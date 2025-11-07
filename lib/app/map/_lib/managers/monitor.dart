@@ -45,7 +45,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   String? _lastEewDataHash;
 
   // Cache autoZoom setting to avoid repeated Provider queries
-  bool _autoZoomEnabled = true;
+  final bool _autoZoomEnabled = true;
 
   // Cached layer and source IDs to avoid repeated string calculations
   late final String _rtsSourceId = MapSourceIds.rts();
@@ -147,85 +147,63 @@ class MonitorMapLayerManager extends MapLayerManager {
   /// RTS data hasn't changed. Returns empty list if no detection areas exist.
   List<LatLng> _getFocusBounds() {
     final rts = GlobalProviders.data.rts;
-    final currentTime = rts?.time;
+    if (_cachedBounds != null && _lastRtsTime == rts?.time) return _cachedBounds!;
 
-    // Return cached bounds if RTS data hasn't changed
-    if (_cachedBounds != null && _lastRtsTime == currentTime) {
-      return _cachedBounds!;
-    }
+    final coords = (rts?.box.isEmpty ?? true)
+        ? <LatLng>[]
+        : [
+            for (final area in Global.boxGeojson.features)
+              if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
+                for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
+                  LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
+          ];
 
-    final coords = <LatLng>[];
-    if (rts != null && rts.box.isNotEmpty) {
-      // Pre-allocate list capacity to avoid dynamic resizing
-      final boxKeys = rts.box.keys.toSet();
-
-      for (final area in Global.boxGeojson.features) {
-        if (area == null) continue;
-
-        final id = area.properties!['ID'].toString();
-        if (!boxKeys.contains(id)) continue;
-
-        final geometry = area.geometry! as GeoJSONPolygon;
-        final coordinates = geometry.coordinates[0] as List;
-
-        // Direct iteration without type checking in loop
-        for (var i = 0; i < coordinates.length; i++) {
-          final coord = coordinates[i] as List;
-          coords.add(LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()));
-        }
-      }
-    }
-
-    // Cache the result
     _cachedBounds = coords;
-    _lastRtsTime = currentTime;
+    _lastRtsTime = rts?.time;
     return coords;
   }
 
   /// Checks if the new bounds have changed significantly from the last zoom bounds
   /// Only zooms if the change is greater than 10% in any dimension
   bool _shouldZoomToBounds(LatLngBounds newBounds) {
-    if (_lastZoomBounds == null) return true;
+    final lastBounds = _lastZoomBounds;
+    if (lastBounds == null) return true;
 
-    final lastBounds = _lastZoomBounds!;
-    final latDiff = (newBounds.northeast.latitude - newBounds.southwest.latitude).abs();
-    final lngDiff = (newBounds.northeast.longitude - newBounds.southwest.longitude).abs();
-    final lastLatDiff = (lastBounds.northeast.latitude - lastBounds.southwest.latitude).abs();
-    final lastLngDiff = (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs();
+    final (latDiff, lngDiff) = (
+      (newBounds.northeast.latitude - newBounds.southwest.latitude).abs(),
+      (newBounds.northeast.longitude - newBounds.southwest.longitude).abs(),
+    );
+    final (lastLatDiff, lastLngDiff) = (
+      (lastBounds.northeast.latitude - lastBounds.southwest.latitude).abs(),
+      (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs(),
+    );
 
-    // Safety check for division by zero (very small bounds)
-    const minBoundSize = 0.0001; // ~11 meters
+    const minBoundSize = 0.0001; // ~11 meters - safety check for division by zero
     if (lastLatDiff < minBoundSize || lastLngDiff < minBoundSize) return true;
 
-    // Check if bounds have changed by more than 10%
-    final latChange = (latDiff - lastLatDiff).abs() / lastLatDiff;
-    final lngChange = (lngDiff - lastLngDiff).abs() / lastLngDiff;
-
-    return latChange > 0.1 || lngChange > 0.1;
+    return (latDiff - lastLatDiff).abs() / lastLatDiff > 0.1 || (lngDiff - lastLngDiff).abs() / lastLngDiff > 0.1;
   }
+
   /// Calculates the bounding box from coordinates and animates the map camera
   /// to fit all detection areas with padding. Only zooms if the bounds have
   /// changed significantly (>10%) from the last zoom to prevent excessive zooming.
   Future<void> _updateMapBounds(List<LatLng> coordinates) async {
     if (coordinates.isEmpty) return;
 
-    // Initialize with first coordinate for better performance
-    var minLat = coordinates[0].latitude;
-    var maxLat = minLat;
-    var minLng = coordinates[0].longitude;
-    var maxLng = minLng;
+    var (minLat, maxLat, minLng, maxLng) = (
+      coordinates[0].latitude,
+      coordinates[0].latitude,
+      coordinates[0].longitude,
+      coordinates[0].longitude,
+    );
 
-    // Start from index 1 since we used index 0 for initialization
     for (var i = 1; i < coordinates.length; i++) {
-      final lat = coordinates[i].latitude;
-      final lng = coordinates[i].longitude;
-
+      final (lat, lng) = (coordinates[i].latitude, coordinates[i].longitude);
       if (lat < minLat) {
         minLat = lat;
       } else if (lat > maxLat) {
         maxLat = lat;
       }
-
       if (lng < minLng) {
         minLng = lng;
       } else if (lng > maxLng) {
@@ -233,12 +211,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
     }
 
-    final bounds = LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
-
-    // Only zoom if bounds have changed significantly
+    final bounds = LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng));
     if (!_shouldZoomToBounds(bounds)) return;
 
     await controller.animateCamera(
@@ -251,15 +224,10 @@ class MonitorMapLayerManager extends MapLayerManager {
       ),
       duration: const Duration(milliseconds: 500),
     );
-
     _lastZoomBounds = bounds;
   }
 
-  Future<void> _focusReset() async {
-    await controller.animateCamera(
-      CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
-    );
-  }
+  Future<void> _focusReset() => controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
 
   /// Automatically adjusts the map camera to fit all detection areas (boxes)
   /// when RTS data contains detection zones. Runs every 2 seconds when enabled.
@@ -304,10 +272,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     try {
       // Single batch query for sources and layers
-      final results = await Future.wait([
-        controller.getSourceIds(),
-        controller.getLayerIds(),
-      ]);
+      final results = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
       final sources = results[0];
       final layers = results[1];
 
@@ -332,9 +297,10 @@ class MonitorMapLayerManager extends MapLayerManager {
       final isIntensity0LayerExists = existingLayers.contains(intensity0LayerId);
       final isIntensityLayerExists = existingLayers.contains(intensityLayerId);
       final isBoxLayerExists = existingLayers.contains(boxLayerId);
-      final isEewLayerExists = existingLayers.contains(epicenterLayerId) &&
-                               existingLayers.contains(pWaveLayerId) &&
-                               existingLayers.contains(sWaveLayerId);
+      final isEewLayerExists =
+          existingLayers.contains(epicenterLayerId) &&
+          existingLayers.contains(pWaveLayerId) &&
+          existingLayers.contains(sWaveLayerId);
 
       if (!context.mounted) return;
 
@@ -344,35 +310,40 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (!existingSources.contains(rtsSourceId)) {
         sourceAdditions.add(
-          controller.addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson()))
+          controller
+              .addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson()))
               .then((_) => TalkerManager.instance.info('Added Source "$rtsSourceId"')),
         );
       }
 
       if (!existingSources.contains(intensity0SourceId)) {
         sourceAdditions.add(
-          controller.addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData))
+          controller
+              .addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData))
               .then((_) => TalkerManager.instance.info('Added Source "$intensity0SourceId"')),
         );
       }
 
       if (!existingSources.contains(intensitySourceId)) {
         sourceAdditions.add(
-          controller.addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData))
+          controller
+              .addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData))
               .then((_) => TalkerManager.instance.info('Added Source "$intensitySourceId"')),
         );
       }
 
       if (!existingSources.contains(boxSourceId)) {
         sourceAdditions.add(
-          controller.addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson()))
+          controller
+              .addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson()))
               .then((_) => TalkerManager.instance.info('Added Source "$boxSourceId"')),
         );
       }
 
       if (!existingSources.contains(eewSourceId)) {
         sourceAdditions.add(
-          controller.addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson()))
+          controller
+              .addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson()))
               .then((_) => TalkerManager.instance.info('Added Source "$eewSourceId"')),
         );
       }
@@ -721,55 +692,36 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!didSetup) return;
 
     try {
-      // Single call to get all source IDs
-      final sourceIds = await controller.getSourceIds();
-      final existingSources = sourceIds.toSet();
+      final existingSources = (await controller.getSourceIds()).toSet();
+      final intensityData = GlobalProviders.data.getIntensityGeoJson();
+      final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
-      // Prepare all updates (sources + visibility) in parallel
-      final updates = <Future<void>>[];
+      await Future.wait([
+        // Update sources
+        if (existingSources.contains(_rtsSourceId))
+          controller.setGeoJsonSource(_rtsSourceId, GlobalProviders.data.getRtsGeoJson()),
+        if (existingSources.contains(_intensitySourceId))
+          controller.setGeoJsonSource(_intensitySourceId, intensityData),
+        if (existingSources.contains(_intensity0SourceId))
+          controller.setGeoJsonSource(_intensity0SourceId, intensityData),
+        if (existingSources.contains(_boxSourceId))
+          controller.setGeoJsonSource(_boxSourceId, GlobalProviders.data.getBoxGeoJson()),
 
-      // Update sources
-      if (existingSources.contains(_rtsSourceId)) {
-        updates.add(controller.setGeoJsonSource(_rtsSourceId, GlobalProviders.data.getRtsGeoJson()));
-      }
-
-      if (existingSources.contains(_intensitySourceId) || existingSources.contains(_intensity0SourceId)) {
-        final intensityData = GlobalProviders.data.getIntensityGeoJson();
-        if (existingSources.contains(_intensitySourceId)) {
-          updates.add(controller.setGeoJsonSource(_intensitySourceId, intensityData));
-        }
-        if (existingSources.contains(_intensity0SourceId)) {
-          updates.add(controller.setGeoJsonSource(_intensity0SourceId, intensityData));
-        }
-      }
-
-      if (existingSources.contains(_boxSourceId)) {
-        updates.add(controller.setGeoJsonSource(_boxSourceId, GlobalProviders.data.getBoxGeoJson()));
-      }
-
-      // Update layer visibility if visible
-      if (visible) {
-        final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-
-        updates.addAll([
+        // Update layer visibility if visible
+        if (visible) ...[
           controller.setLayerVisibility(_rtsLayerId, !hasBox),
           controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
           controller.setLayerVisibility(_intensityLayerId, hasBox),
           controller.setLayerVisibility(_intensity0LayerId, hasBox),
           controller.setLayerVisibility(_boxLayerId, hasBox),
-        ]);
-      }
+        ],
+      ]);
 
-      // Execute all updates in parallel
-      if (updates.isNotEmpty) {
-        await Future.wait(updates);
-        TalkerManager.instance.info('Updated RTS data and layers for time: ${currentRtsTime.value}');
-      }
+      TalkerManager.instance.info('Updated RTS data and layers for time: ${currentRtsTime.value}');
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateRtsDataAndLayers', e, s);
     }
   }
-
 
   Future<void> _updateEewSource() async {
     if (!didSetup) return;
@@ -779,9 +731,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       // Create a simple hash from EEW data to detect changes
       // Only update if the data actually changed
-      final currentHash = eewData.isEmpty
-          ? ''
-          : '${eewData.length}_${eewData.first.serial}_${eewData.first.info.time}';
+      final currentHash = eewData.isEmpty ? '' : '${eewData.length}_${eewData.first.serial}_${eewData.first.info.time}';
 
       if (currentHash == _lastEewDataHash) return;
 
@@ -801,16 +751,10 @@ class MonitorMapLayerManager extends MapLayerManager {
       _blinkTimer?.cancel();
       _blinkTimer = null;
 
-      // Batch hide all layers in parallel
       await Future.wait([
-        controller.setLayerVisibility(_rtsLayerId, false),
-        controller.setLayerVisibility('$_rtsLayerId-label', false),
-        controller.setLayerVisibility(_intensityLayerId, false),
-        controller.setLayerVisibility(_intensity0LayerId, false),
-        controller.setLayerVisibility(_boxLayerId, false),
-        controller.setLayerVisibility(_epicenterLayerId, false),
-        controller.setLayerVisibility(_pWaveLayerId, false),
-        controller.setLayerVisibility(_sWaveLayerId, false),
+        for (final layer in [_rtsLayerId, '$_rtsLayerId-label', _intensityLayerId, _intensity0LayerId,
+          _boxLayerId, _epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
+          controller.setLayerVisibility(layer, false),
       ]);
 
       visible = false;
@@ -826,19 +770,16 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     try {
       _setupBlinkTimer();
-
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
-      // Batch show all layers in parallel, then focus
       await Future.wait([
         controller.setLayerVisibility(_rtsLayerId, !hasBox),
         controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
         controller.setLayerVisibility(_intensityLayerId, hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBox),
-        controller.setLayerVisibility(_epicenterLayerId, true),
-        controller.setLayerVisibility(_pWaveLayerId, true),
-        controller.setLayerVisibility(_sWaveLayerId, true),
+        ...[ for (final layer in [_epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
+          controller.setLayerVisibility(layer, true)],
         _focus(),
       ]);
 
@@ -955,10 +896,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     final theme = context.textTheme;
 
     return Container(
-      decoration: BoxDecoration(
-        color: colors.error,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: colors.error, borderRadius: BorderRadius.circular(8)),
       padding: eewCount > 1 || showLabel
           ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
           : const EdgeInsets.fromLTRB(8, 6, 8, 6),
@@ -968,13 +906,25 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
         children: [
           Icon(Symbols.crisis_alert_rounded, color: colors.onError, weight: 700, size: iconSize),
           if (showLabel)
-            Text('EEW'.i18n, style: theme.labelLarge!.copyWith(color: colors.onError, fontWeight: FontWeight.bold))
+            Text(
+              'EEW'.i18n,
+              style: theme.labelLarge!.copyWith(color: colors.onError, fontWeight: FontWeight.bold),
+            )
           else if (eewCount > 1)
             RichText(
               text: TextSpan(
                 children: [
-                  TextSpan(text: '1', style: theme.labelMedium!.copyWith(color: colors.onError, fontWeight: FontWeight.bold)),
-                  TextSpan(text: '/$eewCount', style: theme.labelMedium!.copyWith(color: colors.onError.withValues(alpha: 0.6), fontWeight: FontWeight.bold)),
+                  TextSpan(
+                    text: '1',
+                    style: theme.labelMedium!.copyWith(color: colors.onError, fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '/$eewCount',
+                    style: theme.labelMedium!.copyWith(
+                      color: colors.onError.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1025,7 +975,12 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       ),
                       Text(
                         countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
-                        style: theme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                        style: theme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.onErrorContainer,
+                          height: 1,
+                          leadingDistribution: TextLeadingDistribution.even,
+                        ),
                       ),
                     ],
                   )
@@ -1052,7 +1007,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 spacing: 8,
                 children: [
                   _buildAlertBadge(eewCount, iconSize: 22, showLabel: true),
-                  Text('第 {serial} 報'.i18n.args({'serial': data.serial}), style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer)),
+                  Text(
+                    '第 {serial} 報'.i18n.args({'serial': data.serial}),
+                    style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
+                  ),
                 ],
               ),
               Icon(Symbols.expand_more_rounded, color: colors.onErrorContainer, size: 24),
@@ -1062,18 +1020,22 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: StyledText(
               text: hasLocation
-                  ? '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'.i18n.args({
-                      'time': data.info.time.toSimpleDateTimeString(),
-                      'location': data.info.location,
-                      'magnitude': data.info.magnitude.toStringAsFixed(1),
-                      'intensity': localIntensity.asIntensityLabel,
-                    })
-                  : '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'.i18n.args({
-                      'time': data.info.time.toSimpleDateTimeString(),
-                      'location': data.info.location,
-                      'magnitude': data.info.magnitude.toStringAsFixed(1),
-                      'depth': data.info.depth.toStringAsFixed(1),
-                    }),
+                  ? '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                        .i18n
+                        .args({
+                          'time': data.info.time.toSimpleDateTimeString(),
+                          'location': data.info.location,
+                          'magnitude': data.info.magnitude.toStringAsFixed(1),
+                          'intensity': localIntensity.asIntensityLabel,
+                        })
+                  : '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
+                        .i18n
+                        .args({
+                          'time': data.info.time.toSimpleDateTimeString(),
+                          'location': data.info.location,
+                          'magnitude': data.info.magnitude.toStringAsFixed(1),
+                          'depth': data.info.depth.toStringAsFixed(1),
+                        }),
               style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
               tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
             ),
@@ -1107,12 +1069,20 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('所在地預估'.i18n, style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6))),
+                        Text(
+                          '所在地預估'.i18n,
+                          style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6)),
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
                           child: Text(
                             localIntensity.asIntensityLabel,
-                            style: theme.displayMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                            style: theme.displayMedium!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colors.onErrorContainer,
+                              height: 1,
+                              leadingDistribution: TextLeadingDistribution.even,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -1128,23 +1098,43 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('震波'.i18n, style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6))),
+                        Text(
+                          '震波'.i18n,
+                          style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6)),
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
                           child: countdown > 0
                               ? RichText(
                                   text: TextSpan(
                                     children: [
-                                      TextSpan(text: countdown.toString(), style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15)),
-                                      TextSpan(text: ' 秒'.i18n, style: TextStyle(fontSize: theme.labelLarge!.fontSize)),
+                                      TextSpan(
+                                        text: countdown.toString(),
+                                        style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
+                                      ),
+                                      TextSpan(
+                                        text: ' 秒'.i18n,
+                                        style: TextStyle(fontSize: theme.labelLarge!.fontSize),
+                                      ),
                                     ],
-                                    style: theme.displayMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                                    style: theme.displayMedium!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.onErrorContainer,
+                                      height: 1,
+                                      leadingDistribution: TextLeadingDistribution.even,
+                                    ),
                                   ),
                                   textAlign: TextAlign.center,
                                 )
                               : Text(
                                   '抵達'.i18n,
-                                  style: theme.displayMedium!.copyWith(fontSize: theme.displayMedium!.fontSize! * 0.81, fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                                  style: theme.displayMedium!.copyWith(
+                                    fontSize: theme.displayMedium!.fontSize! * 0.81,
+                                    fontWeight: FontWeight.bold,
+                                    color: colors.onErrorContainer,
+                                    height: 1,
+                                    leadingDistribution: TextLeadingDistribution.even,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                         ),
