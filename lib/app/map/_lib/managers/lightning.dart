@@ -197,7 +197,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
       await controller.removeSource(sourceId);
     } catch (e, s) {
-      TalkerManager.instance.error('LightningMapLayerManager.dispose', e, s);
+      TalkerManager.instance.error('LightningMapLayerManager.remove', e, s);
     }
 
     didSetup = false;
