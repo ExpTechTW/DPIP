@@ -25,25 +25,24 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
-      - name: Checkout PR fork branch
-        if: github.event.pull_request != null
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Get PR info for fork support
+        id: pr-info
+        if: github.event.issue.pull_request != null
+        run: |
+          PR_NUMBER=$(jq -r .issue.number "$GITHUB_EVENT_PATH")
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+          PR_DATA=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER)
+          HEAD_REPO=$(echo "$PR_DATA" | jq -r .head.repo.full_name)
+          HEAD_REF=$(echo "$PR_DATA" | jq -r .head.ref)
+          echo "HEAD_REPO=$HEAD_REPO" >> $GITHUB_ENV
+          echo "HEAD_REF=$HEAD_REF" >> $GITHUB_ENV
 
-      - name: Checkout PR from Issue comment
+      - name: Checkout repository
         if: github.event.issue.pull_request != null
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          repository: ${{ github.event.issue.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.issue.pull_request.head.ref }}
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
+          repository: ${{ env.HEAD_REPO }}
+          ref: ${{ env.HEAD_REF }}
           fetch-depth: 1
 
       - name: Run Claude Code
@@ -53,7 +52,6 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.CLAUDE_PAT }}
           allowed_non_write_users: '*'
-          
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
