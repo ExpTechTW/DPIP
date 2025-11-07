@@ -32,7 +32,7 @@ class PreferenceKeys {
   static const mapUpdateFps = 'pref:ui:map:updateFps';
   static const mapBase = 'pref:ui:map:base';
   static const mapLayers = 'pref:ui:map:layers';
-  // #endregion
+  static const mapAutoZoom = 'pref:ui:map:autoZoom';
 
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
@@ -132,6 +132,9 @@ class Preference {
 
   static String? get mapLayers => instance.getString(PreferenceKeys.mapLayers);
   static set mapLayers(String? value) => instance.set(PreferenceKeys.mapLayers, value);
+
+  static bool? get mapAutoZoom => instance.getBool(PreferenceKeys.mapAutoZoom);
+  static set mapAutoZoom(bool? value) => instance.set(PreferenceKeys.mapAutoZoom, value);
   // #endregion
 
   // #region Notification
