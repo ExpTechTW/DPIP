@@ -56,15 +56,11 @@ class _DpipDataModel extends ChangeNotifier {
       ),
     ), */
   ];
-  List<Eew>? _cwaCache;
 
   /// Returns only EEWs from the CWA (Central Weather Administration) agency.
   /// This replaces the previous all-source eew.
   /// Results are cached until the underlying EEW list changes.
-  UnmodifiableListView<Eew> get eew {
-    final cache = _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
-    return UnmodifiableListView(cache);
-  }
+  UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
 
   int _eewHash = 0;
 
@@ -76,7 +72,6 @@ class _DpipDataModel extends ChangeNotifier {
     if (_eewHash != newHash) {
       _eewHash = newHash;
       _eew = eew;
-      _cwaCache = null;
       TalkerManager.instance.debug('[setEew] notify: hash=$newHash');
       notifyListeners();
     }
@@ -190,7 +185,7 @@ class DpipDataModel extends _DpipDataModel {
 
   UnmodifiableListView<Eew> get activeEew {
     final cutoffTime = currentTime - _eewActiveWindow;
-    return UnmodifiableListView(eew.where((eew) => eew.info.time >= cutoffTime).toList());
+    return UnmodifiableListView(_eew.where((eew) => eew.info.time >= cutoffTime).toList());
   }
 
   void setRts(Rts rts) {
