@@ -7,8 +7,8 @@ on:
     types: [created]
   issues:
     types: [opened, assigned]
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   claude:
@@ -25,24 +25,9 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
-      - name: Get PR info for fork support
-        id: pr-info
-        if: github.event.issue.pull_request != null
-        run: |
-          PR_NUMBER=$(jq -r .issue.number "$GITHUB_EVENT_PATH")
-          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
-          PR_DATA=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER)
-          HEAD_REPO=$(echo "$PR_DATA" | jq -r .head.repo.full_name)
-          HEAD_REF=$(echo "$PR_DATA" | jq -r .head.ref)
-          echo "HEAD_REPO=$HEAD_REPO" >> $GITHUB_ENV
-          echo "HEAD_REF=$HEAD_REF" >> $GITHUB_ENV
-
       - name: Checkout repository
-        if: github.event.issue.pull_request != null
         uses: actions/checkout@v4
         with:
-          repository: ${{ env.HEAD_REPO }}
-          ref: ${{ env.HEAD_REF }}
           fetch-depth: 1
 
       - name: Run Claude Code
@@ -50,8 +35,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ secrets.CLAUDE_PAT }}
-          allowed_non_write_users: '*'
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
@@ -63,4 +46,3 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
           # claude_args: '--model claude-opus-4-1-20250805 --allowed-tools Bash(gh pr:*)'
-
