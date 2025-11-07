@@ -51,7 +51,6 @@ class MonitorMapLayerManager extends MapLayerManager {
   bool _isUpdatingEew = false;
   bool _hasActiveEew = false;
 
-  // Cached layer and source IDs to avoid repeated string calculations
   late final String _rtsSourceId = MapSourceIds.rts();
   late final String _rtsLayerId = MapLayerIds.rts();
   late final String _intensitySourceId = MapSourceIds.intensity();
