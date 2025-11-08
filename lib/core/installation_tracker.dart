@@ -39,14 +39,6 @@ Future<void> _initializeInstallationDataInternal() async {
     if (installId == null) {
       talker.info('首次安裝或資料重置，建立新的 installId');
 
-      installId = _uuid.v4();
-      try {
-        await Preference.setInstallId(installId);
-      } catch (e, s) {
-        // If we cannot write to secure storage, log the error but continue.
-        talker.error('Failed to write installId to secure storage', e, s);
-      }
-
       Preference.version = currentVersion;
       Preference.buildNumber = currentBuildNumber;
       talker.info(

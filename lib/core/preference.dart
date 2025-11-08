@@ -1,6 +1,5 @@
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/preference.dart';
@@ -51,7 +50,6 @@ class Preference {
   Preference._();
 
   static late SharedPreferencesWithCache instance;
-  static const _secureStorage = FlutterSecureStorage();
 
   static Future<void> init() async {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
@@ -69,11 +67,8 @@ class Preference {
   static String? get buildNumber => instance.getString(PreferenceKeys.appBuildNumber);
   static set buildNumber(String? value) => instance.set(PreferenceKeys.appBuildNumber, value);
 
-  static Future<String?> get installId => _secureStorage.read(key: PreferenceKeys.installId);
-  static Future<void> setInstallId(String? value) =>
-      value == null
-          ? _secureStorage.delete(key: PreferenceKeys.installId)
-          : _secureStorage.write(key: PreferenceKeys.installId, value: value);
+  static String? get installId => instance.getString(PreferenceKeys.installId);
+  static set installId(String? value) => instance.set(PreferenceKeys.installId, value);
   // #endregion
 
   static int? get lastUpdateToServerTime => instance.getInt(PreferenceKeys.lastUpdateToServerTime);
