@@ -30,7 +30,7 @@ msgstr ""
 msgid "緊急地震速報"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:784
+#: ./lib/app/map/_lib/managers/monitor.dart:1210
 msgid "強震監視器"
 msgstr ""
 
@@ -70,11 +70,11 @@ msgstr ""
 msgid "設定"
 msgstr ""
 
-#: ./lib/core/service.dart:438
+#: ./lib/core/service.dart:441
 msgid "服務區域外"
 msgstr ""
 
-#: ./lib/core/service.dart:444
+#: ./lib/core/service.dart:447
 msgid "自動定位中"
 msgstr ""
 
@@ -626,15 +626,23 @@ msgstr ""
 msgid "初始圖層"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:107
+#: ./lib/app/settings/map/page.dart:96
+msgid "自動縮放"
+msgstr ""
+
+#: ./lib/app/settings/map/page.dart:97
+msgid "接收到檢知時自動縮放地圖(監視器模式下)"
+msgstr ""
+
+#: ./lib/app/settings/map/page.dart:123
 msgid "動畫幀率"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:111
+#: ./lib/app/settings/map/page.dart:127
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:142
+#: ./lib/app/settings/map/page.dart:158
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr ""
 
@@ -690,39 +698,39 @@ msgstr ""
 msgid "尚未設定所在地"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1079
+#: ./lib/app/map/_lib/managers/monitor.dart:959
 msgid "EEW"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1089
+#: ./lib/app/map/_lib/managers/monitor.dart:1060
 msgid "第 {serial} 報"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1103
+#: ./lib/app/map/_lib/managers/monitor.dart:1072
 msgid ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:926
+#: ./lib/app/map/_lib/managers/monitor.dart:1080
 msgid ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1137
+#: ./lib/app/map/_lib/managers/monitor.dart:1122
 msgid "所在地預估"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1171
+#: ./lib/app/map/_lib/managers/monitor.dart:1151
 msgid "震波"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1191
+#: ./lib/app/map/_lib/managers/monitor.dart:1165
 msgid " 秒"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1207
+#: ./lib/app/map/_lib/managers/monitor.dart:1179
 msgid "抵達"
 msgstr ""
 
@@ -904,44 +912,44 @@ msgstr ""
 msgid "3 天"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:239
+#: ./lib/app/map/_lib/managers/monitor.dart:397
 msgid "海外測站"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:261
+#: ./lib/app/map/_lib/managers/monitor.dart:419
 msgid "即時震度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:267
+#: ./lib/app/map/_lib/managers/monitor.dart:425
 msgid "地動加速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:274
+#: ./lib/app/map/_lib/managers/monitor.dart:432
 msgid "地動速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:279
+#: ./lib/app/map/_lib/managers/monitor.dart:437
 msgid "無資料"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:792
-msgid "目前沒有生效中的地震速報"
-msgstr ""
-
-#: ./lib/app/map/_lib/managers/monitor.dart:865
-msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
-msgstr ""
-
-#: ./lib/app/map/_lib/managers/monitor.dart:1030
+#: ./lib/app/map/_lib/managers/monitor.dart:1018
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1039
+#: ./lib/app/map/_lib/managers/monitor.dart:1026
 msgid "{countdown}秒後抵達"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1039
+#: ./lib/app/map/_lib/managers/monitor.dart:1026
 msgid "已抵達"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1037
+msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1218
+msgid "目前沒有生效中的地震速報"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/report.dart:369
@@ -1340,18 +1348,18 @@ msgstr ""
 msgid "陰大雷雹"
 msgstr ""
 
-#: ./lib/api/model/location/location.dart:82
+#: ./lib/api/model/location/location.dart:85
 msgid "{city}{cityLevel} {town}{townLevel}"
 msgstr ""
 
-#: ./lib/api/model/location/location.dart:95
+#: ./lib/api/model/location/location.dart:98
 msgid "{city} {town}"
 msgstr ""
 
-#: ./lib/api/model/location/location.dart:104
+#: ./lib/api/model/location/location.dart:110
 msgid "{city}{cityLevel}"
 msgstr ""
 
-#: ./lib/api/model/location/location.dart:113
+#: ./lib/api/model/location/location.dart:124
 msgid "{town}{townLevel}"
 msgstr ""

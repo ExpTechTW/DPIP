@@ -1015,7 +1015,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       StyledText(
-                        text: '規模 <bold>M{magnitude}</bold>,所在地預估<bold>{intensity}</bold>'.i18n.args({
+                        text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
                           'magnitude': data.info.magnitude.toStringAsFixed(1),
                           'intensity': localIntensity.asIntensityLabel,
                         }),
@@ -1034,7 +1034,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     ],
                   )
                 : StyledText(
-                    text: '規模 <bold>M{magnitude}</bold>,深度<bold>{depth}</bold>公里'.i18n.args({
+                    text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
                       'magnitude': data.info.magnitude.toStringAsFixed(1),
                       'depth': data.info.depth.toStringAsFixed(1),
                     }),
@@ -1069,7 +1069,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: StyledText(
               text: hasLocation
-                  ? '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                  ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
                         .i18n
                         .args({
                           'time': data.info.time.toSimpleDateTimeString(),
@@ -1077,7 +1077,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           'magnitude': data.info.magnitude.toStringAsFixed(1),
                           'intensity': localIntensity.asIntensityLabel,
                         })
-                  : '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
+                  : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
                         .i18n
                         .args({
                           'time': data.info.time.toSimpleDateTimeString(),
