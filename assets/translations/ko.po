@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-10-31 05:37\n"
+"PO-Revision-Date: 2025-11-08 12:35\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "알림"
 msgid "緊急地震速報"
 msgstr "긴급 지진 속보"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:784
+#: ./lib/app/map/_lib/managers/monitor.dart:1210
 msgid "強震監視器"
 msgstr "강진 모니터"
 
@@ -84,11 +84,11 @@ msgstr "저희를 후원해주세요"
 msgid "設定"
 msgstr "설정"
 
-#: ./lib/core/service.dart:438
+#: ./lib/core/service.dart:441
 msgid "服務區域外"
 msgstr ""
 
-#: ./lib/core/service.dart:444
+#: ./lib/core/service.dart:447
 msgid "自動定位中"
 msgstr ""
 
@@ -631,15 +631,23 @@ msgstr "배경 레이어"
 msgid "初始圖層"
 msgstr "기본 지도"
 
-#: ./lib/app/settings/map/page.dart:107
+#: ./lib/app/settings/map/page.dart:96
+msgid "自動縮放"
+msgstr ""
+
+#: ./lib/app/settings/map/page.dart:97
+msgid "接收到檢知時自動縮放地圖(監視器模式下)"
+msgstr ""
+
+#: ./lib/app/settings/map/page.dart:123
 msgid "動畫幀率"
 msgstr "애니메이션 주사율"
 
-#: ./lib/app/settings/map/page.dart:111
+#: ./lib/app/settings/map/page.dart:127
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:142
+#: ./lib/app/settings/map/page.dart:158
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "지나치게 높은 애니메이션 주사율은 끊김 현상이나 기기 발열을 일으킬 수 있습니다"
 
@@ -695,35 +703,35 @@ msgstr "체감 온도 {apparent}"
 msgid "尚未設定所在地"
 msgstr "현재 위치가 설정되지 않았습니다"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1079
+#: ./lib/app/map/_lib/managers/monitor.dart:959
 msgid "EEW"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1089
+#: ./lib/app/map/_lib/managers/monitor.dart:1060
 msgid "第 {serial} 報"
 msgstr "제 {serial} 보"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1103
+#: ./lib/app/map/_lib/managers/monitor.dart:1072
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "{time}경, <bold>{location}</bold> 부근 체감 지진 발생. 예상 규모 <bold>M{magnitude}</bold>, 현재 위치 최대 진도 <bold>{intensity}</bold>."
 
-#: ./lib/app/map/_lib/managers/monitor.dart:926
+#: ./lib/app/map/_lib/managers/monitor.dart:1080
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1137
+#: ./lib/app/map/_lib/managers/monitor.dart:1122
 msgid "所在地預估"
 msgstr "현재 위치 예상"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1171
+#: ./lib/app/map/_lib/managers/monitor.dart:1151
 msgid "震波"
 msgstr "지진파"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1191
+#: ./lib/app/map/_lib/managers/monitor.dart:1165
 msgid " 秒"
 msgstr " 초"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1207
+#: ./lib/app/map/_lib/managers/monitor.dart:1179
 msgid "抵達"
 msgstr "도착"
 
@@ -903,45 +911,45 @@ msgstr "2 일"
 msgid "3 天"
 msgstr "3 일"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:239
+#: ./lib/app/map/_lib/managers/monitor.dart:397
 msgid "海外測站"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:261
+#: ./lib/app/map/_lib/managers/monitor.dart:419
 msgid "即時震度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:267
+#: ./lib/app/map/_lib/managers/monitor.dart:425
 msgid "地動加速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:274
+#: ./lib/app/map/_lib/managers/monitor.dart:432
 msgid "地動速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:279
+#: ./lib/app/map/_lib/managers/monitor.dart:437
 msgid "無資料"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:792
-msgid "目前沒有生效中的地震速報"
-msgstr "현재 유효 지진 속보 없음"
-
-#: ./lib/app/map/_lib/managers/monitor.dart:865
-msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
-msgstr ""
-
-#: ./lib/app/map/_lib/managers/monitor.dart:1030
+#: ./lib/app/map/_lib/managers/monitor.dart:1018
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "규모 <bold>M{magnitude}</bold>, 현재 위치 예상 진도 <bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1039
+#: ./lib/app/map/_lib/managers/monitor.dart:1026
 msgid "{countdown}秒後抵達"
 msgstr "{countdown}초 후 도착"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1039
+#: ./lib/app/map/_lib/managers/monitor.dart:1026
 msgid "已抵達"
 msgstr "도착"
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1037
+msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1218
+msgid "目前沒有生效中的地震速報"
+msgstr "현재 유효 지진 속보 없음"
 
 #: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
@@ -1339,19 +1347,19 @@ msgstr "흐림・강한 뇌우"
 msgid "陰大雷雹"
 msgstr "흐림・강한 천둥/우박"
 
-#: ./lib/api/model/location/location.dart:82
+#: ./lib/api/model/location/location.dart:85
 msgid "{city}{cityLevel} {town}{townLevel}"
 msgstr "{city}{cityLevel} {town}{townLevel}"
 
-#: ./lib/api/model/location/location.dart:95
+#: ./lib/api/model/location/location.dart:98
 msgid "{city} {town}"
 msgstr "{city} {town}"
 
-#: ./lib/api/model/location/location.dart:104
+#: ./lib/api/model/location/location.dart:110
 msgid "{city}{cityLevel}"
 msgstr "{city}{cityLevel}"
 
-#: ./lib/api/model/location/location.dart:113
+#: ./lib/api/model/location/location.dart:124
 msgid "{town}{townLevel}"
 msgstr "{town}{townLevel}"
 
