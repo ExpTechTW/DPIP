@@ -25,11 +25,9 @@ Future<void> _initializeInstallationDataInternal() async {
 
     String? installId;
     try {
-      installId = await Preference.installId;
+      installId = Preference.installId;
     } catch (e, s) {
-      // Secure storage read failed; log and continue with a null installId so
-      // we generate a new one locally and attempt to persist it.
-      talker.error('Failed to read installId from secure storage', e, s);
+      talker.error('Failed to read installId from preferences', e, s);
       installId = null;
     }
 
@@ -39,6 +37,8 @@ Future<void> _initializeInstallationDataInternal() async {
     if (installId == null) {
       talker.info('首次安裝或資料重置，建立新的 installId');
 
+      installId = _uuid.v4();
+      Preference.installId = installId;
       Preference.version = currentVersion;
       Preference.buildNumber = currentBuildNumber;
       talker.info(
