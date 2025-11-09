@@ -260,7 +260,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
-    final hideValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label';
+    final hideNameLayerId = '$layerId-${currentPrecipitationInterval.value}-label-name';
 
     try {
       await controller.setLayerVisibility(hideLayerId, false);
