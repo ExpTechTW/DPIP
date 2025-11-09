@@ -369,107 +369,160 @@ class MonitorMapLayerManager extends MapLayerManager {
           ],
           visibility: visible ? 'visible' : 'none',
         );
-        final properties2 = SymbolLayerProperties(
+        final labelIdProps = SymbolLayerProperties(
+          textField: [Expressions.get, 'id'],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Bold'],
+          textOffset: [0, 0.8],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final labelLocProps = SymbolLayerProperties(
           textField: [
-            Expressions.format,
-            [Expressions.get, 'id'],
-            {
-              'text-font': [
-                Expressions.literal,
-                ['Noto Sans TC Bold'],
-              ],
-            },
-            '\n',
-            {},
+            Expressions.caseExpression,
             [
-              Expressions.caseExpression,
-              [
-                Expressions.all,
-                [Expressions.has, 'city'],
-                [Expressions.has, 'town'],
-              ],
-              [
-                Expressions.concat,
-                [Expressions.get, 'city'],
-                ' ',
-                [Expressions.get, 'town'],
-              ],
-              '海外測站'.i18n,
+              Expressions.all,
+              [Expressions.has, 'city'],
+              [Expressions.has, 'town'],
             ],
-            {
-              'text-font': [
-                Expressions.literal,
-                ['Noto Sans TC Bold'],
-              ],
-            },
-            '\n',
-            {},
             [
-              Expressions.caseExpression,
-              [
-                Expressions.all,
-                [Expressions.has, 'i'],
-                [Expressions.has, 'pga'],
-                [Expressions.has, 'pgv'],
-              ],
-              [
-                Expressions.concat,
-                [
-                  Expressions.concat,
-                  '即時震度：'.i18n,
-                  [Expressions.get, 'i'],
-                ],
-                '\n',
-                [
-                  Expressions.concat,
-                  '地動加速度：'.i18n,
-                  [Expressions.get, 'pga'],
-                  'gal',
-                ],
-                '\n',
-                [
-                  Expressions.concat,
-                  '地動速度：'.i18n,
-                  [Expressions.get, 'pgv'],
-                  'cm/s',
-                ],
-              ],
-              '無資料'.i18n,
+              Expressions.concat,
+              [Expressions.get, 'city'],
+              ' ',
+              [Expressions.get, 'town'],
             ],
-            {},
+            '海外測站'.i18n,
           ],
           textSize: 10,
           textColor: colors.onSurfaceVariant.toHexStringRGB(),
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textRadialOffset: 1.5,
+          textOffset: [0, 2],
           textAnchor: 'top',
-          textJustify: 'auto',
-          textVariableAnchor: [
-            'top',
-            'bottom',
-            'left',
-            'right',
-            'top-left',
-            'bottom-left',
-            'top-right',
-            'bottom-right',
-          ],
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
           visibility: visible ? 'visible' : 'none',
         );
 
-        await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$rtsLayerId"');
-
-        await controller.addLayer(
-          rtsSourceId,
-          '$rtsLayerId-label',
-          properties2,
-          belowLayerId: BaseMapLayerIds.userLocation,
-          minzoom: 10,
+        final labelDetailIProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [
+              Expressions.has,
+              'i',
+            ],
+            [Expressions.concat, '即時震度：'.i18n, [Expressions.get, 'i']],
+            '無資料'.i18n,
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, 3.2],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
         );
-        TalkerManager.instance.info('Added Layer "$rtsLayerId-label"');
+
+        final labelDetailPgaProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [Expressions.has, 'pga'],
+            [Expressions.concat, '地動加速度：'.i18n, [Expressions.get, 'pga'], 'gal'],
+            '',
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, 4.4],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final labelDetailPgvProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [Expressions.has, 'pgv'],
+            [Expressions.concat, '地動速度：'.i18n, [Expressions.get, 'pgv'], 'cm/s'],
+            '',
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, 5.6],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final layerAdditions = <Future<void>>[
+          controller
+              .addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation)
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-id',
+                labelIdProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-id"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-loc',
+                labelLocProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-loc"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-i',
+                labelDetailIProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-i"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-pga',
+                labelDetailPgaProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pga"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-pgv',
+                labelDetailPgvProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pgv"')),
+        ];
+
+        await Future.wait(layerAdditions);
       }
 
       if (!isIntensity0LayerExists) {
@@ -745,7 +798,11 @@ class MonitorMapLayerManager extends MapLayerManager {
           controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
 
         controller.setLayerVisibility(_rtsLayerId, hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-id', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-loc', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-i', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pga', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pgv', hasRtsData && !hasBox),
         controller.setLayerVisibility(_intensityLayerId, hasIntensityData && hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasIntensityData && hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBoxData && hasBox),
@@ -793,7 +850,11 @@ class MonitorMapLayerManager extends MapLayerManager {
       await Future.wait([
         for (final layer in [
           _rtsLayerId,
-          '$_rtsLayerId-label',
+          '$_rtsLayerId-label-id',
+          '$_rtsLayerId-label-loc',
+          '$_rtsLayerId-label-detail-i',
+          '$_rtsLayerId-label-detail-pga',
+          '$_rtsLayerId-label-detail-pgv',
           _intensityLayerId,
           _intensity0LayerId,
           _boxLayerId,
@@ -821,7 +882,11 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       await Future.wait([
         controller.setLayerVisibility(_rtsLayerId, !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-id', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-loc', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-i', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pga', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pgv', !hasBox),
         controller.setLayerVisibility(_intensityLayerId, hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBox),
@@ -858,8 +923,16 @@ class MonitorMapLayerManager extends MapLayerManager {
       // rts
       await controller.removeLayer(rtsLayerId);
       TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
-      await controller.removeLayer('$rtsLayerId-label');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label"');
+      await controller.removeLayer('$rtsLayerId-label-id');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-id"');
+      await controller.removeLayer('$rtsLayerId-label-loc');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-loc"');
+      await controller.removeLayer('$rtsLayerId-label-detail-i');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-i"');
+      await controller.removeLayer('$rtsLayerId-label-detail-pga');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pga"');
+      await controller.removeLayer('$rtsLayerId-label-detail-pgv');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pgv"');
       await controller.removeSource(rtsSourceId);
       TalkerManager.instance.info('Removed Source "$rtsSourceId"');
 
