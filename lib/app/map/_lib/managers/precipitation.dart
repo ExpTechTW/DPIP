@@ -249,7 +249,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
               belowLayerId: BaseMapLayerIds.userLocation,
               minzoom: isValueLayer ? 10 : null,
               filter: [
-                Expressions.largerOrEqual,
+                Expressions.larger,
                 [Expressions.get, interval],
                 0,
               ],
