@@ -70,11 +70,11 @@ msgstr ""
 msgid "設定"
 msgstr ""
 
-#: ./lib/core/service.dart:441
+#: ./lib/core/service.dart:445
 msgid "服務區域外"
 msgstr ""
 
-#: ./lib/core/service.dart:447
+#: ./lib/core/service.dart:451
 msgid "自動定位中"
 msgstr ""
 
