@@ -81,9 +81,6 @@ PODS:
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
-  - geolocator_apple (1.2.0):
-    - Flutter
-    - FlutterMacOS
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
@@ -178,7 +175,6 @@ DEPENDENCIES:
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gal (from `.symlinks/plugins/gal/darwin`)
-  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -193,13 +189,9 @@ SPEC REPOS:
   trunk:
     - Firebase
     - FirebaseCore
-    - FirebaseCoreExtension
     - FirebaseCoreInternal
-    - FirebaseCrashlytics
     - FirebaseInstallations
     - FirebaseMessaging
-    - FirebaseRemoteConfigInterop
-    - FirebaseSessions
     - GoogleDataTransport
     - GoogleUtilities
     - IosAwnCore
@@ -232,8 +224,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluttertoast/ios"
   gal:
     :path: ".symlinks/plugins/gal/darwin"
-  geolocator_apple:
-    :path: ".symlinks/plugins/geolocator_apple/darwin"
   in_app_purchase_storekit:
     :path: ".symlinks/plugins/in_app_purchase_storekit/darwin"
   maplibre_gl:
@@ -272,9 +262,8 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_background_service_ios: 00d31bdff7b4bfe06d32375df358abe0329cf87e
   flutter_icmp_ping: 47c1df3440c18ddd39fc457e607bb3b42d4a339f
-  fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
-  gal: baecd024ebfd13c441269ca7404792a7152fde89
-  geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
+  fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
+  gal: 6a522c75909f1244732d4596d11d6a2f86ff37a5
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   in_app_purchase_storekit: 22cca7d08eebca9babdf4d07d0baccb73325d3c8

@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:gal/gal.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -55,9 +55,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             return AlertDialog(
               icon: const Icon(Symbols.error),
               title: Text('無法取得權限'.i18n),
-              content: Text(
-                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。'.i18n : ""}",
-              ),
+              content: Text("儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。'.i18n : ""}"),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
                 TextButton(
@@ -107,7 +105,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             }
           }
         }
-        Fluttertoast.showToast(msg: '已儲存圖片'.i18n);
+        showToast(context, ToastWidget.text('已儲存圖片'.i18n, icon: const Icon(Symbols.check_rounded)));
       } finally {
         // 清理临时文件
         if (await tempFile.exists()) {
@@ -201,9 +199,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                       icon: const Icon(Symbols.close_rounded),
                       style: ButtonStyle(
                         foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
-                        backgroundColor: WidgetStateProperty.all(
-                          context.colors.surfaceContainerHighest.withValues(alpha: 0.8),
-                        ),
+                        backgroundColor: WidgetStateProperty.all(context.colors.surfaceContainerHighest.withValues(alpha: 0.8)),
                       ),
                       onPressed: () {
                         Navigator.maybePop(context);
@@ -214,30 +210,25 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     bottom: 16,
                     right: 16,
                     child: TextButton.icon(
-                      icon:
-                          isDownloading
-                              ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: Padding(
-                                  padding: EdgeInsets.all(4.0),
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                              )
-                              : const Icon(Symbols.save_rounded),
+                      icon: isDownloading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Padding(padding: EdgeInsets.all(4.0), child: CircularProgressIndicator(strokeWidth: 2)),
+                            )
+                          : const Icon(Symbols.save_rounded),
                       label: Text('儲存'.i18n),
                       style: ButtonStyle(
                         foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
                         backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
                       ),
-                      onPressed:
-                          isDownloading
-                              ? null
-                              : () async {
-                                setState(() => isDownloading = true);
-                                await saveImageToDownloads();
-                                setState(() => isDownloading = false);
-                              },
+                      onPressed: isDownloading
+                          ? null
+                          : () async {
+                              setState(() => isDownloading = true);
+                              await saveImageToDownloads();
+                              setState(() => isDownloading = false);
+                            },
                     ),
                   ),
                 ],
