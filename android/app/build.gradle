@@ -27,9 +27,9 @@ def patchVersion = versionParts[2].padLeft(2, '0')
 def flutterVersionCode = (majorVersion + minorVersion + patchVersion).toInteger()
 
 android {
-    namespace "com.exptech.dpip"
+    namespace 'com.exptech.dpip'
     compileSdk flutter.compileSdkVersion
-    ndkVersion "28.1.13356709"
+    ndkVersion '28.1.13356709'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -46,10 +46,10 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.exptech.dpip"
+        applicationId 'com.exptech.dpip'
         minSdkVersion 26
         targetSdkVersion 36
-        versionCode 300100120
+        versionCode 300100131
         versionName flutterVersionName
         multiDexEnabled true
         resConfigs "en", "ko", "zh-rTW", "ja", "zh-rCN"
@@ -57,7 +57,7 @@ android {
 
     signingConfigs {
         release {
-            def keystorePropsFile = rootProject.file("key.properties")
+            def keystorePropsFile = rootProject.file('key.properties')
             if (keystorePropsFile.exists()) {
                 def keystoreProps = new Properties()
                 keystoreProps.load(new FileInputStream(keystorePropsFile))
@@ -67,7 +67,7 @@ android {
                 storeFile file(keystoreProps['storeFile'])
                 storePassword keystoreProps['storePassword']
             } else {
-                println("key.properties not found")
+                println('key.properties not found')
             }
         }
     }
@@ -91,7 +91,7 @@ flutter {
 }
 
 dependencies {
-    implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.core:core-splashscreen:1.2.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
