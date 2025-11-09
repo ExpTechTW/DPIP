@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dpip/utils/log.dart';
 import 'package:flutter/services.dart';
 
 import 'package:geojson_vi/geojson_vi.dart';
@@ -22,14 +26,29 @@ class Global {
   static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
-  static Future<Map<String, Location>> loadLocationData() async {
-    final data = await rootBundle.loadJson('assets/location.json');
+  static Future<Map<String, dynamic>> _loadCompressedJson(String assetPath) async {
+    try {
+      final ByteData byteData = await rootBundle.load(assetPath);
+      final List<int> compressedBytes = byteData.buffer.asUint8List();
 
+      final GZipCodec codec = GZipCodec();
+      final List<int> decompressedBytes = codec.decode(compressedBytes);
+
+      final String jsonString = utf8.decode(decompressedBytes);
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (e, s) {
+      TalkerManager.instance.error('Global._loadCompressedJson($assetPath)', e, s);
+      return {};
+    }
+  }
+
+  static Future<Map<String, Location>> loadLocationData() async {
+    final data = await _loadCompressedJson('assets/location.json.gz');
     return data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
   static Future<TimeTable> loadTimeTableData() async {
-    final data = await rootBundle.loadJson('assets/time.json');
+    final data = await _loadCompressedJson('assets/time.json.gz');
 
     return data.map((key, value) {
       final list =
@@ -61,7 +80,7 @@ class Global {
   }
 
   static Future<GeoJSONFeatureCollection> loadTownGeojson() async {
-    final data = await rootBundle.loadJson('assets/map/town.json');
+    final data = await _loadCompressedJson('assets/map/town.json.gz');
 
     return GeoJSONFeatureCollection.fromMap(data);
   }
