@@ -44,24 +44,63 @@ jobs:
         channel: 'stable'
         cache: true
 
+    - name: Cache Gradle
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-gradle
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/wrapper/gradle-wrapper.properties', '**/build.gradle') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+
     - name: Cache Android NDK
       uses: actions/cache@v4
       with:
         path: /usr/local/lib/android/sdk/ndk
         key: ${{ runner.os }}-ndk-28.1.13356709
 
+    - name: Cache Android sdk
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-Android-sdk
+      with:
+        path: |
+          /usr/local/lib/android/sdk/platforms/android-31
+          /usr/local/lib/android/sdk/platforms/android-33
+        key: ${{ runner.os }}-android-platforms-${{ env.cache-name }}-${{ hashFiles('android/gradle.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+
     - name: Install dependencies and run build_runner
       run: |
         flutter pub get
         dart run build_runner build --delete-conflicting-outputs
 
-    - name: Build APK
-      run: flutter build apk --debug --target-platform android-arm64
+    - name: Decode keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/my-release-key.jks
+
+    - name: Create key.properties
+      run: |
+        cat > android/key.properties << EOF
+        storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+        keyPassword=${{ secrets.KEY_PASSWORD }}
+        keyAlias=${{ secrets.KEY_ALIAS }}
+        storeFile=my-release-key.jks
+        EOF
+
+    - name: Build Release APK
+      run: flutter build apk --release --target-platform android-arm64,android-x64
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: DPIP-Android
+        name: DPIP-Android-Release
         path: build/app/outputs/flutter-apk/*.apk
         retention-days: 7
         compression-level: 6

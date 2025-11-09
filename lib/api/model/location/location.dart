@@ -6,6 +6,9 @@ import 'package:dpip/global.dart';
 
 part 'location.g.dart';
 
+final Map<String, String> _cityWithLevelCache = {};
+final Map<String, String> _townWithLevelCache = {};
+
 /// Represents a geographical location in Taiwan with administrative hierarchy.
 ///
 /// This class encapsulates location data including the city and town names, their administrative levels (縣/市/區/鄉/
@@ -100,8 +103,13 @@ class Location {
   /// Example: "臺北市" or "Taipei City"
   ///
   /// Use this when you only need to display the primary administrative division.
-  String get cityWithLevel =>
-      '{city}{cityLevel}'.i18n.args({'city': city.locationName, 'cityLevel': cityLevel.locationName});
+  String get cityWithLevel {
+    final key = '$city$cityLevel';
+    return _cityWithLevelCache.putIfAbsent(
+      key,
+      () => '{city}{cityLevel}'.i18n.args({'city': city.locationName, 'cityLevel': cityLevel.locationName}),
+    );
+  }
 
   /// Returns the localized town name with its administrative level.
   ///
@@ -109,8 +117,13 @@ class Location {
   /// Example: "信義區" or "Xinyi District"
   ///
   /// Use this when you only need to display the secondary administrative division.
-  String get townWithLevel =>
-      '{town}{townLevel}'.i18n.args({'town': town.locationName, 'townLevel': townLevel.locationName});
+  String get townWithLevel {
+    final key = '$town$townLevel';
+    return _townWithLevelCache.putIfAbsent(
+      key,
+      () => '{town}{townLevel}'.i18n.args({'town': town.locationName, 'townLevel': townLevel.locationName}),
+    );
+  }
 
   /// Returns a localized location name that adapts to available space.
   ///

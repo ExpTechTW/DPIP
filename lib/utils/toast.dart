@@ -16,15 +16,14 @@ void showToast(BuildContext context, ToastWidget toast) {
 
 class ToastWidget extends StatelessWidget {
   final List<Widget> children;
-
   const ToastWidget({super.key, required this.children});
 
   ToastWidget.text(String text, {super.key, Widget? icon})
     : children = [
-        if (icon != null) icon,
-        if (icon != null) const SizedBox(width: 4),
-        Flexible(child: Text(text, textAlign: TextAlign.center)),
-      ];
+      if (icon != null) icon,
+      if (icon != null) const SizedBox(width: 4),
+    Flexible(child: Text(text, textAlign: TextAlign.center)),
+  ];
 
   @override
   Widget build(BuildContext context) {
