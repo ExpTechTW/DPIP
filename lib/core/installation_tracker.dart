@@ -1,50 +1,71 @@
 import 'package:dpip/core/preference.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:uuid/uuid.dart';
 
 final talker = TalkerManager.instance;
+const _uuid = Uuid();
 
-Future<void> initializeInstallationData() async {
+// Guard future to prevent concurrent initializations from racing.
+Future<void>? _initializationFuture;
 
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  final int? installTime = packageInfo.installTime?.millisecondsSinceEpoch;
-  final String currentVersion = packageInfo.version;
+/// Public entry point. Multiple callers will await the same initialization
+/// future so we avoid generating / writing multiple installIds concurrently.
+Future<void> initializeInstallationData() {
+  if (_initializationFuture != null) return _initializationFuture!;
+  _initializationFuture = _initializeInstallationDataInternal();
+  return _initializationFuture!;
+}
 
-  if (installTime == null) {
-    talker.warning('無法獲取目前的應用程式安裝時間，無法執行安裝狀態檢查。');
-    return;
-  }
+Future<void> _initializeInstallationDataInternal() async {
+  try {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentVersion = packageInfo.version;
+    final currentBuildNumber = packageInfo.buildNumber;
 
-  final String? storedVersion = Preference.version;
-  final int? storedInstallTime = Preference.installTime;
-
-  if (storedInstallTime == null || storedVersion == null) {
-    talker.info('這是 App 首次安裝。');
-    
-    Preference.instance.clear();
-    Preference.installTime = installTime;
-    Preference.version = currentVersion;
-    talker.info('已儲存新的安裝時間和版本，並執行了數據初始化/重置。');
-  } else if (storedVersion != currentVersion) {
-    talker.info('偵測到版本變更：$storedVersion → $currentVersion');
-    
-    if (storedInstallTime != installTime) {
-      talker.info('安裝時間也已變更，這是版本升級。');
-      Preference.installTime = installTime;
+    String? installId;
+    try {
+      installId = Preference.installId;
+    } catch (e, s) {
+      talker.error('Failed to read installId from preferences', e, s);
+      installId = null;
     }
-    
-    Preference.version = currentVersion;
-    talker.info('已更新版本資訊，保留現有數據。');
-  } else if (storedInstallTime != installTime) {
-    talker.warning('偵測到相同版本但安裝時間不同。');
-    talker.log('系統安裝時間: $installTime, 儲存的安裝時間: $storedInstallTime');
-    talker.info('這是解除安裝後重新安裝相同版本。');
-    
-    Preference.instance.clear();
-    Preference.installTime = installTime;
-    Preference.version = currentVersion;
-    talker.info('已執行數據重置。');
-  } else {
-    talker.info('應用程式未重新安裝也未升級。使用現有安裝資料。');
+
+    final storedVersion = Preference.version;
+    final storedBuildNumber = Preference.buildNumber;
+
+    if (installId == null) {
+      talker.info('首次安裝或重新安裝，建立新的 installId');
+      installId = _uuid.v4();
+      Preference.installId = installId;
+      Preference.version = currentVersion;
+      Preference.buildNumber = currentBuildNumber;
+      talker.info(
+        '已建立新的 installId 並儲存版本資訊',
+        'version: $currentVersion | buildNumber: $currentBuildNumber\n'
+        'installId: $installId'
+      );
+      return;
+    }
+
+    if (storedVersion != currentVersion || storedBuildNumber != currentBuildNumber) {
+      talker.info('偵測到版本變更：$storedVersion → $currentVersion');
+
+      if (storedBuildNumber != currentBuildNumber) {
+        talker.info('Build 號也已變更，這是版本升級。');
+      }
+      Preference.version = currentVersion;
+      Preference.buildNumber = currentBuildNumber;
+      talker.info('已更新版本資訊，保留現有數據。');
+      return;
+    }
+
+    talker.info(
+      '應用程式未重新安裝也未升級，使用現有的安裝資料。\n'
+      'version: $currentVersion | buildNumber: $currentBuildNumber\n'
+      'installId: $installId'
+    );
+  } catch (e, s) {
+    talker.error('初始化安裝資料時發生錯誤', e, s);
   }
 }

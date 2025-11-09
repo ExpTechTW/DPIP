@@ -28,6 +28,8 @@ import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
 
+final Client _sharedClient = Client();
+
 class ExpTech {
   String? apikey;
 
@@ -36,7 +38,7 @@ class ExpTech {
   Future<EarthquakeReport> getReport(String reportId) async {
     final requestUrl = Routes.report(reportId);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -68,7 +70,7 @@ class ExpTech {
       maxDepth: maxDepth,
     );
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -94,7 +96,7 @@ class ExpTech {
       );
     }
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -118,7 +120,7 @@ class ExpTech {
       );
     }
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
       return (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e as Map<String, dynamic>)).where((e) => e.agency == 'cwa').toList();
@@ -130,7 +132,7 @@ class ExpTech {
   Future<int> getNtp() async {
     final requestUrl = Routes.ntp();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
       return int.parse(res.body);
@@ -142,7 +144,7 @@ class ExpTech {
   Future<Map<String, Station>> getStations() async {
     final requestUrl = Routes.station();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -156,7 +158,7 @@ class ExpTech {
   Future<Tsunami> getTsunami(String tsuId) async {
     final requestUrl = Routes.tsunami(tsuId);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -170,7 +172,7 @@ class ExpTech {
   Future<List<String>> getTsunamiList() async {
     final requestUrl = Routes.tsunamiList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -184,7 +186,7 @@ class ExpTech {
   Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
     final requestUrl = Routes.locale();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -198,7 +200,7 @@ class ExpTech {
   Future<List<String>> getRadarList() async {
     final requestUrl = Routes.radarList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -212,7 +214,7 @@ class ExpTech {
   Future<List<String>> getWeatherList() async {
     final requestUrl = Routes.weatherList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -226,7 +228,7 @@ class ExpTech {
   Future<List<WeatherStation>> getWeather(String time) async {
     final requestUrl = Routes.weather(time);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -240,7 +242,7 @@ class ExpTech {
   Future<RealtimeWeather> getWeatherRealtime(String region) async {
     final requestUrl = Routes.weatherRealtime(region);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -254,7 +256,7 @@ class ExpTech {
   Future<List<String>> getRainList() async {
     final requestUrl = Routes.rainList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -268,7 +270,7 @@ class ExpTech {
   Future<List<RainStation>> getRain(String time) async {
     final requestUrl = Routes.rain(time);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -282,7 +284,7 @@ class ExpTech {
   Future<List> getTyphoonImagesList() async {
     final requestUrl = Routes.typhoonImagesList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -296,7 +298,7 @@ class ExpTech {
   Future<List<String>> getLightningList() async {
     final requestUrl = Routes.lightningList();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -310,7 +312,7 @@ class ExpTech {
   Future<Map<String, dynamic>> getTyphoonGeojson() async {
     final requestUrl = Routes.typhoonGeojson();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -324,7 +326,7 @@ class ExpTech {
   Future<List<Lightning>> getLightning(String time) async {
     final requestUrl = Routes.lightning(time);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -338,7 +340,7 @@ class ExpTech {
   Future<List<History>> getRealtime() async {
     final requestUrl = Routes.realtime();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -352,7 +354,7 @@ class ExpTech {
   Future<List<History>> getHistory() async {
     final requestUrl = Routes.history();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -366,7 +368,7 @@ class ExpTech {
   Future<List<History>> getRealtimeRegion(String region) async {
     final requestUrl = Routes.realtimeRegion(region);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -380,7 +382,7 @@ class ExpTech {
   Future<List<History>> getHistoryRegion(String region) async {
     final requestUrl = Routes.historyRegion(region);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -394,7 +396,7 @@ class ExpTech {
   Future<Map<String, dynamic>> getSupport() async {
     final requestUrl = Routes.support();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -406,7 +408,7 @@ class ExpTech {
   Future<List<GithubRelease>> getReleases() async {
     final requestUrl = 'https://api.github.com/repos/ExpTechTW/DPIP/releases'.asUri;
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -420,7 +422,7 @@ class ExpTech {
   Future<List<Announcement>> getAnnouncement() async {
     final requestUrl = Routes.announcement();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -434,7 +436,7 @@ class ExpTech {
   Future<List<NotificationRecord>> getNotificationHistory() async {
     final requestUrl = Routes.notificationHistory();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -448,7 +450,7 @@ class ExpTech {
   Future<List<ServerStatus>> getStatus() async {
     final requestUrl = Routes.status();
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -462,7 +464,7 @@ class ExpTech {
   Future<MeteorStation> getMeteorStation(String id) async {
     final requestUrl = Routes.meteorStation(id);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -476,7 +478,7 @@ class ExpTech {
   Future<List<History>> getEvent(String id) async {
     final requestUrl = Routes.event(id);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -491,7 +493,7 @@ class ExpTech {
   Future<String> updateDeviceLocation({required String token, required LatLng coordinates}) async {
     final requestUrl = Routes.location(token: token, lat: '${coordinates.latitude}', lng: '${coordinates.longitude}');
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
       Preference.lastUpdateToServerTime = DateTime.now().millisecondsSinceEpoch;
@@ -508,7 +510,7 @@ class ExpTech {
   Future<NotifySettings> getNotify({required String token}) async {
     final requestUrl = Routes.notify(token: token);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -527,7 +529,7 @@ class ExpTech {
   }) async {
     final requestUrl = Routes.notifyStatus(token: token, channel: channel, status: status);
 
-    final res = await get(requestUrl);
+    final res = await _sharedClient.get(requestUrl);
 
     if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
@@ -548,7 +550,7 @@ class ExpTech {
 
     String body = jsonEncode({'ip': ip, 'isp': isp, 'status': status, 'status_dev': status_dev});
 
-    final res = await post(requestUrl, body: body);
+    final res = await _sharedClient.post(requestUrl, body: body);
 
     if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);

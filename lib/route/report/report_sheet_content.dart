@@ -122,7 +122,7 @@ class ReportSheetContent extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: DepthColor.depth(report.depth),
+                        color: getDepthColor(report.depth),
                       ),
                     ),
                     Text('${report.depth} km', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
