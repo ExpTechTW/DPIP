@@ -57,6 +57,7 @@ dependencies:
   styled_text: ^8.1.0
   talker_flutter: ^4.7.2
   timezone: ^0.10.0
+  uuid: ^4.5.2
   url_launcher: ^6.3.1
   ip_country_lookup: ^1.0.0
   flutter_icmp_ping: ^3.1.3
