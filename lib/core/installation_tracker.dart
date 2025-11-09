@@ -35,8 +35,7 @@ Future<void> _initializeInstallationDataInternal() async {
     final storedBuildNumber = Preference.buildNumber;
 
     if (installId == null) {
-      talker.info('首次安裝或資料重置，建立新的 installId');
-
+      talker.info('首次安裝或重新安裝，建立新的 installId');
       installId = _uuid.v4();
       Preference.installId = installId;
       Preference.version = currentVersion;
