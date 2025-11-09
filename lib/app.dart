@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dpip/app/welcome/4-permissions/page.dart';
-import 'package:dpip/core/preference.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +10,9 @@ import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/notify.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
@@ -52,16 +52,10 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
-
-    bool notificationAllowed = false;
-    if (Platform.isIOS) {
-      final iosSettings = await FirebaseMessaging.instance.getNotificationSettings();
-      notificationAllowed =
-          iosSettings.authorizationStatus == AuthorizationStatus.authorized ||
-              iosSettings.authorizationStatus == AuthorizationStatus.provisional;
-    }
-
-    final needWelcome = !notificationAllowed || Preference.isFirstLaunch;
+    final needWelcome = Platform.isIOS
+        ? (await FirebaseMessaging.instance.getNotificationSettings()).authorizationStatus != AuthorizationStatus.authorized &&
+        Preference.isFirstLaunch
+        : Preference.isFirstLaunch;
 
     if (needWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
