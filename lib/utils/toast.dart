@@ -6,11 +6,11 @@ void showToast(BuildContext context, ToastWidget toast) {
   final fToast = FToast();
   fToast.init(context);
   fToast.showToast(
-      child: toast,
-      toastDuration: const Duration(seconds: 3),
-      fadeDuration: Durations.short4,
-      gravity: ToastGravity.BOTTOM,
-      isDismissible: true,
+    child: toast,
+    toastDuration: const Duration(seconds: 3),
+    fadeDuration: Durations.short4,
+    gravity: ToastGravity.BOTTOM,
+    isDismissible: true,
   );
 }
 
@@ -19,9 +19,9 @@ class ToastWidget extends StatelessWidget {
   const ToastWidget({super.key, required this.children});
 
   ToastWidget.text(String text, {super.key, Widget? icon})
-      : children = [
-        if (icon != null) icon,
-        if (icon != null) const SizedBox(width: 4),
+    : children = [
+      if (icon != null) icon,
+      if (icon != null) const SizedBox(width: 4),
     Flexible(child: Text(text, textAlign: TextAlign.center)),
   ];
 
