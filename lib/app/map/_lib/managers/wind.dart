@@ -41,6 +41,9 @@ class WindData {
 class WindMapLayerManager extends MapLayerManager {
   WindMapLayerManager(super.context, super.controller);
 
+  // Label layout constants for wind labels
+  static const double kLabelBaseOffset = 2.0;
+  static const double kLabelLineHeight = 1.1;
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
@@ -146,7 +149,7 @@ class WindMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 2],
+          textOffset: [0, kLabelBaseOffset],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -164,7 +167,7 @@ class WindMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 3.1],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -244,11 +247,12 @@ class WindMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.wind(currentWindTime.value);
       final sourceId = MapSourceIds.wind(currentWindTime.value);
 
-      await controller.removeLayer(layerId);
-      await controller.removeLayer('$layerId-label-name');
-      await controller.removeLayer('$layerId-label-value');
-
-      await controller.removeSource(sourceId);
+      await Future.wait([
+        controller.removeLayer(layerId),
+        controller.removeLayer('$layerId-label-name'),
+        controller.removeLayer('$layerId-label-value'),
+        controller.removeSource(sourceId),
+      ]);
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.dispose', e, s);
     }

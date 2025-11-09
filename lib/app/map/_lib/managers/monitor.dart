@@ -36,6 +36,11 @@ class MonitorMapLayerManager extends MapLayerManager {
   Timer? _focusTimer;
   bool _isFocusing = false;
   static const double kCameraPadding = 80.0;
+  // Layout constants for stacked label lines. Adjust these to tune spacing.
+  // kLabelBaseOffset is the vertical offset of the first text line.
+  // kLabelLineHeight is the vertical spacing between subsequent lines.
+  static const double kLabelBaseOffset = 0.8;
+  static const double kLabelLineHeight = 1.2;
 
   // Cached bounds for performance optimization
   List<LatLng>? _cachedBounds;
@@ -369,6 +374,11 @@ class MonitorMapLayerManager extends MapLayerManager {
           ],
           visibility: visible ? 'visible' : 'none',
         );
+        // Note: Previously this used Expressions.format with inline font/styles and '\n'.
+        // After the map package upgrade, multi-line formatting via '\n' became unreliable,
+        // so we render each logical text line as its own SymbolLayer and stack them using
+        // `textOffset` with the constants above.
+
         final labelIdProps = SymbolLayerProperties(
           textField: [Expressions.get, 'id'],
           textSize: 10,
@@ -376,7 +386,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 0.8],
+          textOffset: [0, kLabelBaseOffset],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -404,7 +414,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textOffset: [0, 2],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -426,7 +436,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textOffset: [0, 3.2],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 2],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -445,7 +455,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textOffset: [0, 4.4],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 3],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -464,7 +474,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textOffset: [0, 5.6],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 4],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -920,21 +930,16 @@ class MonitorMapLayerManager extends MapLayerManager {
     final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      // rts
-      await controller.removeLayer(rtsLayerId);
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
-      await controller.removeLayer('$rtsLayerId-label-id');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-id"');
-      await controller.removeLayer('$rtsLayerId-label-loc');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-loc"');
-      await controller.removeLayer('$rtsLayerId-label-detail-i');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-i"');
-      await controller.removeLayer('$rtsLayerId-label-detail-pga');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pga"');
-      await controller.removeLayer('$rtsLayerId-label-detail-pgv');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pgv"');
-      await controller.removeSource(rtsSourceId);
-      TalkerManager.instance.info('Removed Source "$rtsSourceId"');
+      // rts - remove layers/sources in parallel to reduce round-trips
+      await Future.wait([
+        controller.removeLayer(rtsLayerId).then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId"')),
+        controller.removeLayer('$rtsLayerId-label-id').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-id"')),
+        controller.removeLayer('$rtsLayerId-label-loc').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-loc"')),
+        controller.removeLayer('$rtsLayerId-label-detail-i').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-i"')),
+        controller.removeLayer('$rtsLayerId-label-detail-pga').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pga"')),
+        controller.removeLayer('$rtsLayerId-label-detail-pgv').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pgv"')),
+        controller.removeSource(rtsSourceId).then((_) => TalkerManager.instance.info('Removed Source "$rtsSourceId"')),
+      ]);
 
       // intensity
       await controller.removeLayer(intensityLayerId);

@@ -49,6 +49,9 @@ class TemperatureData {
 class TemperatureMapLayerManager extends MapLayerManager {
   TemperatureMapLayerManager(super.context, super.controller);
 
+  // Label layout constants for temperature labels
+  static const double kLabelBaseOffset = 1.0;
+  static const double kLabelLineHeight = 1.1;
   final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
@@ -200,7 +203,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 1],
+          textOffset: [0, kLabelBaseOffset],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -214,7 +217,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 2.1],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
           textAnchor: 'top',
           textAllowOverlap: true,
           textIgnorePlacement: true,
@@ -290,11 +293,12 @@ class TemperatureMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.temperature(currentTemperatureTime.value);
       final sourceId = MapSourceIds.temperature(currentTemperatureTime.value);
 
-      await controller.removeLayer(layerId);
-      await controller.removeLayer('$layerId-label-name');
-      await controller.removeLayer('$layerId-label-value');
-
-      await controller.removeSource(sourceId);
+      await Future.wait([
+        controller.removeLayer(layerId),
+        controller.removeLayer('$layerId-label-name'),
+        controller.removeLayer('$layerId-label-value'),
+        controller.removeSource(sourceId),
+      ]);
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.remove', e, s);
     }

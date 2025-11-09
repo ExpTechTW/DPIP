@@ -49,6 +49,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   static const precipitationIntervals = ['now', '10m', '1h', '3h', '6h', '12h', '24h', '2d', '3d'];
 
+  // Label layout constants for precipitation labels
+  static const double kLabelBaseOffset = 1.0;
+  static const double kLabelLineHeight = 1.1;
+
   final currentPrecipitationTime = ValueNotifier<String?>(GlobalProviders.data.precipitation.firstOrNull);
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
@@ -211,7 +215,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 textHaloColor: colors.outlineVariant.toHexStringRGB(),
                 textHaloWidth: 1,
                 textFont: ['Noto Sans TC Bold'],
-                textOffset: [0, 1],
+                textOffset: [0, kLabelBaseOffset],
                 textAnchor: 'top',
                 textAllowOverlap: true,
                 textIgnorePlacement: true,
@@ -228,7 +232,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 textHaloColor: colors.outlineVariant.toHexStringRGB(),
                 textHaloWidth: 1,
                 textFont: ['Noto Sans TC Bold'],
-                textOffset: [0, 2.1],
+                textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
                 textAnchor: 'top',
                 textAllowOverlap: true,
                 textIgnorePlacement: true,
@@ -239,8 +243,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
         await Future.wait(
           properties.entries.map((entry) {
-            final isValueLayer = entry.key.contains('-label');
-            final interval = isValueLayer ? entry.key.split('-label')[0] : entry.key;
+            // Detect label entries more precisely using '-label-' marker
+            final isValueLayer = entry.key.contains('-label-');
+            final interval = isValueLayer ? entry.key.split('-label-')[0] : entry.key;
 
             return controller.addLayer(
               sourceId,
@@ -316,13 +321,14 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
       final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
 
+      final removals = <Future<void>>[];
       for (final interval in precipitationIntervals) {
-        await controller.removeLayer('$layerId-$interval');
-        await controller.removeLayer('$layerId-$interval-label-name');
-        await controller.removeLayer('$layerId-$interval-label-value');
+        removals.add(controller.removeLayer('$layerId-$interval'));
+        removals.add(controller.removeLayer('$layerId-$interval-label-name'));
+        removals.add(controller.removeLayer('$layerId-$interval-label-value'));
       }
-
-      await controller.removeSource(sourceId);
+      removals.add(controller.removeSource(sourceId));
+      await Future.wait(removals);
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.remove', e, s);
     }
