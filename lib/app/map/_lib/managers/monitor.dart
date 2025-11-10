@@ -1260,7 +1260,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               },
             ),
             Positioned(
-              top: 24,
+              top: 26,
               left: 95,
               right: 95,
               child: SafeArea(
