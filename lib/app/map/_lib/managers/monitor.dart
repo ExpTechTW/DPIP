@@ -915,6 +915,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
+    currentRtsTime.dispose();
+    displayTimeNotifier.dispose();
+    pingNotifier.dispose();
     super.dispose();
   }
 
