@@ -36,6 +36,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   Timer? _focusTimer;
   bool _isFocusing = false;
   static const double kCameraPadding = 80.0;
+  bool get dataStatus => _dataStatus();
+  double get ping => _ping;
   double _ping = 0;
 
   // Cached bounds for performance optimization
@@ -75,8 +77,12 @@ class MonitorMapLayerManager extends MapLayerManager {
     _setupBlinkTimer();
   }
 
+  bool _dataStatus() {
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 10000;
+  }
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
   final displayTimeNotifier = ValueNotifier<String>('N/A');
+  final pingNotifier = ValueNotifier<double>(0);
   int? _lastDataReceivedTime;
   int _lastDisplayedSecond = 0;
 
@@ -709,7 +715,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     final t = lastDataReceivedTime ?? currentTime;
     _ping = (currentTime - t) / 1000;
-    displayTimeNotifier.notifyListeners();
+    pingNotifier.value = _ping;
   }
 
   void _onDataChanged() {
@@ -727,11 +733,6 @@ class MonitorMapLayerManager extends MapLayerManager {
       _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
       _needsRtsUpdate = true;
     }
-  }
-
-  bool _dataStatus() {
-    final bool status = ((GlobalProviders.data.currentTime) - (_lastDataReceivedTime ?? 0)) < 3000;
-    return status;
   }
 
   Future<void> _updateRtsFromCache() async {
@@ -1271,43 +1272,50 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       final isStale = displayTime.endsWith('|STALE');
                       final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
 
-                      final ping = widget.manager._ping;
-                      final isDataOk = widget.manager._dataStatus();
-                      final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(2)}s';
-                      final pingColor = (!isDataOk)
-                          ? Colors.red
-                          : (ping > 5)
-                          ? Colors.red
-                          : (ping > 1)
-                          ? Colors.orange
-                          : Colors.green;
+                      return ValueListenableBuilder<double>(
+                        valueListenable: widget.manager.pingNotifier,
+                        builder: (context, ping, child) {
+                          final isDataOk = widget.manager.dataStatus;
+                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(2)}s';
+                          final pingColor = (!isDataOk)
+                              ? Colors.red
+                              : (ping > 5)
+                              ? Colors.red
+                              : (ping > 1)
+                              ? Colors.orange
+                              : Colors.green;
 
-                      return Container(
-                        padding: const EdgeInsets.all(8),
-                        width: 230,
-                        decoration: BoxDecoration(
-                          color: context.colors.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              timeText,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: isStale ? Colors.red : context.colors.onSurface, fontSize: 16),
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: context.colors.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 4),
-                            SizedBox(
-                              width: 45,
-                              child: Text(
-                                pingText,
-                                textAlign: TextAlign.right,
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: pingColor),
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  timeText,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: isStale ? Colors.red : context.colors.onSurface,
+                                      fontSize: 16),
+                                ),
+                                const SizedBox(width: 4),
+                                SizedBox(
+                                  width: 45,
+                                  child: Text(
+                                    pingText,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 12, fontWeight: FontWeight.bold, color: pingColor),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     },
                   ),
