@@ -41,6 +41,9 @@ class MonitorMapLayerManager extends MapLayerManager {
   // kLabelLineHeight is the vertical spacing between subsequent lines.
   static const double kLabelBaseOffset = 0.8;
   static const double kLabelLineHeight = 1.2;
+  bool get dataStatus => _dataStatus();
+  double get ping => _ping;
+  double _ping = 0;
 
   // Cached bounds for performance optimization
   List<LatLng>? _cachedBounds;
@@ -70,17 +73,21 @@ class MonitorMapLayerManager extends MapLayerManager {
   late final String _sWaveLayerId = MapLayerIds.eew('s');
 
   MonitorMapLayerManager(
-    super.context,
-    super.controller, {
-    this.isReplayMode = false,
-    this.replayTimestamp = 1761222495000,
-  }) {
+      super.context,
+      super.controller, {
+        this.isReplayMode = false,
+        this.replayTimestamp = 1761222495000,
+      }) {
     GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
     _setupBlinkTimer();
   }
 
+  bool _dataStatus() {
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 12000;
+  }
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
   final displayTimeNotifier = ValueNotifier<String>('N/A');
+  final pingNotifier = ValueNotifier<double>(0);
   int? _lastDataReceivedTime;
   int _lastDisplayedSecond = 0;
 
@@ -151,11 +158,11 @@ class MonitorMapLayerManager extends MapLayerManager {
     final coords = (rts?.box.isEmpty ?? true)
         ? <LatLng>[]
         : [
-            for (final area in Global.boxGeojson.features)
-              if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
-                for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
-                  LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
-          ];
+      for (final area in Global.boxGeojson.features)
+        if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
+          for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
+            LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
+    ];
 
     _cachedBounds = coords;
     _lastRtsTime = rts?.time;
@@ -299,8 +306,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       final isBoxLayerExists = existingLayers.contains(boxLayerId);
       final isEewLayerExists =
           existingLayers.contains(epicenterLayerId) &&
-          existingLayers.contains(pWaveLayerId) &&
-          existingLayers.contains(sWaveLayerId);
+              existingLayers.contains(pWaveLayerId) &&
+              existingLayers.contains(sWaveLayerId);
 
       if (!context.mounted) return;
 
@@ -768,6 +775,10 @@ class MonitorMapLayerManager extends MapLayerManager {
         displayTimeNotifier.value = currentTime.toSimpleDateTimeString();
       }
     }
+
+    final t = lastDataReceivedTime ?? currentTime;
+    _ping = (currentTime - t) / 1000;
+    pingNotifier.value = _ping;
   }
 
   void _onDataChanged() {
@@ -982,6 +993,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
+    currentRtsTime.dispose();
+    displayTimeNotifier.dispose();
+    pingNotifier.dispose();
     super.dispose();
   }
 
@@ -1090,35 +1104,35 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: hasLocation
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      StyledText(
-                        text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'intensity': localIntensity.asIntensityLabel,
-                        }),
-                        style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                        tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                      ),
-                      Text(
-                        countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
-                        style: theme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onErrorContainer,
-                          height: 1,
-                          leadingDistribution: TextLeadingDistribution.even,
-                        ),
-                      ),
-                    ],
-                  )
-                : StyledText(
-                    text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
-                      'magnitude': data.info.magnitude.toStringAsFixed(1),
-                      'depth': data.info.depth.toStringAsFixed(1),
-                    }),
-                    style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                    tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                StyledText(
+                  text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
+                    'magnitude': data.info.magnitude.toStringAsFixed(1),
+                    'intensity': localIntensity.asIntensityLabel,
+                  }),
+                  style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+                  tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                ),
+                Text(
+                  countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                  style: theme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colors.onErrorContainer,
+                    height: 1,
+                    leadingDistribution: TextLeadingDistribution.even,
                   ),
+                ),
+              ],
+            )
+                : StyledText(
+              text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'depth': data.info.depth.toStringAsFixed(1),
+              }),
+              style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+            ),
           ),
         ],
       );
@@ -1148,21 +1162,21 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             child: StyledText(
               text: hasLocation
                   ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                        .i18n
-                        .args({
-                          'time': data.info.time.toSimpleDateTimeString(),
-                          'location': data.info.location,
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'intensity': localIntensity.asIntensityLabel,
-                        })
+                  .i18n
+                  .args({
+                'time': data.info.time.toSimpleDateTimeString(),
+                'location': data.info.location,
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'intensity': localIntensity.asIntensityLabel,
+              })
                   : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
-                        .i18n
-                        .args({
-                          'time': data.info.time.toSimpleDateTimeString(),
-                          'location': data.info.location,
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'depth': data.info.depth.toStringAsFixed(1),
-                        }),
+                  .i18n
+                  .args({
+                'time': data.info.time.toSimpleDateTimeString(),
+                'location': data.info.location,
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'depth': data.info.depth.toStringAsFixed(1),
+              }),
               style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
               tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
             ),
@@ -1233,37 +1247,37 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
                           child: countdown > 0
                               ? RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: countdown.toString(),
-                                        style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
-                                      ),
-                                      TextSpan(
-                                        text: ' 秒'.i18n,
-                                        style: TextStyle(fontSize: theme.labelLarge!.fontSize),
-                                      ),
-                                    ],
-                                    style: theme.displayMedium!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: colors.onErrorContainer,
-                                      height: 1,
-                                      leadingDistribution: TextLeadingDistribution.even,
-                                    ),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                )
-                              : Text(
-                                  '抵達'.i18n,
-                                  style: theme.displayMedium!.copyWith(
-                                    fontSize: theme.displayMedium!.fontSize! * 0.81,
-                                    fontWeight: FontWeight.bold,
-                                    color: colors.onErrorContainer,
-                                    height: 1,
-                                    leadingDistribution: TextLeadingDistribution.even,
-                                  ),
-                                  textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: countdown.toString(),
+                                  style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
                                 ),
+                                TextSpan(
+                                  text: ' 秒'.i18n,
+                                  style: TextStyle(fontSize: theme.labelLarge!.fontSize),
+                                ),
+                              ],
+                              style: theme.displayMedium!.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.onErrorContainer,
+                                height: 1,
+                                leadingDistribution: TextLeadingDistribution.even,
+                              ),
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                              : Text(
+                            '抵達'.i18n,
+                            style: theme.displayMedium!.copyWith(
+                              fontSize: theme.displayMedium!.fontSize! * 0.81,
+                              fontWeight: FontWeight.bold,
+                              color: colors.onErrorContainer,
+                              height: 1,
+                              leadingDistribution: TextLeadingDistribution.even,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
@@ -1327,7 +1341,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               },
             ),
             Positioned(
-              top: 24,
+              top: 26,
               left: 95,
               right: 95,
               child: SafeArea(
@@ -1339,18 +1353,50 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       final isStale = displayTime.endsWith('|STALE');
                       final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
 
-                      return Container(
-                        padding: const EdgeInsets.all(8),
-                        width: 230,
-                        decoration: BoxDecoration(
-                          color: context.colors.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          timeText,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: isStale ? Colors.red : context.colors.onSurface, fontSize: 16),
-                        ),
+                      return ValueListenableBuilder<double>(
+                        valueListenable: widget.manager.pingNotifier,
+                        builder: (context, ping, child) {
+                          final isDataOk = widget.manager.dataStatus;
+                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(2)}s';
+                          final pingColor = (!isDataOk)
+                              ? Colors.red
+                              : (ping > 5)
+                              ? Colors.red
+                              : (ping > 1)
+                              ? Colors.orange
+                              : Colors.green;
+
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: context.colors.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  timeText,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: isStale ? Colors.red : context.colors.onSurface,
+                                      fontSize: 16),
+                                ),
+                                const SizedBox(width: 4),
+                                SizedBox(
+                                  width: 55,
+                                  child: Text(
+                                    pingText,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 12, fontWeight: FontWeight.bold, color: pingColor),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
