@@ -10,11 +10,16 @@ import 'package:flutter/material.dart';
 class SettingsMapModel extends ChangeNotifier {
   void _log(String message) => TalkerManager.instance.info('[SettingsMapModel] $message');
 
+  SettingsMapModel._privateConstructor();
+  static final SettingsMapModel instance = SettingsMapModel._privateConstructor();
+  factory SettingsMapModel() => SettingsMapModel.instance;
+
   final updateIntervalNotifier = ValueNotifier(Preference.mapUpdateFps ?? 10);
   final baseMapNotifier = ValueNotifier(BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech);
   final layersNotifier = ValueNotifier(
     Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor},
   );
+  final showOtherAgency = ValueNotifier(Preference.mapOtherAgency ?? false);
   final autoZoomNotifier = ValueNotifier(Preference.mapAutoZoom ?? false);
 
   int get updateInterval => updateIntervalNotifier.value;
@@ -50,6 +55,13 @@ class SettingsMapModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get otherAgency => showOtherAgency.value;
+  void setOtherAgency(bool value) {
+    Preference.mapOtherAgency = value;
+    showOtherAgency.value = value;
+    notifyListeners();
+  }
+
   /// Refreshes the map settings from preferences.
   ///
   /// Updates the [updateInterval], [baseMap], and [layers] properties to reflect the current preferences.
@@ -60,6 +72,7 @@ class SettingsMapModel extends ChangeNotifier {
     baseMapNotifier.value = BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech;
     layersNotifier.value =
         Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor};
+    showOtherAgency.value = Preference.mapOtherAgency ?? false;
     autoZoomNotifier.value = Preference.mapAutoZoom ?? false;
   }
 }

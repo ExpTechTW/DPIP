@@ -22,6 +22,7 @@ import 'package:dpip/api/model/weather/lightning.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
@@ -123,7 +124,13 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
-      return (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e as Map<String, dynamic>)).where((e) => e.agency == 'cwa').toList();
+      var list = (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e as Map<String, dynamic>)).toList();
+
+      if (!SettingsMapModel.instance.showOtherAgency.value) {
+        list = list.where((e) => e.agency == 'cwa').toList();
+      }
+
+      return list;
     } else {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }

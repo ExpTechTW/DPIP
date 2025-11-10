@@ -32,6 +32,7 @@ class PreferenceKeys {
   static const mapBase = 'pref:ui:map:base';
   static const mapLayers = 'pref:ui:map:layers';
   static const mapAutoZoom = 'pref:ui:map:autoZoom';
+  static const mapOtherAgency = 'pref:ui:map:OtherAgency';
 
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
@@ -130,6 +131,9 @@ class Preference {
 
   static bool? get mapAutoZoom => instance.getBool(PreferenceKeys.mapAutoZoom);
   static set mapAutoZoom(bool? value) => instance.set(PreferenceKeys.mapAutoZoom, value);
+
+  static bool? get mapOtherAgency => instance.getBool(PreferenceKeys.mapOtherAgency);
+  static set mapOtherAgency(bool? value) => instance.set(PreferenceKeys.mapOtherAgency, value);
   // #endregion
 
   // #region Notification
