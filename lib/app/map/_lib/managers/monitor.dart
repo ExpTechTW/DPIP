@@ -78,7 +78,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   bool _dataStatus() {
-    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 10000;
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 12000;
   }
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
   final displayTimeNotifier = ValueNotifier<String>('N/A');
@@ -1304,7 +1304,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                 ),
                                 const SizedBox(width: 4),
                                 SizedBox(
-                                  width: 45,
+                                  width: 55,
                                   child: Text(
                                     pingText,
                                     textAlign: TextAlign.right,
