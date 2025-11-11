@@ -26,6 +26,7 @@ extension CommonContext on int {
   int get asFahrenheit => (this * 9 / 5 + 32).round();
 
   String toSimpleDateTimeString() => asTZDateTime.toSimpleDateTimeString();
+  String toFullSimpleDateTimeString() => asTZDateTime.toFullSimpleDateTimeString();
   String toLocaleFullDateString(BuildContext context) => asTZDateTime.toLocaleFullDateString(context);
   String toLocaleDateTimeString(BuildContext context) => asTZDateTime.toLocaleDateTimeString(context);
   String toLocaleTimeString(BuildContext context) => asTZDateTime.toLocaleTimeString(context);

@@ -753,9 +753,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     if (lastDataReceivedTime != null) {
       if (isStale) {
-        displayTimeNotifier.value = '${lastDataReceivedTime.toSimpleDateTimeString()}|STALE';
+        displayTimeNotifier.value = '${lastDataReceivedTime.toFullSimpleDateTimeString()}|STALE';
       } else {
-        displayTimeNotifier.value = currentTime.toSimpleDateTimeString();
+        displayTimeNotifier.value = currentTime.toFullSimpleDateTimeString();
       }
     }
 
