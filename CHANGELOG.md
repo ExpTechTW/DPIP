@@ -9,6 +9,16 @@
 
 ### 新增
 
+### 更改
+
+### 修正
+
+
+## [3.1.104] - 2025-11-11
+
+### 新增
+- 新增閃電圖層 (#435)
+- 新增強震監視器延遲顯示，可顯示資料延遲狀態 (#442)
 
 ### 更改
 - 改善強震監視器頁面效能。
@@ -252,7 +262,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.103...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.104...HEAD
+[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
 [3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
 [3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
 [3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
