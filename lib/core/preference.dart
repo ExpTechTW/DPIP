@@ -32,7 +32,7 @@ class PreferenceKeys {
   static const mapBase = 'pref:ui:map:base';
   static const mapLayers = 'pref:ui:map:layers';
   static const mapAutoZoom = 'pref:ui:map:autoZoom';
-  static const mapOtherAgency = 'pref:ui:map:OtherAgency';
+  static const mapOtherAgency = 'pref:ui:map:otherAgency';
 
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
