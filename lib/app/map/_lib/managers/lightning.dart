@@ -143,7 +143,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-30',
             '0-60',
             'lightning-0-60',
-            '',
+            'lightning-0-5',
           ],
           iconOpacity: 0.75,
           iconAllowOverlap: true,
@@ -169,7 +169,7 @@ class LightningMapLayerManager extends MapLayerManager {
     final time = currentLightningTime.value;
     if (time == null) return;
 
-    final layerId = MapLayerIds.lightning(currentLightningTime.value);
+    final layerId = MapLayerIds.lightning(time);
 
     try {
       await controller.setLayerVisibility(layerId, false);
@@ -187,7 +187,7 @@ class LightningMapLayerManager extends MapLayerManager {
     final time = currentLightningTime.value;
     if (time == null) return;
 
-    final layerId = MapLayerIds.lightning(currentLightningTime.value);
+    final layerId = MapLayerIds.lightning(time);
 
     try {
       await controller.setLayerVisibility(layerId, true);
@@ -208,8 +208,8 @@ class LightningMapLayerManager extends MapLayerManager {
       final time = currentLightningTime.value;
       if (time == null) return;
 
-      final layerId = MapLayerIds.lightning(currentLightningTime.value);
-      final sourceId = MapSourceIds.lightning(currentLightningTime.value);
+      final layerId = MapLayerIds.lightning(time);
+      final sourceId = MapSourceIds.lightning(time);
 
       await controller.removeLayer(layerId);
 
