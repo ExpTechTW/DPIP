@@ -1,4 +1,3 @@
-import 'package:dpip/app_old/page/map/lightning/lightning.dart';
 import 'package:dpip/app_old/page/map/typhoon/typhoon.dart';
 import 'package:dpip/app_old/page/map/weather/humidity.dart';
 import 'package:dpip/app_old/page/map/weather/pressure.dart';
@@ -19,26 +18,6 @@ class _MapPageState extends State<MapPage> {
 
   late final destinations = [
     const NavigationDrawerDestination(
-      icon: Icon(Symbols.monitor_heart),
-      selectedIcon: Icon(Symbols.monitor_heart, fill: 1),
-      label: Text('強震監視器'),
-    ),
-    const NavigationDrawerDestination(
-      icon: Icon(Symbols.radar_rounded),
-      selectedIcon: Icon(Symbols.radar_rounded, fill: 1),
-      label: Text('雷達回波'),
-    ),
-    const NavigationDrawerDestination(
-      icon: Icon(Symbols.rainy_heavy_rounded),
-      selectedIcon: Icon(Symbols.rainy_heavy_rounded, fill: 1),
-      label: Text('降水'),
-    ),
-    const NavigationDrawerDestination(
-      icon: Icon(Symbols.thermometer_rounded),
-      selectedIcon: Icon(Symbols.thermometer_rounded, fill: 1),
-      label: Text('氣溫'),
-    ),
-    const NavigationDrawerDestination(
       icon: Icon(Symbols.humidity_percentage_rounded),
       selectedIcon: Icon(Symbols.humidity_percentage_rounded, fill: 1),
       label: Text('濕度'),
@@ -47,16 +26,6 @@ class _MapPageState extends State<MapPage> {
       icon: Icon(Symbols.blood_pressure_rounded),
       selectedIcon: Icon(Symbols.blood_pressure_rounded, fill: 1),
       label: Text('氣壓'),
-    ),
-    const NavigationDrawerDestination(
-      icon: Icon(Symbols.wind_power_rounded),
-      selectedIcon: Icon(Symbols.wind_power_rounded, fill: 1),
-      label: Text('風向/風速'),
-    ),
-    const NavigationDrawerDestination(
-      icon: Icon(Symbols.bolt_rounded),
-      selectedIcon: Icon(Symbols.bolt_rounded, fill: 1),
-      label: Text('閃電'),
     ),
     const NavigationDrawerDestination(
       icon: Icon(Symbols.cyclone_rounded),
@@ -86,7 +55,7 @@ class _MapPageState extends State<MapPage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [HumidityMap(), PressureMap(), LightningMap(), TyphoonMap()],
+        children: const [HumidityMap(), PressureMap(), TyphoonMap()],
       ),
     );
   }
