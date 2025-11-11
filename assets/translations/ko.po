@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-11-08 12:35\n"
+"PO-Revision-Date: 2025-11-11 09:23\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "알림"
 msgid "緊急地震速報"
 msgstr "긴급 지진 속보"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1210
+#: ./lib/app/map/_lib/managers/monitor.dart:1302
 msgid "強震監視器"
 msgstr "강진 모니터"
 
@@ -80,15 +80,15 @@ msgstr "공지"
 msgid "贊助我們"
 msgstr "저희를 후원해주세요"
 
-#: ./lib/route/image_viewer/image_viewer.dart:70
+#: ./lib/route/image_viewer/image_viewer.dart:68
 msgid "設定"
 msgstr "설정"
 
-#: ./lib/core/service.dart:441
+#: ./lib/core/service.dart:445
 msgid "服務區域外"
 msgstr ""
 
-#: ./lib/core/service.dart:447
+#: ./lib/core/service.dart:451
 msgid "自動定位中"
 msgstr ""
 
@@ -535,7 +535,7 @@ msgstr ""
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
 msgstr ""
 
-#: ./lib/route/image_viewer/image_viewer.dart:64
+#: ./lib/route/image_viewer/image_viewer.dart:62
 msgid "取消"
 msgstr "취소"
 
@@ -599,15 +599,15 @@ msgstr ""
 msgid "雷達回波"
 msgstr "레이더"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:382
+#: ./lib/app/map/_lib/managers/temperature.dart:407
 msgid "氣溫"
 msgstr "기온"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:470
+#: ./lib/app/map/_lib/managers/precipitation.dart:493
 msgid "降水"
 msgstr "강우"
 
-#: ./lib/app/map/_lib/managers/wind.dart:271
+#: ./lib/app/map/_lib/managers/wind.dart:301
 msgid "風向/風速"
 msgstr "풍향/풍속"
 
@@ -679,7 +679,7 @@ msgstr "시스템 색상"
 msgid "使用系統顏色"
 msgstr "시스템 색상 사용"
 
-#: ./lib/route/image_viewer/image_viewer.dart:130
+#: ./lib/route/image_viewer/image_viewer.dart:128
 msgid "確定"
 msgstr "확인"
 
@@ -703,35 +703,35 @@ msgstr "체감 온도 {apparent}"
 msgid "尚未設定所在地"
 msgstr "현재 위치가 설정되지 않았습니다"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:959
+#: ./lib/app/map/_lib/managers/monitor.dart:1051
 msgid "EEW"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1060
+#: ./lib/app/map/_lib/managers/monitor.dart:1152
 msgid "第 {serial} 報"
 msgstr "제 {serial} 보"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1072
+#: ./lib/app/map/_lib/managers/monitor.dart:1164
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "{time}경, <bold>{location}</bold> 부근 체감 지진 발생. 예상 규모 <bold>M{magnitude}</bold>, 현재 위치 최대 진도 <bold>{intensity}</bold>."
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1080
+#: ./lib/app/map/_lib/managers/monitor.dart:1172
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1122
+#: ./lib/app/map/_lib/managers/monitor.dart:1214
 msgid "所在地預估"
 msgstr "현재 위치 예상"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1151
+#: ./lib/app/map/_lib/managers/monitor.dart:1243
 msgid "震波"
 msgstr "지진파"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1165
+#: ./lib/app/map/_lib/managers/monitor.dart:1257
 msgid " 秒"
 msgstr " 초"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1179
+#: ./lib/app/map/_lib/managers/monitor.dart:1271
 msgid "抵達"
 msgstr "도착"
 
@@ -815,7 +815,7 @@ msgstr "GPS를 이용하여 소재지 위치를 자동으로 업데이트하고,
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
 msgstr "실시간 재난 알림 정보를 위해 DPIP가 백그라운드에서 계속 실행되도록 허용합니다."
 
-#: ./lib/route/image_viewer/image_viewer.dart:228
+#: ./lib/route/image_viewer/image_viewer.dart:220
 msgid "儲存"
 msgstr "이미지 저장"
 
@@ -855,6 +855,10 @@ msgstr ""
 msgid "氣象"
 msgstr "기상"
 
+#: ./lib/app/map/_lib/managers/lightning.dart:266
+msgid "閃電"
+msgstr ""
+
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
 msgstr ""
@@ -875,79 +879,111 @@ msgstr "재생 시작 지점"
 msgid "播放進度"
 msgstr "재생 진행도"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:328
+#: ./lib/app/map/_lib/managers/lightning.dart:344
+msgid "5 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:348
+msgid "10 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:352
+msgid "30 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:356
+msgid "60 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:360
+msgid "5 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:364
+msgid "10 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:368
+msgid "30 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:372
+msgid "60 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "今日"
 msgstr "오늘"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:329
+#: ./lib/app/map/_lib/managers/precipitation.dart:352
 msgid "10 分鐘"
 msgstr "10 분"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:330
+#: ./lib/app/map/_lib/managers/precipitation.dart:353
 msgid "1 小時"
 msgstr "1 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:331
+#: ./lib/app/map/_lib/managers/precipitation.dart:354
 msgid "3 小時"
 msgstr "3 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:332
+#: ./lib/app/map/_lib/managers/precipitation.dart:355
 msgid "6 小時"
 msgstr "6 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:333
+#: ./lib/app/map/_lib/managers/precipitation.dart:356
 msgid "12 小時"
 msgstr "12 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:334
+#: ./lib/app/map/_lib/managers/precipitation.dart:357
 msgid "24 小時"
 msgstr "24 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:335
+#: ./lib/app/map/_lib/managers/precipitation.dart:358
 msgid "2 天"
 msgstr "2 일"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:336
+#: ./lib/app/map/_lib/managers/precipitation.dart:359
 msgid "3 天"
 msgstr "3 일"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:397
+#: ./lib/app/map/_lib/managers/monitor.dart:417
 msgid "海外測站"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:419
+#: ./lib/app/map/_lib/managers/monitor.dart:438
 msgid "即時震度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:425
-msgid "地動加速度："
-msgstr ""
-
-#: ./lib/app/map/_lib/managers/monitor.dart:432
-msgid "地動速度："
-msgstr ""
-
-#: ./lib/app/map/_lib/managers/monitor.dart:437
+#: ./lib/app/map/_lib/managers/monitor.dart:439
 msgid "無資料"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1018
+#: ./lib/app/map/_lib/managers/monitor.dart:457
+msgid "地動加速度："
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:476
+msgid "地動速度："
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1110
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "규모 <bold>M{magnitude}</bold>, 현재 위치 예상 진도 <bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1026
+#: ./lib/app/map/_lib/managers/monitor.dart:1118
 msgid "{countdown}秒後抵達"
 msgstr "{countdown}초 후 도착"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1026
+#: ./lib/app/map/_lib/managers/monitor.dart:1118
 msgid "已抵達"
 msgstr "도착"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1037
+#: ./lib/app/map/_lib/managers/monitor.dart:1129
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1218
+#: ./lib/app/map/_lib/managers/monitor.dart:1310
 msgid "目前沒有生效中的地震速報"
 msgstr "현재 유효 지진 속보 없음"
 
@@ -1063,19 +1099,19 @@ msgstr "현재 공지 없음"
 msgid "公告詳情"
 msgstr "공지 내용"
 
-#: ./lib/route/image_viewer/image_viewer.dart:59
+#: ./lib/route/image_viewer/image_viewer.dart:58
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
 msgstr "응용 프로그램 설정에서 '사진 및 미디어' 권한을 찾아 허용 후에 다시 시도해 주세요."
 
-#: ./lib/route/image_viewer/image_viewer.dart:70
+#: ./lib/route/image_viewer/image_viewer.dart:68
 msgid "再試一次"
 msgstr "다시 시도해 주세요"
 
-#: ./lib/route/image_viewer/image_viewer.dart:110
+#: ./lib/route/image_viewer/image_viewer.dart:108
 msgid "已儲存圖片"
 msgstr "이미지 저장 완료"
 
-#: ./lib/route/image_viewer/image_viewer.dart:126
+#: ./lib/route/image_viewer/image_viewer.dart:124
 msgid "儲存圖片時發生錯誤"
 msgstr "이미지 저장 중 오류"
 
