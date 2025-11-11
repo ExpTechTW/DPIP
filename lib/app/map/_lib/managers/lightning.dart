@@ -66,12 +66,16 @@ class LightningMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _fetchData() async {
-    final lightningList = (await ExpTech().getLightningList()).reversed.toList();
-    if (!context.mounted) return;
+    try {
+      final lightningList = (await ExpTech().getLightningList()).reversed.toList();
+      if (!context.mounted) return;
 
-    GlobalProviders.data.setLightning(lightningList);
-    currentLightningTime.value ??= lightningList.first;
-    _lastFetchTime = DateTime.now();
+      GlobalProviders.data.setLightning(lightningList);
+      currentLightningTime.value ??= lightningList.first;
+      _lastFetchTime = DateTime.now();
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager._fetchData', e, s);
+    }
   }
 
   @override
