@@ -336,35 +336,35 @@ class LightningMapLayerSheet extends StatelessWidget {
                 items: [
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff0000), size: 20),
-                    label: '5 分鐘內對地閃電',
+                    label: '5 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffff00), size: 20),
-                    label: '10 分鐘內對地閃電',
+                    label: '10 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff00ff00), size: 20),
-                    label: '30 分鐘內對地閃電',
+                    label: '30 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0000ff), size: 20),
-                    label: '60 分鐘內對地閃電',
+                    label: '60 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.circle, fill: Color(0xffff0000), size: 20),
-                    label: '5 分鐘內雲間閃電',
+                    label: '5 分鐘內雲間閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.circle, fill: Color(0xffffff00), size: 20),
-                    label: '10 分鐘內雲間閃電',
+                    label: '10 分鐘內雲間閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.circle, fill: Color(0xff00ff00), size: 20),
-                    label: '30 分鐘內雲間閃電',
+                    label: '30 分鐘內雲間閃電'.i18n,
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(Symbols.circle, fill: Color(0xff0000ff), size: 20),
-                    label: '60 分鐘內雲間閃電',
+                    label: '60 分鐘內雲間閃電'.i18n,
                   ),
                 ],
               ),
