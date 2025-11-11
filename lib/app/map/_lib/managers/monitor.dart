@@ -318,40 +318,35 @@ class MonitorMapLayerManager extends MapLayerManager {
       if (!existingSources.contains(rtsSourceId)) {
         sourceAdditions.add(
           controller
-              .addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson()))
-              .then((_) => TalkerManager.instance.info('Added Source "$rtsSourceId"')),
+              .addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson())),
         );
       }
 
       if (!existingSources.contains(intensity0SourceId)) {
         sourceAdditions.add(
           controller
-              .addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData))
-              .then((_) => TalkerManager.instance.info('Added Source "$intensity0SourceId"')),
+              .addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData)),
         );
       }
 
       if (!existingSources.contains(intensitySourceId)) {
         sourceAdditions.add(
           controller
-              .addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData))
-              .then((_) => TalkerManager.instance.info('Added Source "$intensitySourceId"')),
+              .addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData)),
         );
       }
 
       if (!existingSources.contains(boxSourceId)) {
         sourceAdditions.add(
           controller
-              .addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson()))
-              .then((_) => TalkerManager.instance.info('Added Source "$boxSourceId"')),
+              .addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson())),
         );
       }
 
       if (!existingSources.contains(eewSourceId)) {
         sourceAdditions.add(
           controller
-              .addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson()))
-              .then((_) => TalkerManager.instance.info('Added Source "$eewSourceId"')),
+              .addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson())),
         );
       }
 
@@ -490,8 +485,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         final layerAdditions = <Future<void>>[
           controller
-              .addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation)
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId"')),
+              .addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation),
           controller
               .addLayer(
                 rtsSourceId,
@@ -499,8 +493,7 @@ class MonitorMapLayerManager extends MapLayerManager {
                 labelIdProps,
                 belowLayerId: BaseMapLayerIds.userLocation,
                 minzoom: 10,
-              )
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-id"')),
+              ),
           controller
               .addLayer(
                 rtsSourceId,
@@ -508,8 +501,7 @@ class MonitorMapLayerManager extends MapLayerManager {
                 labelLocProps,
                 belowLayerId: BaseMapLayerIds.userLocation,
                 minzoom: 10,
-              )
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-loc"')),
+              ),
           controller
               .addLayer(
                 rtsSourceId,
@@ -517,8 +509,7 @@ class MonitorMapLayerManager extends MapLayerManager {
                 labelDetailIProps,
                 belowLayerId: BaseMapLayerIds.userLocation,
                 minzoom: 10,
-              )
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-i"')),
+              ),
           controller
               .addLayer(
                 rtsSourceId,
@@ -526,8 +517,7 @@ class MonitorMapLayerManager extends MapLayerManager {
                 labelDetailPgaProps,
                 belowLayerId: BaseMapLayerIds.userLocation,
                 minzoom: 10,
-              )
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pga"')),
+              ),
           controller
               .addLayer(
                 rtsSourceId,
@@ -536,7 +526,6 @@ class MonitorMapLayerManager extends MapLayerManager {
                 belowLayerId: BaseMapLayerIds.userLocation,
                 minzoom: 10,
               )
-              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pgv"')),
         ];
 
         await Future.wait(layerAdditions);
@@ -578,7 +567,6 @@ class MonitorMapLayerManager extends MapLayerManager {
           properties,
           belowLayerId: BaseMapLayerIds.userLocation,
         );
-        TalkerManager.instance.info('Added Layer "$intensity0LayerId"');
       }
 
       if (!isIntensityLayerExists) {
@@ -620,7 +608,6 @@ class MonitorMapLayerManager extends MapLayerManager {
           properties,
           belowLayerId: BaseMapLayerIds.userLocation,
         );
-        TalkerManager.instance.info('Added Layer "$intensityLayerId"');
       }
 
       if (!isBoxLayerExists) {
@@ -654,7 +641,6 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
 
         await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$boxLayerId"');
       }
 
       if (!isEewLayerExists) {
@@ -676,7 +662,6 @@ class MonitorMapLayerManager extends MapLayerManager {
             'p',
           ],
         );
-        TalkerManager.instance.info('Added Layer "$pWaveLayerId"');
 
         final sWaveProperties = LineLayerProperties(
           lineColor: Colors.red.toHexStringRGB(),
@@ -696,7 +681,6 @@ class MonitorMapLayerManager extends MapLayerManager {
             's',
           ],
         );
-        TalkerManager.instance.info('Added Layer "$sWaveLayerId"');
 
         final epicenterProperties = SymbolLayerProperties(
           iconImage: 'cross-7',
@@ -718,7 +702,6 @@ class MonitorMapLayerManager extends MapLayerManager {
             'x',
           ],
         );
-        TalkerManager.instance.info('Added Layer "$epicenterLayerId"');
       }
 
       didSetup = true;
@@ -943,13 +926,13 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       // rts - remove layers/sources in parallel to reduce round-trips
       await Future.wait([
-        controller.removeLayer(rtsLayerId).then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId"')),
-        controller.removeLayer('$rtsLayerId-label-id').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-id"')),
-        controller.removeLayer('$rtsLayerId-label-loc').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-loc"')),
-        controller.removeLayer('$rtsLayerId-label-detail-i').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-i"')),
-        controller.removeLayer('$rtsLayerId-label-detail-pga').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pga"')),
-        controller.removeLayer('$rtsLayerId-label-detail-pgv').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pgv"')),
-        controller.removeSource(rtsSourceId).then((_) => TalkerManager.instance.info('Removed Source "$rtsSourceId"')),
+        controller.removeLayer(rtsLayerId),
+        controller.removeLayer('$rtsLayerId-label-id'),
+        controller.removeLayer('$rtsLayerId-label-loc'),
+        controller.removeLayer('$rtsLayerId-label-detail-i'),
+        controller.removeLayer('$rtsLayerId-label-detail-pga'),
+        controller.removeLayer('$rtsLayerId-label-detail-pgv'),
+        controller.removeSource(rtsSourceId),
       ]);
 
       // intensity

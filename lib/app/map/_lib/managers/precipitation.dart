@@ -109,7 +109,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
       } else {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
       }
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager._focus', e, s);

@@ -95,7 +95,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     if (radarManager != null) {
       try {
         await radarManager.updateRadarTime(time);
-        TalkerManager.instance.info('Synced radar time to: $time');
       } catch (e, s) {
         TalkerManager.instance.error('Failed to sync radar time', e, s);
       }
