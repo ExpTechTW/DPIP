@@ -147,7 +147,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-30',
             '0-60',
             'lightning-0-60',
-            'lightning-0-5',
+            'lightning-0-60',
           ],
           iconOpacity: 0.75,
           iconAllowOverlap: true,
