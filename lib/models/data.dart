@@ -206,11 +206,10 @@ class DpipDataModel extends _DpipDataModel {
 
   void setRts(Rts rts) {
     final incoming = rts.time;
-    if (incoming > _rtsTime) {
-      _rtsTime = incoming;
-      _rts = rts;
-      notifyListeners();
-    }
+    if (!_isReplayMode && incoming <= _rtsTime) return;
+    _rtsTime = incoming;
+    _rts = rts;
+    notifyListeners();
   }
 
   void setReplayMode(bool isReplay, [int? timestamp]) {
@@ -227,6 +226,7 @@ class DpipDataModel extends _DpipDataModel {
       _replayStartTime = null;
       _rtsTime = 0;
     }
+    notifyListeners();
   }
 
   void startFetching() {
