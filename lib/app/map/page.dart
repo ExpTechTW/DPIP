@@ -80,7 +80,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Set<MapLayer> get activeLayers => _activeLayers;
 
   MapLayer? get primaryLayer {
-    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind]) {
+    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning]) {
       if (_activeLayers.contains(layer)) {
         return layer;
       }
@@ -117,6 +117,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     windManager?.onTimeChanged = (time) {
       syncTimeToRadar(time);
     };
+
+    final lightningManager = getLayerManager<LightningMapLayerManager>(MapLayer.lightning);
+    lightningManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
   }
 
   Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
@@ -135,6 +140,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       case MapLayer.wind:
         final manager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
         newTime = manager?.currentWindTime.value;
+      case MapLayer.lightning:
+        final manager = getLayerManager<LightningMapLayerManager>(MapLayer.lightning);
+        newTime = manager?.currentLightningTime.value;
       default:
     }
 

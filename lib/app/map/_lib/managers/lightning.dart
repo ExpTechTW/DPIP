@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
@@ -11,6 +10,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
@@ -22,15 +22,6 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-
-class LightningData {
-  final double latitude;
-  final double longitude;
-  final int type;
-  final int time;
-
-  LightningData({required this.latitude, required this.longitude, required this.type, required this.time});
-}
 
 class LightningMapLayerManager extends MapLayerManager {
   LightningMapLayerManager(super.context, super.controller);
@@ -57,6 +48,20 @@ class LightningMapLayerManager extends MapLayerManager {
       TalkerManager.instance.error('LightningMapLayerManager.setLightningTime', e, s);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _focus() async {
+    try {
+      final location = GlobalProviders.location.coordinates;
+
+      if (location != null && location.isValid) {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+      } else {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager._focus', e, s);
     }
   }
 
@@ -160,6 +165,9 @@ class LightningMapLayerManager extends MapLayerManager {
   Future<void> hide() async {
     if (!visible) return;
 
+    final time = currentLightningTime.value;
+    if (time == null) return;
+
     final layerId = MapLayerIds.lightning(currentLightningTime.value);
 
     try {
@@ -175,10 +183,15 @@ class LightningMapLayerManager extends MapLayerManager {
   Future<void> show() async {
     if (visible) return;
 
+    final time = currentLightningTime.value;
+    if (time == null) return;
+
     final layerId = MapLayerIds.lightning(currentLightningTime.value);
 
     try {
       await controller.setLayerVisibility(layerId, true);
+
+      await _focus();
 
       visible = true;
 
@@ -191,6 +204,9 @@ class LightningMapLayerManager extends MapLayerManager {
   @override
   Future<void> remove() async {
     try {
+      final time = currentLightningTime.value;
+      if (time == null) return;
+
       final layerId = MapLayerIds.lightning(currentLightningTime.value);
       final sourceId = MapSourceIds.lightning(currentLightningTime.value);
 

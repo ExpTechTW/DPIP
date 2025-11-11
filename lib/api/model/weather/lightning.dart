@@ -30,7 +30,7 @@ class Lightning {
 
     return GeoJsonFeatureBuilder<GeoJsonFeatureType>(GeoJsonFeatureType.Point)
         .setGeometry([loc.lng, loc.lat])
-        .setProperty('type', '${type}-$level');
+        .setProperty('type', '$type-$level');
   }
 }
 
