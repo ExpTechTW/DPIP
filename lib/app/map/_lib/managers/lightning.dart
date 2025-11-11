@@ -120,9 +120,9 @@ class LightningMapLayerManager extends MapLayerManager {
             ['linear'],
             [Expressions.zoom],
             5,
-            0.5,
-            10,
-            1.3,
+            0.1,
+            15,
+            0.8,
           ],
           iconImage: [
             Expressions.match,
@@ -145,6 +145,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-60',
             '',
           ],
+          iconOpacity: 0.75,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           visibility: visible ? 'visible' : 'none',
@@ -335,19 +336,19 @@ class LightningMapLayerSheet extends StatelessWidget {
               child: Legend(
                 items: [
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff0000), size: 20),
+                    icon: const OutlinedIcon(Symbols.health_cross, fill: Color(0xffff0000), size: 20),
                     label: '5 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffff00), size: 20),
+                    icon: const OutlinedIcon(Symbols.health_cross, fill: Color(0xffffff00), size: 20),
                     label: '10 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff00ff00), size: 20),
+                    icon: const OutlinedIcon(Symbols.health_cross, fill: Color(0xff00ff00), size: 20),
                     label: '30 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0000ff), size: 20),
+                    icon: const OutlinedIcon(Symbols.health_cross, fill: Color(0xff0000ff), size: 20),
                     label: '60 分鐘內對地閃電'.i18n,
                   ),
                   LegendItem(
