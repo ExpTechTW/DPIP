@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-11-08 12:35\n"
+"PO-Revision-Date: 2025-11-11 09:23\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "Notifications"
 msgid "緊急地震速報"
 msgstr "Earthquake Early Warning"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1210
+#: ./lib/app/map/_lib/managers/monitor.dart:1302
 msgid "強震監視器"
 msgstr "Earthquake Monitor"
 
@@ -80,15 +80,15 @@ msgstr "Announcements"
 msgid "贊助我們"
 msgstr "Support Us"
 
-#: ./lib/route/image_viewer/image_viewer.dart:70
+#: ./lib/route/image_viewer/image_viewer.dart:68
 msgid "設定"
 msgstr "Settings"
 
-#: ./lib/core/service.dart:441
+#: ./lib/core/service.dart:445
 msgid "服務區域外"
 msgstr ""
 
-#: ./lib/core/service.dart:447
+#: ./lib/core/service.dart:451
 msgid "自動定位中"
 msgstr ""
 
@@ -537,7 +537,7 @@ msgstr ""
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
 msgstr ""
 
-#: ./lib/route/image_viewer/image_viewer.dart:64
+#: ./lib/route/image_viewer/image_viewer.dart:62
 msgid "取消"
 msgstr "Cancel"
 
@@ -601,15 +601,15 @@ msgstr "Monitor"
 msgid "雷達回波"
 msgstr "Radar"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:382
+#: ./lib/app/map/_lib/managers/temperature.dart:407
 msgid "氣溫"
 msgstr "Temperature"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:470
+#: ./lib/app/map/_lib/managers/precipitation.dart:493
 msgid "降水"
 msgstr "Precipitation"
 
-#: ./lib/app/map/_lib/managers/wind.dart:271
+#: ./lib/app/map/_lib/managers/wind.dart:301
 msgid "風向/風速"
 msgstr "Wind/Gust"
 
@@ -681,7 +681,7 @@ msgstr "System Color"
 msgid "使用系統顏色"
 msgstr "Use System Color"
 
-#: ./lib/route/image_viewer/image_viewer.dart:130
+#: ./lib/route/image_viewer/image_viewer.dart:128
 msgid "確定"
 msgstr "Confirm"
 
@@ -705,35 +705,35 @@ msgstr "Apparent {apparent}°"
 msgid "尚未設定所在地"
 msgstr "Location not set"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:959
+#: ./lib/app/map/_lib/managers/monitor.dart:1051
 msgid "EEW"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1060
+#: ./lib/app/map/_lib/managers/monitor.dart:1152
 msgid "第 {serial} 報"
 msgstr "of {serial}"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1072
+#: ./lib/app/map/_lib/managers/monitor.dart:1164
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold>, with a local felt intensity of <bold>{intensity}</bold>."
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1080
+#: ./lib/app/map/_lib/managers/monitor.dart:1172
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold> and at a depth of <bold>{depth}</bold>KM."
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1122
+#: ./lib/app/map/_lib/managers/monitor.dart:1214
 msgid "所在地預估"
 msgstr "Estimated"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1151
+#: ./lib/app/map/_lib/managers/monitor.dart:1243
 msgid "震波"
 msgstr "Waves"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1165
+#: ./lib/app/map/_lib/managers/monitor.dart:1257
 msgid " 秒"
 msgstr " Seconds"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1179
+#: ./lib/app/map/_lib/managers/monitor.dart:1271
 msgid "抵達"
 msgstr "Arrived"
 
@@ -817,7 +817,7 @@ msgstr "Use location to automatically update location settings and provide local
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
 msgstr "Allow DPIP to run continuously in the background for real-time disaster notification information."
 
-#: ./lib/route/image_viewer/image_viewer.dart:228
+#: ./lib/route/image_viewer/image_viewer.dart:220
 msgid "儲存"
 msgstr "Save"
 
@@ -857,6 +857,10 @@ msgstr "Reports"
 msgid "氣象"
 msgstr "Weather"
 
+#: ./lib/app/map/_lib/managers/lightning.dart:266
+msgid "閃電"
+msgstr ""
+
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
 msgstr "Units: {unit}"
@@ -877,79 +881,111 @@ msgstr "Play start"
 msgid "播放進度"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:328
+#: ./lib/app/map/_lib/managers/lightning.dart:344
+msgid "5 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:348
+msgid "10 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:352
+msgid "30 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:356
+msgid "60 分鐘內對地閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:360
+msgid "5 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:364
+msgid "10 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:368
+msgid "30 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/lightning.dart:372
+msgid "60 分鐘內雲間閃電"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "今日"
 msgstr "Today"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:329
+#: ./lib/app/map/_lib/managers/precipitation.dart:352
 msgid "10 分鐘"
 msgstr "10 min"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:330
+#: ./lib/app/map/_lib/managers/precipitation.dart:353
 msgid "1 小時"
 msgstr "1 hr"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:331
+#: ./lib/app/map/_lib/managers/precipitation.dart:354
 msgid "3 小時"
 msgstr "3 hr"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:332
+#: ./lib/app/map/_lib/managers/precipitation.dart:355
 msgid "6 小時"
 msgstr "6 hr"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:333
+#: ./lib/app/map/_lib/managers/precipitation.dart:356
 msgid "12 小時"
 msgstr "12 hr"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:334
+#: ./lib/app/map/_lib/managers/precipitation.dart:357
 msgid "24 小時"
 msgstr "24 hr"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:335
+#: ./lib/app/map/_lib/managers/precipitation.dart:358
 msgid "2 天"
 msgstr "2 d"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:336
+#: ./lib/app/map/_lib/managers/precipitation.dart:359
 msgid "3 天"
 msgstr "3 d"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:397
+#: ./lib/app/map/_lib/managers/monitor.dart:417
 msgid "海外測站"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:419
+#: ./lib/app/map/_lib/managers/monitor.dart:438
 msgid "即時震度："
 msgstr "Current Intensity:"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:425
-msgid "地動加速度："
-msgstr "PGA:"
-
-#: ./lib/app/map/_lib/managers/monitor.dart:432
-msgid "地動速度："
-msgstr "PGV:"
-
-#: ./lib/app/map/_lib/managers/monitor.dart:437
+#: ./lib/app/map/_lib/managers/monitor.dart:439
 msgid "無資料"
 msgstr "No data"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1018
+#: ./lib/app/map/_lib/managers/monitor.dart:457
+msgid "地動加速度："
+msgstr "PGA:"
+
+#: ./lib/app/map/_lib/managers/monitor.dart:476
+msgid "地動速度："
+msgstr "PGV:"
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1110
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "Estimated <bold>M{magnitude}</bold>, max intensity <bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1026
+#: ./lib/app/map/_lib/managers/monitor.dart:1118
 msgid "{countdown}秒後抵達"
 msgstr "in {countdown}s"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1026
+#: ./lib/app/map/_lib/managers/monitor.dart:1118
 msgid "已抵達"
 msgstr "Arrived"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1037
+#: ./lib/app/map/_lib/managers/monitor.dart:1129
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1218
+#: ./lib/app/map/_lib/managers/monitor.dart:1310
 msgid "目前沒有生效中的地震速報"
 msgstr "There are currently no active earthquake early warnings"
 
@@ -1065,19 +1101,19 @@ msgstr "There is no announcement."
 msgid "公告詳情"
 msgstr "Announcement Details"
 
-#: ./lib/route/image_viewer/image_viewer.dart:59
+#: ./lib/route/image_viewer/image_viewer.dart:58
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
 msgstr "Please go to the app settings and allow the \"Photos and Media\" permissions and try again."
 
-#: ./lib/route/image_viewer/image_viewer.dart:70
+#: ./lib/route/image_viewer/image_viewer.dart:68
 msgid "再試一次"
 msgstr "Try again"
 
-#: ./lib/route/image_viewer/image_viewer.dart:110
+#: ./lib/route/image_viewer/image_viewer.dart:108
 msgid "已儲存圖片"
 msgstr "Saved pictures"
 
-#: ./lib/route/image_viewer/image_viewer.dart:126
+#: ./lib/route/image_viewer/image_viewer.dart:124
 msgid "儲存圖片時發生錯誤"
 msgstr "An error occurred while saving the image"
 
