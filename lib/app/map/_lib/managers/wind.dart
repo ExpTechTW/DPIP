@@ -41,6 +41,9 @@ class WindData {
 class WindMapLayerManager extends MapLayerManager {
   WindMapLayerManager(super.context, super.controller);
 
+  // Label layout constants for wind labels
+  static const double kLabelBaseOffset = 2.0;
+  static const double kLabelLineHeight = 1.1;
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
@@ -139,33 +142,50 @@ class WindMapLayerManager extends MapLayerManager {
           visibility: visible ? 'visible' : 'none',
         );
 
-        // labels
-        final properties2 = SymbolLayerProperties(
+        final labelNameProps = SymbolLayerProperties(
+          textField: [Expressions.get, 'name'],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Bold'],
+          textOffset: [0, kLabelBaseOffset],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final labelValueProps = SymbolLayerProperties(
           textField: [
             Expressions.concat,
-            [Expressions.get, 'name'],
-            '\n',
-            [
-              Expressions.concat,
-              [Expressions.get, 'wind_speed'],
-              'm/s',
-            ],
+            [Expressions.get, 'wind_speed'],
+            'm/s',
           ],
           textSize: 10,
           textColor: colors.onSurfaceVariant.toHexStringRGB(),
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Bold'],
-          textOffset: [0, 2],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
           textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
           visibility: visible ? 'visible' : 'none',
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         await controller.addLayer(
           sourceId,
-          '$layerId-label',
-          properties2,
+          '$layerId-label-name',
+          labelNameProps,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          minzoom: 10,
+        );
+        await controller.addLayer(
+          sourceId,
+          '$layerId-label-value',
+          labelValueProps,
           belowLayerId: BaseMapLayerIds.userLocation,
           minzoom: 10,
         );
@@ -185,9 +205,13 @@ class WindMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.wind(currentWindTime.value);
 
+    final nameLayerId = '$layerId-label-name';
+    final valueLayerId = '$layerId-label-value';
+
     try {
       await controller.setLayerVisibility(layerId, false);
-      await controller.setLayerVisibility('$layerId-label', false);
+      await controller.setLayerVisibility(nameLayerId, false);
+      await controller.setLayerVisibility(valueLayerId, false);
 
       visible = false;
     } catch (e, s) {
@@ -201,9 +225,13 @@ class WindMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.wind(currentWindTime.value);
 
+    final nameLayerId = '$layerId-label-name';
+    final valueLayerId = '$layerId-label-value';
+
     try {
       await controller.setLayerVisibility(layerId, true);
-      await controller.setLayerVisibility('$layerId-label', true);
+      await controller.setLayerVisibility(nameLayerId, true);
+      await controller.setLayerVisibility(valueLayerId, true);
 
       visible = true;
 
@@ -219,10 +247,12 @@ class WindMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.wind(currentWindTime.value);
       final sourceId = MapSourceIds.wind(currentWindTime.value);
 
-      await controller.removeLayer(layerId);
-      await controller.removeLayer('$layerId-label');
-
-      await controller.removeSource(sourceId);
+      await Future.wait([
+        controller.removeLayer(layerId),
+        controller.removeLayer('$layerId-label-name'),
+        controller.removeLayer('$layerId-label-value'),
+        controller.removeSource(sourceId),
+      ]);
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.dispose', e, s);
     }

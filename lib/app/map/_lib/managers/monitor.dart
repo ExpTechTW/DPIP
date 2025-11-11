@@ -36,6 +36,14 @@ class MonitorMapLayerManager extends MapLayerManager {
   Timer? _focusTimer;
   bool _isFocusing = false;
   static const double kCameraPadding = 80.0;
+  // Layout constants for stacked label lines. Adjust these to tune spacing.
+  // kLabelBaseOffset is the vertical offset of the first text line.
+  // kLabelLineHeight is the vertical spacing between subsequent lines.
+  static const double kLabelBaseOffset = 0.8;
+  static const double kLabelLineHeight = 1.2;
+  bool get dataStatus => _dataStatus();
+  double get ping => _ping;
+  double _ping = 0;
 
   // Cached bounds for performance optimization
   List<LatLng>? _cachedBounds;
@@ -65,17 +73,21 @@ class MonitorMapLayerManager extends MapLayerManager {
   late final String _sWaveLayerId = MapLayerIds.eew('s');
 
   MonitorMapLayerManager(
-    super.context,
-    super.controller, {
-    this.isReplayMode = false,
-    this.replayTimestamp = 1761222495000,
-  }) {
+      super.context,
+      super.controller, {
+        this.isReplayMode = false,
+        this.replayTimestamp = 1761222495000,
+      }) {
     GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
     _setupBlinkTimer();
   }
 
+  bool _dataStatus() {
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 12000;
+  }
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
   final displayTimeNotifier = ValueNotifier<String>('N/A');
+  final pingNotifier = ValueNotifier<double>(0);
   int? _lastDataReceivedTime;
   int _lastDisplayedSecond = 0;
 
@@ -146,11 +158,11 @@ class MonitorMapLayerManager extends MapLayerManager {
     final coords = (rts?.box.isEmpty ?? true)
         ? <LatLng>[]
         : [
-            for (final area in Global.boxGeojson.features)
-              if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
-                for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
-                  LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
-          ];
+      for (final area in Global.boxGeojson.features)
+        if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
+          for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
+            LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
+    ];
 
     _cachedBounds = coords;
     _lastRtsTime = rts?.time;
@@ -294,8 +306,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       final isBoxLayerExists = existingLayers.contains(boxLayerId);
       final isEewLayerExists =
           existingLayers.contains(epicenterLayerId) &&
-          existingLayers.contains(pWaveLayerId) &&
-          existingLayers.contains(sWaveLayerId);
+              existingLayers.contains(pWaveLayerId) &&
+              existingLayers.contains(sWaveLayerId);
 
       if (!context.mounted) return;
 
@@ -369,107 +381,165 @@ class MonitorMapLayerManager extends MapLayerManager {
           ],
           visibility: visible ? 'visible' : 'none',
         );
-        final properties2 = SymbolLayerProperties(
+        // Note: Previously this used Expressions.format with inline font/styles and '\n'.
+        // After the map package upgrade, multi-line formatting via '\n' became unreliable,
+        // so we render each logical text line as its own SymbolLayer and stack them using
+        // `textOffset` with the constants above.
+
+        final labelIdProps = SymbolLayerProperties(
+          textField: [Expressions.get, 'id'],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Bold'],
+          textOffset: [0, kLabelBaseOffset],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final labelLocProps = SymbolLayerProperties(
           textField: [
-            Expressions.format,
-            [Expressions.get, 'id'],
-            {
-              'text-font': [
-                Expressions.literal,
-                ['Noto Sans TC Bold'],
-              ],
-            },
-            '\n',
-            {},
+            Expressions.caseExpression,
             [
-              Expressions.caseExpression,
-              [
-                Expressions.all,
-                [Expressions.has, 'city'],
-                [Expressions.has, 'town'],
-              ],
-              [
-                Expressions.concat,
-                [Expressions.get, 'city'],
-                ' ',
-                [Expressions.get, 'town'],
-              ],
-              '海外測站'.i18n,
+              Expressions.all,
+              [Expressions.has, 'city'],
+              [Expressions.has, 'town'],
             ],
-            {
-              'text-font': [
-                Expressions.literal,
-                ['Noto Sans TC Bold'],
-              ],
-            },
-            '\n',
-            {},
             [
-              Expressions.caseExpression,
-              [
-                Expressions.all,
-                [Expressions.has, 'i'],
-                [Expressions.has, 'pga'],
-                [Expressions.has, 'pgv'],
-              ],
-              [
-                Expressions.concat,
-                [
-                  Expressions.concat,
-                  '即時震度：'.i18n,
-                  [Expressions.get, 'i'],
-                ],
-                '\n',
-                [
-                  Expressions.concat,
-                  '地動加速度：'.i18n,
-                  [Expressions.get, 'pga'],
-                  'gal',
-                ],
-                '\n',
-                [
-                  Expressions.concat,
-                  '地動速度：'.i18n,
-                  [Expressions.get, 'pgv'],
-                  'cm/s',
-                ],
-              ],
-              '無資料'.i18n,
+              Expressions.concat,
+              [Expressions.get, 'city'],
+              ' ',
+              [Expressions.get, 'town'],
             ],
-            {},
+            '海外測站'.i18n,
           ],
           textSize: 10,
           textColor: colors.onSurfaceVariant.toHexStringRGB(),
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textRadialOffset: 1.5,
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
           textAnchor: 'top',
-          textJustify: 'auto',
-          textVariableAnchor: [
-            'top',
-            'bottom',
-            'left',
-            'right',
-            'top-left',
-            'bottom-left',
-            'top-right',
-            'bottom-right',
-          ],
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
           visibility: visible ? 'visible' : 'none',
         );
 
-        await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$rtsLayerId"');
-
-        await controller.addLayer(
-          rtsSourceId,
-          '$rtsLayerId-label',
-          properties2,
-          belowLayerId: BaseMapLayerIds.userLocation,
-          minzoom: 10,
+        final labelDetailIProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [
+              Expressions.has,
+              'i',
+            ],
+            [Expressions.concat, '即時震度：'.i18n, [Expressions.get, 'i']],
+            '無資料'.i18n,
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 2],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
         );
-        TalkerManager.instance.info('Added Layer "$rtsLayerId-label"');
+
+        final labelDetailPgaProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [Expressions.has, 'pga'],
+            [Expressions.concat, '地動加速度：'.i18n, [Expressions.get, 'pga'], 'gal'],
+            '',
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 3],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final labelDetailPgvProps = SymbolLayerProperties(
+          textField: [
+            Expressions.caseExpression,
+            [Expressions.has, 'pgv'],
+            [Expressions.concat, '地動速度：'.i18n, [Expressions.get, 'pgv'], 'cm/s'],
+            '',
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 4],
+          textAnchor: 'top',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        final layerAdditions = <Future<void>>[
+          controller
+              .addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation)
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-id',
+                labelIdProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-id"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-loc',
+                labelLocProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-loc"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-i',
+                labelDetailIProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-i"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-pga',
+                labelDetailPgaProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pga"')),
+          controller
+              .addLayer(
+                rtsSourceId,
+                '$rtsLayerId-label-detail-pgv',
+                labelDetailPgvProps,
+                belowLayerId: BaseMapLayerIds.userLocation,
+                minzoom: 10,
+              )
+              .then((_) => TalkerManager.instance.info('Added Layer "$rtsLayerId-label-detail-pgv"')),
+        ];
+
+        await Future.wait(layerAdditions);
       }
 
       if (!isIntensity0LayerExists) {
@@ -705,6 +775,10 @@ class MonitorMapLayerManager extends MapLayerManager {
         displayTimeNotifier.value = currentTime.toSimpleDateTimeString();
       }
     }
+
+    final t = lastDataReceivedTime ?? currentTime;
+    _ping = (currentTime - t) / 1000;
+    pingNotifier.value = _ping;
   }
 
   void _onDataChanged() {
@@ -745,7 +819,11 @@ class MonitorMapLayerManager extends MapLayerManager {
           controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
 
         controller.setLayerVisibility(_rtsLayerId, hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-id', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-loc', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-i', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pga', hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pgv', hasRtsData && !hasBox),
         controller.setLayerVisibility(_intensityLayerId, hasIntensityData && hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasIntensityData && hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBoxData && hasBox),
@@ -793,7 +871,11 @@ class MonitorMapLayerManager extends MapLayerManager {
       await Future.wait([
         for (final layer in [
           _rtsLayerId,
-          '$_rtsLayerId-label',
+          '$_rtsLayerId-label-id',
+          '$_rtsLayerId-label-loc',
+          '$_rtsLayerId-label-detail-i',
+          '$_rtsLayerId-label-detail-pga',
+          '$_rtsLayerId-label-detail-pgv',
           _intensityLayerId,
           _intensity0LayerId,
           _boxLayerId,
@@ -821,7 +903,11 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       await Future.wait([
         controller.setLayerVisibility(_rtsLayerId, !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-id', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-loc', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-i', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pga', !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label-detail-pgv', !hasBox),
         controller.setLayerVisibility(_intensityLayerId, hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBox),
@@ -855,13 +941,16 @@ class MonitorMapLayerManager extends MapLayerManager {
     final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      // rts
-      await controller.removeLayer(rtsLayerId);
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
-      await controller.removeLayer('$rtsLayerId-label');
-      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label"');
-      await controller.removeSource(rtsSourceId);
-      TalkerManager.instance.info('Removed Source "$rtsSourceId"');
+      // rts - remove layers/sources in parallel to reduce round-trips
+      await Future.wait([
+        controller.removeLayer(rtsLayerId).then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId"')),
+        controller.removeLayer('$rtsLayerId-label-id').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-id"')),
+        controller.removeLayer('$rtsLayerId-label-loc').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-loc"')),
+        controller.removeLayer('$rtsLayerId-label-detail-i').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-i"')),
+        controller.removeLayer('$rtsLayerId-label-detail-pga').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pga"')),
+        controller.removeLayer('$rtsLayerId-label-detail-pgv').then((_) => TalkerManager.instance.info('Removed Layer "$rtsLayerId-label-detail-pgv"')),
+        controller.removeSource(rtsSourceId).then((_) => TalkerManager.instance.info('Removed Source "$rtsSourceId"')),
+      ]);
 
       // intensity
       await controller.removeLayer(intensityLayerId);
@@ -904,6 +993,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
+    currentRtsTime.dispose();
+    displayTimeNotifier.dispose();
+    pingNotifier.dispose();
     super.dispose();
   }
 
@@ -1012,35 +1104,35 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: hasLocation
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      StyledText(
-                        text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'intensity': localIntensity.asIntensityLabel,
-                        }),
-                        style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                        tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                      ),
-                      Text(
-                        countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
-                        style: theme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onErrorContainer,
-                          height: 1,
-                          leadingDistribution: TextLeadingDistribution.even,
-                        ),
-                      ),
-                    ],
-                  )
-                : StyledText(
-                    text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
-                      'magnitude': data.info.magnitude.toStringAsFixed(1),
-                      'depth': data.info.depth.toStringAsFixed(1),
-                    }),
-                    style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                    tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                StyledText(
+                  text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
+                    'magnitude': data.info.magnitude.toStringAsFixed(1),
+                    'intensity': localIntensity.asIntensityLabel,
+                  }),
+                  style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+                  tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                ),
+                Text(
+                  countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                  style: theme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colors.onErrorContainer,
+                    height: 1,
+                    leadingDistribution: TextLeadingDistribution.even,
                   ),
+                ),
+              ],
+            )
+                : StyledText(
+              text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'depth': data.info.depth.toStringAsFixed(1),
+              }),
+              style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+            ),
           ),
         ],
       );
@@ -1070,21 +1162,21 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             child: StyledText(
               text: hasLocation
                   ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                        .i18n
-                        .args({
-                          'time': data.info.time.toSimpleDateTimeString(),
-                          'location': data.info.location,
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'intensity': localIntensity.asIntensityLabel,
-                        })
+                  .i18n
+                  .args({
+                'time': data.info.time.toSimpleDateTimeString(),
+                'location': data.info.location,
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'intensity': localIntensity.asIntensityLabel,
+              })
                   : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
-                        .i18n
-                        .args({
-                          'time': data.info.time.toSimpleDateTimeString(),
-                          'location': data.info.location,
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'depth': data.info.depth.toStringAsFixed(1),
-                        }),
+                  .i18n
+                  .args({
+                'time': data.info.time.toSimpleDateTimeString(),
+                'location': data.info.location,
+                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                'depth': data.info.depth.toStringAsFixed(1),
+              }),
               style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
               tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
             ),
@@ -1155,37 +1247,37 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
                           child: countdown > 0
                               ? RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: countdown.toString(),
-                                        style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
-                                      ),
-                                      TextSpan(
-                                        text: ' 秒'.i18n,
-                                        style: TextStyle(fontSize: theme.labelLarge!.fontSize),
-                                      ),
-                                    ],
-                                    style: theme.displayMedium!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: colors.onErrorContainer,
-                                      height: 1,
-                                      leadingDistribution: TextLeadingDistribution.even,
-                                    ),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                )
-                              : Text(
-                                  '抵達'.i18n,
-                                  style: theme.displayMedium!.copyWith(
-                                    fontSize: theme.displayMedium!.fontSize! * 0.81,
-                                    fontWeight: FontWeight.bold,
-                                    color: colors.onErrorContainer,
-                                    height: 1,
-                                    leadingDistribution: TextLeadingDistribution.even,
-                                  ),
-                                  textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: countdown.toString(),
+                                  style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
                                 ),
+                                TextSpan(
+                                  text: ' 秒'.i18n,
+                                  style: TextStyle(fontSize: theme.labelLarge!.fontSize),
+                                ),
+                              ],
+                              style: theme.displayMedium!.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.onErrorContainer,
+                                height: 1,
+                                leadingDistribution: TextLeadingDistribution.even,
+                              ),
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                              : Text(
+                            '抵達'.i18n,
+                            style: theme.displayMedium!.copyWith(
+                              fontSize: theme.displayMedium!.fontSize! * 0.81,
+                              fontWeight: FontWeight.bold,
+                              color: colors.onErrorContainer,
+                              height: 1,
+                              leadingDistribution: TextLeadingDistribution.even,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
@@ -1249,7 +1341,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               },
             ),
             Positioned(
-              top: 24,
+              top: 26,
               left: 95,
               right: 95,
               child: SafeArea(
@@ -1261,18 +1353,50 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       final isStale = displayTime.endsWith('|STALE');
                       final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
 
-                      return Container(
-                        padding: const EdgeInsets.all(8),
-                        width: 230,
-                        decoration: BoxDecoration(
-                          color: context.colors.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          timeText,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: isStale ? Colors.red : context.colors.onSurface, fontSize: 16),
-                        ),
+                      return ValueListenableBuilder<double>(
+                        valueListenable: widget.manager.pingNotifier,
+                        builder: (context, ping, child) {
+                          final isDataOk = widget.manager.dataStatus;
+                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(2)}s';
+                          final pingColor = (!isDataOk)
+                              ? Colors.red
+                              : (ping > 5)
+                              ? Colors.red
+                              : (ping > 1)
+                              ? Colors.orange
+                              : Colors.green;
+
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: context.colors.surface.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  timeText,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: isStale ? Colors.red : context.colors.onSurface,
+                                      fontSize: 16),
+                                ),
+                                const SizedBox(width: 4),
+                                SizedBox(
+                                  width: 55,
+                                  child: Text(
+                                    pingText,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 12, fontWeight: FontWeight.bold, color: pingColor),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

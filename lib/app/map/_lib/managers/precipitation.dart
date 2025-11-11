@@ -49,6 +49,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   static const precipitationIntervals = ['now', '10m', '1h', '3h', '6h', '12h', '24h', '2d', '3d'];
 
+  // Label layout constants for precipitation labels
+  static const double kLabelBaseOffset = 1.0;
+  static const double kLabelLineHeight = 1.1;
+
   final currentPrecipitationTime = ValueNotifier<String?>(GlobalProviders.data.precipitation.firstOrNull);
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
@@ -84,10 +88,12 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
 
       await controller.setLayerVisibility(showLayerId, true);
-      await controller.setLayerVisibility('$showLayerId-label', true);
+      await controller.setLayerVisibility('$showLayerId-label-name', true);
+      await controller.setLayerVisibility('$showLayerId-label-value', true);
 
       await controller.setLayerVisibility(hideLayerId, false);
-      await controller.setLayerVisibility('$hideLayerId-label', false);
+      await controller.setLayerVisibility('$hideLayerId-label-name', false);
+      await controller.setLayerVisibility('$hideLayerId-label-value', false);
 
       currentPrecipitationInterval.value = interval;
     } catch (e, s) {
@@ -202,24 +208,34 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 circleStrokeOpacity: 0.75,
                 visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
               ),
-              '$interval-label': SymbolLayerProperties(
+              '$interval-label-name': SymbolLayerProperties(
+                textField: [Expressions.get, 'name'],
+                textSize: 10,
+                textColor: colors.onSurfaceVariant.toHexStringRGB(),
+                textHaloColor: colors.outlineVariant.toHexStringRGB(),
+                textHaloWidth: 1,
+                textFont: ['Noto Sans TC Bold'],
+                textOffset: [0, kLabelBaseOffset],
+                textAnchor: 'top',
+                textAllowOverlap: true,
+                textIgnorePlacement: true,
+                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+              ),
+              '$interval-label-value': SymbolLayerProperties(
                 textField: [
                   Expressions.concat,
-                  [Expressions.get, 'name'],
-                  '\n',
-                  [
-                    Expressions.concat,
-                    [Expressions.get, interval],
-                    'mm',
-                  ],
+                  [Expressions.get, interval],
+                  'mm',
                 ],
                 textSize: 10,
                 textColor: colors.onSurfaceVariant.toHexStringRGB(),
                 textHaloColor: colors.outlineVariant.toHexStringRGB(),
                 textHaloWidth: 1,
                 textFont: ['Noto Sans TC Bold'],
-                textOffset: [0, 1],
+                textOffset: [0, kLabelBaseOffset + kLabelLineHeight * 1],
                 textAnchor: 'top',
+                textAllowOverlap: true,
+                textIgnorePlacement: true,
                 visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
               ),
             }),
@@ -227,8 +243,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
         await Future.wait(
           properties.entries.map((entry) {
-            final isValueLayer = entry.key.endsWith('-label');
-            final interval = isValueLayer ? entry.key.substring(0, entry.key.length - 6) : entry.key;
+            // Detect label entries more precisely using '-label-' marker
+            final isValueLayer = entry.key.contains('-label-');
+            final interval = isValueLayer ? entry.key.split('-label-')[0] : entry.key;
 
             return controller.addLayer(
               sourceId,
@@ -237,7 +254,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
               belowLayerId: BaseMapLayerIds.userLocation,
               minzoom: isValueLayer ? 10 : null,
               filter: [
-                Expressions.largerOrEqual,
+                Expressions.larger,
                 [Expressions.get, interval],
                 0,
               ],
@@ -260,10 +277,12 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
-    final hideValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label';
+    final hideNameLayerId = '$layerId-${currentPrecipitationInterval.value}-label-name';
+    final hideValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label-value';
 
     try {
       await controller.setLayerVisibility(hideLayerId, false);
+      await controller.setLayerVisibility(hideNameLayerId, false);
       await controller.setLayerVisibility(hideValueLayerId, false);
 
       visible = false;
@@ -278,10 +297,12 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final showLayerId = '$layerId-${currentPrecipitationInterval.value}';
-    final showValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label';
+    final showNameLayerId = '$layerId-${currentPrecipitationInterval.value}-label-name';
+    final showValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label-value';
 
     try {
       await controller.setLayerVisibility(showLayerId, true);
+      await controller.setLayerVisibility(showNameLayerId, true);
       await controller.setLayerVisibility(showValueLayerId, true);
 
       await _focus();
@@ -300,12 +321,14 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
       final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
 
+      final removals = <Future<void>>[];
       for (final interval in precipitationIntervals) {
-        await controller.removeLayer('$layerId-$interval');
-        await controller.removeLayer('$layerId-$interval-label');
+        removals.add(controller.removeLayer('$layerId-$interval'));
+        removals.add(controller.removeLayer('$layerId-$interval-label-name'));
+        removals.add(controller.removeLayer('$layerId-$interval-label-value'));
       }
-
-      await controller.removeSource(sourceId);
+      removals.add(controller.removeSource(sourceId));
+      await Future.wait(removals);
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.remove', e, s);
     }
