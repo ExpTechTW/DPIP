@@ -14,6 +14,7 @@ import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/api/model/rts/rts.dart';
 import 'package:dpip/api/model/station.dart';
 import 'package:dpip/api/model/weather/rain.dart';
+import 'package:dpip/api/model/weather/lightning.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/global.dart';
@@ -148,6 +149,24 @@ class _DpipDataModel extends ChangeNotifier {
 
   void setWind(List<String> wind) {
     _wind = wind;
+    notifyListeners();
+  }
+
+  List<String> _lightning = [];
+
+  UnmodifiableListView<String> get lightning => UnmodifiableListView(_lightning);
+
+  void setLightning(List<String> lightning) {
+    _lightning = lightning;
+    notifyListeners();
+  }
+
+  final Map<String, List<Lightning>> _lightningData = {};
+
+  UnmodifiableMapView<String, List<Lightning>> get lightningData => UnmodifiableMapView(_lightningData);
+
+  void setLightningData(String time, List<Lightning> lightning) {
+    _lightningData[time] = lightning;
     notifyListeners();
   }
 
