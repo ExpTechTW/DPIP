@@ -60,10 +60,10 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
     return;
   }
 
-  if (channelKey.startsWith('announcement')) {
-    context.push('/announcement');
-    return;
-  }
+  // if (channelKey.startsWith('announcement')) {
+  //   context.push('/announcement');
+  //   return;
+  // }
 
   context.go('/home');
 }
