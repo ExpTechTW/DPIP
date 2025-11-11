@@ -104,15 +104,15 @@ class SettingsMapPage extends StatelessWidget {
                 );
               },
             ),
-            AnimatedBuilder(
-              animation: SettingsMapModel.instance,
-              builder: (context, _) {
+            ValueListenableBuilder<bool>(
+              valueListenable: SettingsMapModel.instance.showOtherAgency,
+              builder: (context, otherAgency, _) {
                 return ListSectionTile(
                   icon: Symbols.filter_alt_rounded,
                   title: '顯示其他資料來源'.i18n,
                   subtitle: Text('開啟後會顯示 中央氣象署(CWA) 以外的來源'.i18n),
                   trailing: Switch(
-                    value: SettingsMapModel.instance.otherAgency,
+                    value: otherAgency,
                     onChanged: (value) {
                       SettingsMapModel.instance.setOtherAgency(value);
                     },
