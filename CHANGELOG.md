@@ -9,12 +9,26 @@
 
 ### 新增
 
-
 ### 更改
-
 
 ### 修正
 
+
+## [3.1.104] - 2025-11-11
+
+### 新增
+- 新增閃電圖層 (#435)
+- 新增強震監視器延遲顯示，可顯示資料延遲狀態 (#442)
+
+### 更改
+- 改善強震監視器頁面效能。
+- 重構 installId 初始化邏輯。 (#432)
+
+### 修正
+- 修正 P、S 波動畫在 FPS 設定下的順暢度問題。
+- 修正 EEW 資料未正確過濾 CWA 來源的問題。 (#428)
+- 修正字體網址問題。 (#434)
+- 修正關閉自動定位設定後，仍會異常執行自動定位的問題。(Android) (#432)
 
 ## [3.1.103] - 2025-11-05
 
@@ -248,7 +262,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.103...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.104...HEAD
+[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
 [3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
 [3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
 [3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
