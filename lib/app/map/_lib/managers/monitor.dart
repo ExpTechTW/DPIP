@@ -76,6 +76,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
       super.context,
       super.controller, {
+        this.isReplayMode = false,
         this.replayTimestamp = 1762892804468,
       }) {
     GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
@@ -147,7 +148,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           _isBoxVisible = !_isBoxVisible;
           await controller.setLayerVisibility(_boxLayerId, _isBoxVisible);
         } else {
-          // Ensure box layer hidden when no boxes
+          // Reset blink state to start from visible on next blink cycle
           _isBoxVisible = true;
           await controller.setLayerVisibility(_boxLayerId, false);
         }
