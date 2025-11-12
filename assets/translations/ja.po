@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-11-11 09:23\n"
+"PO-Revision-Date: 2025-11-12 14:38\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -138,7 +138,7 @@ msgstr "サウンドテストは端末上でのみ実行され、通知受信時
 
 #: ./lib/app/settings/notify/page.dart:86
 msgid "伺服器排隊中，請稍候…"
-msgstr ""
+msgstr "サーバーで順番待ち中です。しばらくお待ちください…"
 
 #: ./lib/app/settings/notify/page.dart:146
 msgid "請先設定所在地來使用通知功能"
@@ -178,7 +178,7 @@ msgstr "一般"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯消息發布時"
-msgstr ""
+msgstr "津波情報発表時"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -636,11 +636,11 @@ msgstr "初期レイヤー"
 
 #: ./lib/app/settings/map/page.dart:96
 msgid "自動縮放"
-msgstr ""
+msgstr "自動ズーム"
 
 #: ./lib/app/settings/map/page.dart:97
 msgid "接收到檢知時自動縮放地圖(監視器模式下)"
-msgstr ""
+msgstr "検知を受信したときに地図を自動ズーム（強震モニターモード時）"
 
 #: ./lib/app/settings/map/page.dart:123
 msgid "動畫幀率"
@@ -860,7 +860,7 @@ msgstr "気象"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:266
 msgid "閃電"
-msgstr ""
+msgstr "落雷"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
@@ -884,35 +884,35 @@ msgstr "再生中"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:344
 msgid "5 分鐘內對地閃電"
-msgstr ""
+msgstr "5分間以内の落雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:348
 msgid "10 分鐘內對地閃電"
-msgstr ""
+msgstr "10分間以内の落雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:352
 msgid "30 分鐘內對地閃電"
-msgstr ""
+msgstr "30分間以内の落雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:356
 msgid "60 分鐘內對地閃電"
-msgstr ""
+msgstr "1時間以内の落雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:360
 msgid "5 分鐘內雲間閃電"
-msgstr ""
+msgstr "5分間以内の雲内雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:364
 msgid "10 分鐘內雲間閃電"
-msgstr ""
+msgstr "10分間以内の雲内雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:368
 msgid "30 分鐘內雲間閃電"
-msgstr ""
+msgstr "30分間以内の雲内雷"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:372
 msgid "60 分鐘內雲間閃電"
-msgstr ""
+msgstr "1時間以内の雲内雷"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "今日"

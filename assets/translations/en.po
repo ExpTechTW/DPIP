@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-11-11 09:23\n"
+"PO-Revision-Date: 2025-11-12 14:38\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -86,11 +86,11 @@ msgstr "Settings"
 
 #: ./lib/core/service.dart:445
 msgid "服務區域外"
-msgstr ""
+msgstr "Outside Services Area"
 
 #: ./lib/core/service.dart:451
 msgid "自動定位中"
-msgstr ""
+msgstr "Auto locating..."
 
 #: ./lib/app/settings/notify/page.dart:61
 msgid "接收全部"
@@ -138,7 +138,7 @@ msgstr "The sound test is a local notification performed on the device, used onl
 
 #: ./lib/app/settings/notify/page.dart:86
 msgid "伺服器排隊中，請稍候…"
-msgstr ""
+msgstr "Queuing, Please Wait..."
 
 #: ./lib/app/settings/notify/page.dart:146
 msgid "請先設定所在地來使用通知功能"
@@ -635,11 +635,11 @@ msgstr "Initial Layer"
 
 #: ./lib/app/settings/map/page.dart:96
 msgid "自動縮放"
-msgstr ""
+msgstr "Auto Zoom"
 
 #: ./lib/app/settings/map/page.dart:97
 msgid "接收到檢知時自動縮放地圖(監視器模式下)"
-msgstr ""
+msgstr "Auto zoom on detection (Monitor Mode)"
 
 #: ./lib/app/settings/map/page.dart:123
 msgid "動畫幀率"
@@ -859,7 +859,7 @@ msgstr "Weather"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:266
 msgid "閃電"
-msgstr ""
+msgstr "Lightning"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
@@ -883,35 +883,35 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/lightning.dart:344
 msgid "5 分鐘內對地閃電"
-msgstr ""
+msgstr "Lightning to ground in 5 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:348
 msgid "10 分鐘內對地閃電"
-msgstr ""
+msgstr "Lightning to ground in 10 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:352
 msgid "30 分鐘內對地閃電"
-msgstr ""
+msgstr "Lightning to ground in 30 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:356
 msgid "60 分鐘內對地閃電"
-msgstr ""
+msgstr "Lightning to ground in 60 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:360
 msgid "5 分鐘內雲間閃電"
-msgstr ""
+msgstr "Lightning in cloud in 5 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:364
 msgid "10 分鐘內雲間閃電"
-msgstr ""
+msgstr "Lightning in cloud in 10 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:368
 msgid "30 分鐘內雲間閃電"
-msgstr ""
+msgstr "Lightning in cloud in 30 min"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:372
 msgid "60 分鐘內雲間閃電"
-msgstr ""
+msgstr "Lightning in cloud in 60 min"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "今日"
