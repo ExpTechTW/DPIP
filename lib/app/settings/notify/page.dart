@@ -67,6 +67,11 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
   void initState() {
     super.initState();
 
+    final hasLocation = GlobalProviders.location.coordinates != null ||
+        (Preference.locationAuto ?? false);
+
+    if (!hasLocation) return;
+
     if (Preference.notifyEew == null ||
         Preference.notifyMonitor == null ||
         Preference.notifyReport == null ||
