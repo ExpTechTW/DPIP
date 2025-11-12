@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-11-11 09:23\n"
+"PO-Revision-Date: 2025-11-12 13:43\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -18,7 +18,7 @@ msgstr "현재 지역"
 
 #: ./lib/app/settings/location/page.dart:420
 msgid "新增地點"
-msgstr ""
+msgstr "위치 추가"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
@@ -86,7 +86,7 @@ msgstr "설정"
 
 #: ./lib/core/service.dart:445
 msgid "服務區域外"
-msgstr ""
+msgstr "서비스 불가 지역"
 
 #: ./lib/core/service.dart:451
 msgid "自動定位中"
@@ -138,7 +138,7 @@ msgstr "사운드 테스트는 기기에서 수행되는 로컬 알림입니다.
 
 #: ./lib/app/settings/notify/page.dart:86
 msgid "伺服器排隊中，請稍候…"
-msgstr ""
+msgstr "서버 대기 중입니다. 잠시만 기다려 주세요…"
 
 #: ./lib/app/settings/notify/page.dart:146
 msgid "請先設定所在地來使用通知功能"
@@ -593,7 +593,7 @@ msgstr "현재 위치"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
-msgstr ""
+msgstr "모니터"
 
 #: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
@@ -613,7 +613,7 @@ msgstr "풍향/풍속"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
-msgstr ""
+msgstr "간단함"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
@@ -633,11 +633,11 @@ msgstr "기본 지도"
 
 #: ./lib/app/settings/map/page.dart:96
 msgid "自動縮放"
-msgstr ""
+msgstr "자동 확대/축소"
 
 #: ./lib/app/settings/map/page.dart:97
 msgid "接收到檢知時自動縮放地圖(監視器模式下)"
-msgstr ""
+msgstr "감지 수신 시 지도 자동 확대 (지진 모니터 모드)"
 
 #: ./lib/app/settings/map/page.dart:123
 msgid "動畫幀率"
@@ -645,7 +645,7 @@ msgstr "애니메이션 주사율"
 
 #: ./lib/app/settings/map/page.dart:127
 msgid "影響強震監視器的震波模擬動畫流暢度"
-msgstr ""
+msgstr "지진 모니터의 진동파 시뮬레이션 애니메이션 부드러움에 영향을 줍니다."
 
 #: ./lib/app/settings/map/page.dart:158
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
@@ -849,7 +849,7 @@ msgstr "표시 지도 레이더 선택"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
-msgstr ""
+msgstr "지진 정보"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
@@ -857,7 +857,7 @@ msgstr "기상"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:266
 msgid "閃電"
-msgstr ""
+msgstr "번개"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
@@ -881,35 +881,35 @@ msgstr "재생 진행도"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:344
 msgid "5 分鐘內對地閃電"
-msgstr ""
+msgstr "5분 이내 지상 낙뢰"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:348
 msgid "10 分鐘內對地閃電"
-msgstr ""
+msgstr "10분 이내 지상 낙뢰"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:352
 msgid "30 分鐘內對地閃電"
-msgstr ""
+msgstr "30분 이내 지상 낙뢰"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:356
 msgid "60 分鐘內對地閃電"
-msgstr ""
+msgstr "60분 이내 지상 낙뢰"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:360
 msgid "5 分鐘內雲間閃電"
-msgstr ""
+msgstr "5분 이내 구름 사이 번개"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:364
 msgid "10 分鐘內雲間閃電"
-msgstr ""
+msgstr "10분 이내 구름 사이 번개"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:368
 msgid "30 分鐘內雲間閃電"
-msgstr ""
+msgstr "30분 이내 구름 사이 번개"
 
 #: ./lib/app/map/_lib/managers/lightning.dart:372
 msgid "60 分鐘內雲間閃電"
-msgstr ""
+msgstr "60분 이내 구름 사이 번개"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "今日"
