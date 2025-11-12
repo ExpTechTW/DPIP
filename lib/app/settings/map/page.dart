@@ -51,6 +51,7 @@ class SettingsMapPage extends StatelessWidget {
       MapLayer.temperature: '氣溫'.i18n,
       MapLayer.precipitation: '降水'.i18n,
       MapLayer.wind: '風向/風速'.i18n,
+      MapLayer.lightning: '閃電'.i18n,
     };
     final baseMapLabels = {
       BaseMapType.exptech: '簡單'.i18n,
