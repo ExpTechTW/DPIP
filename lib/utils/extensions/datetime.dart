@@ -17,6 +17,7 @@ extension DateTimeExtension on DateTime {
       _getDateFormat('yyyy/MM/dd (EEEE)', context.locale.toLanguageTag()).format(this);
   String toDateTimeString() => _getDateFormat('yyyy/MM/dd HH:mm:ss').format(this);
   String toLocaleTimeString() => _getDateFormat('HH:mm:ss').format(this);
+  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
 }
 
 extension TZDateTimeExtension on TZDateTime {
@@ -27,4 +28,5 @@ extension TZDateTimeExtension on TZDateTime {
       _getDateFormat('yyyy/MM/dd HH:mm:ss', context.locale.toLanguageTag()).format(this);
   String toLocaleTimeString(BuildContext context) =>
       _getDateFormat('HH:mm:ss', context.locale.toLanguageTag()).format(this);
+  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
 }
