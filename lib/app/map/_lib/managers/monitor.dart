@@ -33,6 +33,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   final int? replayTimestamp;
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
+  bool _isEpicenterVisible = true;
   Timer? _focusTimer;
   bool _isFocusing = false;
   static const double kCameraPadding = 80.0;
@@ -75,8 +76,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
       super.context,
       super.controller, {
-        this.isReplayMode = false,
-        this.replayTimestamp = 1761222495000,
+        this.replayTimestamp = 1762892804468,
       }) {
     GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
     _setupBlinkTimer();
@@ -135,13 +135,31 @@ class MonitorMapLayerManager extends MapLayerManager {
       if (!didSetup) return;
 
       try {
-        _isBoxVisible = !_isBoxVisible;
+        final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+        final hasBoxFlag = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+        final shouldBlinkBoxes = hasBoxData && hasBoxFlag;
 
-        // Batch blink visibility updates without querying layer IDs every time
-        await Future.wait([
-          controller.setLayerVisibility(_boxLayerId, _isBoxVisible),
-          controller.setLayerVisibility(_epicenterLayerId, _isBoxVisible),
-        ]);
+        final hasEew = GlobalProviders.data.activeEew.isNotEmpty;
+        final shouldBlinkEpicenter = hasEew;
+
+        // Boxes blinking
+        if (shouldBlinkBoxes) {
+          _isBoxVisible = !_isBoxVisible;
+          await controller.setLayerVisibility(_boxLayerId, _isBoxVisible);
+        } else {
+          // Ensure box layer hidden when no boxes
+          _isBoxVisible = true;
+          await controller.setLayerVisibility(_boxLayerId, false);
+        }
+
+        // Epicenter blinking is independent: only blink when EEW active
+        if (shouldBlinkEpicenter) {
+          _isEpicenterVisible = !_isEpicenterVisible;
+          await controller.setLayerVisibility(_epicenterLayerId, _isEpicenterVisible);
+        } else {
+          _isEpicenterVisible = true;
+          await controller.setLayerVisibility(_epicenterLayerId, false);
+        }
       } catch (e, s) {
         TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
       }
@@ -825,6 +843,8 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final data = GlobalProviders.data.getEewGeoJson();
       await controller.setGeoJsonSource(_eewSourceId, data);
+      _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
+      _needsRtsUpdate = true;
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateEewFromCache', e, s);
     } finally {
@@ -836,6 +856,8 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final emptyData = {'type': 'FeatureCollection', 'features': []};
       await controller.setGeoJsonSource(_eewSourceId, emptyData);
+      _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
+      _needsRtsUpdate = true;
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._clearEew', e, s);
     } finally {
