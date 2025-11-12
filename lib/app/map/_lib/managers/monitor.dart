@@ -136,6 +136,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       if (!didSetup) return;
 
       try {
+        // Cache blink conditions at the start of each blink cycle to ensure consistency
         final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
         final hasBoxFlag = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
         final shouldBlinkBoxes = hasBoxData && hasBoxFlag;
@@ -143,22 +144,21 @@ class MonitorMapLayerManager extends MapLayerManager {
         final hasEew = GlobalProviders.data.activeEew.isNotEmpty;
         final shouldBlinkEpicenter = hasEew;
 
-        // Boxes blinking
+        // Boxes blinking - only toggle if conditions allow, otherwise hide
         if (shouldBlinkBoxes) {
           _isBoxVisible = !_isBoxVisible;
           await controller.setLayerVisibility(_boxLayerId, _isBoxVisible);
         } else {
-          // Reset blink state to start from visible on next blink cycle
-          _isBoxVisible = true;
+          _isBoxVisible = false;
           await controller.setLayerVisibility(_boxLayerId, false);
         }
 
-        // Epicenter blinking is independent: only blink when EEW active
+        // Epicenter blinking - independent of boxes
         if (shouldBlinkEpicenter) {
           _isEpicenterVisible = !_isEpicenterVisible;
           await controller.setLayerVisibility(_epicenterLayerId, _isEpicenterVisible);
         } else {
-          _isEpicenterVisible = true;
+          _isEpicenterVisible = false;
           await controller.setLayerVisibility(_epicenterLayerId, false);
         }
       } catch (e, s) {
@@ -844,8 +844,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final data = GlobalProviders.data.getEewGeoJson();
       await controller.setGeoJsonSource(_eewSourceId, data);
-      _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
-      _needsRtsUpdate = true;
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateEewFromCache', e, s);
     } finally {
@@ -857,8 +855,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final emptyData = {'type': 'FeatureCollection', 'features': []};
       await controller.setGeoJsonSource(_eewSourceId, emptyData);
-      _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
-      _needsRtsUpdate = true;
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._clearEew', e, s);
     } finally {
