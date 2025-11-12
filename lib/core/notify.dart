@@ -40,17 +40,8 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
 
   TalkerManager.instance.debug('Navigating based on channelKey: $channelKey');
 
-  if (channelKey.startsWith('eew')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
-    return;
-  }
-
-  if (channelKey.startsWith('int_report')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
-    return;
-  }
-
-  if (channelKey.startsWith('eq')) {
+  if (channelKey.startsWith('eew') || channelKey.startsWith('int_report') ||
+      channelKey.startsWith('eq')) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
     return;
   }
