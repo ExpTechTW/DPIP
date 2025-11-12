@@ -61,11 +61,17 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     BasicNotifyType.all => '接收全部'.i18n,
   };
 
+  bool get hasLocation => GlobalProviders.location.coordinates != null ||
+      GlobalProviders.location.code != null ||
+      (Preference.locationAuto ?? false);
+
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
+
+    if (!hasLocation) return;
 
     if (Preference.notifyEew == null ||
         Preference.notifyMonitor == null ||
@@ -123,7 +129,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     return Selector<SettingsLocationModel, String?>(
       selector: (_, model) => model.code,
       builder: (context, code, child) {
-        final enabled = code != null || (Preference.locationAuto ?? false);
+        final enabled = hasLocation;
 
         return Stack(
           children: [
