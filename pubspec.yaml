@@ -8,7 +8,11 @@ environment:
   flutter: ">=3.35.7"
 
 dependencies:
-  android_alarm_manager_plus: ^5.0.0
+  android_alarm_manager_plus:
+    git:
+      url: https://github.com/ExpTechTW/plus_plugins.git
+      path: packages/android_alarm_manager_plus
+      ref: 81fc434
   async: ^2.13.0
   awesome_notifications: 0.10.1
   awesome_notifications_fcm: 0.10.1
