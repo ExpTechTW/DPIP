@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:ui';
 
@@ -14,7 +15,6 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/core/preference.dart';
-import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
@@ -248,26 +248,6 @@ class LocationServiceManager {
     }
   }
 
-  /// Updates the UI with the new location.
-  ///
-  /// Called when location has been updated to refresh the UI and update device location on server.
-  static Future<void> _onPosition(PositionEvent event) async {
-    try {
-      TalkerManager.instance.info('👷 location updated by service, reloading preferences');
-
-      await Preference.reload();
-      GlobalProviders.location.refresh();
-
-      final fcmToken = Preference.notifyToken;
-      if (fcmToken.isNotEmpty && event.coordinates != null) {
-        await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
-      }
-
-      TalkerManager.instance.info('👷 preferences reloaded');
-    } catch (e, s) {
-      TalkerManager.instance.error('👷 failed to update location', e, s);
-    }
-  }
 }
 
 /// The background location service.
@@ -349,8 +329,17 @@ class LocationService {
         await _$updatePosition(coordinates, nextUpdateIn: nextInterval);
       }
 
-      // Call the position handler to update UI
-      await LocationServiceManager._onPosition(PositionEvent(coordinates, Preference.locationCode));
+      // Update device location on server (directly from background isolate)
+      final fcmToken = Preference.notifyToken;
+      if (fcmToken.isNotEmpty) {
+        try {
+          TalkerManager.instance.debug('⚙️::BackgroundLocationService updating location on server');
+          await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: coordinates);
+          TalkerManager.instance.info('⚙️::BackgroundLocationService location updated on server successfully');
+        } catch (e, s) {
+          TalkerManager.instance.error('⚙️::BackgroundLocationService failed to update location on server', e, s);
+        }
+      }
 
       // Reschedule the alarm with the calculated interval
       await LocationServiceManager._rescheduleAlarm(nextInterval);
@@ -414,7 +403,20 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService attempting to dismiss notification');
+
+      // Try both dismiss and cancel to ensure notification is removed
+      // dismiss() removes from notification tray
       await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
+
+      // cancel() removes from scheduled notifications (backup method)
+      await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
+
+      // On some devices (like Pixel), we need to also dismiss all notifications in the channel
+      // as a workaround for sticky notifications
+      await AwesomeNotifications().dismissNotificationsByChannelKey('background');
+
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService notification dismiss commands sent');
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
     }
