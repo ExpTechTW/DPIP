@@ -57,6 +57,9 @@ class LocationServiceManager {
       return;
     }
 
+    // Log all available GPS accuracy types
+    await _logAvailableAccuracyTypes();
+
     try {
       await AndroidAlarmManager.initialize();
       await start();
