@@ -56,8 +56,10 @@ class LocationServiceManager {
       return;
     }
 
-    // Log all available GPS accuracy types
-    await _logAvailableAccuracyTypes();
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      return;
+    }
 
     try {
       await AndroidAlarmManager.initialize();
@@ -289,8 +291,6 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
-      // Try both dismiss and cancel to ensure notification is removed
-      // dismiss() removes from notification tray
       await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
       await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
       await AwesomeNotifications().dismissNotificationsByChannelKey('background');
@@ -439,7 +439,6 @@ class LocationService {
 
     final result = position != null ? _$getLocationFromCoordinates(position) : null;
 
-    // Save position to preferences
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
