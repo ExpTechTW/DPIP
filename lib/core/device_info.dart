@@ -12,7 +12,7 @@ mixin DeviceInfo {
     if (Platform.isAndroid) {
       final info = await deviceInfo.androidInfo;
       model = info.model;
-      serial = info.serialNumber;
+      serial = info.id;
       version = info.version.sdkInt.toString();
     }
     if (Platform.isIOS) {
