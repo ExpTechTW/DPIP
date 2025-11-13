@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:ui';
 
@@ -19,24 +18,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/log.dart';
-
-class PositionEvent {
-  final LatLng? coordinates;
-  final String? code;
-
-  PositionEvent(this.coordinates, this.code);
-
-  factory PositionEvent.fromJson(Map<String, dynamic> json) {
-    final coordinates = json['coordinates'] as List<dynamic>?;
-    final code = json['code'] as String?;
-
-    return PositionEvent(coordinates != null ? LatLng(coordinates[0] as double, coordinates[1] as double) : null, code);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'coordinates': coordinates?.toJson(), 'code': code};
-  }
-}
 
 /// Background location service.
 ///
@@ -110,55 +91,74 @@ class LocationServiceManager {
   static Future<void> _logAvailableAccuracyTypes() async {
     TalkerManager.instance.info('👷 === GPS Accuracy Types Info ===');
 
+    // Check location service status
     final isLocationEnabled = await Geolocator.isLocationServiceEnabled();
     TalkerManager.instance.info('👷 Location service enabled: $isLocationEnabled');
 
     if (!isLocationEnabled) {
-      TalkerManager.instance.warning('👷 Location service is disabled, skipping accuracy tests');
+      TalkerManager.instance.warning('👷 Location service is disabled, cannot test accuracy types');
+      TalkerManager.instance.info('👷 === End GPS Accuracy Types Info ===');
       return;
     }
 
-    // Test each accuracy level
+    // Check and request permissions if needed
+    LocationPermission permission = await Geolocator.checkPermission();
+    TalkerManager.instance.info('👷 Location permission status: $permission');
+
+    if (permission == LocationPermission.denied) {
+      TalkerManager.instance.info('👷 Requesting location permission...');
+      permission = await Geolocator.requestPermission();
+      TalkerManager.instance.info('👷 Permission request result: $permission');
+    }
+
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      TalkerManager.instance.warning('👷 Location permission not granted, cannot test accuracy types');
+      TalkerManager.instance.info('👷 === End GPS Accuracy Types Info ===');
+      return;
+    }
+
+    // Test only the accuracy levels we actually use in production
     final accuracyTypes = {
-      'lowest': LocationAccuracy.lowest,
       'low': LocationAccuracy.low,
       'medium': LocationAccuracy.medium,
-      'high': LocationAccuracy.high,
-      'best': LocationAccuracy.best,
-      'bestForNavigation': LocationAccuracy.bestForNavigation,
     };
+
+    TalkerManager.instance.info('👷 Testing accuracy types used in production...');
 
     for (final entry in accuracyTypes.entries) {
       final name = entry.key;
       final accuracy = entry.value;
 
       try {
-        TalkerManager.instance.info('👷 Testing accuracy: $name ($accuracy)');
+        TalkerManager.instance.info('👷 Testing: $name ($accuracy)');
 
-        // Try to get position with very short timeout (2s) to avoid delays
         final position = await Geolocator.getCurrentPosition(
           locationSettings: LocationSettings(
             accuracy: accuracy,
-            timeLimit: const Duration(seconds: 2),
+            timeLimit: const Duration(seconds: 10),
           ),
         ).timeout(
-          const Duration(seconds: 3),
-          onTimeout: () => throw TimeoutException('Timeout'),
+          const Duration(seconds: 12),
+          onTimeout: () => throw TimeoutException('Timeout after 12s'),
         );
 
         TalkerManager.instance.info(
           '👷   ✓ $name: SUCCESS - accuracy=${position.accuracy.toStringAsFixed(1)}m, '
-          'lat=${position.latitude.toStringAsFixed(6)}, lng=${position.longitude.toStringAsFixed(6)}',
+          'lat=${position.latitude.toStringAsFixed(6)}, lng=${position.longitude.toStringAsFixed(6)}, '
+          'speed=${position.speed.toStringAsFixed(1)}m/s, altitude=${position.altitude.toStringAsFixed(1)}m',
         );
-      } on TimeoutException {
-        TalkerManager.instance.warning('👷   ⏱ $name: TIMEOUT (may still work with longer timeout)');
+      } on TimeoutException catch (e) {
+        TalkerManager.instance.warning('👷   ⏱ $name: TIMEOUT - $e');
       } on PermissionDeniedException {
         TalkerManager.instance.error('👷   ✗ $name: PERMISSION_DENIED');
         break; // No point testing other accuracy levels
       } catch (e) {
         final errorType = e.runtimeType;
-        TalkerManager.instance.warning('👷   ✗ $name: FAILED ($errorType: $e)');
+        TalkerManager.instance.warning('👷   ✗ $name: FAILED - $errorType: $e');
       }
+
+      // Add small delay between tests to avoid overwhelming the GPS
+      await Future.delayed(const Duration(milliseconds: 500));
     }
 
     TalkerManager.instance.info('👷 === End GPS Accuracy Types Info ===');
@@ -334,9 +334,6 @@ class LocationService {
   /// Gets the current location of the device and updates preferences and notification.
   @pragma('vm:entry-point')
   static Future<void> _$task() async {
-    final $perf = Stopwatch()..start();
-    TalkerManager.instance.debug('⚙️::BackgroundLocationService task started');
-
     try {
       DartPluginRegistrant.ensureInitialized();
 
@@ -346,6 +343,23 @@ class LocationService {
 
       if (Preference.locationAuto != true) {
         await LocationServiceManager.stop();
+        return;
+      }
+
+      // Check location permission before attempting to get GPS
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted, stopping service');
+        await LocationServiceManager.stop();
+        return;
+      }
+
+      // Check if location service is enabled
+      final isLocationEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!isLocationEnabled) {
+        TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is disabled, skipping this update');
+        // Don't stop the service, just skip this update (user might enable GPS later)
+        await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
         return;
       }
 
@@ -380,12 +394,8 @@ class LocationService {
       }
 
       if (distanceInMeters == null || distanceInMeters >= 250) {
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInMeters, updating position');
         await _$updatePosition(coordinates, nextUpdateIn: nextInterval);
       } else {
-        TalkerManager.instance.debug(
-          '⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position',
-        );
         // Still update notification with next update time even if position hasn't changed significantly
         await _$updatePosition(coordinates, nextUpdateIn: nextInterval);
       }
@@ -394,9 +404,8 @@ class LocationService {
       final fcmToken = Preference.notifyToken;
       if (fcmToken.isNotEmpty) {
         try {
-          TalkerManager.instance.debug('⚙️::BackgroundLocationService updating location on server');
           await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: coordinates);
-          TalkerManager.instance.info('⚙️::BackgroundLocationService location updated on server successfully');
+          TalkerManager.instance.info('⚙️::BackgroundLocationService location updated on server');
         } catch (e, s) {
           TalkerManager.instance.error('⚙️::BackgroundLocationService failed to update location on server', e, s);
         }
@@ -412,12 +421,7 @@ class LocationService {
       // Dismiss notification after processing
       await _$dismissNotification();
     } catch (e, s) {
-      $perf.stop();
-      TalkerManager.instance.error(
-        '⚙️::BackgroundLocationService task FAILED after ${$perf.elapsedMilliseconds}ms',
-        e,
-        s,
-      );
+      TalkerManager.instance.error('⚙️::BackgroundLocationService task FAILED', e, s);
 
       // Dismiss notification on error
       await _$dismissNotification();
@@ -427,11 +431,6 @@ class LocationService {
         await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
       } catch (_) {
         // Ignore reschedule errors
-      }
-    } finally {
-      if ($perf.isRunning) {
-        $perf.stop();
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService task completed in ${$perf.elapsedMilliseconds}ms');
       }
     }
   }
@@ -464,8 +463,6 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService attempting to dismiss notification');
-
       // Try both dismiss and cancel to ensure notification is removed
       // dismiss() removes from notification tray
       await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
@@ -476,8 +473,6 @@ class LocationService {
       // On some devices (like Pixel), we need to also dismiss all notifications in the channel
       // as a workaround for sticky notifications
       await AwesomeNotifications().dismissNotificationsByChannelKey('background');
-
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService notification dismiss commands sent');
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
     }
@@ -498,8 +493,15 @@ class LocationService {
   /// Returns null if location services are disabled or all attempts fail.
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
-    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    // Check permission first (this shouldn't fail since we check in _$task, but double-check for safety)
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted');
+      return null;
+    }
 
+    // Check if location service is enabled
+    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!isLocationServiceEnabled) {
       TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is not available');
       return null;
@@ -512,20 +514,16 @@ class LocationService {
         // Check if last known position is recent enough (< 10 minutes old)
         final age = DateTime.now().difference(lastKnown.timestamp);
         if (age.inMinutes < 10 && lastKnown.accuracy <= 500) {
-          TalkerManager.instance.debug(
-            '⚙️::BackgroundLocationService using last known position (age: ${age.inMinutes}min, accuracy: ${lastKnown.accuracy.toStringAsFixed(0)}m)',
-          );
           return LatLng(lastKnown.latitude, lastKnown.longitude);
         }
       }
     } catch (e) {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService last known position unavailable: $e');
+      // Last known position unavailable, continue to next strategy
     }
 
     // Strategy 2: Try low accuracy (network-based) with timeout
     // This uses WiFi/Cell towers - very battery efficient
     try {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService trying low accuracy (network-based)');
       final lowAccuracyPosition = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.low,
@@ -535,19 +533,15 @@ class LocationService {
 
       // If accuracy is good enough (< 500m), use it
       if (lowAccuracyPosition.accuracy <= 500) {
-        TalkerManager.instance.debug(
-          '⚙️::BackgroundLocationService got low accuracy position (accuracy: ${lowAccuracyPosition.accuracy.toStringAsFixed(0)}m)',
-        );
         return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
       }
     } catch (e) {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService low accuracy failed: $e');
+      // Low accuracy failed, continue to next strategy
     }
 
     // Strategy 3: Fall back to medium accuracy (balanced GPS + Network)
     // Only use if low accuracy failed or was too inaccurate
     try {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService falling back to medium accuracy');
       final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.medium,
@@ -555,18 +549,14 @@ class LocationService {
         ),
       );
 
-      TalkerManager.instance.debug(
-        '⚙️::BackgroundLocationService got medium accuracy position (accuracy: ${mediumAccuracyPosition.accuracy.toStringAsFixed(0)}m)',
-      );
       return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
     } catch (e) {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService medium accuracy failed: $e');
+      // Medium accuracy failed, continue to last resort
     }
 
     // Strategy 4: Last resort - high accuracy GPS (most battery intensive)
     // Only reached if all previous strategies failed
     try {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService last resort: using high accuracy GPS');
       final currentPosition = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -574,12 +564,9 @@ class LocationService {
         ),
       );
 
-      TalkerManager.instance.debug(
-        '⚙️::BackgroundLocationService got high accuracy position (accuracy: ${currentPosition.accuracy.toStringAsFixed(0)}m)',
-      );
       return LatLng(currentPosition.latitude, currentPosition.longitude);
     } catch (e) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed: $e');
+      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed', e);
       return null;
     }
   }
