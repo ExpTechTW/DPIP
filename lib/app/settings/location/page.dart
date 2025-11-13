@@ -60,8 +60,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       notificationPermission = values[0] as PermissionStatus?;
       locationPermission = values[1] as PermissionStatus?;
       locationAlwaysPermission = values[2] as PermissionStatus?;
-      autoStartPermission = values[3] as bool? ?? true;
-      batteryOptimizationPermission = values[4] as bool? ?? true;
+      autoStartPermission = true;
+      batteryOptimizationPermission = values[3] as bool? ?? true;
     });
   }
 

@@ -10,6 +10,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
@@ -179,6 +180,12 @@ class LocationService {
       await Preference.init();
       await AppLocalizations.load();
       await LocationNameLocalizations.load();
+
+      try {
+        final _ = Global.packageInfo;
+      } catch (_) {
+        Global.packageInfo = await PackageInfo.fromPlatform();
+      }
 
       if (Preference.locationAuto != true) {
         await LocationServiceManager.stop();
