@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:ui';
 
@@ -290,8 +289,6 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
-      TalkerManager.instance.debug('⚙️::BackgroundLocationService attempting to dismiss notification');
-
       // Try both dismiss and cancel to ensure notification is removed
       // dismiss() removes from notification tray
       await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
