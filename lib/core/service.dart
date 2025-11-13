@@ -30,23 +30,14 @@ class LocationServiceManager {
   /// The notification ID used for location updates notification
   static const int kNotificationId = 888888;
 
-  /// Preference keys for storing location update intervals
   static const String _kPrefKeyUpdateInterval = 'location_update_interval';
-  static const String _kPrefKeyLastDistance = 'location_last_distance';
-  static const String _kPrefKeyShowNotification = 'location_show_notification';
 
-  /// Dynamic update intervals based on movement
-  static const Duration kMinUpdateInterval = Duration(minutes: 5);     // 最小間隔：5分鐘
-  static const Duration kMaxUpdateInterval = Duration(hours: 2);       // 最大間隔：2小時
-  static const Duration kDefaultUpdateInterval = Duration(minutes: 10); // 預設間隔：10分鐘
+  static const Duration kMinUpdateInterval = Duration(minutes: 1);
+  static const Duration kMaxUpdateInterval = Duration(minutes: 1);
+  static const Duration kDefaultUpdateInterval = Duration(minutes: 1);
 
-  /// Distance thresholds for interval adjustment (in meters)
-  static const double kHighMovementThreshold = 1000;  // 移動超過1km，認為是高移動
-  static const double kLowMovementThreshold = 100;    // 移動少於100m，認為是低移動
-
-  /// Whether to show notification (default: false for silent mode)
-  static bool get showNotification => Preference.instance.getBool(_kPrefKeyShowNotification) ?? false;
-  static set showNotification(bool value) => Preference.instance.setBool(_kPrefKeyShowNotification, value);
+  static const double kHighMovementThreshold = 1000;
+  static const double kLowMovementThreshold = 100;
 
   /// Platform channel for iOS
   static const platform = MethodChannel('com.exptech.dpip/location');
@@ -80,10 +71,6 @@ class LocationServiceManager {
 
   static Future<void> _setUpdateInterval(Duration interval) async {
     await Preference.instance.setInt(_kPrefKeyUpdateInterval, interval.inMinutes);
-  }
-
-  static Future<void> _setLastDistance(double distance) async {
-    await Preference.instance.setDouble(_kPrefKeyLastDistance, distance);
   }
 
   static Duration _calculateNextInterval(double? distanceInMeters) {
@@ -229,10 +216,6 @@ class LocationService {
 
       final nextInterval = LocationServiceManager._calculateNextInterval(distanceInMeters);
       await LocationServiceManager._setUpdateInterval(nextInterval);
-
-      if (distanceInMeters != null) {
-        await LocationServiceManager._setLastDistance(distanceInMeters);
-      }
 
       await _$updatePosition(coordinates);
 
