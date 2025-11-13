@@ -434,6 +434,7 @@ class LocationService {
 
     final result = position != null ? _$getLocationFromCoordinates(position) : null;
 
+    // Save position to preferences
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
