@@ -32,6 +32,11 @@ enum HistoryType {
 
   @JsonValue('workSchlClos')
   workAndClassSuspension,
+
+  @JsonValue('seawave')
+  seawave,
+
+  unknown,
 }
 
 @JsonSerializable()
@@ -64,7 +69,14 @@ class History {
   }
 
   factory History.fromJson(Map<String, dynamic> json) {
-    final type = $enumDecode(_$HistoryTypeEnumMap, json['type']);
+    HistoryType type;
+    try {
+      type = $enumDecode(_$HistoryTypeEnumMap, json['type']);
+    } catch (e) {
+      // 處理未知類型
+      type = HistoryType.unknown;
+      json['type'] = 'unknown';
+    }
 
     switch (type) {
       case HistoryType.earthquake:
