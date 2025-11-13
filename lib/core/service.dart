@@ -33,9 +33,9 @@ class LocationServiceManager {
 
   static const String _kPrefKeyUpdateInterval = 'location_update_interval';
 
-  static const Duration kMinUpdateInterval = Duration(minutes: 1);
-  static const Duration kMaxUpdateInterval = Duration(minutes: 1);
-  static const Duration kDefaultUpdateInterval = Duration(minutes: 1);
+  static const Duration kMinUpdateInterval = Duration(minutes: 5);
+  static const Duration kMaxUpdateInterval = Duration(minutes: 60);
+  static const Duration kDefaultUpdateInterval = Duration(minutes: 10);
 
   static const double kHighMovementThreshold = 1000;
   static const double kLowMovementThreshold = 100;
@@ -86,7 +86,7 @@ class LocationServiceManager {
     }
 
     final currentInterval = _getUpdateInterval();
-    final newInterval = Duration(minutes: currentInterval.inMinutes + 10);
+    final newInterval = Duration(minutes: currentInterval.inMinutes + 5);
     return newInterval > kMaxUpdateInterval ? kMaxUpdateInterval : newInterval;
   }
 
@@ -161,7 +161,6 @@ class LocationServiceManager {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
     }
   }
-
 }
 
 @pragma('vm:entry-point')
@@ -194,14 +193,18 @@ class LocationService {
 
       final permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted, stopping service');
+        TalkerManager.instance.warning(
+          '⚙️::BackgroundLocationService location permission not granted, stopping service',
+        );
         await LocationServiceManager.stop();
         return;
       }
 
       final isLocationEnabled = await Geolocator.isLocationServiceEnabled();
       if (!isLocationEnabled) {
-        TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is disabled, skipping this update');
+        TalkerManager.instance.warning(
+          '⚙️::BackgroundLocationService location service is disabled, skipping this update',
+        );
         await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
         return;
       }
@@ -250,8 +253,7 @@ class LocationService {
 
       try {
         await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
-      } catch (_) {
-      }
+      } catch (_) {}
     }
   }
 
@@ -310,10 +312,7 @@ class LocationService {
 
     try {
       final lowAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 10),
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 10)),
       );
 
       if (lowAccuracyPosition.accuracy <= 500) {
@@ -323,10 +322,7 @@ class LocationService {
 
     try {
       final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 15),
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
       );
 
       return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
@@ -334,10 +330,7 @@ class LocationService {
 
     try {
       final currentPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 30),
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 30)),
       );
 
       return LatLng(currentPosition.latitude, currentPosition.longitude);
