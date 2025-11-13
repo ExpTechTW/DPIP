@@ -5,11 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" android:minSdkVersion="34"/>
-
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
@@ -53,13 +51,23 @@
                 android:value="2"/>
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
         <meta-data android:name="com.exptech.dpip.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
+
+        <!-- AlarmManager service -->
         <service
-                android:name="id.flutter.flutter_background_service.BackgroundService"
-                android:foregroundServiceType="location"
-                android:exported="true"
-                android:stopWithTask="true"
-                tools:replace="android:exported,android:stopWithTask"
-        />
+                android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
+                android:permission="android.permission.BIND_JOB_SERVICE"
+                android:exported="false"/>
+        <receiver
+                android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver"
+                android:exported="false"/>
+        <receiver
+                android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
+                android:enabled="true"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
     <queries>
         <intent>

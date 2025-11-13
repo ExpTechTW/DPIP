@@ -5,8 +5,8 @@ import 'dart:ui';
 import 'package:dpip/core/i18n.dart';
 import 'package:flutter/services.dart';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -38,27 +38,35 @@ class PositionEvent {
   }
 }
 
-/// Events emitted by the background service.
-final class LocationServiceEvent {
-  /// Event emitted when a new position is set in the background service. Contains the updated location coordinates.
-  static const position = 'position';
-
-  /// Method event to stop the service.
-  static const stop = 'stop';
-}
-
 /// Background location service.
 ///
-/// This class is responsible for managing the background location service. It is used to handle start and stop the
-/// service.
+/// This class is responsible for managing the background location service using AlarmManager.
 class LocationServiceManager {
   LocationServiceManager._();
 
-  /// The notification ID used for the background service notification
-  static const kNotificationId = 888888;
+  /// The alarm ID used for periodic location updates
+  static const int kAlarmId = 888888;
 
-  /// Instance of the background service
-  static FlutterBackgroundService? instance;
+  /// The notification ID used for location updates notification
+  static const int kNotificationId = 888888;
+
+  /// Preference keys for storing location update intervals
+  static const String _kPrefKeyUpdateInterval = 'location_update_interval';
+  static const String _kPrefKeyLastDistance = 'location_last_distance';
+  static const String _kPrefKeyShowNotification = 'location_show_notification';
+
+  /// Dynamic update intervals based on movement
+  static const Duration kMinUpdateInterval = Duration(minutes: 5);     // 最小間隔：5分鐘
+  static const Duration kMaxUpdateInterval = Duration(hours: 2);       // 最大間隔：2小時
+  static const Duration kDefaultUpdateInterval = Duration(minutes: 10); // 預設間隔：10分鐘
+
+  /// Distance thresholds for interval adjustment (in meters)
+  static const double kHighMovementThreshold = 1000;  // 移動超過1km，認為是高移動
+  static const double kLowMovementThreshold = 100;    // 移動少於100m，認為是低移動
+
+  /// Whether to show notification (default: false for silent mode)
+  static bool get showNotification => Preference.instance.getBool(_kPrefKeyShowNotification) ?? false;
+  static set showNotification(bool value) => Preference.instance.setBool(_kPrefKeyShowNotification, value);
 
   /// Platform channel for iOS
   static const platform = MethodChannel('com.exptech.dpip/location');
@@ -68,50 +76,81 @@ class LocationServiceManager {
 
   /// Initializes the background location service.
   ///
-  /// Configures the service with Android specific settings. Sets up a listener for position updates that reloads
-  /// preferences and updates device location.
+  /// Sets up the AlarmManager for periodic location updates.
   ///
-  /// Will starts the service if automatic location updates are enabled.
+  /// Will start the service if automatic location updates are enabled.
   ///
-  /// This method is Android specific.
+  /// **Important**: This method should be called on every app startup to ensure
+  /// the alarm is restored after device reboot (as rescheduleOnReboot may not
+  /// be reliable on all devices).
   static Future<void> initalize() async {
-    if (instance != null || !Platform.isAndroid) return;
+    if (!Platform.isAndroid) return;
 
     TalkerManager.instance.info('👷 initializing location service');
 
-    final service = FlutterBackgroundService();
-
     try {
-      await service.configure(
-        androidConfiguration: AndroidConfiguration(
-          onStart: LocationService._$onStart,
-          autoStart: false,
-          isForegroundMode: false,
-          foregroundServiceTypes: [AndroidForegroundType.location],
-          notificationChannelId: 'background',
-          initialNotificationTitle: 'DPIP',
-          initialNotificationContent: '正在初始化自動定位服務...',
-          foregroundServiceNotificationId: kNotificationId,
-        ),
-        // iOS is handled in native code
-        iosConfiguration: IosConfiguration(autoStart: false),
-      );
-
-      // Reloads the UI isolate's preference cache when a new position is set in the background service.
-      service.on(LocationServiceEvent.position).listen((data) => _onPosition(PositionEvent.fromJson(data!)));
-
-      instance = service;
+      await AndroidAlarmManager.initialize();
       TalkerManager.instance.info('👷 service initialized');
     } catch (e, s) {
       TalkerManager.instance.error('👷 initializing location service FAILED', e, s);
     }
 
-    if (Preference.locationAuto == true) await start();
+    // Always attempt to restore the alarm if location auto is enabled
+    // This ensures the service continues after device reboot
+    if (Preference.locationAuto == true) {
+      TalkerManager.instance.info('👷 location auto is enabled, ensuring alarm is scheduled');
+      await start();
+    }
+  }
+
+  // ==================== Private Helper Methods ====================
+
+  /// Gets the current update interval from SharedPreferences.
+  static Duration _getUpdateInterval() {
+    final minutes = Preference.instance.getInt(_kPrefKeyUpdateInterval);
+    return minutes != null ? Duration(minutes: minutes) : kDefaultUpdateInterval;
+  }
+
+  /// Saves the update interval to SharedPreferences.
+  static Future<void> _setUpdateInterval(Duration interval) async {
+    await Preference.instance.setInt(_kPrefKeyUpdateInterval, interval.inMinutes);
+  }
+
+  /// Stores the last movement distance for debugging purposes.
+  static Future<void> _setLastDistance(double distance) async {
+    await Preference.instance.setDouble(_kPrefKeyLastDistance, distance);
+  }
+
+  /// Calculates the next update interval based on movement distance.
+  ///
+  /// Strategy:
+  /// - **High movement** (≥1000m): 5 minutes - Fast updates for moving users
+  /// - **Medium movement** (100m-1000m): 10 minutes - Balanced updates for walking
+  /// - **Low movement** (<100m): Gradually increase to 2 hours - Battery saving for stationary users
+  static Duration _calculateNextInterval(double? distanceInMeters) {
+    if (distanceInMeters == null) return kDefaultUpdateInterval;
+
+    if (distanceInMeters >= kHighMovementThreshold) {
+      return kMinUpdateInterval; // High movement: 5 min
+    }
+
+    if (distanceInMeters >= kLowMovementThreshold) {
+      return kDefaultUpdateInterval; // Medium movement: 10 min
+    }
+
+    // Low movement: Gradually increase interval
+    final currentInterval = _getUpdateInterval();
+    final newInterval = Duration(minutes: currentInterval.inMinutes + 10);
+    return newInterval > kMaxUpdateInterval ? kMaxUpdateInterval : newInterval;
   }
 
   /// Starts the background location service.
   ///
-  /// Initializes the service if not already initialized. Only starts if the service is not already running.
+  /// Schedules the first alarm with default interval. Subsequent alarms will be dynamically adjusted.
+  ///
+  /// **Note**: On Android 12+, the SCHEDULE_EXACT_ALARM permission is required.
+  /// If the permission is not granted, the alarm may not fire at the exact time,
+  /// but will still work with less precision.
   static Future<void> start() async {
     if (!avaliable) return;
 
@@ -123,21 +162,70 @@ class LocationServiceManager {
         return;
       }
 
-      final service = instance;
-      if (service == null) throw Exception('Not initialized.');
+      // Cancel any existing alarm first to avoid duplicates
+      await AndroidAlarmManager.cancel(kAlarmId);
 
-      if (await service.isRunning()) {
-        TalkerManager.instance.warning('👷 location service is already running, skipping...');
-        return;
-      }
+      // Reset to default interval on start
+      await _setUpdateInterval(kDefaultUpdateInterval);
 
-      await service.startService();
+      // Schedule one-time alarm with default interval
+      // The task will reschedule itself dynamically based on movement
+      // Note: If SCHEDULE_EXACT_ALARM permission is not granted (Android 12+),
+      // the alarm will still work but with less precision
+      await AndroidAlarmManager.oneShot(
+        kDefaultUpdateInterval,
+        kAlarmId,
+        LocationService._$task,
+        wakeup: true,
+        exact: true,
+        rescheduleOnReboot: true,
+      );
+
+      TalkerManager.instance.info('👷 location service started with ${kDefaultUpdateInterval.inMinutes}min interval');
     } catch (e, s) {
       TalkerManager.instance.error('👷 starting location service FAILED', e, s);
+
+      // If exact alarm fails, try with inexact alarm as fallback
+      if (e.toString().contains('SCHEDULE_EXACT_ALARM')) {
+        TalkerManager.instance.warning('👷 exact alarm permission not granted, trying inexact alarm');
+        try {
+          await AndroidAlarmManager.oneShot(
+            kDefaultUpdateInterval,
+            kAlarmId,
+            LocationService._$task,
+            wakeup: true,
+            rescheduleOnReboot: true,
+            // exact: false is the default, so omitted
+          );
+          TalkerManager.instance.info('👷 location service started with inexact alarm');
+        } catch (e2, s2) {
+          TalkerManager.instance.error('👷 starting inexact alarm also FAILED', e2, s2);
+        }
+      }
     }
   }
 
-  /// Stops the background location service by invoking the stop event.
+  /// Reschedules the next alarm with the specified interval.
+  static Future<void> _rescheduleAlarm(Duration interval) async {
+    try {
+      await AndroidAlarmManager.cancel(kAlarmId);
+
+      await AndroidAlarmManager.oneShot(
+        interval,
+        kAlarmId,
+        LocationService._$task,
+        wakeup: true,
+        exact: true,
+        rescheduleOnReboot: true,
+      );
+
+      TalkerManager.instance.info('👷 rescheduled alarm with ${interval.inMinutes}min interval');
+    } catch (e, s) {
+      TalkerManager.instance.error('👷 rescheduling alarm FAILED', e, s);
+    }
+  }
+
+  /// Stops the background location service by canceling the periodic alarm.
   static Future<void> stop() async {
     if (!avaliable) return;
 
@@ -149,18 +237,20 @@ class LocationServiceManager {
         return;
       }
 
-      final service = instance;
-      if (service == null) throw Exception('Not initialized.');
+      await AndroidAlarmManager.cancel(kAlarmId);
 
-      service.invoke(LocationServiceEvent.stop);
+      // Dismiss notification
+      await AwesomeNotifications().dismiss(kNotificationId);
+
+      TalkerManager.instance.info('👷 location service stopped');
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
     }
   }
 
-  /// The event handler for the "position" event.
+  /// Updates the UI with the new location.
   ///
-  /// Called when the service has updated the current location.
+  /// Called when location has been updated to refresh the UI and update device location on server.
   static Future<void> _onPosition(PositionEvent event) async {
     try {
       TalkerManager.instance.info('👷 location updated by service, reloading preferences');
@@ -182,92 +272,56 @@ class LocationServiceManager {
 
 /// The background location service.
 ///
-/// This service is used to get the current location of the device in the background and notify the main isolate to
-/// update the UI with the new location.
+/// This service is used to get the current location of the device in the background using AlarmManager.
 ///
 /// All property prefixed with `_$` are isolated from the main app.
 @pragma('vm:entry-point')
 class LocationService {
   LocationService._();
 
-  /// The service instance
-  static late AndroidServiceInstance _$service;
-
   /// The last known location coordinates
   static LatLng? _$location;
 
-  /// Timer for scheduling periodic location updates
-  static Timer? _$locationUpdateTimer;
-
   /// Cached GeoJSON data for location lookups
-  static late GeoJSONFeatureCollection _$geoJsonData;
+  static GeoJSONFeatureCollection? _$geoJsonData;
 
   /// Cached location data mapping
-  static late Map<String, Location> _$locationData;
+  static Map<String, Location>? _$locationData;
 
-  /// Entry point for the background service.
+  /// The main task function that gets called periodically by AlarmManager.
   ///
-  /// Sets up notifications, initializes required data, and starts periodic location updates. Updates the notification
-  /// with current location information. Adjusts update frequency based on movement distance.
-  @pragma('vm:entry-point')
-  static Future<void> _$onStart(ServiceInstance service) async {
-    if (service is! AndroidServiceInstance) return;
-    _$service = service;
-
-    DartPluginRegistrant.ensureInitialized();
-
-    await Preference.init();
-    await AppLocalizations.load();
-    await LocationNameLocalizations.load();
-
-    if (Preference.locationAuto != true) {
-      await _$onStop();
-      return;
-    }
-
-    _$geoJsonData = await Global.loadTownGeojson();
-    _$locationData = await Global.loadLocationData();
-
-    _$service.setAutoStartOnBootMode(true);
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: LocationServiceManager.kNotificationId,
-        channelKey: 'background',
-        title: 'DPIP',
-        body: '自動定位服務啟動中...',
-        locked: true,
-        autoDismissible: false,
-        icon: 'resource://drawable/ic_stat_name',
-        badge: 0,
-      ),
-    );
-
-    await _$service.setAsForegroundService();
-    _$service.on(LocationServiceEvent.stop).listen((_) => _$onStop());
-
-    // Start the periodic location update task
-    await _$task();
-    _$locationUpdateTimer = Timer.periodic(const Duration(minutes: 10), (timer) => _$task());
-  }
-
-  /// The main tick function of the service.
-  ///
-  /// This function is used to get the current location of the device and update the notification. It is called
-  /// periodically to check if the device has moved and update the notification accordingly.
+  /// Gets the current location of the device and updates preferences and notification.
   @pragma('vm:entry-point')
   static Future<void> _$task() async {
-    if (!await _$service.isForegroundService()) return;
-
     final $perf = Stopwatch()..start();
     TalkerManager.instance.debug('⚙️::BackgroundLocationService task started');
 
     try {
+      DartPluginRegistrant.ensureInitialized();
+
+      await Preference.init();
+      await AppLocalizations.load();
+      await LocationNameLocalizations.load();
+
+      if (Preference.locationAuto != true) {
+        await LocationServiceManager.stop();
+        return;
+      }
+
+      // Show silent notification to indicate processing
+      await _$showProcessingNotification();
+
+      // Load data if not already loaded
+      _$geoJsonData ??= await Global.loadTownGeojson();
+      _$locationData ??= await Global.loadLocationData();
+
       // Get current position and location info
       final coordinates = await _$getDeviceGeographicalLocation();
 
       if (coordinates == null) {
-        _$updatePosition(_$service, null);
+        await _$updatePosition(null);
+        // Dismiss notification after processing
+        await _$dismissNotification();
         return;
       }
 
@@ -275,14 +329,38 @@ class LocationService {
 
       final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
 
+      // Calculate and schedule next update based on movement
+      final nextInterval = LocationServiceManager._calculateNextInterval(distanceInMeters);
+      await LocationServiceManager._setUpdateInterval(nextInterval);
+
+      // Store distance for interval calculation
+      if (distanceInMeters != null) {
+        await LocationServiceManager._setLastDistance(distanceInMeters);
+      }
+
       if (distanceInMeters == null || distanceInMeters >= 250) {
         TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInMeters, updating position');
-        _$updatePosition(_$service, coordinates);
+        await _$updatePosition(coordinates, nextUpdateIn: nextInterval);
       } else {
         TalkerManager.instance.debug(
           '⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position',
         );
+        // Still update notification with next update time even if position hasn't changed significantly
+        await _$updatePosition(coordinates, nextUpdateIn: nextInterval);
       }
+
+      // Call the position handler to update UI
+      await LocationServiceManager._onPosition(PositionEvent(coordinates, Preference.locationCode));
+
+      // Reschedule the alarm with the calculated interval
+      await LocationServiceManager._rescheduleAlarm(nextInterval);
+
+      TalkerManager.instance.info(
+        '⚙️::BackgroundLocationService next update in ${nextInterval.inMinutes}min (distance: ${distanceInMeters?.toStringAsFixed(0) ?? "unknown"}m)',
+      );
+
+      // Dismiss notification after processing
+      await _$dismissNotification();
     } catch (e, s) {
       $perf.stop();
       TalkerManager.instance.error(
@@ -290,6 +368,16 @@ class LocationService {
         e,
         s,
       );
+
+      // Dismiss notification on error
+      await _$dismissNotification();
+
+      // On error, retry with default interval
+      try {
+        await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
+      } catch (_) {
+        // Ignore reschedule errors
+      }
     } finally {
       if ($perf.isRunning) {
         $perf.stop();
@@ -298,29 +386,53 @@ class LocationService {
     }
   }
 
-  /// The event handler for the "stop" event.
+  /// Shows a silent notification to indicate GPS processing.
   ///
-  /// Called when the service manager sends a stop signal to terminate the location service.
+  /// This notification is completely silent (no sound, no vibration) and will be
+  /// automatically dismissed after GPS processing completes.
   @pragma('vm:entry-point')
-  static Future<void> _$onStop() async {
+  static Future<void> _$showProcessingNotification() async {
     try {
-      TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
-
-      // Cleanup timer
-      _$locationUpdateTimer?.cancel();
-
-      await _$service.setAutoStartOnBootMode(false);
-      await _$service.stopSelf();
-
-      TalkerManager.instance.info('⚙️::BackgroundLocationService location service stopped');
+      // Note: The 'background' channel must be configured with enableSound: false
+      // and enableVibration: false to ensure completely silent notifications
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: LocationServiceManager.kNotificationId,
+          channelKey: 'background',  // Must be a silent channel
+          title: '正在更新位置'.i18n,
+          body: '取得 GPS 位置中...',
+          icon: 'resource://drawable/ic_stat_name',
+          badge: 0,
+        ),
+      );
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService stopping location service FAILED', e, s);
+      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to show notification', e, s);
     }
   }
 
-  /// Gets the current geographical location of the device.
+  /// Dismisses the GPS processing notification.
+  @pragma('vm:entry-point')
+  static Future<void> _$dismissNotification() async {
+    try {
+      await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
+    } catch (e, s) {
+      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
+    }
+  }
+
+  /// Gets the current geographical location of the device using a smart, battery-efficient strategy.
   ///
-  /// Returns null if location services are disabled. Uses medium accuracy for location detection.
+  /// **Multi-tier location strategy** (from most to least battery-efficient):
+  /// 1. **Last Known Position** - Uses cached location (0% battery cost)
+  /// 2. **Low Accuracy** - Network-based location (minimal battery, ~100-500m accuracy)
+  /// 3. **Medium Accuracy** - Balanced GPS + Network (~10-100m accuracy)
+  /// 4. **High Accuracy** - Full GPS (highest battery, ~5-10m accuracy)
+  ///
+  /// The strategy progressively falls back to higher accuracy only when:
+  /// - Previous method fails or times out
+  /// - Previous result is too old or inaccurate
+  ///
+  /// Returns null if location services are disabled or all attempts fail.
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -330,11 +442,83 @@ class LocationService {
       return null;
     }
 
-    final currentPosition = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-    );
+    // Strategy 1: Try last known position first (FREE - no battery cost!)
+    try {
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        // Check if last known position is recent enough (< 10 minutes old)
+        final age = DateTime.now().difference(lastKnown.timestamp);
+        if (age.inMinutes < 10 && lastKnown.accuracy <= 500) {
+          TalkerManager.instance.debug(
+            '⚙️::BackgroundLocationService using last known position (age: ${age.inMinutes}min, accuracy: ${lastKnown.accuracy.toStringAsFixed(0)}m)',
+          );
+          return LatLng(lastKnown.latitude, lastKnown.longitude);
+        }
+      }
+    } catch (e) {
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService last known position unavailable: $e');
+    }
 
-    return LatLng(currentPosition.latitude, currentPosition.longitude);
+    // Strategy 2: Try low accuracy (network-based) with timeout
+    // This uses WiFi/Cell towers - very battery efficient
+    try {
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService trying low accuracy (network-based)');
+      final lowAccuracyPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+
+      // If accuracy is good enough (< 500m), use it
+      if (lowAccuracyPosition.accuracy <= 500) {
+        TalkerManager.instance.debug(
+          '⚙️::BackgroundLocationService got low accuracy position (accuracy: ${lowAccuracyPosition.accuracy.toStringAsFixed(0)}m)',
+        );
+        return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
+      }
+    } catch (e) {
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService low accuracy failed: $e');
+    }
+
+    // Strategy 3: Fall back to medium accuracy (balanced GPS + Network)
+    // Only use if low accuracy failed or was too inaccurate
+    try {
+      TalkerManager.instance.debug('⚙️::BackgroundLocationService falling back to medium accuracy');
+      final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+
+      TalkerManager.instance.debug(
+        '⚙️::BackgroundLocationService got medium accuracy position (accuracy: ${mediumAccuracyPosition.accuracy.toStringAsFixed(0)}m)',
+      );
+      return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
+    } catch (e) {
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService medium accuracy failed: $e');
+    }
+
+    // Strategy 4: Last resort - high accuracy GPS (most battery intensive)
+    // Only reached if all previous strategies failed
+    try {
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService last resort: using high accuracy GPS');
+      final currentPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 30),
+        ),
+      );
+
+      TalkerManager.instance.debug(
+        '⚙️::BackgroundLocationService got high accuracy position (accuracy: ${currentPosition.accuracy.toStringAsFixed(0)}m)',
+      );
+      return LatLng(currentPosition.latitude, currentPosition.longitude);
+    } catch (e) {
+      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed: $e');
+      return null;
+    }
   }
 
   /// Gets the location code for given coordinates by checking if they fall within polygon boundaries.
@@ -342,7 +526,12 @@ class LocationService {
   /// Takes a target LatLng and checks if it falls within any polygon in the GeoJSON data. Returns the location code if
   /// found, null otherwise.
   static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
-    final features = _$geoJsonData.features;
+    final geoJsonData = _$geoJsonData;
+    final locationData = _$locationData;
+
+    if (geoJsonData == null || locationData == null) return null;
+
+    final features = geoJsonData.features;
 
     for (final feature in features) {
       if (feature == null) continue;
@@ -406,7 +595,7 @@ class LocationService {
         final code = feature.properties!['CODE']?.toString();
         if (code == null) return null;
 
-        final location = _$locationData[code];
+        final location = locationData[code];
         if (location == null) return null;
 
         return (code: code, location: location);
@@ -416,55 +605,56 @@ class LocationService {
     return null;
   }
 
-  /// Updates the current position in the service.
+  /// Updates the current position.
   ///
-  /// Invokes a position event with the new coordinates that can be listened to by the main app to update the UI.
+  /// Saves the new position to preferences and optionally updates the notification.
   @pragma('vm:entry-point')
-  static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
+  static Future<void> _$updatePosition(LatLng? position, {Duration? nextUpdateIn}) async {
     _$location = position;
 
     final result = position != null ? _$getLocationFromCoordinates(position) : null;
 
+    // Save position to preferences
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
 
-    service.invoke(LocationServiceEvent.position, PositionEvent(position, result?.code).toJson());
+    // Only show notification if enabled
+    if (!LocationServiceManager.showNotification) {
+      return;
+    }
 
-    // Update notification with current position
+    // Build notification content
     final timestamp = DateTime.now().toDateTimeString();
-    String content = '服務區域外'.i18n;
+    String locationText = '服務區域外'.i18n;
 
-    if (position == null) {
-      content = '服務區域外'.i18n;
-    } else {
+    if (position != null) {
       final latitude = position.latitude.toStringAsFixed(6);
       final longitude = position.longitude.toStringAsFixed(6);
 
-      if (result == null) {
-        content = '${'服務區域外'.i18n} ($latitude, $longitude)';
+      if (result != null) {
+        locationText = '${result.location.cityWithLevel} ${result.location.townWithLevel} ($latitude, $longitude)';
       } else {
-        content = '${result.location.cityWithLevel} ${result.location.townWithLevel} ($latitude, $longitude)';
+        locationText = '${'服務區域外'.i18n} ($latitude, $longitude)';
       }
     }
 
-    final notificationTitle = '自動定位中'.i18n;
-    final notificationBody =
-        '$timestamp\n'
-        '$content';
+    // Add next update time if provided
+    String content = locationText;
+    if (nextUpdateIn != null) {
+      content += '\n下次更新: ${nextUpdateIn.inMinutes}分鐘後';
+    }
 
+    // Create notification
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: LocationServiceManager.kNotificationId,
         channelKey: 'background',
-        title: notificationTitle,
-        body: notificationBody,
-        locked: true,
-        autoDismissible: false,
+        title: '自動定位中'.i18n,
+        body: '$timestamp\n$content',
+        icon: 'resource://drawable/ic_stat_name',
         badge: 0,
       ),
     );
-
-    _$service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
   }
 }
