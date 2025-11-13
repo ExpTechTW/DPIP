@@ -88,6 +88,9 @@ class LocationServiceManager {
 
     TalkerManager.instance.info('👷 initializing location service');
 
+    // Log all available GPS accuracy types
+    await _logAvailableAccuracyTypes();
+
     try {
       await AndroidAlarmManager.initialize();
       TalkerManager.instance.info('👷 service initialized');
@@ -101,6 +104,64 @@ class LocationServiceManager {
       TalkerManager.instance.info('👷 location auto is enabled, ensuring alarm is scheduled');
       await start();
     }
+  }
+
+  /// Logs all available GPS accuracy types and their capabilities
+  static Future<void> _logAvailableAccuracyTypes() async {
+    TalkerManager.instance.info('👷 === GPS Accuracy Types Info ===');
+
+    final isLocationEnabled = await Geolocator.isLocationServiceEnabled();
+    TalkerManager.instance.info('👷 Location service enabled: $isLocationEnabled');
+
+    if (!isLocationEnabled) {
+      TalkerManager.instance.warning('👷 Location service is disabled, skipping accuracy tests');
+      return;
+    }
+
+    // Test each accuracy level
+    final accuracyTypes = {
+      'lowest': LocationAccuracy.lowest,
+      'low': LocationAccuracy.low,
+      'medium': LocationAccuracy.medium,
+      'high': LocationAccuracy.high,
+      'best': LocationAccuracy.best,
+      'bestForNavigation': LocationAccuracy.bestForNavigation,
+    };
+
+    for (final entry in accuracyTypes.entries) {
+      final name = entry.key;
+      final accuracy = entry.value;
+
+      try {
+        TalkerManager.instance.info('👷 Testing accuracy: $name ($accuracy)');
+
+        // Try to get position with very short timeout (2s) to avoid delays
+        final position = await Geolocator.getCurrentPosition(
+          locationSettings: LocationSettings(
+            accuracy: accuracy,
+            timeLimit: const Duration(seconds: 2),
+          ),
+        ).timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => throw TimeoutException('Timeout'),
+        );
+
+        TalkerManager.instance.info(
+          '👷   ✓ $name: SUCCESS - accuracy=${position.accuracy.toStringAsFixed(1)}m, '
+          'lat=${position.latitude.toStringAsFixed(6)}, lng=${position.longitude.toStringAsFixed(6)}',
+        );
+      } on TimeoutException {
+        TalkerManager.instance.warning('👷   ⏱ $name: TIMEOUT (may still work with longer timeout)');
+      } on PermissionDeniedException {
+        TalkerManager.instance.error('👷   ✗ $name: PERMISSION_DENIED');
+        break; // No point testing other accuracy levels
+      } catch (e) {
+        final errorType = e.runtimeType;
+        TalkerManager.instance.warning('👷   ✗ $name: FAILED ($errorType: $e)');
+      }
+    }
+
+    TalkerManager.instance.info('👷 === End GPS Accuracy Types Info ===');
   }
 
   // ==================== Private Helper Methods ====================
