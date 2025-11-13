@@ -11,6 +11,7 @@ const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
   MapLayer.monitor: {MapLayer.monitor},
   MapLayer.report: {MapLayer.report},
   MapLayer.tsunami: {MapLayer.tsunami},
+  MapLayer.radar: {MapLayer.radar, MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning},
   MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
   MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
   MapLayer.wind: {MapLayer.radar, MapLayer.wind},
