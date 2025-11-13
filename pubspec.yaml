@@ -5,7 +5,7 @@ version: 3.1.2
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
-  flutter: '>=3.35.7'
+  flutter: '>=3.38.0'
 
 dependencies:
   awesome_notifications: 0.10.1
