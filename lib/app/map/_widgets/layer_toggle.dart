@@ -6,8 +6,15 @@ class LayerToggle extends StatelessWidget {
   final bool checked;
   final String label;
   final void Function(bool)? onChanged;
+  final void Function(bool)? onLongPress;
 
-  const LayerToggle({super.key, required this.checked, required this.label, required this.onChanged});
+  const LayerToggle({
+    super.key,
+    required this.checked,
+    required this.label,
+    required this.onChanged,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,8 @@ class LayerToggle extends StatelessWidget {
       child: Opacity(
         opacity: isDisabled ? 0.4 : 1.0,
         child: InkWell(
-          onTap: onChanged != null ? () => onChanged!(!checked) : null, //() => onChanged(!checked),
+          onTap: onChanged != null ? () => onChanged!(!checked) : null,
+          onLongPress: onLongPress != null ? () => onLongPress!(!checked) : null,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(6),

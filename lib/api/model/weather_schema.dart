@@ -103,23 +103,24 @@ class RealtimeWeatherWeather {
 
 @JsonSerializable()
 class RealtimeWeatherRainData {
-  final int now;
-  @JsonKey(name: '10m')
-  final int tenMinutes;
-  @JsonKey(name: '1h')
-  final int oneHour;
-  @JsonKey(name: '3h')
-  final int threeHours;
-  @JsonKey(name: '6h')
-  final int sixHours;
-  @JsonKey(name: '12h')
-  final int twelveHours;
-  @JsonKey(name: '24h')
-  final int twentyFourHours;
-  @JsonKey(name: '2d')
-  final int twoDays;
-  @JsonKey(name: '3d')
-  final int threeDays;
+  @JsonKey(fromJson: parseDouble)
+  final double now;
+  @JsonKey(name: '10m', fromJson: parseDouble)
+  final double tenMinutes;
+  @JsonKey(name: '1h', fromJson: parseDouble)
+  final double oneHour;
+  @JsonKey(name: '3h', fromJson: parseDouble)
+  final double threeHours;
+  @JsonKey(name: '6h', fromJson: parseDouble)
+  final double sixHours;
+  @JsonKey(name: '12h', fromJson: parseDouble)
+  final double twelveHours;
+  @JsonKey(name: '24h', fromJson: parseDouble)
+  final double twentyFourHours;
+  @JsonKey(name: '2d', fromJson: parseDouble)
+  final double twoDays;
+  @JsonKey(name: '3d', fromJson: parseDouble)
+  final double threeDays;
 
   RealtimeWeatherRainData({
     required this.now,

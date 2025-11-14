@@ -15,6 +15,7 @@ import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
 import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
+import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
@@ -45,6 +46,8 @@ class _HomePageState extends State<HomePage> {
   bool _isOutOfService = false;
   RealtimeWeather? _weather;
   List<History>? _history;
+  List<History>? _realtimeRegion; // 專門用於即時資訊的數據（總是來自 getRealtimeRegion）
+  HomeMode _currentMode = HomeMode.localActive;
 
   void _checkVersion() {
     Preference.version ??= Global.packageInfo.version;
@@ -67,7 +70,8 @@ class _HomePageState extends State<HomePage> {
     final code = GlobalProviders.location.code;
     final location = Global.location[code];
 
-    if (code == null || location == null) {
+    // 只有所在地模式需要檢查 location
+    if (_currentMode.isNational == false && (code == null || location == null)) {
       if (auto) {
         setState(() => _isOutOfService = true);
       }
@@ -78,25 +82,65 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       _isLoading = true;
+      _isOutOfService = false; // 切換到全國模式或有所在地時，重置狀態
       _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
     });
 
     _refreshIndicatorKey.currentState?.show();
 
-    try {
-      final v = await ExpTech().getWeatherRealtime(code);
-      if (!mounted) return;
+    // 天氣資訊總是獲取（不受模式影響）
+    if (code != null) {
+      try {
+        final v = await ExpTech().getWeatherRealtime(code);
+        if (!mounted) return;
 
-      setState(() => _weather = v);
-    } catch (e, s) {
-      if (!mounted) return;
+        setState(() => _weather = v);
+      } catch (e, s) {
+        if (!mounted) return;
 
-      TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
+        TalkerManager.instance.error('_HomePageState._refresh', e, s);
+        context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
+      }
+    } else {
+      setState(() => _weather = null);
     }
 
+    // 總是獲取即時資訊數據（用於 EEW 和雷雨卡片）
+    if (code != null) {
+      try {
+        final v = await ExpTech().getRealtimeRegion(code);
+        if (!mounted) return;
+
+        setState(() => _realtimeRegion = v);
+      } catch (e, s) {
+        if (!mounted) return;
+
+        TalkerManager.instance.error('_HomePageState._refresh (realtime)', e, s);
+        setState(() => _realtimeRegion = null);
+      }
+    } else {
+      setState(() => _realtimeRegion = null);
+    }
+
+    // 根據模式調用對應的 API
     try {
-      final v = await ExpTech().getHistoryRegion(code);
+      final List<History> v;
+      if (_currentMode.isNational) {
+        // 全國模式
+        if (_currentMode.isActive) {
+          v = await ExpTech().getRealtime(); // 全國生效中
+        } else {
+          v = await ExpTech().getHistory(); // 全國歷史
+        }
+      } else {
+        // 所在地模式
+        if (_currentMode.isActive) {
+          v = await ExpTech().getRealtimeRegion(code!); // 所在地生效中
+        } else {
+          v = await ExpTech().getHistoryRegion(code!); // 所在地歷史
+        }
+      }
+
       if (!mounted) return;
 
       setState(() => _history = v);
@@ -104,23 +148,19 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得歷史資訊異常'.i18n)));
     }
 
     if (!mounted) return;
 
     setState(() {
-      _isOutOfService = false;
       _isLoading = false;
     });
   }
 
   History? get _thunderstorm {
     final item =
-        _history
-            ?.where((e) => e.type == HistoryType.thunderstorm && !e.isExpired)
-            .sorted((a, b) => b.time.send.compareTo(a.time.send))
-            .firstOrNull;
+        _realtimeRegion?.where((e) => e.type == HistoryType.thunderstorm).sorted((a, b) => b.time.send.compareTo(a.time.send)).firstOrNull;
     return item;
   }
 
@@ -157,19 +197,21 @@ class _HomePageState extends State<HomePage> {
               else
                 const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard()),
 
-              // 即時資訊
-              if (!_isLoading && GlobalProviders.data.eew.isNotEmpty)
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: GlobalProviders.data.eew.length,
-                  itemBuilder: (context, index) {
-                    final data = GlobalProviders.data.eew[index];
-                    return Padding(padding: const EdgeInsets.all(16), child: EewCard(data));
-                  },
-                ),
-              if (!_isLoading && _thunderstorm != null)
-                Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
+              // 即時資訊 - 總是使用 getRealtimeRegion 數據
+              if (!_isLoading) ...[
+                if (GlobalProviders.data.eew.isNotEmpty)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: GlobalProviders.data.eew.length,
+                    itemBuilder: (context, index) {
+                      final data = GlobalProviders.data.eew[index];
+                      return Padding(padding: const EdgeInsets.all(16), child: EewCard(data));
+                    },
+                  ),
+                if (_thunderstorm != null)
+                  Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
+              ],
 
               // 地圖
               Padding(padding: const EdgeInsets.all(16), child: RadarMapCard(key: _mapKey)),
@@ -179,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) {
                   final history = _history;
 
-                  if (history == null) {
+                  if (history == null || history.isEmpty) {
                     return const SizedBox.shrink();
                   }
 
@@ -192,7 +234,17 @@ class _HomePageState extends State<HomePage> {
                           final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
                           return Column(
                             children: [
-                              DateTimelineItem(date, first: index == 0),
+                              DateTimelineItem(
+                                date,
+                                first: index == 0,
+                                mode: index == 0 ? _currentMode : null,
+                                onModeChanged: index == 0
+                                    ? (mode) {
+                                        setState(() => _currentMode = mode);
+                                        _refresh();
+                                      }
+                                    : null,
+                              ),
                               ...historyGroup.map((item) {
                                 final int? expireTimestamp = item.time.expires['all'];
                                 final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);

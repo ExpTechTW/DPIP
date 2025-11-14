@@ -53,6 +53,11 @@ void handleEventList(BuildContext context, History history) {
 
     case HistoryType.intensity:
       page = IntensityPage(item: history as IntensityHistory);
+
+    case HistoryType.seawave:
+    case HistoryType.unknown:
+      // 未實現的類型，不顯示詳情
+      return;
   }
 
   if (page == null) return;

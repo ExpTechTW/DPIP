@@ -67,6 +67,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
   late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
+  Future<void>? _toggleLayerOperation;
 
   void _setupTicker() {
     _ticker?.cancel();
@@ -156,7 +157,20 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   Future<void> toggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
+    // Wait for any pending operations to complete
+    await _toggleLayerOperation;
+
+    // Queue this operation
+    _toggleLayerOperation = _performToggleLayer(layer, show, activeLayers);
+    await _toggleLayerOperation;
+  }
+
+  Future<void> _performToggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
     if (!mounted) return;
+
+    // Update state immediately to prevent race conditions
+    final previousLayers = _activeLayers;
+    setState(() => _activeLayers = activeLayers);
 
     try {
       final manager = _managers[layer];
@@ -165,72 +179,22 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         throw UnimplementedError('Unknown layer: $layer');
       }
 
-      if (_activeLayers.contains(layer)) {
-        await manager.hide();
-        setState(() {
-          _activeLayers.remove(layer);
-        });
-      } else {
-        final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
-
-        final isEarthquakeLayer = kEarthquakeLayers.contains(layer);
-        final isWeatherLayer = kWeatherLayers.contains(layer);
-
-        if (isEarthquakeLayer) {
-          await _clearLayers(kEarthquakeLayers);
-          await _clearLayers(kWeatherLayers);
-        } else if (isWeatherLayer) {
-          final weatherLayersInNew = newLayers.where((l) => kWeatherLayers.contains(l)).toSet();
-          if (!isValidLayerCombination(weatherLayersInNew)) {
-            if (weatherLayersInNew.contains(MapLayer.radar)) {
-              final nonRadarWeatherLayers = kWeatherLayers.where((l) => l != MapLayer.radar).toSet();
-              await _clearLayers(nonRadarWeatherLayers);
-            } else {
-              await _clearLayers(kWeatherLayers);
-            }
-          }
-          await _clearLayers(kEarthquakeLayers);
-        }
-
+      if (show) {
         if (!manager.didSetup) await manager.setup();
         await manager.show();
-        setState(() {
-          _activeLayers.add(layer);
-        });
-
         await _syncRadarTimeOnCombination(layer);
+      } else {
+        await manager.hide();
       }
 
       if (_activeLayers.isEmpty) {
         await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
       }
     } catch (e, s) {
+      // Revert state on error
+      setState(() => _activeLayers = previousLayers);
       TalkerManager.instance.error('_MapPageState.toggleLayer', e, s);
     }
-  }
-
-  /// Hides and removes the specified map layers from the active layer set.
-  ///
-  /// Takes a [Set] of [MapLayer]s to clear. For each layer in the set that is
-  /// currently active:
-  /// 1. Hides the layer's visual elements via its manager if one exists
-  /// 2. Removes the layer from the active layers set
-  ///
-  /// This is used when switching between incompatible layer types, like
-  /// earthquake and weather layers.
-  Future<void> _clearLayers(Set<MapLayer> layers) async {
-    final newLayers = Set<MapLayer>.from(_activeLayers);
-
-    for (final layer in layers) {
-      if (newLayers.contains(layer)) {
-        final manager = _managers[layer];
-        if (manager != null) {
-          await manager.hide();
-        }
-        newLayers.remove(layer);
-      }
-    }
-    setState(() => _activeLayers = newLayers);
   }
 
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
