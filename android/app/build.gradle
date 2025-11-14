@@ -29,7 +29,7 @@ def flutterVersionCode = (majorVersion + minorVersion + patchVersion).toInteger(
 android {
     namespace 'com.exptech.dpip'
     compileSdk flutter.compileSdkVersion
-    ndkVersion '28.1.13356709'
+    ndkVersion '28.2.13676358'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
