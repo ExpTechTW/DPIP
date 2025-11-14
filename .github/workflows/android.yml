@@ -60,8 +60,8 @@ jobs:
     - name: Cache Android NDK
       uses: actions/cache@v4
       with:
-        path: /usr/local/lib/android/sdk/ndk
-        key: ${{ runner.os }}-ndk-28.1.13356709
+        path: /usr/local/lib/android/sdk/ndk/28.2.13676358
+        key: ${{ runner.os }}-ndk-28.2.13676358
 
     - name: Cache Android sdk
       uses: actions/cache@v3

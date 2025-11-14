@@ -44,7 +44,7 @@ class LocationServiceManager {
   static const platform = MethodChannel('com.exptech.dpip/location');
 
   /// Whether the background service is available on the current platform
-  static bool get avaliable => Platform.isAndroid || Platform.isIOS;
+  static bool get available => Platform.isAndroid || Platform.isIOS;
 
   static Future<void> initalize() async {
     if (!Platform.isAndroid) return;
@@ -58,7 +58,6 @@ class LocationServiceManager {
 
     try {
       await AndroidAlarmManager.initialize();
-      await LocationService._$task();
       await start();
     } catch (e, s) {
       TalkerManager.instance.error('👷 location service initialization failed', e, s);
@@ -91,7 +90,7 @@ class LocationServiceManager {
   }
 
   static Future<void> start() async {
-    if (!avaliable) return;
+    if (!available) return;
 
     try {
       if (Platform.isIOS) {
@@ -147,7 +146,7 @@ class LocationServiceManager {
   }
 
   static Future<void> stop() async {
-    if (!avaliable) return;
+    if (!available) return;
 
     try {
       if (Platform.isIOS) {
@@ -265,7 +264,7 @@ class LocationService {
           id: LocationServiceManager.kNotificationId,
           channelKey: 'background',
           title: '正在更新位置'.i18n,
-          body: '取得 GPS 位置中...',
+          body: '取得 GPS 位置中...'.i18n,
           icon: 'resource://drawable/ic_stat_name',
           badge: 0,
         ),
