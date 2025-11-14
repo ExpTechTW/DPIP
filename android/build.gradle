@@ -2,7 +2,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -10,27 +9,9 @@ rootProject.buildDir = '../build'
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-
-    // Override repositories for all subprojects (fixes third-party plugins using jcenter)
-    buildscript {
-        repositories {
-            google()
-            mavenCentral()
-        }
-    }
-
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-
-    // Auto-fill namespace for plugins without one
-    afterEvaluate {
-        if (hasProperty('android') && android.namespace == null) {
-            android.namespace = project.group
-        }
-    }
+}
+subprojects {
+    project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
