@@ -44,7 +44,7 @@ class LocationServiceManager {
   static const platform = MethodChannel('com.exptech.dpip/location');
 
   /// Whether the background service is available on the current platform
-  static bool get avaliable => Platform.isAndroid || Platform.isIOS;
+  static bool get available => Platform.isAndroid || Platform.isIOS;
 
   static Future<void> initalize() async {
     if (!Platform.isAndroid) return;
@@ -91,7 +91,7 @@ class LocationServiceManager {
   }
 
   static Future<void> start() async {
-    if (!avaliable) return;
+    if (!available) return;
 
     try {
       if (Platform.isIOS) {
@@ -147,7 +147,7 @@ class LocationServiceManager {
   }
 
   static Future<void> stop() async {
-    if (!avaliable) return;
+    if (!available) return;
 
     try {
       if (Platform.isIOS) {
