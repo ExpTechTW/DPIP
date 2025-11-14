@@ -9,9 +9,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 Completer<void>? _completer;
 
-/// 更新位置信息 (iOS 使用 geolocator 前台获取,后台由 native 处理)
 Future<void> updateSavedLocationIOS() async {
-  // 只在 iOS 上执行
   if (!Platform.isIOS) return;
 
   final completer = _completer;
@@ -21,7 +19,6 @@ Future<void> updateSavedLocationIOS() async {
   _completer = Completer();
 
   try {
-    // 检查位置服务是否启用
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       TalkerManager.instance.debug('📍 [iOS GPS] Location services are disabled');
@@ -31,7 +28,6 @@ Future<void> updateSavedLocationIOS() async {
       return;
     }
 
-    // 检查权限
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       TalkerManager.instance.debug('📍 [iOS GPS] Location permission denied');
@@ -49,17 +45,12 @@ Future<void> updateSavedLocationIOS() async {
       return;
     }
 
-    // 获取最后已知位置 (快速,不消耗电量)
     Position? position = await Geolocator.getLastKnownPosition();
 
-    // 如果没有最后位置,则获取当前位置
     if (position == null) {
       TalkerManager.instance.debug('📍 [iOS GPS] No last known position, getting current position');
       position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 10),
-        ),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 10)),
       );
     }
 
@@ -73,7 +64,6 @@ Future<void> updateSavedLocationIOS() async {
     GlobalProviders.location.setCoordinates(LatLng(latitude, longitude));
   } catch (e, s) {
     TalkerManager.instance.error('📍 [iOS GPS] Error getting location', e, s);
-    // 发生错误时不清除位置,保留上次的位置
   } finally {
     _completer?.complete();
   }
