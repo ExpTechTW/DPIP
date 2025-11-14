@@ -209,7 +209,7 @@ class DpipMapState extends State<DpipMap> {
         return ColoredBox(
           color: context.colors.surface,
           child: MapLibreMap(
-            minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
+            minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
             trackCameraPosition: true,
             initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
             styleString: styleString,
