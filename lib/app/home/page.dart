@@ -159,8 +159,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   History? get _thunderstorm {
-    final item =
-        _realtimeRegion?.where((e) => e.type == HistoryType.thunderstorm).sorted((a, b) => b.time.send.compareTo(a.time.send)).firstOrNull;
+    final item = _realtimeRegion
+        ?.where((e) => e.type == HistoryType.thunderstorm)
+        .sorted((a, b) => b.time.send.compareTo(a.time.send))
+        .firstOrNull;
     return item;
   }
 
@@ -169,6 +171,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
+    GlobalProviders.location.refresh();
     GlobalProviders.location.$code.addListener(_refresh);
     _refresh();
   }
@@ -214,7 +217,10 @@ class _HomePageState extends State<HomePage> {
               ],
 
               // 地圖
-              Padding(padding: const EdgeInsets.all(16), child: RadarMapCard(key: _mapKey)),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: RadarMapCard(key: _mapKey),
+              ),
 
               // 歷史資訊
               Builder(
@@ -228,36 +234,31 @@ class _HomePageState extends State<HomePage> {
                   final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
 
                   return Column(
-                    children:
-                        grouped.entries.sorted((a, b) => b.key.compareTo(a.key)).mapIndexed((index, entry) {
-                          final date = entry.key;
-                          final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
-                          return Column(
-                            children: [
-                              DateTimelineItem(
-                                date,
-                                first: index == 0,
-                                mode: index == 0 ? _currentMode : null,
-                                onModeChanged: index == 0
-                                    ? (mode) {
-                                        setState(() => _currentMode = mode);
-                                        _refresh();
-                                      }
-                                    : null,
-                              ),
-                              ...historyGroup.map((item) {
-                                final int? expireTimestamp = item.time.expires['all'];
-                                final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-                                final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-                                return HistoryTimelineItem(
-                                  expired: isExpired,
-                                  history: item,
-                                  last: item == history.last,
-                                );
-                              }),
-                            ],
-                          );
-                        }).toList(),
+                    children: grouped.entries.sorted((a, b) => b.key.compareTo(a.key)).mapIndexed((index, entry) {
+                      final date = entry.key;
+                      final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
+                      return Column(
+                        children: [
+                          DateTimelineItem(
+                            date,
+                            first: index == 0,
+                            mode: index == 0 ? _currentMode : null,
+                            onModeChanged: index == 0
+                                ? (mode) {
+                                    setState(() => _currentMode = mode);
+                                    _refresh();
+                                  }
+                                : null,
+                          ),
+                          ...historyGroup.map((item) {
+                            final int? expireTimestamp = item.time.expires['all'];
+                            final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+                            final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+                            return HistoryTimelineItem(expired: isExpired, history: item, last: item == history.last);
+                          }),
+                        ],
+                      );
+                    }).toList(),
                   );
                 },
               ),
@@ -268,7 +269,9 @@ class _HomePageState extends State<HomePage> {
           top: 24,
           left: 0,
           right: 0,
-          child: SafeArea(child: Align(alignment: Alignment.topCenter, child: LocationButton())),
+          child: SafeArea(
+            child: Align(alignment: Alignment.topCenter, child: LocationButton()),
+          ),
         ),
       ],
     );
