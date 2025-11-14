@@ -49,6 +49,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   List<History>? _realtimeRegion;
   HomeMode _currentMode = HomeMode.localActive;
 
+  String? _lastRefreshCode;
+  DateTime? _lastRefreshTime;
+
   History? get _thunderstorm => _realtimeRegion
       ?.where((e) => e.type == HistoryType.thunderstorm)
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
@@ -99,6 +102,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final location = Global.location[code];
     final isOutOfService = auto && (code == null || location == null);
 
+    // 如果 code 不變且距離上次刷新不到 1 分鐘，跳過刷新
+    final now = DateTime.now();
+    if (_lastRefreshCode == code &&
+        _lastRefreshTime != null &&
+        now.difference(_lastRefreshTime!).inMinutes < 1) {
+      return;
+    }
+
     if (isOutOfService && !_currentMode.isNational) {
       _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
     }
@@ -113,7 +124,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
 
-    if (mounted) setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = false);
+      _lastRefreshCode = code;
+      _lastRefreshTime = now;
+    }
   }
 
   Future<void> _fetchWeather(String? code) async {
@@ -171,6 +186,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onModeChanged(HomeMode mode) {
     setState(() => _currentMode = mode);
+    // 強制刷新，重置時間戳以略過 1 分鐘限制
+    _lastRefreshTime = null;
     _refresh();
   }
 
