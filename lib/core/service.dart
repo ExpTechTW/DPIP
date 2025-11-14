@@ -265,7 +265,7 @@ class LocationService {
           id: LocationServiceManager.kNotificationId,
           channelKey: 'background',
           title: '正在更新位置'.i18n,
-          body: '取得 GPS 位置中...',
+          body: '取得 GPS 位置中...'.i18n,
           icon: 'resource://drawable/ic_stat_name',
           badge: 0,
         ),
