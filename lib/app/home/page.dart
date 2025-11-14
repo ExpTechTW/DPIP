@@ -97,34 +97,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
-    // 重新載入位置數據
-    if (Platform.isIOS && GlobalProviders.location.auto) {
-      // iOS: 使用 geolocator 在前台獲取位置 (後台由 native 處理)
-      await updateSavedLocationIOS();
-    } else {
-      // Android: 重新載入 SharedPreferences 緩存以獲取背景 task 寫入的最新數據
-      await Preference.reload();
-      GlobalProviders.location.refresh();
-    }
+    await _reloadLocationData();
 
-    final auto = GlobalProviders.location.auto;
     final code = GlobalProviders.location.code;
-    final location = Global.location[code];
-    // 服務區外的情況包括:
-    // 1. 啟用自動定位但沒有有效位置 (auto && code == null)
-    // 2. 沒有設定任何位置 (code == null)
-    final isOutOfService = code == null || (auto && location == null);
 
-    // 如果 code 不變且距離上次刷新不到 1 分鐘，跳過刷新
-    final now = DateTime.now();
-    if (_lastRefreshCode == code &&
-        _lastRefreshTime != null &&
-        now.difference(_lastRefreshTime!).inMinutes < 1) {
-      return;
-    }
+    if (_shouldSkipRefresh(code)) return;
 
-    // 如果服務區外或尚未設定所在地，切換到全國模式
-    if ((isOutOfService || code == null) && !_currentMode.isNational) {
+    final isOutOfService = _checkIfOutOfService(code);
+
+    if (isOutOfService && !_currentMode.isNational) {
       _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
     }
 
@@ -136,13 +117,43 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
-    await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
+    await Future.wait([
+      _fetchWeather(code),
+      _fetchRealtimeRegion(code),
+      _fetchHistory(code, isOutOfService),
+    ]);
 
     if (mounted) {
       setState(() => _isLoading = false);
       _lastRefreshCode = code;
-      _lastRefreshTime = now;
+      _lastRefreshTime = DateTime.now();
     }
+  }
+
+  Future<void> _reloadLocationData() async {
+    if (Platform.isIOS && GlobalProviders.location.auto) {
+      await updateSavedLocationIOS();
+    } else {
+      await Preference.reload();
+      GlobalProviders.location.refresh();
+    }
+  }
+
+  bool _shouldSkipRefresh(String? code) {
+    if (_lastRefreshCode != code) return false;
+    if (_lastRefreshTime == null) return false;
+
+    final timeSinceLastRefresh = DateTime.now().difference(_lastRefreshTime!);
+    return timeSinceLastRefresh.inMinutes < 1;
+  }
+
+  bool _checkIfOutOfService(String? code) {
+    if (code == null) return true;
+
+    final auto = GlobalProviders.location.auto;
+    final location = Global.location[code];
+
+    return auto && location == null;
   }
 
   Future<void> _fetchWeather(String? code) async {
@@ -200,7 +211,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onModeChanged(HomeMode mode) {
     setState(() => _currentMode = mode);
-    // 強制刷新，重置時間戳以略過 1 分鐘限制
     _lastRefreshTime = null;
     _refresh();
   }

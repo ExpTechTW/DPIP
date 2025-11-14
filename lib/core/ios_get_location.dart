@@ -12,9 +12,9 @@ Completer<void>? _completer;
 Future<void> updateSavedLocationIOS() async {
   if (!Platform.isIOS) return;
 
-  final completer = _completer;
-
-  if (completer != null && !completer.isCompleted) return completer.future;
+  if (_completer != null && !_completer!.isCompleted) {
+    return _completer!.future;
+  }
 
   _completer = Completer();
 
@@ -22,31 +22,18 @@ Future<void> updateSavedLocationIOS() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       TalkerManager.instance.debug('📍 [iOS GPS] Location services are disabled');
-      GlobalProviders.location.setCode(null);
-      GlobalProviders.location.setCoordinates(null);
-      _completer?.complete();
+      _clearLocation();
       return;
     }
 
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       TalkerManager.instance.debug('📍 [iOS GPS] Location permission denied');
-      GlobalProviders.location.setCode(null);
-      GlobalProviders.location.setCoordinates(null);
-      _completer?.complete();
-      return;
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      TalkerManager.instance.debug('📍 [iOS GPS] Location permission denied forever');
-      GlobalProviders.location.setCode(null);
-      GlobalProviders.location.setCoordinates(null);
-      _completer?.complete();
+      _clearLocation();
       return;
     }
 
     Position? position = await Geolocator.getLastKnownPosition();
-
     if (position == null) {
       TalkerManager.instance.debug('📍 [iOS GPS] No last known position, getting current position');
       position = await Geolocator.getCurrentPosition(
@@ -54,12 +41,12 @@ Future<void> updateSavedLocationIOS() async {
       );
     }
 
-    final latitude = position.latitude;
-    final longitude = position.longitude;
-    final coordinates = LatLng(latitude, longitude);
-
+    final coordinates = LatLng(position.latitude, position.longitude);
     final code = getTownCodeFromCoordinates(coordinates);
-    TalkerManager.instance.debug('📍 [iOS GPS] Updated location: ($latitude, $longitude) → code: $code');
+
+    TalkerManager.instance.debug(
+      '📍 [iOS GPS] Updated location: (${position.latitude}, ${position.longitude}) → code: $code',
+    );
 
     GlobalProviders.location.setCoordinates(coordinates);
     GlobalProviders.location.setCode(code);
@@ -67,5 +54,11 @@ Future<void> updateSavedLocationIOS() async {
     TalkerManager.instance.error('📍 [iOS GPS] Error getting location', e, s);
   } finally {
     _completer?.complete();
+    _completer = null;
   }
+}
+
+void _clearLocation() {
+  GlobalProviders.location.setCoordinates(null);
+  GlobalProviders.location.setCode(null);
 }
