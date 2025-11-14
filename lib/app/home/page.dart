@@ -95,6 +95,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
+    // 重新載入 SharedPreferences 緩存以獲取背景 task 寫入的最新數據
+    await Preference.reload();
     GlobalProviders.location.refresh();
 
     final auto = GlobalProviders.location.auto;
