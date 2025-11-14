@@ -12,7 +12,7 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbolsart';
+import 'package:material_symbols_icons/symbols.dart';
 
 typedef PositionUpdateCallback = void Function();
 

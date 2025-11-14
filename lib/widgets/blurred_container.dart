@@ -1,7 +1,8 @@
 import 'dart:ui';
 
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class BlurredContainer extends StatelessWidget {
   final Widget child;

@@ -1,6 +1,8 @@
-import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
 import 'package:flutter/material.dart';
+
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
 
 const kZoomPageTransitionsTheme = PageTransitionsTheme(
   builders: {

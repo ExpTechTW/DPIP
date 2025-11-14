@@ -3,7 +3,7 @@ import 'package:dpip/api/model/rts/rts_station.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-import 'package:json_annotation/json_annotatin.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'rts.g.dart';
 

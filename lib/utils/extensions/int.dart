@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
+
+import 'package:timezone/timezone.dart';
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/parser.dart';
-import 'package:flutter/material.dart';
-import 'package:timezone/timezone.dart';
 
 extension CommonContext on int {
   String get asIntensityNumber => ['0', '1', '2', '3', '4', '5', '5', '6', '6', '7'][this];
