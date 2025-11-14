@@ -132,8 +132,8 @@ class DpipMapState extends State<DpipMap> {
 
       await controller.setGeoJsonSource(BaseMapSourceIds.userLocation, data);
 
-      if (widget.focusUserLocationWhenUpdated) {
-        await controller.moveCamera(CameraUpdate.newLatLngZoom(location!, DpipMap.kUserLocationZoom));
+      if (widget.focusUserLocationWhenUpdated && location != null) {
+        await controller.moveCamera(CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom));
       }
     } catch (e, s) {
       TalkerManager.instance.error('🗺️ failed to update user location', e, s);

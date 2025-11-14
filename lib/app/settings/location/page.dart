@@ -59,7 +59,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       locationPermission = values[1] as PermissionStatus?;
       locationAlwaysPermission = values[2] as PermissionStatus?;
       autoStartPermission = true;
-      batteryOptimizationPermission = values[3] as bool? ?? true;
+      batteryOptimizationPermission = !Platform.isAndroid || (values[3] as bool? ?? true);
     });
   }
 

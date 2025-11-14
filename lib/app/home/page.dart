@@ -14,6 +14,7 @@ import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
@@ -26,6 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:timezone/timezone.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -95,14 +97,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
-    // 重新載入 SharedPreferences 緩存以獲取背景 task 寫入的最新數據
-    await Preference.reload();
-    GlobalProviders.location.refresh();
+    // 重新載入位置數據
+    if (Platform.isIOS && GlobalProviders.location.auto) {
+      // iOS: 從 native 端讀取保存的位置
+      await updateSavedLocationIOS();
+    } else {
+      // Android: 重新載入 SharedPreferences 緩存以獲取背景 task 寫入的最新數據
+      await Preference.reload();
+      GlobalProviders.location.refresh();
+    }
 
     final auto = GlobalProviders.location.auto;
     final code = GlobalProviders.location.code;
     final location = Global.location[code];
-    final isOutOfService = auto && (code == null || location == null);
+    // 服務區外的情況包括:
+    // 1. 啟用自動定位但沒有有效位置 (auto && code == null)
+    // 2. 沒有設定任何位置 (code == null)
+    final isOutOfService = code == null || (auto && location == null);
 
     // 如果 code 不變且距離上次刷新不到 1 分鐘，跳過刷新
     final now = DateTime.now();
@@ -112,7 +123,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return;
     }
 
-    if (isOutOfService && !_currentMode.isNational) {
+    // 如果服務區外或尚未設定所在地，切換到全國模式
+    if ((isOutOfService || code == null) && !_currentMode.isNational) {
       _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
     }
 
@@ -167,15 +179,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _fetchHistory(String? code, bool isOutOfService) async {
     try {
-      final shouldUseNational = _currentMode.isNational || isOutOfService;
+      final shouldUseNational = _currentMode.isNational || isOutOfService || code == null;
       final List<History> history;
 
       if (shouldUseNational) {
         history = _currentMode.isActive ? await ExpTech().getRealtime() : await ExpTech().getHistory();
       } else {
         history = _currentMode.isActive
-            ? await ExpTech().getRealtimeRegion(code!)
-            : await ExpTech().getHistoryRegion(code!);
+            ? await ExpTech().getRealtimeRegion(code)
+            : await ExpTech().getHistoryRegion(code);
       }
 
       if (mounted) setState(() => _history = history);
