@@ -194,14 +194,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     if (shouldEnable) {
       if (!await requestPermissions()) return;
 
-      // 立即執行一次定位任務
-      await LocationServiceManager.updateNow();
-      // 啟動定期更新服務
-      await LocationServiceManager.start();
+      await LocationServiceManager.initalize();
     } else {
       await LocationServiceManager.stop();
     }
-
     GlobalProviders.location.setAuto(shouldEnable);
   }
 
@@ -384,39 +380,37 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         subtitle: Text(
                           '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
                         ),
-                        leading:
-                            isCurrentLoading
-                                ? const LoadingIcon()
-                                : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
+                        leading: isCurrentLoading
+                            ? const LoadingIcon()
+                            : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
                         trailing: IconButton(
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
                           onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
                         ),
                         enabled: !model.auto && loadingCode == null,
-                        onTap:
-                            isSelected
-                                ? null
-                                : () async {
-                                  setState(() => loadingCode = code);
+                        onTap: isSelected
+                            ? null
+                            : () async {
+                                setState(() => loadingCode = code);
 
-                                  try {
-                                    await ExpTech().updateDeviceLocation(
-                                      token: Preference.notifyToken,
-                                      coordinates: LatLng(location.lat, location.lng),
-                                    );
+                                try {
+                                  await ExpTech().updateDeviceLocation(
+                                    token: Preference.notifyToken,
+                                    coordinates: LatLng(location.lat, location.lng),
+                                  );
 
-                                    if (!context.mounted) return;
+                                  if (!context.mounted) return;
 
-                                    model.setCode(code);
-                                  } catch (e, s) {
-                                    if (!context.mounted) return;
-                                    TalkerManager.instance.error('Failed to set location code', e, s);
-                                    showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
-                                  }
+                                  model.setCode(code);
+                                } catch (e, s) {
+                                  if (!context.mounted) return;
+                                  TalkerManager.instance.error('Failed to set location code', e, s);
+                                  showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
+                                }
 
-                                  setState(() => loadingCode = null);
-                                },
+                                setState(() => loadingCode = null);
+                              },
                       );
                     }),
                     ListSectionTile(

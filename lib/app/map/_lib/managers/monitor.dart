@@ -993,7 +993,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     _blinkTimer?.cancel();
     _blinkTimer = null;
     _stopFocusTimer();
-    GlobalProviders.data.setReplayMode(false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GlobalProviders.data.setReplayMode(false);
+    });
     GlobalProviders.data.removeListener(_onDataChanged);
     currentRtsTime.dispose();
     displayTimeNotifier.dispose();
