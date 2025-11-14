@@ -8,12 +8,23 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 Completer<void>? _completer;
+DateTime? _lastUpdateTime;
+
+const _kMinUpdateInterval = Duration(seconds: 30);
 
 Future<void> updateSavedLocationIOS() async {
   if (!Platform.isIOS) return;
 
   if (_completer != null && !_completer!.isCompleted) {
     return _completer!.future;
+  }
+
+  final now = DateTime.now();
+  if (_lastUpdateTime != null && now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
+    TalkerManager.instance.debug(
+      '📍 [iOS GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)',
+    );
+    return;
   }
 
   _completer = Completer();
@@ -50,6 +61,8 @@ Future<void> updateSavedLocationIOS() async {
 
     GlobalProviders.location.setCoordinates(coordinates);
     GlobalProviders.location.setCode(code);
+
+    _lastUpdateTime = now;
   } catch (e, s) {
     TalkerManager.instance.error('📍 [iOS GPS] Error getting location', e, s);
   } finally {
