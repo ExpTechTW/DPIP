@@ -56,12 +56,13 @@ Future<void> updateSavedLocationIOS() async {
 
     final latitude = position.latitude;
     final longitude = position.longitude;
+    final coordinates = LatLng(latitude, longitude);
 
-    final code = getTownCodeFromCoordinates(LatLng(latitude, longitude));
+    final code = getTownCodeFromCoordinates(coordinates);
     TalkerManager.instance.debug('📍 [iOS GPS] Updated location: ($latitude, $longitude) → code: $code');
 
+    GlobalProviders.location.setCoordinates(coordinates);
     GlobalProviders.location.setCode(code);
-    GlobalProviders.location.setCoordinates(LatLng(latitude, longitude));
   } catch (e, s) {
     TalkerManager.instance.error('📍 [iOS GPS] Error getting location', e, s);
   } finally {

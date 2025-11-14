@@ -114,6 +114,7 @@ class DpipMap extends StatefulWidget {
 class DpipMapState extends State<DpipMap> {
   MapLibreMapController? _controller;
   Future<String>? _stylePathFuture;
+  bool _isMapReady = false;
 
   Future<void> _updateUserLocation() async {
     if (!mounted) return;
@@ -132,8 +133,12 @@ class DpipMapState extends State<DpipMap> {
 
       await controller.setGeoJsonSource(BaseMapSourceIds.userLocation, data);
 
-      if (widget.focusUserLocationWhenUpdated && location != null) {
-        await controller.moveCamera(CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom));
+      if (_isMapReady && widget.focusUserLocationWhenUpdated && location != null) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom),
+          duration: const Duration(milliseconds: 500),
+        );
       }
     } catch (e, s) {
       TalkerManager.instance.error('🗺️ failed to update user location', e, s);
@@ -142,7 +147,7 @@ class DpipMapState extends State<DpipMap> {
 
   void _initMap() {
     if (_controller == null) return;
-
+    _isMapReady = true;
     _updateUserLocation();
   }
 
