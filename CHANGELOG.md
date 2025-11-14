@@ -14,6 +14,21 @@
 ### 修正
 
 
+## [3.1.306]
+
+### 新增
+- 新增「事件切換」功能，可在全國／所在地，以及生效中／歷史之間切換查看 (#459)
+
+### 更改
+- 重構 GPS 定位邏輯以降低電量消耗，有助於提升使用者續航體驗 (#458) (Android)
+- 核心框架更新，提升穩定性
+
+### 修正
+- 修正歷史事件未定義，現在可以看到事件了(#459)
+- 天氣類圖層可以直接點選切換，圖層長按即可疊加顯示（例如雷達回波）
+- 大(豪)雨特報頁面左上角顯示時間問題 (#464)
+
+
 ## [3.1.104] - 2025-11-11
 
 ### 新增
@@ -262,8 +277,9 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.104...HEAD
-[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.306...HEAD
+[3.1.306]: https://github.com/exptechtw/dpip/compare/v3.1.004...v3.1.306
+[3.1.104]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
 [3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
 [3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
 [3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
