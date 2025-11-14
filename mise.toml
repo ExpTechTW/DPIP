@@ -1,4 +1,5 @@
 [tools]
-flutter = "3.35.7"
+android-sdk = "19"
+flutter = "3.35"
 java = "zulu-21"
 ruby = "3.4.7"
