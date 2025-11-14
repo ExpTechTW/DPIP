@@ -9,6 +9,7 @@ class DateTimelineItem extends StatelessWidget {
   final bool last;
   final HomeMode? mode;
   final ValueChanged<HomeMode>? onModeChanged;
+  final bool isOutOfService;
 
   const DateTimelineItem(
     this.date, {
@@ -17,6 +18,7 @@ class DateTimelineItem extends StatelessWidget {
     this.last = false,
     this.mode,
     this.onModeChanged,
+    this.isOutOfService = false,
   });
 
   void _showModeMenu(BuildContext context) {
@@ -35,12 +37,17 @@ class DateTimelineItem extends StatelessWidget {
       Offset.zero & overlay.size,
     );
 
+    // 如果在服務區外，只顯示全國模式
+    final availableModes = isOutOfService
+        ? HomeMode.values.where((m) => m.isNational).toList()
+        : HomeMode.values;
+
     showMenu<HomeMode>(
       context: context,
       position: position,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 8,
-      items: HomeMode.values.map((m) {
+      items: availableModes.map((m) {
         return PopupMenuItem<HomeMode>(
           value: m,
           child: Row(

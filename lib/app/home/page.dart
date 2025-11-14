@@ -38,7 +38,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   Key? _mapKey;
 
@@ -46,8 +46,10 @@ class _HomePageState extends State<HomePage> {
   bool _isOutOfService = false;
   RealtimeWeather? _weather;
   List<History>? _history;
-  List<History>? _realtimeRegion; // 專門用於即時資訊的數據（總是來自 getRealtimeRegion）
+  List<History>? _realtimeRegion;
   HomeMode _currentMode = HomeMode.localActive;
+
+  bool _wasVisible = true;
 
   void _checkVersion() {
     Preference.version ??= Global.packageInfo.version;
@@ -66,23 +68,23 @@ class _HomePageState extends State<HomePage> {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
+    GlobalProviders.location.refresh();
+
     final auto = GlobalProviders.location.auto;
     final code = GlobalProviders.location.code;
     final location = Global.location[code];
 
-    // 只有所在地模式需要檢查 location
-    if (_currentMode.isNational == false && (code == null || location == null)) {
-      if (auto) {
-        setState(() => _isOutOfService = true);
-      }
+    // 檢查是否在服務區外
+    final isOutOfService = auto && (code == null || location == null);
 
-      setState(() => _weather = _history = null);
-      return;
+    // 如果在服務區外且當前是所在地模式，自動切換到對應的全國模式
+    if (isOutOfService && !_currentMode.isNational) {
+      _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
     }
 
     setState(() {
       _isLoading = true;
-      _isOutOfService = false; // 切換到全國模式或有所在地時，重置狀態
+      _isOutOfService = isOutOfService;
       _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
     });
 
@@ -122,11 +124,13 @@ class _HomePageState extends State<HomePage> {
       setState(() => _realtimeRegion = null);
     }
 
-    // 根據模式調用對應的 API
+    // 根據模式調用對應的 API，如果在服務區外則強制使用全國模式
     try {
       final List<History> v;
-      if (_currentMode.isNational) {
-        // 全國模式
+      final shouldUseNational = _currentMode.isNational || isOutOfService;
+
+      if (shouldUseNational) {
+        // 全國模式（包含服務區外時）
         if (_currentMode.isActive) {
           v = await ExpTech().getRealtime(); // 全國生效中
         } else {
@@ -170,14 +174,28 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
-    GlobalProviders.location.refresh();
     GlobalProviders.location.$code.addListener(_refresh);
     _refresh();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refresh();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isVisible = ModalRoute.of(context)?.isCurrent ?? false;
+
+    if (!_wasVisible && isVisible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+    }
+    _wasVisible = isVisible;
+
     final topPadding = 24 + 48 + context.padding.top;
 
     return Stack(
@@ -227,8 +245,24 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) {
                   final history = _history;
 
+                  // 如果沒有資料，仍然顯示一個空的時間軸項目（今天的日期）以顯示模式選擇器
                   if (history == null || history.isEmpty) {
-                    return const SizedBox.shrink();
+                    final today = TZDateTime.now(UTC).toLocaleFullDateString(context);
+                    return Column(
+                      children: [
+                        DateTimelineItem(
+                          today,
+                          first: true,
+                          last: true,
+                          mode: _currentMode,
+                          onModeChanged: (mode) {
+                            setState(() => _currentMode = mode);
+                            _refresh();
+                          },
+                          isOutOfService: _isOutOfService,
+                        ),
+                      ],
+                    );
                   }
 
                   final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
@@ -249,6 +283,7 @@ class _HomePageState extends State<HomePage> {
                                     _refresh();
                                   }
                                 : null,
+                            isOutOfService: _isOutOfService,
                           ),
                           ...historyGroup.map((item) {
                             final int? expireTimestamp = item.time.expires['all'];
@@ -279,6 +314,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
     super.dispose();
   }
