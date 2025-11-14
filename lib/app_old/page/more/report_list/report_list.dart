@@ -184,7 +184,10 @@ class _ReportListPageState extends State<ReportListPage> {
                         } else if (isLoading) {
                           isLoadingEnd = false;
                         }
-                        return const Padding(padding: EdgeInsets.all(8.0), child: Center(child: Text('到底了')));
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('到底了')),
+                        );
                       }
 
                       var showDate = false;

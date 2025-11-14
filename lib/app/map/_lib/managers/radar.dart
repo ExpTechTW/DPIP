@@ -857,12 +857,11 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                 }
 
                 return GestureDetector(
-                  onLongPress:
-                      isLoading
-                          ? null
-                          : () {
-                            widget.manager.setPlayStartTime(time.value);
-                          },
+                  onLongPress: isLoading
+                      ? null
+                      : () {
+                          widget.manager.setPlayStartTime(time.value);
+                        },
                   child: FilterChip(
                     key: _chipKeys[time.value],
                     selected: isSelected,
@@ -871,13 +870,12 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                     backgroundColor: chipColor,
                     side: BorderSide(color: borderColor),
                     avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                    onSelected:
-                        isLoading
-                            ? null
-                            : (selected) {
-                              if (!selected) return;
-                              widget.manager.updateRadarTime(time.value);
-                            },
+                    onSelected: isLoading
+                        ? null
+                        : (selected) {
+                            if (!selected) return;
+                            widget.manager.updateRadarTime(time.value);
+                          },
                   ),
                 );
               },

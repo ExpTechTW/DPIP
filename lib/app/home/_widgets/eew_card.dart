@@ -1,13 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:styled_text/styled_text.dart';
-
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
@@ -17,6 +9,12 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:styled_text/styled_text.dart';
 
 class EewCard extends StatefulWidget {
   final Eew data;
@@ -121,24 +119,23 @@ class _EewCardState extends State<EewCard> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: StyledText(
-                    text:
-                        localIntensity != null
-                            ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                                .i18n
-                                .args({
-                                  'time': widget.data.info.time.toSimpleDateTimeString(),
-                                  'location': widget.data.info.location,
-                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
-                                  'intensity': localIntensity!.asIntensityLabel,
-                                })
-                            : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
-                                .i18n
-                                .args({
-                                  'time': widget.data.info.time.toSimpleDateTimeString(),
-                                  'location': widget.data.info.location,
-                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
-                                  'depth': widget.data.info.depth.toStringAsFixed(1),
-                                }),
+                    text: localIntensity != null
+                        ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                              .i18n
+                              .args({
+                                'time': widget.data.info.time.toSimpleDateTimeString(),
+                                'location': widget.data.info.location,
+                                'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                'intensity': localIntensity!.asIntensityLabel,
+                              })
+                        : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
+                              .i18n
+                              .args({
+                                'time': widget.data.info.time.toSimpleDateTimeString(),
+                                'location': widget.data.info.location,
+                                'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                'depth': widget.data.info.depth.toStringAsFixed(1),
+                              }),
                     style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                     tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                   ),
@@ -203,44 +200,41 @@ class _EewCardState extends State<EewCard> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 12, bottom: 8),
-                                      child:
-                                          (countdown > 0)
-                                              ? RichText(
-                                                text: TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: countdown.toString(),
-                                                      style: TextStyle(
-                                                        fontSize: context.textTheme.displayMedium!.fontSize! * 1.15,
-                                                      ),
+                                      child: (countdown > 0)
+                                          ? RichText(
+                                              text: TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: countdown.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: context.textTheme.displayMedium!.fontSize! * 1.15,
                                                     ),
-                                                    TextSpan(
-                                                      text: ' 秒'.i18n,
-                                                      style: TextStyle(
-                                                        fontSize: context.textTheme.labelLarge!.fontSize,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                  style: context.textTheme.displayMedium!.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: context.colors.onErrorContainer,
-                                                    height: 1,
-                                                    leadingDistribution: TextLeadingDistribution.even,
                                                   ),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              )
-                                              : Text(
-                                                '抵達'.i18n,
+                                                  TextSpan(
+                                                    text: ' 秒'.i18n,
+                                                    style: TextStyle(fontSize: context.textTheme.labelLarge!.fontSize),
+                                                  ),
+                                                ],
                                                 style: context.textTheme.displayMedium!.copyWith(
-                                                  fontSize: context.textTheme.displayMedium!.fontSize! * 0.92,
                                                   fontWeight: FontWeight.bold,
                                                   color: context.colors.onErrorContainer,
                                                   height: 1,
                                                   leadingDistribution: TextLeadingDistribution.even,
                                                 ),
-                                                textAlign: TextAlign.center,
                                               ),
+                                              textAlign: TextAlign.center,
+                                            )
+                                          : Text(
+                                              '抵達'.i18n,
+                                              style: context.textTheme.displayMedium!.copyWith(
+                                                fontSize: context.textTheme.displayMedium!.fontSize! * 0.92,
+                                                fontWeight: FontWeight.bold,
+                                                color: context.colors.onErrorContainer,
+                                                height: 1,
+                                                leadingDistribution: TextLeadingDistribution.even,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
                                     ),
                                   ],
                                 ),

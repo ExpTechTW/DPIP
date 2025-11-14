@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/notification_record.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NotificationHistoryPage extends StatefulWidget {
   const NotificationHistoryPage({super.key});
@@ -153,7 +151,10 @@ class NotificationCard extends StatelessWidget {
       children: [
         Icon(Icons.access_time, size: 16, color: context.colors.primary),
         const SizedBox(width: 4),
-        Text(_formatDate(record.time), style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold)),
+        Text(
+          _formatDate(record.time),
+          style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -179,16 +180,16 @@ class NotificationCard extends StatelessWidget {
               .toList() +
           (record.area.length > 2
               ? [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.blue),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    child: Text('+${record.area.length - 2}', style: const TextStyle(fontSize: 12)),
                   ),
-                  child: Text('+${record.area.length - 2}', style: const TextStyle(fontSize: 12)),
-                ),
-              ]
+                ]
               : []),
     );
   }
@@ -243,7 +244,10 @@ class NotificationDetailPage extends StatelessWidget {
         children: [
           Icon(Icons.calendar_today, size: 18, color: context.colors.primary),
           const SizedBox(width: 8),
-          Text(_formatDate(record.time), style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold)),
+          Text(
+            _formatDate(record.time),
+            style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -262,20 +266,19 @@ class NotificationDetailPage extends StatelessWidget {
     return Wrap(
       spacing: 4,
       runSpacing: 4,
-      children:
-          record.area
-              .map(
-                (area) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.blue),
-                  ),
-                  child: Text(area, style: const TextStyle(fontSize: 12)),
-                ),
-              )
-              .toList(),
+      children: record.area
+          .map(
+            (area) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.blue),
+              ),
+              child: Text(area, style: const TextStyle(fontSize: 12)),
+            ),
+          )
+          .toList(),
     );
   }
 

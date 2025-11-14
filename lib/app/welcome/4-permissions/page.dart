@@ -336,21 +336,20 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   void _showPermanentlyDeniedDialog(PermissionItem item) {
     showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: Text('權限請求'.i18n),
-            content: Text('需要使用者手動到設定開啟相關權限。'.i18n),
-            actions: [
-              TextButton(child: Text('取消'.i18n), onPressed: () => Navigator.of(context).pop()),
-              TextButton(
-                child: Text('確定'.i18n),
-                onPressed: () {
-                  openAppSettings();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('權限請求'.i18n),
+        content: Text('需要使用者手動到設定開啟相關權限。'.i18n),
+        actions: [
+          TextButton(child: Text('取消'.i18n), onPressed: () => Navigator.of(context).pop()),
+          TextButton(
+            child: Text('確定'.i18n),
+            onPressed: () {
+              openAppSettings();
+              Navigator.of(context).pop();
+            },
           ),
+        ],
+      ),
     );
   }
 

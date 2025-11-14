@@ -23,46 +23,43 @@ class SettingsThemeSelectPage extends StatelessWidget {
           children: [
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder:
-                  (context, themeMode, child) => ListSectionTile(
-                    icon: Symbols.light_mode_rounded,
-                    title: '淺色'.i18n,
-                    trailing: Icon(themeMode == ThemeMode.light ? Symbols.check : null),
-                    onTap: () {
-                      context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.light);
-                      context.pop();
-                    },
-                  ),
+              builder: (context, themeMode, child) => ListSectionTile(
+                icon: Symbols.light_mode_rounded,
+                title: '淺色'.i18n,
+                trailing: Icon(themeMode == ThemeMode.light ? Symbols.check : null),
+                onTap: () {
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.light);
+                  context.pop();
+                },
+              ),
             ),
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder:
-                  (context, themeMode, child) => ListSectionTile(
-                    icon: Symbols.dark_mode_rounded,
-                    title: '深色'.i18n,
-                    trailing: Icon(themeMode == ThemeMode.dark ? Symbols.check : null),
-                    onTap: () {
-                      context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.dark);
-                      context.pop();
-                    },
-                  ),
+              builder: (context, themeMode, child) => ListSectionTile(
+                icon: Symbols.dark_mode_rounded,
+                title: '深色'.i18n,
+                trailing: Icon(themeMode == ThemeMode.dark ? Symbols.check : null),
+                onTap: () {
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.dark);
+                  context.pop();
+                },
+              ),
             ),
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder:
-                  (context, themeMode, child) => ListSectionTile(
-                    icon: Symbols.devices_rounded,
-                    title: '跟隨系統主題'.i18n,
-                    subtitle: Text(switch (MediaQuery.of(context).platformBrightness) {
-                      Brightness.light => '淺色'.i18n,
-                      Brightness.dark => '深色'.i18n,
-                    }),
-                    trailing: Icon(themeMode == ThemeMode.system ? Symbols.check : null),
-                    onTap: () {
-                      context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.system);
-                      context.pop();
-                    },
-                  ),
+              builder: (context, themeMode, child) => ListSectionTile(
+                icon: Symbols.devices_rounded,
+                title: '跟隨系統主題'.i18n,
+                subtitle: Text(switch (MediaQuery.of(context).platformBrightness) {
+                  Brightness.light => '淺色'.i18n,
+                  Brightness.dark => '深色'.i18n,
+                }),
+                trailing: Icon(themeMode == ThemeMode.system ? Symbols.check : null),
+                onTap: () {
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.system);
+                  context.pop();
+                },
+              ),
             ),
           ],
         ),

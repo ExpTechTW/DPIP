@@ -54,7 +54,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             bottom: TabBar(
               controller: controller,
               isScrollable: true,
-              tabs: const [Tab(text: '降水'), Tab(text: '氣溫'), Tab(text: '風向/風速')],
+              tabs: const [
+                Tab(text: '降水'),
+                Tab(text: '氣溫'),
+                Tab(text: '風向/風速'),
+              ],
             ),
           ),
         ];

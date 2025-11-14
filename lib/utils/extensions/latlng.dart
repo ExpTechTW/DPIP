@@ -1,7 +1,6 @@
+import 'package:dpip/utils/geojson.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
-import 'package:dpip/utils/geojson.dart';
 
 extension GeoJsonLatLng on LatLng {
   bool get isValid => latitude != 0 && longitude != 0;

@@ -5,7 +5,13 @@ enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, win
 
 const Set<MapLayer> kEarthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
 
-const Set<MapLayer> kWeatherLayers = {MapLayer.radar, MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning};
+const Set<MapLayer> kWeatherLayers = {
+  MapLayer.radar,
+  MapLayer.temperature,
+  MapLayer.precipitation,
+  MapLayer.wind,
+  MapLayer.lightning,
+};
 
 const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
   MapLayer.monitor: {MapLayer.monitor},
@@ -83,8 +89,8 @@ class MapLayerIds {
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {
-  final layerIds =
-      (await controller.getLayerIds()).cast<String>()..removeWhere((v) => BaseMapLayerIds.values().contains(v));
+  final layerIds = (await controller.getLayerIds()).cast<String>()
+    ..removeWhere((v) => BaseMapLayerIds.values().contains(v));
   final sourceIds = (await controller.getSourceIds())..removeWhere((v) => v == 'map');
 
   for (final layerId in layerIds) {

@@ -160,10 +160,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildHeader() {
-    final String displayValue =
-        touchedIndex != -1
-            ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
-            : '平均  ${_calculate24HourAverage()}${units[selectedDataType]}';
+    final String displayValue = touchedIndex != -1
+        ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
+        : '平均  ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
       elevation: 4,
@@ -442,23 +441,22 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 rightTitles: const AxisTitles(),
               ),
               borderData: FlBorderData(show: true),
-              barGroups:
-                  weatherData[selectedDataType]!
-                      .asMap()
-                      .entries
-                      .map(
-                        (entry) => BarChartGroupData(
-                          x: entry.key,
-                          barRods: [
-                            BarChartRodData(
-                              toY: entry.value == -99 ? 0 : entry.value,
-                              color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
-                              width: 3,
-                            ),
-                          ],
+              barGroups: weatherData[selectedDataType]!
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => BarChartGroupData(
+                      x: entry.key,
+                      barRods: [
+                        BarChartRodData(
+                          toY: entry.value == -99 ? 0 : entry.value,
+                          color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
+                          width: 3,
                         ),
-                      )
-                      .toList(),
+                      ],
+                    ),
+                  )
+                  .toList(),
               barTouchData: BarTouchData(
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(getTooltipItem: (group, groupIndex, rod, rodIndex) => null),
@@ -555,7 +553,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Container(
               width: 20,
               height: 1,
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey))),
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey)),
+              ),
             ),
             const SizedBox(width: 8),
             const Text('平均'),
@@ -575,10 +575,9 @@ class BackgroundPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = abnormalColor
-          ..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = abnormalColor
+      ..style = PaintingStyle.fill;
 
     const double leftPadding = 55;
     const double bottomPadding = 30;

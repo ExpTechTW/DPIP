@@ -321,33 +321,32 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
                 return DecoratedBoxTransition(
                   decoration: animController.drive(decorationTween),
-                  child:
-                      isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : report == null
-                          ? Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                const Flexible(
-                                  flex: 8,
-                                  child: Text('取得地震報告時發生錯誤，請檢查網路狀況後再試一次。', style: TextStyle(fontSize: 16)),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : report == null
+                      ? Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              const Flexible(
+                                flex: 8,
+                                child: Text('取得地震報告時發生錯誤，請檢查網路狀況後再試一次。', style: TextStyle(fontSize: 16)),
+                              ),
+                              const SizedBox(width: 10),
+                              Flexible(
+                                flex: 2,
+                                child: IconButton(
+                                  icon: const Icon(Symbols.refresh),
+                                  style: ElevatedButton.styleFrom(foregroundColor: context.colors.onSurface),
+                                  onPressed: () {
+                                    refreshReport();
+                                  },
                                 ),
-                                const SizedBox(width: 10),
-                                Flexible(
-                                  flex: 2,
-                                  child: IconButton(
-                                    icon: const Icon(Symbols.refresh),
-                                    style: ElevatedButton.styleFrom(foregroundColor: context.colors.onSurface),
-                                    onPressed: () {
-                                      refreshReport();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                          : ReportSheetContent(report: report!, controller: controller, focus: focus),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ReportSheetContent(report: report!, controller: controller, focus: focus),
                 );
               },
             ),

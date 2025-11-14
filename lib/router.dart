@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:talker_flutter/talker_flutter.dart';
-
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
@@ -42,6 +37,9 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();
@@ -55,19 +53,28 @@ final router = GoRouter(
       navigatorKey: _welcomeNavigatorKey,
       builder: (context, state, child) => ShellWrapper(WelcomeLayout(child: child)),
       routes: [
-        GoRoute(path: WelcomeAboutPage.route, builder: (context, state) => const Material(child: WelcomeAboutPage())),
+        GoRoute(
+          path: WelcomeAboutPage.route,
+          builder: (context, state) => const Material(child: WelcomeAboutPage()),
+        ),
         GoRoute(
           path: WelcomeExpTechPage.route,
           builder: (context, state) => const Material(child: WelcomeExpTechPage()),
         ),
-        GoRoute(path: WelcomeNoticePage.route, builder: (context, state) => const Material(child: WelcomeNoticePage())),
+        GoRoute(
+          path: WelcomeNoticePage.route,
+          builder: (context, state) => const Material(child: WelcomeNoticePage()),
+        ),
         GoRoute(
           path: WelcomePermissionPage.route,
           builder: (context, state) => const Material(child: WelcomePermissionPage()),
         ),
       ],
     ),
-    GoRoute(path: HomePage.route, builder: (context, state) => const AppLayout(child: HomePage())),
+    GoRoute(
+      path: HomePage.route,
+      builder: (context, state) => const AppLayout(child: HomePage()),
+    ),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
@@ -108,7 +115,10 @@ final router = GoRouter(
         );
       },
       routes: [
-        GoRoute(path: SettingsIndexPage.route, builder: (context, state) => const Material(child: SettingsIndexPage())),
+        GoRoute(
+          path: SettingsIndexPage.route,
+          builder: (context, state) => const Material(child: SettingsIndexPage()),
+        ),
         GoRoute(
           path: SettingsLocationPage.route,
           builder: (context, state) => const Material(child: SettingsLocationPage()),
@@ -119,10 +129,13 @@ final router = GoRouter(
         ),
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
-          builder:
-              (context, state) => Material(child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!)),
+          builder: (context, state) =>
+              Material(child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!)),
         ),
-        GoRoute(path: SettingsThemePage.route, builder: (context, state) => const Material(child: SettingsThemePage())),
+        GoRoute(
+          path: SettingsThemePage.route,
+          builder: (context, state) => const Material(child: SettingsThemePage()),
+        ),
         GoRoute(
           path: SettingsThemeSelectPage.route,
           builder: (context, state) => const Material(child: SettingsThemeSelectPage()),
@@ -135,8 +148,14 @@ final router = GoRouter(
           path: SettingsLocaleSelectPage.route,
           builder: (context, state) => const Material(child: SettingsLocaleSelectPage()),
         ),
-        GoRoute(path: SettingsUnitPage.route, builder: (context, state) => const Material(child: SettingsUnitPage())),
-        GoRoute(path: SettingsMapPage.route, builder: (context, state) => const Material(child: SettingsMapPage())),
+        GoRoute(
+          path: SettingsUnitPage.route,
+          builder: (context, state) => const Material(child: SettingsUnitPage()),
+        ),
+        GoRoute(
+          path: SettingsMapPage.route,
+          builder: (context, state) => const Material(child: SettingsMapPage()),
+        ),
         GoRoute(
           path: SettingsNotifyPage.route,
           builder: (context, state) => const Material(child: SettingsNotifyPage()),

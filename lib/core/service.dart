@@ -2,22 +2,20 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:dpip/core/i18n.dart';
-import 'package:flutter/services.dart';
-
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:geojson_vi/geojson_vi.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/services.dart';
+import 'package:geojson_vi/geojson_vi.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Background location service.
 ///

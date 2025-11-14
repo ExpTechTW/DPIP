@@ -161,58 +161,55 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 final item = ranked[index];
                 final rank = index + 1;
 
-                final backgroundColor =
-                    index == 0
-                        ? context.theme.extendedColors.amberContainer
-                        : index == 1
-                        ? context.theme.extendedColors.greyContainer
-                        : index == 2
-                        ? context.theme.extendedColors.brownContainer
-                        : index < 10
-                        ? context.colors.surfaceContainerHigh
-                        : context.colors.surfaceContainer;
+                final backgroundColor = index == 0
+                    ? context.theme.extendedColors.amberContainer
+                    : index == 1
+                    ? context.theme.extendedColors.greyContainer
+                    : index == 2
+                    ? context.theme.extendedColors.brownContainer
+                    : index < 10
+                    ? context.colors.surfaceContainerHigh
+                    : context.colors.surfaceContainer;
 
-                final foregroundColor =
-                    index == 0
-                        ? context.theme.extendedColors.onAmberContainer
-                        : index == 1
-                        ? context.colors.onSurface
-                        : index == 2
-                        ? context.theme.extendedColors.onBrownContainer
-                        : index < 10
-                        ? context.colors.onSurface
-                        : context.colors.onSurfaceVariant;
+                final foregroundColor = index == 0
+                    ? context.theme.extendedColors.onAmberContainer
+                    : index == 1
+                    ? context.colors.onSurface
+                    : index == 2
+                    ? context.theme.extendedColors.onBrownContainer
+                    : index < 10
+                    ? context.colors.onSurface
+                    : context.colors.onSurfaceVariant;
 
-                final iconColor =
-                    index == 0
-                        ? context.theme.extendedColors.amber
-                        : index == 1
-                        ? context.theme.extendedColors.grey
-                        : context.theme.extendedColors.brown;
+                final iconColor = index == 0
+                    ? context.theme.extendedColors.amber
+                    : index == 1
+                    ? context.theme.extendedColors.grey
+                    : context.theme.extendedColors.brown;
 
-                final double fontSize =
-                    index == 0
-                        ? 20
-                        : index < 3
-                        ? 18
-                        : 16;
+                final double fontSize = index == 0
+                    ? 20
+                    : index < 3
+                    ? 18
+                    : 16;
 
-                final double iconSize =
-                    index == 0
-                        ? 32
-                        : index == 1
-                        ? 28
-                        : 24;
+                final double iconSize = index == 0
+                    ? 32
+                    : index == 1
+                    ? 28
+                    : 24;
 
-                final leading =
-                    index < 3
-                        ? Icon(
-                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                          color: iconColor,
-                          size: iconSize,
-                          fill: 1,
-                        )
-                        : Text('$rank', style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                final leading = index < 3
+                    ? Icon(
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                        color: iconColor,
+                        size: iconSize,
+                        fill: 1,
+                      )
+                    : Text(
+                        '$rank',
+                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
+                      );
 
                 final percentage = item.$2 / ranked.first.$2;
 
@@ -221,12 +218,11 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                     item.$1.name,
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight:
-                          index == 0
-                              ? FontWeight.bold
-                              : index < 3
-                              ? FontWeight.w500
-                              : null,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                          ? FontWeight.w500
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -238,21 +234,19 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
                 final content = [
                   Expanded(
-                    child:
-                        index < 3
-                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
-                            : Row(children: location),
+                    child: index < 3
+                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        : Row(children: location),
                   ),
                   Text(
                     '${item.$2} mm',
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight:
-                          index == 0
-                              ? FontWeight.bold
-                              : index < 3
-                              ? FontWeight.w500
-                              : null,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                          ? FontWeight.w500
+                          : null,
                     ),
                   ),
                 ];

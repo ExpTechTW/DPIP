@@ -1,14 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/intensity_history.dart';
 import 'package:dpip/core/ios_get_location.dart';
@@ -24,6 +17,11 @@ import 'package:dpip/widgets/list/detail_field_tile.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:timezone/timezone.dart';
 
 class IntensityPage extends StatefulWidget {
   final IntensityHistory item;
@@ -142,10 +140,9 @@ class _IntensityPageState extends State<IntensityPage> {
       height: 20,
       width: 300,
       child: Row(
-        children:
-            intensities.map((intensity) {
-              return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
-            }).toList(),
+        children: intensities.map((intensity) {
+          return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
+        }).toList(),
       ),
     );
   }
@@ -161,13 +158,12 @@ class _IntensityPageState extends State<IntensityPage> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children:
-            labels.map((label) {
-              return SizedBox(
-                width: 300 / 9,
-                child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
-              );
-            }).toList(),
+        children: labels.map((label) {
+          return SizedBox(
+            width: 300 / 9,
+            child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
+          );
+        }).toList(),
       ),
     );
   }
@@ -358,16 +354,15 @@ class _IntensityPageState extends State<IntensityPage> {
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children:
-                          locations.map((e) {
-                            return Chip(
-                              padding: const EdgeInsets.all(4),
-                              side: BorderSide(color: context.colors.outline),
-                              backgroundColor: context.colors.surfaceContainerHigh,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              label: Text(e.townWithLevel),
-                            );
-                          }).toList(),
+                      children: locations.map((e) {
+                        return Chip(
+                          padding: const EdgeInsets.all(4),
+                          side: BorderSide(color: context.colors.outline),
+                          backgroundColor: context.colors.surfaceContainerHigh,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          label: Text(e.townWithLevel),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ],
@@ -378,6 +373,9 @@ class _IntensityPageState extends State<IntensityPage> {
       );
     }
 
-    return DetailFieldTile(label: '影響區域', child: Column(children: areas));
+    return DetailFieldTile(
+      label: '影響區域',
+      child: Column(children: areas),
+    );
   }
 }

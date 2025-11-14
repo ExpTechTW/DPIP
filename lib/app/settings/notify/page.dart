@@ -61,7 +61,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     BasicNotifyType.all => '接收全部'.i18n,
   };
 
-  bool get hasLocation => GlobalProviders.location.coordinates != null ||
+  bool get hasLocation =>
+      GlobalProviders.location.coordinates != null ||
       GlobalProviders.location.code != null ||
       (Preference.locationAuto ?? false);
 
@@ -87,11 +88,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('伺服器排隊中，請稍候…'.i18n),
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
         }
       });
       ExpTech()

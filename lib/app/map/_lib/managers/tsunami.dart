@@ -204,23 +204,22 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
         if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
       });
     } else {
-      final features =
-          tsunami.info.data.map((station) {
-            final actualStation = station as TsunamiActual;
-            return {
-              'type': 'Feature',
-              'properties': {
-                'name': actualStation.name,
-                'id': actualStation.id,
-                'waveHeight': actualStation.waveHeight,
-                'arrivalTime': DateFormat('MM/dd HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
-              },
-              'geometry': {
-                'type': 'Point',
-                'coordinates': [actualStation.lon ?? 0, actualStation.lat ?? 0],
-              },
-            };
-          }).toList();
+      final features = tsunami.info.data.map((station) {
+        final actualStation = station as TsunamiActual;
+        return {
+          'type': 'Feature',
+          'properties': {
+            'name': actualStation.name,
+            'id': actualStation.id,
+            'waveHeight': actualStation.waveHeight,
+            'arrivalTime': DateFormat('MM/dd HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
+          },
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [actualStation.lon ?? 0, actualStation.lat ?? 0],
+          },
+        };
+      }).toList();
 
       await _mapController.setGeoJsonSource('tsunami-data', {'type': 'FeatureCollection', 'features': features});
 
@@ -446,252 +445,246 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20),
-                      child:
-                          tsunami == null
-                              ? Container()
-                              : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                      child: tsunami == null
+                          ? Container()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            tsunami == null ? '近期無海嘯資訊' : '海嘯警報',
+                                            style: TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          if (tsunami != null)
+                                            Text(
+                                              '${tsunami!.id}號 第${tsunami!.serial}報',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: context.colors.onSurface.withValues(alpha: 0.8),
+                                              ),
+                                            ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            tsunami != null
+                                                ? '${tsunami!.time.toLocaleDateTimeString(context)} $tsunamiStatus'
+                                                : '${getTime()} 更新',
+                                            style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    if (tsunamiOptions.isNotEmpty)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: context.colors.surface,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: context.colors.onSurface.withValues(alpha: 0.1),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: DropdownButton<String>(
+                                          value: _selectedOption,
+                                          onChanged: (String? newValue) async {
+                                            if (newValue == null) return;
+                                            _selectedOption = newValue;
+                                            tsunami = await ExpTech().getTsunami(newValue);
+                                            tsunamiStatus = tsunami?.status == 0
+                                                ? '發布'
+                                                : tsunami?.status == 1
+                                                ? '更新'
+                                                : '解除';
+                                            if (tsunami != null) {
+                                              await addTsunamiObservationPoints(tsunami!);
+                                            }
+                                            setState(() {});
+                                          },
+                                          items: tsunamiOptions.reversed.map<DropdownMenuItem<String>>((String value) {
+                                            return DropdownMenuItem<String>(value: value, child: Text(value));
+                                          }).toList(),
+                                          style: TextStyle(
+                                            color: context.colors.onSurface,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          icon: Icon(Icons.arrow_drop_down, color: context.colors.onSurface),
+                                          underline: const SizedBox(),
+                                          dropdownColor: context.colors.surface,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 30),
+                                if (tsunami != null)
+                                  Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Column(
+                                      Text(
+                                        '${tsunami?.content}',
+                                        style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      if (tsunami?.info.type == 'estimate')
+                                        Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              tsunami == null ? '近期無海嘯資訊' : '海嘯警報',
+                                              '預估海嘯到達時間及波高',
                                               style: TextStyle(
-                                                fontSize: 28,
+                                                fontSize: 22,
                                                 fontWeight: FontWeight.bold,
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
-                                            const SizedBox(height: 8),
-                                            if (tsunami != null)
-                                              Text(
-                                                '${tsunami!.id}號 第${tsunami!.serial}報',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: context.colors.onSurface.withValues(alpha: 0.8),
-                                                ),
-                                              ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              tsunami != null
-                                                  ? '${tsunami!.time.toLocaleDateTimeString(context)} $tsunamiStatus'
-                                                  : '${getTime()} 更新',
-                                              style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
-                                            ),
+                                            const SizedBox(height: 10),
+                                            TsunamiEstimateList(tsunamiList: tsunami!.info.data),
                                           ],
+                                        )
+                                      else
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '各地觀測到的海嘯',
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: context.colors.onSurface,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            TsunamiObservedList(tsunamiList: tsunami!.info.data),
+                                          ],
+                                        ),
+                                      const SizedBox(height: 15),
+                                      Text(
+                                        '地震資訊',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: context.colors.onSurface,
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
-                                      if (tsunamiOptions.isNotEmpty)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(8),
-                                            color: context.colors.surface,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: context.colors.onSurface.withValues(alpha: 0.1),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: DropdownButton<String>(
-                                            value: _selectedOption,
-                                            onChanged: (String? newValue) async {
-                                              if (newValue == null) return;
-                                              _selectedOption = newValue;
-                                              tsunami = await ExpTech().getTsunami(newValue);
-                                              tsunamiStatus =
-                                                  tsunami?.status == 0
-                                                      ? '發布'
-                                                      : tsunami?.status == 1
-                                                      ? '更新'
-                                                      : '解除';
-                                              if (tsunami != null) {
-                                                await addTsunamiObservationPoints(tsunami!);
-                                              }
-                                              setState(() {});
-                                            },
-                                            items:
-                                                tsunamiOptions.reversed.map<DropdownMenuItem<String>>((String value) {
-                                                  return DropdownMenuItem<String>(value: value, child: Text(value));
-                                                }).toList(),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('發生時間', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            tsunami!.eq.time.toLocaleDateTimeString(context),
                                             style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
                                               color: context.colors.onSurface,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
                                             ),
-                                            icon: Icon(Icons.arrow_drop_down, color: context.colors.onSurface),
-                                            underline: const SizedBox(),
-                                            dropdownColor: context.colors.surface,
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 30),
-                                  if (tsunami != null)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${tsunami?.content}',
-                                          style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                        ),
-                                        const SizedBox(height: 20),
-                                        if (tsunami?.info.type == 'estimate')
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('位於', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
                                           Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '預估海嘯到達時間及波高',
+                                                tsunami!.eq.loc,
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                   color: context.colors.onSurface,
                                                 ),
                                               ),
-                                              const SizedBox(height: 10),
-                                              TsunamiEstimateList(tsunamiList: tsunami!.info.data),
-                                            ],
-                                          )
-                                        else
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
                                               Text(
-                                                '各地觀測到的海嘯',
+                                                convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
                                                 style: TextStyle(
-                                                  fontSize: 22,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                   color: context.colors.onSurface,
                                                 ),
                                               ),
-                                              const SizedBox(height: 10),
-                                              TsunamiObservedList(tsunamiList: tsunami!.info.data),
                                             ],
                                           ),
-                                        const SizedBox(height: 15),
-                                        Text(
-                                          '地震資訊',
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: context.colors.onSurface,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              '發生時間',
-                                              style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              tsunami!.eq.time.toLocaleDateTimeString(context),
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: context.colors.onSurface,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text('位於', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
-                                                  tsunami!.eq.loc,
+                                                  '規模',
+                                                  style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                ),
+                                                Text(
+                                                  '${tsunami!.eq.mag}',
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                     color: context.colors.onSurface,
                                                   ),
                                                 ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
                                                 Text(
-                                                  convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
+                                                  '深度',
+                                                  style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                ),
+                                                Text(
+                                                  '${tsunami!.eq.depth}km',
                                                   style: TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                     color: context.colors.onSurface,
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    '規模',
-                                                    style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                                  ),
-                                                  Text(
-                                                    '${tsunami!.eq.mag}',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: context.colors.onSurface,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    '深度',
-                                                    style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                                  ),
-                                                  Text(
-                                                    '${tsunami!.eq.depth}km',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: context.colors.onSurface,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-                                  else
-                                    Container(),
-                                ],
-                              ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                else
+                                  Container(),
+                              ],
+                            ),
                     ),
                   ],
                 ),

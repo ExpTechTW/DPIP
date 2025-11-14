@@ -237,14 +237,8 @@ class DpipDataModel extends _DpipDataModel {
 
       try {
         final data = _isReplayMode
-            ? await Future.wait([
-                ExpTech().getRts(currentTime),
-                ExpTech().getEew(currentTime),
-              ])
-            : await Future.wait([
-                ExpTech().getRts(),
-                ExpTech().getEew(),
-              ]);
+            ? await Future.wait([ExpTech().getRts(currentTime), ExpTech().getEew(currentTime)])
+            : await Future.wait([ExpTech().getRts(), ExpTech().getEew()]);
 
         final [rts as Rts, eew as List<Eew>] = data;
 

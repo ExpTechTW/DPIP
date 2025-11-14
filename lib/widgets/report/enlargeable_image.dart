@@ -26,7 +26,10 @@ class EnlargeableImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Stack(
             children: [
-              Hero(tag: heroTag, child: CachedNetworkImage(imageUrl: imageUrl)),
+              Hero(
+                tag: heroTag,
+                child: CachedNetworkImage(imageUrl: imageUrl),
+              ),
               Positioned.fill(
                 child: Material(
                   color: Colors.transparent,

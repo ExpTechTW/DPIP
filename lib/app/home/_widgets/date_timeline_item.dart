@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
 
 class DateTimelineItem extends StatelessWidget {
   final String date;
@@ -38,9 +37,7 @@ class DateTimelineItem extends StatelessWidget {
     );
 
     // 如果在服務區外，只顯示全國模式
-    final availableModes = isOutOfService
-        ? HomeMode.values.where((m) => m.isNational).toList()
-        : HomeMode.values;
+    final availableModes = isOutOfService ? HomeMode.values.where((m) => m.isNational).toList() : HomeMode.values;
 
     showMenu<HomeMode>(
       context: context,
@@ -53,11 +50,7 @@ class DateTimelineItem extends StatelessWidget {
           child: Row(
             spacing: 12,
             children: [
-              Icon(
-                m.icon,
-                size: 20,
-                color: mode == m ? context.colors.primary : context.colors.onSurfaceVariant,
-              ),
+              Icon(m.icon, size: 20, color: mode == m ? context.colors.primary : context.colors.onSurfaceVariant),
               Text(
                 m.label,
                 style: context.theme.textTheme.bodyMedium?.copyWith(
@@ -123,11 +116,7 @@ class DateTimelineItem extends StatelessWidget {
                         spacing: 6,
                         children: [
                           if (mode != null) ...[
-                            Icon(
-                              mode!.icon,
-                              size: 16,
-                              color: context.colors.onSecondaryContainer,
-                            ),
+                            Icon(mode!.icon, size: 16, color: context.colors.onSecondaryContainer),
                             Text(
                               mode!.label,
                               style: context.theme.textTheme.labelMedium?.copyWith(

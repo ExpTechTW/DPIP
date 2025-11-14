@@ -291,13 +291,12 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
 
                   final isFullScreen = _morphController.value == 1.0 && _controller.size == widget.maxChildSize;
 
-                  final borderRadius =
-                      !isFullScreen
-                          ? Tween<double>(
-                            begin: widget.borderRadius?.topLeft.y ?? 16.0,
-                            end: _isOverflowing ? 0.0 : (widget.borderRadius?.topLeft.y ?? 16.0),
-                          ).transform(_morphController.value)
-                          : 0.0;
+                  final borderRadius = !isFullScreen
+                      ? Tween<double>(
+                          begin: widget.borderRadius?.topLeft.y ?? 16.0,
+                          end: _isOverflowing ? 0.0 : (widget.borderRadius?.topLeft.y ?? 16.0),
+                        ).transform(_morphController.value)
+                      : 0.0;
 
                   final elevation = Tween<double>(
                     begin: widget.elevation,

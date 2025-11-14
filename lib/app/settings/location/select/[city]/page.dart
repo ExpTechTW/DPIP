@@ -44,13 +44,12 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
                     title: town.cityTownWithLevel,
                     subtitle: Text('$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N'),
                     trailing: isFavorited ? const Icon(Symbols.star_rounded, fill: 1) : null,
-                    onTap:
-                        isFavorited
-                            ? null
-                            : () {
-                              context.read<SettingsLocationModel>().favorite(code);
-                              context.popUntil(SettingsLocationPage.route);
-                            },
+                    onTap: isFavorited
+                        ? null
+                        : () {
+                            context.read<SettingsLocationModel>().favorite(code);
+                            context.popUntil(SettingsLocationPage.route);
+                          },
                   );
                 },
               ),

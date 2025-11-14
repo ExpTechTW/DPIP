@@ -51,15 +51,14 @@ class Global {
     final data = await _loadCompressedJson('assets/time.json.gz');
 
     return data.map((key, value) {
-      final list =
-          (value as List).map((item) {
-            final map = item as Map<String, dynamic>;
-            return (
-              P: double.parse(map['P'].toString()),
-              R: double.parse(map['R'].toString()),
-              S: double.parse(map['S'].toString()),
-            );
-          }).toList();
+      final list = (value as List).map((item) {
+        final map = item as Map<String, dynamic>;
+        return (
+          P: double.parse(map['P'].toString()),
+          R: double.parse(map['R'].toString()),
+          S: double.parse(map['S'].toString()),
+        );
+      }).toList();
       return MapEntry(key, list);
     });
   }

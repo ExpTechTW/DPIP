@@ -28,9 +28,9 @@ class Lightning {
       level = 60;
     }
 
-    return GeoJsonFeatureBuilder<GeoJsonFeatureType>(GeoJsonFeatureType.Point)
-        .setGeometry([loc.lng, loc.lat])
-        .setProperty('type', '$type-$level');
+    return GeoJsonFeatureBuilder<GeoJsonFeatureType>(
+      GeoJsonFeatureType.Point,
+    ).setGeometry([loc.lng, loc.lat]).setProperty('type', '$type-$level');
   }
 }
 

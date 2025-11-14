@@ -39,12 +39,11 @@ class _TsunamiNotifySectionState extends State<TsunamiNotifySection> {
           ListSectionTile(
             title: title,
             icon: icon,
-            trailing:
-                _loading == item
-                    ? loading
-                    : (widget.value == item)
-                    ? check
-                    : empty,
+            trailing: _loading == item
+                ? loading
+                : (widget.value == item)
+                ? check
+                : empty,
             enabled: _loading == null,
             onTap: _loading == null ? () => onChanged(item) : null,
           ),

@@ -51,44 +51,43 @@ class TsunamiEstimateList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children:
-          tsunamiList.map((item) {
-            return Column(
+      children: tsunamiList.map((item) {
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(item.area, style: const TextStyle(fontSize: 18, letterSpacing: 2)),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(item.area, style: const TextStyle(fontSize: 18, letterSpacing: 2)),
-                    Row(
-                      children: [
-                        Text(convertTimestamp(item.arrivalTime), style: const TextStyle(fontSize: 12)),
-                        const SizedBox(width: 10),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: heightToColor(item.waveHeight),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          width: 75,
-                          child: Center(
-                            child: Text(
-                              heightToString(item.waveHeight),
-                              style: TextStyle(
-                                color: heightToTextColor(item.waveHeight),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                letterSpacing: 1,
-                              ),
-                            ),
+                    Text(convertTimestamp(item.arrivalTime), style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: heightToColor(item.waveHeight),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      width: 75,
+                      child: Center(
+                        child: Text(
+                          heightToString(item.waveHeight),
+                          style: TextStyle(
+                            color: heightToTextColor(item.waveHeight),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            letterSpacing: 1,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
               ],
-            );
-          }).toList(),
+            ),
+            const SizedBox(height: 4),
+          ],
+        );
+      }).toList(),
     );
   }
 }

@@ -45,7 +45,10 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(title: destinations[currentIndex].label),
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [const ListTileGroupHeader(title: '地圖列表'), ...destinations],
+        children: [
+          const ListTileGroupHeader(title: '地圖列表'),
+          ...destinations,
+        ],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);

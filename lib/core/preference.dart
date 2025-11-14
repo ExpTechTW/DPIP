@@ -1,8 +1,7 @@
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/preference.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceKeys {
   static const lastUpdateToServerTime = 'lastUpdateToServerTime';

@@ -17,13 +17,13 @@ class TsunamiInfo {
     var data = [];
 
     if (type == 'estimate') {
-      data =
-          (json['data'] as List<dynamic>)
-              .map((item) => TsunamiEstimate.fromJson(item as Map<String, dynamic>))
-              .toList();
+      data = (json['data'] as List<dynamic>)
+          .map((item) => TsunamiEstimate.fromJson(item as Map<String, dynamic>))
+          .toList();
     } else if (type == 'actual') {
-      data =
-          (json['data'] as List<dynamic>).map((item) => TsunamiActual.fromJson(item as Map<String, dynamic>)).toList();
+      data = (json['data'] as List<dynamic>)
+          .map((item) => TsunamiActual.fromJson(item as Map<String, dynamic>))
+          .toList();
     }
 
     return TsunamiInfo(type: type, data: data);
@@ -32,15 +32,14 @@ class TsunamiInfo {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
-      'data':
-          data.map((item) {
-            if (type == 'estimate') {
-              return (item as TsunamiEstimate).toJson();
-            } else if (type == 'actual') {
-              return (item as TsunamiActual).toJson();
-            }
-            return null;
-          }).toList(),
+      'data': data.map((item) {
+        if (type == 'estimate') {
+          return (item as TsunamiEstimate).toJson();
+        } else if (type == 'actual') {
+          return (item as TsunamiActual).toJson();
+        }
+        return null;
+      }).toList(),
     };
   }
 }

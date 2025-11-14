@@ -1,6 +1,5 @@
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/widgets/map/map.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 extension MapLibreMapControllerExtension on MapLibreMapController {
   Future<void> setBaseMap(BaseMapType baseMapType) async {

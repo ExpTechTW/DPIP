@@ -5,12 +5,7 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-enum HomeMode {
-  nationalActive,
-  nationalHistory,
-  localActive,
-  localHistory,
-}
+enum HomeMode { nationalActive, nationalHistory, localActive, localHistory }
 
 extension HomeModeExtension on HomeMode {
   String get label {
@@ -50,11 +45,7 @@ class ModeToggleButton extends StatelessWidget {
   final HomeMode currentMode;
   final ValueChanged<HomeMode> onModeChanged;
 
-  const ModeToggleButton({
-    super.key,
-    required this.currentMode,
-    required this.onModeChanged,
-  });
+  const ModeToggleButton({super.key, required this.currentMode, required this.onModeChanged});
 
   void _showModeMenu(BuildContext context) {
     final RenderBox? button = context.findRenderObject() as RenderBox?;
@@ -131,22 +122,12 @@ class ModeToggleButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 8,
                   children: [
-                    Icon(
-                      currentMode.icon,
-                      size: 20,
-                      color: context.colors.outline,
-                    ),
+                    Icon(currentMode.icon, size: 20, color: context.colors.outline),
                     Text(
                       currentMode.label,
-                      style: context.theme.textTheme.bodyLarge?.copyWith(
-                        color: context.colors.outline,
-                      ),
+                      style: context.theme.textTheme.bodyLarge?.copyWith(color: context.colors.outline),
                     ),
-                    Icon(
-                      Symbols.arrow_drop_down_rounded,
-                      size: 20,
-                      color: context.colors.outline,
-                    ),
+                    Icon(Symbols.arrow_drop_down_rounded, size: 20, color: context.colors.outline),
                   ],
                 ),
               ),

@@ -1,13 +1,12 @@
 import 'package:collection/collection.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/api/model/report/area_intensity.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/utils/parser.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:timezone/timezone.dart';
 
 part 'earthquake_report.g.dart';
 
@@ -198,16 +197,14 @@ class EarthquakeReport {
 
   GeoJsonBuilder toGeoJson() {
     final stations = list.values.expand((area) => area.town.values);
-    final features =
-        stations
-            .sorted((a, b) => a.intensity.compareTo(b.intensity))
-            .map((station) => station.toGeoJsonFeature())
-            .toList();
-    final cross =
-        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-          ..setGeometry(latlng.asGeoJsonCooridnate)
-          ..setProperty('icon', 'cross-7')
-          ..setProperty('magnitude', magnitude);
+    final features = stations
+        .sorted((a, b) => a.intensity.compareTo(b.intensity))
+        .map((station) => station.toGeoJsonFeature())
+        .toList();
+    final cross = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+      ..setGeometry(latlng.asGeoJsonCooridnate)
+      ..setProperty('icon', 'cross-7')
+      ..setProperty('magnitude', magnitude);
 
     features.add(cross);
 

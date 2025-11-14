@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
@@ -23,6 +17,10 @@ import 'package:dpip/widgets/blurred_container.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class RainData {
   final double latitude;
@@ -408,13 +406,12 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                         color: isSelected ? context.colors.primary : context.colors.outlineVariant,
                                       ),
                                       avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                                      onSelected:
-                                          isLoading
-                                              ? null
-                                              : (selected) {
-                                                if (!selected) return;
-                                                manager.setPrecipitationInterval(interval);
-                                              },
+                                      onSelected: isLoading
+                                          ? null
+                                          : (selected) {
+                                              if (!selected) return;
+                                              manager.setPrecipitationInterval(interval);
+                                            },
                                     );
                                   },
                                 );
@@ -454,13 +451,12 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                             color: isSelected ? context.colors.primary : context.colors.outlineVariant,
                                           ),
                                           avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                                          onSelected:
-                                              isLoading
-                                                  ? null
-                                                  : (selected) {
-                                                    if (!selected) return;
-                                                    manager.setPrecipitationTime(time.value);
-                                                  },
+                                          onSelected: isLoading
+                                              ? null
+                                              : (selected) {
+                                                  if (!selected) return;
+                                                  manager.setPrecipitationTime(time.value);
+                                                },
                                         );
                                       },
                                     ),

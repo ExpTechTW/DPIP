@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
+import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;

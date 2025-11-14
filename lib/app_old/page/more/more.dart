@@ -33,7 +33,10 @@ class _MorePageState extends State<MorePage> {
     return Scaffold(
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [const ListTileGroupHeader(title: '更多功能列表'), ...destinations],
+        children: [
+          const ListTileGroupHeader(title: '更多功能列表'),
+          ...destinations,
+        ],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);

@@ -131,7 +131,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 16,
-                children: [Text(error.toString()), FilledButton.tonal(onPressed: refresh, child: Text('重新載入'.i18n))],
+                children: [
+                  Text(error.toString()),
+                  FilledButton.tonal(onPressed: refresh, child: Text('重新載入'.i18n)),
+                ],
               ),
             );
           }
@@ -170,48 +173,42 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in subscriptions)
                       ListSectionTile(
-                        title:
-                            product.title.contains('(')
-                                ? product.title.substring(0, product.title.indexOf('(')).trim()
-                                : product.title,
-                        titleStyle:
-                            (processingProductId != null && processingProductId != product.id)
-                                ? TextStyle(color: context.theme.disabledColor)
-                                : const TextStyle(fontWeight: FontWeight.bold),
+                        title: product.title.contains('(')
+                            ? product.title.substring(0, product.title.indexOf('(')).trim()
+                            : product.title,
+                        titleStyle: (processingProductId != null && processingProductId != product.id)
+                            ? TextStyle(color: context.theme.disabledColor)
+                            : const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
-                            color:
-                                (processingProductId != null && processingProductId != product.id)
-                                    ? context.theme.disabledColor
-                                    : context.textTheme.bodySmall?.color,
+                            color: (processingProductId != null && processingProductId != product.id)
+                                ? context.theme.disabledColor
+                                : context.textTheme.bodySmall?.color,
                           ),
                         ),
-                        trailing:
-                            (purchasedProductIds.contains(product.id))
-                                ? Icon(Symbols.check_rounded, color: context.colors.primary)
-                                : (processingProductId == product.id)
-                                ? const CircularProgressIndicator.adaptive()
-                                : Text(
-                                  '{price}/月'.i18n.args({'price': product.price}),
-                                  style: TextStyle(
-                                    color:
-                                        (processingProductId != null && processingProductId != product.id)
-                                            ? context.theme.disabledColor
-                                            : context.textTheme.bodyMedium?.color,
-                                  ),
+                        trailing: (purchasedProductIds.contains(product.id))
+                            ? Icon(Symbols.check_rounded, color: context.colors.primary)
+                            : (processingProductId == product.id)
+                            ? const CircularProgressIndicator.adaptive()
+                            : Text(
+                                '{price}/月'.i18n.args({'price': product.price}),
+                                style: TextStyle(
+                                  color: (processingProductId != null && processingProductId != product.id)
+                                      ? context.theme.disabledColor
+                                      : context.textTheme.bodyMedium?.color,
                                 ),
-                        onTap:
-                            isPending || purchasedProductIds.contains(product.id)
-                                ? null
-                                : () {
-                                  setState(() {
-                                    isPending = true;
-                                    processingProductId = product.id;
-                                  });
-                                  final purchaseParam = PurchaseParam(productDetails: product);
-                                  InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
-                                },
+                              ),
+                        onTap: isPending || purchasedProductIds.contains(product.id)
+                            ? null
+                            : () {
+                                setState(() {
+                                  isPending = true;
+                                  processingProductId = product.id;
+                                });
+                                final purchaseParam = PurchaseParam(productDetails: product);
+                                InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+                              },
                       ),
                   ],
                 ),
@@ -221,46 +218,40 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in oneTime)
                       ListSectionTile(
-                        title:
-                            product.title.contains('(')
-                                ? product.title.substring(0, product.title.indexOf('(')).trim()
-                                : product.title,
-                        titleStyle:
-                            (processingProductId != null && processingProductId != product.id)
-                                ? TextStyle(color: context.theme.disabledColor)
-                                : const TextStyle(fontWeight: FontWeight.bold),
+                        title: product.title.contains('(')
+                            ? product.title.substring(0, product.title.indexOf('(')).trim()
+                            : product.title,
+                        titleStyle: (processingProductId != null && processingProductId != product.id)
+                            ? TextStyle(color: context.theme.disabledColor)
+                            : const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
-                            color:
-                                (processingProductId != null && processingProductId != product.id)
-                                    ? context.theme.disabledColor
-                                    : context.textTheme.bodySmall?.color,
+                            color: (processingProductId != null && processingProductId != product.id)
+                                ? context.theme.disabledColor
+                                : context.textTheme.bodySmall?.color,
                           ),
                         ),
-                        trailing:
-                            (processingProductId == product.id)
-                                ? const CircularProgressIndicator.adaptive()
-                                : Text(
-                                  product.price,
-                                  style: TextStyle(
-                                    color:
-                                        (processingProductId != null && processingProductId != product.id)
-                                            ? context.theme.disabledColor
-                                            : context.textTheme.bodyMedium?.color,
-                                  ),
+                        trailing: (processingProductId == product.id)
+                            ? const CircularProgressIndicator.adaptive()
+                            : Text(
+                                product.price,
+                                style: TextStyle(
+                                  color: (processingProductId != null && processingProductId != product.id)
+                                      ? context.theme.disabledColor
+                                      : context.textTheme.bodyMedium?.color,
                                 ),
-                        onTap:
-                            isPending
-                                ? null
-                                : () {
-                                  setState(() {
-                                    isPending = true;
-                                    processingProductId = product.id;
-                                  });
-                                  final purchaseParam = PurchaseParam(productDetails: product);
-                                  InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
-                                },
+                              ),
+                        onTap: isPending
+                            ? null
+                            : () {
+                                setState(() {
+                                  isPending = true;
+                                  processingProductId = product.id;
+                                });
+                                final purchaseParam = PurchaseParam(productDetails: product);
+                                InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
+                              },
                       ),
                   ],
                 ),

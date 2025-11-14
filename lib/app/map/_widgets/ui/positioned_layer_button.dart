@@ -29,22 +29,21 @@ class PositionedLayerButton extends StatelessWidget {
         child: BlurredIconButton(
           icon: const Icon(Symbols.layers_rounded),
           elevation: 2,
-          onPressed:
-              () => showModalBottomSheet(
-                context: context,
-                useRootNavigator: true,
-                useSafeArea: true,
-                isScrollControlled: true,
-                constraints: context.bottomSheetConstraints,
-                builder: (context) {
-                  return LayerToggleSheet(
-                    activeLayers: activeLayers,
-                    currentBaseMap: currentBaseMap,
-                    onLayerChanged: onLayerChanged,
-                    onBaseMapChanged: onBaseMapChanged,
-                  );
-                },
-              ),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            useSafeArea: true,
+            isScrollControlled: true,
+            constraints: context.bottomSheetConstraints,
+            builder: (context) {
+              return LayerToggleSheet(
+                activeLayers: activeLayers,
+                currentBaseMap: currentBaseMap,
+                onLayerChanged: onLayerChanged,
+                onBaseMapChanged: onBaseMapChanged,
+              );
+            },
+          ),
         ),
       ),
     );

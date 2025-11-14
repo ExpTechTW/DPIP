@@ -168,8 +168,9 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                       Text(
                         DateFormat('MM/dd').format(time),
                         style: TextStyle(
-                          color:
-                              isSelected ? context.colors.onSecondary : context.colors.onSurface.withValues(alpha: 0.7),
+                          color: isSelected
+                              ? context.colors.onSecondary
+                              : context.colors.onSurface.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),

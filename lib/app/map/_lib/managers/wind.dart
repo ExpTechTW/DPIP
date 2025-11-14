@@ -107,11 +107,10 @@ class WindMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setWeatherData(time, weatherData);
         }
 
-        final features =
-            weatherData
-                .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-                .map((station) => station.toFeatureBuilder())
-                .toList();
+        final features = weatherData
+            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+            .map((station) => station.toFeatureBuilder())
+            .toList();
 
         final data = GeoJsonBuilder().setFeatures(features).build();
 
@@ -332,13 +331,12 @@ class WindMapLayerSheet extends StatelessWidget {
                                             color: isSelected ? context.colors.primary : context.colors.outlineVariant,
                                           ),
                                           avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                                          onSelected:
-                                              isLoading
-                                                  ? null
-                                                  : (selected) {
-                                                    if (!selected) return;
-                                                    manager.setWindTime(time.value);
-                                                  },
+                                          onSelected: isLoading
+                                              ? null
+                                              : (selected) {
+                                                  if (!selected) return;
+                                                  manager.setWindTime(time.value);
+                                                },
                                         );
                                       },
                                     ),

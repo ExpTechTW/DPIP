@@ -30,7 +30,11 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
         ListSection(
           title: '音效測試'.i18n,
           children: [
-            SoundListTile(title: '重大'.i18n, subtitle: Text('所在地(鄉鎮)發布防災警訊時'.i18n), type: 'evacuation_major-important-v2'),
+            SoundListTile(
+              title: '重大'.i18n,
+              subtitle: Text('所在地(鄉鎮)發布防災警訊時'.i18n),
+              type: 'evacuation_major-important-v2',
+            ),
             SoundListTile(title: '一般'.i18n, subtitle: Text('所在地(鄉鎮)發布防災資訊時'.i18n), type: 'evacuation_minor-general-v2'),
           ],
         ),

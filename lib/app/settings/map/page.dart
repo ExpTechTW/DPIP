@@ -108,8 +108,8 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, int>(
               selector: (context, model) => model.updateInterval,
               builder: (context, updateInterval, child) {
-                final maxFpsAllowed =
-                    WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate.floorToDouble();
+                final maxFpsAllowed = WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate
+                    .floorToDouble();
 
                 return Layout.col.left[8](
                   padding: const EdgeInsets.all(16),

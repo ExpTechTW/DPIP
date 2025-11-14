@@ -1,8 +1,7 @@
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'location.g.dart';
 

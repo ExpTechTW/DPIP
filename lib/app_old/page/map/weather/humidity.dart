@@ -74,21 +74,20 @@ class _HumidityMapState extends State<HumidityMap> {
 
     final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    humidityDataList =
-        weatherData
-            .where((station) => station.data.air.relativeHumidity != -99)
-            .map(
-              (station) => HumidityData(
-                id: station.id,
-                latitude: station.station.lat,
-                longitude: station.station.lng,
-                humidity: station.data.air.relativeHumidity,
-                stationName: station.station.name,
-                county: station.station.county,
-                town: station.station.town,
-              ),
-            )
-            .toList();
+    humidityDataList = weatherData
+        .where((station) => station.data.air.relativeHumidity != -99)
+        .map(
+          (station) => HumidityData(
+            id: station.id,
+            latitude: station.station.lat,
+            longitude: station.station.lng,
+            humidity: station.data.air.relativeHumidity,
+            stationName: station.station.name,
+            county: station.station.county,
+            town: station.station.town,
+          ),
+        )
+        .toList();
 
     await addHumidityCircles(humidityDataList);
 
@@ -145,19 +144,18 @@ class _HumidityMapState extends State<HumidityMap> {
   }
 
   Future<void> addHumidityCircles(List<HumidityData> humidityDataList) async {
-    final features =
-        humidityDataList
-            .map(
-              (data) => {
-                'type': 'Feature',
-                'properties': {'id': data.id, 'humidity': data.humidity},
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [data.longitude, data.latitude],
-                },
-              },
-            )
-            .toList();
+    final features = humidityDataList
+        .map(
+          (data) => {
+            'type': 'Feature',
+            'properties': {'id': data.id, 'humidity': data.humidity},
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [data.longitude, data.latitude],
+            },
+          },
+        )
+        .toList();
 
     await _mapController.setGeoJsonSource('humidity-data', {'type': 'FeatureCollection', 'features': features});
 
@@ -332,21 +330,20 @@ class _HumidityMapState extends State<HumidityMap> {
 
                 humidityDataList = [];
 
-                humidityDataList =
-                    weatherData
-                        .where((station) => station.data.air.relativeHumidity != -99)
-                        .map(
-                          (station) => HumidityData(
-                            id: station.id,
-                            latitude: station.station.lat,
-                            longitude: station.station.lng,
-                            humidity: station.data.air.relativeHumidity,
-                            stationName: station.station.name,
-                            county: station.station.county,
-                            town: station.station.town,
-                          ),
-                        )
-                        .toList();
+                humidityDataList = weatherData
+                    .where((station) => station.data.air.relativeHumidity != -99)
+                    .map(
+                      (station) => HumidityData(
+                        id: station.id,
+                        latitude: station.station.lat,
+                        longitude: station.station.lng,
+                        humidity: station.data.air.relativeHumidity,
+                        stationName: station.station.name,
+                        county: station.station.county,
+                        town: station.station.town,
+                      ),
+                    )
+                    .toList();
 
                 await addHumidityCircles(humidityDataList);
                 await _addUserLocationMarker();

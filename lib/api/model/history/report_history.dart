@@ -1,6 +1,5 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
 import 'package:dpip/api/model/history/history.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'report_history.g.dart';
 

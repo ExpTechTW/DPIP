@@ -297,13 +297,12 @@ class LightningMapLayerSheet extends StatelessWidget {
                                             color: isSelected ? context.colors.primary : context.colors.outlineVariant,
                                           ),
                                           avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                                          onSelected:
-                                              isLoading
-                                                  ? null
-                                                  : (selected) {
-                                                    if (!selected) return;
-                                                    manager.setLightningTime(time.value);
-                                                  },
+                                          onSelected: isLoading
+                                              ? null
+                                              : (selected) {
+                                                  if (!selected) return;
+                                                  manager.setLightningTime(time.value);
+                                                },
                                         );
                                       },
                                     ),

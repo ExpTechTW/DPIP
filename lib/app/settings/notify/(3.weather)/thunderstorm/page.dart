@@ -30,16 +30,8 @@ class SettingsNotifyThunderstormPage extends StatelessWidget {
         ListSection(
           title: '音效測試'.i18n,
           children: [
-            SoundListTile(
-              title: '重大'.i18n,
-              subtitle: Text('所在地(鄉鎮)發布山區暴雨時'.i18n),
-              type: 'thunderstorm-important-v2',
-            ),
-            SoundListTile(
-              title: '一般'.i18n,
-              subtitle: Text('所在地(鄉鎮)發布雷雨即時訊息時'.i18n),
-              type: 'thunderstorm-general-v2',
-            ),
+            SoundListTile(title: '重大'.i18n, subtitle: Text('所在地(鄉鎮)發布山區暴雨時'.i18n), type: 'thunderstorm-important-v2'),
+            SoundListTile(title: '一般'.i18n, subtitle: Text('所在地(鄉鎮)發布雷雨即時訊息時'.i18n), type: 'thunderstorm-general-v2'),
           ],
         ),
         SettingsListTextSection(

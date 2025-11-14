@@ -1,10 +1,9 @@
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/global.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/int.dart';
+import 'package:flutter/widgets.dart';
 
 extension StringExtension on String {
   Locale get asLocale {

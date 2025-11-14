@@ -74,21 +74,20 @@ class _PressureMapState extends State<PressureMap> {
 
     final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    pressureDataList =
-        weatherData
-            .where((station) => station.data.air.pressure != -99)
-            .map(
-              (station) => PressureData(
-                id: station.id,
-                latitude: station.station.lat,
-                longitude: station.station.lng,
-                pressure: station.data.air.pressure,
-                stationName: station.station.name,
-                county: station.station.county,
-                town: station.station.town,
-              ),
-            )
-            .toList();
+    pressureDataList = weatherData
+        .where((station) => station.data.air.pressure != -99)
+        .map(
+          (station) => PressureData(
+            id: station.id,
+            latitude: station.station.lat,
+            longitude: station.station.lng,
+            pressure: station.data.air.pressure,
+            stationName: station.station.name,
+            county: station.station.county,
+            town: station.station.town,
+          ),
+        )
+        .toList();
 
     await addPressureCircles(pressureDataList);
 
@@ -145,19 +144,18 @@ class _PressureMapState extends State<PressureMap> {
   }
 
   Future<void> addPressureCircles(List<PressureData> pressureDataList) async {
-    final features =
-        pressureDataList
-            .map(
-              (data) => {
-                'type': 'Feature',
-                'properties': {'id': data.id, 'pressure': data.pressure},
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [data.longitude, data.latitude],
-                },
-              },
-            )
-            .toList();
+    final features = pressureDataList
+        .map(
+          (data) => {
+            'type': 'Feature',
+            'properties': {'id': data.id, 'pressure': data.pressure},
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [data.longitude, data.latitude],
+            },
+          },
+        )
+        .toList();
 
     await _mapController.setGeoJsonSource('pressure-data', {'type': 'FeatureCollection', 'features': features});
 
@@ -336,21 +334,20 @@ class _PressureMapState extends State<PressureMap> {
 
                 pressureDataList = [];
 
-                pressureDataList =
-                    weatherData
-                        .where((station) => station.data.air.pressure != -99)
-                        .map(
-                          (station) => PressureData(
-                            id: station.id,
-                            latitude: station.station.lat,
-                            longitude: station.station.lng,
-                            pressure: station.data.air.pressure,
-                            stationName: station.station.name,
-                            county: station.station.county,
-                            town: station.station.town,
-                          ),
-                        )
-                        .toList();
+                pressureDataList = weatherData
+                    .where((station) => station.data.air.pressure != -99)
+                    .map(
+                      (station) => PressureData(
+                        id: station.id,
+                        latitude: station.station.lat,
+                        longitude: station.station.lng,
+                        pressure: station.data.air.pressure,
+                        stationName: station.station.name,
+                        county: station.station.county,
+                        town: station.station.town,
+                      ),
+                    )
+                    .toList();
 
                 await addPressureCircles(pressureDataList);
                 await _addUserLocationMarker();

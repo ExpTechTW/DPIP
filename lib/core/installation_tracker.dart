@@ -1,6 +1,6 @@
 import 'package:dpip/core/preference.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:uuid/uuid.dart';
 
 final talker = TalkerManager.instance;
@@ -43,7 +43,7 @@ Future<void> _initializeInstallationDataInternal() async {
       talker.info(
         '已建立新的 installId 並儲存版本資訊',
         'version: $currentVersion | buildNumber: $currentBuildNumber\n'
-        'installId: $installId'
+            'installId: $installId',
       );
       return;
     }
@@ -63,7 +63,7 @@ Future<void> _initializeInstallationDataInternal() async {
     talker.info(
       '應用程式未重新安裝也未升級，使用現有的安裝資料。\n'
       'version: $currentVersion | buildNumber: $currentBuildNumber\n'
-      'installId: $installId'
+      'installId: $installId',
     );
   } catch (e, s) {
     talker.error('初始化安裝資料時發生錯誤', e, s);

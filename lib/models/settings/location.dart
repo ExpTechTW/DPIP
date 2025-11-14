@@ -184,10 +184,9 @@ class _SettingsLocationModel extends ChangeNotifier {
   /// This method is used to refresh the location settings when the preferences are updated.
   void refresh() {
     $code.value = Preference.locationCode;
-    $coordinates.value =
-        Preference.locationLatitude != null && Preference.locationLongitude != null
-            ? LatLng(Preference.locationLatitude!, Preference.locationLongitude!)
-            : null;
+    $coordinates.value = Preference.locationLatitude != null && Preference.locationLongitude != null
+        ? LatLng(Preference.locationLatitude!, Preference.locationLongitude!)
+        : null;
     $auto.value = Preference.locationAuto ?? false;
     $favorited.value = Preference.locationFavorited.toSet();
   }

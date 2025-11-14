@@ -418,16 +418,15 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children:
-                          locations.map((e) {
-                            return Chip(
-                              padding: const EdgeInsets.all(4),
-                              side: BorderSide(color: context.colors.outline),
-                              backgroundColor: context.colors.surfaceContainerHigh,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              label: Text(e.townWithLevel),
-                            );
-                          }).toList(),
+                      children: locations.map((e) {
+                        return Chip(
+                          padding: const EdgeInsets.all(4),
+                          side: BorderSide(color: context.colors.outline),
+                          backgroundColor: context.colors.surfaceContainerHigh,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          label: Text(e.townWithLevel),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ],
@@ -438,6 +437,9 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       );
     }
 
-    return DetailFieldTile(label: '影響區域', child: Column(children: areas));
+    return DetailFieldTile(
+      label: '影響區域',
+      child: Column(children: areas),
+    );
   }
 }

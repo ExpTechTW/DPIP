@@ -1,10 +1,5 @@
 import 'dart:async';
 
-import 'package:dpip/utils/extensions/maplibre.dart';
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/managers/lightning.dart';
 import 'package:dpip/app/map/_lib/managers/monitor.dart';
@@ -18,9 +13,12 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MapPageOptions {
   final Set<MapLayer>? initialLayers;

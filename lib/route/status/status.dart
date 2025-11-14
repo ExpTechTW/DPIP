@@ -185,7 +185,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                           children: [
                             Icon(statusIcon, color: statusColor, size: 18),
                             const SizedBox(width: 6),
-                            Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
+                            Text(
+                              statusText,
+                              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                       ),
@@ -205,8 +208,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: status.services.length,
-              separatorBuilder:
-                  (context, index) => Divider(height: 1, color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
+              separatorBuilder: (context, index) =>
+                  Divider(height: 1, color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
               itemBuilder: (context, index) {
                 final entry = status.services.entries.elementAt(index);
                 return _buildServiceTile(entry.key, entry.value, isDarkMode);
@@ -262,7 +265,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           color: isDarkMode ? statusColor.withValues(alpha: 0.3) : statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
+        child: Text(
+          statusText,
+          style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

@@ -1,9 +1,8 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/widgets/map/latlng_altitude.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 part 'rain.g.dart';
 
@@ -21,23 +20,22 @@ class RainStation {
 
   Map<String, dynamic> toJson() => _$RainStationToJson(this);
 
-  GeoJsonFeatureBuilder toFeatureBuilder() =>
-      GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        ..setGeometry(station.latlng.asGeoJsonCooridnate)
-        ..setProperty('id', id)
-        ..setProperty('name', station.name)
-        ..setProperty('county', station.county)
-        ..setProperty('town', station.town)
-        ..setProperty('altitude', station.altitude)
-        ..setProperty('now', data.now)
-        ..setProperty('10m', data.tenMinutes)
-        ..setProperty('1h', data.oneHour)
-        ..setProperty('3h', data.threeHours)
-        ..setProperty('6h', data.sixHours)
-        ..setProperty('12h', data.twelveHours)
-        ..setProperty('24h', data.twentyFourHours)
-        ..setProperty('2d', data.twoDays)
-        ..setProperty('3d', data.threeDays);
+  GeoJsonFeatureBuilder toFeatureBuilder() => GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+    ..setGeometry(station.latlng.asGeoJsonCooridnate)
+    ..setProperty('id', id)
+    ..setProperty('name', station.name)
+    ..setProperty('county', station.county)
+    ..setProperty('town', station.town)
+    ..setProperty('altitude', station.altitude)
+    ..setProperty('now', data.now)
+    ..setProperty('10m', data.tenMinutes)
+    ..setProperty('1h', data.oneHour)
+    ..setProperty('3h', data.threeHours)
+    ..setProperty('6h', data.sixHours)
+    ..setProperty('12h', data.twelveHours)
+    ..setProperty('24h', data.twentyFourHours)
+    ..setProperty('2d', data.twoDays)
+    ..setProperty('3d', data.threeDays);
 }
 
 @JsonSerializable()

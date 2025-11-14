@@ -58,41 +58,39 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
 
                   return ListSectionTile(
                     title: item.nativeName,
-                    subtitle:
-                        (item.toLanguageTag() != 'zh-Hant')
-                            ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '已翻譯 {translated}・已校對 {approved}'.i18n.args({
-                                    'translated': translated,
-                                    'approved': approved,
-                                  }),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child:
-                                      p != null
-                                          ? Stack(
-                                            children: [
-                                              LinearProgressIndicator(
-                                                value: p.translation / 100,
-                                                color: Colors.blue,
-                                                year2023: false,
-                                              ),
-                                              LinearProgressIndicator(
-                                                value: p.approval / 100,
-                                                color: Colors.lightGreen,
-                                                backgroundColor: Colors.transparent,
-                                                year2023: false,
-                                              ),
-                                            ],
-                                          )
-                                          : const LinearProgressIndicator(year2023: false),
-                                ),
-                              ],
-                            )
-                            : Text('來源語言'.i18n),
+                    subtitle: (item.toLanguageTag() != 'zh-Hant')
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '已翻譯 {translated}・已校對 {approved}'.i18n.args({
+                                  'translated': translated,
+                                  'approved': approved,
+                                }),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: p != null
+                                    ? Stack(
+                                        children: [
+                                          LinearProgressIndicator(
+                                            value: p.translation / 100,
+                                            color: Colors.blue,
+                                            year2023: false,
+                                          ),
+                                          LinearProgressIndicator(
+                                            value: p.approval / 100,
+                                            color: Colors.lightGreen,
+                                            backgroundColor: Colors.transparent,
+                                            year2023: false,
+                                          ),
+                                        ],
+                                      )
+                                    : const LinearProgressIndicator(year2023: false),
+                              ),
+                            ],
+                          )
+                        : Text('來源語言'.i18n),
                     leading: Container(
                       height: 28,
                       width: 40,

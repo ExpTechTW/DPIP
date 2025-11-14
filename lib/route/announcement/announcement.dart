@@ -85,7 +85,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [const SizedBox(height: 16), Expanded(child: _buildAnnouncementList())],
+            children: [
+              const SizedBox(height: 16),
+              Expanded(child: _buildAnnouncementList()),
+            ],
           ),
         ),
       ),

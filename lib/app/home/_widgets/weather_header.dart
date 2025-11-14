@@ -33,7 +33,10 @@ class WeatherHeader extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               spacing: 4,
-              children: [const Bone.icon(size: 28), Bone.text(words: 1, style: context.theme.textTheme.titleLarge)],
+              children: [
+                const Bone.icon(size: 28),
+                Bone.text(words: 1, style: context.theme.textTheme.titleLarge),
+              ],
             ),
             Bone.text(width: 128, style: context.theme.textTheme.displayLarge),
             Column(
@@ -66,7 +69,10 @@ class WeatherHeader extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: 4,
-                  children: [const Bone.icon(size: 16), Bone.text(words: 1, style: context.theme.textTheme.bodyLarge)],
+                  children: [
+                    const Bone.icon(size: 16),
+                    Bone.text(words: 1, style: context.theme.textTheme.bodyLarge),
+                  ],
                 ),
               ],
             ),

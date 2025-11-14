@@ -16,16 +16,15 @@ class IntensityBox extends StatelessWidget {
     return Container(
       height: size,
       width: size,
-      decoration:
-          border
-              ? BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                border: Border.all(color: IntensityColor.intensity(intensity), width: 3.0),
-              )
-              : BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                color: IntensityColor.intensity(intensity),
-              ),
+      decoration: border
+          ? BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: IntensityColor.intensity(intensity), width: 3.0),
+            )
+          : BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              color: IntensityColor.intensity(intensity),
+            ),
       child: Center(
         child: Text(
           intensity.asIntensityDisplayLabel,

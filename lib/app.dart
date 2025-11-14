@@ -56,7 +56,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       final iosSettings = await FirebaseMessaging.instance.getNotificationSettings();
       final notificationAllowed =
           iosSettings.authorizationStatus == AuthorizationStatus.authorized ||
-              iosSettings.authorizationStatus == AuthorizationStatus.provisional;
+          iosSettings.authorizationStatus == AuthorizationStatus.provisional;
 
       if (!Preference.isFirstLaunch && !notificationAllowed) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -126,7 +126,10 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               builder: (context, child) {
                 final mediaQueryData = MediaQuery.of(context);
                 final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.2);
-                return MediaQuery(data: mediaQueryData.copyWith(textScaler: scale), child: child!);
+                return MediaQuery(
+                  data: mediaQueryData.copyWith(textScaler: scale),
+                  child: child!,
+                );
               },
               title: 'DPIP',
               theme: lightTheme,

@@ -17,7 +17,11 @@ class _SettingsLayoutState extends State<SettingsLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title), leading: BackButton(onPressed: () => context.pop()), centerTitle: true),
+      appBar: AppBar(
+        title: Text(widget.title),
+        leading: BackButton(onPressed: () => context.pop()),
+        centerTitle: true,
+      ),
       body: widget.child,
     );
   }

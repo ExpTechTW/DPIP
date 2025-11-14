@@ -8,13 +8,7 @@ class LayerToggle extends StatelessWidget {
   final void Function(bool)? onChanged;
   final void Function(bool)? onLongPress;
 
-  const LayerToggle({
-    super.key,
-    required this.checked,
-    required this.label,
-    required this.onChanged,
-    this.onLongPress,
-  });
+  const LayerToggle({super.key, required this.checked, required this.label, required this.onChanged, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {

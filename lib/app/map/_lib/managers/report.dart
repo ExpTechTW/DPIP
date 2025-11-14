@@ -122,10 +122,9 @@ class ReportMapLayerManager extends MapLayerManager {
       if (isSourceExists && isLayerExists) return;
 
       if (!isSourceExists) {
-        final data =
-            GeoJsonBuilder()
-                .setFeatures(GlobalProviders.data.partialReport.reversed.map((report) => report.toGeoJsonFeature()))
-                .build();
+        final data = GeoJsonBuilder()
+            .setFeatures(GlobalProviders.data.partialReport.reversed.map((report) => report.toGeoJsonFeature()))
+            .build();
 
         final properties = GeojsonSourceProperties(data: data);
 
@@ -509,11 +508,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
           valueListenable: widget.manager.currentReport,
           builder: (context, currentReport, child) {
             if (currentReport == null) {
-              final grouped =
-                  GlobalProviders.data.partialReport
-                      .groupListsBy((report) => report.time.toLocaleFullDateString(context))
-                      .entries
-                      .toList();
+              final grouped = GlobalProviders.data.partialReport
+                  .groupListsBy((report) => report.time.toLocaleFullDateString(context))
+                  .entries
+                  .toList();
 
               return CustomScrollView(
                 controller: controller,
@@ -539,32 +537,31 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
                         return ListSection(
                           title: date,
-                          children:
-                              reports.map((report) {
-                                final locationString = report.extractLocation();
-                                final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+                          children: reports.map((report) {
+                            final locationString = report.extractLocation();
+                            final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
 
-                                return ListSectionTile(
-                                  leading: IntensityBox(
-                                    intensity: report.intensity,
-                                    size: 36,
-                                    borderRadius: 8,
-                                    border: !report.hasNumber,
-                                  ),
-                                  title: location,
-                                  subtitle: Text(
-                                    '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
-                                  ),
-                                  trailing: Text(
-                                    'M ${report.magnitude.toStringAsFixed(1)}',
-                                    style: context.textTheme.labelLarge,
-                                  ),
-                                  onTap: () {
-                                    widget.manager.setReport(report.id);
-                                    sheetController.collapse();
-                                  },
-                                );
-                              }).toList(),
+                            return ListSectionTile(
+                              leading: IntensityBox(
+                                intensity: report.intensity,
+                                size: 36,
+                                borderRadius: 8,
+                                border: !report.hasNumber,
+                              ),
+                              title: location,
+                              subtitle: Text(
+                                '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
+                              ),
+                              trailing: Text(
+                                'M ${report.magnitude.toStringAsFixed(1)}',
+                                style: context.textTheme.labelLarge,
+                              ),
+                              onTap: () {
+                                widget.manager.setReport(report.id);
+                                sheetController.collapse();
+                              },
+                            );
+                          }).toList(),
                         );
                       },
                     ),

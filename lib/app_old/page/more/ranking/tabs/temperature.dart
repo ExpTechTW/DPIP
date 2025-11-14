@@ -36,22 +36,21 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   }
 
   void rank() {
-    final temp =
-        (merge != MergeType.none)
-            ? groupBy(
-              data,
-              (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
-            ).values.map(
-              (v) => v.reduce(
-                (acc, e) =>
-                    (reversed
-                            ? e.data.air.temperature < acc.data.air.temperature
-                            : e.data.air.temperature > acc.data.air.temperature)
-                        ? e
-                        : acc,
-              ),
-            )
-            : data;
+    final temp = (merge != MergeType.none)
+        ? groupBy(
+            data,
+            (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
+          ).values.map(
+            (v) => v.reduce(
+              (acc, e) =>
+                  (reversed
+                      ? e.data.air.temperature < acc.data.air.temperature
+                      : e.data.air.temperature > acc.data.air.temperature)
+                  ? e
+                  : acc,
+            ),
+          )
+        : data;
 
     final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
     setState(() {
@@ -134,121 +133,110 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 final item = ranked[index];
                 final rank = index + 1;
 
-                final backgroundColor =
-                    index == 0
-                        ? context.theme.extendedColors.amberContainer
-                        : index == 1
-                        ? context.theme.extendedColors.greyContainer
-                        : index == 2
-                        ? context.theme.extendedColors.brownContainer
-                        : index < 10
-                        ? context.colors.surfaceContainerHigh
-                        : context.colors.surfaceContainer;
+                final backgroundColor = index == 0
+                    ? context.theme.extendedColors.amberContainer
+                    : index == 1
+                    ? context.theme.extendedColors.greyContainer
+                    : index == 2
+                    ? context.theme.extendedColors.brownContainer
+                    : index < 10
+                    ? context.colors.surfaceContainerHigh
+                    : context.colors.surfaceContainer;
 
-                final foregroundColor =
-                    index == 0
-                        ? context.theme.extendedColors.onAmberContainer
-                        : index == 1
-                        ? context.colors.onSurface
-                        : index == 2
-                        ? context.theme.extendedColors.onBrownContainer
-                        : index < 10
-                        ? context.colors.onSurface
-                        : context.colors.onSurfaceVariant;
+                final foregroundColor = index == 0
+                    ? context.theme.extendedColors.onAmberContainer
+                    : index == 1
+                    ? context.colors.onSurface
+                    : index == 2
+                    ? context.theme.extendedColors.onBrownContainer
+                    : index < 10
+                    ? context.colors.onSurface
+                    : context.colors.onSurfaceVariant;
 
-                final iconColor =
-                    index == 0
-                        ? context.theme.extendedColors.amber
-                        : index == 1
-                        ? context.theme.extendedColors.grey
-                        : context.theme.extendedColors.brown;
+                final iconColor = index == 0
+                    ? context.theme.extendedColors.amber
+                    : index == 1
+                    ? context.theme.extendedColors.grey
+                    : context.theme.extendedColors.brown;
 
-                final double fontSize =
-                    index == 0
-                        ? 20
-                        : index < 3
-                        ? 18
-                        : 16;
+                final double fontSize = index == 0
+                    ? 20
+                    : index < 3
+                    ? 18
+                    : 16;
 
-                final double iconSize =
-                    index == 0
-                        ? 32
-                        : index == 1
-                        ? 28
-                        : 24;
+                final double iconSize = index == 0
+                    ? 32
+                    : index == 1
+                    ? 28
+                    : 24;
 
-                final leading =
-                    index < 3
-                        ? Icon(
-                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                          color: iconColor,
-                          size: iconSize,
-                          fill: 1,
-                        )
-                        : Text('$rank', style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                final leading = index < 3
+                    ? Icon(
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                        color: iconColor,
+                        size: iconSize,
+                        fill: 1,
+                      )
+                    : Text(
+                        '$rank',
+                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
+                      );
 
-                final percentage =
-                    reversed
-                        ? (ranked.first.data.air.temperature - item.data.air.temperature) /
-                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
-                        : (item.data.air.temperature - ranked.last.data.air.temperature) /
-                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
+                final percentage = reversed
+                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
+                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
+                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
+                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
 
-                final location =
-                    merge != MergeType.none
-                        ? [
-                          Text(
-                            merge == MergeType.town
-                                ? '${item.station.county}${item.station.town}'
-                                : item.station.county,
-                            style: TextStyle(
-                              fontSize: fontSize,
-                              fontWeight:
-                                  index == 0
-                                      ? FontWeight.bold
-                                      : index < 3
-                                      ? FontWeight.w500
-                                      : null,
-                            ),
+                final location = merge != MergeType.none
+                    ? [
+                        Text(
+                          merge == MergeType.town ? '${item.station.county}${item.station.town}' : item.station.county,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: index == 0
+                                ? FontWeight.bold
+                                : index < 3
+                                ? FontWeight.w500
+                                : null,
                           ),
-                        ]
-                        : [
-                          Text(
-                            item.station.name,
-                            style: TextStyle(
-                              fontSize: fontSize,
-                              fontWeight:
-                                  index == 0
-                                      ? FontWeight.bold
-                                      : index < 3
-                                      ? FontWeight.w500
-                                      : null,
-                            ),
+                        ),
+                      ]
+                    : [
+                        Text(
+                          item.station.name,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: index == 0
+                                ? FontWeight.bold
+                                : index < 3
+                                ? FontWeight.w500
+                                : null,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${item.station.county}${item.station.town}',
-                            style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withValues(alpha: 0.8)),
-                          ),
-                        ];
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${item.station.county}${item.station.town}',
+                          style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withValues(alpha: 0.8)),
+                        ),
+                      ];
 
                 final content = [
                   Expanded(
-                    child:
-                        index < 3
-                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
-                            : Row(children: location),
+                    child: index < 3
+                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        : Row(children: location),
                   ),
                   Text(
                     '${item.data.air.temperature.toStringAsFixed(1)}℃',
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight:
-                          index == 0
-                              ? FontWeight.bold
-                              : index < 3
-                              ? FontWeight.w500
-                              : null,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                          ? FontWeight.w500
+                          : null,
                     ),
                   ),
                 ];

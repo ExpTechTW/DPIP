@@ -144,10 +144,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? context.colors.onSecondary
-                                            : context.colors.onSurface.withValues(alpha: 0.7),
+                                    color: isSelected
+                                        ? context.colors.onSecondary
+                                        : context.colors.onSurface.withValues(alpha: 0.7),
                                     fontSize: 12,
                                   ),
                                   child: Text(DateFormat('MM/dd').format(time)),

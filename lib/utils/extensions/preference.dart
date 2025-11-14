@@ -1,6 +1,5 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:dpip/utils/log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 extension PreferenceExtension on SharedPreferencesWithCache {
   /// Sets a value of any supported type to SharedPreferences.
