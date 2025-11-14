@@ -31,7 +31,7 @@ msgstr "語言"
 msgid "單位"
 msgstr "單位"
 
-#: ./lib/app/settings/map/page.dart:65
+#: ./lib/app/settings/map/page.dart:66
 msgid "地圖"
 msgstr "地圖"
 
@@ -39,11 +39,11 @@ msgstr "地圖"
 msgid "通知"
 msgstr "通知"
 
-#: ./lib/app/settings/notify/page.dart:159
+#: ./lib/app/settings/notify/page.dart:165
 msgid "緊急地震速報"
 msgstr "緊急地震速報"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1302
+#: ./lib/app/map/_lib/managers/monitor.dart:1304
 msgid "強震監視器"
 msgstr "強震監視器"
 
@@ -51,7 +51,7 @@ msgstr "強震監視器"
 msgid "地震報告"
 msgstr "地震報告"
 
-#: ./lib/app/settings/notify/page.dart:203
+#: ./lib/app/settings/notify/page.dart:209
 msgid "震度速報"
 msgstr "震度速報"
 
@@ -59,11 +59,11 @@ msgstr "震度速報"
 msgid "雷雨即時訊息"
 msgstr "雷雨即時訊息"
 
-#: ./lib/app/settings/notify/page.dart:234
+#: ./lib/app/settings/notify/page.dart:240
 msgid "天氣警特報"
 msgstr "天氣警特報"
 
-#: ./lib/app/settings/notify/page.dart:247
+#: ./lib/app/settings/notify/page.dart:253
 msgid "防災資訊"
 msgstr "防災資訊"
 
@@ -135,15 +135,15 @@ msgstr "發送公告時"
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 
-#: ./lib/app/settings/notify/page.dart:86
+#: ./lib/app/settings/notify/page.dart:92
 msgid "伺服器排隊中，請稍候…"
 msgstr "伺服器排隊中，請稍候…"
 
-#: ./lib/app/settings/notify/page.dart:146
+#: ./lib/app/settings/notify/page.dart:152
 msgid "請先設定所在地來使用通知功能"
 msgstr "請先設定所在地來使用通知功能"
 
-#: ./lib/app/settings/notify/page.dart:153
+#: ./lib/app/settings/notify/page.dart:159
 msgid "地震速報"
 msgstr "地震速報"
 
@@ -151,7 +151,7 @@ msgstr "地震速報"
 msgid "地震"
 msgstr "地震"
 
-#: ./lib/app/settings/notify/page.dart:215
+#: ./lib/app/settings/notify/page.dart:221
 msgid "天氣"
 msgstr "天氣"
 
@@ -159,7 +159,7 @@ msgstr "天氣"
 msgid "海嘯"
 msgstr "海嘯"
 
-#: ./lib/app/settings/notify/page.dart:277
+#: ./lib/app/settings/notify/page.dart:283
 msgid "其他"
 msgstr "其他"
 
@@ -627,7 +627,7 @@ msgstr "雷達回波"
 msgid "氣溫"
 msgstr "氣溫"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:493
+#: ./lib/app/map/_lib/managers/precipitation.dart:492
 msgid "降水"
 msgstr "降水"
 
@@ -635,15 +635,19 @@ msgstr "降水"
 msgid "風向/風速"
 msgstr "風向/風速"
 
+#: ./lib/app/map/_lib/managers/lightning.dart:266
+msgid "閃電"
+msgstr "閃電"
+
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
 msgstr "簡單"
 
-#: ./lib/app/settings/map/page.dart:57
+#: ./lib/app/settings/map/page.dart:58
 msgid "OpenStreetMap"
 msgstr "OpenStreetMap"
 
-#: ./lib/app/settings/map/page.dart:58
+#: ./lib/app/settings/map/page.dart:59
 msgid "Google"
 msgstr "Google"
 
@@ -651,27 +655,27 @@ msgstr "Google"
 msgid "底圖"
 msgstr "底圖"
 
-#: ./lib/app/settings/map/page.dart:84
+#: ./lib/app/settings/map/page.dart:85
 msgid "初始圖層"
 msgstr "初始圖層"
 
-#: ./lib/app/settings/map/page.dart:96
+#: ./lib/app/settings/map/page.dart:97
 msgid "自動縮放"
 msgstr "自動縮放"
 
-#: ./lib/app/settings/map/page.dart:97
+#: ./lib/app/settings/map/page.dart:98
 msgid "接收到檢知時自動縮放地圖(監視器模式下)"
 msgstr "接收到檢知時自動縮放地圖(監視器模式下)"
 
-#: ./lib/app/settings/map/page.dart:123
+#: ./lib/app/settings/map/page.dart:124
 msgid "動畫幀率"
 msgstr "動畫幀率"
 
-#: ./lib/app/settings/map/page.dart:127
+#: ./lib/app/settings/map/page.dart:128
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr "影響強震監視器的震波模擬動畫流暢度"
 
-#: ./lib/app/settings/map/page.dart:158
+#: ./lib/app/settings/map/page.dart:159
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "過高的動畫幀率可能會造成卡頓或設備發熱"
 
@@ -727,15 +731,15 @@ msgstr "體感約 {apparent}°"
 msgid "尚未設定所在地"
 msgstr "尚未設定所在地"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1051
+#: ./lib/app/map/_lib/managers/monitor.dart:1053
 msgid "EEW"
 msgstr "EEW"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1152
+#: ./lib/app/map/_lib/managers/monitor.dart:1154
 msgid "第 {serial} 報"
 msgstr "第 {serial} 報"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1164
+#: ./lib/app/map/_lib/managers/monitor.dart:1166
 msgid ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
@@ -743,7 +747,7 @@ msgstr ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1172
+#: ./lib/app/map/_lib/managers/monitor.dart:1174
 msgid ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
@@ -751,19 +755,19 @@ msgstr ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1214
+#: ./lib/app/map/_lib/managers/monitor.dart:1216
 msgid "所在地預估"
 msgstr "所在地預估"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1243
+#: ./lib/app/map/_lib/managers/monitor.dart:1245
 msgid "震波"
 msgstr "震波"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1257
+#: ./lib/app/map/_lib/managers/monitor.dart:1259
 msgid " 秒"
 msgstr " 秒"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1271
+#: ./lib/app/map/_lib/managers/monitor.dart:1273
 msgid "抵達"
 msgstr "抵達"
 
@@ -891,10 +895,6 @@ msgstr "報告"
 msgid "氣象"
 msgstr "氣象"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:266
-msgid "閃電"
-msgstr "閃電"
-
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
 msgstr "單位：{unit}"
@@ -947,79 +947,79 @@ msgstr "30 分鐘內雲間閃電"
 msgid "60 分鐘內雲間閃電"
 msgstr "60 分鐘內雲間閃電"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:351
+#: ./lib/app/map/_lib/managers/precipitation.dart:350
 msgid "今日"
 msgstr "今日"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:352
+#: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "10 分鐘"
 msgstr "10 分鐘"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:353
+#: ./lib/app/map/_lib/managers/precipitation.dart:352
 msgid "1 小時"
 msgstr "1 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:354
+#: ./lib/app/map/_lib/managers/precipitation.dart:353
 msgid "3 小時"
 msgstr "3 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:355
+#: ./lib/app/map/_lib/managers/precipitation.dart:354
 msgid "6 小時"
 msgstr "6 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:356
+#: ./lib/app/map/_lib/managers/precipitation.dart:355
 msgid "12 小時"
 msgstr "12 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:357
+#: ./lib/app/map/_lib/managers/precipitation.dart:356
 msgid "24 小時"
 msgstr "24 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:358
+#: ./lib/app/map/_lib/managers/precipitation.dart:357
 msgid "2 天"
 msgstr "2 天"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:359
+#: ./lib/app/map/_lib/managers/precipitation.dart:358
 msgid "3 天"
 msgstr "3 天"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:417
+#: ./lib/app/map/_lib/managers/monitor.dart:431
 msgid "海外測站"
 msgstr "海外測站"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:438
+#: ./lib/app/map/_lib/managers/monitor.dart:452
 msgid "即時震度："
 msgstr "即時震度："
 
-#: ./lib/app/map/_lib/managers/monitor.dart:439
+#: ./lib/app/map/_lib/managers/monitor.dart:453
 msgid "無資料"
 msgstr "無資料"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:457
+#: ./lib/app/map/_lib/managers/monitor.dart:471
 msgid "地動加速度："
 msgstr "地動加速度："
 
-#: ./lib/app/map/_lib/managers/monitor.dart:476
+#: ./lib/app/map/_lib/managers/monitor.dart:490
 msgid "地動速度："
 msgstr "地動速度："
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1110
+#: ./lib/app/map/_lib/managers/monitor.dart:1112
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1118
+#: ./lib/app/map/_lib/managers/monitor.dart:1120
 msgid "{countdown}秒後抵達"
 msgstr "{countdown}秒後抵達"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1118
+#: ./lib/app/map/_lib/managers/monitor.dart:1120
 msgid "已抵達"
 msgstr "已抵達"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1129
+#: ./lib/app/map/_lib/managers/monitor.dart:1131
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1310
+#: ./lib/app/map/_lib/managers/monitor.dart:1312
 msgid "目前沒有生效中的地震速報"
 msgstr "目前沒有生效中的地震速報"
 
