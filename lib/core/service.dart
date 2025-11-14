@@ -56,13 +56,9 @@ class LocationServiceManager {
       return;
     }
 
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      return;
-    }
-
     try {
       await AndroidAlarmManager.initialize();
+      await LocationService._$task();
       await start();
     } catch (e, s) {
       TalkerManager.instance.error('👷 location service initialization failed', e, s);
