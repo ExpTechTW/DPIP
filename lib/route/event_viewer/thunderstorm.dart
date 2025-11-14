@@ -59,9 +59,14 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Future<void> _loadMap() async {
     final outlineColor = context.colors.outline.toHexStringRGB();
+    
+    final list = await ExpTech().getRadarList();
 
-    radarList = await ExpTech().getRadarList();
-
+    if (mounted) {
+      setState(() {
+        radarList = list;
+      });
+    }
     final String newTileUrl = Routes.radarTile(radarList.last);
 
     await _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
@@ -203,7 +208,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
-          if (!isExpired)
             Positioned(
               left: 4,
               top: 4,
@@ -222,7 +226,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                 ),
               ),
             ),
-          if (!isExpired)
             Positioned(
               left: 4,
               top: 32,
