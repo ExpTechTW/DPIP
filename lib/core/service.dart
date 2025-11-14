@@ -64,6 +64,15 @@ class LocationServiceManager {
     }
   }
 
+  /// Triggers an immediate location update
+  static Future<void> updateNow() async {
+    try {
+      await LocationService._$task();
+    } catch (e, s) {
+      TalkerManager.instance.error('👷 immediate location update failed', e, s);
+    }
+  }
+
   static Duration _getUpdateInterval() {
     final minutes = Preference.instance.getInt(_kPrefKeyUpdateInterval);
     return minutes != null ? Duration(minutes: minutes) : kDefaultUpdateInterval;

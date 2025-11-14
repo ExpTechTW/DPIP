@@ -194,6 +194,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     if (shouldEnable) {
       if (!await requestPermissions()) return;
 
+      // 立即執行一次定位任務
+      await LocationServiceManager.updateNow();
+      // 啟動定期更新服務
       await LocationServiceManager.start();
     } else {
       await LocationServiceManager.stop();
