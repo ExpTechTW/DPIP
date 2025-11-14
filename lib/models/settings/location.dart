@@ -189,6 +189,7 @@ class _SettingsLocationModel extends ChangeNotifier {
         : null;
     $auto.value = Preference.locationAuto ?? false;
     $favorited.value = Preference.locationFavorited.toSet();
+    notifyListeners();
   }
 }
 
