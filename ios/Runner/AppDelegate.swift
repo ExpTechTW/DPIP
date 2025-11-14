@@ -7,9 +7,8 @@ import UserNotifications
 @objc
 class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     // MARK: - Properties
-    
+
     private var locationChannel: FlutterMethodChannel?
-    private var methodChannel: FlutterMethodChannel?
     private var locationManager: CLLocationManager!
     private var lastSentLocation: CLLocation?
     private var isLocationEnabled: Bool = false
@@ -52,21 +51,13 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
 
     private func setupFlutterChannels() {
         guard let controller = window?.rootViewController as? FlutterViewController else { return }
-        
+
         locationChannel = FlutterMethodChannel(
             name: "com.exptech.dpip/location",
             binaryMessenger: controller.binaryMessenger)
-        
+
         locationChannel?.setMethodCallHandler { [weak self] (call, result) in
             self?.handleLocationChannelCall(call, result: result)
-        }
-        
-        methodChannel = FlutterMethodChannel(
-            name: "com.exptech.dpip/data",
-            binaryMessenger: controller.binaryMessenger)
-        
-        methodChannel?.setMethodCallHandler { [weak self] (call, result) in
-            self?.handleMethodChannelCall(call, result: result)
         }
     }
     
@@ -106,17 +97,9 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
             result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid argument", details: nil))
             return
         }
-        
+
         toggleLocation(isEnabled: isEnabled)
         result("Location toggled")
-    }
-    
-    private func handleMethodChannelCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        if call.method == "getSavedLocation" {
-            handleGetSavedLocation(result: result)
-        } else {
-            result(FlutterMethodNotImplemented)
-        }
     }
     
     // MARK: - Location Management
@@ -204,8 +187,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         let urlString =
             "https://api-1.exptech.dev/api/v2/location/1/\(token)/\(appVersion)/\(latitude),\(longitude)"
         guard let url = URL(string: urlString) else { return }
-        UserDefaults.standard.set(latitude, forKey: "user-lat")
-        UserDefaults.standard.set(longitude, forKey: "user-lon")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -250,18 +231,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         if backgroundTask != .invalid {
             UIApplication.shared.endBackgroundTask(backgroundTask)
             backgroundTask = .invalid
-        }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func handleGetSavedLocation(result: FlutterResult) {
-        let latitude = UserDefaults.standard.double(forKey: "user-lat")
-        let longitude = UserDefaults.standard.double(forKey: "user-lon")
-        if latitude != 0 && longitude != 0 {
-            result(["lat": latitude, "lon": longitude])
-        } else {
-            result(nil)
         }
     }
     

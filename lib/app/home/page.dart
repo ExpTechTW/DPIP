@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     // 重新載入位置數據
     if (Platform.isIOS && GlobalProviders.location.auto) {
-      // iOS: 從 native 端讀取保存的位置
+      // iOS: 使用 geolocator 在前台獲取位置 (後台由 native 處理)
       await updateSavedLocationIOS();
     } else {
       // Android: 重新載入 SharedPreferences 緩存以獲取背景 task 寫入的最新數據
