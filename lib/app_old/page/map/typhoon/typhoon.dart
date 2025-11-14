@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -39,8 +38,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonImagesList = await ExpTech().getTyphoonImagesList();
       typhoonData = await ExpTech().getTyphoonGeojson();
 
-      if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-        await updateSavedLocationIOS();
+      if (GlobalProviders.location.auto) {
+        await updateLocationFromGPS();
       }
       userLat = Global.preference.getDouble('user-lat') ?? 0.0;
       userLon = Global.preference.getDouble('user-lon') ?? 0.0;

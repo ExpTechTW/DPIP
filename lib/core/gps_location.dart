@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
@@ -12,18 +11,14 @@ DateTime? _lastUpdateTime;
 
 const _kMinUpdateInterval = Duration(seconds: 30);
 
-Future<void> updateSavedLocationIOS() async {
-  if (!Platform.isIOS) return;
-
+Future<void> updateLocationFromGPS() async {
   if (_completer != null && !_completer!.isCompleted) {
     return _completer!.future;
   }
 
   final now = DateTime.now();
   if (_lastUpdateTime != null && now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
-    TalkerManager.instance.debug(
-      '📍 [iOS GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)',
-    );
+    TalkerManager.instance.debug('📍 [GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)');
     return;
   }
 
@@ -32,21 +27,21 @@ Future<void> updateSavedLocationIOS() async {
   try {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      TalkerManager.instance.debug('📍 [iOS GPS] Location services are disabled');
+      TalkerManager.instance.debug('📍 [GPS] Location services are disabled');
       _clearLocation();
       return;
     }
 
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      TalkerManager.instance.debug('📍 [iOS GPS] Location permission denied');
+      TalkerManager.instance.debug('📍 [GPS] Location permission denied');
       _clearLocation();
       return;
     }
 
     Position? position = await Geolocator.getLastKnownPosition();
     if (position == null) {
-      TalkerManager.instance.debug('📍 [iOS GPS] No last known position, getting current position');
+      TalkerManager.instance.debug('📍 [GPS] No last known position, getting current position');
       position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 10)),
       );
@@ -56,7 +51,7 @@ Future<void> updateSavedLocationIOS() async {
     final code = getTownCodeFromCoordinates(coordinates);
 
     TalkerManager.instance.debug(
-      '📍 [iOS GPS] Updated location: (${position.latitude}, ${position.longitude}) → code: $code',
+      '📍 [GPS] Updated location: (${position.latitude}, ${position.longitude}) → code: $code',
     );
 
     GlobalProviders.location.setCoordinates(coordinates);
@@ -64,12 +59,15 @@ Future<void> updateSavedLocationIOS() async {
 
     _lastUpdateTime = now;
   } catch (e, s) {
-    TalkerManager.instance.error('📍 [iOS GPS] Error getting location', e, s);
+    TalkerManager.instance.error('📍 [GPS] Error getting location', e, s);
   } finally {
     _completer?.complete();
     _completer = null;
   }
 }
+
+@Deprecated('Use updateLocationFromGPS() instead')
+Future<void> updateSavedLocationIOS() => updateLocationFromGPS();
 
 void _clearLocation() {
   GlobalProviders.location.setCoordinates(null);

@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app_old/page/map/meteor.dart';
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
@@ -57,8 +57,8 @@ class _HumidityMapState extends State<HumidityMap> {
   }
 
   Future<void> _loadMap() async {
-    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await updateSavedLocationIOS();
+    if (GlobalProviders.location.auto) {
+      await updateLocationFromGPS();
     }
     userLat = Global.preference.getDouble('user-lat') ?? 0.0;
     userLon = Global.preference.getDouble('user-lon') ?? 0.0;

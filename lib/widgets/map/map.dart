@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:async/async.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
@@ -123,8 +122,8 @@ class DpipMapState extends State<DpipMap> {
     if (controller == null) return;
 
     try {
-      if (Platform.isIOS && GlobalProviders.location.auto) {
-        await updateSavedLocationIOS();
+      if (GlobalProviders.location.auto) {
+        await updateLocationFromGPS();
       }
 
       final location = GlobalProviders.location.coordinates;

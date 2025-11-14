@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -14,7 +13,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_widgets/map_legend.dart';
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -101,8 +100,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       belowLayerId: BaseMapLayerIds.userLocation,
     );
 
-    if (Platform.isIOS && GlobalProviders.location.auto) {
-      await updateSavedLocationIOS();
+    if (GlobalProviders.location.auto) {
+      await updateLocationFromGPS();
     }
 
     await _mapController.addSource(

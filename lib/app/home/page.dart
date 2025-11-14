@@ -14,7 +14,7 @@ import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
 import 'package:dpip/core/i18n.dart';
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
@@ -27,7 +27,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:timezone/timezone.dart';
-import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -117,11 +116,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
-    await Future.wait([
-      _fetchWeather(code),
-      _fetchRealtimeRegion(code),
-      _fetchHistory(code, isOutOfService),
-    ]);
+    await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
 
     if (mounted) {
       setState(() => _isLoading = false);
@@ -131,8 +126,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _reloadLocationData() async {
-    if (Platform.isIOS && GlobalProviders.location.auto) {
-      await updateSavedLocationIOS();
+    if (GlobalProviders.location.auto) {
+      await updateLocationFromGPS();
     } else {
       await Preference.reload();
       GlobalProviders.location.refresh();

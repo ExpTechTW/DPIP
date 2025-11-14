@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/intensity_history.dart';
-import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -56,8 +55,8 @@ class _IntensityPageState extends State<IntensityPage> {
   Future<void> _loadMap() async {
     radarList = await ExpTech().getRadarList();
 
-    if (Platform.isIOS && GlobalProviders.location.auto) {
-      await updateSavedLocationIOS();
+    if (GlobalProviders.location.auto) {
+      await updateLocationFromGPS();
     }
 
     await _mapController.addSource(
