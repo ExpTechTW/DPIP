@@ -1,19 +1,16 @@
+import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:async/async.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
-import 'package:dpip/core/gps_location.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/style.dart';
-
-enum BaseMapType { exptech, osm, google }
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_glype { exptech, osm, google }
 
 class BaseMapSourceIds {
   const BaseMapSourceIds._();

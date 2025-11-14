@@ -1,6 +1,6 @@
 import 'package:dpip/utils/extensions/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_routero_router.dart';
 
 extension CommonContext on BuildContext {
   ThemeData get theme => Theme.of(this);

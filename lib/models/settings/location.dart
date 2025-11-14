@@ -1,11 +1,9 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class _SettingsLocationModel extends ChangeNotifier {
   /// The underlying [ValueNotifier] for the current location represented as a postal code.

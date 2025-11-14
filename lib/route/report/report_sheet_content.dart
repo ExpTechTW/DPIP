@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcherart';
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;

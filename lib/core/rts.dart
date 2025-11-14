@@ -1,5 +1,5 @@
 import 'package:dpip/api/model/station_info.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intldart';
 
 StationInfo findAppropriateItem(List<StationInfo> infos, int date) {
   final DateTime targetDate = (date == 0) ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(date);

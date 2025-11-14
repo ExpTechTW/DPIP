@@ -1,14 +1,12 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/sheet_container.dart';
 import 'package:dpip/widgets/ui/labeled_divider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LayerToggleSheet extends StatefulWidget {
   final Set<MapLayer> activeLayers;

@@ -1,10 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/core/eew.dart';
@@ -17,6 +12,9 @@ import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ReportRoute extends StatefulWidget {
   final String id;
