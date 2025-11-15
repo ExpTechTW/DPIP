@@ -236,100 +236,78 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     });
 
     try {
-      PermissionStatus status;
       if (value) {
-        status = await item.permission.request();
-        if (status.isPermanentlyDenied) {
-          _showPermanentlyDeniedDialog(item);
-        } else if (item.permission == Permission.notification) {
-          if (Platform.isAndroid) {
-            if (status == PermissionStatus.granted) {
-              _isNotificationPermission = true;
-            } else {
-              await openAppSettings();
-            }
-          } else if (Platform.isIOS) {
-            final NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-              announcement: true,
-              carPlay: true,
-              criticalAlert: true,
-              provisional: true,
-            );
-            if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-              _isNotificationPermission = true;
-            }
-          }
-        } else if (item.permission == Permission.location) {
-          status = await item.permission.status;
-          if (status.isPermanentlyDenied) {
-            _showPermanentlyDeniedDialog(item);
-          }
-          if (Platform.isAndroid) {
-            _permissionsFuture = _initializePermissions();
-            item.permission = Permission.locationAlways;
-            if (status.isDenied) {
-              status = await item.permission.request();
-              if (status.isPermanentlyDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isGranted) {
-                _showPermanentlyDeniedDialog(item);
-              }
-            } else if (status.isGranted) {
-              status = await item.permission.request();
-              if (status.isPermanentlyDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isGranted) {
-                _showPermanentlyDeniedDialog(item);
-              }
-            }
-          }
-        } else if (item.permission == Permission.locationAlways) {
-          status = await item.permission.status;
-          if (status.isPermanentlyDenied) {
-            _showPermanentlyDeniedDialog(item);
-          }
-          if (Platform.isAndroid) {
-            _permissionsFuture = _initializePermissions();
-            if (status.isDenied) {
-              status = await item.permission.request();
-              if (status.isPermanentlyDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isGranted) {
-                _showPermanentlyDeniedDialog(item);
-              }
-            } else if (status.isGranted) {
-              status = await item.permission.request();
-              if (status.isPermanentlyDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isDenied) {
-                _showPermanentlyDeniedDialog(item);
-              } else if (status.isGranted) {
-                _showPermanentlyDeniedDialog(item);
-              }
-            }
-          }
-        }
+        await _requestPermission(item);
       } else {
-        status = await item.permission.status;
-        if (status.isGranted) {
-          await openAppSettings();
-        }
+        await openAppSettings();
       }
-      item.isGranted = status.isGranted;
 
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change permission: ${item.text}')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('權限請求失敗: ${item.text}')));
+      }
     } finally {
       setState(() {
         _isRequestingPermission = false;
       });
+    }
+  }
+
+  Future<void> _requestPermission(PermissionItem item) async {
+    PermissionStatus status;
+
+    switch (item.permission) {
+      case Permission.notification:
+        await _requestNotificationPermission();
+
+      case Permission.location:
+        status = await Permission.location.request();
+
+        if (status.isPermanentlyDenied) {
+          _showPermanentlyDeniedDialog(item);
+        } else if (status.isGranted) {
+          _permissionsFuture = _initializePermissions();
+        }
+
+      case Permission.locationAlways:
+        status = await Permission.locationAlways.request();
+
+        if (status.isPermanentlyDenied || status.isDenied) {
+          _showPermanentlyDeniedDialog(item);
+        }
+
+      case Permission.ignoreBatteryOptimizations:
+      case Permission.storage:
+      case Permission.photosAddOnly:
+        status = await item.permission.request();
+
+        if (status.isPermanentlyDenied) {
+          _showPermanentlyDeniedDialog(item);
+        }
+
+      default:
+    }
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.notification.request();
+      if (status.isGranted) {
+        _isNotificationPermission = true;
+      } else if (status.isPermanentlyDenied) {
+        await openAppSettings();
+      }
+    } else if (Platform.isIOS) {
+      final NotificationSettings iosSettings = await FirebaseMessaging.instance.requestPermission(
+        announcement: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: true,
+      );
+      if (iosSettings.criticalAlert == AppleNotificationSetting.enabled) {
+        _isNotificationPermission = true;
+      }
     }
   }
 
