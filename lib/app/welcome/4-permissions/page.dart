@@ -267,14 +267,21 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         if (status.isPermanentlyDenied) {
           _showPermanentlyDeniedDialog(item);
         } else if (status.isGranted) {
+          if (Platform.isAndroid) {
+            final shouldContinue = await _showBackgroundLocationExplanationDialog();
+
+            if (shouldContinue && mounted) {
+              await Permission.locationAlways.request();
+            }
+          }
           _permissionsFuture = _initializePermissions();
         }
 
       case Permission.locationAlways:
-        status = await Permission.locationAlways.request();
+        final shouldContinue = await _showBackgroundLocationExplanationDialog();
 
-        if (status.isPermanentlyDenied || status.isDenied) {
-          _showPermanentlyDeniedDialog(item);
+        if (shouldContinue && mounted) {
+          await Permission.locationAlways.request();
         }
 
       case Permission.ignoreBatteryOptimizations:
@@ -329,6 +336,26 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         ],
       ),
     );
+  }
+
+  Future<bool> _showBackgroundLocationExplanationDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('需要背景位置權限'.i18n),
+        content: Text(
+          '為了在背景持續提供即時防災資訊，DPIP 需要「永遠允許」位置權限。\n\n'
+                  '接下來系統會引導您到設定頁面，請選擇「永遠允許」選項。'
+              .i18n,
+        ),
+        actions: [
+          TextButton(child: Text('稍後'.i18n), onPressed: () => Navigator.of(context).pop(false)),
+          FilledButton(child: Text('前往設定'.i18n), onPressed: () => Navigator.of(context).pop(true)),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   @override
