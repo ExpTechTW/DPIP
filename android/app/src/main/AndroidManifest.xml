@@ -24,11 +24,13 @@
             android:name="${applicationName}"
             android:icon="@mipmap/ic_launcher"
             android:theme="@style/LaunchTheme"
-            android:enableOnBackInvokedCallback="true">
+            android:enableOnBackInvokedCallback="true"
+            android:allowBackup="false"
+            android:fullBackupContent="false"
+            tools:replace="android:allowBackup,android:fullBackupContent">
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:allowBackup="false"
                 android:largeHeap="true"
                 android:launchMode="singleTop"
                 android:theme="@style/NormalTheme"
@@ -36,8 +38,7 @@
                 android:hardwareAccelerated="true"
                 android:windowSoftInputMode="adjustResize"
                 android:showWhenLocked="true"
-                android:turnScreenOn="true"
-                android:fullBackupContent="false">
+                android:turnScreenOn="true">
             <meta-data
                     android:name="io.flutter.embedding.android.NormalTheme"
                     android:resource="@style/NormalTheme"
