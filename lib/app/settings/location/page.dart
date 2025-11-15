@@ -418,6 +418,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       enabled: loadingCode == null,
                       onTap: () => context.push(SettingsLocationSelectPage.route),
                     ),
+                    if (model.code == null)
+                      SettingsListTextSection(
+                        icon: Symbols.info_rounded,
+                        content: '完成新增地點後，請務必要在上方地點清單中選擇並顯示打勾才能完成。'.i18n,
+                      ),
                   ],
                 );
               },
