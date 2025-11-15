@@ -52,20 +52,24 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
+    bool notificationAllowed = false;
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
     if (Platform.isIOS) {
-      final iosSettings = await FirebaseMessaging.instance.getNotificationSettings();
-      final notificationAllowed =
-          iosSettings.authorizationStatus == AuthorizationStatus.authorized ||
-          iosSettings.authorizationStatus == AuthorizationStatus.provisional;
+      notificationAllowed =
+        settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+    } else if (Platform.isAndroid) {
+      notificationAllowed =
+        settings.authorizationStatus == AuthorizationStatus.authorized;
+    }
 
-      if (!Preference.isFirstLaunch && !notificationAllowed) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final ctx = router.routerDelegate.navigatorKey.currentContext;
-          if (ctx != null && mounted) {
-            ctx.go(WelcomePermissionPage.route);
-          }
-        });
-      }
+    if (!Preference.isFirstLaunch && !notificationAllowed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = router.routerDelegate.navigatorKey.currentContext;
+        if (ctx != null && mounted) {
+          ctx.go(WelcomePermissionPage.route);
+        }
+      });
     }
   }
 
