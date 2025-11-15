@@ -40,6 +40,9 @@ Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
       'title': data['title'] as String?,
       'body': data['body'] as String?,
       'notificationLayout': NotificationLayout.Default.name,
+      'wakeUpScreen': true,
+      'fullScreenIntent': true,
+      'category': NotificationCategory.Alarm.name,
     };
     await AwesomeNotifications().createNotificationFromJsonData(data);
   } else {
@@ -56,6 +59,9 @@ Future<void> showNotify(Map<String, dynamic> data) async {
       channelKey: channelKey,
       title: data['title'] as String?,
       body: data['body'] as String?,
+      wakeUpScreen: true,
+      fullScreenIntent: true,
+      category: NotificationCategory.Alarm,
     ),
   );
 }
