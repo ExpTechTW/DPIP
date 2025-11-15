@@ -36,7 +36,9 @@
                 android:hardwareAccelerated="true"
                 android:windowSoftInputMode="adjustResize"
                 android:showWhenLocked="true"
-                android:turnScreenOn="true">
+                android:turnScreenOn="true"
+                android:allowBackup="false"
+                android:fullBackupContent="false">
             <meta-data
                     android:name="io.flutter.embedding.android.NormalTheme"
                     android:resource="@style/NormalTheme"
