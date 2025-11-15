@@ -4,7 +4,6 @@ import 'package:dpip/app.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/i18n.dart';
-import 'package:dpip/core/installation_tracker.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -46,7 +45,6 @@ void main() async {
     AppLocalizations.load(),
     LocationNameLocalizations.load(),
     WeatherStationLocalizations.load(),
-    initializeInstallationData(),
     fcmInit(),
     notifyInit(),
     updateInfoToServer(),
