@@ -3,9 +3,6 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened]
-    branches:
-      - '**'
-      - '!i18n'
     paths:
       - '.crowdin/**'
       - 'android/**'
@@ -18,10 +15,9 @@ on:
       - 'pubspec.yaml'
       - 'CHANGELOG.md'
       - 'README.md'
-
-  issue_comment:
-    types: [created]
-
+    branches:
+      - '**'
+      - '!i18n'
 
 jobs:
   claude-review:
@@ -31,49 +27,17 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write
-
+    
     steps:
-      - name: Ensure comment is on a PR
-        if: github.event_name == 'issue_comment'
-        run: |
-          if [[ -z "${{ github.event.issue.pull_request.url }}" ]]; then
-            echo "Not a PR comment, skipping."
-            exit 0
-          fi
-
-      - name: Load PR data
-        id: pr
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-          else
-            # issue_comment
-            PR_URL="${{ github.event.issue.pull_request.url }}"
-            PR_NUMBER=$(basename "$PR_URL")
-            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Checkout PR head
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
 
-      - name: Verify PR branch exists
-        run: |
-          HEAD_REPO="${{ github.event.pull_request.head.repo.clone_url }}"
-          HEAD_REF="${{ github.event.pull_request.head.ref }}"
-
-          if ! git ls-remote --exit-code "$HEAD_REPO" "refs/heads/$HEAD_REF"; then
-            echo "PR head branch missing. Skipping Claude review."
-            exit 0
-          fi
-
-      - name: Claude Code Review
-        if: success()
+      - name: Run Claude Code Review
+        id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
-          skip_checkout: true
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
           prompt: |
@@ -83,8 +47,14 @@ jobs:
             - Performance considerations
             - Security concerns
             - Test coverage
+            
+            This is a flutter project, please review the PR with flutter best practices in mind.
+            Be constructive and helpful in your feedback.
+            Please suggest changes in the PR review comments if there are any important issues or improvements.
 
-            This is a Flutter project. Please review using Flutter/Dart best practices.
-            Provide constructive improvement suggestions and inline PR comments.
-
+            Note: The PR Branch is already checked out.
+          
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+
