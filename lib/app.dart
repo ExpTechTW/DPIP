@@ -58,7 +58,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       notificationAllowed =
         settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
-    } else if (Platform.isAndroid) {
+    } else {
       notificationAllowed =
         settings.authorizationStatus == AuthorizationStatus.authorized;
     }
