@@ -28,7 +28,7 @@
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:allowBackup="true"
+                android:allowBackup="false"
                 android:largeHeap="true"
                 android:launchMode="singleTop"
                 android:theme="@style/NormalTheme"
@@ -37,7 +37,6 @@
                 android:windowSoftInputMode="adjustResize"
                 android:showWhenLocked="true"
                 android:turnScreenOn="true"
-                android:allowBackup="false"
                 android:fullBackupContent="false">
             <meta-data
                     android:name="io.flutter.embedding.android.NormalTheme"
