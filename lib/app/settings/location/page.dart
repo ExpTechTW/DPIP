@@ -365,58 +365,67 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
             return StatefulBuilder(
               builder: (context, setState) {
-                return ListSection(
-                  title: '所在地'.i18n,
+                return Column(
                   children: [
-                    ...model.favorited.map((code) {
-                      final location = Global.location[code]!;
+                    ListSection(
+                      title: '所在地'.i18n,
+                      children: [
+                        ...model.favorited.map((code) {
+                          final location = Global.location[code]!;
+                          final isCurrentLoading = loadingCode == code;
+                          final isSelected = code == model.code;
 
-                      final isCurrentLoading = loadingCode == code;
-                      final isSelected = code == model.code;
+                          return ListSectionTile(
+                            title: location.cityTownWithLevel,
+                            subtitle: Text(
+                              '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                            ),
+                            leading: isCurrentLoading
+                                ? const LoadingIcon()
+                                : Icon(
+                              isSelected ? Symbols.check_rounded : null,
+                              color: context.colors.primary,
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Symbols.delete_rounded),
+                              color: context.colors.error,
+                              onPressed:
+                              isCurrentLoading ? null : () => model.unfavorite(code),
+                            ),
+                            enabled: !model.auto && loadingCode == null,
+                            onTap: isSelected
+                                ? null
+                                : () async {
+                              setState(() => loadingCode = code);
+                              try {
+                                await ExpTech().updateDeviceLocation(
+                                  token: Preference.notifyToken,
+                                  coordinates:
+                                  LatLng(location.lat, location.lng),
+                                );
 
-                      return ListSectionTile(
-                        title: location.cityTownWithLevel,
-                        subtitle: Text(
-                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                                if (!context.mounted) return;
+                                model.setCode(code);
+                              } catch (e, s) {
+                                if (!context.mounted) return;
+                                TalkerManager.instance.error(
+                                    'Failed to set location code', e, s);
+                                showToast(
+                                  context,
+                                  ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n),
+                                );
+                              }
+                              setState(() => loadingCode = null);
+                            },
+                          );
+                        }),
+                        ListSectionTile(
+                          title: '新增地點'.i18n,
+                          icon: Symbols.add_circle_rounded,
+                          enabled: loadingCode == null,
+                          onTap: () => context.push(SettingsLocationSelectPage.route),
                         ),
-                        leading: isCurrentLoading
-                            ? const LoadingIcon()
-                            : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
-                        trailing: IconButton(
-                          icon: const Icon(Symbols.delete_rounded),
-                          color: context.colors.error,
-                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
-                        ),
-                        enabled: !model.auto && loadingCode == null,
-                        onTap: isSelected
-                            ? null
-                            : () async {
-                                setState(() => loadingCode = code);
-
-                                try {
-                                  await ExpTech().updateDeviceLocation(
-                                    token: Preference.notifyToken,
-                                    coordinates: LatLng(location.lat, location.lng),
-                                  );
-
-                                  if (!context.mounted) return;
-
-                                  model.setCode(code);
-                                } catch (e, s) {
-                                  if (!context.mounted) return;
-                                  TalkerManager.instance.error('Failed to set location code', e, s);
-                                  showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
-                                }
-
-                                setState(() => loadingCode = null);
-                              },
-                      );
-                    }),
-                    ListSectionTile(
-                      title: '新增地點'.i18n,
-                      icon: Symbols.add_circle_rounded,
-                      enabled: loadingCode == null,
-                      onTap: () => context.push(SettingsLocationSelectPage.route),
+                      ],
                     ),
                     if (model.code == null)
                       SettingsListTextSection(
