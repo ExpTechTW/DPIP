@@ -13,8 +13,9 @@ import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/api/model/rts/rts.dart';
 import 'package:dpip/api/model/station.dart';
-import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/lightning.dart';
+import 'package:dpip/api/model/weather/rain.dart';
+import 'package:dpip/api/model/weather/typhoon.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/global.dart';
@@ -167,6 +168,24 @@ class _DpipDataModel extends ChangeNotifier {
 
   void setLightningData(String time, List<Lightning> lightning) {
     _lightningData[time] = lightning;
+    notifyListeners();
+  }
+
+  List<String> _typhoon = [];
+
+  UnmodifiableListView<String> get typhoon => UnmodifiableListView(_typhoon);
+
+  void setTyphoon(List<String> typhoon) {
+    _typhoon = typhoon;
+    notifyListeners();
+  }
+
+  final Map<String, List<Typhoon>> _typhoonData = {};
+
+  UnmodifiableMapView<String, List<Typhoon>> get typhoonData => UnmodifiableMapView(_typhoonData);
+
+  void setTyphoonData(String time, List<Typhoon> typhoon) {
+    _typhoonData[time] = typhoon;
     notifyListeners();
   }
 
