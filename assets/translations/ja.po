@@ -10,13 +10,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-11-12 14:38\n"
+"PO-Revision-Date: 2025-11-14 11:03\n"
 
-#: ./lib/app/settings/location/page.dart:371
+#: ./lib/app/settings/location/page.dart:369
 msgid "所在地"
 msgstr "現在地"
 
-#: ./lib/app/settings/location/page.dart:420
+#: ./lib/app/settings/location/page.dart:416
 msgid "新增地點"
 msgstr "地点を追加"
 
@@ -32,7 +32,7 @@ msgstr "言語"
 msgid "單位"
 msgstr "単位"
 
-#: ./lib/app/settings/map/page.dart:65
+#: ./lib/app/settings/map/page.dart:66
 msgid "地圖"
 msgstr "地図"
 
@@ -40,31 +40,31 @@ msgstr "地図"
 msgid "通知"
 msgstr "通知"
 
-#: ./lib/app/settings/notify/page.dart:159
+#: ./lib/app/settings/notify/page.dart:162
 msgid "緊急地震速報"
 msgstr "緊急地震速報"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1302
+#: ./lib/app/map/_lib/managers/monitor.dart:1301
 msgid "強震監視器"
 msgstr "強震モニター"
 
-#: ./lib/app/map/_lib/managers/report.dart:818
+#: ./lib/app/map/_lib/managers/report.dart:815
 msgid "地震報告"
 msgstr "地震情報"
 
-#: ./lib/app/settings/notify/page.dart:203
+#: ./lib/app/settings/notify/page.dart:206
 msgid "震度速報"
 msgstr "地震速報"
 
-#: ./lib/app/home/_widgets/thunderstorm_card.dart:59
+#: ./lib/app/home/_widgets/thunderstorm_card.dart:57
 msgid "雷雨即時訊息"
 msgstr "雷雨注意情報"
 
-#: ./lib/app/settings/notify/page.dart:234
+#: ./lib/app/settings/notify/page.dart:237
 msgid "天氣警特報"
 msgstr "天気警報"
 
-#: ./lib/app/settings/notify/page.dart:247
+#: ./lib/app/settings/notify/page.dart:250
 msgid "防災資訊"
 msgstr "防災情報"
 
@@ -80,16 +80,16 @@ msgstr "お知らせ"
 msgid "贊助我們"
 msgstr "応援する"
 
-#: ./lib/route/image_viewer/image_viewer.dart:68
+#: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "設定"
 msgstr "設定"
 
-#: ./lib/core/service.dart:445
-msgid "服務區域外"
+#: ./lib/core/service.dart:266
+msgid "正在更新位置"
 msgstr ""
 
-#: ./lib/core/service.dart:451
-msgid "自動定位中"
+#: ./lib/core/service.dart:267
+msgid "取得 GPS 位置中..."
 msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:61
@@ -132,39 +132,39 @@ msgstr "サウンドテスト"
 msgid "發送公告時"
 msgstr "通知受信時"
 
-#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
+#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "サウンドテストは端末上でのみ実行され、通知受信時に正しく音が再生されるかを確認するためだけに使われます。このテストでサーバーにリクエストが送信されることはありません。"
 
-#: ./lib/app/settings/notify/page.dart:86
+#: ./lib/app/settings/notify/page.dart:91
 msgid "伺服器排隊中，請稍候…"
 msgstr "サーバーで順番待ち中です。しばらくお待ちください…"
 
-#: ./lib/app/settings/notify/page.dart:146
+#: ./lib/app/settings/notify/page.dart:149
 msgid "請先設定所在地來使用通知功能"
 msgstr "通知機能を利用するには、先に現在地を設定してください。"
 
-#: ./lib/app/settings/notify/page.dart:153
+#: ./lib/app/settings/notify/page.dart:156
 msgid "地震速報"
 msgstr "地震速報"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:128
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:114
 msgid "地震"
 msgstr "地震"
 
-#: ./lib/app/settings/notify/page.dart:215
+#: ./lib/app/settings/notify/page.dart:218
 msgid "天氣"
 msgstr "天気"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:129
 msgid "海嘯"
 msgstr "津波"
 
-#: ./lib/app/settings/notify/page.dart:277
+#: ./lib/app/settings/notify/page.dart:280
 msgid "其他"
 msgstr "その他"
 
-#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
+#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "重大"
 msgstr "重大"
 
@@ -172,7 +172,7 @@ msgstr "重大"
 msgid "海嘯警報發布時"
 msgstr "津波警報発令中"
 
-#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
+#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "一般"
 msgstr "一般"
 
@@ -196,19 +196,19 @@ msgstr "強震モニター（通常）"
 msgid "偵測到晃動"
 msgstr "揺れを検出"
 
-#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
+#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:34
 msgid "震度速報(一般)"
 msgstr "震度速報（通常）"
 
-#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
+#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "所在地(鄉鎮)實測震度 3 以上"
 msgstr "現在地（郷／鎮）測りにより震度 3 超え"
 
-#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
+#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:39
 msgid "震度速報(無聲通知)"
 msgstr "震度速報（音無し）"
 
-#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:36
+#: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:40
 msgid "所在地(鄉鎮)實測震度 1 以上"
 msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
@@ -290,11 +290,11 @@ msgstr "地震速報（音無し）"
 msgid "所在地(鄉鎮)預估震度 1 以上"
 msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
-#: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
+#: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:35
 msgid "所在地(鄉鎮)發布防災警訊時"
 msgstr ""
 
-#: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
+#: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:38
 msgid "所在地(鄉鎮)發布防災資訊時"
 msgstr ""
 
@@ -308,11 +308,11 @@ msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
 msgstr "現在地（郷／鎮）に、上記以外の気象注意報・特別警報が発表されました"
 
-#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
+#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "所在地(鄉鎮)發布山區暴雨時"
 msgstr ""
 
-#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
+#: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "所在地(鄉鎮)發布雷雨即時訊息時"
 msgstr ""
 
@@ -344,11 +344,11 @@ msgstr "DPIPの翻訳にご協力をお願いします！"
 msgid "選擇語言"
 msgstr "言語を選択"
 
-#: ./lib/app/settings/locale/select/page.dart:67
+#: ./lib/app/settings/locale/select/page.dart:66
 msgid "已翻譯 {translated}・已校對 {approved}"
 msgstr "{translated} 翻訳済み・{approved} 校正済み"
 
-#: ./lib/app/settings/locale/select/page.dart:95
+#: ./lib/app/settings/locale/select/page.dart:93
 msgid "來源語言"
 msgstr "ソース言語"
 
@@ -360,49 +360,49 @@ msgstr "ストアに接続できません"
 msgid "找不到商品，請稍候再試"
 msgstr "商品が見つかりません"
 
-#: ./lib/app/settings/donate/page.dart:134
+#: ./lib/app/settings/donate/page.dart:136
 msgid "重新載入"
 msgstr "再読み込み"
 
-#: ./lib/app/settings/donate/page.dart:144
+#: ./lib/app/settings/donate/page.dart:147
 msgid "正在載入商店物品中"
 msgstr "ストアの商品を読み込み中"
 
-#: ./lib/app/settings/donate/page.dart:161
+#: ./lib/app/settings/donate/page.dart:164
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
 msgstr "DPIPはリアルタイムで地震情報を提供することに尽力しているアプリで、現在は広告やその他の収益手段を設けていません。高品質なサービスを維持するためには、サーバーの運用、地震データの取得・配信、そして新機能の開発やメンテナンスといったコストを負担する必要があります。\n\n"
 "お選びいただいたご支援は、これらの運営費用に直接充てられ、DPIPが安定してサービスを提供し続けるための力となります。皆さまのご理解とご支援に心より感謝いたします！"
 
-#: ./lib/app/settings/donate/page.dart:169
+#: ./lib/app/settings/donate/page.dart:172
 msgid "訂閱制"
 msgstr "サブスクリプション"
 
-#: ./lib/app/settings/donate/page.dart:196
+#: ./lib/app/settings/donate/page.dart:195
 msgid "{price}/月"
 msgstr "{price}/毎月"
 
-#: ./lib/app/settings/donate/page.dart:220
+#: ./lib/app/settings/donate/page.dart:217
 msgid "單次支援"
 msgstr "一回払い"
 
-#: ./lib/app/settings/donate/page.dart:284
+#: ./lib/app/settings/donate/page.dart:275
 msgid "無法連線至 {store}，請稍後再試。"
 msgstr "{store}に接続できませんでした。しばらく時間をおいてから、もう一度お試しください。"
 
-#: ./lib/app/settings/donate/page.dart:290
+#: ./lib/app/settings/donate/page.dart:281
 msgid "正在恢復您購買的訂閱"
 msgstr "ご購入内容を復元しています"
 
-#: ./lib/app/settings/donate/page.dart:292
+#: ./lib/app/settings/donate/page.dart:283
 msgid "恢復購買"
 msgstr "購入を復元"
 
-#: ./lib/app/settings/donate/page.dart:299
+#: ./lib/app/settings/donate/page.dart:290
 msgid "使用條款"
 msgstr "利用規約"
 
-#: ./lib/app/settings/donate/page.dart:306
+#: ./lib/app/settings/donate/page.dart:297
 msgid "隱私權政策"
 msgstr "プライバシーポリシー"
 
@@ -490,15 +490,15 @@ msgstr "アプリログ"
 msgid "任何資訊應以中央氣象署發布之內容為準。"
 msgstr "すべての情報は、中央気象署（CWA）の公式発表を基準にしてください。"
 
-#: ./lib/app/settings/location/page.dart:75
+#: ./lib/app/settings/location/page.dart:73
 msgid "無法取得通知權限"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:77
+#: ./lib/app/settings/location/page.dart:75
 msgid "無法取得位置權限"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:78
+#: ./lib/app/settings/location/page.dart:76
 msgid "無法取得自啟動權限"
 msgstr ""
 
@@ -510,91 +510,91 @@ msgstr "電力を守る策略"
 msgid "無法取得權限"
 msgstr "権限を取得できませんでした"
 
-#: ./lib/app/settings/location/page.dart:84
+#: ./lib/app/settings/location/page.dart:82
 msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:85
+#: ./lib/app/settings/location/page.dart:83
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:88
+#: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:89
+#: ./lib/app/settings/location/page.dart:87
 msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:90
+#: ./lib/app/settings/location/page.dart:88
 msgid "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:91
+#: ./lib/app/settings/location/page.dart:89
 msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:92
+#: ./lib/app/settings/location/page.dart:90
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
 msgstr ""
 
-#: ./lib/route/image_viewer/image_viewer.dart:62
+#: ./lib/route/image_viewer/image_viewer.dart:64
 msgid "取消"
 msgstr "キャンセル"
 
-#: ./lib/app/settings/location/page.dart:162
+#: ./lib/app/settings/location/page.dart:160
 msgid "自動啟動"
 msgstr "自動起動"
 
-#: ./lib/app/settings/location/page.dart:163
+#: ./lib/app/settings/location/page.dart:161
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:185
+#: ./lib/app/settings/location/page.dart:183
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:219
+#: ./lib/app/settings/location/page.dart:217
 msgid "一律允許"
 msgstr "常に許可"
 
-#: ./lib/app/settings/location/page.dart:219
+#: ./lib/app/settings/location/page.dart:217
 msgid "永遠"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:230
+#: ./lib/app/settings/location/page.dart:228
 msgid "自動更新"
 msgstr "自動更新"
 
-#: ./lib/app/settings/location/page.dart:231
+#: ./lib/app/settings/location/page.dart:229
 msgid "定期更新目前的所在地"
 msgstr "定期的に現在地を更新する"
 
-#: ./lib/app/settings/location/page.dart:241
+#: ./lib/app/settings/location/page.dart:239
 msgid "自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
 msgstr "この機能には、デバイスのGPSを利用して、地理的な位置情報に基づいて所在地を更新します。リアルタイムの天気情報や地震情報を提供し、最新の地域状況を取得します。"
 
-#: ./lib/app/settings/location/page.dart:300
+#: ./lib/app/settings/location/page.dart:298
 msgid "通知功能已被拒絕，請移至設定允許權限。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:351
+#: ./lib/app/settings/location/page.dart:349
 msgid "省電策略已被拒絕，請移至設定允許權限。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:412
+#: ./lib/app/settings/location/page.dart:408
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/select/page.dart:38
+#: ./lib/app/settings/location/select/page.dart:35
 msgid "縣市"
 msgstr "県／市"
 
-#: ./lib/app/settings/location/select/page.dart:49
+#: ./lib/app/settings/location/select/page.dart:44
 msgid "目前所在地"
 msgstr "現在地"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:120
 msgid "監視器"
 msgstr "強震モニター"
 
@@ -602,55 +602,59 @@ msgstr "強震モニター"
 msgid "雷達回波"
 msgstr "レーダー"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:407
+#: ./lib/app/map/_lib/managers/temperature.dart:405
 msgid "氣溫"
 msgstr "気温"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:493
+#: ./lib/app/map/_lib/managers/precipitation.dart:488
 msgid "降水"
 msgstr "降水量"
 
-#: ./lib/app/map/_lib/managers/wind.dart:301
+#: ./lib/app/map/_lib/managers/wind.dart:300
 msgid "風向/風速"
 msgstr "風向・風速"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+#: ./lib/app/map/_lib/managers/lightning.dart:266
+msgid "閃電"
+msgstr "落雷"
+
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:98
 msgid "簡單"
 msgstr "シンプル"
 
-#: ./lib/app/settings/map/page.dart:57
+#: ./lib/app/settings/map/page.dart:58
 msgid "OpenStreetMap"
 msgstr "OpenStreetMap"
 
-#: ./lib/app/settings/map/page.dart:58
+#: ./lib/app/settings/map/page.dart:59
 msgid "Google"
 msgstr "Google"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:106
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:92
 msgid "底圖"
 msgstr "ベースマップ"
 
-#: ./lib/app/settings/map/page.dart:84
+#: ./lib/app/settings/map/page.dart:85
 msgid "初始圖層"
 msgstr "初期レイヤー"
 
-#: ./lib/app/settings/map/page.dart:96
+#: ./lib/app/settings/map/page.dart:97
 msgid "自動縮放"
 msgstr "自動ズーム"
 
-#: ./lib/app/settings/map/page.dart:97
+#: ./lib/app/settings/map/page.dart:98
 msgid "接收到檢知時自動縮放地圖(監視器模式下)"
 msgstr "検知を受信したときに地図を自動ズーム（強震モニターモード時）"
 
-#: ./lib/app/settings/map/page.dart:123
+#: ./lib/app/settings/map/page.dart:124
 msgid "動畫幀率"
 msgstr "動画のフレームレート"
 
-#: ./lib/app/settings/map/page.dart:127
+#: ./lib/app/settings/map/page.dart:128
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr "強震モニターの地震波アニメーションの滑らかさを調整します"
 
-#: ./lib/app/settings/map/page.dart:158
+#: ./lib/app/settings/map/page.dart:159
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "速すぎたフレームレートはラッグや設備発熱に至る可能性があります"
 
@@ -658,15 +662,15 @@ msgstr "速すぎたフレームレートはラッグや設備発熱に至る可
 msgid "主題模式"
 msgstr "テーマモード"
 
-#: ./lib/app/settings/theme/select/page.dart:57
+#: ./lib/app/settings/theme/select/page.dart:54
 msgid "淺色"
 msgstr "ライト"
 
-#: ./lib/app/settings/theme/select/page.dart:58
+#: ./lib/app/settings/theme/select/page.dart:55
 msgid "深色"
 msgstr "ダーク"
 
-#: ./lib/app/settings/theme/select/page.dart:55
+#: ./lib/app/settings/theme/select/page.dart:52
 msgid "跟隨系統主題"
 msgstr "システムに従う"
 
@@ -682,11 +686,11 @@ msgstr "システム色"
 msgid "使用系統顏色"
 msgstr "システムの色を使う"
 
-#: ./lib/route/image_viewer/image_viewer.dart:128
+#: ./lib/route/image_viewer/image_viewer.dart:130
 msgid "確定"
 msgstr "確認"
 
-#: ./lib/app/home/_widgets/thunderstorm_card.dart:76
+#: ./lib/app/home/_widgets/thunderstorm_card.dart:74
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
 msgstr "お住まいの地域付近で激しい雷雨または降雨が発生しています。ご注意ください。<bold>{time}</bold> まで続く見込みです。"
 
@@ -694,11 +698,11 @@ msgstr "お住まいの地域付近で激しい雷雨または降雨が発生し
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "台湾以外ではご利用いただけません"
 
-#: ./lib/app/home/_widgets/location_button.dart:25
+#: ./lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr "未設定"
 
-#: ./lib/app/home/_widgets/weather_header.dart:127
+#: ./lib/app/home/_widgets/weather_header.dart:133
 msgid "體感約 {apparent}°"
 msgstr "体感温度 {apparent}°"
 
@@ -706,45 +710,65 @@ msgstr "体感温度 {apparent}°"
 msgid "尚未設定所在地"
 msgstr "現在地が設定されていません"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1051
+#: ./lib/app/home/_widgets/mode_toggle_button.dart:14
+msgid "全國 · 生效中"
+msgstr ""
+
+#: ./lib/app/home/_widgets/mode_toggle_button.dart:16
+msgid "全國 · 歷史"
+msgstr ""
+
+#: ./lib/app/home/_widgets/mode_toggle_button.dart:18
+msgid "所在地 · 生效中"
+msgstr ""
+
+#: ./lib/app/home/_widgets/mode_toggle_button.dart:20
+msgid "所在地 · 歷史"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1050
 msgid "EEW"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1152
+#: ./lib/app/map/_lib/managers/monitor.dart:1151
 msgid "第 {serial} 報"
 msgstr "第{serial}報"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1164
+#: ./lib/app/map/_lib/managers/monitor.dart:1163
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "{time}ごろ、<bold>{location}</bold>付近で地震。推定M<bold>{magnitude}</bold>、最大震度<bold>{intensity}</bold>。"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1172
+#: ./lib/app/map/_lib/managers/monitor.dart:1171
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr "{time}ごろ、<bold>{location}</bold>付近で地震。推定M<bold>{magnitude}</bold>、深さ<bold>{depth}</bold>キロメートル。"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1214
+#: ./lib/app/map/_lib/managers/monitor.dart:1213
 msgid "所在地預估"
 msgstr "現在地の予想"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1243
+#: ./lib/app/map/_lib/managers/monitor.dart:1242
 msgid "震波"
 msgstr "地震波"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1257
+#: ./lib/app/map/_lib/managers/monitor.dart:1256
 msgid " 秒"
 msgstr " 秒"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1271
+#: ./lib/app/map/_lib/managers/monitor.dart:1270
 msgid "抵達"
 msgstr "到達"
 
-#: ./lib/app/home/page.dart:56
+#: ./lib/app/home/page.dart:88
 msgid "已更新至 {version}"
 msgstr "{version}に更新されました"
 
 #: ./lib/utils/weather_icon.dart:282
 msgid "取得天氣異常"
 msgstr "天気の取得に失敗しました"
+
+#: ./lib/app/home/page.dart:185
+msgid "取得歷史資訊異常"
+msgstr ""
 
 #: ./lib/app/changelog/page.dart:109
 msgid "無法載入更新日誌，請稍後再試。"
@@ -754,7 +778,7 @@ msgstr "変更履歴を読み込めませんでした。"
 msgid "重試"
 msgstr "再試行"
 
-#: ./lib/app/welcome/4-permissions/page.dart:363
+#: ./lib/app/welcome/4-permissions/page.dart:362
 msgid "下一步"
 msgstr "次"
 
@@ -818,7 +842,7 @@ msgstr "定位により自動的に現在地を更新し、当地である即時
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
 msgstr "DPIPをバックグラウンドで継続的に動作させることで、防災通知を即時に受け取ることができます。"
 
-#: ./lib/route/image_viewer/image_viewer.dart:220
+#: ./lib/route/image_viewer/image_viewer.dart:227
 msgid "儲存"
 msgstr "保存"
 
@@ -826,43 +850,39 @@ msgstr "保存"
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
 msgstr "中央気象署または ExpTech が提供するデータの可視化画像を保存するために使用します"
 
-#: ./lib/app/welcome/4-permissions/page.dart:341
+#: ./lib/app/welcome/4-permissions/page.dart:340
 msgid "權限請求"
 msgstr "権限を要求"
 
-#: ./lib/app/welcome/4-permissions/page.dart:342
+#: ./lib/app/welcome/4-permissions/page.dart:341
 msgid "需要使用者手動到設定開啟相關權限。"
 msgstr "ユーザーが手動で設定から該当の権限を有効にする必要があります。"
 
-#: ./lib/app/welcome/4-permissions/page.dart:382
+#: ./lib/app/welcome/4-permissions/page.dart:381
 msgid "權限"
 msgstr "権限"
 
-#: ./lib/app/welcome/4-permissions/page.dart:395
+#: ./lib/app/welcome/4-permissions/page.dart:394
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
 msgstr "私たちは常にユーザーの立場に寄り添い、プライバシーの保護に取り組み続けています。"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:99
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:85
 msgid "地圖圖層"
 msgstr "地図レイヤー"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:100
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:86
 msgid "選擇要顯示的地圖圖層"
 msgstr "表示する地図のレイヤーを選択してください"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:125
 msgid "報告"
 msgstr "地震情報"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:132
 msgid "氣象"
 msgstr "気象"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:266
-msgid "閃電"
-msgstr "落雷"
-
-#: ./lib/app/map/_widgets/map_legend.dart:181
+#: ./lib/app/map/_widgets/map_legend.dart:180
 msgid "單位：{unit}"
 msgstr "単位：{unit}"
 
@@ -878,171 +898,171 @@ msgstr "表示中の時刻"
 msgid "播放起點"
 msgstr "再生の起点"
 
-#: ./lib/app/map/_lib/managers/radar.dart:938
+#: ./lib/app/map/_lib/managers/radar.dart:936
 msgid "播放進度"
 msgstr "再生中"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:344
+#: ./lib/app/map/_lib/managers/lightning.dart:343
 msgid "5 分鐘內對地閃電"
 msgstr "5分間以内の落雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:348
+#: ./lib/app/map/_lib/managers/lightning.dart:347
 msgid "10 分鐘內對地閃電"
 msgstr "10分間以内の落雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:352
+#: ./lib/app/map/_lib/managers/lightning.dart:351
 msgid "30 分鐘內對地閃電"
 msgstr "30分間以内の落雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:356
+#: ./lib/app/map/_lib/managers/lightning.dart:355
 msgid "60 分鐘內對地閃電"
 msgstr "1時間以内の落雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:360
+#: ./lib/app/map/_lib/managers/lightning.dart:359
 msgid "5 分鐘內雲間閃電"
 msgstr "5分間以内の雲内雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:364
+#: ./lib/app/map/_lib/managers/lightning.dart:363
 msgid "10 分鐘內雲間閃電"
 msgstr "10分間以内の雲内雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:368
+#: ./lib/app/map/_lib/managers/lightning.dart:367
 msgid "30 分鐘內雲間閃電"
 msgstr "30分間以内の雲内雷"
 
-#: ./lib/app/map/_lib/managers/lightning.dart:372
+#: ./lib/app/map/_lib/managers/lightning.dart:371
 msgid "60 分鐘內雲間閃電"
 msgstr "1時間以内の雲内雷"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:351
+#: ./lib/app/map/_lib/managers/precipitation.dart:348
 msgid "今日"
 msgstr "今日"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:352
+#: ./lib/app/map/_lib/managers/precipitation.dart:349
 msgid "10 分鐘"
 msgstr "10分間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:353
+#: ./lib/app/map/_lib/managers/precipitation.dart:350
 msgid "1 小時"
 msgstr "1時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:354
+#: ./lib/app/map/_lib/managers/precipitation.dart:351
 msgid "3 小時"
 msgstr "3時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:355
+#: ./lib/app/map/_lib/managers/precipitation.dart:352
 msgid "6 小時"
 msgstr "6時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:356
+#: ./lib/app/map/_lib/managers/precipitation.dart:353
 msgid "12 小時"
 msgstr "12時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:357
+#: ./lib/app/map/_lib/managers/precipitation.dart:354
 msgid "24 小時"
 msgstr "24時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:358
+#: ./lib/app/map/_lib/managers/precipitation.dart:355
 msgid "2 天"
 msgstr "2日間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:359
+#: ./lib/app/map/_lib/managers/precipitation.dart:356
 msgid "3 天"
 msgstr "3日間"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:417
+#: ./lib/app/map/_lib/managers/monitor.dart:421
 msgid "海外測站"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:438
+#: ./lib/app/map/_lib/managers/monitor.dart:441
 msgid "即時震度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:439
+#: ./lib/app/map/_lib/managers/monitor.dart:444
 msgid "無資料"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:457
+#: ./lib/app/map/_lib/managers/monitor.dart:464
 msgid "地動加速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:476
+#: ./lib/app/map/_lib/managers/monitor.dart:488
 msgid "地動速度："
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1110
+#: ./lib/app/map/_lib/managers/monitor.dart:1109
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "M<bold>{magnitude}</bold>、最大震度<bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1118
+#: ./lib/app/map/_lib/managers/monitor.dart:1117
 msgid "{countdown}秒後抵達"
 msgstr "到達まであと{countdown}秒"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1118
+#: ./lib/app/map/_lib/managers/monitor.dart:1117
 msgid "已抵達"
 msgstr "到達済み"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1129
+#: ./lib/app/map/_lib/managers/monitor.dart:1128
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr "M<bold>{magnitude}</bold>、深さ<bold>{depth}</bold>キロメートル"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1310
+#: ./lib/app/map/_lib/managers/monitor.dart:1309
 msgid "目前沒有生效中的地震速報"
 msgstr "緊急地震速報は発表されていません"
 
-#: ./lib/app/map/_lib/managers/report.dart:369
+#: ./lib/app/map/_lib/managers/report.dart:368
 msgid "近期的地震報告"
 msgstr "最近の地震情報"
 
-#: ./lib/app/map/_lib/managers/report.dart:374
+#: ./lib/app/map/_lib/managers/report.dart:373
 msgid "更多"
 msgstr "さらに表示"
 
-#: ./lib/app/map/_lib/managers/report.dart:599
+#: ./lib/app/map/_lib/managers/report.dart:596
 msgid "編號 {number} 顯著有感地震"
 msgstr "ID #{number} の顕著な地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:600
+#: ./lib/app/map/_lib/managers/report.dart:597
 msgid "小區域有感地震"
 msgstr "局地的地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:656
+#: ./lib/app/map/_lib/managers/report.dart:653
 msgid "地震規模"
 msgstr "マグニチュード"
 
-#: ./lib/app/map/_lib/managers/report.dart:678
+#: ./lib/app/map/_lib/managers/report.dart:675
 msgid "震源深度"
 msgstr "震源の深さ"
 
-#: ./lib/app/map/_lib/managers/report.dart:615
+#: ./lib/app/map/_lib/managers/report.dart:612
 msgid "報告頁面"
 msgstr "Webで見る"
 
-#: ./lib/app/map/_lib/managers/report.dart:639
+#: ./lib/app/map/_lib/managers/report.dart:636
 msgid "發震時間"
 msgstr "発震時刻"
 
-#: ./lib/app/map/_lib/managers/report.dart:646
+#: ./lib/app/map/_lib/managers/report.dart:643
 msgid "位於"
 msgstr "震源地"
 
-#: ./lib/app/map/_lib/managers/report.dart:702
+#: ./lib/app/map/_lib/managers/report.dart:699
 msgid "各地震度"
 msgstr "各地の震度"
 
-#: ./lib/app/map/_lib/managers/report.dart:773
+#: ./lib/app/map/_lib/managers/report.dart:770
 msgid "地震報告圖"
 msgstr "地震情報図"
 
-#: ./lib/app/map/_lib/managers/report.dart:783
+#: ./lib/app/map/_lib/managers/report.dart:780
 msgid "震度圖"
 msgstr "震度分布図"
 
-#: ./lib/app/map/_lib/managers/report.dart:793
+#: ./lib/app/map/_lib/managers/report.dart:790
 msgid "最大地動加速度圖"
 msgstr "地動最大加速度"
 
-#: ./lib/app/map/_lib/managers/report.dart:803
+#: ./lib/app/map/_lib/managers/report.dart:800
 msgid "最大地動速度圖"
 msgstr "地動最大速度"
 
@@ -1094,67 +1114,67 @@ msgstr "気象相関"
 msgid "未知"
 msgstr "不明"
 
-#: ./lib/route/announcement/announcement.dart:103
+#: ./lib/route/announcement/announcement.dart:106
 msgid "目前沒有公告"
 msgstr "現在お知らせはありません"
 
-#: ./lib/route/announcement/announcement.dart:223
+#: ./lib/route/announcement/announcement.dart:226
 msgid "公告詳情"
 msgstr "お知らせの詳細"
 
-#: ./lib/route/image_viewer/image_viewer.dart:58
+#: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
 msgstr "アプリの設定で「写真とメディア」へのアクセス権限を有効にしてから、もう一度お試しください。"
 
-#: ./lib/route/image_viewer/image_viewer.dart:68
+#: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
 msgstr "再試行"
 
-#: ./lib/route/image_viewer/image_viewer.dart:108
+#: ./lib/route/image_viewer/image_viewer.dart:110
 msgid "已儲存圖片"
 msgstr "保存しました"
 
-#: ./lib/route/image_viewer/image_viewer.dart:124
+#: ./lib/route/image_viewer/image_viewer.dart:126
 msgid "儲存圖片時發生錯誤"
 msgstr "画像を保存中にエラーが発生しました"
 
-#: ./lib/utils/extensions/int.dart:13
+#: ./lib/utils/extensions/int.dart:12
 msgid "０級"
 msgstr "０"
 
-#: ./lib/utils/extensions/int.dart:14
+#: ./lib/utils/extensions/int.dart:13
 msgid "１級"
 msgstr "１"
 
-#: ./lib/utils/extensions/int.dart:15
+#: ./lib/utils/extensions/int.dart:14
 msgid "２級"
 msgstr "２"
 
-#: ./lib/utils/extensions/int.dart:16
+#: ./lib/utils/extensions/int.dart:15
 msgid "３級"
 msgstr "３"
 
-#: ./lib/utils/extensions/int.dart:17
+#: ./lib/utils/extensions/int.dart:16
 msgid "４級"
 msgstr "４"
 
-#: ./lib/utils/extensions/int.dart:18
+#: ./lib/utils/extensions/int.dart:17
 msgid "５弱"
 msgstr "５弱"
 
-#: ./lib/utils/extensions/int.dart:19
+#: ./lib/utils/extensions/int.dart:18
 msgid "５強"
 msgstr "５強"
 
-#: ./lib/utils/extensions/int.dart:20
+#: ./lib/utils/extensions/int.dart:19
 msgid "６弱"
 msgstr "６弱"
 
-#: ./lib/utils/extensions/int.dart:21
+#: ./lib/utils/extensions/int.dart:20
 msgid "６強"
 msgstr "６強"
 
-#: ./lib/utils/extensions/int.dart:22
+#: ./lib/utils/extensions/int.dart:21
 msgid "７級"
 msgstr "７"
 
@@ -1386,19 +1406,19 @@ msgstr "曇りのち雨、大雷あり"
 msgid "陰大雷雹"
 msgstr "曇りのち大雹、大雷あり"
 
-#: ./lib/api/model/location/location.dart:85
+#: ./lib/api/model/location/location.dart:84
 msgid "{city}{cityLevel} {town}{townLevel}"
 msgstr "{city}{cityLevel} {town}{townLevel}"
 
-#: ./lib/api/model/location/location.dart:98
+#: ./lib/api/model/location/location.dart:97
 msgid "{city} {town}"
 msgstr "{city} {town}"
 
-#: ./lib/api/model/location/location.dart:110
+#: ./lib/api/model/location/location.dart:109
 msgid "{city}{cityLevel}"
 msgstr "{city}{cityLevel}"
 
-#: ./lib/api/model/location/location.dart:124
+#: ./lib/api/model/location/location.dart:123
 msgid "{town}{townLevel}"
 msgstr "{town}{townLevel}"
 
