@@ -8,6 +8,7 @@ import 'package:dpip/app/map/_lib/managers/radar.dart';
 import 'package:dpip/app/map/_lib/managers/report.dart';
 import 'package:dpip/app/map/_lib/managers/temperature.dart';
 import 'package:dpip/app/map/_lib/managers/tsunami.dart';
+import 'package:dpip/app/map/_lib/managers/typhoon.dart';
 import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
@@ -79,7 +80,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Set<MapLayer> get activeLayers => _activeLayers;
 
   MapLayer? get primaryLayer {
-    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning]) {
+    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning, MapLayer.typhoon]) {
       if (_activeLayers.contains(layer)) {
         return layer;
       }
@@ -120,6 +121,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     lightningManager?.onTimeChanged = (time) {
       syncTimeToRadar(time);
     };
+
+    final typhoonManager = getLayerManager<TyphoonMapLayerManager>(MapLayer.typhoon);
+    typhoonManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
   }
 
   Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
@@ -141,6 +147,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       case MapLayer.lightning:
         final manager = getLayerManager<LightningMapLayerManager>(MapLayer.lightning);
         newTime = manager?.currentLightningTime.value;
+      case MapLayer.typhoon:
+        final manager = getLayerManager<TyphoonMapLayerManager>(MapLayer.typhoon);
+        newTime = manager?.currentTyphoonTime.value;
       default:
     }
 
@@ -240,6 +249,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
     _managers[MapLayer.lightning] = LightningMapLayerManager(context, controller);
+    _managers[MapLayer.typhoon] = TyphoonMapLayerManager(context, controller);
 
     _setupWeatherLayerTimeSync();
 
