@@ -1454,3 +1454,14 @@ msgstr "{city}{cityLevel}"
 #: ./lib/api/model/location/location.dart:123
 msgid "{town}{townLevel}"
 msgstr "{town}{townLevel}"
+
+#: ./lib/utils/extensions/datetime.dart:45
+msgid "yyyy/MM/dd (EEEE)"
+msgstr "yyyy年M月d日 (EEEE)"
+
+#: ./lib/utils/extensions/datetime.dart:71
+msgid "MM/dd HH:mm"
+msgstr "MM/dd HH:mm"
+
+msgid "天氣預報"
+msgstr "天氣預報"

@@ -52,7 +52,9 @@ class Routes {
 
   static Uri eew() => Uri.parse('$lb/v2/eq/eew?type=cwa');
 
-  static Uri weatherRealtime(String postalCode) => Uri.parse('$onlyapi/v2/weather/realtime/$postalCode');
+  static Uri weatherRealtimeByCoords(double lat, double lon) =>
+      Uri.parse('$onlyapi/v3/weather/realtime/${lat.toStringAsFixed(2)},${lon.toStringAsFixed(2)}');
+  static Uri weatherForecast(String postalCode) => Uri.parse('$onlyapi/v3/weather/forecast/$postalCode');
 
   static Uri station() => Uri.parse('$api/v1/trem/station');
 

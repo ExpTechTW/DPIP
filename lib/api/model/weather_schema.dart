@@ -6,20 +6,16 @@ part 'weather_schema.g.dart';
 @JsonSerializable()
 class RealtimeWeatherStation {
   final String name;
-  final String county;
-  final String town;
-  final double altitude;
   final double lat;
-  final double lng;
+  final double lon;
+  final double altitude;
   final double distance;
 
   RealtimeWeatherStation({
     required this.name,
-    required this.county,
-    required this.town,
-    required this.altitude,
     required this.lat,
-    required this.lng,
+    required this.lon,
+    required this.altitude,
     required this.distance,
   });
 
@@ -29,133 +25,70 @@ class RealtimeWeatherStation {
 
 @JsonSerializable()
 class RealtimeWeatherWind {
-  final double direction;
+  final String direction;
   final double speed;
+  final int beaufort;
 
-  RealtimeWeatherWind({required this.direction, required this.speed});
+  RealtimeWeatherWind({required this.direction, required this.speed, required this.beaufort});
 
   factory RealtimeWeatherWind.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherWindFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherWindToJson(this);
 }
 
 @JsonSerializable()
-class RealtimeWeatherAir {
-  final double temperature;
-  final double pressure;
-  @JsonKey(name: 'relative_humidity')
-  final double relativeHumidity;
+class RealtimeWeatherGust {
+  final double speed;
+  final int beaufort;
 
-  RealtimeWeatherAir({required this.temperature, required this.pressure, required this.relativeHumidity});
+  RealtimeWeatherGust({required this.speed, required this.beaufort});
 
-  factory RealtimeWeatherAir.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherAirFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherAirToJson(this);
+  factory RealtimeWeatherGust.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherGustFromJson(json);
+  Map<String, dynamic> toJson() => _$RealtimeWeatherGustToJson(this);
 }
 
 @JsonSerializable()
-class RealtimeWeatherWeatherData {
+class RealtimeWeatherData {
   final String weather;
-  final RealtimeWeatherWind wind;
-  final RealtimeWeatherAir air;
   final int weatherCode;
-
-  RealtimeWeatherWeatherData({required this.weather, required this.wind, required this.air, required this.weatherCode});
-
-  factory RealtimeWeatherWeatherData.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherWeatherDataFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherWeatherDataToJson(this);
-}
-
-@JsonSerializable()
-class RealtimeWeatherTemperatureData {
-  @JsonKey(fromJson: parseDouble)
   final double temperature;
-  final int time;
+  final double humidity;
+  final double rain;
+  final RealtimeWeatherWind wind;
+  final RealtimeWeatherGust gust;
+  final double visibility;
+  final double pressure;
+  final double sunshine;
 
-  RealtimeWeatherTemperatureData({required this.temperature, required this.time});
-
-  factory RealtimeWeatherTemperatureData.fromJson(Map<String, dynamic> json) =>
-      _$RealtimeWeatherTemperatureDataFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherTemperatureDataToJson(this);
-}
-
-@JsonSerializable()
-class RealtimeWeatherDaily {
-  final RealtimeWeatherTemperatureData high;
-  final RealtimeWeatherTemperatureData low;
-
-  RealtimeWeatherDaily({required this.high, required this.low});
-
-  factory RealtimeWeatherDaily.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherDailyFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherDailyToJson(this);
-}
-
-@JsonSerializable()
-class RealtimeWeatherWeather {
-  final String id;
-  final RealtimeWeatherStation station;
-  final RealtimeWeatherWeatherData data;
-  final RealtimeWeatherDaily daily;
-
-  RealtimeWeatherWeather({required this.id, required this.station, required this.data, required this.daily});
-
-  factory RealtimeWeatherWeather.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherWeatherFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherWeatherToJson(this);
-}
-
-@JsonSerializable()
-class RealtimeWeatherRainData {
-  @JsonKey(fromJson: parseDouble)
-  final double now;
-  @JsonKey(name: '10m', fromJson: parseDouble)
-  final double tenMinutes;
-  @JsonKey(name: '1h', fromJson: parseDouble)
-  final double oneHour;
-  @JsonKey(name: '3h', fromJson: parseDouble)
-  final double threeHours;
-  @JsonKey(name: '6h', fromJson: parseDouble)
-  final double sixHours;
-  @JsonKey(name: '12h', fromJson: parseDouble)
-  final double twelveHours;
-  @JsonKey(name: '24h', fromJson: parseDouble)
-  final double twentyFourHours;
-  @JsonKey(name: '2d', fromJson: parseDouble)
-  final double twoDays;
-  @JsonKey(name: '3d', fromJson: parseDouble)
-  final double threeDays;
-
-  RealtimeWeatherRainData({
-    required this.now,
-    required this.tenMinutes,
-    required this.oneHour,
-    required this.threeHours,
-    required this.sixHours,
-    required this.twelveHours,
-    required this.twentyFourHours,
-    required this.twoDays,
-    required this.threeDays,
+  RealtimeWeatherData({
+    required this.weather,
+    required this.weatherCode,
+    required this.temperature,
+    required this.humidity,
+    required this.rain,
+    required this.wind,
+    required this.gust,
+    required this.visibility,
+    required this.pressure,
+    required this.sunshine,
   });
 
-  factory RealtimeWeatherRainData.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherRainDataFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherRainDataToJson(this);
-}
-
-@JsonSerializable()
-class RealtimeWeatherRain {
-  final String id;
-  final RealtimeWeatherStation station;
-  final RealtimeWeatherRainData data;
-
-  RealtimeWeatherRain({required this.id, required this.station, required this.data});
-
-  factory RealtimeWeatherRain.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherRainFromJson(json);
-  Map<String, dynamic> toJson() => _$RealtimeWeatherRainToJson(this);
+  factory RealtimeWeatherData.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherDataFromJson(json);
+  Map<String, dynamic> toJson() => _$RealtimeWeatherDataToJson(this);
 }
 
 @JsonSerializable()
 class RealtimeWeather {
-  final RealtimeWeatherWeather weather;
-  final RealtimeWeatherRain rain;
+  final String id;
+  final RealtimeWeatherStation station;
+  final int time;
+  final RealtimeWeatherData data;
 
-  RealtimeWeather({required this.weather, required this.rain});
+  RealtimeWeather({
+    required this.id,
+    required this.station,
+    required this.time,
+    required this.data,
+  });
 
   factory RealtimeWeather.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherToJson(this);

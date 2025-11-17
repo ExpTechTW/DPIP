@@ -1424,3 +1424,11 @@ msgstr "{city}{cityLevel}"
 msgid "{town}{townLevel}"
 msgstr "{town}{townLevel}"
 
+
+#: ./lib/utils/extensions/datetime.dart:45
+msgid "yyyy/MM/dd (EEEE)"
+msgstr "yyyy/MM/dd (EEEE)"
+
+#: ./lib/utils/extensions/datetime.dart:71
+msgid "MM/dd HH:mm"
+msgstr "MM/dd HH:mm"

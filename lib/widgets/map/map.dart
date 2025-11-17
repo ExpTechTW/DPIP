@@ -126,18 +126,28 @@ class DpipMapState extends State<DpipMap> {
         await updateLocationFromGPS();
       }
 
+      if (!mounted) return;
+
       final location = GlobalProviders.location.coordinates;
 
       final data = location?.toGeoJsonMap() ?? GeoJsonBuilder.empty;
 
       await controller.setGeoJsonSource(BaseMapSourceIds.userLocation, data);
 
+      if (!mounted) return;
+
       if (_isMapReady && widget.focusUserLocationWhenUpdated && location != null) {
-        await Future.delayed(const Duration(milliseconds: 100));
-        await controller.animateCamera(
-          CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom),
-          duration: const Duration(milliseconds: 500),
-        );
+        try {
+          await Future.delayed(const Duration(milliseconds: 100));
+          if (!mounted) return;
+          await controller.animateCamera(
+            CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom),
+            duration: const Duration(milliseconds: 500),
+          );
+        } catch (e) {
+          // 忽略相機動畫錯誤，可能是地圖還沒完全初始化
+          TalkerManager.instance.debug('地圖相機動畫失敗（可忽略）: $e');
+        }
       }
     } catch (e, s) {
       TalkerManager.instance.error('🗺️ failed to update user location', e, s);

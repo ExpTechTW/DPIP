@@ -11,6 +11,7 @@ import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/home/_widgets/date_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
+import 'package:dpip/app/home/_widgets/forecast_card.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
@@ -47,6 +48,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _wasVisible = true;
 
   RealtimeWeather? _weather;
+  Map<String, dynamic>? _forecast;
   List<History>? _history;
   List<History>? _realtimeRegion;
   HomeMode _currentMode = HomeMode.localActive;
@@ -97,16 +99,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
+    TalkerManager.instance.debug('🔄 _refresh called');
+
     await _reloadLocationData();
 
     final code = GlobalProviders.location.code;
+    final coords = GlobalProviders.location.coordinates;
+    final auto = GlobalProviders.location.auto;
 
-    if (_shouldSkipRefresh(code)) return;
+    TalkerManager.instance.debug('🔄 After reload: code=$code, coords=$coords, auto=$auto');
+
+    if (_shouldSkipRefresh(code)) {
+      TalkerManager.instance.debug('🔄 Skipping refresh (throttled)');
+      return;
+    }
 
     final isOutOfService = _checkIfOutOfService(code);
+    TalkerManager.instance.debug('🔄 isOutOfService=$isOutOfService');
 
     if (isOutOfService && !_currentMode.isNational) {
       _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
+      TalkerManager.instance.debug('🔄 Switched to national mode');
     }
 
     setState(() {
@@ -117,12 +130,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
+    TalkerManager.instance.debug('🔄 Fetching weather, realtime region, and history...');
     await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
 
     if (mounted) {
       setState(() => _isLoading = false);
       _lastRefreshCode = code;
       _lastRefreshTime = DateTime.now();
+      TalkerManager.instance.debug('🔄 Refresh completed');
     }
   }
 
@@ -153,14 +168,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _fetchWeather(String? code) async {
+    TalkerManager.instance.debug('🌤️ _fetchWeather called with code: $code');
+
     if (code == null) {
-      if (mounted) setState(() => _weather = null);
+      TalkerManager.instance.debug('🌤️ code is null, clearing weather data');
+      if (mounted)
+        setState(() {
+          _weather = null;
+          _forecast = null;
+        });
       return;
     }
 
     try {
-      final weather = await ExpTech().getWeatherRealtime(code);
-      if (mounted) setState(() => _weather = weather);
+      // 使用經緯度取得即時天氣
+      final coords = GlobalProviders.location.coordinates;
+      TalkerManager.instance.debug('🌤️ coordinates: $coords');
+
+      if (coords != null) {
+        TalkerManager.instance.debug('🌤️ Fetching realtime weather for ${coords.latitude}, ${coords.longitude}');
+        final weather = await ExpTech().getWeatherRealtimeByCoords(coords.latitude, coords.longitude);
+        TalkerManager.instance.debug('🌤️ Got realtime weather: ${weather.toJson()}');
+        if (mounted) setState(() => _weather = weather);
+      } else {
+        TalkerManager.instance.debug('🌤️ coordinates is null, clearing realtime weather');
+        if (mounted) setState(() => _weather = null);
+      }
+
+      // 取得天氣預報
+      TalkerManager.instance.debug('🌤️ Fetching weather forecast for code: $code');
+      final forecast = await ExpTech().getWeatherForecast(code);
+      TalkerManager.instance.debug('🌤️ Got weather forecast keys: ${forecast.keys}');
+      TalkerManager.instance.debug('🌤️ Got weather forecast[\'forecast\']: ${forecast['forecast']}');
+      if (mounted) setState(() => _forecast = forecast);
     } catch (e, s) {
       if (!mounted) return;
       TalkerManager.instance.error('_HomePageState._fetchWeather', e, s);
@@ -224,10 +264,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: _refresh,
-          edgeOffset: 24 + 48 + context.padding.top,
+          edgeOffset: 16 + 48 + context.padding.top,
           child: ListView(
             children: [
-              SizedBox(height: 24 + 48 + context.padding.top),
+              SizedBox(height: 16 + context.padding.top),
               _buildWeatherHeader(),
               if (!_isLoading) ..._buildRealtimeInfo(),
               _buildRadarMap(),
@@ -236,7 +276,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
         const Positioned(
-          top: 24,
+          top: 16,
           left: 0,
           right: 0,
           child: SafeArea(
@@ -248,15 +288,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildWeatherHeader() {
+    final code = GlobalProviders.location.code;
+    final coords = GlobalProviders.location.coordinates;
+
+    TalkerManager.instance.debug(
+      '🌤️ _buildWeatherHeader: isLoading=$_isLoading, weather=$_weather, code=$code, coords=$coords, isOutOfService=$_isOutOfService',
+    );
+
     if (_isLoading) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader.skeleton(context));
+      TalkerManager.instance.debug('🌤️ Showing skeleton (loading)');
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
     }
     if (_weather != null) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader(_weather!));
+      TalkerManager.instance.debug('🌤️ Showing weather header with data');
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader(_weather!));
     }
+
+    // 檢查是否有設定所在地 (code 存在)
+    final hasLocation = code != null;
+
     if (_isOutOfService) {
+      TalkerManager.instance.debug('🌤️ Showing out of service card');
       return const Padding(padding: EdgeInsets.all(16), child: LocationOutOfServiceCard());
     }
+
+    // 如果有設定所在地但沒有天氣資料，可能是正在載入或發生錯誤，顯示 skeleton
+    if (hasLocation) {
+      TalkerManager.instance.debug('🌤️ Showing skeleton (has location but no weather)');
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
+    }
+
+    TalkerManager.instance.debug('🌤️ Showing location not set card');
     return const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard());
   }
 
@@ -271,6 +333,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Padding(padding: const EdgeInsets.all(16), child: EewCard(GlobalProviders.data.eew[index])),
         ),
       if (_thunderstorm != null) Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
+      if (_forecast != null) ForecastCard(_forecast!),
     ];
   }
 
