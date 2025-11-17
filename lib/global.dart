@@ -86,18 +86,21 @@ class Global {
 
   static Future init() async {
     final results = await Future.wait([
+      PackageInfo.fromPlatform(),
+      SharedPreferences.getInstance(),
       loadBoxGeojson(),
       loadLocationData(),
       loadTownGeojson(),
+      loadTimeTableData(),
     ]);
 
-    boxGeojson = (results[0] as GeoJSONFeatureCollection?)!;
-    location = (results[1] as Map<String, Location>?)!;
-    townGeojson = (results[2] as GeoJSONFeatureCollection?)!;
+    packageInfo = (results[0] as PackageInfo?)!;
+    preference = (results[1] as SharedPreferences?)!;
+    boxGeojson = (results[2] as GeoJSONFeatureCollection?)!;
+    location = (results[3] as Map<String, Location>?)!;
+    townGeojson = (results[4] as GeoJSONFeatureCollection?)!;
+    timeTable = (results[5] as TimeTable?)!;
 
-    await PackageInfo.fromPlatform();
-    await SharedPreferences.getInstance();
-    await loadTimeTableData();
     await loadNotifyTestContent();
   }
 }
