@@ -232,6 +232,17 @@ class WeatherHeader extends StatelessWidget {
                   '${weather.station.distance.toStringAsFixed(1)}km',
                   style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
                 ),
+                Container(
+                  width: 1,
+                  height: 12,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  color: context.colors.onSurfaceVariant.withValues(alpha: 0.3),
+                ),
+                Icon(Symbols.schedule_rounded, size: 14, color: context.colors.onSurfaceVariant),
+                Text(
+                  weather.time.toLocaleTimeString(context).substring(0, 5),
+                  style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
+                ),
               ],
             ),
           ),
