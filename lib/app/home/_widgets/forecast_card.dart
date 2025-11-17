@@ -46,25 +46,47 @@ class _ForecastCardState extends State<ForecastCard> {
 
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.colors.outline.withValues(alpha: 0.1)),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
               child: Row(
                 children: [
-                  Icon(Icons.wb_sunny_outlined, color: context.colors.primary, size: 16),
-                  const SizedBox(width: 5),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: context.colors.primaryContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.wb_sunny_outlined, color: context.colors.primary, size: 16),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    '未來預報'.i18n,
-                    style: context.theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    '天氣預報(24h)'.i18n,
+                    style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   if (pages.length > 1)
-                    Text(
-                      '${_currentPage + 1}/${pages.length}',
-                      style: context.theme.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${_currentPage + 1}/${pages.length}',
+                        style: context.theme.textTheme.bodySmall?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -77,7 +99,7 @@ class _ForecastCardState extends State<ForecastCard> {
                   for (int i = 0; i < pageData.length; i++) {
                     final globalIndex = pageIndex * 3 + i;
                     final isExpanded = _expandedItems.contains(globalIndex);
-                    height += isExpanded ? 185 : 37;
+                    height += isExpanded ? 220 : 50;
                     if (i < pageData.length - 1 && !isExpanded) height += 1;
                   }
                   return (height + 4).clamp(0, 600);
@@ -90,15 +112,13 @@ class _ForecastCardState extends State<ForecastCard> {
                   if (box != null && box.hasSize) measuredHeight = box.size.height;
                 }
 
-                final calculatedHeight = pages.isNotEmpty ? calculatePageHeight(_currentPage) : 0.0;
-                final pageHeight = measuredHeight ?? calculatedHeight;
-                final finalHeight = pageHeight > 0 ? pageHeight : calculatedHeight;
+                final pageHeight = measuredHeight ?? (pages.isNotEmpty ? calculatePageHeight(_currentPage) : 0.0);
 
                 return AnimatedSize(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
                   child: SizedBox(
-                    height: finalHeight > 0 ? finalHeight : null,
+                    height: pageHeight > 0 ? pageHeight : null,
                     child: PageView.builder(
                       controller: _pageController,
                       scrollDirection: Axis.vertical,
@@ -122,7 +142,7 @@ class _ForecastCardState extends State<ForecastCard> {
                           physics: const NeverScrollableScrollPhysics(),
                           child: Padding(
                             key: _pageKeys[pageIndex],
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: pages[pageIndex].asMap().entries.map((entry) {
@@ -176,245 +196,254 @@ class _ForecastCardState extends State<ForecastCard> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: () {
-            setState(() {
-              if (isExpanded) {
-                _expandedItems.remove(index);
-              } else {
-                _expandedItems.add(index);
-              }
-            });
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              final key = _pageKeys[_currentPage];
-              if (key?.currentContext != null && mounted) setState(() {});
-            });
-          },
-          borderRadius: BorderRadius.circular(6),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 42,
-                      child: Text(
-                        time,
-                        style: context.theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                if (isExpanded) {
+                  _expandedItems.remove(index);
+                } else {
+                  _expandedItems.add(index);
+                }
+              });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final key = _pageKeys[_currentPage];
+                if (key?.currentContext != null && mounted) setState(() {});
+              });
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: isExpanded ? context.colors.surfaceContainerHighest.withValues(alpha: 0.3) : null,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 48,
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Text(
+                          time,
+                          style: context.theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: context.colors.primary,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
-                    ),
-                    SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: _getWeatherIcon(weather, context),
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: 85,
-                      child: Container(
-                        height: 18,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: context.colors.outline, width: 1),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: FractionallySizedBox(
-                          widthFactor: tempPercent.clamp(0.05, 1.0),
-                          alignment: Alignment.centerLeft,
-                          child: Container(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 4,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: context.colors.primary,
-                              borderRadius: BorderRadius.circular(2),
+                              color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(6),
                             ),
+                            child: _getWeatherIcon(weather, context),
+                          ),
+                          if (weather.isNotEmpty)
+                            Text(
+                              weather,
+                              style: context.theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: context.colors.onSurfaceVariant,
+                                fontSize: 10,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          if (pop > 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 2,
+                                children: [
+                                  Icon(
+                                    Symbols.rainy_rounded,
+                                    size: 11,
+                                    color: Colors.indigo,
+                                  ),
+                                  Text(
+                                    '$pop%',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.indigo,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Container(
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: context.colors.surfaceContainerHighest.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Stack(
+                            children: [
+                              FractionallySizedBox(
+                                widthFactor: tempPercent.clamp(0.05, 1.0),
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        context.colors.primary,
+                                        context.colors.primary.withValues(alpha: 0.7),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    SizedBox(
-                      width: 26,
-                      child: Text(
+                      const SizedBox(width: 8),
+                      Text(
                         '${temp.round()}°',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: context.colors.onSurface,
                         ),
-                        textAlign: TextAlign.right,
                       ),
-                    ),
-                    if (pop > 0) ...[
-                      const SizedBox(width: 3),
-                      Icon(Symbols.water_drop_rounded, size: 12, color: Colors.blue),
-                      const SizedBox(width: 2),
-                      SizedBox(
-                        width: 22,
-                        child: Text(
-                          '$pop%',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        isExpanded ? Symbols.expand_less_rounded : Symbols.expand_more_rounded,
+                        size: 18,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                  if (isExpanded) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: context.colors.surfaceContainerHighest.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: context.colors.outline.withValues(alpha: 0.1),
+                          width: 1,
                         ),
                       ),
-                    ] else
-                      const SizedBox(width: 40),
-                    Icon(
-                      isExpanded ? Symbols.expand_less_rounded : Symbols.expand_more_rounded,
-                      size: 16,
-                      color: context.colors.onSurfaceVariant,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildDetailChip(
+                            context,
+                            Symbols.thermometer_rounded,
+                            '氣溫',
+                            '${temp.round()}°C',
+                            Colors.orange,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.thermostat_rounded,
+                            '體感',
+                            '${apparent.round()}°C',
+                            Colors.deepOrange,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.air_rounded,
+                            '風速',
+                            '${windSpeed}m/s',
+                            context.colors.primary,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.explore_rounded,
+                            '風向',
+                            windDirection.isNotEmpty ? windDirection : '-',
+                            context.colors.primary,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.wind_power_rounded,
+                            '蒲福',
+                            '${windBeaufort}級',
+                            Colors.teal,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.humidity_percentage_rounded,
+                            '濕度',
+                            '${humidity.round()}%',
+                            Colors.blue,
+                          ),
+                          _buildDetailChip(
+                            context,
+                            Symbols.rainy_rounded,
+                            '降雨機率',
+                            '$pop%',
+                            Colors.indigo,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-                if (isExpanded) ...[
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (weather.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              children: [
-                                Icon(Symbols.partly_cloudy_day_rounded, size: 14, color: context.colors.primary),
-                                const SizedBox(width: 5),
-                                Text(
-                                  weather,
-                                  style: context.theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: context.colors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.thermometer_rounded,
-                                    '氣溫',
-                                    '${temp.round()}°C',
-                                    Colors.orange,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.thermostat_rounded,
-                                    '體感',
-                                    '${apparent.round()}°C',
-                                    Colors.deepOrange,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.air_rounded,
-                                    '風速',
-                                    '${windSpeed}m/s',
-                                    context.colors.primary,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.explore_rounded,
-                                    '風向',
-                                    windDirection.isNotEmpty ? windDirection : '-',
-                                    context.colors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.wind_power_rounded,
-                                    '蒲福風級',
-                                    '${windBeaufort}級',
-                                    Colors.teal,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildDetailRow(
-                                    context,
-                                    Symbols.humidity_percentage_rounded,
-                                    '濕度',
-                                    '${humidity.round()}%',
-                                    Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
         if (index % 3 != 2 && !isExpanded)
           Divider(
             height: 1,
-            indent: 8,
-            endIndent: 8,
-            color: context.colors.outlineVariant.withValues(alpha: 0.3),
+            indent: 10,
+            endIndent: 10,
+            color: context.colors.outlineVariant.withValues(alpha: 0.2),
           ),
       ],
     );
   }
 
-  Widget _buildDetailRow(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value,
-    Color color,
-  ) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: color),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Column(
+  Widget _buildDetailChip(BuildContext context, IconData icon, String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Icon(icon, size: 14, color: color, weight: 600),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 label,
                 style: context.theme.textTheme.bodySmall?.copyWith(
                   color: context.colors.onSurfaceVariant,
                   fontSize: 9,
-                  height: 1.2,
+                  height: 1.0,
                 ),
               ),
               Text(
@@ -422,27 +451,27 @@ class _ForecastCardState extends State<ForecastCard> {
                 style: context.theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
-                  height: 1.3,
+                  height: 1.2,
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Icon _getWeatherIcon(String weather, BuildContext context) {
     if (weather.contains('晴')) {
-      return Icon(Icons.wb_sunny, color: Colors.orange, size: 13);
+      return Icon(Icons.wb_sunny, color: Colors.orange, size: 14);
     } else if (weather.contains('雨')) {
-      return Icon(Icons.grain, color: Colors.blue, size: 13);
+      return Icon(Icons.grain, color: Colors.blue, size: 14);
     } else if (weather.contains('雲') || weather.contains('陰')) {
-      return Icon(Icons.cloud, color: context.colors.onSurface.withValues(alpha: 0.6), size: 13);
+      return Icon(Icons.cloud, color: context.colors.onSurface.withValues(alpha: 0.6), size: 14);
     } else if (weather.contains('雷')) {
-      return Icon(Icons.flash_on, color: Colors.amber, size: 13);
+      return Icon(Icons.flash_on, color: Colors.amber, size: 14);
     } else {
-      return Icon(Icons.wb_cloudy, color: context.colors.onSurface.withValues(alpha: 0.6), size: 13);
+      return Icon(Icons.wb_cloudy, color: context.colors.onSurface.withValues(alpha: 0.6), size: 14);
     }
   }
 }

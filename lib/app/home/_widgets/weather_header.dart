@@ -16,69 +16,33 @@ class WeatherHeader extends StatelessWidget {
   const WeatherHeader(this.weather, {super.key});
 
   static Widget skeleton(BuildContext context) {
-    final separator = Container(
-      width: 3,
-      height: 3,
-      margin: const EdgeInsets.symmetric(horizontal: 3),
-      decoration: BoxDecoration(color: context.colors.onSurfaceVariant, shape: BoxShape.circle),
-    );
-
     return Skeletonizer.zone(
       child: Center(
         child: Column(
-          spacing: 10,
+          spacing: 12,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               spacing: 4,
               children: [
-                const Bone.icon(size: 24),
-                Bone.text(words: 1, style: context.theme.textTheme.titleMedium),
+                const Bone.icon(size: 32),
+                Bone.text(words: 1, style: context.theme.textTheme.titleLarge),
               ],
             ),
-            Bone.text(width: 120, style: context.theme.textTheme.displayLarge),
-            Column(
+            Bone.text(width: 140, style: context.theme.textTheme.displayLarge),
+            Row(
               mainAxisSize: MainAxisSize.min,
-              spacing: 6,
+              spacing: 12,
               children: [
-                Bone.text(words: 1, style: context.theme.textTheme.bodyMedium),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 3,
-                  children: [
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 28, style: context.theme.textTheme.bodySmall),
-                    separator,
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 28, style: context.theme.textTheme.bodySmall),
-                    separator,
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 28, style: context.theme.textTheme.bodySmall),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 3,
-                  children: [
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 40, style: context.theme.textTheme.bodySmall),
-                    separator,
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 40, style: context.theme.textTheme.bodySmall),
-                    separator,
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 40, style: context.theme.textTheme.bodySmall),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 3,
-                  children: [
-                    const Bone.icon(size: 14),
-                    Bone.text(width: 60, style: context.theme.textTheme.bodySmall),
-                  ],
-                ),
+                Bone.text(width: 60, style: context.theme.textTheme.bodyLarge),
+                Bone.text(width: 60, style: context.theme.textTheme.bodyLarge),
               ],
+            ),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: List.generate(9, (_) => Bone.text(width: 50, style: context.theme.textTheme.bodySmall)),
             ),
           ],
         ),
@@ -94,31 +58,32 @@ class WeatherHeader extends StatelessWidget {
         6.105 *
         exp(17.27 * weather.data.temperature / (weather.data.temperature + 237.3));
     final feelsLike = weather.data.temperature + 0.33 * e - 0.7 * weather.data.wind.speed - 4.0;
-    final separator = Container(
-      width: 3,
-      height: 3,
-      margin: const EdgeInsets.symmetric(horizontal: 3),
-      decoration: BoxDecoration(color: context.colors.onSurfaceVariant.withValues(alpha: 0.6), shape: BoxShape.circle),
-    );
 
     return Center(
       child: Column(
-        spacing: 10,
+        spacing: 12,
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,
-            spacing: 5,
+            spacing: 6,
             children: [
-              Icon(
-                WeatherIcons.getWeatherIcon(weather.data.weatherCode, true),
-                size: 28,
-                color: context.colors.secondary,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: context.colors.secondaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  WeatherIcons.getWeatherIcon(weather.data.weatherCode, true),
+                  size: 32,
+                  color: context.colors.secondary,
+                ),
               ),
               Text(
                 WeatherIcons.getWeatherContent(context, weather.data.weatherCode),
-                style: context.theme.textTheme.titleMedium!.copyWith(
+                style: context.theme.textTheme.titleLarge!.copyWith(
                   color: context.colors.secondary,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -127,26 +92,33 @@ class WeatherHeader extends StatelessWidget {
             selector: (context, model) => model.useFahrenheit,
             builder: (context, useFahrenheit, child) {
               final value = weather.data.temperature;
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 6,
+              final displayTemp = (useFahrenheit ? value.asFahrenheit : value).round();
+              final displayFeelsLike = (useFahrenheit ? feelsLike.asFahrenheit : feelsLike).round();
+
+              return Column(
+                spacing: 8,
                 children: [
                   Text(
-                    '${(useFahrenheit ? value.asFahrenheit : value).round()}°',
+                    '$displayTemp°',
                     style: context.theme.textTheme.displayLarge!.copyWith(
-                      fontSize: 52,
+                      fontSize: 64,
                       color: context.colors.onSurface,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w200,
                       height: 1.0,
+                      letterSpacing: -2,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Text(
-                      '體感 ${(useFahrenheit ? feelsLike.asFahrenheit : feelsLike).round()}°'.i18n,
-                      style: context.theme.textTheme.bodySmall!.copyWith(
+                      '體感 $displayFeelsLike°'.i18n,
+                      style: context.theme.textTheme.bodyLarge!.copyWith(
                         color: context.colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -154,71 +126,153 @@ class WeatherHeader extends StatelessWidget {
               );
             },
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 5,
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 3,
-                children: [
-                  Icon(Symbols.water_drop_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.humidity >= 0 ? '${weather.data.humidity.round()}%' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                  separator,
-                  Icon(Symbols.wind_power_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.wind.speed >= 0 ? '${weather.data.wind.speed}m/s ${weather.data.wind.direction}' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                  separator,
-                  Icon(Symbols.compress_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.pressure >= 0 ? '${weather.data.pressure.round()}hPa' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                ],
+              _buildInfoChip(
+                context,
+                Symbols.water_drop_rounded,
+                '濕度',
+                '${weather.data.humidity >= 0 ? weather.data.humidity.round() : "-"}%',
+                Colors.blue,
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 3,
-                children: [
-                  Icon(Symbols.rainy_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.rain >= 0 ? '${weather.data.rain}mm' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                  separator,
-                  Icon(Symbols.visibility_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.visibility >= 0 ? '${weather.data.visibility.round()}km' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                  separator,
-                  Icon(Symbols.air_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    weather.data.gust.speed >= 0 ? '${weather.data.gust.speed}m/s' : '-',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                ],
+              _buildInfoChip(
+                context,
+                Symbols.wind_power_rounded,
+                '風速',
+                weather.data.wind.speed >= 0 ? '${weather.data.wind.speed}m/s' : '-',
+                Colors.teal,
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 3,
-                children: [
-                  Icon(Symbols.pin_drop_rounded, size: 13, color: context.colors.onSurfaceVariant),
-                  Text(
-                    '${weather.station.name}氣象站',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                  separator,
-                  Text(
-                    '距離 ${weather.station.distance.toStringAsFixed(1)}km',
-                    style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-                ],
+              _buildInfoChip(
+                context,
+                Symbols.wind_power_rounded,
+                '風級',
+                weather.data.wind.beaufort > 0 ? '${weather.data.wind.beaufort}級' : '-',
+                Colors.teal,
+              ),
+              _buildInfoChip(
+                context,
+                Symbols.explore_rounded,
+                '風向',
+                weather.data.wind.direction.isNotEmpty ? weather.data.wind.direction : '-',
+                Colors.cyan,
+              ),
+              _buildInfoChip(
+                context,
+                Symbols.compress_rounded,
+                '氣壓',
+                weather.data.pressure >= 0 ? '${weather.data.pressure.round()}hPa' : '-',
+                Colors.orange,
+              ),
+              _buildInfoChip(
+                context,
+                Symbols.rainy_rounded,
+                '降雨',
+                weather.data.rain >= 0 ? '${weather.data.rain}mm' : '-',
+                Colors.indigo,
+              ),
+              _buildInfoChip(
+                context,
+                Symbols.visibility_rounded,
+                '能見度',
+                weather.data.visibility >= 0 ? '${weather.data.visibility.round()}km' : '-',
+                Colors.grey,
+              ),
+              if (weather.data.gust.speed > 0)
+                _buildInfoChip(
+                  context,
+                  Symbols.air_rounded,
+                  '陣風',
+                  '${weather.data.gust.speed}m/s',
+                  Colors.purple,
+                ),
+              if (weather.data.gust.beaufort > 0)
+                _buildInfoChip(
+                  context,
+                  Symbols.wind_power_rounded,
+                  '陣風級',
+                  '${weather.data.gust.beaufort}級',
+                  Colors.deepPurple,
+                ),
+              if (weather.data.sunshine >= 0)
+                _buildInfoChip(
+                  context,
+                  Symbols.wb_sunny_rounded,
+                  '日照',
+                  '${weather.data.sunshine.toStringAsFixed(1)}h',
+                  Colors.amber,
+                ),
+            ],
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainerHighest.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 6,
+              children: [
+                Icon(Symbols.pin_drop_rounded, size: 14, color: context.colors.onSurfaceVariant),
+                Text(
+                  '${weather.station.name}氣象站',
+                  style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
+                ),
+                Container(
+                  width: 1,
+                  height: 12,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  color: context.colors.onSurfaceVariant.withValues(alpha: 0.3),
+                ),
+                Text(
+                  '${weather.station.distance.toStringAsFixed(1)}km',
+                  style: context.theme.textTheme.bodySmall!.copyWith(color: context.colors.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(BuildContext context, IconData icon, String label, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Icon(icon, size: 14, color: color, weight: 600),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: context.theme.textTheme.bodySmall!.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                  fontSize: 9,
+                  height: 1.0,
+                ),
+              ),
+              Text(
+                text,
+                style: context.theme.textTheme.bodySmall!.copyWith(
+                  color: context.colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  height: 1.2,
+                ),
               ),
             ],
           ),

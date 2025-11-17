@@ -29,6 +29,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -99,45 +100,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
-    TalkerManager.instance.debug('🔄 _refresh called');
-
     await _reloadLocationData();
 
     final code = GlobalProviders.location.code;
-    final coords = GlobalProviders.location.coordinates;
-    final auto = GlobalProviders.location.auto;
 
-    TalkerManager.instance.debug('🔄 After reload: code=$code, coords=$coords, auto=$auto');
-
-    if (_shouldSkipRefresh(code)) {
-      TalkerManager.instance.debug('🔄 Skipping refresh (throttled)');
-      return;
-    }
+    if (_shouldSkipRefresh(code)) return;
 
     final isOutOfService = _checkIfOutOfService(code);
-    TalkerManager.instance.debug('🔄 isOutOfService=$isOutOfService');
 
     if (isOutOfService && !_currentMode.isNational) {
       _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
-      TalkerManager.instance.debug('🔄 Switched to national mode');
     }
 
     setState(() {
       _isLoading = true;
       _isOutOfService = isOutOfService;
       _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
+      if (_lastRefreshCode != code) {
+        _weather = null;
+        _forecast = null;
+      }
     });
 
     _refreshIndicatorKey.currentState?.show();
 
-    TalkerManager.instance.debug('🔄 Fetching weather, realtime region, and history...');
     await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
 
     if (mounted) {
       setState(() => _isLoading = false);
       _lastRefreshCode = code;
       _lastRefreshTime = DateTime.now();
-      TalkerManager.instance.debug('🔄 Refresh completed');
     }
   }
 
@@ -146,12 +138,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       await updateLocationFromGPS();
     } else {
       await Preference.reload();
+      final code = Preference.locationCode;
+      if (code != null) {
+        final location = Global.location[code];
+        if (location != null) {
+          Preference.locationLatitude = location.lat;
+          Preference.locationLongitude = location.lng;
+        }
+      }
       GlobalProviders.location.refresh();
     }
   }
 
   bool _shouldSkipRefresh(String? code) {
-    if (_lastRefreshCode != code) return false;
+    if (_lastRefreshCode != code) {
+      _lastRefreshCode = code;
+      _lastRefreshTime = null;
+      return false;
+    }
     if (_lastRefreshTime == null) return false;
 
     final timeSinceLastRefresh = DateTime.now().difference(_lastRefreshTime!);
@@ -168,10 +172,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _fetchWeather(String? code) async {
-    TalkerManager.instance.debug('🌤️ _fetchWeather called with code: $code');
-
     if (code == null) {
-      TalkerManager.instance.debug('🌤️ code is null, clearing weather data');
       if (mounted)
         setState(() {
           _weather = null;
@@ -181,25 +182,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     try {
-      // 使用經緯度取得即時天氣
-      final coords = GlobalProviders.location.coordinates;
-      TalkerManager.instance.debug('🌤️ coordinates: $coords');
+      LatLng? coords;
+      if (Preference.locationLatitude != null && Preference.locationLongitude != null) {
+        coords = LatLng(Preference.locationLatitude!, Preference.locationLongitude!);
+      } else {
+        coords = GlobalProviders.location.coordinates;
+      }
 
       if (coords != null) {
-        TalkerManager.instance.debug('🌤️ Fetching realtime weather for ${coords.latitude}, ${coords.longitude}');
         final weather = await ExpTech().getWeatherRealtimeByCoords(coords.latitude, coords.longitude);
-        TalkerManager.instance.debug('🌤️ Got realtime weather: ${weather.toJson()}');
         if (mounted) setState(() => _weather = weather);
       } else {
-        TalkerManager.instance.debug('🌤️ coordinates is null, clearing realtime weather');
         if (mounted) setState(() => _weather = null);
       }
 
-      // 取得天氣預報
-      TalkerManager.instance.debug('🌤️ Fetching weather forecast for code: $code');
       final forecast = await ExpTech().getWeatherForecast(code);
-      TalkerManager.instance.debug('🌤️ Got weather forecast keys: ${forecast.keys}');
-      TalkerManager.instance.debug('🌤️ Got weather forecast[\'forecast\']: ${forecast['forecast']}');
       if (mounted) setState(() => _forecast = forecast);
     } catch (e, s) {
       if (!mounted) return;
@@ -289,36 +286,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildWeatherHeader() {
     final code = GlobalProviders.location.code;
-    final coords = GlobalProviders.location.coordinates;
-
-    TalkerManager.instance.debug(
-      '🌤️ _buildWeatherHeader: isLoading=$_isLoading, weather=$_weather, code=$code, coords=$coords, isOutOfService=$_isOutOfService',
-    );
 
     if (_isLoading) {
-      TalkerManager.instance.debug('🌤️ Showing skeleton (loading)');
       return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
     }
     if (_weather != null) {
-      TalkerManager.instance.debug('🌤️ Showing weather header with data');
       return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader(_weather!));
     }
 
-    // 檢查是否有設定所在地 (code 存在)
-    final hasLocation = code != null;
-
     if (_isOutOfService) {
-      TalkerManager.instance.debug('🌤️ Showing out of service card');
       return const Padding(padding: EdgeInsets.all(16), child: LocationOutOfServiceCard());
     }
 
-    // 如果有設定所在地但沒有天氣資料，可能是正在載入或發生錯誤，顯示 skeleton
-    if (hasLocation) {
-      TalkerManager.instance.debug('🌤️ Showing skeleton (has location but no weather)');
+    if (code != null) {
       return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
     }
 
-    TalkerManager.instance.debug('🌤️ Showing location not set card');
     return const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard());
   }
 
