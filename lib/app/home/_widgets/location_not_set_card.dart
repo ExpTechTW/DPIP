@@ -28,7 +28,7 @@ class LocationNotSetCard extends StatelessWidget {
               Icon(Symbols.not_listed_location_rounded, color: context.colors.onSecondaryContainer, weight: 500),
               Text(
                 '尚未設定所在地'.i18n,
-                style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
+                style: context.texts.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
               ),
             ],
           ),

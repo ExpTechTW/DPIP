@@ -1,5 +1,5 @@
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:flutter/material.dart';
 

@@ -1,5 +1,5 @@
 import 'package:dpip/api/model/history/history.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'intensity_history.g.dart';

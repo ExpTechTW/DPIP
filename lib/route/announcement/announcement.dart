@@ -245,7 +245,7 @@ class AnnouncementDetailPage extends StatelessWidget {
               const SizedBox(height: 24),
               MarkdownBody(
                 data: announcement.content,
-                styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                styleSheet: MarkdownStyleSheet.fromTheme(context.theme).copyWith(
                   h1: context.theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                   h2: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                   p: context.theme.textTheme.bodyLarge,

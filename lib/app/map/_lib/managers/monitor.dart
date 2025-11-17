@@ -13,7 +13,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -1033,7 +1033,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   // Build common alert badge with count indicator
   Widget _buildAlertBadge(int eewCount, {double iconSize = 16, bool showLabel = false}) {
     final colors = context.colors;
-    final theme = context.textTheme;
+    final theme = context.texts;
 
     return Container(
       decoration: BoxDecoration(color: colors.error, borderRadius: BorderRadius.circular(8)),
@@ -1076,7 +1076,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   // Build collapsed or expanded EEW info
   Widget _buildEewContent(Eew data, int eewCount, bool hasLocation) {
     final colors = context.colors;
-    final theme = context.textTheme;
+    final theme = context.texts;
 
     if (_isCollapsed) {
       // Collapsed view - compact info
@@ -1194,7 +1194,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
         if (code == null) return const SizedBox.shrink();
 
         final colors = context.colors;
-        final theme = context.textTheme;
+        final theme = context.texts;
 
         return Padding(
           padding: const EdgeInsets.only(top: 8, bottom: 4),

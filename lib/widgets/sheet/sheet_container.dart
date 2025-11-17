@@ -42,13 +42,13 @@ class SheetContainer extends StatelessWidget {
                       spacing: 8,
                       children: [
                         if (icon != null) Icon(icon, size: 28),
-                        Text(title, style: context.textTheme.titleLarge),
+                        Text(title, style: context.texts.titleLarge),
                       ],
                     ),
                     if (description != null)
                       Text(
                         description!,
-                        style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                        style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                       ),
                   ],
                 ),

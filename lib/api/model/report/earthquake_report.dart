@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:dpip/api/model/report/area_intensity.dart';
+import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/utils/map_utils.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
@@ -144,7 +144,7 @@ class EarthquakeReport {
 
     for (final area in list.values) {
       for (final town in area.town.values) {
-        expandBounds(bounds, LatLng(town.lat, town.lon));
+        bounds.expandBounds(LatLng(town.lat, town.lon));
       }
     }
 

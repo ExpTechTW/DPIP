@@ -297,7 +297,7 @@ class WindMapLayerSheet extends StatelessWidget {
                           spacing: 8,
                           children: [
                             const Icon(Symbols.wind_power_rounded, size: 24),
-                            Text('風向/風速'.i18n, style: context.textTheme.titleMedium),
+                            Text('風向/風速'.i18n, style: context.texts.titleMedium),
                           ],
                         ),
                       ),

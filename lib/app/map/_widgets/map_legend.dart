@@ -105,7 +105,7 @@ class ColorLegend extends StatelessWidget {
                       style: TextStyle(color: context.colors.outline),
                     ),
                 ],
-                style: context.textTheme.labelSmall?.copyWith(
+                style: context.texts.labelSmall?.copyWith(
                   color: context.colors.onSurfaceVariant,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
@@ -122,7 +122,7 @@ class ColorLegend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
           ),
       ],
     );
@@ -162,7 +162,7 @@ class Legend extends StatelessWidget {
                     style: TextStyle(color: context.colors.outline),
                   ),
               ],
-              style: context.textTheme.labelSmall?.copyWith(
+              style: context.texts.labelSmall?.copyWith(
                 color: context.colors.onSurfaceVariant,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
@@ -178,7 +178,7 @@ class Legend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
           ),
       ],
     );

@@ -15,7 +15,6 @@ import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -173,7 +172,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     try {
       final manager = _managers[layer];
       if (manager == null) {
-        showUnimplementedSnackBar(context);
         throw UnimplementedError('Unknown layer: $layer');
       }
 

@@ -8,28 +8,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 
-List<double> expandBounds(List<double> bounds, LatLng point) {
-  // [南西,北東]
-  //南
-  if (bounds[0] > point.latitude) {
-    bounds[0] = point.latitude;
-  }
-  //西
-  if (bounds[1] > point.longitude) {
-    bounds[1] = point.longitude;
-  }
-  //北
-  if (bounds[2] < point.latitude) {
-    bounds[2] = point.latitude;
-  }
-  //東
-  if (bounds[3] < point.longitude) {
-    bounds[3] = point.longitude;
-  }
-
-  return bounds;
-}
-
 enum Units {
   meters,
   metres,

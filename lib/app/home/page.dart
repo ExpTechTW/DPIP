@@ -1,4 +1,10 @@
+import 'package:flutter/material.dart';
+
 import 'package:collection/collection.dart';
+import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:timezone/timezone.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
@@ -13,8 +19,8 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
-import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/gps_location.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
@@ -22,11 +28,6 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/utils/time_convert.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:timezone/timezone.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -325,9 +326,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           isOutOfService: _isOutOfService,
         ),
         ...historyGroup.map((item) {
-          final expireTime = convertToTZDateTime(item.time.expires['all'] ?? 0);
-          final isExpired = TZDateTime.now(UTC).isAfter(expireTime.toUtc());
-          return HistoryTimelineItem(expired: isExpired, history: item, last: item == allHistory.last);
+          return HistoryTimelineItem(expired: item.isExpired, history: item, last: item == allHistory.last);
         }),
       ],
     );

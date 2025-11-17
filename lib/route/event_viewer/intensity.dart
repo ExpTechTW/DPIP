@@ -10,7 +10,7 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
 import 'package:dpip/widgets/map/legend.dart';

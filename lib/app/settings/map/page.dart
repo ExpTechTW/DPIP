@@ -122,11 +122,11 @@ class SettingsMapPage extends StatelessWidget {
                             children: [
                               Text(
                                 '動畫幀率'.i18n,
-                                style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                                style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 '影響強震監視器的震波模擬動畫流暢度'.i18n,
-                                style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                                style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                               ),
                             ],
                           ),
@@ -147,7 +147,7 @@ class SettingsMapPage extends StatelessWidget {
                             year2023: false,
                           ),
                         ),
-                        SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
+                        SizedBox(width: 28, child: Text('$updateInterval', style: context.texts.labelSmall)),
                       ],
                     ),
                     if (updateInterval > 20)
@@ -157,7 +157,7 @@ class SettingsMapPage extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
-                              style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
+                              style: context.texts.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
                             ),
                           ),
                         ],

@@ -263,7 +263,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                           spacing: 8,
                           children: [
                             const Icon(Symbols.bolt, size: 24),
-                            Text('閃電'.i18n, style: context.textTheme.titleMedium),
+                            Text('閃電'.i18n, style: context.texts.titleMedium),
                           ],
                         ),
                       ),

@@ -1,3 +1,4 @@
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -16,7 +17,6 @@ import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/geojson.dart';
@@ -402,7 +402,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                     spacing: 8,
                     children: [
                       const Icon(Symbols.thermostat_rounded, size: 24),
-                      Text('氣溫'.i18n, style: context.textTheme.titleMedium),
+                      Text('氣溫'.i18n, style: context.texts.titleMedium),
                     ],
                   ),
                 ),

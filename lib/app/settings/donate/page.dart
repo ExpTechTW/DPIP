@@ -163,7 +163,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 child: Text(
                   'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'
                       .i18n,
-                  style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                  style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                   textAlign: TextAlign.justify,
                 ),
               ),
@@ -184,7 +184,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                           style: TextStyle(
                             color: (processingProductId != null && processingProductId != product.id)
                                 ? context.theme.disabledColor
-                                : context.textTheme.bodySmall?.color,
+                                : context.texts.bodySmall?.color,
                           ),
                         ),
                         trailing: (purchasedProductIds.contains(product.id))
@@ -196,7 +196,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                 style: TextStyle(
                                   color: (processingProductId != null && processingProductId != product.id)
                                       ? context.theme.disabledColor
-                                      : context.textTheme.bodyMedium?.color,
+                                      : context.texts.bodyMedium?.color,
                                 ),
                               ),
                         onTap: isPending || purchasedProductIds.contains(product.id)
@@ -229,7 +229,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                           style: TextStyle(
                             color: (processingProductId != null && processingProductId != product.id)
                                 ? context.theme.disabledColor
-                                : context.textTheme.bodySmall?.color,
+                                : context.texts.bodySmall?.color,
                           ),
                         ),
                         trailing: (processingProductId == product.id)
@@ -239,7 +239,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                 style: TextStyle(
                                   color: (processingProductId != null && processingProductId != product.id)
                                       ? context.theme.disabledColor
-                                      : context.textTheme.bodyMedium?.color,
+                                      : context.texts.bodyMedium?.color,
                                 ),
                               ),
                         onTap: isPending

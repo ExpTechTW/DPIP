@@ -64,6 +64,11 @@ class ExtendedColors {
   }
 }
 
+/// Extension on [ThemeData] that provides convenient access to extended semantic colors.
+///
+/// This extension adds helpful getters to access extended color palettes that complement the standard Material Design 3
+/// color scheme.
 extension CustomColors on ThemeData {
+  /// Returns an [ExtendedColors] instance with colors matching the current theme's brightness.
   ExtendedColors get extendedColors => ExtendedColors(brightness);
 }

@@ -101,7 +101,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                       child: Center(
                         child: Text(
                           item.iconLabel,
-                          style: context.textTheme.labelLarge?.copyWith(
+                          style: context.texts.labelLarge?.copyWith(
                             color: context.colors.onSecondaryContainer,
                             height: 1,
                           ),

@@ -100,7 +100,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
                         Layout.row[8](
                           children: [
                             const Icon(Symbols.radar, size: 24),
-                            Text('雷達回波'.i18n, style: context.textTheme.titleMedium),
+                            Text('雷達回波'.i18n, style: context.texts.titleMedium),
                             FutureBuilder(
                               future: radarListFuture,
                               builder: (context, snapshot) {
@@ -108,7 +108,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
 
                                 if (data == null) return const SizedBox.shrink();
 
-                                final style = context.textTheme.labelSmall?.copyWith(
+                                final style = context.texts.labelSmall?.copyWith(
                                   color: context.colors.onSurfaceVariant,
                                 );
 

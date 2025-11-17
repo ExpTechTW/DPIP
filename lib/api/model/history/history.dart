@@ -1,9 +1,10 @@
-import 'package:dpip/api/model/history/intensity_history.dart';
-import 'package:dpip/api/model/history/report_history.dart';
-import 'package:dpip/utils/parser.dart';
-import 'package:dpip/utils/time_convert.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timezone/timezone.dart';
+
+import 'package:dpip/api/model/history/intensity_history.dart';
+import 'package:dpip/api/model/history/report_history.dart';
+import 'package:dpip/utils/extensions/number.dart';
+import 'package:dpip/utils/serialization.dart';
 
 part 'history.g.dart';
 
@@ -62,7 +63,12 @@ class History {
 
   bool get isExpired {
     final int? expireTimestamp = time.expires['all'];
-    final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+
+    if (expireTimestamp == null) {
+      return false;
+    }
+
+    final TZDateTime expireTimeUTC = expireTimestamp.asTZDateTime;
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     return isExpired;
   }
@@ -100,7 +106,7 @@ class InfoTime {
 
   TZDateTime get expiresAt {
     final int expireTimestamp = expires['all']!;
-    return convertToTZDateTime(expireTimestamp);
+    return expireTimestamp.asTZDateTime;
   }
 
   factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);

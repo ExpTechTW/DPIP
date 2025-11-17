@@ -4,11 +4,16 @@ analyzer:
   errors:
     todo: info
   exclude:
-    - '**.freezed.dart'
-    - '**.g.dart'
+    - "**.freezed.dart"
+    - "**.g.dart"
 
 linter:
   rules:
-    directives_ordering: false
-    flutter_style_todos: true
-    prefer_single_quotes: true
+    flutter_style_todos: error
+    prefer_single_quotes: warning
+    avoid_annotating_with_dynamic: error
+    public_member_api_docs: warning
+
+formatter:
+  page_width: 120
+  trailing_commas: preserve

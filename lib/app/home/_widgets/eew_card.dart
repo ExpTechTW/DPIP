@@ -8,7 +8,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -99,7 +99,7 @@ class _EewCardState extends State<EewCard> {
                               Icon(Symbols.crisis_alert_rounded, color: context.colors.onError, weight: 700, size: 22),
                               Text(
                                 'EEW'.i18n,
-                                style: context.textTheme.labelLarge!.copyWith(
+                                style: context.texts.labelLarge!.copyWith(
                                   color: context.colors.onError,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -109,7 +109,7 @@ class _EewCardState extends State<EewCard> {
                         ),
                         Text(
                           '第 {serial} 報'.i18n.args({'serial': widget.data.serial}),
-                          style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                          style: context.texts.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                         ),
                       ],
                     ),
@@ -136,7 +136,7 @@ class _EewCardState extends State<EewCard> {
                                 'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
                                 'depth': widget.data.info.depth.toStringAsFixed(1),
                               }),
-                    style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                    style: context.texts.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                     tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                   ),
                 ),
@@ -163,7 +163,7 @@ class _EewCardState extends State<EewCard> {
                                   children: [
                                     Text(
                                       '所在地預估'.i18n,
-                                      style: context.textTheme.labelLarge!.copyWith(
+                                      style: context.texts.labelLarge!.copyWith(
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),
                                     ),
@@ -171,7 +171,7 @@ class _EewCardState extends State<EewCard> {
                                       padding: const EdgeInsets.only(top: 12, bottom: 8),
                                       child: Text(
                                         localIntensity!.asIntensityLabel,
-                                        style: context.textTheme.displayMedium!.copyWith(
+                                        style: context.texts.displayMedium!.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: context.colors.onErrorContainer,
                                           height: 1,
@@ -194,7 +194,7 @@ class _EewCardState extends State<EewCard> {
                                   children: [
                                     Text(
                                       '震波'.i18n,
-                                      style: context.textTheme.labelLarge!.copyWith(
+                                      style: context.texts.labelLarge!.copyWith(
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),
                                     ),
@@ -207,15 +207,15 @@ class _EewCardState extends State<EewCard> {
                                                   TextSpan(
                                                     text: countdown.toString(),
                                                     style: TextStyle(
-                                                      fontSize: context.textTheme.displayMedium!.fontSize! * 1.15,
+                                                      fontSize: context.texts.displayMedium!.fontSize! * 1.15,
                                                     ),
                                                   ),
                                                   TextSpan(
                                                     text: ' 秒'.i18n,
-                                                    style: TextStyle(fontSize: context.textTheme.labelLarge!.fontSize),
+                                                    style: TextStyle(fontSize: context.texts.labelLarge!.fontSize),
                                                   ),
                                                 ],
-                                                style: context.textTheme.displayMedium!.copyWith(
+                                                style: context.texts.displayMedium!.copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   color: context.colors.onErrorContainer,
                                                   height: 1,
@@ -226,8 +226,8 @@ class _EewCardState extends State<EewCard> {
                                             )
                                           : Text(
                                               '抵達'.i18n,
-                                              style: context.textTheme.displayMedium!.copyWith(
-                                                fontSize: context.textTheme.displayMedium!.fontSize! * 0.92,
+                                              style: context.texts.displayMedium!.copyWith(
+                                                fontSize: context.texts.displayMedium!.fontSize! * 0.92,
                                                 fontWeight: FontWeight.bold,
                                                 color: context.colors.onErrorContainer,
                                                 height: 1,

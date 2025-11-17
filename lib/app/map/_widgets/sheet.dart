@@ -16,7 +16,7 @@ class _CustomSheetState extends State<CustomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = context.screen.height;
+    final screenHeight = context.dimension.height;
     final defaultInitialSize = (context.bottomSheetConstraints.maxHeight * 0.4) / screenHeight;
 
     return Positioned.fill(

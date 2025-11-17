@@ -1,5 +1,5 @@
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/list.dart';
+import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:flutter/material.dart';
 
 class ListSection extends StatelessWidget {

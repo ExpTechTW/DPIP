@@ -485,7 +485,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                     spacing: 8,
                     children: [
                       const Icon(Symbols.water_drop_rounded, size: 24),
-                      Text('降水'.i18n, style: context.textTheme.titleMedium),
+                      Text('降水'.i18n, style: context.texts.titleMedium),
                     ],
                   ),
                 ),

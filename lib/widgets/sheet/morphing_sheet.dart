@@ -105,7 +105,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
     final RenderBox? partialBox = _partialKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (contentBox != null) {
-      final screenHeight = context.screen.height;
+      final screenHeight = context.dimension.height;
       final isOverflowing = contentBox.size.height > screenHeight * 0.85;
       if (_isOverflowing != isOverflowing) {
         setState(() {
@@ -126,7 +126,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
 
   double get _minChildSize {
     if (_partialSize == null) return _minHeightRatio;
-    final screenHeight = context.screen.height;
+    final screenHeight = context.dimension.height;
 
     // Calculate total height including all padding and margin
     final totalHeight =

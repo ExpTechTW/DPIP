@@ -80,7 +80,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
                     Row(
                       spacing: 8,
                       children: [
-                        Text(release.name, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(release.name, style: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                         if (release.prerelease)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -90,7 +90,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
                             ),
                             child: Text(
                               'Pre-Release',
-                              style: context.textTheme.labelSmall?.copyWith(color: Colors.orangeAccent),
+                              style: context.texts.labelSmall?.copyWith(color: Colors.orangeAccent),
                             ),
                           ),
                       ],

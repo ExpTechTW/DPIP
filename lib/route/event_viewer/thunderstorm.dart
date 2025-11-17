@@ -19,7 +19,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -58,7 +58,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Future<void> _loadMap() async {
     final outlineColor = context.colors.outline.toHexStringRGB();
-    
+
     final list = await ExpTech().getRadarList();
 
     if (mounted) {
@@ -207,42 +207,42 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
-            Positioned(
-              left: 4,
-              top: 4,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
-                    child: Text(
-                      DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.onSurface),
-                    ),
+          Positioned(
+            left: 4,
+            top: 4,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
+                  child: Text(
+                    DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.onSurface),
                   ),
                 ),
               ),
             ),
-            Positioned(
-              left: 4,
-              top: 32,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
-                    child: Text(
-                      '雷達合成回波',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.colors.onSurface),
-                    ),
+          ),
+          Positioned(
+            left: 4,
+            top: 32,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
+                  child: Text(
+                    '雷達合成回波',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.colors.onSurface),
                   ),
                 ),
               ),
             ),
+          ),
           _buildDraggableSheet(context),
         ],
       ),

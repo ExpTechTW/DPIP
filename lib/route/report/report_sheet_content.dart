@@ -1,7 +1,7 @@
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/magnitude_color.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';

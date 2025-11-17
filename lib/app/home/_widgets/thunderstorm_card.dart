@@ -55,7 +55,7 @@ class ThunderstormCard extends StatelessWidget {
                               ),
                               Text(
                                 '雷雨即時訊息'.i18n,
-                                style: context.textTheme.labelLarge!.copyWith(
+                                style: context.texts.labelLarge!.copyWith(
                                   color: context.theme.extendedColors.onBlue,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -74,7 +74,7 @@ class ThunderstormCard extends StatelessWidget {
                     text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。'.i18n.args({
                       'time': history.time.expiresAt.toSimpleDateTimeString(),
                     }),
-                    style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
+                    style: context.texts.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
                     tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                   ),
                 ),

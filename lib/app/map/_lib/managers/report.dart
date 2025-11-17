@@ -1,3 +1,4 @@
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -21,13 +22,11 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
-import 'package:dpip/utils/extensions/int.dart';
-import 'package:dpip/utils/extensions/list.dart';
+import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/magnitude_color.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
@@ -89,7 +88,7 @@ class ReportMapLayerManager extends MapLayerManager {
       if (bounds.isEmpty) {
         bounds = [report.latitude, report.longitude, report.latitude, report.longitude];
       } else {
-        bounds = expandBounds(bounds, report.latlng);
+        bounds.expandBounds(report.latlng);
       }
     }
 
@@ -366,12 +365,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               Expanded(
                                 child: Text(
                                   '近期的地震報告'.i18n,
-                                  style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                                  style: context.texts.titleMedium?.copyWith(color: context.colors.onSurface),
                                 ),
                               ),
                               Text(
                                 '更多'.i18n,
-                                style: context.textTheme.labelSmall?.copyWith(color: context.colors.outline),
+                                style: context.texts.labelSmall?.copyWith(color: context.colors.outline),
                               ),
                               Icon(Symbols.swipe_up_rounded, size: 16, color: context.colors.outline),
                             ],
@@ -397,18 +396,18 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       report.hasNumber
                                           ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
                                           : location,
-                                      style: context.textTheme.titleMedium,
+                                      style: context.texts.titleMedium,
                                     ),
                                     Text(
                                       report.time.toLocaleDateTimeString(context),
-                                      style: context.textTheme.bodyMedium?.copyWith(
+                                      style: context.texts.bodyMedium?.copyWith(
                                         color: context.colors.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Text('M ${report.magnitude.toStringAsFixed(1)}', style: context.textTheme.titleMedium),
+                              Text('M ${report.magnitude.toStringAsFixed(1)}', style: context.texts.titleMedium),
                             ],
                           ),
                         ),
@@ -444,12 +443,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               currentReport.hasNumber
                                   ? '編號 {number} 顯著有感地震'.i18n.args({'number': currentReport.number})
                                   : '小區域有感地震'.i18n,
-                              style: context.textTheme.labelMedium?.copyWith(color: context.colors.outline),
+                              style: context.texts.labelMedium?.copyWith(color: context.colors.outline),
                             ),
-                            Text(location, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)),
+                            Text(location, style: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.w500)),
                             Text(
                               currentReport.time.toLocaleDateTimeString(context),
-                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                              style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                           ],
                         ),
@@ -471,11 +470,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Text(
                               '地震規模'.i18n,
-                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                              style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                             Text(
                               'M ${currentReport.magnitude.toStringAsFixed(1)}',
-                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                              style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -486,11 +485,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Text(
                               '震源深度'.i18n,
-                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                              style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                             Text(
                               '${currentReport.depth}km',
-                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                              style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -554,7 +553,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               ),
                               trailing: Text(
                                 'M ${report.magnitude.toStringAsFixed(1)}',
-                                style: context.textTheme.labelLarge,
+                                style: context.texts.labelLarge,
                               ),
                               onTap: () {
                                 widget.manager.setReport(report.id);

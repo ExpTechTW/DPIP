@@ -455,7 +455,7 @@ class _LegendItem extends StatelessWidget {
             border: Border.all(color: borderColor),
           ),
         ),
-        Text(label, style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant, height: 1)),
+        Text(label, style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant, height: 1)),
       ],
     );
   }
@@ -503,7 +503,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                   Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
                                   Text(
                                     '雷達回波'.i18n,
-                                    style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                                    style: context.texts.titleMedium?.copyWith(color: context.colors.onSurface),
                                   ),
                                   AnimatedBuilder(
                                     animation: Listenable.merge([
@@ -541,7 +541,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                               if (date.isNotEmpty) ...[
                                                 Text(
                                                   date,
-                                                  style: context.textTheme.labelSmall?.copyWith(
+                                                  style: context.texts.labelSmall?.copyWith(
                                                     color: context.colors.onSurfaceVariant,
                                                     height: 1,
                                                   ),
@@ -555,7 +555,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                               ],
                                               Text(
                                                 time,
-                                                style: context.textTheme.bodySmall?.copyWith(
+                                                style: context.texts.bodySmall?.copyWith(
                                                   color: context.colors.onSurface,
                                                   fontWeight: FontWeight.bold,
                                                   height: 1,
@@ -617,7 +617,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                               child: Text(
                                 '長按設定播放起點'.i18n,
-                                style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                                style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
                               ),
                             );
                           }
@@ -933,11 +933,11 @@ class _RadarProgressBar extends StatelessWidget {
       spacing: 8,
       children: [
         Icon(Icons.play_circle_rounded, size: 16, color: context.colors.primary),
-        Text('播放進度'.i18n, style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
+        Text('播放進度'.i18n, style: context.texts.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
         Expanded(child: LinearProgressIndicator(value: progress, year2023: false)),
         Text(
           '${(progress * 100).round()}%',
-          style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+          style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
         ),
       ],
     );

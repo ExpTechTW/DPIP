@@ -15,6 +15,7 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
 
@@ -88,7 +89,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             bounds.addAll([town.lat, town.lon, town.lat, town.lon]);
           }
 
-          expandBounds(bounds, LatLng(town.lat, town.lon));
+          bounds.expandBounds(LatLng(town.lat, town.lon));
         }
       }
 
@@ -100,7 +101,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         'geometry': {'coordinates': data.latlng.asGeoJsonCooridnate, 'type': 'Point'},
       });
 
-      expandBounds(bounds, data.latlng);
+      bounds.expandBounds(data.latlng);
 
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(

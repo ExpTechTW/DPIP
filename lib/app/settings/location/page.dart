@@ -383,40 +383,37 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                             leading: isCurrentLoading
                                 ? const LoadingIcon()
                                 : Icon(
-                              isSelected ? Symbols.check_rounded : null,
-                              color: context.colors.primary,
-                            ),
+                                    isSelected ? Symbols.check_rounded : null,
+                                    color: context.colors.primary,
+                                  ),
                             trailing: IconButton(
                               icon: const Icon(Symbols.delete_rounded),
                               color: context.colors.error,
-                              onPressed:
-                              isCurrentLoading ? null : () => model.unfavorite(code),
+                              onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
                             ),
                             enabled: !model.auto && loadingCode == null,
                             onTap: isSelected
                                 ? null
                                 : () async {
-                              setState(() => loadingCode = code);
-                              try {
-                                await ExpTech().updateDeviceLocation(
-                                  token: Preference.notifyToken,
-                                  coordinates:
-                                  LatLng(location.lat, location.lng),
-                                );
+                                    setState(() => loadingCode = code);
+                                    try {
+                                      await ExpTech().updateDeviceLocation(
+                                        token: Preference.notifyToken,
+                                        coordinates: LatLng(location.lat, location.lng),
+                                      );
 
-                                if (!context.mounted) return;
-                                model.setCode(code);
-                              } catch (e, s) {
-                                if (!context.mounted) return;
-                                TalkerManager.instance.error(
-                                    'Failed to set location code', e, s);
-                                showToast(
-                                  context,
-                                  ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n),
-                                );
-                              }
-                              setState(() => loadingCode = null);
-                            },
+                                      if (!context.mounted) return;
+                                      model.setCode(code);
+                                    } catch (e, s) {
+                                      if (!context.mounted) return;
+                                      TalkerManager.instance.error('Failed to set location code', e, s);
+                                      showToast(
+                                        context,
+                                        ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n),
+                                      );
+                                    }
+                                    setState(() => loadingCode = null);
+                                  },
                           );
                         }),
                         ListSectionTile(

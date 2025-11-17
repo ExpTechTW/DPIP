@@ -1,4 +1,4 @@
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'weather_schema.g.dart';
