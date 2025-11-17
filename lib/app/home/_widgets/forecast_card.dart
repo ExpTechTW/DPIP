@@ -17,7 +17,9 @@ class _ForecastCardState extends State<ForecastCard> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final Set<int> _expandedItems = {};
+  final Map<int, double> _measuredHeights = {};
   final Map<int, GlobalKey> _pageKeys = {};
+  List<List<dynamic>> _pages = [];
 
   @override
   void dispose() {
@@ -39,10 +41,11 @@ class _ForecastCardState extends State<ForecastCard> {
         maxTemp = max(maxTemp, temp);
       }
 
-      final pages = <List<dynamic>>[];
-      for (int i = 0; i < data.length; i += 3) {
-        pages.add(data.skip(i).take(3).toList());
+      _pages = <List<dynamic>>[];
+      for (int i = 0; i < data.length; i += 4) {
+        _pages.add(data.skip(i).take(4).toList());
       }
+      final pages = _pages;
 
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -97,40 +100,39 @@ class _ForecastCardState extends State<ForecastCard> {
                   double height = 0;
                   final pageData = pages[pageIndex];
                   for (int i = 0; i < pageData.length; i++) {
-                    final globalIndex = pageIndex * 3 + i;
+                    final globalIndex = pageIndex * 4 + i;
                     final isExpanded = _expandedItems.contains(globalIndex);
-                    height += isExpanded ? 220 : 50;
+                    height += isExpanded ? 320 : 84;
                     if (i < pageData.length - 1 && !isExpanded) height += 1;
                   }
-                  return (height + 4).clamp(0, 600);
+                  return height + 4;
                 }
 
-                double? measuredHeight;
-                final currentKey = _pageKeys[_currentPage];
-                if (currentKey?.currentContext != null) {
-                  final RenderBox? box = currentKey!.currentContext!.findRenderObject() as RenderBox?;
-                  if (box != null && box.hasSize) measuredHeight = box.size.height;
-                }
-
-                final pageHeight = measuredHeight ?? (pages.isNotEmpty ? calculatePageHeight(_currentPage) : 0.0);
+                final calculatedHeight = pages.isNotEmpty ? calculatePageHeight(_currentPage) : 0.0;
+                final pageHeight = _measuredHeights[_currentPage] ?? calculatedHeight;
 
                 return AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
+                  duration: const Duration(milliseconds: 150),
+                  curve: Curves.easeOut,
                   child: SizedBox(
-                    height: pageHeight > 0 ? pageHeight : null,
+                    height: pageHeight,
                     child: PageView.builder(
                       controller: _pageController,
                       scrollDirection: Axis.vertical,
                       itemCount: pages.length,
                       physics: const ClampingScrollPhysics(),
                       onPageChanged: (index) {
-                        setState(() => _currentPage = index);
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final key = _pageKeys[index];
-                          if (key?.currentContext != null) {
-                            final RenderBox? box = key!.currentContext!.findRenderObject() as RenderBox?;
-                            if (box != null && box.hasSize && mounted) setState(() {});
+                        setState(() {
+                          _currentPage = index;
+                          if (index < _pages.length) {
+                            final currentPageStart = index * 4;
+                            final currentPageEnd = currentPageStart + _pages[index].length - 1;
+                            _expandedItems.removeWhere((expandedIndex) {
+                              return expandedIndex < currentPageStart || expandedIndex > currentPageEnd;
+                            });
+                            if (_expandedItems.isNotEmpty) {
+                              _measuredHeights.clear();
+                            }
                           }
                         });
                       },
@@ -138,15 +140,29 @@ class _ForecastCardState extends State<ForecastCard> {
                         if (!_pageKeys.containsKey(pageIndex)) {
                           _pageKeys[pageIndex] = GlobalKey();
                         }
+                        final key = _pageKeys[pageIndex]!;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (key.currentContext != null && mounted) {
+                            final RenderBox? box = key.currentContext!.findRenderObject() as RenderBox?;
+                            if (box != null && box.hasSize) {
+                              final measuredHeight = box.size.height;
+                              if (_measuredHeights[pageIndex] != measuredHeight) {
+                                setState(() {
+                                  _measuredHeights[pageIndex] = measuredHeight;
+                                });
+                              }
+                            }
+                          }
+                        });
                         return SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
                           child: Padding(
-                            key: _pageKeys[pageIndex],
+                            key: key,
                             padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: pages[pageIndex].asMap().entries.map((entry) {
-                                final globalIndex = pageIndex * 3 + entry.key;
+                                final globalIndex = pageIndex * 4 + entry.key;
                                 return _buildForecastItem(
                                   context,
                                   entry.value as Map<String, dynamic>,
@@ -191,7 +207,7 @@ class _ForecastCardState extends State<ForecastCard> {
     final humidity = (item['humidity'] ?? 0) as num;
     final isExpanded = _expandedItems.contains(index);
     final tempRange = maxTemp - minTemp;
-    final tempPercent = tempRange > 0 ? ((temp - minTemp) / tempRange) : 0.5;
+    final tempPercent = tempRange > 0 ? ((temp - minTemp) / tempRange).clamp(0.0, 1.0) : 0.5;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -204,17 +220,17 @@ class _ForecastCardState extends State<ForecastCard> {
                 if (isExpanded) {
                   _expandedItems.remove(index);
                 } else {
+                  _expandedItems.clear();
                   _expandedItems.add(index);
+                  _measuredHeights.clear();
                 }
-              });
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final key = _pageKeys[_currentPage];
-                if (key?.currentContext != null && mounted) setState(() {});
+                final pageIndex = index ~/ 4;
+                _measuredHeights.remove(pageIndex);
               });
             },
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: isExpanded ? 10 : 14),
               decoration: BoxDecoration(
                 color: isExpanded ? context.colors.surfaceContainerHighest.withValues(alpha: 0.3) : null,
                 borderRadius: BorderRadius.circular(10),
@@ -225,105 +241,121 @@ class _ForecastCardState extends State<ForecastCard> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 48,
-                        padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(
                           time,
                           style: context.theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 14,
                             color: context.colors.primary,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 4,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: _getWeatherIcon(weather, context),
-                          ),
-                          if (weather.isNotEmpty)
-                            Text(
-                              weather,
-                              style: context.theme.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: context.colors.onSurfaceVariant,
-                                fontSize: 10,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          if (pop > 0)
+                      SizedBox(
+                        width: 120,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 4,
+                          children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                color: Colors.indigo.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(4),
+                                color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(7),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 2,
-                                children: [
-                                  Icon(
-                                    Symbols.rainy_rounded,
-                                    size: 11,
-                                    color: Colors.indigo,
+                              child: _getWeatherIcon(weather, context),
+                            ),
+                            if (weather.isNotEmpty)
+                              Flexible(
+                                child: Text(
+                                  weather,
+                                  style: context.theme.textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: context.colors.onSurfaceVariant,
+                                    fontSize: 12,
                                   ),
-                                  Text(
-                                    '$pop%',
-                                    style: TextStyle(
-                                      fontSize: 9,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            if (pop > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.indigo.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 2,
+                                  children: [
+                                    Icon(
+                                      Symbols.rainy_rounded,
+                                      size: 13,
                                       color: Colors.indigo,
-                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    Text(
+                                      '$pop%',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.indigo,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final barWidth = constraints.maxWidth;
+                            final indicatorPosition = tempPercent * barWidth;
+                            final indicatorWidth = 20.0;
+
+                            return Container(
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: context.colors.surfaceContainerHighest.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    left: (indicatorPosition - indicatorWidth / 2).clamp(
+                                      0.0,
+                                      barWidth - indicatorWidth,
+                                    ),
+                                    width: indicatorWidth,
+                                    height: 20,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            context.colors.primary,
+                                            context.colors.primary.withValues(alpha: 0.7),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: context.colors.surfaceContainerHighest.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Stack(
-                            children: [
-                              FractionallySizedBox(
-                                widthFactor: tempPercent.clamp(0.05, 1.0),
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        context.colors.primary,
-                                        context.colors.primary.withValues(alpha: 0.7),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '${temp.round()}°',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: context.colors.onSurface,
                         ),
@@ -331,7 +363,7 @@ class _ForecastCardState extends State<ForecastCard> {
                       const SizedBox(width: 4),
                       Icon(
                         isExpanded ? Symbols.expand_less_rounded : Symbols.expand_more_rounded,
-                        size: 18,
+                        size: 20,
                         color: context.colors.onSurfaceVariant,
                       ),
                     ],
@@ -377,7 +409,7 @@ class _ForecastCardState extends State<ForecastCard> {
                             context,
                             Symbols.explore_rounded,
                             '風向',
-                            windDirection.isNotEmpty ? windDirection : '-',
+                            windDirection.isNotEmpty ? _convertWindDirection(windDirection) : '-',
                             context.colors.primary,
                           ),
                           _buildDetailChip(
@@ -410,7 +442,7 @@ class _ForecastCardState extends State<ForecastCard> {
             ),
           ),
         ),
-        if (index % 3 != 2 && !isExpanded)
+        if (index % 4 != 3 && !isExpanded)
           Divider(
             height: 1,
             indent: 10,
@@ -463,15 +495,37 @@ class _ForecastCardState extends State<ForecastCard> {
 
   Icon _getWeatherIcon(String weather, BuildContext context) {
     if (weather.contains('晴')) {
-      return Icon(Icons.wb_sunny, color: Colors.orange, size: 14);
+      return Icon(Icons.wb_sunny, color: Colors.orange, size: 16);
     } else if (weather.contains('雨')) {
-      return Icon(Icons.grain, color: Colors.blue, size: 14);
+      return Icon(Icons.grain, color: Colors.blue, size: 16);
     } else if (weather.contains('雲') || weather.contains('陰')) {
-      return Icon(Icons.cloud, color: context.colors.onSurface.withValues(alpha: 0.6), size: 14);
+      return Icon(Icons.cloud, color: context.colors.onSurface.withValues(alpha: 0.6), size: 16);
     } else if (weather.contains('雷')) {
-      return Icon(Icons.flash_on, color: Colors.amber, size: 14);
+      return Icon(Icons.flash_on, color: Colors.amber, size: 16);
     } else {
-      return Icon(Icons.wb_cloudy, color: context.colors.onSurface.withValues(alpha: 0.6), size: 14);
+      return Icon(Icons.wb_cloudy, color: context.colors.onSurface.withValues(alpha: 0.6), size: 16);
     }
+  }
+
+  String _convertWindDirection(String direction) {
+    const Map<String, String> directionMap = {
+      'N': '北',
+      'NNE': '北北東',
+      'NE': '東北',
+      'ENE': '東北東',
+      'E': '東',
+      'ESE': '東南東',
+      'SE': '東南',
+      'SSE': '南南東',
+      'S': '南',
+      'SSW': '南南西',
+      'SW': '西南',
+      'WSW': '西南西',
+      'W': '西',
+      'WNW': '西北西',
+      'NW': '西北',
+      'NNW': '北北西',
+    };
+    return directionMap[direction.toUpperCase()] ?? direction;
   }
 }
