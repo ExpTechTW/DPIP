@@ -64,17 +64,10 @@ void main() async {
   final futureWaitDuration = futureWaitEnd.difference(futureWaitStart).inMilliseconds;
   talker.log('✅ 3. Future.wait 並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitDuration}ms');
 
-  final locationInitStart = DateTime.now();
-  talker.log('⏳ 4. 啟動 LocationServiceManager.initalize()...');
-  await LocationServiceManager.initalize();
-  final locationInitEnd = DateTime.now();
-  final locationDuration = locationInitEnd.difference(locationInitStart).inMilliseconds;
-  talker.log('✅ 4. LocationServiceManager.initalize() 完成。耗時: ${locationDuration}ms');
-
   final overallEndTime = DateTime.now();
   final overallDuration = overallEndTime.difference(overallStartTime).inMilliseconds;
   talker.log('--- 冷啟動偵測結束 ---');
-  talker.log('🎉 5. 主函數執行完成 (準備呼叫 runApp)。');
+  talker.log('🎉 4. 主函數執行完成 (準備呼叫 runApp)。');
   talker.log('🚨 總初始化耗時 (Main 開始到 runApp 前): ${overallDuration}ms');
 
   runApp(
@@ -107,9 +100,20 @@ void main() async {
       ),
     ),
   );
+  final locationInitStart = DateTime.now();
+  talker.log('🚀 5. 啟動 LocationServiceManager.initalize() (並行背景執行)...');
+  // ***關鍵修改：移除 await***
+  final locationFuture = LocationServiceManager.initalize();
+
+  locationFuture.whenComplete(() {
+    final locationInitEnd = DateTime.now();
+    final locationDuration = locationInitEnd.difference(locationInitStart).inMilliseconds;
+    talker.log('✅ 5. LocationServiceManager.initalize() 完成。耗時: ${locationDuration}ms');
+  }).catchError((e) {
+    talker.error('❌ 5. LocationServiceManager.initalize() 失敗。錯誤: $e');
+  });
 }
 Future<T> _loggedTask<T>(String taskName, Future<T> future) async {
-  talker.log('  [並行] 任務 "$taskName" 開始執行...');
   final start = DateTime.now();
   try {
     final result = await future;
