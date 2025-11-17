@@ -1,15 +1,6 @@
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/settings/location/page.dart';
-import 'package:dpip/app/settings/notify/(1.eew)/eew/page.dart';
-import 'package:dpip/app/settings/notify/(2.earthquake)/intensity/page.dart';
-import 'package:dpip/app/settings/notify/(2.earthquake)/monitor/page.dart';
-import 'package:dpip/app/settings/notify/(2.earthquake)/report/page.dart';
-import 'package:dpip/app/settings/notify/(3.weather)/advisory/page.dart';
-import 'package:dpip/app/settings/notify/(3.weather)/evacuation/page.dart';
-import 'package:dpip/app/settings/notify/(3.weather)/thunderstorm/page.dart';
-import 'package:dpip/app/settings/notify/(4.tsunami)/tsunami/page.dart';
-import 'package:dpip/app/settings/notify/(5.basic)/announcement/page.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
@@ -148,7 +139,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     icon: Symbols.warning_rounded,
                     content: '請先設定所在地來使用通知功能'.i18n,
                     trailing: TextButton(
-                      onPressed: () => context.push(SettingsLocationPage.route),
+                      onPressed: () => const SettingsLocationRoute().push(context),
                       child: Text('設定'.i18n),
                     ),
                   ),
@@ -164,7 +155,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.crisis_alert_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyEewPage.route),
+                          onTap: () => const SettingsNotifyEewRoute().push(context),
                         );
                       },
                     ),
@@ -182,7 +173,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.monitor_heart_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyMonitorPage.route),
+                          onTap: () => const SettingsNotifyMonitorRoute().push(context),
                         );
                       },
                     ),
@@ -195,7 +186,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.docs_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyReportPage.route),
+                          onTap: () => const SettingsNotifyReportRoute().push(context),
                         );
                       },
                     ),
@@ -208,7 +199,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.summarize_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyIntensityPage.route),
+                          onTap: () => const SettingsNotifyIntensityRoute().push(context),
                         );
                       },
                     ),
@@ -226,7 +217,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.thunderstorm_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyThunderstormPage.route),
+                          onTap: () => const SettingsNotifyThunderstormRoute().push(context),
                         );
                       },
                     ),
@@ -239,7 +230,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.warning_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyAdvisoryPage.route),
+                          onTap: () => const SettingsNotifyAdvisoryRoute().push(context),
                         );
                       },
                     ),
@@ -252,7 +243,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.directions_run_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyEvacuationPage.route),
+                          onTap: () => const SettingsNotifyEvacuationRoute().push(context),
                         );
                       },
                     ),
@@ -270,7 +261,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.tsunami_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyTsunamiPage.route),
+                          onTap: () => const SettingsNotifyTsunamiRoute().push(context),
                         );
                       },
                     ),
@@ -288,7 +279,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.campaign_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => context.push(SettingsNotifyAnnouncementPage.route),
+                          onTap: () => const SettingsNotifyAnnouncementRoute().push(context),
                         );
                       },
                     ),

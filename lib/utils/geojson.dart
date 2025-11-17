@@ -98,7 +98,10 @@ class GeoJsonBuilder {
   /// The map contains a 'type' field set to 'FeatureCollection' and a 'features' array containing
   /// all added features.
   Map<String, dynamic> build() {
-    return {'type': 'FeatureCollection', 'features': features.map((f) => f.build()).toList()};
+    return {
+      'type': 'FeatureCollection',
+      'features': features.map((f) => f.build()).toList(),
+    };
   }
 }
 

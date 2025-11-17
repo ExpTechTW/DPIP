@@ -2,20 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
-
 /// Page transitions theme that uses zoom transitions with predictive back gesture support on Android.
 ///
 /// This theme provides platform-specific page transitions:
 /// - iOS: Uses the standard Cupertino page transitions
 /// - Android: Uses predictive back page transitions for better gesture navigation support
-///
-/// This is typically used for the main application theme to provide consistent navigation transitions
-/// throughout the app.
 const kZoomPageTransitionsTheme = PageTransitionsTheme(
   builders: {
     TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-    TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+    TargetPlatform.android: PredictiveBackFullscreenPageTransitionsBuilder(),
   },
 );
 
@@ -24,13 +19,10 @@ const kZoomPageTransitionsTheme = PageTransitionsTheme(
 /// This theme provides platform-specific page transitions:
 /// - iOS: Uses the standard Cupertino page transitions
 /// - Android: Uses predictive back fade-forward page transitions for a smoother fade effect
-///
-/// This is typically used for settings pages and other secondary navigation flows where a fade transition
-/// provides a more subtle navigation experience.
 const kFadeForwardPageTransitionsTheme = PageTransitionsTheme(
   builders: {
     TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-    TargetPlatform.android: PredictiveBackFadeForwardPageTransitionsBuilder(),
+    TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
   },
 );
 
