@@ -42,11 +42,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  final _locationButtonKey = GlobalKey();
 
   Key? _mapKey;
   bool _isLoading = false;
   bool _isOutOfService = false;
   bool _wasVisible = true;
+  double? _locationButtonHeight;
 
   RealtimeWeather? _weather;
   Map<String, dynamic>? _forecast;
@@ -256,15 +258,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     _wasVisible = isVisible;
 
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _locationButtonKey.currentContext != null) {
+        final RenderBox? box = _locationButtonKey.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null && box.hasSize) {
+          final newHeight = box.size.height;
+          if (_locationButtonHeight != newHeight) {
+            setState(() {
+              _locationButtonHeight = newHeight;
+            });
+          }
+        }
+      }
+    });
+
     return Stack(
       children: [
         RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: _refresh,
-          edgeOffset: 16 + 48 + context.padding.top,
           child: ListView(
+            padding: EdgeInsets.only(
+              top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
+            ),
             children: [
-              SizedBox(height: 16 + context.padding.top),
               _buildWeatherHeader(),
               if (!_isLoading) ..._buildRealtimeInfo(),
               _buildRadarMap(),
@@ -272,12 +291,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
           ),
         ),
-        const Positioned(
+        Positioned(
           top: 16,
           left: 0,
           right: 0,
           child: SafeArea(
-            child: Align(alignment: Alignment.topCenter, child: LocationButton()),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: LocationButton(key: _locationButtonKey),
+            ),
           ),
         ),
       ],
