@@ -147,17 +147,17 @@ class WeatherHeader extends StatelessWidget {
               ),
               _buildInfoChip(
                 context,
-                Symbols.wind_power_rounded,
-                '風級',
-                weather.data.wind.beaufort > 0 ? '${weather.data.wind.beaufort}級' : '-',
-                Colors.teal,
-              ),
-              _buildInfoChip(
-                context,
                 Symbols.explore_rounded,
                 '風向',
                 weather.data.wind.direction.isNotEmpty ? weather.data.wind.direction : '-',
                 Colors.cyan,
+              ),
+              _buildInfoChip(
+                context,
+                Symbols.wind_power_rounded,
+                '風級',
+                weather.data.wind.beaufort > 0 ? '${weather.data.wind.beaufort}級' : '-',
+                Colors.teal,
               ),
               _buildInfoChip(
                 context,

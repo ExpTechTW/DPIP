@@ -415,7 +415,7 @@ class _ForecastCardState extends State<ForecastCard> {
                           _buildDetailChip(
                             context,
                             Symbols.wind_power_rounded,
-                            '蒲福',
+                            '風級',
                             '${windBeaufort}級',
                             Colors.teal,
                           ),
