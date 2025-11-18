@@ -1419,13 +1419,3 @@ msgstr ""
 #: ./lib/api/model/location/location.dart:123
 msgid "{town}{townLevel}"
 msgstr ""
-#: ./lib/utils/extensions/datetime.dart:45
-msgid "yyyy/MM/dd (EEEE)"
-msgstr ""
-
-#: ./lib/utils/extensions/datetime.dart:71
-msgid "MM/dd HH:mm"
-msgstr ""
-
-msgid "天氣預報"
-msgstr ""
