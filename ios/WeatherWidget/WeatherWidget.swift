@@ -60,8 +60,8 @@ struct WeatherProvider: TimelineProvider {
         let weather = loadWeatherData()
         let entry = WeatherEntry(date: currentDate, weather: weather)
 
-        // 設定下次更新時間 (15分鐘後)
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!
+        // 設定下次更新時間 (30分鐘後)
+        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: currentDate)!
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
 
         completion(timeline)

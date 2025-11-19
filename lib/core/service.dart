@@ -14,6 +14,7 @@ import 'package:dpip/utils/log.dart';
 import 'package:flutter/services.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -428,5 +429,22 @@ class LocationService {
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
+
+    // 保存座標到 widget 用的 SharedPreferences
+    if (position != null) {
+      await _$saveLocationToWidget(position.latitude, position.longitude);
+    }
+  }
+
+  /// 保存位置資訊到 Widget
+  @pragma('vm:entry-point')
+  static Future<void> _$saveLocationToWidget(double latitude, double longitude) async {
+    try {
+      await HomeWidget.saveWidgetData<double>('widget_latitude', latitude);
+      await HomeWidget.saveWidgetData<double>('widget_longitude', longitude);
+      TalkerManager.instance.debug('Widget location saved: $latitude, $longitude');
+    } catch (e, s) {
+      TalkerManager.instance.error('Failed to save location to widget', e, s);
+    }
   }
 }

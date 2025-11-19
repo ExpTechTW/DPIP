@@ -176,9 +176,13 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     private func sendLocationToServer(location: CLLocation) {
         guard isLocationEnabled else { return }
         guard let token = apnsToken else { return }
-        
+
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
+
+        // 保存座標到 widget shared UserDefaults
+        saveLocationToWidget(latitude: latitude, longitude: longitude)
+
         let appVersion =
             Bundle.main.object(
                 forInfoDictionaryKey: "CFBundleShortVersionString") as? String
@@ -206,6 +210,22 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         }
 
         task.resume()
+    }
+
+    // MARK: - Widget Data Management
+
+    /// 保存位置資訊到 Widget
+    private func saveLocationToWidget(latitude: Double, longitude: Double) {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.exptech.dpip") else {
+            print("Failed to get shared UserDefaults for widget")
+            return
+        }
+
+        sharedDefaults.set(latitude, forKey: "widget_latitude")
+        sharedDefaults.set(longitude, forKey: "widget_longitude")
+        sharedDefaults.synchronize()
+
+        print("Widget location saved: \(latitude), \(longitude)")
     }
     
     // MARK: - Background Task Management
