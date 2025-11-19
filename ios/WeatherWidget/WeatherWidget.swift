@@ -186,7 +186,7 @@ struct WeatherWidgetEntryView : View {
 
     @ViewBuilder
     private func mediumLayout() -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: getWeatherIcon(code: entry.weather.weatherCode))
                     .font(.system(size: 24))
@@ -204,15 +204,16 @@ struct WeatherWidgetEntryView : View {
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.8))
             }
+            Spacer(minLength: 2)
 
             VStack(spacing: 6) {
                 Text("\(Int(entry.weather.temperature))°")
-                    .font(.system(size: 48, weight: .thin))
+                    .font(.system(size: 44, weight: .thin))
                     .foregroundColor(.white)
                     .minimumScaleFactor(0.7)
 
                 Text("體感 \(Int(entry.weather.feelsLike))°")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.9))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
@@ -220,6 +221,7 @@ struct WeatherWidgetEntryView : View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .frame(maxWidth: .infinity)
+            Spacer(minLength: 2)
 
             HStack(spacing: 8) {
                     InfoItem(label: "濕度", value: "\(Int(entry.weather.humidity))%")
@@ -227,6 +229,7 @@ struct WeatherWidgetEntryView : View {
                 InfoItem(label: "風向", value: entry.weather.windDirection)
                 InfoItem(label: "降雨", value: String(format: "%.1fmm", entry.weather.rain))
             }
+            Spacer(minLength: 2)
 
             if !entry.weather.stationName.isEmpty {
                 Text("\(entry.weather.stationName)氣象站 · \(String(format: "%.1f", entry.weather.stationDistance))km")
@@ -341,6 +344,8 @@ struct WeatherWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WeatherProvider()) { entry in
             let content = WeatherWidgetEntryView(entry: entry)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
             if #available(iOS 17.0, *) {
                 content
                     .containerBackground(for: .widget) {
@@ -348,12 +353,11 @@ struct WeatherWidget: Widget {
                     }
             } else {
                 content
-                    .padding(8)
                     .background(
                         WeatherWidget.backgroundGradient
                             .cornerRadius(20)
                     )
-                    .padding(4)
+                    .padding(6)
             }
         }
         .configurationDisplayName("即時天氣")
