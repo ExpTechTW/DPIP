@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
 final talker = TalkerManager.instance;

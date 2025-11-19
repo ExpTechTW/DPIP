@@ -94,6 +94,83 @@
                     android:name="android.appwidget.provider"
                     android:resource="@xml/weather_widget_small_info"/>
         </receiver>
+
+        <!-- Workmanager 背景任務服務 -->
+        <provider
+                android:name="androidx.startup.InitializationProvider"
+                android:authorities="${applicationId}.androidx-startup"
+                android:exported="false"
+                tools:node="merge">
+            <meta-data
+                    android:name="androidx.work.WorkManagerInitializer"
+                    android:value="androidx.startup"
+                    tools:node="remove" />
+        </provider>
+
+        <!-- WorkManager Worker -->
+        <service
+                android:name="androidx.work.impl.background.systemjob.SystemJobService"
+                android:directBootAware="false"
+                android:enabled="@bool/enable_system_job_service_default"
+                android:exported="true"
+                android:permission="android.permission.BIND_JOB_SERVICE"
+                tools:targetApi="n" />
+
+        <service
+                android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+                android:directBootAware="false"
+                android:enabled="@bool/enable_system_alarm_service_default"
+                android:exported="false" />
+
+        <service
+                android:name="androidx.work.impl.foreground.SystemForegroundService"
+                android:directBootAware="false"
+                android:enabled="@bool/enable_system_foreground_service_default"
+                android:exported="false" />
+
+        <receiver
+                android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+                android:directBootAware="false"
+                android:enabled="false"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+                android:directBootAware="false"
+                android:enabled="false"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+                android:directBootAware="false"
+                android:enabled="@bool/enable_system_alarm_service_default"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+                android:directBootAware="false"
+                android:enabled="true"
+                android:exported="true"
+                android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+            </intent-filter>
+        </receiver>
     </application>
     <queries>
         <intent>

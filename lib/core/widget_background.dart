@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dpip/core/widget_service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
@@ -40,6 +41,13 @@ class WidgetBackground {
 
   /// 初始化背景任務
   static Future<void> initialize() async {
+    // 只有 Android 需要初始化 Workmanager
+    // iOS 使用 WidgetKit 的內建 Timeline 機制
+    if (!Platform.isAndroid) {
+      talker.info('[WidgetBackground] iOS 使用 WidgetKit Timeline，無需額外初始化');
+      return;
+    }
+
     try {
       await Workmanager().initialize(
         callbackDispatcher,
@@ -55,7 +63,14 @@ class WidgetBackground {
   /// 註冊週期性更新任務
   ///
   /// [frequencyMinutes] - 更新頻率(分鐘),最小值為15分鐘 (Android WorkManager 系統限制)
+  /// iOS 不需要註冊週期性任務，使用 WidgetKit Timeline
   static Future<void> registerPeriodicUpdate({int frequencyMinutes = 15}) async {
+    // iOS 使用 WidgetKit 的 Timeline，在 Swift 端自動處理
+    if (!Platform.isAndroid) {
+      talker.info('[WidgetBackground] iOS 使用 WidgetKit Timeline (${frequencyMinutes}分鐘自動更新)');
+      return;
+    }
+
     try {
       // 確保頻率不低於15分鐘 (Android WorkManager 限制)
       final frequency = frequencyMinutes < 15 ? 15 : frequencyMinutes;
