@@ -80,8 +80,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// 初始化桌面小部件
   Future<void> _initializeWidget() async {
-    // 註冊週期性背景更新 (每30分鐘)
-    await WidgetBackground.registerPeriodicUpdate(frequencyMinutes: 30);
+    // 註冊週期性背景更新 (每15分鐘 - Android WorkManager 最小值)
+    await WidgetBackground.registerPeriodicUpdate(frequencyMinutes: 15);
 
     // 立即更新一次小部件
     await WidgetService.updateWidget();

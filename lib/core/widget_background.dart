@@ -54,8 +54,8 @@ class WidgetBackground {
 
   /// 註冊週期性更新任務
   ///
-  /// [frequencyMinutes] - 更新頻率(分鐘),最小值為15分鐘
-  static Future<void> registerPeriodicUpdate({int frequencyMinutes = 30}) async {
+  /// [frequencyMinutes] - 更新頻率(分鐘),最小值為15分鐘 (Android WorkManager 系統限制)
+  static Future<void> registerPeriodicUpdate({int frequencyMinutes = 15}) async {
     try {
       // 確保頻率不低於15分鐘 (Android WorkManager 限制)
       final frequency = frequencyMinutes < 15 ? 15 : frequencyMinutes;
