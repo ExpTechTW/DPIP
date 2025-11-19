@@ -155,15 +155,12 @@ struct WeatherWidgetEntryView : View {
     private func contentView() -> some View {
         if entry.weather.hasError {
             errorView()
-                .padding()
         } else {
             switch widgetFamily {
             case .systemSmall:
                 smallLayout()
-                    .padding(12)
             default:
                 mediumLayout()
-                    .padding(16)
             }
         }
     }
@@ -186,14 +183,15 @@ struct WeatherWidgetEntryView : View {
 
     @ViewBuilder
     private func mediumLayout() -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+            // 頂部：天氣狀態和時間
             HStack(spacing: 8) {
                 Image(systemName: getWeatherIcon(code: entry.weather.weatherCode))
-                    .font(.system(size: 24))
+                    .font(.system(size: 22))
                     .foregroundColor(.white)
 
                 Text(entry.weather.weatherStatus)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -204,36 +202,40 @@ struct WeatherWidgetEntryView : View {
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.8))
             }
-            Spacer(minLength: 2)
 
-            VStack(spacing: 6) {
+            Spacer(minLength: 0)
+
+            // 中間：溫度資訊
+            VStack(spacing: 4) {
                 Text("\(Int(entry.weather.temperature))°")
-                    .font(.system(size: 44, weight: .thin))
+                    .font(.system(size: 40, weight: .thin))
                     .foregroundColor(.white)
                     .minimumScaleFactor(0.7)
 
                 Text("體感 \(Int(entry.weather.feelsLike))°")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.white.opacity(0.9))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 3)
                     .background(Color.white.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .frame(maxWidth: .infinity)
-            Spacer(minLength: 2)
 
-            HStack(spacing: 8) {
-                    InfoItem(label: "濕度", value: "\(Int(entry.weather.humidity))%")
-                    InfoItem(label: "風速", value: String(format: "%.1fm/s", entry.weather.windSpeed))
+            Spacer(minLength: 0)
+
+            // 底部：詳細資訊
+            HStack(spacing: 6) {
+                InfoItem(label: "濕度", value: "\(Int(entry.weather.humidity))%")
+                InfoItem(label: "風速", value: String(format: "%.1fm/s", entry.weather.windSpeed))
                 InfoItem(label: "風向", value: entry.weather.windDirection)
                 InfoItem(label: "降雨", value: String(format: "%.1fmm", entry.weather.rain))
             }
-            Spacer(minLength: 2)
 
+            // 氣象站資訊
             if !entry.weather.stationName.isEmpty {
                 Text("\(entry.weather.stationName)氣象站 · \(String(format: "%.1f", entry.weather.stationDistance))km")
-                    .font(.system(size: 10))
+                    .font(.system(size: 9))
                     .foregroundColor(.white.opacity(0.7))
                     .frame(maxWidth: .infinity, alignment: .center)
                     .lineLimit(1)
@@ -343,21 +345,16 @@ struct WeatherWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WeatherProvider()) { entry in
-            let content = WeatherWidgetEntryView(entry: entry)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
             if #available(iOS 17.0, *) {
-                content
+                WeatherWidgetEntryView(entry: entry)
+                    .padding(16)
                     .containerBackground(for: .widget) {
                         WeatherWidget.backgroundGradient
                     }
             } else {
-                content
-                    .background(
-                        WeatherWidget.backgroundGradient
-                            .cornerRadius(20)
-                    )
-                    .padding(6)
+                WeatherWidgetEntryView(entry: entry)
+                    .padding(16)
+                    .background(WeatherWidget.backgroundGradient)
             }
         }
         .configurationDisplayName("即時天氣")
