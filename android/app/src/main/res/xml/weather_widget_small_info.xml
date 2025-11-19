@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 小部件配置 (小方形版 2x2) -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="120dp"
+    android:minHeight="120dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/weather_widget_small"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="@string/weather_widget_small_description"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/weather_widget_small" />

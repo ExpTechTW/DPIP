@@ -70,6 +70,30 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
+        <!-- Weather Widget (標準版 4x3) -->
+        <receiver
+                android:name=".WeatherWidgetProvider"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/weather_widget_info"/>
+        </receiver>
+
+        <!-- Weather Widget Small (小方形版 2x2) -->
+        <receiver
+                android:name=".WeatherWidgetSmallProvider"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/weather_widget_small_info"/>
+        </receiver>
     </application>
     <queries>
         <intent>
