@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui' as ui;
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 
 final talker = TalkerManager.instance;
@@ -63,10 +62,18 @@ class WidgetService {
       // 5. 觸發小部件更新 (更新所有小部件變體)
       if (Platform.isAndroid) {
         // 更新標準版和小方形版
+        // 注意：在背景更新時，需要確保真正觸發 widget UI 更新
         await HomeWidget.updateWidget(androidName: _widgetNameAndroid);
         await HomeWidget.updateWidget(androidName: _widgetNameAndroidSmall);
+
+        // 額外確保：手動觸發 widget 更新（用於背景更新場景）
+        // 這會發送 APPWIDGET_UPDATE broadcast 來觸發 onUpdate 方法
+        await _forceAndroidWidgetUpdate();
       } else {
         await HomeWidget.updateWidget(iOSName: _widgetNameIOS);
+
+        // iOS: 主動請求 Timeline 重新載入
+        await _reloadIOSTimeline();
       }
 
       talker.info('[WidgetService] 小部件更新成功');
@@ -161,8 +168,10 @@ class WidgetService {
     if (Platform.isAndroid) {
       await HomeWidget.updateWidget(androidName: _widgetNameAndroid);
       await HomeWidget.updateWidget(androidName: _widgetNameAndroidSmall);
+      await _forceAndroidWidgetUpdate();
     } else {
       await HomeWidget.updateWidget(iOSName: _widgetNameIOS);
+      await _reloadIOSTimeline();
     }
   }
 
@@ -174,8 +183,39 @@ class WidgetService {
     if (Platform.isAndroid) {
       await HomeWidget.updateWidget(androidName: _widgetNameAndroid);
       await HomeWidget.updateWidget(androidName: _widgetNameAndroidSmall);
+      await _forceAndroidWidgetUpdate();
     } else {
       await HomeWidget.updateWidget(iOSName: _widgetNameIOS);
+      await _reloadIOSTimeline();
+    }
+  }
+
+  /// 強制觸發 Android widget 更新（用於背景更新場景）
+  /// 發送 APPWIDGET_UPDATE broadcast 來確保 widget UI 真正更新
+  static Future<void> _forceAndroidWidgetUpdate() async {
+    try {
+      const platform = MethodChannel('com.exptech.dpip/widget');
+      await platform.invokeMethod('updateWidgets');
+      talker.debug('[WidgetService] 已手動觸發 Android widget 更新');
+    } catch (e) {
+      // 如果方法通道不存在，使用備用方案：再次調用 updateWidget
+      talker.debug('[WidgetService] 方法通道不可用，使用備用更新方式: $e');
+      // 備用方案：再次調用 updateWidget 確保更新
+      await HomeWidget.updateWidget(androidName: _widgetNameAndroid);
+      await HomeWidget.updateWidget(androidName: _widgetNameAndroidSmall);
+    }
+  }
+
+  /// 重新載入 iOS widget Timeline
+  /// 使用 WidgetCenter 主動請求系統重新載入 Timeline
+  static Future<void> _reloadIOSTimeline() async {
+    try {
+      const platform = MethodChannel('com.exptech.dpip/widget');
+      await platform.invokeMethod('reloadWidgetTimeline');
+      talker.debug('[WidgetService] 已請求 iOS widget Timeline 重新載入');
+    } catch (e) {
+      talker.warning('[WidgetService] 無法重新載入 iOS Timeline: $e');
+      // iOS Timeline 會自動在設定的時間更新，這裡只是主動請求
     }
   }
 }
