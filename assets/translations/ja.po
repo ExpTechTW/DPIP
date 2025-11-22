@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-11-14 11:03\n"
+"PO-Revision-Date: 2025-11-22 17:11\n"
 
 #: ./lib/app/settings/location/page.dart:369
 msgid "所在地"
@@ -86,11 +86,11 @@ msgstr "設定"
 
 #: ./lib/core/service.dart:266
 msgid "正在更新位置"
-msgstr ""
+msgstr "位置を更新中"
 
 #: ./lib/core/service.dart:267
 msgid "取得 GPS 位置中..."
-msgstr ""
+msgstr "GPS 位置を取得中…"
 
 #: ./lib/app/settings/notify/page.dart:61
 msgid "接收全部"
@@ -292,11 +292,11 @@ msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:35
 msgid "所在地(鄉鎮)發布防災警訊時"
-msgstr ""
+msgstr "所在地（町・村）で防災警報を発表する時"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:38
 msgid "所在地(鄉鎮)發布防災資訊時"
-msgstr ""
+msgstr "所在地（町）が防災警報を発令した場合"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
@@ -310,11 +310,11 @@ msgstr "現在地（郷／鎮）に、上記以外の気象注意報・特別警
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "所在地(鄉鎮)發布山區暴雨時"
-msgstr ""
+msgstr "所在地（町）が山間部の豪雨警報を発令した場合"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "所在地(鄉鎮)發布雷雨即時訊息時"
-msgstr ""
+msgstr "所在地（町）が雷雨のリアルタイム情報を発令した場合"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
@@ -492,15 +492,15 @@ msgstr "すべての情報は、中央気象署（CWA）の公式発表を基準
 
 #: ./lib/app/settings/location/page.dart:73
 msgid "無法取得通知權限"
-msgstr ""
+msgstr "通知の権限を取得できません"
 
 #: ./lib/app/settings/location/page.dart:75
 msgid "無法取得位置權限"
-msgstr ""
+msgstr "位置情報の権限を取得できません"
 
 #: ./lib/app/settings/location/page.dart:76
 msgid "無法取得自啟動權限"
-msgstr ""
+msgstr "自動起動の権限を取得できません"
 
 #: ./lib/app/welcome/4-permissions/page.dart:166
 msgid "省電策略"
@@ -512,27 +512,27 @@ msgstr "権限を取得できませんでした"
 
 #: ./lib/app/settings/location/page.dart:82
 msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
-msgstr ""
+msgstr "自動位置機能を正常に動作させるには、DPIP に通知の権限を許可する必要があります。アプリの設定で「通知」権限を見つけて許可した後、もう一度お試しください。"
 
 #: ./lib/app/settings/location/page.dart:83
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
-msgstr ""
+msgstr "自動位置機能を正常に動作させるには、DPIP に位置情報の権限を許可する必要があります。アプリの設定で「位置」権限を見つけて許可した後、もう一度お試しください。"
 
 #: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
-msgstr ""
+msgstr "自動位置機能を正常に動作させるには、DPIP に常に位置情報の権限を許可する必要があります。アプリの設定で位置情報の権限を開き、「常に」を選択した後、もう一度お試しください。"
 
 #: ./lib/app/settings/location/page.dart:87
 msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
-msgstr ""
+msgstr "自動位置機能を正常に動作させるには、DPIP に位置情報の使用を常に許可する必要があります。アプリの設定で位置情報の権限を開き、「常に許可」を選択した後、もう一度お試しください。"
 
 #: ./lib/app/settings/location/page.dart:88
 msgid "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
-msgstr ""
+msgstr "より良い自動位置設定体験を得るために、DPIP がバックグラウンドで所在地情報を自動設定できるように、「自動起動の権限」を許可してください。"
 
 #: ./lib/app/settings/location/page.dart:89
 msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
-msgstr ""
+msgstr "より良い自動位置設定体験を得るために、DPIP がバックグラウンドで所在地情報を自動更新できるよう、動作を「制限なし」にしてください。"
 
 #: ./lib/app/settings/location/page.dart:90
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
