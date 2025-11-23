@@ -230,7 +230,7 @@ class _ForecastCardState extends State<ForecastCard> {
             },
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: isExpanded ? 10 : 14),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: isExpanded ? 10 : 14),
               decoration: BoxDecoration(
                 color: isExpanded ? context.colors.surfaceContainerHighest.withValues(alpha: 0.3) : null,
                 borderRadius: BorderRadius.circular(10),
@@ -242,7 +242,7 @@ class _ForecastCardState extends State<ForecastCard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 48,
+                        width: 54,
                         child: Text(
                           time,
                           style: context.theme.textTheme.bodySmall?.copyWith(
@@ -254,7 +254,7 @@ class _ForecastCardState extends State<ForecastCard> {
                         ),
                       ),
                       SizedBox(
-                        width: 120,
+                        width: 135,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 4,
