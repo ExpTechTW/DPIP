@@ -1,10 +1,9 @@
 import 'dart:math';
+import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-
-import '../../../utils/log.dart';
 
 class ForecastCard extends StatefulWidget {
   final Map<String, dynamic> forecast;
@@ -194,6 +193,7 @@ class _ForecastCardState extends State<ForecastCard> {
       TalkerManager.instance.error('Failed to render forecast card', e, s);
       context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('無法載入天氣預報'.i18n)));
     }
+    return const SizedBox.shrink();
   }
 
   Widget _buildForecastItem(
