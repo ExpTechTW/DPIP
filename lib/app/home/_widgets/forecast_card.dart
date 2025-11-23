@@ -19,6 +19,7 @@ class _ForecastCardState extends State<ForecastCard> {
   final Set<int> _expandedItems = {};
   final Map<int, double> _measuredHeights = {};
   final Map<int, GlobalKey> _pageKeys = {};
+  final Set<int> _measuringPages = {};
   List<List<dynamic>> _pages = [];
 
   @override
@@ -141,19 +142,23 @@ class _ForecastCardState extends State<ForecastCard> {
                           _pageKeys[pageIndex] = GlobalKey();
                         }
                         final key = _pageKeys[pageIndex]!;
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (key.currentContext != null && mounted) {
-                            final RenderBox? box = key.currentContext!.findRenderObject() as RenderBox?;
-                            if (box != null && box.hasSize) {
-                              final measuredHeight = box.size.height;
-                              if (_measuredHeights[pageIndex] != measuredHeight) {
-                                setState(() {
-                                  _measuredHeights[pageIndex] = measuredHeight;
-                                });
-                              }
+                        if (!_measuredHeights.containsKey(pageIndex) && !_measuringPages.contains(pageIndex)) {
+                          _measuringPages.add(pageIndex);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!mounted) return;
+                            final ctx = key.currentContext;
+                            if (ctx == null) return;
+                            final box = ctx.findRenderObject() as RenderBox?;
+                            if (box == null || !box.hasSize) return;
+                            final h = box.size.height;
+                            if (!_measuredHeights.containsKey(pageIndex)) {
+                              setState(() {
+                                _measuredHeights[pageIndex] = h;
+                              });
                             }
-                          }
-                        });
+                            _measuringPages.remove(pageIndex);
+                          });
+                        }
                         return SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
                           child: Padding(
@@ -220,9 +225,9 @@ class _ForecastCardState extends State<ForecastCard> {
                 if (isExpanded) {
                   _expandedItems.remove(index);
                 } else {
-                  _expandedItems.clear();
-                  _expandedItems.add(index);
-                  _measuredHeights.clear();
+                  _expandedItems
+                    ..clear()
+                    ..add(index);
                 }
                 final pageIndex = index ~/ 4;
                 _measuredHeights.remove(pageIndex);
