@@ -11,6 +11,7 @@ import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/home/_widgets/date_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
+import 'package:dpip/app/home/_widgets/forecast_card.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
@@ -28,6 +29,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,13 +42,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  final _locationButtonKey = GlobalKey();
 
   Key? _mapKey;
   bool _isLoading = false;
   bool _isOutOfService = false;
   bool _wasVisible = true;
+  double? _locationButtonHeight;
 
   RealtimeWeather? _weather;
+  Map<String, dynamic>? _forecast;
   List<History>? _history;
   List<History>? _realtimeRegion;
   HomeMode _currentMode = HomeMode.localActive;
@@ -113,6 +118,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _isLoading = true;
       _isOutOfService = isOutOfService;
       _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
+      if (_lastRefreshCode != code) {
+        _weather = null;
+        _forecast = null;
+      }
     });
 
     _refreshIndicatorKey.currentState?.show();
@@ -131,12 +140,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       await updateLocationFromGPS();
     } else {
       await Preference.reload();
+      final code = Preference.locationCode;
+      if (code != null) {
+        final location = Global.location[code];
+        if (location != null) {
+          Preference.locationLatitude = location.lat;
+          Preference.locationLongitude = location.lng;
+        }
+      }
       GlobalProviders.location.refresh();
     }
   }
 
   bool _shouldSkipRefresh(String? code) {
-    if (_lastRefreshCode != code) return false;
+    if (_lastRefreshCode != code) {
+      _lastRefreshCode = code;
+      _lastRefreshTime = null;
+      return false;
+    }
     if (_lastRefreshTime == null) return false;
 
     final timeSinceLastRefresh = DateTime.now().difference(_lastRefreshTime!);
@@ -154,13 +175,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _fetchWeather(String? code) async {
     if (code == null) {
-      if (mounted) setState(() => _weather = null);
+      if (mounted)
+        setState(() {
+          _weather = null;
+          _forecast = null;
+        });
       return;
     }
 
     try {
-      final weather = await ExpTech().getWeatherRealtime(code);
-      if (mounted) setState(() => _weather = weather);
+      LatLng? coords;
+      if (Preference.locationLatitude != null && Preference.locationLongitude != null) {
+        coords = LatLng(Preference.locationLatitude!, Preference.locationLongitude!);
+      } else {
+        coords = GlobalProviders.location.coordinates;
+      }
+
+      if (coords != null) {
+        final weather = await ExpTech().getWeatherRealtimeByCoords(coords.latitude, coords.longitude);
+        if (mounted) setState(() => _weather = weather);
+      } else {
+        if (mounted) setState(() => _weather = null);
+      }
+
+      final forecast = await ExpTech().getWeatherForecast(code);
+      if (mounted) setState(() => _forecast = forecast);
     } catch (e, s) {
       if (!mounted) return;
       TalkerManager.instance.error('_HomePageState._fetchWeather', e, s);
@@ -219,15 +258,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     _wasVisible = isVisible;
 
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _locationButtonKey.currentContext != null) {
+        final RenderBox? box = _locationButtonKey.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null && box.hasSize) {
+          final newHeight = box.size.height;
+          if (_locationButtonHeight != newHeight) {
+            setState(() {
+              _locationButtonHeight = newHeight;
+            });
+          }
+        }
+      }
+    });
+
     return Stack(
       children: [
         RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: _refresh,
-          edgeOffset: 24 + 48 + context.padding.top,
           child: ListView(
+            padding: EdgeInsets.only(
+              top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
+            ),
             children: [
-              SizedBox(height: 24 + 48 + context.padding.top),
               _buildWeatherHeader(),
               if (!_isLoading) ..._buildRealtimeInfo(),
               _buildRadarMap(),
@@ -235,12 +291,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
           ),
         ),
-        const Positioned(
-          top: 24,
+        Positioned(
+          top: 16,
           left: 0,
           right: 0,
           child: SafeArea(
-            child: Align(alignment: Alignment.topCenter, child: LocationButton()),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: LocationButton(key: _locationButtonKey),
+            ),
           ),
         ),
       ],
@@ -248,15 +307,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildWeatherHeader() {
+    final code = GlobalProviders.location.code;
+
     if (_isLoading) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader.skeleton(context));
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
     }
     if (_weather != null) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader(_weather!));
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader(_weather!));
     }
+
     if (_isOutOfService) {
       return const Padding(padding: EdgeInsets.all(16), child: LocationOutOfServiceCard());
     }
+
+    if (code != null) {
+      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
+    }
+
     return const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard());
   }
 
@@ -271,6 +338,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Padding(padding: const EdgeInsets.all(16), child: EewCard(GlobalProviders.data.eew[index])),
         ),
       if (_thunderstorm != null) Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
+      if (_forecast != null) ForecastCard(_forecast!),
     ];
   }
 

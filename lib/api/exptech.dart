@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/api/model/eew.dart';
@@ -242,18 +243,45 @@ class ExpTech {
     return jsonData.map((item) => WeatherStation.fromJson(item as Map<String, dynamic>)).toList();
   }
 
-  Future<RealtimeWeather> getWeatherRealtime(String region) async {
-    final requestUrl = Routes.weatherRealtime(region);
+  Future<RealtimeWeather> getWeatherRealtimeByCoords(double lat, double lon) async {
+    final requestUrl = Routes.weatherRealtimeByCoords(lat, lon);
+
+    TalkerManager.instance.debug('🌐 API: GET $requestUrl');
 
     final res = await _sharedClient.get(requestUrl);
+
+    TalkerManager.instance.debug('🌐 API: Response status=${res.statusCode}, body length=${res.body.length}');
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
+    TalkerManager.instance.debug('🌐 API: JSON decoded successfully');
 
-    return RealtimeWeather.fromJson(json);
+    final weather = RealtimeWeather.fromJson(json);
+    TalkerManager.instance.debug('🌐 API: RealtimeWeather.fromJson completed');
+
+    return weather;
+  }
+
+  Future<Map<String, dynamic>> getWeatherForecast(String region) async {
+    final requestUrl = Routes.weatherForecast(region);
+
+    TalkerManager.instance.debug('🌐 Forecast API: GET $requestUrl');
+
+    final res = await _sharedClient.get(requestUrl);
+
+    TalkerManager.instance.debug('🌐 Forecast API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    if (res.statusCode != 200) {
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+    }
+
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
+    TalkerManager.instance.debug('🌐 Forecast API: Response JSON: $json');
+
+    return json;
   }
 
   Future<List<String>> getRainList() async {

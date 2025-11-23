@@ -33,6 +33,9 @@ import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
+import 'package:dpip/app/welcome/2-exptech/page.dart';
+import 'package:dpip/app/welcome/3-notice/page.dart';
+import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
@@ -55,6 +58,42 @@ class WelcomeRoute extends GoRouteData with $WelcomeRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WelcomeAboutPage();
+  }
+}
+
+/// Welcome ExpTech route - displays ExpTech introduction page.
+@TypedGoRoute<WelcomeExptechRoute>(path: '/welcome/exptech')
+class WelcomeExptechRoute extends GoRouteData with $WelcomeExptechRoute {
+  /// Creates a [WelcomeExptechRoute].
+  const WelcomeExptechRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const WelcomeExpTechPage();
+  }
+}
+
+/// Welcome Notice route - displays notice/disclaimer page.
+@TypedGoRoute<WelcomeNoticeRoute>(path: '/welcome/notice')
+class WelcomeNoticeRoute extends GoRouteData with $WelcomeNoticeRoute {
+  /// Creates a [WelcomeNoticeRoute].
+  const WelcomeNoticeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const WelcomeNoticePage();
+  }
+}
+
+/// Welcome Permissions route - displays permissions request page.
+@TypedGoRoute<WelcomePermissionsRoute>(path: '/welcome/permissions')
+class WelcomePermissionsRoute extends GoRouteData with $WelcomePermissionsRoute {
+  /// Creates a [WelcomePermissionsRoute].
+  const WelcomePermissionsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const WelcomePermissionPage();
   }
 }
 
