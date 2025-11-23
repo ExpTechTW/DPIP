@@ -10,13 +10,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-11-14 11:03\n"
+"PO-Revision-Date: 2025-11-23 12:03\n"
 
-#: ./lib/app/settings/location/page.dart:369
+#: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
 msgstr "현재 지역"
 
-#: ./lib/app/settings/location/page.dart:416
+#: ./lib/app/settings/location/page.dart:420
 msgid "新增地點"
 msgstr "위치 추가"
 
@@ -40,7 +40,7 @@ msgstr "지도"
 msgid "通知"
 msgstr "알림"
 
-#: ./lib/app/settings/notify/page.dart:162
+#: ./lib/app/settings/notify/page.dart:153
 msgid "緊急地震速報"
 msgstr "긴급 지진 속보"
 
@@ -48,11 +48,11 @@ msgstr "긴급 지진 속보"
 msgid "強震監視器"
 msgstr "강진 모니터"
 
-#: ./lib/app/map/_lib/managers/report.dart:815
+#: ./lib/app/map/_lib/managers/report.dart:814
 msgid "地震報告"
 msgstr "지진 보고"
 
-#: ./lib/app/settings/notify/page.dart:206
+#: ./lib/app/settings/notify/page.dart:197
 msgid "震度速報"
 msgstr "진도 속보"
 
@@ -60,11 +60,11 @@ msgstr "진도 속보"
 msgid "雷雨即時訊息"
 msgstr "실시간 뇌우 정보"
 
-#: ./lib/app/settings/notify/page.dart:237
+#: ./lib/app/settings/notify/page.dart:228
 msgid "天氣警特報"
 msgstr "기상특보"
 
-#: ./lib/app/settings/notify/page.dart:250
+#: ./lib/app/settings/notify/page.dart:241
 msgid "防災資訊"
 msgstr "방재 정보"
 
@@ -92,11 +92,11 @@ msgstr ""
 msgid "取得 GPS 位置中..."
 msgstr ""
 
-#: ./lib/app/settings/notify/page.dart:61
+#: ./lib/app/settings/notify/page.dart:52
 msgid "接收全部"
 msgstr "모두 수신"
 
-#: ./lib/app/settings/notify/page.dart:60
+#: ./lib/app/settings/notify/page.dart:51
 msgid "關閉"
 msgstr "닫기"
 
@@ -104,23 +104,23 @@ msgstr "닫기"
 msgid "接收類別"
 msgstr "수신 카테고리"
 
-#: ./lib/app/settings/notify/page.dart:45
+#: ./lib/app/settings/notify/page.dart:36
 msgid "所在地震度1以上"
 msgstr "현재 위치 진도 1 이상"
 
-#: ./lib/app/settings/notify/page.dart:56
+#: ./lib/app/settings/notify/page.dart:47
 msgid "海嘯消息、海嘯警報"
 msgstr "해일 정보, 해일 경보"
 
-#: ./lib/app/settings/notify/page.dart:55
+#: ./lib/app/settings/notify/page.dart:46
 msgid "只接收海嘯警報"
 msgstr "해일 경보만 수신"
 
-#: ./lib/app/settings/notify/page.dart:51
+#: ./lib/app/settings/notify/page.dart:42
 msgid "接收所在地"
 msgstr "현재 위치 수신"
 
-#: ./lib/app/settings/notify/page.dart:38
+#: ./lib/app/settings/notify/page.dart:29
 msgid "所在地震度4以上"
 msgstr "현재 위치 진도 4 이상"
 
@@ -136,15 +136,15 @@ msgstr "공지 발송 시"
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "사운드 테스트는 기기에서 수행되는 로컬 알림입니다. 기기가 알림을 수신했을 때 음향 효과를 정상적으로 재생할 수 있는지 확인하는 데만 사용됩니다. 이 테스트는 요청을 서버에 전송하지 않습니다"
 
-#: ./lib/app/settings/notify/page.dart:91
+#: ./lib/app/settings/notify/page.dart:82
 msgid "伺服器排隊中，請稍候…"
 msgstr "서버 대기 중입니다. 잠시만 기다려 주세요…"
 
-#: ./lib/app/settings/notify/page.dart:149
+#: ./lib/app/settings/notify/page.dart:140
 msgid "請先設定所在地來使用通知功能"
 msgstr "알림 기능을 사용하시려면 먼저 위치를 설정해 주세요"
 
-#: ./lib/app/settings/notify/page.dart:156
+#: ./lib/app/settings/notify/page.dart:147
 msgid "地震速報"
 msgstr "지진 속보"
 
@@ -152,7 +152,7 @@ msgstr "지진 속보"
 msgid "地震"
 msgstr "지진"
 
-#: ./lib/app/settings/notify/page.dart:218
+#: ./lib/app/settings/notify/page.dart:209
 msgid "天氣"
 msgstr "날씨"
 
@@ -160,7 +160,7 @@ msgstr "날씨"
 msgid "海嘯"
 msgstr "해일"
 
-#: ./lib/app/settings/notify/page.dart:280
+#: ./lib/app/settings/notify/page.dart:271
 msgid "其他"
 msgstr "기타"
 
@@ -579,8 +579,12 @@ msgstr ""
 msgid "省電策略已被拒絕，請移至設定允許權限。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:408
+#: ./lib/app/settings/location/select/[city]/page.dart:91
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:430
+msgid "完成新增地點後，請務必要在上方地點清單中選擇並顯示打勾才能完成。"
 msgstr ""
 
 #: ./lib/app/settings/location/select/page.dart:35
@@ -691,6 +695,38 @@ msgstr "확인"
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
 msgstr "현재 위치 부근 강한 뇌우 또는 비. <bold>{time}</bold>까지 계속될 수 있으니 주의."
 
+#: ./lib/app/home/_widgets/forecast_card.dart:78
+msgid "天氣預報(24h)"
+msgstr ""
+
+#: ./lib/app/home/_widgets/forecast_card.dart:195
+msgid "無法載入天氣預報"
+msgstr ""
+
+#: ./lib/app/home/_widgets/forecast_card.dart:405
+msgid "體感"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:144
+msgid "風速"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:151
+msgid "風向"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:158
+msgid "風級"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:137
+msgid "濕度"
+msgstr ""
+
+#: ./lib/app/home/_widgets/forecast_card.dart:440
+msgid "降雨機率"
+msgstr ""
+
 #: ./lib/app/home/_widgets/location_out_of_service.dart:24
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "서비스 지역 외에서는 사용할 수 없으며, 대만에서만 이용 가능합니다"
@@ -699,9 +735,29 @@ msgstr "서비스 지역 외에서는 사용할 수 없으며, 대만에서만 �
 msgid "尚未設定"
 msgstr "설정되지 않음"
 
-#: ./lib/app/home/_widgets/weather_header.dart:133
-msgid "體感約 {apparent}°"
-msgstr "체감 온도 {apparent}"
+#: ./lib/app/home/_widgets/weather_header.dart:165
+msgid "氣壓"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:172
+msgid "降雨"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:179
+msgid "能見度"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:187
+msgid "陣風"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:195
+msgid "陣風級"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:203
+msgid "日照"
+msgstr ""
 
 #: ./lib/app/home/_widgets/location_not_set_card.dart:30
 msgid "尚未設定所在地"
@@ -755,7 +811,7 @@ msgstr " 초"
 msgid "抵達"
 msgstr "도착"
 
-#: ./lib/app/home/page.dart:88
+#: ./lib/app/home/page.dart:95
 msgid "已更新至 {version}"
 msgstr "{version} 업데이트"
 
@@ -763,7 +819,7 @@ msgstr "{version} 업데이트"
 msgid "取得天氣異常"
 msgstr "날씨 이상 정보 확인"
 
-#: ./lib/app/home/page.dart:185
+#: ./lib/app/home/page.dart:243
 msgid "取得歷史資訊異常"
 msgstr ""
 
@@ -775,7 +831,7 @@ msgstr "업데이트 로그를 불러올 수 없습니다. 나중에 다시 시�
 msgid "重試"
 msgstr "다시 시도"
 
-#: ./lib/app/welcome/4-permissions/page.dart:362
+#: ./lib/app/welcome/4-permissions/page.dart:367
 msgid "下一步"
 msgstr "다음 단계"
 
@@ -847,19 +903,36 @@ msgstr "이미지 저장"
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
 msgstr "대만 기상청 또는 ExpTech에서 제공하는 데이터 시각화 이미지를 저장하는 데 사용"
 
-#: ./lib/app/welcome/4-permissions/page.dart:340
+#: ./lib/app/welcome/4-permissions/page.dart:325
 msgid "權限請求"
 msgstr "권한 요청"
 
-#: ./lib/app/welcome/4-permissions/page.dart:341
+#: ./lib/app/welcome/4-permissions/page.dart:326
 msgid "需要使用者手動到設定開啟相關權限。"
 msgstr "사용자가 수동으로 설정에서 관련 권한을 활성화해야 합니다."
 
-#: ./lib/app/welcome/4-permissions/page.dart:381
+#: ./lib/app/welcome/4-permissions/page.dart:346
+msgid "需要背景位置權限"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:348
+msgid "為了在背景持續提供即時防災資訊，DPIP 需要「永遠允許」位置權限。\n\n"
+"接下來系統會引導您到設定頁面，請選擇「永遠允許」選項。"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:353
+msgid "稍後"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:354
+msgid "前往設定"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:386
 msgid "權限"
 msgstr "권한"
 
-#: ./lib/app/welcome/4-permissions/page.dart:394
+#: ./lib/app/welcome/4-permissions/page.dart:399
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
 msgstr "우리는 항상 사용자와 함께하며 사용자의 프라이버시를 위해 끊임없이 노력합니다."
 
@@ -1007,59 +1080,59 @@ msgstr ""
 msgid "目前沒有生效中的地震速報"
 msgstr "현재 유효 지진 속보 없음"
 
-#: ./lib/app/map/_lib/managers/report.dart:368
+#: ./lib/app/map/_lib/managers/report.dart:367
 msgid "近期的地震報告"
 msgstr "최근 지진 현황"
 
-#: ./lib/app/map/_lib/managers/report.dart:373
+#: ./lib/app/map/_lib/managers/report.dart:372
 msgid "更多"
 msgstr "더 보기"
 
-#: ./lib/app/map/_lib/managers/report.dart:596
+#: ./lib/app/map/_lib/managers/report.dart:595
 msgid "編號 {number} 顯著有感地震"
 msgstr "번호 {number} 강한 체감 지진"
 
-#: ./lib/app/map/_lib/managers/report.dart:597
+#: ./lib/app/map/_lib/managers/report.dart:596
 msgid "小區域有感地震"
 msgstr "소구역 체감 지진"
 
-#: ./lib/app/map/_lib/managers/report.dart:653
+#: ./lib/app/map/_lib/managers/report.dart:652
 msgid "地震規模"
 msgstr "지진 규모"
 
-#: ./lib/app/map/_lib/managers/report.dart:675
+#: ./lib/app/map/_lib/managers/report.dart:674
 msgid "震源深度"
 msgstr "진원 깊이"
 
-#: ./lib/app/map/_lib/managers/report.dart:612
+#: ./lib/app/map/_lib/managers/report.dart:611
 msgid "報告頁面"
 msgstr "보고 페이지"
 
-#: ./lib/app/map/_lib/managers/report.dart:636
+#: ./lib/app/map/_lib/managers/report.dart:635
 msgid "發震時間"
 msgstr "지진 발생 시간"
 
-#: ./lib/app/map/_lib/managers/report.dart:643
+#: ./lib/app/map/_lib/managers/report.dart:642
 msgid "位於"
 msgstr "에 위치"
 
-#: ./lib/app/map/_lib/managers/report.dart:699
+#: ./lib/app/map/_lib/managers/report.dart:698
 msgid "各地震度"
 msgstr "각 지역 진도"
 
-#: ./lib/app/map/_lib/managers/report.dart:770
+#: ./lib/app/map/_lib/managers/report.dart:769
 msgid "地震報告圖"
 msgstr "지진 보고"
 
-#: ./lib/app/map/_lib/managers/report.dart:780
+#: ./lib/app/map/_lib/managers/report.dart:779
 msgid "震度圖"
 msgstr "진도"
 
-#: ./lib/app/map/_lib/managers/report.dart:790
+#: ./lib/app/map/_lib/managers/report.dart:789
 msgid "最大地動加速度圖"
 msgstr "최대 지반 가속도"
 
-#: ./lib/app/map/_lib/managers/report.dart:800
+#: ./lib/app/map/_lib/managers/report.dart:799
 msgid "最大地動速度圖"
 msgstr "최대 지반 속도"
 
@@ -1135,43 +1208,43 @@ msgstr "이미지 저장 완료"
 msgid "儲存圖片時發生錯誤"
 msgstr "이미지 저장 중 오류"
 
-#: ./lib/utils/extensions/int.dart:12
+#: ./lib/utils/extensions/number.dart:25
 msgid "０級"
 msgstr "０급"
 
-#: ./lib/utils/extensions/int.dart:13
+#: ./lib/utils/extensions/number.dart:26
 msgid "１級"
 msgstr "１급"
 
-#: ./lib/utils/extensions/int.dart:14
+#: ./lib/utils/extensions/number.dart:27
 msgid "２級"
 msgstr "２급"
 
-#: ./lib/utils/extensions/int.dart:15
+#: ./lib/utils/extensions/number.dart:28
 msgid "３級"
 msgstr "３급"
 
-#: ./lib/utils/extensions/int.dart:16
+#: ./lib/utils/extensions/number.dart:29
 msgid "４級"
 msgstr "４급"
 
-#: ./lib/utils/extensions/int.dart:17
+#: ./lib/utils/extensions/number.dart:30
 msgid "５弱"
 msgstr "５약"
 
-#: ./lib/utils/extensions/int.dart:18
+#: ./lib/utils/extensions/number.dart:31
 msgid "５強"
 msgstr "５강"
 
-#: ./lib/utils/extensions/int.dart:19
+#: ./lib/utils/extensions/number.dart:32
 msgid "６弱"
 msgstr "６약"
 
-#: ./lib/utils/extensions/int.dart:20
+#: ./lib/utils/extensions/number.dart:33
 msgid "６強"
 msgstr "６강"
 
-#: ./lib/utils/extensions/int.dart:21
+#: ./lib/utils/extensions/number.dart:34
 msgid "７級"
 msgstr "７급"
 
