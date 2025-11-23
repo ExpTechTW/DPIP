@@ -10,51 +10,51 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-11-14 11:03\n"
+"PO-Revision-Date: 2025-11-22 17:11\n"
 
 #: ./lib/app/settings/location/page.dart:369
 msgid "所在地"
-msgstr ""
+msgstr "Местоположение"
 
 #: ./lib/app/settings/location/page.dart:416
 msgid "新增地點"
-msgstr ""
+msgstr "Добавить место"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
-msgstr ""
+msgstr "Тема"
 
 #: ./lib/app/settings/page.dart:60
 msgid "語言"
-msgstr ""
+msgstr "Язык"
 
 #: ./lib/app/settings/page.dart:68
 msgid "單位"
-msgstr ""
+msgstr "Единица"
 
 #: ./lib/app/settings/map/page.dart:66
 msgid "地圖"
-msgstr ""
+msgstr "Карта"
 
 #: ./lib/app/welcome/4-permissions/page.dart:152
 msgid "通知"
-msgstr ""
+msgstr "Уведомление"
 
 #: ./lib/app/settings/notify/page.dart:162
 msgid "緊急地震速報"
-msgstr ""
+msgstr "Экстренное предупреждение о землетрясении"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1301
 msgid "強震監視器"
-msgstr ""
+msgstr "Система слежения за сильными толчками"
 
 #: ./lib/app/map/_lib/managers/report.dart:815
 msgid "地震報告"
-msgstr ""
+msgstr "Отчет о землетрясении"
 
 #: ./lib/app/settings/notify/page.dart:206
 msgid "震度速報"
-msgstr ""
+msgstr "Срочное предупреждение о магнитуде землетрясения"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:57
 msgid "雷雨即時訊息"

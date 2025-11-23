@@ -4,6 +4,8 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../utils/log.dart';
+
 class ForecastCard extends StatefulWidget {
   final Map<String, dynamic> forecast;
 
@@ -19,6 +21,7 @@ class _ForecastCardState extends State<ForecastCard> {
   final Set<int> _expandedItems = {};
   final Map<int, double> _measuredHeights = {};
   final Map<int, GlobalKey> _pageKeys = {};
+  final Set<int> _measuringPages = {};
   List<List<dynamic>> _pages = [];
 
   @override
@@ -141,19 +144,23 @@ class _ForecastCardState extends State<ForecastCard> {
                           _pageKeys[pageIndex] = GlobalKey();
                         }
                         final key = _pageKeys[pageIndex]!;
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (key.currentContext != null && mounted) {
-                            final RenderBox? box = key.currentContext!.findRenderObject() as RenderBox?;
-                            if (box != null && box.hasSize) {
-                              final measuredHeight = box.size.height;
-                              if (_measuredHeights[pageIndex] != measuredHeight) {
-                                setState(() {
-                                  _measuredHeights[pageIndex] = measuredHeight;
-                                });
-                              }
+                        if (!_measuredHeights.containsKey(pageIndex) && !_measuringPages.contains(pageIndex)) {
+                          _measuringPages.add(pageIndex);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!mounted) return;
+                            final ctx = key.currentContext;
+                            if (ctx == null) return;
+                            final box = ctx.findRenderObject() as RenderBox?;
+                            if (box == null || !box.hasSize) return;
+                            final h = box.size.height;
+                            if (!_measuredHeights.containsKey(pageIndex)) {
+                              setState(() {
+                                _measuredHeights[pageIndex] = h;
+                              });
                             }
-                          }
-                        });
+                            _measuringPages.remove(pageIndex);
+                          });
+                        }
                         return SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
                           child: Padding(
@@ -183,8 +190,9 @@ class _ForecastCardState extends State<ForecastCard> {
           ],
         ),
       );
-    } catch (e) {
-      return const SizedBox.shrink();
+    } catch (e, s) {
+      TalkerManager.instance.error('Failed to render forecast card', e, s);
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('無法載入天氣預報'.i18n)));
     }
   }
 
@@ -220,9 +228,9 @@ class _ForecastCardState extends State<ForecastCard> {
                 if (isExpanded) {
                   _expandedItems.remove(index);
                 } else {
-                  _expandedItems.clear();
-                  _expandedItems.add(index);
-                  _measuredHeights.clear();
+                  _expandedItems
+                    ..clear()
+                    ..add(index);
                 }
                 final pageIndex = index ~/ 4;
                 _measuredHeights.remove(pageIndex);
@@ -230,7 +238,7 @@ class _ForecastCardState extends State<ForecastCard> {
             },
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: isExpanded ? 10 : 14),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: isExpanded ? 10 : 14),
               decoration: BoxDecoration(
                 color: isExpanded ? context.colors.surfaceContainerHighest.withValues(alpha: 0.3) : null,
                 borderRadius: BorderRadius.circular(10),
@@ -242,7 +250,7 @@ class _ForecastCardState extends State<ForecastCard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 48,
+                        width: 54,
                         child: Text(
                           time,
                           style: context.theme.textTheme.bodySmall?.copyWith(
@@ -254,7 +262,7 @@ class _ForecastCardState extends State<ForecastCard> {
                         ),
                       ),
                       SizedBox(
-                        width: 120,
+                        width: 135,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 4,
@@ -387,49 +395,49 @@ class _ForecastCardState extends State<ForecastCard> {
                           _buildDetailChip(
                             context,
                             Symbols.thermometer_rounded,
-                            '氣溫',
+                            '氣溫'.i18n,
                             '${temp.round()}°C',
                             Colors.orange,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.thermostat_rounded,
-                            '體感',
+                            '體感'.i18n,
                             '${apparent.round()}°C',
                             Colors.deepOrange,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.air_rounded,
-                            '風速',
+                            '風速'.i18n,
                             '${windSpeed}m/s',
                             context.colors.primary,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.explore_rounded,
-                            '風向',
+                            '風向'.i18n,
                             windDirection.isNotEmpty ? _convertWindDirection(windDirection) : '-',
                             context.colors.primary,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.wind_power_rounded,
-                            '風級',
-                            '${windBeaufort}級',
+                            '風級'.i18n,
+                            '${windBeaufort}級'.i18n,
                             Colors.teal,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.humidity_percentage_rounded,
-                            '濕度',
+                            '濕度'.i18n,
                             '${humidity.round()}%',
                             Colors.blue,
                           ),
                           _buildDetailChip(
                             context,
                             Symbols.rainy_rounded,
-                            '降雨機率',
+                            '降雨機率'.i18n,
                             '$pop%',
                             Colors.indigo,
                           ),
