@@ -213,7 +213,7 @@ Future<void> notifyInit() async {
         channelGroupKey: 'group_eq',
         channelKey: 'report-silence-v2',
         channelName: '地震報告 (無聲通知)',
-        channelDescription: '地震報告所在地震度 3 以下的地區',
+        channelDescription: '地震報告所在地震度 1 以上',
         groupAlertBehavior: GroupAlertBehavior.Children,
         importance: NotificationImportance.Min,
         defaultPrivacy: NotificationPrivacy.Public,
