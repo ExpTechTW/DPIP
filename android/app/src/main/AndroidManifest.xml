@@ -55,9 +55,9 @@
                 android:value="2"/>
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
         <meta-data android:name="com.exptech.dpip.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
-
+        
         <service
-                android:name="com.exptech.dpip.LocationForegroundService"
+                android:name=".LocationForegroundService"
                 android:enabled="true"
                 android:exported="false"
                 android:foregroundServiceType="location"/>

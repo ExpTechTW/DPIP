@@ -240,41 +240,28 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$showProcessingNotification() async {
     try {
-      try {
-        await LocationServiceManager.platform.invokeMethod('startService');
-      } catch (e, s) {
-        TalkerManager.instance.error('⚙️::BackgroundLocationService failed to start native foreground service', e, s);
-        try {
-          await AwesomeNotifications().createNotification(
-            content: NotificationContent(
-              id: LocationServiceManager.kNotificationId,
-              channelKey: 'background',
-              title: '正在更新位置'.i18n,
-              body: '取得 GPS 位置中...'.i18n,
-              icon: 'resource://drawable/ic_stat_name',
-              badge: 0,
-            ),
-          );
-        } catch (_) {}
-      }
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: LocationServiceManager.kNotificationId,
+          channelKey: 'background',
+          title: '正在更新位置'.i18n,
+          body: '取得 GPS 位置中...'.i18n,
+          icon: 'resource://drawable/ic_stat_name',
+          badge: 0,
+          notificationLayout: NotificationLayout.Default,
+        ),
+      );
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to show processing notification', e, s);
+      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to show notification', e, s);
     }
   }
 
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
-      try {
-        await LocationServiceManager.platform.invokeMethod('stopService');
-      } catch (e, s) {
-        TalkerManager.instance.error('⚙️::BackgroundLocationService failed to stop native foreground service', e, s);
-        try {
-          await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
-          await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
-          await AwesomeNotifications().dismissNotificationsByChannelKey('background');
-        } catch (_) {}
-      }
+      await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
+      await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
+      await AwesomeNotifications().dismissNotificationsByChannelKey('background');
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
     }
