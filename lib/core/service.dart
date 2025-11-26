@@ -248,6 +248,7 @@ class LocationService {
           body: '取得 GPS 位置中...'.i18n,
           icon: 'resource://drawable/ic_stat_name',
           badge: 0,
+          category: NotificationCategory.Service,
           notificationLayout: NotificationLayout.Default,
         ),
       );
