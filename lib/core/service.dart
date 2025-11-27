@@ -79,7 +79,37 @@ class LocationServiceManager {
       await _setUpdateInterval(kDefaultUpdateInterval);
 
       // 啟動前景服務
+    try {
       await platform.invokeMethod('startForegroundService');
+      try {
+        await AndroidAlarmManager.oneShot(
+          kDefaultUpdateInterval,
+          kAlarmId,
+          LocationService._$task,
+          wakeup: true,
+          exact: true,
+          rescheduleOnReboot: true,
+        );
+      } catch (_) {
+        // fallback alarm
+        try {
+          await AndroidAlarmManager.oneShot(
+            kDefaultUpdateInterval,
+            kAlarmId,
+            LocationService._$task,
+            wakeup: true,
+            rescheduleOnReboot: true,
+          );
+        } catch (e2, s2) {
+          TalkerManager.instance.error('Inexact alarm also failed', e2, s2);
+          await platform.invokeMethod('stopForegroundService');
+          rethrow;
+        }
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('Foreground service failed to start', e, s);
+      rethrow;
+    }
 
       await AndroidAlarmManager.oneShot(
         kDefaultUpdateInterval,
