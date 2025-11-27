@@ -109,9 +109,15 @@ void main() async {
   );
   if (!isFirstLaunch) {
     talker.log('🟢 非首次啟動 → 通知與 FCM 改為背景初始化');
-    unawaited(Future(() => fcmInit()));
-    unawaited(Future(() => notifyInit()));
-    unawaited(Future(() => updateInfoToServer()));
+    unawaited(Future(() async {
+      try {
+        await fcmInit();
+        await notifyInit();
+        await updateInfoToServer();
+      } catch (e, st) {
+        talker.error('背景初始化失敗: $e\n$st');
+      }
+    }));
   }
   final locationInitStart = DateTime.now();
   talker.log('🚀 5. 啟動 LocationServiceManager (並行背景執行)...');
