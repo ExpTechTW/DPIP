@@ -22,12 +22,9 @@ Future<void> fcmInit() async {
     );
     await AwesomeNotificationsFcm().requestFirebaseAppToken();
   } else if (Platform.isIOS) {
-    try {
-      Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
-    } finally {
-      if (!fcmReadyCompleter.isCompleted) {
-        fcmReadyCompleter.complete();
-      }
+    Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (!fcmReadyCompleter.isCompleted) {
+      fcmReadyCompleter.complete();
     }
   }
 }

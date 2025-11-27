@@ -53,7 +53,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
-    if (Platform.isIOS) return;
+    if (Platform.isAndroid) return;
     await fcmReadyCompleter.future;
     bool notificationAllowed = false;
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
