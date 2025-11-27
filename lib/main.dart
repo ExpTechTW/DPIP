@@ -21,6 +21,7 @@ import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart';
 
+final fcmReadyCompleter = Completer<void>();
 final talker = TalkerManager.instance;
 void main() async {
   final overallStartTime = DateTime.now();

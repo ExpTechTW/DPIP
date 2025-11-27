@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:dpip/main.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,7 +22,13 @@ Future<void> fcmInit() async {
     );
     await AwesomeNotificationsFcm().requestFirebaseAppToken();
   } else if (Platform.isIOS) {
-    Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
+    try {
+      Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
+    } finally {
+      if (!fcmReadyCompleter.isCompleted) {
+        fcmReadyCompleter.complete();
+      }
+    }
   }
 }
 

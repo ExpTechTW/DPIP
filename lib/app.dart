@@ -10,6 +10,7 @@ import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:provider/provider.dart';
 
+import 'main.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
@@ -52,19 +53,19 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
-    if (Platform.isIOS) {
-      bool notificationAllowed = false;
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      notificationAllowed = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional;
+    if (Platform.isIOS) return;
+    await fcmReadyCompleter.future;
+    bool notificationAllowed = false;
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    notificationAllowed = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional;
 
-      if (!Preference.isFirstLaunch && !notificationAllowed) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final ctx = router.routerDelegate.navigatorKey.currentContext;
-          if (ctx != null && mounted) {
-            ctx.go(WelcomePermissionPage.route);
-          }
-        });
-      }
+    if (!Preference.isFirstLaunch && !notificationAllowed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = router.routerDelegate.navigatorKey.currentContext;
+        if (ctx != null && mounted) {
+          ctx.go(WelcomePermissionPage.route);
+        }
+      });
     }
   }
 
@@ -89,12 +90,12 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     _checkUpdate();
     WidgetsBinding.instance.addObserver(this);
     GlobalProviders.data.startFetching();
+    _checkNotificationPermission();
     router.routerDelegate.addListener(_handlePendingNotificationWhenReady);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         _handlePendingNotificationWhenReady();
-        _checkNotificationPermission();
       });
     });
   }
