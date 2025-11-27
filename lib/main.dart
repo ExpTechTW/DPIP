@@ -64,7 +64,7 @@ void main() async {
   talker.log('✅ 3.並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitEnd.difference(futureWaitStart).inMilliseconds}ms');
 
   if (isFirstLaunch) {
-    talker.log('🟣 首次啟動 → 前置初始化 FCN + 通知');
+    talker.log('🟣 首次啟動 → 前置初始化 FCM + 通知');
     await Future.wait([
       _loggedTask('fcmInit', fcmInit()),
       _loggedTask('notifyInit', notifyInit()),
