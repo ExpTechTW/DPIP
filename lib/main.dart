@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/app.dart';
@@ -24,7 +25,7 @@ final talker = TalkerManager.instance;
 void main() async {
   final overallStartTime = DateTime.now();
   talker.log('--- 冷啟動偵測開始 ---');
-  talker.log('🔥 1. 主函數 (main) 啟動時間: ${overallStartTime.toIso8601String()}');
+  talker.log('🔥 1. (main) 啟動時間: ${overallStartTime.toIso8601String()}');
   WidgetsFlutterBinding.ensureInitialized();
   // iOS 14 以下改回用 StoreKit1
   InAppPurchaseStoreKitPlatform.enableStoreKit1();
@@ -34,44 +35,47 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     talker.handle(details.exception, details.stack);
-
     if (Platform.isAndroid) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(details);
     }
   };
 
   final globalInitStart = DateTime.now();
-  talker.log('⏳ 2. 啟動 Global.init()...');
+  talker.log('⏳ 2. 啟動 Global...');
   await Global.init();
   final globalInitEnd = DateTime.now();
-  final globalDuration = globalInitEnd.difference(globalInitStart).inMilliseconds;
-  talker.log('✅ 2. Global.init() 完成。耗時: ${globalDuration}ms');
+  talker.log('✅ 2. Global 完成。耗時: ${globalInitEnd.difference(globalInitStart).inMilliseconds}ms');
 
   await Preference.init();
+  final isFirstLaunch = Preference.instance.getBool('isFirstLaunch') ?? true;
   GlobalProviders.init();
   initializeTimeZones();
 
-  talker.log('⏳ 3. 啟動 Future.wait 並行任務... (測量總耗時)');
+  talker.log('⏳ 3. 啟動 並行任務... (測量總耗時)');
   final futureWaitStart = DateTime.now();
   await Future.wait([
     _loggedTask('DeviceInfo.init', DeviceInfo.init()),
     _loggedTask('AppLocalizations.load', AppLocalizations.load()),
     _loggedTask('LocationNameLocalizations.load', LocationNameLocalizations.load()),
     _loggedTask('WeatherStationLocalizations.load', WeatherStationLocalizations.load()),
-    _loggedTask('fcmInit', fcmInit()),
-    _loggedTask('notifyInit', notifyInit()),
-    _loggedTask('updateInfoToServer', updateInfoToServer()),
   ]);
 
   final futureWaitEnd = DateTime.now();
-  final futureWaitDuration = futureWaitEnd.difference(futureWaitStart).inMilliseconds;
-  talker.log('✅ 3. Future.wait 並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitDuration}ms');
+  talker.log('✅ 3.並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitEnd.difference(futureWaitStart).inMilliseconds}ms');
+
+  if (isFirstLaunch) {
+    talker.log('🟣 首次啟動 → 前置初始化 FCN + 通知');
+    await Future.wait([
+      _loggedTask('fcmInit', fcmInit()),
+      _loggedTask('notifyInit', notifyInit()),
+    ]);
+    unawaited(Future(() => updateInfoToServer()));
+    await Preference.instance.setBool('isFirstLaunch', false);
+  }
 
   final overallEndTime = DateTime.now();
-  final overallDuration = overallEndTime.difference(overallStartTime).inMilliseconds;
   talker.log('--- 冷啟動偵測結束 ---');
-  talker.log('🎉 4. 主函數執行完成 (準備呼叫 runApp)。');
-  talker.log('🚨 總初始化耗時 (Main 開始到 runApp 前): ${overallDuration}ms');
+  talker.log('🚨 總初始化耗時 (runApp 前): ${overallEndTime.difference(overallStartTime).inMilliseconds}ms');
 
   runApp(
     I18n(
@@ -103,19 +107,25 @@ void main() async {
       ),
     ),
   );
+  if (!isFirstLaunch) {
+    talker.log('🟢 非首次啟動 → 通知與 FCM 改為背景初始化');
+    unawaited(Future(() => fcmInit()));
+    unawaited(Future(() => notifyInit()));
+    unawaited(Future(() => updateInfoToServer()));
+  }
   final locationInitStart = DateTime.now();
-  talker.log('🚀 5. 啟動 LocationServiceManager.initalize() (並行背景執行)...');
-  // ***關鍵修改：移除 await***
+  talker.log('🚀 5. 啟動 LocationServiceManager (並行背景執行)...');
   final locationFuture = LocationServiceManager.initalize();
 
   locationFuture.whenComplete(() {
     final locationInitEnd = DateTime.now();
     final locationDuration = locationInitEnd.difference(locationInitStart).inMilliseconds;
-    talker.log('✅ 5. LocationServiceManager.initalize() 完成。耗時: ${locationDuration}ms');
+    talker.log('✅ 5. LocationServiceManager 完成。耗時: ${locationDuration}ms');
   }).catchError((e) {
-    talker.error('❌ 5. LocationServiceManager.initalize() 失敗。錯誤: $e');
+    talker.error('❌ 5. LocationServiceManager 失敗。錯誤: $e');
   });
 }
+
 Future<T> _loggedTask<T>(String taskName, Future<T> future) async {
   final start = DateTime.now();
   try {
@@ -128,6 +138,6 @@ Future<T> _loggedTask<T>(String taskName, Future<T> future) async {
     final end = DateTime.now();
     final duration = end.difference(start).inMilliseconds;
     talker.error('  [並行] 任務 "$taskName" 失敗。耗時: ${duration}ms', e);
-    rethrow; // 確保失敗時應用程式會報錯
+    rethrow;
   }
 }
