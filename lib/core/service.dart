@@ -17,28 +17,23 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-/// Background location service with foreground support
 class LocationServiceManager {
   LocationServiceManager._();
 
   static const int kAlarmId = 888888;
-  static const int kNotificationId = 888888;
+  static const int kNotificationId = 888999; // 前景服務通知ID
   static const String _kPrefKeyUpdateInterval = 'location_update_interval';
-
   static const Duration kMinUpdateInterval = Duration(minutes: 5);
   static const Duration kMaxUpdateInterval = Duration(minutes: 60);
   static const Duration kDefaultUpdateInterval = Duration(minutes: 10);
-
   static const double kHighMovementThreshold = 1000;
   static const double kLowMovementThreshold = 100;
 
   static const platform = MethodChannel('com.exptech.dpip/location');
-
   static bool get available => Platform.isAndroid || Platform.isIOS;
 
   static Future<void> initalize() async {
     if (!Platform.isAndroid) return;
-
     if (Preference.locationAuto != true) return;
 
     final permission = await Geolocator.checkPermission();
@@ -68,7 +63,6 @@ class LocationServiceManager {
     if (distanceInMeters == null) return kDefaultUpdateInterval;
     if (distanceInMeters >= kHighMovementThreshold) return kMinUpdateInterval;
     if (distanceInMeters >= kLowMovementThreshold) return kDefaultUpdateInterval;
-
     final currentInterval = _getUpdateInterval();
     final newInterval = Duration(minutes: currentInterval.inMinutes + 5);
     return newInterval > kMaxUpdateInterval ? kMaxUpdateInterval : newInterval;
@@ -76,15 +70,16 @@ class LocationServiceManager {
 
   static Future<void> start() async {
     if (!available) return;
-
     try {
       if (Platform.isIOS) {
         await platform.invokeMethod('toggleLocation', {'isEnabled': true});
         return;
       }
-
       await AndroidAlarmManager.cancel(kAlarmId);
       await _setUpdateInterval(kDefaultUpdateInterval);
+
+      // 啟動前景服務
+      await platform.invokeMethod('startForegroundService');
 
       await AndroidAlarmManager.oneShot(
         kDefaultUpdateInterval,
@@ -135,8 +130,10 @@ class LocationServiceManager {
         await platform.invokeMethod('toggleLocation', {'isEnabled': false});
         return;
       }
-
       await AndroidAlarmManager.cancel(kAlarmId);
+      // 停止前景服務
+      await platform.invokeMethod('stopForegroundService');
+
       await AwesomeNotifications().dismiss(kNotificationId);
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
@@ -190,8 +187,8 @@ class LocationService {
         return;
       }
 
-      // --- 前景通知開始 ---
-      await _$showProcessingNotification();
+      // 前景通知顯示
+      await LocationServiceManager.platform.invokeMethod('startForegroundService');
 
       _$geoJsonData ??= await Global.loadTownGeojson();
       _$locationData ??= await Global.loadLocationData();
@@ -199,7 +196,7 @@ class LocationService {
       final coordinates = await _$getDeviceGeographicalLocation();
       if (coordinates == null) {
         await _$updatePosition(null);
-        await _$dismissNotification();
+        await LocationServiceManager.platform.invokeMethod('stopForegroundService');
         return;
       }
 
@@ -226,123 +223,28 @@ class LocationService {
         '⚙️::BackgroundLocationService next update in ${nextInterval.inMinutes}min (distance: ${distanceInMeters?.toStringAsFixed(0) ?? "unknown"}m)',
       );
 
-      // --- 前景通知結束 ---
-      await _$dismissNotification();
+      // 更新完成 → 停止前景服務，通知消失
+      await LocationServiceManager.platform.invokeMethod('stopForegroundService');
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService task FAILED', e, s);
-      await _$dismissNotification();
       try {
         await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
       } catch (_) {}
+      await LocationServiceManager.platform.invokeMethod('stopForegroundService');
     }
   }
 
-  @pragma('vm:entry-point')
-  static Future<void> _$showProcessingNotification() async {
-    try {
-      await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: LocationServiceManager.kNotificationId,
-          channelKey: 'background',
-          title: '正在更新位置'.i18n,
-          body: '取得 GPS 位置中...'.i18n,
-          icon: 'resource://drawable/ic_stat_name',
-          badge: 0,
-          category: NotificationCategory.Service,
-          notificationLayout: NotificationLayout.Default,
-        ),
-      );
-    } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to show notification', e, s);
-    }
-  }
-
-  @pragma('vm:entry-point')
-  static Future<void> _$dismissNotification() async {
-    try {
-      await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
-      await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
-      await AwesomeNotifications().dismissNotificationsByChannelKey('background');
-    } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
-    }
-  }
-
-  @pragma('vm:entry-point')
-  static Future<LatLng?> _$getDeviceGeographicalLocation() async {
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted');
-      return null;
-    }
-
-    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!isLocationServiceEnabled) {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is not available');
-      return null;
-    }
-
-    try {
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null) {
-        final age = DateTime.now().difference(lastKnown.timestamp);
-        if (age.inMinutes < 10 && lastKnown.accuracy <= 500) {
-          return LatLng(lastKnown.latitude, lastKnown.longitude);
-        }
-      }
-    } catch (_) {}
-
-    try {
-      final lowAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 10),
-        ),
-      );
-      if (lowAccuracyPosition.accuracy <= 500) {
-        return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
-      }
-    } catch (_) {}
-
-    try {
-      final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 15),
-        ),
-      );
-      return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
-    } catch (_) {}
-
-    try {
-      final currentPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 30),
-        ),
-      );
-      return LatLng(currentPosition.latitude, currentPosition.longitude);
-    } catch (e) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed', e);
-      return null;
-    }
-  }
-
-  // --- 其餘原本 GeoJSON 判斷、updatePosition 保留不變 ---
+  // 其餘 GeoJSON 判斷、updatePosition 保留不變
   static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
     final geoJsonData = _$geoJsonData;
     final locationData = _$locationData;
-
     if (geoJsonData == null || locationData == null) return null;
-
     final features = geoJsonData.features;
 
     for (final feature in features) {
       if (feature == null) continue;
       final geometry = feature.geometry;
       if (geometry == null) continue;
-
       bool isInPolygon = false;
 
       if (geometry is GeoJSONPolygon) {
@@ -404,5 +306,65 @@ class LocationService {
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
+  }
+
+  @pragma('vm:entry-point')
+  static Future<LatLng?> _$getDeviceGeographicalLocation() async {
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted');
+      return null;
+    }
+    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!isLocationServiceEnabled) {
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is not available');
+      return null;
+    }
+
+    try {
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        final age = DateTime.now().difference(lastKnown.timestamp);
+        if (age.inMinutes < 10 && lastKnown.accuracy <= 500) {
+          return LatLng(lastKnown.latitude, lastKnown.longitude);
+        }
+      }
+    } catch (_) {}
+
+    try {
+      final lowAccuracyPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+      if (lowAccuracyPosition.accuracy <= 500) {
+        return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
+      }
+    } catch (_) {}
+
+    try {
+      final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
+    } catch (_) {}
+
+    try {
+      final currentPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 30),
+        ),
+      );
+      return LatLng(currentPosition.latitude, currentPosition.longitude);
+    } catch (e) {
+      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed', e);
+      return null;
+    }
   }
 }
