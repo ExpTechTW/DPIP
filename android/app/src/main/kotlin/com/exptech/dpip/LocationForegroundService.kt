@@ -19,32 +19,34 @@ class LocationForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("正在更新位置")
             .setContentText("取得 GPS 位置中...")
             .setSmallIcon(R.drawable.ic_stat_name)
-            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
             .build()
 
         startForeground(NOTIFICATION_ID, notification)
-    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
+            val channel = NotificationChannel(
                 CHANNEL_ID,
                 "DPIP Location Service",
                 NotificationManager.IMPORTANCE_MIN
             )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
+
+            val mgr = getSystemService(NotificationManager::class.java)
+            mgr.createNotificationChannel(channel)
         }
     }
 }

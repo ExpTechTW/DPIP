@@ -91,7 +91,6 @@ class LocationServiceManager {
   /// It schedules the first Alarm (exact preferred; fallback to inexact).
   static Future<void> start() async {
     if (!available) return;
-
     try {
       if (Platform.isIOS) {
         await platform.invokeMethod('toggleLocation', {'isEnabled': true});
@@ -100,8 +99,6 @@ class LocationServiceManager {
 
       await AndroidAlarmManager.cancel(kAlarmId);
       await _setUpdateInterval(kDefaultUpdateInterval);
-
-      // 嘗試用 exact oneShot（需要 SCHEDULE_EXACT_ALARM）
       try {
         await AndroidAlarmManager.oneShot(
           kDefaultUpdateInterval,
@@ -112,36 +109,16 @@ class LocationServiceManager {
           rescheduleOnReboot: true,
         );
       } catch (_) {
-        // fallback: 使用非 exact 的 oneShot（雖然不精確，但可用）
-        try {
-          await AndroidAlarmManager.oneShot(
-            kDefaultUpdateInterval,
-            kAlarmId,
-            LocationService._$task,
-            wakeup: true,
-            rescheduleOnReboot: true,
-          );
-        } catch (e2, s2) {
-          TalkerManager.instance.error('👷 starting inexact alarm also FAILED', e2, s2);
-          rethrow;
-        }
+        await AndroidAlarmManager.oneShot(
+          kDefaultUpdateInterval,
+          kAlarmId,
+          LocationService._$task,
+          wakeup: true,
+          rescheduleOnReboot: true,
+        );
       }
     } catch (e, s) {
-      TalkerManager.instance.error('👷 starting location service FAILED', e, s);
-      // 嘗試 fallback（之前的處理邏輯保留）
-      if (e.toString().contains('SCHEDULE_EXACT_ALARM')) {
-        try {
-          await AndroidAlarmManager.oneShot(
-            kDefaultUpdateInterval,
-            kAlarmId,
-            LocationService._$task,
-            wakeup: true,
-            rescheduleOnReboot: true,
-          );
-        } catch (e2, s2) {
-          TalkerManager.instance.error('👷 starting inexact alarm also FAILED', e2, s2);
-        }
-      }
+      TalkerManager.instance.error('👷 start failed', e, s);
     }
   }
 
@@ -158,19 +135,14 @@ class LocationServiceManager {
         rescheduleOnReboot: true,
       );
     } catch (e, s) {
-      TalkerManager.instance.error('👷 rescheduling alarm FAILED', e, s);
-      // fallback to inexact
-      try {
-        await AndroidAlarmManager.oneShot(
-          interval,
-          kAlarmId,
-          LocationService._$task,
-          wakeup: true,
-          rescheduleOnReboot: true,
-        );
-      } catch (e2, s2) {
-        TalkerManager.instance.error('👷 rescheduling inexact alarm FAILED', e2, s2);
-      }
+      TalkerManager.instance.error('👷 reschedule exact failed', e, s);
+      await AndroidAlarmManager.oneShot(
+        interval,
+        kAlarmId,
+        LocationService._$task,
+        wakeup: true,
+        rescheduleOnReboot: true,
+      );
     }
   }
 
