@@ -251,7 +251,7 @@ class LocationService {
           notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Service,
           displayOnForeground: false,
-          displayOnBackground: true,
+          displayOnBackground: false,
         ),
       );
     } catch (e, s) {
