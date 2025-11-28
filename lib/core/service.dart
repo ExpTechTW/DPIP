@@ -249,6 +249,7 @@ class LocationService {
           icon: 'resource://drawable/ic_stat_name',
           badge: 0,
           notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Service,
           displayOnForeground: false,
           displayOnBackground: true,
         ),
