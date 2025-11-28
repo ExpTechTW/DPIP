@@ -184,7 +184,6 @@ class LocationServiceManager {
       }
 
       await AndroidAlarmManager.cancel(kAlarmId);
-
       // 停止前景服務（若有在跑）
       try {
         await platform.invokeMethod('stopForegroundService');
@@ -192,7 +191,6 @@ class LocationServiceManager {
         // 忽略 native 停止失敗
         TalkerManager.instance.error('👷 stopForegroundService failed', e, s);
       }
-
       // 清理 Dart-side notifications（若你有用 awesome 建立過）
       try {
         await AwesomeNotifications().dismiss(kNotificationId);
@@ -231,14 +229,12 @@ class LocationService {
       }
 
       if (Preference.locationAuto != true) {
-        // 如果用戶關掉自動定位，則取消排程並確保 native service 停止
         await LocationServiceManager.stop();
         return;
       }
 
       final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         TalkerManager.instance.warning(
           '⚙️::BackgroundLocationService location permission not granted, stopping service',
         );
@@ -328,7 +324,6 @@ class LocationService {
     }
   }
 
-  // --- GeoJSON 判斷與 updatePosition 保持原樣 ---
   static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
     final geoJsonData = _$geoJsonData;
     final locationData = _$locationData;
