@@ -172,8 +172,7 @@ class LocationService {
       }
 
       final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         TalkerManager.instance.warning(
           '⚙️::BackgroundLocationService location permission not granted, stopping service',
         );
@@ -190,13 +189,12 @@ class LocationService {
         return;
       }
 
-      // --- 前景通知開始 ---
       await _$showProcessingNotification();
 
       _$geoJsonData ??= await Global.loadTownGeojson();
       _$locationData ??= await Global.loadLocationData();
-
       final coordinates = await _$getDeviceGeographicalLocation();
+
       if (coordinates == null) {
         await _$updatePosition(null);
         await _$dismissNotification();
@@ -226,7 +224,6 @@ class LocationService {
         '⚙️::BackgroundLocationService next update in ${nextInterval.inMinutes}min (distance: ${distanceInMeters?.toStringAsFixed(0) ?? "unknown"}m)',
       );
 
-      // --- 前景通知結束 ---
       await _$dismissNotification();
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService task FAILED', e, s);
@@ -248,8 +245,8 @@ class LocationService {
           body: '取得 GPS 位置中...'.i18n,
           icon: 'resource://drawable/ic_stat_name',
           badge: 0,
-          notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Service,
+          notificationLayout: NotificationLayout.Default,
           displayOnForeground: false,
           displayOnBackground: false,
         ),
@@ -273,8 +270,7 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted');
       return null;
     }
@@ -331,7 +327,6 @@ class LocationService {
     }
   }
 
-  // --- 其餘原本 GeoJSON 判斷、updatePosition 保留不變 ---
   static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
     final geoJsonData = _$geoJsonData;
     final locationData = _$locationData;

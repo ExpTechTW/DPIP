@@ -384,7 +384,7 @@ Future<void> notifyInit() async {
         playSound: false,
         locked: true,
         onlyAlertOnce: true,
-        defaultPrivacy: NotificationPrivacy.Private,
+        defaultPrivacy: NotificationPrivacy.Secret,
       ),
     ],
     channelGroups: [
