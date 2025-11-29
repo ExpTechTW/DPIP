@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-11-23 12:03\n"
+"PO-Revision-Date: 2025-11-29 10:55\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -587,7 +587,7 @@ msgstr "Failed to set your location. Please try again later."
 
 #: ./lib/app/settings/location/page.dart:430
 msgid "完成新增地點後，請務必要在上方地點清單中選擇並顯示打勾才能完成。"
-msgstr ""
+msgstr "Press the correct button on the top of the list to finish adding the location"
 
 #: ./lib/app/settings/location/select/page.dart:35
 msgid "縣市"
@@ -699,35 +699,35 @@ msgstr "Severe thunderstorms or heavy rain are occurring near your area. Please 
 
 #: ./lib/app/home/_widgets/forecast_card.dart:78
 msgid "天氣預報(24h)"
-msgstr ""
+msgstr "Weather forecast (24 h)"
 
 #: ./lib/app/home/_widgets/forecast_card.dart:195
 msgid "無法載入天氣預報"
-msgstr ""
+msgstr "Unable to load the weather forecast"
 
 #: ./lib/app/home/_widgets/forecast_card.dart:405
 msgid "體感"
-msgstr ""
+msgstr "Feels like"
 
 #: ./lib/app/home/_widgets/weather_header.dart:144
 msgid "風速"
-msgstr ""
+msgstr "Wind speed"
 
 #: ./lib/app/home/_widgets/weather_header.dart:151
 msgid "風向"
-msgstr ""
+msgstr "Wind direction"
 
 #: ./lib/app/home/_widgets/weather_header.dart:158
 msgid "風級"
-msgstr ""
+msgstr "Beaufort Scale"
 
 #: ./lib/app/home/_widgets/weather_header.dart:137
 msgid "濕度"
-msgstr ""
+msgstr "Humidity"
 
 #: ./lib/app/home/_widgets/forecast_card.dart:440
 msgid "降雨機率"
-msgstr ""
+msgstr "Raining possibility"
 
 #: ./lib/app/home/_widgets/location_out_of_service.dart:24
 msgid "服務區域外，僅在臺灣各地可用"
@@ -739,27 +739,27 @@ msgstr "Not Set"
 
 #: ./lib/app/home/_widgets/weather_header.dart:165
 msgid "氣壓"
-msgstr ""
+msgstr "Air pressure"
 
 #: ./lib/app/home/_widgets/weather_header.dart:172
 msgid "降雨"
-msgstr ""
+msgstr "Rain Fall"
 
 #: ./lib/app/home/_widgets/weather_header.dart:179
 msgid "能見度"
-msgstr ""
+msgstr "Visibility"
 
 #: ./lib/app/home/_widgets/weather_header.dart:187
 msgid "陣風"
-msgstr ""
+msgstr "Gust"
 
 #: ./lib/app/home/_widgets/weather_header.dart:195
 msgid "陣風級"
-msgstr ""
+msgstr "Gust Scale"
 
 #: ./lib/app/home/_widgets/weather_header.dart:203
 msgid "日照"
-msgstr ""
+msgstr "Sun UVI"
 
 #: ./lib/app/home/_widgets/location_not_set_card.dart:30
 msgid "尚未設定所在地"
@@ -915,20 +915,21 @@ msgstr "Users are required to manually go to settings to enable relevant permiss
 
 #: ./lib/app/welcome/4-permissions/page.dart:346
 msgid "需要背景位置權限"
-msgstr ""
+msgstr "Background Location Access Required"
 
 #: ./lib/app/welcome/4-permissions/page.dart:348
 msgid "為了在背景持續提供即時防災資訊，DPIP 需要「永遠允許」位置權限。\n\n"
 "接下來系統會引導您到設定頁面，請選擇「永遠允許」選項。"
-msgstr ""
+msgstr "To continuing giving the disaster prevention information immediately, DPIP needs the access of location forever.\n\n"
+"System will guide you to the setting, please select forever location accession."
 
 #: ./lib/app/welcome/4-permissions/page.dart:353
 msgid "稍後"
-msgstr ""
+msgstr "Wait"
 
 #: ./lib/app/welcome/4-permissions/page.dart:354
 msgid "前往設定"
-msgstr ""
+msgstr "Go to settings"
 
 #: ./lib/app/welcome/4-permissions/page.dart:386
 msgid "權限"
@@ -1076,7 +1077,7 @@ msgstr "Arrived"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1128
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
-msgstr ""
+msgstr "Magnitude<bold>M{magnitude}</bold>, Depth<bold>{depth}</bold>km"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1309
 msgid "目前沒有生效中的地震速報"
