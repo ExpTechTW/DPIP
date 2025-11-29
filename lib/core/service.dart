@@ -247,8 +247,6 @@ class LocationService {
           badge: 0,
           category: NotificationCategory.Service,
           notificationLayout: NotificationLayout.Default,
-          displayOnForeground: false,
-          displayOnBackground: false,
         ),
       );
     } catch (e, s) {
