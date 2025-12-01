@@ -22,6 +22,7 @@ class LocationServiceManager {
   LocationServiceManager._();
 
   static const int kAlarmId = 888888;
+  static const int kBackupAlarmId = 888890;
   static const int kNotificationId = 888888;
   static const String _kPrefKeyUpdateInterval = 'location_update_interval';
 
@@ -110,6 +111,14 @@ class LocationServiceManager {
         }
       }
     }
+
+    await AndroidAlarmManager.periodic(
+      Duration(hours: 1),
+      kBackupAlarmId,
+      LocationService._$task,
+      wakeup: true,
+      rescheduleOnReboot: true,
+    );
   }
 
   static Future<void> _rescheduleAlarm(Duration interval) async {
@@ -137,6 +146,7 @@ class LocationServiceManager {
       }
 
       await AndroidAlarmManager.cancel(kAlarmId);
+      await AndroidAlarmManager.cancel(kBackupAlarmId);
       await AwesomeNotifications().dismiss(kNotificationId);
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
