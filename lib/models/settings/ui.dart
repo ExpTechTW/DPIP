@@ -6,6 +6,8 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/home/home_display_mode.dart';
+
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
 
@@ -13,6 +15,8 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   int? get _themeColor => Preference.themeColor;
   Locale? get _locale => Preference.locale?.asLocale;
   bool get _useFahrenheit => Preference.useFahrenheit ?? false;
+  late Set<HomeDisplaySection> homeSections;
+  final savedList = Preference.homeDisplaySections;
 
   ThemeMode get themeMode => ThemeMode.values.byName(_themeMode);
   void setThemeMode(ThemeMode value) {
@@ -46,6 +50,29 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     Preference.useFahrenheit = value;
 
     _log('Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}');
+    notifyListeners();
+  }
+
+  SettingsUserInterfaceModel() {
+    final saved = savedList
+        .map((s) => HomeDisplaySection.values.firstWhere((e) => e.name == s,))
+        .whereType<HomeDisplaySection>()
+        .toSet();
+    homeSections = saved.isNotEmpty
+        ? saved
+        : {HomeDisplaySection.weather};
+  }
+
+  bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
+
+  void toggleSection(HomeDisplaySection section, bool enabled) {
+    if (enabled) {
+      homeSections.add(section);
+    } else {
+      homeSections.remove(section);
+    }
+
+    Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
     notifyListeners();
   }
 }

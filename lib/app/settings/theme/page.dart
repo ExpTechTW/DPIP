@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../../home/home_display_mode.dart';
+
 class SettingsThemePage extends StatelessWidget {
   const SettingsThemePage({super.key});
 
@@ -118,6 +120,44 @@ class SettingsThemePage extends StatelessWidget {
                     if (result == null) return;
                     model.setThemeColor(result);
                   },
+                );
+              },
+            ),
+          ],
+        ),
+        ListSection(
+        title: '首頁模式'.i18n,
+          children: [
+            Consumer<SettingsUserInterfaceModel>(
+              builder: (context, model, child) {
+                return Column(
+                  children: [
+                    SwitchListTile(
+                      title: Text('天氣資訊'.i18n),
+                      value: model.isEnabled(HomeDisplaySection.weather),
+                      onChanged: (v) => model.toggleSection(HomeDisplaySection.weather, v),
+                    ),
+                    SwitchListTile(
+                      title: Text('圖卡資訊'.i18n),
+                      value: model.isEnabled(HomeDisplaySection.realtime),
+                      onChanged: (v) => model.toggleSection(HomeDisplaySection.realtime, v),
+                    ),
+                    SwitchListTile(
+                      title: Text('雷達回波'.i18n),
+                      value: model.isEnabled(HomeDisplaySection.radar),
+                      onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),
+                    ),
+                    SwitchListTile(
+                      title: Text('天氣預報(24h)'.i18n),
+                      value: model.isEnabled(HomeDisplaySection.forecast),
+                      onChanged: (v) => model.toggleSection(HomeDisplaySection.forecast, v),
+                    ),
+                    SwitchListTile(
+                      title: Text('歷史事件'.i18n),
+                      value: model.isEnabled(HomeDisplaySection.history),
+                      onChanged: (v) => model.toggleSection(HomeDisplaySection.history, v),
+                    ),
+                  ],
                 );
               },
             ),

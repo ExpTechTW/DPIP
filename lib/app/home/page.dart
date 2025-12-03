@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -26,10 +27,13 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/constants.dart';
+import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'home_display_mode.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -257,7 +261,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
     }
     _wasVisible = isVisible;
-
+    final model = context.watch<SettingsUserInterfaceModel>();
     final topPadding = MediaQuery.of(context).padding.top;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -284,10 +288,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
             ),
             children: [
-              _buildWeatherHeader(),
-              if (!_isLoading) ..._buildRealtimeInfo(),
-              _buildRadarMap(),
-              _buildHistoryTimeline(),
+              if (model.isEnabled(HomeDisplaySection.weather))
+                _buildWeatherHeader(),
+              if (model.isEnabled(HomeDisplaySection.realtime))
+                ..._buildRealtimeInfo(),
+              if (model.isEnabled(HomeDisplaySection.radar))
+                _buildRadarMap(),
+              if (model.isEnabled(HomeDisplaySection.forecast))
+                _buildForecast(),
+              if (model.isEnabled(HomeDisplaySection.history))
+                _buildHistoryTimeline(),
             ],
           ),
         ),
@@ -338,7 +348,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               Padding(padding: const EdgeInsets.all(16), child: EewCard(GlobalProviders.data.eew[index])),
         ),
       if (_thunderstorm != null) Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
-      if (_forecast != null) ForecastCard(_forecast!),
     ];
   }
 
@@ -346,6 +355,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: RadarMapCard(key: _mapKey),
+    );
+  }
+
+  Widget _buildForecast() {
+    if (_forecast == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: ForecastCard(_forecast!),
     );
   }
 
