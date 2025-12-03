@@ -66,12 +66,15 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
 
   void toggleSection(HomeDisplaySection section, bool enabled) {
+    if (!enabled && homeSections.length == 1 && homeSections.contains(section)) {
+      return;
+    }
+
     if (enabled) {
       homeSections.add(section);
     } else {
       homeSections.remove(section);
     }
-
     Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
     notifyListeners();
   }

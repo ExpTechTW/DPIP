@@ -124,16 +124,6 @@ class Preference {
 
   static List<String> get homeDisplaySections => instance.getStringList(PreferenceKeys.homeDisplaySections) ?? [];
   static set homeDisplaySections(List<String> value) => instance.set(PreferenceKeys.homeDisplaySections, value);
-
-  static void toggleHomeSection(String section, bool enabled) {
-    final current = homeDisplaySections;
-    if (enabled) {
-      if (!current.contains(section)) current.add(section);
-    } else {
-      current.remove(section);
-    }
-    instance.set(PreferenceKeys.homeDisplaySections, current);
-  }
   // #endregion
 
   // #region Notification
