@@ -360,10 +360,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildForecast() {
     if (_forecast == null) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ForecastCard(_forecast!),
-    );
+    return ForecastCard(_forecast!);
   }
 
   Widget _buildHistoryTimeline() {
