@@ -310,7 +310,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         announcement: true,
         carPlay: true,
         criticalAlert: true,
-        provisional: true,
+        provisional: false,
       );
       if (iosSettings.criticalAlert == AppleNotificationSetting.enabled) {
         _isNotificationPermission = true;
