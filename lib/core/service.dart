@@ -17,18 +17,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-/// Background location service.
-///
-/// This class is responsible for managing the background location service using AlarmManager.
+/// Background location service with foreground support
 class LocationServiceManager {
   LocationServiceManager._();
 
-  /// The alarm ID used for periodic location updates
   static const int kAlarmId = 888888;
-
-  /// The notification ID used for location updates notification
+  static const int kBackupAlarmId = 888890;
   static const int kNotificationId = 888888;
-
   static const String _kPrefKeyUpdateInterval = 'location_update_interval';
 
   static const Duration kMinUpdateInterval = Duration(minutes: 5);
@@ -38,10 +33,8 @@ class LocationServiceManager {
   static const double kHighMovementThreshold = 1000;
   static const double kLowMovementThreshold = 100;
 
-  /// Platform channel for iOS
   static const platform = MethodChannel('com.exptech.dpip/location');
 
-  /// Whether the background service is available on the current platform
   static bool get available => Platform.isAndroid || Platform.isIOS;
 
   static Future<void> initalize() async {
@@ -50,9 +43,8 @@ class LocationServiceManager {
     if (Preference.locationAuto != true) return;
 
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      return;
-    }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) return;
 
     try {
       await stop();
@@ -75,14 +67,8 @@ class LocationServiceManager {
 
   static Duration _calculateNextInterval(double? distanceInMeters) {
     if (distanceInMeters == null) return kDefaultUpdateInterval;
-
-    if (distanceInMeters >= kHighMovementThreshold) {
-      return kMinUpdateInterval;
-    }
-
-    if (distanceInMeters >= kLowMovementThreshold) {
-      return kDefaultUpdateInterval;
-    }
+    if (distanceInMeters >= kHighMovementThreshold) return kMinUpdateInterval;
+    if (distanceInMeters >= kLowMovementThreshold) return kDefaultUpdateInterval;
 
     final currentInterval = _getUpdateInterval();
     final newInterval = Duration(minutes: currentInterval.inMinutes + 5);
@@ -111,7 +97,6 @@ class LocationServiceManager {
       );
     } catch (e, s) {
       TalkerManager.instance.error('👷 starting location service FAILED', e, s);
-
       if (e.toString().contains('SCHEDULE_EXACT_ALARM')) {
         try {
           await AndroidAlarmManager.oneShot(
@@ -126,12 +111,19 @@ class LocationServiceManager {
         }
       }
     }
+
+    await AndroidAlarmManager.periodic(
+      Duration(hours: 1),
+      kBackupAlarmId,
+      LocationService._$task,
+      wakeup: true,
+      rescheduleOnReboot: true,
+    );
   }
 
   static Future<void> _rescheduleAlarm(Duration interval) async {
     try {
       await AndroidAlarmManager.cancel(kAlarmId);
-
       await AndroidAlarmManager.oneShot(
         interval,
         kAlarmId,
@@ -147,7 +139,6 @@ class LocationServiceManager {
 
   static Future<void> stop() async {
     if (!available) return;
-
     try {
       if (Platform.isIOS) {
         await platform.invokeMethod('toggleLocation', {'isEnabled': false});
@@ -155,6 +146,7 @@ class LocationServiceManager {
       }
 
       await AndroidAlarmManager.cancel(kAlarmId);
+      await AndroidAlarmManager.cancel(kBackupAlarmId);
       await AwesomeNotifications().dismiss(kNotificationId);
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
@@ -174,7 +166,6 @@ class LocationService {
   static Future<void> _$task() async {
     try {
       DartPluginRegistrant.ensureInitialized();
-
       await Preference.init();
       await AppLocalizations.load();
       await LocationNameLocalizations.load();
@@ -222,7 +213,6 @@ class LocationService {
 
       final previousLocation = _$location;
       final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
-
       final nextInterval = LocationServiceManager._calculateNextInterval(distanceInMeters);
       await LocationServiceManager._setUpdateInterval(nextInterval);
 
@@ -247,9 +237,7 @@ class LocationService {
       await _$dismissNotification();
     } catch (e, s) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService task FAILED', e, s);
-
       await _$dismissNotification();
-
       try {
         await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
       } catch (_) {}
@@ -313,9 +301,11 @@ class LocationService {
 
     try {
       final lowAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 10)),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
+        ),
       );
-
       if (lowAccuracyPosition.accuracy <= 500) {
         return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
       }
@@ -323,17 +313,21 @@ class LocationService {
 
     try {
       final mediumAccuracyPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
-
       return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
     } catch (_) {}
 
     try {
       final currentPosition = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 30)),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 30),
+        ),
       );
-
       return LatLng(currentPosition.latitude, currentPosition.longitude);
     } catch (e) {
       TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed', e);
@@ -351,7 +345,6 @@ class LocationService {
 
     for (final feature in features) {
       if (feature == null) continue;
-
       final geometry = feature.geometry;
       if (geometry == null) continue;
 
@@ -359,7 +352,6 @@ class LocationService {
 
       if (geometry is GeoJSONPolygon) {
         final polygon = geometry.coordinates[0];
-
         bool isInside = false;
         int j = polygon.length - 1;
         for (int i = 0; i < polygon.length; i++) {
@@ -367,12 +359,9 @@ class LocationService {
           final double yi = polygon[i][1];
           final double xj = polygon[j][0];
           final double yj = polygon[j][1];
-
-          final bool intersect =
-              ((yi > target.latitude) != (yj > target.latitude)) &&
+          final bool intersect = ((yi > target.latitude) != (yj > target.latitude)) &&
               (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
           if (intersect) isInside = !isInside;
-
           j = i;
         }
         isInPolygon = isInside;
@@ -380,10 +369,8 @@ class LocationService {
 
       if (geometry is GeoJSONMultiPolygon) {
         final multiPolygon = geometry.coordinates;
-
         for (final polygonCoordinates in multiPolygon) {
           final polygon = polygonCoordinates[0];
-
           bool isInside = false;
           int j = polygon.length - 1;
           for (int i = 0; i < polygon.length; i++) {
@@ -391,15 +378,11 @@ class LocationService {
             final double yi = polygon[i][1];
             final double xj = polygon[j][0];
             final double yj = polygon[j][1];
-
-            final bool intersect =
-                ((yi > target.latitude) != (yj > target.latitude)) &&
+            final bool intersect = ((yi > target.latitude) != (yj > target.latitude)) &&
                 (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
             if (intersect) isInside = !isInside;
-
             j = i;
           }
-
           if (isInside) {
             isInPolygon = true;
             break;
@@ -410,10 +393,8 @@ class LocationService {
       if (isInPolygon) {
         final code = feature.properties!['CODE']?.toString();
         if (code == null) return null;
-
         final location = locationData[code];
         if (location == null) return null;
-
         return (code: code, location: location);
       }
     }
@@ -424,9 +405,7 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$updatePosition(LatLng? position) async {
     _$location = position;
-
     final result = position != null ? _$getLocationFromCoordinates(position) : null;
-
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
