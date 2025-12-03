@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
         Positioned(
-          top: 16,
+          top: 24,
           left: 0,
           right: 0,
           child: SafeArea(
