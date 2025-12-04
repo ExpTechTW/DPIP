@@ -288,7 +288,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
             ),
             children: [
-              if (model.isEnabled(HomeDisplaySection.weather))
                 _buildWeatherHeader(),
               if (model.isEnabled(HomeDisplaySection.realtime))
                 ..._buildRealtimeInfo(),

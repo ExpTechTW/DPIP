@@ -55,21 +55,19 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
 
   SettingsUserInterfaceModel() {
     final saved = savedList
-        .map((s) => HomeDisplaySection.values.firstWhere((e) => e.name == s,))
+        .map((s) => HomeDisplaySection.values
+        .cast<HomeDisplaySection?>()
+        .firstWhere((e) => e?.name == s, orElse: () => null))
         .whereType<HomeDisplaySection>()
         .toSet();
     homeSections = saved.isNotEmpty
         ? saved
-        : {HomeDisplaySection.weather};
+        : {HomeDisplaySection.realtime};
   }
 
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
 
   void toggleSection(HomeDisplaySection section, bool enabled) {
-    if (!enabled && homeSections.length == 1 && homeSections.contains(section)) {
-      return;
-    }
-
     if (enabled) {
       homeSections.add(section);
     } else {

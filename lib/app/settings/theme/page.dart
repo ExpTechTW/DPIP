@@ -133,11 +133,6 @@ class SettingsThemePage extends StatelessWidget {
                 return Column(
                   children: [
                     SwitchListTile(
-                      title: Text('天氣資訊'.i18n),
-                      value: model.isEnabled(HomeDisplaySection.weather),
-                      onChanged: (v) => model.toggleSection(HomeDisplaySection.weather, v),
-                    ),
-                    SwitchListTile(
                       title: Text('圖卡資訊'.i18n),
                       value: model.isEnabled(HomeDisplaySection.realtime),
                       onChanged: (v) => model.toggleSection(HomeDisplaySection.realtime, v),
