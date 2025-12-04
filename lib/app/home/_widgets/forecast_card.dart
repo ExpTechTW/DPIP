@@ -325,6 +325,8 @@ class _ForecastCardState extends State<ForecastCard> {
                             final barWidth = constraints.maxWidth;
                             final indicatorPosition = tempPercent * barWidth;
                             final indicatorWidth = 20.0;
+                            final maxLeft = (barWidth - indicatorWidth).clamp(0.0, double.infinity);
+                            final leftPos = (indicatorPosition - indicatorWidth / 2).clamp(0.0, maxLeft);
 
                             return Container(
                               height: 20,
@@ -335,10 +337,7 @@ class _ForecastCardState extends State<ForecastCard> {
                               child: Stack(
                                 children: [
                                   Positioned(
-                                    left: (indicatorPosition - indicatorWidth / 2).clamp(
-                                      0.0,
-                                      barWidth - indicatorWidth,
-                                    ),
+                                    left: leftPos,
                                     width: indicatorWidth,
                                     height: 20,
                                     child: Container(
