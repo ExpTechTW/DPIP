@@ -261,7 +261,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
     }
     _wasVisible = isVisible;
-    final model = context.watch<SettingsUserInterfaceModel>();
+    final homeSections = context.select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
+            (model) => model.homeSections
+    );
     final topPadding = MediaQuery.of(context).padding.top;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -289,13 +291,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             children: [
                 _buildWeatherHeader(),
-              if (model.isEnabled(HomeDisplaySection.realtime))
+              if (homeSections.contains(HomeDisplaySection.realtime))
                 ..._buildRealtimeInfo(),
-              if (model.isEnabled(HomeDisplaySection.radar))
+              if (homeSections.contains(HomeDisplaySection.radar))
                 _buildRadarMap(),
-              if (model.isEnabled(HomeDisplaySection.forecast))
+              if (homeSections.contains(HomeDisplaySection.forecast))
                 _buildForecast(),
-              if (model.isEnabled(HomeDisplaySection.history))
+              if (homeSections.contains(HomeDisplaySection.history))
                 _buildHistoryTimeline(),
             ],
           ),
