@@ -60,9 +60,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
         .firstWhere((e) => e?.name == s, orElse: () => null))
         .whereType<HomeDisplaySection>()
         .toSet();
-    homeSections = saved.isNotEmpty
-        ? saved
-        : {HomeDisplaySection.realtime};
+    homeSections = saved;
   }
 
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
