@@ -112,7 +112,7 @@ class EarthquakeReport {
 
   String get traceBaseUrl {
     final year = time.year.toString();
-    return 'https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/';
+    return 'https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year';
   }
 
   String? get intensityMapImageName {
