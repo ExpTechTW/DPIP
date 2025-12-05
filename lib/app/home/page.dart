@@ -21,6 +21,7 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
+import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -287,18 +288,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           onRefresh: _refresh,
           child: ListView(
             padding: EdgeInsets.only(
-              top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
+              top: _locationButtonHeight != null ? 24 + topPadding + _locationButtonHeight! : 0,
             ),
             children: [
-                _buildWeatherHeader(),
-              if (homeSections.contains(HomeDisplaySection.realtime))
-                ..._buildRealtimeInfo(),
-              if (homeSections.contains(HomeDisplaySection.radar))
-                _buildRadarMap(),
-              if (homeSections.contains(HomeDisplaySection.forecast))
-                _buildForecast(),
-              if (homeSections.contains(HomeDisplaySection.history))
-                _buildHistoryTimeline(),
+              _buildWeatherHeader(),
+              if (homeSections.isNotEmpty) ...[
+                if (homeSections.contains(HomeDisplaySection.realtime))
+                  ..._buildRealtimeInfo(),
+                if (homeSections.contains(HomeDisplaySection.radar))
+                  _buildRadarMap(),
+                if (homeSections.contains(HomeDisplaySection.forecast))
+                  _buildForecast(),
+                if (homeSections.contains(HomeDisplaySection.history))
+                  _buildHistoryTimeline(),
+              ] else if (GlobalProviders.location.code != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: () => context.push(SettingsThemePage.route),
+                        child: Text('前往設定'.i18n),
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
