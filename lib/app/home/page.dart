@@ -362,6 +362,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (GlobalProviders.data.eew.isNotEmpty)
         ListView.builder(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: GlobalProviders.data.eew.length,
           itemBuilder: (context, index) =>
