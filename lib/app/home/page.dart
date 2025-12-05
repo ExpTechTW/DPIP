@@ -21,7 +21,7 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
-import 'package:dpip/app/settings/theme/page.dart';
+import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -33,7 +33,6 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'home_display_mode.dart';
 
 class HomePage extends StatefulWidget {
@@ -312,7 +311,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 12),
                       FilledButton(
-                        onPressed: () => context.push(SettingsThemePage.route),
+                        onPressed: () => context.push(SettingsLayoutPage.route),
                         child: Text('前往設定'.i18n),
                       ),
                     ],

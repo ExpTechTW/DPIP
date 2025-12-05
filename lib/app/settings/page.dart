@@ -20,6 +20,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'layout/page.dart';
+
 class SettingsIndexPage extends StatelessWidget {
   const SettingsIndexPage({super.key});
 
@@ -47,6 +49,14 @@ class SettingsIndexPage extends StatelessWidget {
     final userInterface = ListSection(
       title: '介面'.i18n,
       children: [
+        ListSectionTile(
+          icon: Symbols.grid_view_rounded,
+          title: '佈局'.i18n,
+          subtitle: Text('調整 DPIP 的佈局樣式'.i18n),
+          onTap: () {
+            context.push(SettingsLayoutPage.route);
+          },
+        ),
         ListSectionTile(
           icon: Symbols.brush_rounded,
           title: '主題'.i18n,

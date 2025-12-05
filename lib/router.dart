@@ -12,6 +12,7 @@ import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout.dart';
+import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
@@ -113,6 +114,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 @TypedShellRoute<SettingsShellRoute>(
   routes: <TypedGoRoute<GoRouteData>>[
     TypedGoRoute<SettingsIndexRoute>(path: '/settings'),
+    TypedGoRoute<SettingsLayoutRoute>(path: '/settings/layout'),
     TypedGoRoute<SettingsLocationRoute>(path: '/settings/location'),
     TypedGoRoute<SettingsLocationSelectRoute>(path: '/settings/location/select'),
     TypedGoRoute<SettingsLocationSelectCityRoute>(path: '/settings/location/select/:city'),
@@ -166,6 +168,7 @@ class SettingsShellRoute extends ShellRouteData {
       '/settings/location' => '所在地'.i18n,
       '/settings/location/select' => '新增地點'.i18n,
       final p when p?.startsWith('/settings/location/select/') == true => '新增地點'.i18n,
+      '/settings/layout' => '佈局'.i18n,
       '/settings/theme' => '主題'.i18n,
       '/settings/theme/select' => '主題'.i18n,
       '/settings/locale' => '語言'.i18n,
@@ -232,6 +235,16 @@ class SettingsLocationSelectCityRoute extends GoRouteData with $SettingsLocation
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return Material(child: SettingsLocationSelectCityPage(city: city));
+  }
+}
+
+class SettingsLayoutRoute extends GoRouteData with $SettingsLayoutRoute {
+  /// Creates a [SettingsLayoutRoute].
+  const SettingsLayoutRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const Material(child: SettingsLayoutPage());
   }
 }
 
