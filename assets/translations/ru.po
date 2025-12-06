@@ -10,25 +10,29 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-11-23 12:03\n"
+"PO-Revision-Date: 2025-12-06 03:47\n"
 
-#: ./lib/app/settings/location/page.dart:371
+#: ./lib/app/settings/location/page.dart:369
 msgid "所在地"
 msgstr "Местоположение"
 
-#: ./lib/app/settings/location/page.dart:420
+#: ./lib/app/settings/location/page.dart:412
 msgid "新增地點"
 msgstr "Добавить место"
 
-#: ./lib/app/settings/page.dart:52
+#: ./lib/app/settings/page.dart:54
+msgid "佈局"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:62
 msgid "主題"
 msgstr "Тема"
 
-#: ./lib/app/settings/page.dart:60
+#: ./lib/app/settings/page.dart:70
 msgid "語言"
 msgstr "Язык"
 
-#: ./lib/app/settings/page.dart:68
+#: ./lib/app/settings/page.dart:78
 msgid "單位"
 msgstr "Единица"
 
@@ -76,7 +80,7 @@ msgstr ""
 msgid "公告"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:112
+#: ./lib/app/settings/page.dart:122
 msgid "贊助我們"
 msgstr ""
 
@@ -84,11 +88,11 @@ msgstr ""
 msgid "設定"
 msgstr ""
 
-#: ./lib/core/service.dart:266
+#: ./lib/core/service.dart:254
 msgid "正在更新位置"
 msgstr ""
 
-#: ./lib/core/service.dart:267
+#: ./lib/core/service.dart:255
 msgid "取得 GPS 位置中..."
 msgstr ""
 
@@ -406,39 +410,43 @@ msgstr ""
 msgid "位置"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:39
+#: ./lib/app/settings/page.dart:41
 msgid "設定你的所在地來接收當地的即時資訊"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:48
+#: ./lib/app/settings/page.dart:50
 msgid "介面"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:53
+#: ./lib/app/settings/page.dart:55
+msgid "調整 DPIP 的佈局樣式"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:63
 msgid "調整 DPIP 整體的外觀與顏色"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:61
+#: ./lib/app/settings/page.dart:71
 msgid "調整 DPIP 的顯示語言"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:69
+#: ./lib/app/settings/page.dart:79
 msgid "調整 DPIP 顯示數值時使用的單位"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:75
+#: ./lib/app/settings/page.dart:85
 msgid "調整 DPIP 地圖的設定"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:87
+#: ./lib/app/settings/page.dart:97
 msgid "推播通知設定與通知音效測試"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:94
+#: ./lib/app/settings/page.dart:104
 msgid "資訊"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:99
+#: ./lib/app/settings/page.dart:109
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
 msgstr ""
 
@@ -446,35 +454,35 @@ msgstr ""
 msgid "更新日誌"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:106
+#: ./lib/app/settings/page.dart:116
 msgid "瀏覽 DPIP 的歷次更新紀錄"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:113
+#: ./lib/app/settings/page.dart:123
 msgid "幫助我們維護伺服器的穩定和長久發展"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:119
+#: ./lib/app/settings/page.dart:129
 msgid "第三方套件授權"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:120
+#: ./lib/app/settings/page.dart:130
 msgid "DPIP 的實現歸功於開放源始碼"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:162
+#: ./lib/app/settings/page.dart:172
 msgid "除錯"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:166
+#: ./lib/app/settings/page.dart:176
 msgid "應用程式版本"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:172
+#: ./lib/app/settings/page.dart:182
 msgid "裝置資訊"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:178
+#: ./lib/app/settings/page.dart:188
 msgid "複製通知 Token"
 msgstr ""
 
@@ -582,10 +590,6 @@ msgstr ""
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:430
-msgid "完成新增地點後，請務必要在上方地點清單中選擇並顯示打勾才能完成。"
-msgstr ""
-
 #: ./lib/app/settings/location/select/page.dart:35
 msgid "縣市"
 msgstr ""
@@ -594,12 +598,28 @@ msgstr ""
 msgid "目前所在地"
 msgstr ""
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:120
-msgid "監視器"
+#: ./lib/app/settings/layout/page.dart:16
+msgid "首頁樣式"
+msgstr ""
+
+#: ./lib/app/settings/layout/page.dart:22
+msgid "圖卡資訊"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
+msgstr ""
+
+#: ./lib/app/home/_widgets/forecast_card.dart:77
+msgid "天氣預報(24h)"
+msgstr ""
+
+#: ./lib/app/settings/layout/page.dart:37
+msgid "歷史事件"
+msgstr ""
+
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:120
+msgid "監視器"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/temperature.dart:405
@@ -694,15 +714,11 @@ msgstr ""
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
 msgstr ""
 
-#: ./lib/app/home/_widgets/forecast_card.dart:78
-msgid "天氣預報(24h)"
-msgstr ""
-
-#: ./lib/app/home/_widgets/forecast_card.dart:195
+#: ./lib/app/home/_widgets/forecast_card.dart:194
 msgid "無法載入天氣預報"
 msgstr ""
 
-#: ./lib/app/home/_widgets/forecast_card.dart:405
+#: ./lib/app/home/_widgets/forecast_card.dart:404
 msgid "體感"
 msgstr ""
 
@@ -722,7 +738,7 @@ msgstr ""
 msgid "濕度"
 msgstr ""
 
-#: ./lib/app/home/_widgets/forecast_card.dart:440
+#: ./lib/app/home/_widgets/forecast_card.dart:439
 msgid "降雨機率"
 msgstr ""
 
@@ -810,7 +826,7 @@ msgstr ""
 msgid "抵達"
 msgstr ""
 
-#: ./lib/app/home/page.dart:95
+#: ./lib/app/home/page.dart:99
 msgid "已更新至 {version}"
 msgstr ""
 
@@ -818,8 +834,16 @@ msgstr ""
 msgid "取得天氣異常"
 msgstr ""
 
-#: ./lib/app/home/page.dart:243
+#: ./lib/app/home/page.dart:247
 msgid "取得歷史資訊異常"
+msgstr ""
+
+#: ./lib/app/home/page.dart:309
+msgid "您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:354
+msgid "前往設定"
 msgstr ""
 
 #: ./lib/app/changelog/page.dart:109
@@ -921,10 +945,6 @@ msgstr ""
 
 #: ./lib/app/welcome/4-permissions/page.dart:353
 msgid "稍後"
-msgstr ""
-
-#: ./lib/app/welcome/4-permissions/page.dart:354
-msgid "前往設定"
 msgstr ""
 
 #: ./lib/app/welcome/4-permissions/page.dart:386
