@@ -60,6 +60,7 @@ class _ForecastCardState extends State<ForecastCard> {
           )..layout(minWidth: 0, maxWidth: double.infinity);
 
           longestWidth = max(longestWidth, tp.width);
+          tp.dispose();
         }
 
         const iconWidth = 30;
