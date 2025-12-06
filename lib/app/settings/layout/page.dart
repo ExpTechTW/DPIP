@@ -17,29 +17,33 @@ class SettingsLayoutPage extends StatelessWidget {
       children: [
         Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
+            final tiles = [
+              SwitchListTile(
+                title: Text('圖卡資訊'.i18n),
+                value: model.isEnabled(HomeDisplaySection.realtime),
+                onChanged: (v) => model.toggleSection(HomeDisplaySection.realtime, v),
+              ),
+              SwitchListTile(
+                title: Text('雷達回波'.i18n),
+                value: model.isEnabled(HomeDisplaySection.radar),
+                onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),
+              ),
+              SwitchListTile(
+                title: Text('天氣預報(24h)'.i18n),
+                value: model.isEnabled(HomeDisplaySection.forecast),
+                onChanged: (v) => model.toggleSection(HomeDisplaySection.forecast, v),
+              ),
+              SwitchListTile(
+                title: Text('歷史事件'.i18n),
+                value: model.isEnabled(HomeDisplaySection.history),
+                onChanged: (v) => model.toggleSection(HomeDisplaySection.history, v),
+              ),
+            ];
             return Column(
-              children: [
-                SwitchListTile(
-                  title: Text('圖卡資訊'.i18n),
-                  value: model.isEnabled(HomeDisplaySection.realtime),
-                  onChanged: (v) => model.toggleSection(HomeDisplaySection.realtime, v),
-                ),
-                SwitchListTile(
-                  title: Text('雷達回波'.i18n),
-                  value: model.isEnabled(HomeDisplaySection.radar),
-                  onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),
-                ),
-                SwitchListTile(
-                  title: Text('天氣預報(24h)'.i18n),
-                  value: model.isEnabled(HomeDisplaySection.forecast),
-                  onChanged: (v) => model.toggleSection(HomeDisplaySection.forecast, v),
-                ),
-                SwitchListTile(
-                  title: Text('歷史事件'.i18n),
-                  value: model.isEnabled(HomeDisplaySection.history),
-                  onChanged: (v) => model.toggleSection(HomeDisplaySection.history, v),
-                ),
-              ],
+              children: ListTile.divideTiles(
+                context: context,
+                tiles: tiles,
+              ).toList(),
             );
           },
         ),
