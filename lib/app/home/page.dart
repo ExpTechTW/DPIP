@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -20,6 +21,7 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
+import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -28,10 +30,12 @@ import 'package:dpip/core/widget_background.dart';
 import 'package:dpip/core/widget_service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/constants.dart';
+import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'home_display_mode.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -277,7 +281,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
     }
     _wasVisible = isVisible;
-
+    final homeSections = context.select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
+            (model) => model.homeSections
+    );
     final topPadding = MediaQuery.of(context).padding.top;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -301,18 +307,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           onRefresh: _refresh,
           child: ListView(
             padding: EdgeInsets.only(
-              top: _locationButtonHeight != null ? 16 + topPadding + _locationButtonHeight! : 0,
+              top: _locationButtonHeight != null ? 24 + topPadding + _locationButtonHeight! : 0,
             ),
             children: [
               _buildWeatherHeader(),
-              if (!_isLoading) ..._buildRealtimeInfo(),
-              _buildRadarMap(),
-              _buildHistoryTimeline(),
+              if (homeSections.isNotEmpty) ...[
+                if (homeSections.contains(HomeDisplaySection.realtime))
+                  ..._buildRealtimeInfo(),
+                if (homeSections.contains(HomeDisplaySection.radar))
+                  _buildRadarMap(),
+                if (homeSections.contains(HomeDisplaySection.forecast))
+                  _buildForecast(),
+                if (homeSections.contains(HomeDisplaySection.history))
+                  _buildHistoryTimeline(),
+              ] else if (GlobalProviders.location.code != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: () => context.push(SettingsLayoutPage.route),
+                        child: Text('前往設定'.i18n),
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
         Positioned(
-          top: 16,
+          top: 24,
           left: 0,
           right: 0,
           child: SafeArea(
@@ -352,13 +381,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (GlobalProviders.data.eew.isNotEmpty)
         ListView.builder(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: GlobalProviders.data.eew.length,
           itemBuilder: (context, index) =>
               Padding(padding: const EdgeInsets.all(16), child: EewCard(GlobalProviders.data.eew[index])),
         ),
       if (_thunderstorm != null) Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
-      if (_forecast != null) ForecastCard(_forecast!),
     ];
   }
 
@@ -367,6 +396,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       padding: const EdgeInsets.all(16),
       child: RadarMapCard(key: _mapKey),
     );
+  }
+
+  Widget _buildForecast() {
+    if (_forecast == null) return const SizedBox.shrink();
+    return ForecastCard(_forecast!);
   }
 
   Widget _buildHistoryTimeline() {

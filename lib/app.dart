@@ -10,6 +10,7 @@ import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:provider/provider.dart';
 
+import 'main.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
@@ -52,6 +53,8 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   }
 
   Future<void> _checkNotificationPermission() async {
+    if (Platform.isAndroid) return;
+    await fcmReadyCompleter.future;
     bool notificationAllowed = false;
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
     notificationAllowed = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional;
@@ -88,7 +91,6 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     GlobalProviders.data.startFetching();
     _checkNotificationPermission();
-
     router.routerDelegate.addListener(_handlePendingNotificationWhenReady);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

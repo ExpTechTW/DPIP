@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
@@ -54,6 +56,11 @@
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
         <meta-data android:name="com.exptech.dpip.default_notification_icon" android:resource="@drawable/ic_stat_name"/>
 
+        <service
+                android:name=".LocationForegroundService"
+                android:enabled="true"
+                android:exported="false"
+                android:foregroundServiceType="location"/>
         <!-- AlarmManager service -->
         <service
                 android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"

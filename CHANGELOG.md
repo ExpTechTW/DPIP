@@ -13,6 +13,18 @@
 
 ### 修正
 
+## [3.1.310]
+
+### 新增
+- 新增首頁模式設定
+
+### 更改
+- 重構天氣測站資訊 (#470)
+- 改善 App 啟動速度 (#475)
+
+### 修正
+- 手動定位 部分地點問題 (#474) (#477)
+- 自動定位異常掛掉問題 (#473) (Android)
 
 ## [3.1.306]
 
@@ -277,7 +289,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.306...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.310...HEAD
+[3.1.310]: https://github.com/exptechtw/dpip/compare/v3.1.3...v3.1.310
 [3.1.306]: https://github.com/exptechtw/dpip/compare/v3.1.004...v3.1.306
 [3.1.104]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
 [3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
