@@ -26,6 +26,7 @@ class PreferenceKeys {
   static const mapBase = 'pref:ui:map:base';
   static const mapLayers = 'pref:ui:map:layers';
   static const mapAutoZoom = 'pref:ui:map:autoZoom';
+  static const homeDisplaySections = 'pref:ui:homeDisplaySections';
 
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
@@ -116,6 +117,9 @@ class Preference {
 
   static bool? get mapAutoZoom => instance.getBool(PreferenceKeys.mapAutoZoom);
   static set mapAutoZoom(bool? value) => instance.set(PreferenceKeys.mapAutoZoom, value);
+
+  static List<String> get homeDisplaySections => instance.getStringList(PreferenceKeys.homeDisplaySections) ?? [];
+  static set homeDisplaySections(List<String> value) => instance.set(PreferenceKeys.homeDisplaySections, value);
   // #endregion
 
   // #region Notification
