@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DPIP</string>
+    <string name="weather_widget_description">顯示所在地即時天氣資訊</string>
+    <string name="weather_widget_small_description">緊湊的天氣小部件</string>
 </resources>

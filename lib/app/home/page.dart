@@ -26,6 +26,8 @@ import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/core/widget_background.dart';
+import 'package:dpip/core/widget_service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/models/settings/ui.dart';
@@ -72,9 +74,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkVersion();
+      _initializeWidget();
+    });
     GlobalProviders.location.$code.addListener(_refresh);
     _refresh();
+  }
+
+  /// 初始化桌面小部件
+  Future<void> _initializeWidget() async {
+    // 註冊週期性背景更新 (每15分鐘 - Android WorkManager 最小值)
+    await WidgetBackground.registerPeriodicUpdate(frequencyMinutes: 15);
+
+    // 立即更新一次小部件
+    await WidgetService.updateWidget();
   }
 
   @override
@@ -130,7 +144,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
-    await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
+    await Future.wait([
+      _fetchWeather(code),
+      _fetchRealtimeRegion(code),
+      _fetchHistory(code, isOutOfService),
+      // 同時更新桌面小部件
+      WidgetService.updateWidget(),
+    ]);
 
     if (mounted) {
       setState(() => _isLoading = false);

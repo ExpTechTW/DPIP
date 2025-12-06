@@ -2,6 +2,7 @@ import CoreLocation
 import Flutter
 import UIKit
 import UserNotifications
+import WidgetKit
 
 @UIApplicationMain
 @objc
@@ -9,6 +10,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     // MARK: - Properties
 
     private var locationChannel: FlutterMethodChannel?
+    private var widgetChannel: FlutterMethodChannel?
     private var locationManager: CLLocationManager!
     private var lastSentLocation: CLLocation?
     private var isLocationEnabled: Bool = false
@@ -59,6 +61,14 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         locationChannel?.setMethodCallHandler { [weak self] (call, result) in
             self?.handleLocationChannelCall(call, result: result)
         }
+        
+        widgetChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/widget",
+            binaryMessenger: controller.binaryMessenger)
+
+        widgetChannel?.setMethodCallHandler { [weak self] (call, result) in
+            self?.handleWidgetChannelCall(call, result: result)
+        }
     }
     
     private func setupLocationManager() {
@@ -100,6 +110,16 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
 
         toggleLocation(isEnabled: isEnabled)
         result("Location toggled")
+    }
+    
+    private func handleWidgetChannelCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "reloadWidgetTimeline":
+            reloadWidgetTimeline()
+            result(true)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
     }
     
     // MARK: - Location Management
@@ -176,9 +196,13 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     private func sendLocationToServer(location: CLLocation) {
         guard isLocationEnabled else { return }
         guard let token = apnsToken else { return }
-        
+
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
+
+        // 保存座標到 widget shared UserDefaults
+        saveLocationToWidget(latitude: latitude, longitude: longitude)
+
         let appVersion =
             Bundle.main.object(
                 forInfoDictionaryKey: "CFBundleShortVersionString") as? String
@@ -206,6 +230,31 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         }
 
         task.resume()
+    }
+
+    // MARK: - Widget Data Management
+
+    /// 保存位置資訊到 Widget
+    private func saveLocationToWidget(latitude: Double, longitude: Double) {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.exptech.dpip") else {
+            print("Failed to get shared UserDefaults for widget")
+            return
+        }
+
+        sharedDefaults.set(latitude, forKey: "widget_latitude")
+        sharedDefaults.set(longitude, forKey: "widget_longitude")
+        sharedDefaults.synchronize()
+
+        print("Widget location saved: \(latitude), \(longitude)")
+    }
+    
+    /// 重新載入 Widget Timeline
+    /// 主動請求系統重新載入 widget 的時間線，確保 widget 顯示最新資料
+    private func reloadWidgetTimeline() {
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadTimelines(ofKind: "WeatherWidget")
+            print("Widget timeline reload requested")
+        }
     }
     
     // MARK: - Background Task Management
