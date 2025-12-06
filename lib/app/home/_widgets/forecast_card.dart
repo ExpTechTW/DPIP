@@ -22,6 +22,8 @@ class _ForecastCardState extends State<ForecastCard> {
   final Map<int, GlobalKey> _pageKeys = {};
   final Set<int> _measuringPages = {};
   List<List<dynamic>> _pages = [];
+  double maxWeatherWidth = 0;
+  List<dynamic>? _lastForecast;
 
   @override
   void dispose() {
@@ -34,6 +36,37 @@ class _ForecastCardState extends State<ForecastCard> {
     try {
       final data = widget.forecast['forecast'] as List<dynamic>?;
       if (data == null || data.isEmpty) return const SizedBox.shrink();
+      if (_lastForecast != data) {
+        _lastForecast = data;
+
+        final List<String> allWeatherTexts = [];
+        for (final item in data) {
+          final w = item['weather'] as String?;
+          if (w != null && w.isNotEmpty) allWeatherTexts.add(w);
+        }
+
+        double longestWidth = 0;
+        for (final text in allWeatherTexts) {
+          final tp = TextPainter(
+            text: TextSpan(
+              text: text,
+              style: context.theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+            ),
+            maxLines: 1,
+            textDirection: TextDirection.ltr,
+          )..layout(minWidth: 0, maxWidth: double.infinity);
+
+          longestWidth = max(longestWidth, tp.width);
+        }
+
+        const iconWidth = 30;
+        const spacing = 8;
+        const popWidth = 55;
+        maxWeatherWidth = iconWidth + spacing + longestWidth + spacing + popWidth;
+      }
 
       double minTemp = double.infinity;
       double maxTemp = double.negativeInfinity;
@@ -44,8 +77,8 @@ class _ForecastCardState extends State<ForecastCard> {
       }
 
       _pages = <List<dynamic>>[];
-      for (int i = 0; i < data.length; i += 4) {
-        _pages.add(data.skip(i).take(4).toList());
+      for (int i = 0; i < data.length; i += 6) {
+        _pages.add(data.skip(i).take(6).toList());
       }
       final pages = _pages;
 
@@ -102,7 +135,7 @@ class _ForecastCardState extends State<ForecastCard> {
                   double height = 0;
                   final pageData = pages[pageIndex];
                   for (int i = 0; i < pageData.length; i++) {
-                    final globalIndex = pageIndex * 4 + i;
+                    final globalIndex = pageIndex * 6 + i;
                     final isExpanded = _expandedItems.contains(globalIndex);
                     height += isExpanded ? 320 : 84;
                     if (i < pageData.length - 1 && !isExpanded) height += 1;
@@ -127,7 +160,7 @@ class _ForecastCardState extends State<ForecastCard> {
                         setState(() {
                           _currentPage = index;
                           if (index < _pages.length) {
-                            final currentPageStart = index * 4;
+                            final currentPageStart = index * 6;
                             final currentPageEnd = currentPageStart + _pages[index].length - 1;
                             _expandedItems.removeWhere((expandedIndex) {
                               return expandedIndex < currentPageStart || expandedIndex > currentPageEnd;
@@ -136,6 +169,7 @@ class _ForecastCardState extends State<ForecastCard> {
                               _measuredHeights.clear();
                             }
                           }
+                          _measuredHeights.removeWhere((key, value) => key != index);
                         });
                       },
                       itemBuilder: (context, pageIndex) {
@@ -168,7 +202,7 @@ class _ForecastCardState extends State<ForecastCard> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: pages[pageIndex].asMap().entries.map((entry) {
-                                final globalIndex = pageIndex * 4 + entry.key;
+                                final globalIndex = pageIndex * 6 + entry.key;
                                 return _buildForecastItem(
                                   context,
                                   entry.value as Map<String, dynamic>,
@@ -232,7 +266,7 @@ class _ForecastCardState extends State<ForecastCard> {
                     ..clear()
                     ..add(index);
                 }
-                final pageIndex = index ~/ 4;
+                final pageIndex = index ~/ 6;
                 _measuredHeights.remove(pageIndex);
               });
             },
@@ -262,7 +296,7 @@ class _ForecastCardState extends State<ForecastCard> {
                         ),
                       ),
                       SizedBox(
-                        width: 135,
+                        width: maxWeatherWidth,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           spacing: 4,
@@ -276,45 +310,43 @@ class _ForecastCardState extends State<ForecastCard> {
                               child: _getWeatherIcon(weather, context),
                             ),
                             if (weather.isNotEmpty)
-                              Flexible(
-                                child: Text(
-                                  weather,
-                                  style: context.theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: context.colors.onSurfaceVariant,
-                                    fontSize: 12,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
+                            Text(
+                              weather,
+                              style: context.theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: context.colors.onSurfaceVariant,
+                                fontSize: 12,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.visible,
+                            ),
                             if (pop > 0)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.indigo.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: 2,
-                                  children: [
-                                    Icon(
-                                      Symbols.rainy_rounded,
-                                      size: 13,
-                                      color: Colors.indigo,
-                                    ),
-                                    Text(
-                                      '$pop%',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.indigo,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
                               ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Symbols.rainy_rounded,
+                                    size: 13,
+                                    color: Colors.indigo,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    '$pop%',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.indigo,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
