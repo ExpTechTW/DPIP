@@ -1,17 +1,11 @@
 import 'package:dpip/widgets/map/map.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, wind, lightning }
+enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, wind, lightning, typhoon}
 
 const Set<MapLayer> kEarthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
 
-const Set<MapLayer> kWeatherLayers = {
-  MapLayer.radar,
-  MapLayer.temperature,
-  MapLayer.precipitation,
-  MapLayer.wind,
-  MapLayer.lightning,
-};
+const Set<MapLayer> kWeatherLayers = {MapLayer.radar, MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning, MapLayer.typhoon};
 
 const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
   MapLayer.monitor: {MapLayer.monitor},
@@ -22,6 +16,7 @@ const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
   MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
   MapLayer.wind: {MapLayer.radar, MapLayer.wind},
   MapLayer.lightning: {MapLayer.radar, MapLayer.lightning},
+  MapLayer.typhoon: {MapLayer.typhoon},
 };
 
 /// Validates if a combination of map layers follows the defined rules.
@@ -66,6 +61,7 @@ class MapSourceIds {
   static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
   static String lightning([String? time]) => time == null ? 'lightning' : 'lightning-$time';
+  static String typhoon([String? time]) => time == null ? 'typhoon' : 'typhoon-$time';
   static String intensity() => 'intensity';
   static String intensity0() => 'intensity0';
   static String box() => 'box';
@@ -83,6 +79,7 @@ class MapLayerIds {
   static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
   static String lightning([String? time]) => time == null ? 'lightning' : 'lightning-$time';
+  static String typhoon([String? time]) => time == null ? 'typhoon' : 'typhoon-$time';
   static String intensity() => 'intensity';
   static String intensity0() => 'intensity0';
   static String box() => 'box';
