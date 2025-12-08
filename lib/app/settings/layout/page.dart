@@ -19,11 +19,6 @@ class SettingsLayoutPage extends StatelessWidget {
           builder: (context, model, child) {
             final tiles = [
               SwitchListTile(
-                title: Text('圖卡資訊'.i18n),
-                value: model.isEnabled(HomeDisplaySection.realtime),
-                onChanged: (v) => model.toggleSection(HomeDisplaySection.realtime, v),
-              ),
-              SwitchListTile(
                 title: Text('雷達回波'.i18n),
                 value: model.isEnabled(HomeDisplaySection.radar),
                 onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),

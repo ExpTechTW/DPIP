@@ -291,9 +291,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             children: [
               _buildWeatherHeader(),
+              if (!_isLoading) ..._buildRealtimeInfo(),
               if (homeSections.isNotEmpty) ...[
-                if (homeSections.contains(HomeDisplaySection.realtime))
-                  ..._buildRealtimeInfo(),
                 if (homeSections.contains(HomeDisplaySection.radar))
                   _buildRadarMap(),
                 if (homeSections.contains(HomeDisplaySection.forecast))
