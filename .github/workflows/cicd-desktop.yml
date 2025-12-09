@@ -92,30 +92,44 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run package:${{ matrix.platform == 'macos-latest' && 'mac' || matrix.platform == 'windows-latest' && 'win' || 'linux' }}
 
-      - name: Upload artifacts (macOS)
+      - name: Upload macOS DMG (arm64)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: macos-app
-          path: |
-            packages/desktop/dist/*.dmg
-            packages/desktop/dist/*.zip
-            packages/desktop/dist/*.blockmap
+          name: DPIP-macOS-arm64-dmg
+          path: packages/desktop/dist/*-arm64.dmg
 
-      - name: Upload artifacts (Windows)
+      - name: Upload macOS DMG (x64)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DPIP-macOS-x64-dmg
+          path: packages/desktop/dist/*-x64.dmg
+
+      - name: Upload Windows (x64)
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app
-          path: |
-            packages/desktop/dist/*.exe
-            packages/desktop/dist/*.blockmap
+          name: DPIP-Windows-x64
+          path: packages/desktop/dist/*-x64.exe
 
-      - name: Upload artifacts (Linux)
+      - name: Upload Windows (ia32)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DPIP-Windows-ia32
+          path: packages/desktop/dist/*-ia32.exe
+
+      - name: Upload Linux (x64)
         if: matrix.platform == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
-          name: linux-app
-          path: |
-            packages/desktop/dist/*.AppImage
-            packages/desktop/dist/*.blockmap
+          name: DPIP-Linux-x64
+          path: packages/desktop/dist/*-x64.AppImage
+
+      - name: Upload Linux (arm64)
+        if: matrix.platform == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DPIP-Linux-arm64
+          path: packages/desktop/dist/*-arm64.AppImage
