@@ -3,55 +3,55 @@ name: CI Build Check
 on:
   push:
     branches:
-      - main
+    - main
   pull_request:
     branches:
-      - main
+    - main
 
 jobs:
   # Web Build Check
   build-web:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
 
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.bun/install/cache
+          node_modules
+          packages/*/node_modules
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
 
-      - name: Cache Next.js
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/web/.next/cache
-          key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-web-
+    - name: Cache Next.js
+      uses: actions/cache@v4
+      with:
+        path: |
+          packages/web/.next/cache
+        key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+        restore-keys: |
+          ${{ runner.os }}-nextjs-web-
 
-      - name: Install dependencies
-        run: bun install
+    - name: Install dependencies
+      run: bun install
 
-      - name: Build Web app
-        run: bun run build:web
+    - name: Build Web app
+      run: bun run build:web
 
-      - name: Upload Web artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build
-          path: packages/web/out
+    - name: Upload Web artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build
+        path: packages/web/out
 
   # Desktop Build Check
   build-desktop:
@@ -59,119 +59,124 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest"
-            build_script: "package:mac"
-          - platform: "windows-latest"
-            build_script: "package:win"
-          - platform: "ubuntu-22.04"
-            build_script: "package:linux"
+        - platform: "macos-latest"
+          build_script: "package:mac"
+        - platform: "windows-latest"
+          build_script: "package:win"
+        - platform: "ubuntu-22.04"
+          build_script: "package:linux"
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: latest
 
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
 
-      - name: Cache Next.js
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/desktop/.next/cache
-          key: ${{ runner.os }}-nextjs-desktop-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-desktop-
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.bun/install/cache
+          node_modules
+          packages/*/node_modules
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
 
-      - name: Cache Webpack
-        uses: actions/cache@v4
-        with:
-          path: |
-            packages/desktop/build
-            packages/desktop/.erb
-          key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/desktop/electron/**/*.ts') }}
-          restore-keys: |
-            ${{ runner.os }}-webpack-
+    - name: Cache Next.js
+      uses: actions/cache@v4
+      with:
+        path: |
+          packages/desktop/.next/cache
+        key: ${{ runner.os }}-nextjs-desktop-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+        restore-keys: |
+          ${{ runner.os }}-nextjs-desktop-
 
-      - name: Cache electron-builder
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/Library/Caches/electron
-            ~/Library/Caches/electron-builder
-            ~/.cache/electron
-            ~/.cache/electron-builder
-            ~/AppData/Local/electron/Cache
-            ~/AppData/Local/electron-builder/Cache
-          key: ${{ runner.os }}-electron-${{ hashFiles('**/bun.lockb') }}
-          restore-keys: |
-            ${{ runner.os }}-electron-
+    - name: Cache Webpack
+      uses: actions/cache@v4
+      with:
+        path: |
+          packages/desktop/build
+          packages/desktop/.erb
+        key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/desktop/electron/**/*.ts') }}
+        restore-keys: |
+          ${{ runner.os }}-webpack-
 
-      - name: Install dependencies
-        run: bun install
+    - name: Cache electron-builder
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/electron
+          ~/Library/Caches/electron-builder
+          ~/.cache/electron
+          ~/.cache/electron-builder
+          ~/AppData/Local/electron/Cache
+          ~/AppData/Local/electron-builder/Cache
+        key: ${{ runner.os }}-electron-${{ hashFiles('**/bun.lockb') }}
+        restore-keys: |
+          ${{ runner.os }}-electron-
 
-      - name: Import Code-Signing Certificates (macOS)
-        if: matrix.platform == 'macos-latest' && env.APPLE_CERTIFICATE != ''
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-        uses: apple-actions/import-codesign-certs@v3
-        with:
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+    - name: Install dependencies
+      run: bun install
 
-      - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y rpm
+    - name: Import Code-Signing Certificates (macOS)
+      if: matrix.platform == 'macos-latest' && env.APPLE_CERTIFICATE != ''
+      env:
+        APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      uses: apple-actions/import-codesign-certs@v3
+      with:
+        p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
+        p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
-      - name: Build Desktop app
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
-          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun run ${{ matrix.build_script }}
+    - name: Install Linux dependencies
+      if: matrix.platform == 'ubuntu-22.04'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y rpm
 
-      - name: Upload artifacts (macOS)
-        if: matrix.platform == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-app
-          path: |
-            packages/desktop/dist/*.dmg
-            packages/desktop/dist/*.zip
-            packages/desktop/dist/*.blockmap
+    - name: Build Desktop app
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
+        CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: bun run ${{ matrix.build_script }}
 
-      - name: Upload artifacts (Windows)
-        if: matrix.platform == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-app
-          path: |
-            packages/desktop/dist/*.exe
-            packages/desktop/dist/*.blockmap
+    - name: Upload artifacts (macOS)
+      if: matrix.platform == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-app
+        path: |
+          packages/desktop/dist/*.dmg
+          packages/desktop/dist/*.zip
+          packages/desktop/dist/*.blockmap
 
-      - name: Upload artifacts (Linux)
-        if: matrix.platform == 'ubuntu-22.04'
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-app
-          path: |
-            packages/desktop/dist/*.AppImage
-            packages/desktop/dist/*.blockmap
+    - name: Upload artifacts (Windows)
+      if: matrix.platform == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-app
+        path: |
+          packages/desktop/dist/*.exe
+          packages/desktop/dist/*.blockmap
+
+    - name: Upload artifacts (Linux)
+      if: matrix.platform == 'ubuntu-22.04'
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-app
+        path: |
+          packages/desktop/dist/*.AppImage
+          packages/desktop/dist/*.blockmap

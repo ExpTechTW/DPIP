@@ -18,7 +18,7 @@ compression: maximum
 asar: true
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 
-afterPack: .erb/scripts/afterPack.js
+afterPack: .erb/scripts/afterPack.cjs
 
 win:
   target:

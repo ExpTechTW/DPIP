@@ -13,10 +13,10 @@
     "build:electron:prod": "cross-env NODE_ENV=production node node_modules/webpack/bin/webpack.js --config .erb/configs/webpack.config.main.prod.cjs",
     "electron": "electron .",
     "build": "bun run build:electron:prod && next build",
-    "package": "bun run build:electron:prod && next build && electron-builder build",
-    "package:win": "bun run build:electron:prod && next build && electron-builder build --win",
-    "package:mac": "bun run build:electron:prod && next build && electron-builder build --mac",
-    "package:linux": "bun run build:electron:prod && next build && electron-builder build --linux"
+    "package": "bun run build:electron:prod && next build && node node_modules/electron-builder/cli.js build",
+    "package:win": "bun run build:electron:prod && next build && node node_modules/electron-builder/cli.js build --win",
+    "package:mac": "bun run build:electron:prod && next build && node node_modules/electron-builder/cli.js build --mac",
+    "package:linux": "bun run build:electron:prod && next build && node node_modules/electron-builder/cli.js build --linux"
   },
   "dependencies": {
     "@dpip/common": "*",
