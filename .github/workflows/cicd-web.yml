@@ -5,16 +5,16 @@ on:
     branches:
       - main
     paths:
-      - 'packages/common/**'
-      - 'packages/web/**'
-      - 'package.json'
+      - "packages/common/**"
+      - "packages/web/**"
+      - "package.json"
   pull_request:
     branches:
       - main
     paths:
-      - 'packages/common/**'
-      - 'packages/web/**'
-      - 'package.json'
+      - "packages/common/**"
+      - "packages/web/**"
+      - "package.json"
   workflow_dispatch:
 
 jobs:
@@ -50,13 +50,3 @@ jobs:
 
       - name: Build Web app
         run: npm run build:web
-
-      - name: Deploy to Cloudflare Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: dpip
-          directory: packages/web/out
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
