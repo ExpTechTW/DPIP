@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-TW">
-      <body>{children}</body>
+    <html lang="zh-TW" className="h-full">
+      <body className="h-full m-0 p-0">{children}</body>
     </html>
   )
 }
