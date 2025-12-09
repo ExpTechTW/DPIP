@@ -1,9 +1,16 @@
-name: Deploy Web
+name: CI/CD Web
 
 on:
   push:
     branches:
-    - release
+    - main
+    paths:
+    - 'packages/common/**'
+    - 'packages/web/**'
+    - 'package.json'
+  pull_request:
+    branches:
+    - main
     paths:
     - 'packages/common/**'
     - 'packages/web/**'
@@ -12,12 +19,8 @@ on:
 
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      deployments: write
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -38,17 +41,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-bun-
 
+    - name: Cache Next.js
+      uses: actions/cache@v4
+      with:
+        path: |
+          packages/web/.next/cache
+        key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+        restore-keys: |
+          ${{ runner.os }}-nextjs-web-
+
     - name: Install dependencies
       run: bun install
 
     - name: Build Web app
       run: bun run build:web
-
-    - name: Deploy to Cloudflare Pages
-      uses: cloudflare/pages-action@v1
-      with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: DPIP Web
-        directory: packages/web/out
-        gitHubToken: ${{ secrets.GITHUB_TOKEN }}

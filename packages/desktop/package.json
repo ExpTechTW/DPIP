@@ -3,6 +3,10 @@
   "version": "1.0.0-pre.2",
   "description": "DPIP - Desktop Application",
   "author": "ExpTech Studio <ExpTech.tw@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExpTechTW/DPIP.git"
+  },
   "type": "module",
   "main": "build/main.cjs",
   "private": true,
