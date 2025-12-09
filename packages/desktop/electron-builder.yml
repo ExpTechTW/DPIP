@@ -36,7 +36,7 @@ nsis:
 
 mac:
   category: public.app-category.productivity
-  icon: ./public/icons/app.png
+  icon: ../common/public/icons/app.png
   hardenedRuntime: true
   target:
   - target: dmg
@@ -53,7 +53,7 @@ mac:
 
 linux:
   category: Development
-  icon: ./public/icons/app.png
+  icon: ../common/public/icons/app.png
   target:
   - target: AppImage
     arch:

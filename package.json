@@ -1,6 +1,6 @@
 {
   "name": "dpip",
-  "version": "1.0.0-pre.2",
+  "version": "1.0.0-beta.1",
   "private": true,
   "description": "DPIP - Disaster Prevention Information Platform",
   "author": "ExpTech Studio <ExpTech.tw@gmail.com>",
@@ -9,14 +9,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "bun run --cwd packages/web dev",
-    "dev:desktop": "bun run --cwd packages/desktop dev",
-    "build:web": "bun run --cwd packages/web build",
-    "build:desktop": "bun run --cwd packages/desktop build",
-    "package": "bun run --cwd packages/desktop package",
-    "package:win": "bun run --cwd packages/desktop package:win",
-    "package:mac": "bun run --cwd packages/desktop package:mac",
-    "package:linux": "bun run --cwd packages/desktop package:linux"
+    "sync": "bun run scripts/sync-version.ts",
+    "dev:web": "bun run sync && bun run --cwd packages/web dev",
+    "dev:desktop": "bun run sync && bun run --cwd packages/desktop dev",
+    "build:web": "bun run sync && bun run --cwd packages/web build",
+    "build:desktop": "bun run sync && bun run --cwd packages/desktop build",
+    "package": "bun run sync && bun run --cwd packages/desktop package",
+    "package:win": "bun run sync && bun run --cwd packages/desktop package:win",
+    "package:mac": "bun run sync && bun run --cwd packages/desktop package:mac",
+    "package:linux": "bun run sync && bun run --cwd packages/desktop package:linux"
   },
   "dependencies": {
     "next": "^16.0.8",
