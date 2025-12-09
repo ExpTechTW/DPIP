@@ -1,0 +1,61 @@
+appId: com.eq-rts-map
+productName: eq-rts-map
+copyright: Copyright © 2025 ExpTech Studio
+
+directories:
+  output: dist
+
+extraMetadata:
+  main: ./build/main.cjs
+
+files:
+  - build/**/*
+  - out/**/*
+  - package.json
+  - "!dist"
+
+compression: maximum
+asar: true
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+afterPack: .erb/scripts/afterPack.js
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+  icon: ./public/icons/app.ico
+  verifyUpdateCodeSignature: false
+
+nsis:
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  deleteAppDataOnUninstall: false
+
+mac:
+  category: public.app-category.productivity
+  icon: ./public/icons/app.png
+  hardenedRuntime: true
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  gatekeeperAssess: false
+  entitlements: ./assets/entitlements.mac.plist
+  entitlementsInherit: ./assets/entitlements.mac.plist
+
+linux:
+  category: Development
+  icon: ./public/icons/app.png
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
