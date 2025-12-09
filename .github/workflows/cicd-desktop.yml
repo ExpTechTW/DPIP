@@ -22,13 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: macos-latest
-            build_script: package:mac
-          - platform: windows-latest
-            build_script: package:win
-          - platform: ubuntu-22.04
-            build_script: package:linux
+        platform: [macos-latest, windows-latest, ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -107,7 +101,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rpm
 
-      - name: Build Desktop app
+      - name: Build Electron and Next.js
+        run: |
+          bun run sync
+          bun run --cwd packages/desktop build:electron:prod
+          bun run --cwd packages/desktop next build
+
+      - name: Install production dependencies with npm
+        working-directory: packages/desktop
+        run: npm install --omit=dev --ignore-scripts
+
+      - name: Package Desktop app
+        working-directory: packages/desktop
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -115,7 +120,7 @@ jobs:
           CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
           CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun run ${{ matrix.build_script }}
+        run: node node_modules/electron-builder/cli.js build --${{ matrix.platform == 'macos-latest' && 'mac' || matrix.platform == 'windows-latest' && 'win' || 'linux' }}
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
