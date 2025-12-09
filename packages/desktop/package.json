@@ -23,6 +23,7 @@
     "package:linux": "bun run build:electron:prod && next build && node node_modules/electron-builder/cli.js build --linux"
   },
   "dependencies": {
+    "@dpip/common": "*",
     "@electron/remote": "^2.1.3",
     "electron-serve": "^3.0.0",
     "electron-updater": "^6.6.2"

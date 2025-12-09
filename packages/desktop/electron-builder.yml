@@ -17,6 +17,9 @@ files:
 compression: maximum
 asar: true
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+buildDependenciesFromSource: false
+nodeGypRebuild: false
+npmRebuild: false
 
 afterPack: .erb/scripts/afterPack.cjs
 
