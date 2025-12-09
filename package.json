@@ -19,7 +19,7 @@
     "package:linux": "bun run --cwd packages/desktop package:linux"
   },
   "dependencies": {
-    "next": "^15.5.5",
+    "next": "^16.0.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "maplibre-gl": "^5.13.0"
