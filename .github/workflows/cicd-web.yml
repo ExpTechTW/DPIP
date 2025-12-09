@@ -3,55 +3,60 @@ name: CI/CD Web
 on:
   push:
     branches:
-    - main
+      - main
     paths:
-    - 'packages/common/**'
-    - 'packages/web/**'
-    - 'package.json'
+      - 'packages/common/**'
+      - 'packages/web/**'
+      - 'package.json'
   pull_request:
     branches:
-    - main
+      - main
     paths:
-    - 'packages/common/**'
-    - 'packages/web/**'
-    - 'package.json'
+      - 'packages/common/**'
+      - 'packages/web/**'
+      - 'package.json'
   workflow_dispatch:
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
 
-    - name: Cache Bun dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.bun/install/cache
-          node_modules
-          packages/*/node_modules
-        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-bun-
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
-    - name: Cache Next.js
-      uses: actions/cache@v4
-      with:
-        path: |
-          packages/web/.next/cache
-        key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
-        restore-keys: |
-          ${{ runner.os }}-nextjs-web-
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: packages/web/.next/cache
+          key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-web-
 
-    - name: Install dependencies
-      run: bun install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build Web app
-      run: bun run build:web
+      - name: Build Web app
+        run: npm run build:web
+
+      - name: Deploy to Cloudflare Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: dpip
+          directory: packages/web/out
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

@@ -3,9 +3,8 @@ name: Release Desktop
 on:
   push:
     tags:
-    - "*"
+      - "*"
   workflow_dispatch:
-
 
 jobs:
   release:
@@ -14,114 +13,86 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - platform: "macos-latest"
-          build_script: "package:mac"
-        - platform: "windows-latest"
-          build_script: "package:win"
-        - platform: "ubuntu-22.04"
-          build_script: "package:linux"
+        platform: [macos-latest, windows-latest, ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: latest
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
-    - name: Cache Bun dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.bun/install/cache
-          node_modules
-          packages/*/node_modules
-        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-bun-
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: packages/desktop/.next/cache
+          key: ${{ runner.os }}-nextjs-desktop-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-desktop-
 
-    - name: Cache Next.js
-      uses: actions/cache@v4
-      with:
-        path: |
-          packages/desktop/.next/cache
-        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.js', 'packages/**/*.jsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
-        restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-
-          ${{ runner.os }}-nextjs-
+      - name: Cache electron-builder
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: ${{ runner.os }}-electron-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-
 
-    - name: Cache Webpack
-      uses: actions/cache@v4
-      with:
-        path: |
-          packages/desktop/build
-          packages/desktop/.erb
-        key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/desktop/electron/**/*.ts') }}
-        restore-keys: |
-          ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-
-          ${{ runner.os }}-webpack-
+      - name: Install dependencies
+        run: npm install
 
-    - name: Cache electron-builder
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/Library/Caches/electron
-          ~/Library/Caches/electron-builder
-          ~/.cache/electron
-          ~/.cache/electron-builder
-          ~/AppData/Local/electron/Cache
-          ~/AppData/Local/electron-builder/Cache
-        key: ${{ runner.os }}-electron-${{ hashFiles('**/bun.lockb') }}
-        restore-keys: |
-          ${{ runner.os }}-electron-
+      - name: Import Code-Signing Certificates (macOS)
+        if: matrix.platform == 'macos-latest' && env.APPLE_CERTIFICATE != ''
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
-    - name: Install dependencies
-      run: bun install
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
 
-    - name: Import Code-Signing Certificates (macOS)
-      if: matrix.platform == 'macos-latest' && env.APPLE_CERTIFICATE != ''
-      env:
-        APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-      uses: apple-actions/import-codesign-certs@v3
-      with:
-        p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
-        p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      - name: Build Desktop app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run package:${{ matrix.platform == 'macos-latest' && 'mac' || matrix.platform == 'windows-latest' && 'win' || 'linux' }}
 
-    - name: Install Linux dependencies
-      if: matrix.platform == 'ubuntu-22.04'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y rpm
-
-    - name: Build Desktop app
-      env:
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
-        CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: bun run ${{ matrix.build_script }} --publish never
-      working-directory: packages/desktop
-
-    - name: Upload Release Assets
-      uses: softprops/action-gh-release@v1
-      with:
-        draft: true
-        files: |
-          packages/desktop/dist/*.dmg
-          packages/desktop/dist/*.zip
-          packages/desktop/dist/*.exe
-          packages/desktop/dist/*.AppImage
-          packages/desktop/dist/*.blockmap
-          packages/desktop/dist/latest*.yml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            packages/desktop/dist/*.dmg
+            packages/desktop/dist/*.zip
+            packages/desktop/dist/*.exe
+            packages/desktop/dist/*.AppImage
+            packages/desktop/dist/*.blockmap
+            packages/desktop/dist/latest*.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

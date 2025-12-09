@@ -9,15 +9,15 @@
     "packages/*"
   ],
   "scripts": {
-    "sync": "bun run scripts/sync-version.ts",
-    "dev:web": "bun run sync && bun run --cwd packages/web dev",
-    "dev:desktop": "bun run sync && bun run --cwd packages/desktop dev",
-    "build:web": "bun run sync && bun run --cwd packages/web build",
-    "build:desktop": "bun run sync && bun run --cwd packages/desktop build",
-    "package": "bun run sync && bun run --cwd packages/desktop package",
-    "package:win": "bun run sync && bun run --cwd packages/desktop package:win",
-    "package:mac": "bun run sync && bun run --cwd packages/desktop package:mac",
-    "package:linux": "bun run sync && bun run --cwd packages/desktop package:linux"
+    "sync": "node scripts/sync-version.cjs",
+    "dev:web": "npm run sync && npm run --prefix packages/web dev",
+    "dev:desktop": "npm run sync && npm run --prefix packages/desktop dev",
+    "build:web": "npm run sync && npm run --prefix packages/web build",
+    "build:desktop": "npm run sync && npm run --prefix packages/desktop build",
+    "package": "npm run sync && npm run --prefix packages/desktop package",
+    "package:win": "npm run sync && npm run --prefix packages/desktop package:win",
+    "package:mac": "npm run sync && npm run --prefix packages/desktop package:mac",
+    "package:linux": "npm run sync && npm run --prefix packages/desktop package:linux"
   },
   "dependencies": {
     "next": "^16.0.8",
