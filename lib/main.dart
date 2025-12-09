@@ -10,6 +10,7 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/core/update.dart';
+import 'package:dpip/core/widget_background.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -59,6 +60,7 @@ void main() async {
     _loggedTask('AppLocalizations.load', AppLocalizations.load()),
     _loggedTask('LocationNameLocalizations.load', LocationNameLocalizations.load()),
     _loggedTask('WeatherStationLocalizations.load', WeatherStationLocalizations.load()),
+    _loggedTask('WidgetBackground.initialize', WidgetBackground.initialize()),
   ]);
 
   final futureWaitEnd = DateTime.now();

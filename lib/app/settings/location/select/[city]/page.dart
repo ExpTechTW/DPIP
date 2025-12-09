@@ -10,6 +10,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
+import 'package:dpip/core/widget_service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -18,6 +19,7 @@ import 'package:dpip/utils/toast.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:home_widget/home_widget.dart';
 
 class SettingsLocationSelectCityPage extends StatefulWidget {
   final String city;
@@ -77,7 +79,14 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
                               if (!context.mounted) return;
                               model.setCode(code);
 
-                              // 4. 返回所在地設定頁面
+                              // 4. 保存位置到 widget
+                              await HomeWidget.saveWidgetData<double>('widget_latitude', town.lat);
+                              await HomeWidget.saveWidgetData<double>('widget_longitude', town.lng);
+
+                              // 5. 更新 widget
+                              await WidgetService.updateWidget();
+
+                              // 6. 返回所在地設定頁面
                               if (!context.mounted) return;
                               context.popUntil(SettingsLocationPage.route);
                             } catch (e, s) {

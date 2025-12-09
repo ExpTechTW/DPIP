@@ -69,6 +69,12 @@ dependencies:
   talker_flutter: ^5.0.2
   timezone: ^0.10.0
   url_launcher: ^6.3.1
+  home_widget: ^0.8.1
+  workmanager:
+    git:
+      url: https://github.com/fluttercommunity/flutter_workmanager.git
+      path: workmanager
+      ref: main
 
 dev_dependencies:
   build_runner: ^2.10.0
