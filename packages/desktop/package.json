@@ -1,7 +1,7 @@
 {
   "name": "@dpip/desktop",
   "version": "1.0.0-pre.2",
-  "description": "EQ RTS Map - Desktop Application",
+  "description": "DPIP - Desktop Application",
   "author": "ExpTech Studio <ExpTech.tw@gmail.com>",
   "type": "module",
   "main": "build/main.cjs",

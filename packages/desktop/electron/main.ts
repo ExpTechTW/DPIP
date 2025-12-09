@@ -79,7 +79,7 @@ if (app.isPackaged) {
   autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'ExpTechTW',
-    repo: 'eq-rts-map',
+    repo: 'DPIP',
     vPrefixedTagName: false,
   });
 }
