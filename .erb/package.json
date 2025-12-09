@@ -1,7 +1,0 @@
-{
-  "type": "commonjs",
-  "devDependencies": {
-    "@types/webpack-bundle-analyzer": "^4.7.0",
-    "@types/webpack-node-externals": "^3.0.4"
-  }
-}

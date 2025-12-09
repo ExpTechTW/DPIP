@@ -9,7 +9,52 @@ on:
       - main
 
 jobs:
-  build-check:
+  # Web Build Check
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/web/.next/cache
+          key: ${{ runner.os }}-nextjs-web-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-web-
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Web app
+        run: bun run build:web
+
+      - name: Upload Web artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: packages/web/out
+
+  # Desktop Build Check
+  build-desktop:
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +82,8 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -45,21 +91,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+            packages/desktop/.next/cache
+          key: ${{ runner.os }}-nextjs-desktop-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.ts', 'packages/**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-nextjs-
+            ${{ runner.os }}-nextjs-desktop-
 
       - name: Cache Webpack
         uses: actions/cache@v4
         with:
           path: |
-            build
-            .erb
-          key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('electron/**/*.ts') }}
+            packages/desktop/build
+            packages/desktop/.erb
+          key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/desktop/electron/**/*.ts') }}
           restore-keys: |
-            ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-webpack-
 
       - name: Cache electron-builder
@@ -76,7 +120,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: bun install
 
       - name: Import Code-Signing Certificates (macOS)
@@ -94,7 +138,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rpm
 
-      - name: Build Electron app
+      - name: Build Desktop app
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -110,9 +154,9 @@ jobs:
         with:
           name: macos-app
           path: |
-            dist/*.dmg
-            dist/*.zip
-            dist/*.blockmap
+            packages/desktop/dist/*.dmg
+            packages/desktop/dist/*.zip
+            packages/desktop/dist/*.blockmap
 
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'windows-latest'
@@ -120,8 +164,8 @@ jobs:
         with:
           name: windows-app
           path: |
-            dist/*.exe
-            dist/*.blockmap
+            packages/desktop/dist/*.exe
+            packages/desktop/dist/*.blockmap
 
       - name: Upload artifacts (Linux)
         if: matrix.platform == 'ubuntu-22.04'
@@ -129,5 +173,5 @@ jobs:
         with:
           name: linux-app
           path: |
-            dist/*.AppImage
-            dist/*.blockmap
+            packages/desktop/dist/*.AppImage
+            packages/desktop/dist/*.blockmap

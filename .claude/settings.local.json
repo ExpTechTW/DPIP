@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(mkdir -p:*)",
+      "Bash(dir /s /b \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\web\\public\")",
+      "Bash(dir:*)",
+      "Bash(dir /s /b \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\common\\public\")",
+      "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\web\\public\")",
+      "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\desktop\\public\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

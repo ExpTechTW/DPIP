@@ -1,4 +1,4 @@
-name: Release
+name: Release Desktop
 
 on:
   push:
@@ -37,7 +37,8 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+            packages/*/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -45,8 +46,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+            packages/desktop/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/**/*.js', 'packages/**/*.jsx', 'packages/**/*.ts', 'packages/**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-nextjs-
@@ -55,9 +56,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            build
-            .erb
-          key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('electron/**/*.ts') }}
+            packages/desktop/build
+            packages/desktop/.erb
+          key: ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-${{ hashFiles('packages/desktop/electron/**/*.ts') }}
           restore-keys: |
             ${{ runner.os }}-webpack-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-webpack-
@@ -76,7 +77,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: bun install
 
       - name: Import Code-Signing Certificates (macOS)
@@ -94,7 +95,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rpm
 
-      - name: Build Electron app
+      - name: Build Desktop app
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -103,17 +104,18 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run ${{ matrix.build_script }} --publish never
+        working-directory: packages/desktop
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           files: |
-            dist/*.dmg
-            dist/*.zip
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.blockmap
-            dist/latest*.yml
+            packages/desktop/dist/*.dmg
+            packages/desktop/dist/*.zip
+            packages/desktop/dist/*.exe
+            packages/desktop/dist/*.AppImage
+            packages/desktop/dist/*.blockmap
+            packages/desktop/dist/latest*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

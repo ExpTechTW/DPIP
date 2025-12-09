@@ -1,0 +1,12 @@
+{
+  "name": "@dpip/common",
+  "version": "1.0.0-pre.2",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./pages/*": "./src/pages/*.tsx"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

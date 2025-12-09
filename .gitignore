@@ -29,3 +29,13 @@ Thumbs.db
 .idea
 *.swp
 *.swo
+
+# Monorepo
+packages/*/node_modules
+packages/*/.next
+packages/*/out
+packages/*/dist
+packages/*/build
+
+# Plan files
+PLAN.md

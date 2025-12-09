@@ -1,0 +1,15 @@
+{
+  "name": "@dpip/web",
+  "version": "1.0.0-pre.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@dpip/common": "*"
+  }
+}
