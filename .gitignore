@@ -36,6 +36,3 @@ packages/*/.next
 packages/*/out
 packages/*/dist
 packages/*/build
-
-# Plan files
-PLAN.md
