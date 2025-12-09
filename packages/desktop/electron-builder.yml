@@ -26,7 +26,7 @@ win:
       arch:
         - x64
         - ia32
-  icon: ./public/icons/app.ico
+  icon: ../common/public/icons/app.ico
   verifyUpdateCodeSignature: false
 
 nsis:
