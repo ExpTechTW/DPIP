@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Map, GeoJSONSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import '../../styles/maplibre.css';
 import { useRTS } from '../../contexts/RTSContext';
 import type { StationGeoJSON } from '../../lib/rts';
 import regionData from '../../data/region.json';
@@ -70,14 +71,21 @@ const getRegionName = (code: string): string => {
 const intensityToInt = (f: number): number =>
   f < 0 ? 0 : f < 4.5 ? Math.round(f) : f < 5 ? 5 : f < 5.5 ? 6 : f < 6 ? 7 : f < 6.5 ? 8 : 9;
 
-const reusableBoxGeoJSON = { type: 'FeatureCollection' as const, features: [] as any[] };
+const reusableBoxGeoJSON = { type: 'FeatureCollection' as const, features: [] as BoxFeature[] };
 const reusableLineGeoJSON = { type: 'FeatureCollection' as const, features: [] as any[] };
+
+const formatTime = (ts: number) => {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+};
 
 export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) => void; onCleanup?: () => void }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const sourceInitializedRef = useRef(false);
   const connectedStationsRef = useRef(new Set<string>());
+  const lastReceivedTimeRef = useRef(0);
 
   const { data: rtsData, lastUpdate, ntpTime } = useRTS();
 
@@ -86,17 +94,9 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   const [maxIntensity, setMaxIntensity] = useState(-3);
   const [isMapReady, setIsMapReady] = useState(false);
   const [boxVisible, setBoxVisible] = useState(true);
-  const [tooltipSwitchIndex, setTooltipSwitchIndex] = useState(0);
   const [tooltips, setTooltips] = useState<AlertTooltip[]>([]);
   const [alertStations, setAlertStations] = useState<AlertTooltip[]>([]);
   const [isStale, setIsStale] = useState(false);
-  const lastReceivedTimeRef = useRef(0);
-
-  const formatTime = (ts: number) => {
-    if (!ts) return '';
-    const d = new Date(ts);
-    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-  };
 
   const updateBoxGeoJSON = useCallback(() => {
     if (!rtsData?.box) return null;
@@ -122,8 +122,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   }, []);
 
   const initializeMapSource = useCallback((map: Map, geojson: StationGeoJSON) => {
-    if (sourceInitializedRef.current) return;
-    if (map.getSource('stations')) return;
+    if (sourceInitializedRef.current || map.getSource('stations')) return;
 
     map.addSource('stations', { type: 'geojson', data: geojson });
     map.addSource('tooltip-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
@@ -183,8 +182,9 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
     source.setData(reusableLineGeoJSON);
   }, []);
 
+  // Initialize map
   useEffect(() => {
-    if (mapContainerRef.current === null) return;
+    if (!mapContainerRef.current) return;
 
     const map = new Map({
       container: mapContainerRef.current,
@@ -192,10 +192,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
         version: 8,
         name: 'ExpTech Studio',
         sources: {
-          map: {
-            type: 'vector',
-            url: 'https://lb.exptech.dev/api/v1/map/tiles/tiles.json',
-          },
+          map: { type: 'vector', url: 'https://lb.exptech.dev/api/v1/map/tiles/tiles.json' },
         },
         sprite: '',
         glyphs: 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
@@ -209,56 +206,61 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
       center: [121.6, 23.5],
       zoom: 6.8,
       attributionControl: false,
-      pitchWithRotate: false,
       dragRotate: false,
+      touchZoomRotate: true,
+      touchPitch: false,
+      pitchWithRotate: false,
+      boxZoom: false,
       maxZoom: 12,
       minZoom: 4,
+      maxPitch: 0,
     });
+
+    // Disable rotation via keyboard
+    map.keyboard.disableRotation();
 
     mapRef.current = map;
-
-    const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
-    void map.fitBounds(MAP_BOUNDS, { padding: 20, duration: 0 });
-
+    map.fitBounds([[118.0, 21.2], [124.0, 25.8]], { padding: 20, duration: 0 });
     map.on('load', () => {
       setIsMapReady(true);
-      if (onMapLoaded) onMapLoaded(map);
+      onMapLoaded?.(map);
     });
-
-    map.on('error', () => void 0);
 
     return () => {
       sourceInitializedRef.current = false;
       connectedStationsRef.current.clear();
-      if (onCleanup) onCleanup();
+      onCleanup?.();
       map.remove();
     };
   }, []);
 
-  // Check stale status and update display time (triggered by RTSContext's 1s interval)
+  // Check stale status and update display time
   useEffect(() => {
     if (lastUpdate === 0) return;
-    const now = Date.now();
-    const stale = lastReceivedTimeRef.current > 0 && now - lastReceivedTimeRef.current > 3000;
+    const stale = lastReceivedTimeRef.current > 0 && Date.now() - lastReceivedTimeRef.current > 3000;
     setIsStale(stale);
-    // If stale, show last rts.time; otherwise show NTP time
     setDisplayTime(stale ? dataTime : ntpTime);
   }, [lastUpdate, ntpTime, dataTime]);
 
-  // Process RTS data when it updates
+  // Process RTS data
   useEffect(() => {
     if (!rtsData) return;
     setDataTime(rtsData.time);
     lastReceivedTimeRef.current = Date.now();
     setIsStale(false);
+
     let max = -3;
     const alerts: AlertTooltip[] = [];
     for (const f of rtsData.geojson.features) {
       if (f.properties.intensity > max) max = f.properties.intensity;
       if (f.properties.hasAlert) {
         alerts.push({
-          stationId: f.properties.id, stationCode: f.properties.code, intensity: f.properties.intensity,
-          coordinates: f.geometry.coordinates, tooltipPosition: [0, 0], cornerId: '',
+          stationId: f.properties.id,
+          stationCode: f.properties.code,
+          intensity: f.properties.intensity,
+          coordinates: f.geometry.coordinates,
+          tooltipPosition: [0, 0],
+          cornerId: '',
         });
       }
     }
@@ -269,13 +271,16 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   // Update tooltip positions
   useEffect(() => {
     connectedStationsRef.current.clear();
-    if (alertStations.length === 0) { setTooltips([]); return; }
+    if (alertStations.length === 0) {
+      setTooltips([]);
+      return;
+    }
     const positioned = assignTooltipPositions(alertStations);
     setTooltips(positioned);
     for (const t of positioned) connectedStationsRef.current.add(t.stationId);
-  }, [alertStations, tooltipSwitchIndex, assignTooltipPositions]);
+  }, [alertStations, assignTooltipPositions]);
 
-  // Update map sources when data changes
+  // Update map sources
   useEffect(() => {
     if (!rtsData || !isMapReady || !sourceInitializedRef.current) return;
     updateStationSource();
@@ -289,23 +294,22 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
     }
   }, [isMapReady, rtsData?.geojson, initializeMapSource]);
 
-  // Tooltip switch interval
+  // Tooltip switch interval (3s)
   useEffect(() => {
-    const id = setInterval(() => setTooltipSwitchIndex(p => p + 1), 3000);
+    const id = setInterval(() => setAlertStations(prev => [...prev]), 3000);
     return () => clearInterval(id);
   }, []);
 
-  // Box visibility toggle
+  // Box visibility toggle (1s)
   useEffect(() => {
-    const id = setInterval(() => setBoxVisible(p => !p), 1000);
+    const id = setInterval(() => setBoxVisible(prev => !prev), 1000);
     return () => clearInterval(id);
   }, []);
 
   // Update box visibility
   useEffect(() => {
     if (!mapRef.current || !sourceInitializedRef.current) return;
-    const map = mapRef.current;
-    if (map.getLayer('box-outlines')) map.setLayoutProperty('box-outlines', 'visibility', boxVisible ? 'visible' : 'none');
+    mapRef.current.setLayoutProperty('box-outlines', 'visibility', boxVisible ? 'visible' : 'none');
   }, [boxVisible]);
 
   // Update box source
@@ -319,11 +323,10 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
 
       {/* Alert tooltips */}
       {tooltips.map((t) => {
-        if (!mapRef.current) return null;
+        if (!mapRef.current || !mapContainerRef.current) return null;
         const pixel = mapRef.current.project(t.tooltipPosition);
         const offset = TOOLTIP_OFFSETS[t.cornerId];
         const container = mapContainerRef.current;
-        if (!container) return null;
         const left = Math.max(5, Math.min(container.offsetWidth - 95, pixel.x + offset.x));
         const top = Math.max(5, Math.min(container.offsetHeight - 75, pixel.y + offset.y));
         const int = intensityToInt(t.intensity);
@@ -349,16 +352,25 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
           <div className="backdrop-blur-sm rounded-md p-2">
             <div className="flex items-start gap-1.5">
               <div className="flex flex-col text-[9px] text-white/90 font-medium text-right" style={{ height: 180, justifyContent: 'space-between' }}>
-                {[7,6,5,4,3,2,1,0,-1,-2,-3].map(n => <span key={n} style={{ lineHeight: '9px' }}>{n}</span>)}
+                {[7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3].map(n => <span key={n} style={{ lineHeight: '9px' }}>{n}</span>)}
               </div>
               <div className="relative" style={{ height: 180 }}>
                 <div className="w-1.5 h-full rounded-full" style={{
                   background: 'linear-gradient(180deg, #b720e9 0%, #fc5235 10%, #ff9300 20%, #fff000 30%, #beff0c 40%, #44fa34 50%, #49E9AD 60%, #79E5FD 70%, #009EF8 80%, #004bf8 90%, #0005d0 100%)',
                   boxShadow: '0 0 4px rgba(0,0,0,0.3)'
                 }} />
-                <div className="absolute -right-3 text-white text-[10px] transition-all duration-300" style={{
-                  top: `${((7 - maxIntensity) / 10) * 100}%`, transform: 'translateY(-50%)', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'
-                }}>◀</div>
+                <svg
+                  className="absolute -right-2 w-1.5 h-1.5 transition-all duration-300"
+                  viewBox="0 0 10 10"
+                  fill="white"
+                  style={{
+                    top: `${((7 - maxIntensity) / 10) * 100}%`,
+                    transform: 'translateY(-50%)',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'
+                  }}
+                >
+                  <polygon points="10,0 0,5 10,10" />
+                </svg>
               </div>
             </div>
           </div>

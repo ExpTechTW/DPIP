@@ -1,0 +1,8 @@
+/* Override MapLibre default focus outline */
+.maplibregl-canvas:focus {
+  outline: none !important;
+}
+
+.maplibregl-map:focus {
+  outline: none !important;
+}
