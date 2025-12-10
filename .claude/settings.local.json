@@ -12,7 +12,11 @@
       "Bash(ln:*)",
       "Bash(node scripts/sync-version.cjs:*)",
       "Bash(git rm:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(npm run build:web:*)",
+      "Bash(npm run build:desktop:*)"
     ],
     "deny": [],
     "ask": []

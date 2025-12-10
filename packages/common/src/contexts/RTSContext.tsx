@@ -8,6 +8,7 @@ interface RTSContextType {
   data: ProcessedStationData | null;
   isLoading: boolean;
   error: Error | null;
+  lastUpdate: number;
 }
 
 const RTSContext = createContext<RTSContextType | undefined>(undefined);
@@ -16,6 +17,7 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<ProcessedStationData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
   const workerManagerRef = useRef<RTSWorkerManager | null>(null);
   const isMountedRef = useRef<boolean>(true);
 
@@ -40,6 +42,7 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
       } finally {
         if (isMountedRef.current) {
           setIsLoading(false);
+          setLastUpdate(Date.now());
         }
       }
     };
@@ -59,7 +62,7 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <RTSContext.Provider value={{ data, isLoading, error }}>
+    <RTSContext.Provider value={{ data, isLoading, error, lastUpdate }}>
       {children}
     </RTSContext.Provider>
   );

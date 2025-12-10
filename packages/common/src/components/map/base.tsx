@@ -79,7 +79,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   const sourceInitializedRef = useRef(false);
   const connectedStationsRef = useRef(new Set<string>());
 
-  const { data: rtsData, error: rtsError } = useRTS();
+  const { data: rtsData, lastUpdate } = useRTS();
 
   const [dataTime, setDataTime] = useState(0);
   const [maxIntensity, setMaxIntensity] = useState(-3);
@@ -88,6 +88,8 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   const [tooltipSwitchIndex, setTooltipSwitchIndex] = useState(0);
   const [tooltips, setTooltips] = useState<AlertTooltip[]>([]);
   const [alertStations, setAlertStations] = useState<AlertTooltip[]>([]);
+  const [isStale, setIsStale] = useState(false);
+  const lastReceivedTimeRef = useRef(0);
 
   const formatTime = (ts: number) => {
     if (!ts) return '';
@@ -232,10 +234,21 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
     };
   }, []);
 
+  // Check stale status on every update (triggered by RTSContext's 1s interval)
+  useEffect(() => {
+    if (lastUpdate === 0) return;
+    const now = Date.now();
+    if (lastReceivedTimeRef.current > 0) {
+      setIsStale(now - lastReceivedTimeRef.current > 3000);
+    }
+  }, [lastUpdate]);
+
   // Process RTS data when it updates
   useEffect(() => {
     if (!rtsData) return;
     setDataTime(rtsData.time);
+    lastReceivedTimeRef.current = Date.now();
+    setIsStale(false);
     let max = -3;
     const alerts: AlertTooltip[] = [];
     for (const f of rtsData.geojson.features) {
@@ -348,7 +361,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
             </div>
           </div>
           <div className="bg-black/70 backdrop-blur-md rounded-lg px-3 py-1.5 border border-white/10 shadow-lg flex items-center gap-1.5">
-            <div className={`w-2 h-2 rounded-full animate-pulse ${rtsError ? 'bg-red-500' : 'bg-emerald-400'}`} />
+            <div className={`w-2 h-2 rounded-full animate-pulse ${isStale ? 'bg-red-500' : 'bg-emerald-400'}`} />
             <span className="text-white/90 text-xs font-medium tracking-wide">{formatTime(dataTime)}</span>
           </div>
         </div>
