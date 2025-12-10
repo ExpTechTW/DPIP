@@ -1,0 +1,3 @@
+# Shared resources copied from packages/common/public
+public/icons/
+public/rts-worker.js

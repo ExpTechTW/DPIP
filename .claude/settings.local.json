@@ -10,7 +10,8 @@
       "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\desktop\\public\")",
       "Bash(npx tsc:*)",
       "Bash(ln:*)",
-      "Bash(node scripts/sync-version.cjs:*)"
+      "Bash(node scripts/sync-version.cjs:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
