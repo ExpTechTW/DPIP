@@ -27,11 +27,11 @@ for (const pkg of packages) {
   }
 }
 
-// Sync common/public to web/public and desktop/public
-const commonPublic = path.join(rootDir, 'packages/common/public');
+// Sync common/public/common to web/public/common and desktop/public/common
+const commonPublic = path.join(rootDir, 'packages/common/public/common');
 const targets = [
-  path.join(rootDir, 'packages/web/public'),
-  path.join(rootDir, 'packages/desktop/public'),
+  path.join(rootDir, 'packages/web/public/common'),
+  path.join(rootDir, 'packages/desktop/public/common'),
 ];
 
 function copyRecursive(src, dest) {
@@ -58,4 +58,4 @@ function copyRecursive(src, dest) {
 for (const target of targets) {
   copyRecursive(commonPublic, target);
 }
-console.log('Synced common/public to web and desktop');
+console.log('Synced common/public/common to web and desktop');

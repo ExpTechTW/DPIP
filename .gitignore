@@ -1,7 +1,5 @@
 # Dependencies
 node_modules
-.pnp
-.pnp.js
 
 # Next.js
 .next
@@ -23,12 +21,6 @@ build
 # OS
 .DS_Store
 Thumbs.db
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
 
 # Monorepo
 packages/*/node_modules

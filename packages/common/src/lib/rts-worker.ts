@@ -21,7 +21,7 @@ export class RTSWorkerManager {
 
   private initWorker() {
     if (typeof Worker !== 'undefined') {
-      this.worker = new Worker('/rts-worker.js');
+      this.worker = new Worker('/common/rts-worker.js');
 
       this.worker.onmessage = (e) => {
         const { type, data, error } = e.data;

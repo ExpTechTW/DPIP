@@ -11,7 +11,8 @@
       "Bash(npx tsc:*)",
       "Bash(ln:*)",
       "Bash(node scripts/sync-version.cjs:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
