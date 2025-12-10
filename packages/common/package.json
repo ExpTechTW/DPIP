@@ -4,7 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./pages/*": "./src/pages/*.tsx"
+    "./pages/*": {
+      "import": "./src/pages/*.tsx"
+    },
+    "./components/*": {
+      "import": "./src/components/*.tsx"
+    }
   },
   "peerDependencies": {
     "react": "^19.0.0"

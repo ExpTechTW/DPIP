@@ -79,7 +79,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   const sourceInitializedRef = useRef(false);
   const connectedStationsRef = useRef(new Set<string>());
 
-  const { data: rtsData } = useRTS();
+  const { data: rtsData, error: rtsError } = useRTS();
 
   const [dataTime, setDataTime] = useState(0);
   const [maxIntensity, setMaxIntensity] = useState(-3);
@@ -347,8 +347,9 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
               </div>
             </div>
           </div>
-          <div className="bg-background/90 backdrop-blur-sm border border-border/50 rounded-md px-3 py-2 shadow-md">
-            <p className="text-xs text-white font-bold">{formatTime(dataTime)}</p>
+          <div className="bg-black/70 backdrop-blur-md rounded-lg px-3 py-1.5 border border-white/10 shadow-lg flex items-center gap-1.5">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${rtsError ? 'bg-red-500' : 'bg-emerald-400'}`} />
+            <span className="text-white/90 text-xs font-medium tracking-wide">{formatTime(dataTime)}</span>
           </div>
         </div>
       )}
