@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Footer } from '@dpip/common/components/footer';
 
 export const metadata: Metadata = {
   title: 'DPIP',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW" className="h-full">
-      <body className="h-full m-0 p-0">{children}</body>
+      <body className="h-full m-0 p-0 relative">
+        {children}
+        <Footer />
+      </body>
     </html>
   )
 }
