@@ -9,6 +9,7 @@ interface RTSContextType {
   isLoading: boolean;
   error: Error | null;
   lastUpdate: number;
+  ntpTime: number;
 }
 
 const RTSContext = createContext<RTSContextType | undefined>(undefined);
@@ -18,8 +19,29 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
+  const [ntpTime, setNtpTime] = useState<number>(0);
+  const ntpOffsetRef = useRef<number>(0);
   const workerManagerRef = useRef<RTSWorkerManager | null>(null);
   const isMountedRef = useRef<boolean>(true);
+
+  // Sync NTP time offset on mount and every 60 seconds
+  useEffect(() => {
+    const syncNtp = async () => {
+      try {
+        const beforeRequest = Date.now();
+        const res = await fetch('https://lb.exptech.dev/ntp');
+        const afterRequest = Date.now();
+        const serverTime = parseInt(await res.text(), 10);
+        const latency = (afterRequest - beforeRequest) / 2;
+        ntpOffsetRef.current = serverTime - (beforeRequest + latency);
+      } catch {
+        ntpOffsetRef.current = 0;
+      }
+    };
+    syncNtp();
+    const ntpInterval = setInterval(syncNtp, 60000);
+    return () => clearInterval(ntpInterval);
+  }, []);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -43,6 +65,7 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
         if (isMountedRef.current) {
           setIsLoading(false);
           setLastUpdate(Date.now());
+          setNtpTime(Date.now() + ntpOffsetRef.current);
         }
       }
     };
@@ -62,7 +85,7 @@ export function RTSProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <RTSContext.Provider value={{ data, isLoading, error, lastUpdate }}>
+    <RTSContext.Provider value={{ data, isLoading, error, lastUpdate, ntpTime }}>
       {children}
     </RTSContext.Provider>
   );

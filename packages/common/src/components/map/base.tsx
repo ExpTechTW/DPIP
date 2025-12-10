@@ -79,9 +79,10 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
   const sourceInitializedRef = useRef(false);
   const connectedStationsRef = useRef(new Set<string>());
 
-  const { data: rtsData, lastUpdate } = useRTS();
+  const { data: rtsData, lastUpdate, ntpTime } = useRTS();
 
   const [dataTime, setDataTime] = useState(0);
+  const [displayTime, setDisplayTime] = useState(0);
   const [maxIntensity, setMaxIntensity] = useState(-3);
   const [isMapReady, setIsMapReady] = useState(false);
   const [boxVisible, setBoxVisible] = useState(true);
@@ -234,14 +235,15 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
     };
   }, []);
 
-  // Check stale status on every update (triggered by RTSContext's 1s interval)
+  // Check stale status and update display time (triggered by RTSContext's 1s interval)
   useEffect(() => {
     if (lastUpdate === 0) return;
     const now = Date.now();
-    if (lastReceivedTimeRef.current > 0) {
-      setIsStale(now - lastReceivedTimeRef.current > 3000);
-    }
-  }, [lastUpdate]);
+    const stale = lastReceivedTimeRef.current > 0 && now - lastReceivedTimeRef.current > 3000;
+    setIsStale(stale);
+    // If stale, show last rts.time; otherwise show NTP time
+    setDisplayTime(stale ? dataTime : ntpTime);
+  }, [lastUpdate, ntpTime, dataTime]);
 
   // Process RTS data when it updates
   useEffect(() => {
@@ -313,7 +315,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
 
   return (
     <div className="h-full w-full relative">
-      <div ref={mapContainerRef} className="h-full w-full" />
+      <div ref={mapContainerRef} className="h-full w-full outline-none" />
 
       {/* Alert tooltips */}
       {tooltips.map((t) => {
@@ -342,7 +344,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
       })}
 
       {/* Intensity legend and time display */}
-      {dataTime > 0 && (
+      {displayTime > 0 && (
         <div className="absolute bottom-3 right-3 z-50 flex flex-col gap-2 items-end">
           <div className="backdrop-blur-sm rounded-md p-2">
             <div className="flex items-start gap-1.5">
@@ -362,7 +364,7 @@ export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) =
           </div>
           <div className="bg-black/70 backdrop-blur-md rounded-lg px-3 py-1.5 border border-white/10 shadow-lg flex items-center gap-1.5">
             <div className={`w-2 h-2 rounded-full animate-pulse ${isStale ? 'bg-red-500' : 'bg-emerald-400'}`} />
-            <span className="text-white/90 text-xs font-medium tracking-wide">{formatTime(dataTime)}</span>
+            <span className="text-white/90 text-xs font-medium tracking-wide">{formatTime(displayTime)}</span>
           </div>
         </div>
       )}

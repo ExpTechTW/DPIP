@@ -10,8 +10,5 @@
     "./components/*": {
       "import": "./src/components/*.tsx"
     }
-  },
-  "peerDependencies": {
-    "react": "^19.0.0"
   }
 }

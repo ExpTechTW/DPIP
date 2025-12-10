@@ -16,7 +16,8 @@
       "Bash(npm run build:*)",
       "Bash(timeout 10 npm run dev:*)",
       "Bash(npm run build:web:*)",
-      "Bash(npm run build:desktop:*)"
+      "Bash(npm run build:desktop:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
