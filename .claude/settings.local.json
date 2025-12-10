@@ -7,7 +7,12 @@
       "Bash(dir:*)",
       "Bash(dir /s /b \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\common\\public\")",
       "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\web\\public\")",
-      "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\desktop\\public\")"
+      "Bash(rd /s /q \"c:\\Users\\YuYu1015\\Documents\\GitHub\\DPIP\\packages\\desktop\\public\")",
+      "Bash(npx tsc:*)",
+      "Bash(ln:*)",
+      "Bash(node scripts/sync-version.cjs:*)",
+      "Bash(git rm:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
