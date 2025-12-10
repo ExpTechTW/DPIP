@@ -50,3 +50,17 @@ jobs:
 
       - name: Build Web app
         run: npm run build:web
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to dev server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ./DPIP-dev && git pull && docker compose up -d --build dpip-dev && docker system prune -a --volumes -f
