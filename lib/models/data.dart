@@ -191,6 +191,8 @@ class DpipDataModel extends _DpipDataModel {
   int? _replayTimestamp;
   int? _replayStartTime;
   final Random _random = Random();
+  int? _syncDistance;
+  int _lastSyncTime = 0;
 
   int get currentTime {
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -229,27 +231,71 @@ class DpipDataModel extends _DpipDataModel {
     notifyListeners();
   }
 
+  void _updateRtsData(Rts rts, List<Eew> eew) {
+    _syncDistance = currentTime - rts.time;
+    setRts(rts);
+    setEew(eew);
+  }
+
+  Future<(Rts, List<Eew>)> _fetchRtsData() async {
+    final data = _isReplayMode
+        ? await Future.wait([ExpTech().getRts(currentTime), ExpTech().getEew(currentTime)])
+        : await Future.wait([ExpTech().getRts(), ExpTech().getEew()]);
+    return (data[0] as Rts, data[1] as List<Eew>);
+  }
+
+  Future<void> fetchRtsImmediately() async {
+    if (!_isInForeground) return;
+    try {
+      final (rts, eew) = await _fetchRtsData();
+      _updateRtsData(rts, eew);
+    } catch (e, s) {
+      TalkerManager.instance.error('fetchRtsImmediately', e, s);
+    }
+  }
+
   void startFetching() {
     if (_secondTimer != null) return;
 
-    Future<void> everySecondCallback() async {
+    Future<void> fetchCallback() async {
       if (!_isInForeground) return;
-
       try {
-        final data = _isReplayMode
-            ? await Future.wait([ExpTech().getRts(currentTime), ExpTech().getEew(currentTime)])
-            : await Future.wait([ExpTech().getRts(), ExpTech().getEew()]);
-
-        final [rts as Rts, eew as List<Eew>] = data;
-
-        setRts(rts);
-        setEew(eew);
+        final (rts, eew) = await _fetchRtsData();
+        _updateRtsData(rts, eew);
       } catch (e, s) {
-        TalkerManager.instance.error('everySecondCallback', e, s);
+        TalkerManager.instance.error('fetchCallback', e, s);
       }
     }
 
-    _secondTimer = Timer.periodic(const Duration(seconds: 1), (_) => everySecondCallback());
+    _secondTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
+      if (!_isInForeground) return;
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final timeSinceLastSync = now - _lastSyncTime;
+      final shouldSync = timeSinceLastSync >= 10000;
+
+      await fetchCallback();
+
+      if (shouldSync && _syncDistance != null) {
+        _lastSyncTime = now;
+
+        final serverMs = (currentTime % 1000 - _syncDistance! % 1000 + 1000) % 1000;
+        final delayToNextSecond = serverMs == 0 ? 1000 : (1000 - serverMs);
+
+        Timer(Duration(milliseconds: delayToNextSecond), () async {
+          if (!_isInForeground) return;
+          try {
+            final (rts, eew) = await _fetchRtsData();
+            _updateRtsData(rts, eew);
+          } catch (e, s) {
+            TalkerManager.instance.error('syncCallback', e, s);
+          }
+        });
+      }
+    });
+
+    _lastSyncTime = DateTime.now().millisecondsSinceEpoch;
+    fetchCallback();
 
     Future<void> everyMinuteCallback() async {
       if (!_isInForeground) return;
@@ -284,7 +330,10 @@ class DpipDataModel extends _DpipDataModel {
     _secondTimer = null;
     _minuteTimer?.cancel();
     _minuteTimer = null;
+    _lastSyncTime = 0;
   }
+
+  int? get lastRtsPing => _syncDistance;
 
   void onAppLifecycleStateChanged(AppLifecycleState state) {
     _isInForeground = state == AppLifecycleState.resumed;

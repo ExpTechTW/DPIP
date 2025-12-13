@@ -773,8 +773,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
     }
 
-    final t = lastDataReceivedTime ?? currentTime;
-    _ping = (currentTime - t) / 1000;
+    final rtsPing = GlobalProviders.data.lastRtsPing;
+    if (rtsPing != null) {
+      _ping = rtsPing.toDouble();
+    } else {
+      _ping = -1;
+    }
     pingNotifier.value = _ping;
   }
 
@@ -897,6 +901,8 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       _setupBlinkTimer();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+
+      unawaited(GlobalProviders.data.fetchRtsImmediately());
 
       await Future.wait([
         controller.setLayerVisibility(_rtsLayerId, !hasBox),
@@ -1356,12 +1362,12 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                         valueListenable: widget.manager.pingNotifier,
                         builder: (context, ping, child) {
                           final isDataOk = widget.manager.dataStatus;
-                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(2)}s';
+                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(0)}ms';
                           final pingColor = (!isDataOk)
                               ? Colors.red
-                              : (ping > 5)
+                              : (ping > 5000)
                               ? Colors.red
-                              : (ping > 1)
+                              : (ping > 1000)
                               ? Colors.orange
                               : Colors.green;
 
