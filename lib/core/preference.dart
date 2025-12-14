@@ -49,6 +49,14 @@ class PreferenceKeys {
   static const radarListCache = 'radar-list-cache';
   static const stationEtag = 'station-etag';
   static const stationCache = 'station-cache';
+  static const realtimeListEtag = 'realtime-list-etag';
+  static const realtimeListCache = 'realtime-list-cache';
+  static const realtimeRegionEtag = 'realtime-region-etag';
+  static const realtimeRegionCache = 'realtime-region-cache';
+  static const historyListEtag = 'history-list-etag';
+  static const historyListCache = 'history-list-cache';
+  static const historyRegionEtag = 'history-region-etag';
+  static const historyRegionCache = 'history-region-cache';
   // #endregion
 
   // #region Network

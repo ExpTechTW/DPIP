@@ -527,13 +527,44 @@ class ExpTech {
   Future<List<History>> getRealtime() async {
     final requestUrl = Routes.realtime();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Realtime List API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.realtimeListEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 Realtime List API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug('🌐 Realtime List API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.realtimeListCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 Realtime List API: Using cached data (304 Not Modified)');
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.realtimeListEtag, etag);
+      TalkerManager.instance.debug('🌐 Realtime List API: Saved ETag: $etag');
+    }
+
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(PreferenceKeys.realtimeListCache, res.body);
+    TalkerManager.instance.debug('🌐 Realtime List API: Saved cached data');
 
     return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
@@ -541,13 +572,44 @@ class ExpTech {
   Future<List<History>> getHistory() async {
     final requestUrl = Routes.history();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 History List API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.historyListEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 History List API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug('🌐 History List API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.historyListCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 History List API: Using cached data (304 Not Modified)');
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.historyListEtag, etag);
+      TalkerManager.instance.debug('🌐 History List API: Saved ETag: $etag');
+    }
+
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(PreferenceKeys.historyListCache, res.body);
+    TalkerManager.instance.debug('🌐 History List API: Saved cached data');
 
     return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
@@ -555,13 +617,44 @@ class ExpTech {
   Future<List<History>> getRealtimeRegion(String region) async {
     final requestUrl = Routes.realtimeRegion(region);
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Realtime Region API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.realtimeRegionEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 Realtime Region API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug('🌐 Realtime Region API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.realtimeRegionCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 Realtime Region API: Using cached data (304 Not Modified)');
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.realtimeRegionEtag, etag);
+      TalkerManager.instance.debug('🌐 Realtime Region API: Saved ETag: $etag');
+    }
+
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(PreferenceKeys.realtimeRegionCache, res.body);
+    TalkerManager.instance.debug('🌐 Realtime Region API: Saved cached data');
 
     return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
@@ -569,13 +662,44 @@ class ExpTech {
   Future<List<History>> getHistoryRegion(String region) async {
     final requestUrl = Routes.historyRegion(region);
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 History Region API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.historyRegionEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 History Region API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug('🌐 History Region API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.historyRegionCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 History Region API: Using cached data (304 Not Modified)');
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.historyRegionEtag, etag);
+      TalkerManager.instance.debug('🌐 History Region API: Saved ETag: $etag');
+    }
+
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(PreferenceKeys.historyRegionCache, res.body);
+    TalkerManager.instance.debug('🌐 History Region API: Saved cached data');
 
     return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
