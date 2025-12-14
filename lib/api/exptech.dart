@@ -30,7 +30,6 @@ import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
 
-/// HTTP Client with gzip compression support
 class _GzipClient extends http.BaseClient {
   final http.Client _inner;
 
@@ -38,7 +37,6 @@ class _GzipClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
-    // 添加 Accept-Encoding header 以啟用 gzip 壓縮
     request.headers['Accept-Encoding'] = 'gzip, deflate';
     return _inner.send(request);
   }
@@ -47,11 +45,9 @@ class _GzipClient extends http.BaseClient {
   void close() => _inner.close();
 }
 
-/// 創建帶有代理設定的 HTTP Client
 http.Client _createHttpClient() {
   final httpClient = HttpClient();
 
-  // 從 Preference 讀取代理設定
   final proxyEnabled = Preference.proxyEnabled ?? false;
   final proxyHost = Preference.proxyHost;
   final proxyPort = Preference.proxyPort;
@@ -60,7 +56,6 @@ http.Client _createHttpClient() {
     httpClient.findProxy = (uri) {
       return 'PROXY $proxyHost:$proxyPort';
     };
-    // 允許代理連接到 HTTPS
     httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) => false;
   }
 
@@ -188,7 +183,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Station API: GET $requestUrl');
 
-    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
     final headers = <String, String>{};
     final cachedEtag = Preference.instance.getString(PreferenceKeys.stationEtag);
     if (cachedEtag != null) {
@@ -200,7 +194,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Station API: Response status=${res.statusCode}, body length=${res.body.length}');
 
-    // 處理 304 Not Modified - 使用快取的資料
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.stationCache);
       if (cachedData != null) {
@@ -218,7 +211,6 @@ class ExpTech {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
-    // 儲存 ETag 和資料
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
       Preference.instance.setString(PreferenceKeys.stationEtag, etag);
@@ -281,7 +273,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Radar List API: GET $requestUrl');
 
-    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
     final headers = <String, String>{};
     final cachedEtag = Preference.instance.getString(PreferenceKeys.radarListEtag);
     if (cachedEtag != null) {
@@ -295,7 +286,6 @@ class ExpTech {
       '🌐 Radar List API: Response status=${res.statusCode}, body length=${res.body.length}',
     );
 
-    // 處理 304 Not Modified - 使用快取的資料
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.radarListCache);
       if (cachedData != null) {
@@ -311,7 +301,6 @@ class ExpTech {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
-    // 儲存 ETag 和資料
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
       Preference.instance.setString(PreferenceKeys.radarListEtag, etag);
@@ -358,7 +347,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 API: GET $requestUrl');
 
-    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
     final headers = <String, String>{};
     final cachedEtag = Preference.instance.getString(PreferenceKeys.weatherEtag);
     if (cachedEtag != null) {
@@ -370,7 +358,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 API: Response status=${res.statusCode}, body length=${res.body.length}');
 
-    // 處理 304 Not Modified - 使用快取的資料
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.weatherCache);
       if (cachedData != null) {
@@ -378,7 +365,6 @@ class ExpTech {
         final json = jsonDecode(cachedData) as Map<String, dynamic>;
         return RealtimeWeather.fromJson(json);
       } else {
-        // 如果沒有快取資料，拋出錯誤
         throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
       }
     }
@@ -387,7 +373,6 @@ class ExpTech {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
-    // 儲存 ETag 和資料
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
       Preference.instance.setString(PreferenceKeys.weatherEtag, etag);
@@ -411,7 +396,6 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Forecast API: GET $requestUrl');
 
-    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
     final headers = <String, String>{};
     final cachedEtag = Preference.instance.getString(PreferenceKeys.forecastEtag);
     if (cachedEtag != null) {
@@ -423,14 +407,12 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Forecast API: Response status=${res.statusCode}, body length=${res.body.length}');
 
-    // 處理 304 Not Modified - 使用快取的資料
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.forecastCache);
       if (cachedData != null) {
         TalkerManager.instance.debug('🌐 Forecast API: Using cached data (304 Not Modified)');
         return jsonDecode(cachedData) as Map<String, dynamic>;
       } else {
-        // 如果沒有快取資料，拋出錯誤
         throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
       }
     }
@@ -439,7 +421,6 @@ class ExpTech {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
-    // 儲存 ETag 和資料
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
       Preference.instance.setString(PreferenceKeys.forecastEtag, etag);

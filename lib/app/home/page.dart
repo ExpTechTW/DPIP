@@ -118,8 +118,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     setState(() {
       _isLoading = true;
       _isOutOfService = isOutOfService;
-      _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
       if (_lastRefreshCode != code) {
+        _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
         _weather = null;
         _forecast = null;
       }
