@@ -180,14 +180,17 @@ class ExpTech {
 
   Future<Map<String, Station>> getStations() async {
     final requestUrl = Routes.station();
+    final host = requestUrl.host;
 
     TalkerManager.instance.debug('🌐 Station API: GET $requestUrl');
 
     final headers = <String, String>{};
-    final cachedEtag = Preference.instance.getString(PreferenceKeys.stationEtag);
+    final etagKey = '${PreferenceKeys.stationEtag}:$host';
+    final cacheKey = '${PreferenceKeys.stationCache}:$host';
+    final cachedEtag = Preference.instance.getString(etagKey);
     if (cachedEtag != null) {
       headers['If-None-Match'] = cachedEtag;
-      TalkerManager.instance.debug('🌐 Station API: Using ETag: $cachedEtag');
+      TalkerManager.instance.debug('🌐 Station API: Using ETag: $cachedEtag (host: $host)');
     }
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
@@ -195,7 +198,7 @@ class ExpTech {
     TalkerManager.instance.debug('🌐 Station API: Response status=${res.statusCode}, body length=${res.body.length}');
 
     if (res.statusCode == 304) {
-      final cachedData = Preference.instance.getString(PreferenceKeys.stationCache);
+      final cachedData = Preference.instance.getString(cacheKey);
       if (cachedData != null) {
         TalkerManager.instance.debug('🌐 Station API: Using cached data (304 Not Modified)');
         final json = jsonDecode(cachedData) as Map<String, dynamic>;
@@ -213,13 +216,13 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      Preference.instance.setString(PreferenceKeys.stationEtag, etag);
-      TalkerManager.instance.debug('🌐 Station API: Saved ETag: $etag');
+      Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug('🌐 Station API: Saved ETag: $etag (host: $host)');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    Preference.instance.setString(PreferenceKeys.stationCache, res.body);
-    TalkerManager.instance.debug('🌐 Station API: Saved cached data');
+    Preference.instance.setString(cacheKey, res.body);
+    TalkerManager.instance.debug('🌐 Station API: Saved cached data (host: $host)');
 
     return json.map((key, value) {
       return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
