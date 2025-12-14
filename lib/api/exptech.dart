@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/model/announcement.dart';
@@ -29,7 +29,24 @@ import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
 
-final Client _sharedClient = Client();
+/// HTTP Client with gzip compression support
+class _GzipClient extends http.BaseClient {
+  final http.Client _inner;
+
+  _GzipClient(this._inner);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    // 添加 Accept-Encoding header 以啟用 gzip 壓縮
+    request.headers['Accept-Encoding'] = 'gzip, deflate';
+    return _inner.send(request);
+  }
+
+  @override
+  void close() => _inner.close();
+}
+
+final http.Client _sharedClient = _GzipClient(http.Client());
 
 class ExpTech {
   String? apikey;
@@ -248,15 +265,46 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 API: GET $requestUrl');
 
-    final res = await _sharedClient.get(requestUrl);
+    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
+    final headers = <String, String>{};
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.weatherEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
 
     TalkerManager.instance.debug('🌐 API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    // 處理 304 Not Modified - 使用快取的資料
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.weatherCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 API: Using cached data (304 Not Modified)');
+        final json = jsonDecode(cachedData) as Map<String, dynamic>;
+        return RealtimeWeather.fromJson(json);
+      } else {
+        // 如果沒有快取資料，拋出錯誤
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    // 儲存 ETag 和資料
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      Preference.instance.setString(PreferenceKeys.weatherEtag, etag);
+      TalkerManager.instance.debug('🌐 API: Saved ETag: $etag');
+    }
+
     final json = jsonDecode(res.body) as Map<String, dynamic>;
+    Preference.instance.setString(PreferenceKeys.weatherCache, res.body);
+    TalkerManager.instance.debug('🌐 API: Saved cached data');
+
     TalkerManager.instance.debug('🌐 API: JSON decoded successfully');
 
     final weather = RealtimeWeather.fromJson(json);
@@ -270,15 +318,45 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Forecast API: GET $requestUrl');
 
-    final res = await _sharedClient.get(requestUrl);
+    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
+    final headers = <String, String>{};
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.forecastEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 Forecast API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
 
     TalkerManager.instance.debug('🌐 Forecast API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    // 處理 304 Not Modified - 使用快取的資料
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.forecastCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 Forecast API: Using cached data (304 Not Modified)');
+        return jsonDecode(cachedData) as Map<String, dynamic>;
+      } else {
+        // 如果沒有快取資料，拋出錯誤
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    // 儲存 ETag 和資料
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      Preference.instance.setString(PreferenceKeys.forecastEtag, etag);
+      TalkerManager.instance.debug('🌐 Forecast API: Saved ETag: $etag');
+    }
+
     final json = jsonDecode(res.body) as Map<String, dynamic>;
+    Preference.instance.setString(PreferenceKeys.forecastCache, res.body);
+    TalkerManager.instance.debug('🌐 Forecast API: Saved cached data');
+
     TalkerManager.instance.debug('🌐 Forecast API: Response JSON: $json');
 
     return json;

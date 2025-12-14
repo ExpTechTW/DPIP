@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   HomeMode _currentMode = HomeMode.localActive;
 
   String? _lastRefreshCode;
-  DateTime? _lastRefreshTime;
 
   History? get _thunderstorm => _realtimeRegion
       ?.where((e) => e.type == HistoryType.thunderstorm)
@@ -110,8 +109,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     final code = GlobalProviders.location.code;
 
-    if (_shouldSkipRefresh(code)) return;
-
     final isOutOfService = _checkIfOutOfService(code);
 
     if (isOutOfService && !_currentMode.isNational) {
@@ -135,7 +132,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (mounted) {
       setState(() => _isLoading = false);
       _lastRefreshCode = code;
-      _lastRefreshTime = DateTime.now();
     }
   }
 
@@ -154,18 +150,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
       GlobalProviders.location.refresh();
     }
-  }
-
-  bool _shouldSkipRefresh(String? code) {
-    if (_lastRefreshCode != code) {
-      _lastRefreshCode = code;
-      _lastRefreshTime = null;
-      return false;
-    }
-    if (_lastRefreshTime == null) return false;
-
-    final timeSinceLastRefresh = DateTime.now().difference(_lastRefreshTime!);
-    return timeSinceLastRefresh.inMinutes < 1;
   }
 
   bool _checkIfOutOfService(String? code) {
@@ -250,7 +234,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onModeChanged(HomeMode mode) {
     setState(() => _currentMode = mode);
-    _lastRefreshTime = null;
     _refresh();
   }
 
@@ -262,7 +245,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     _wasVisible = isVisible;
     final homeSections = context.select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
-            (model) => model.homeSections
+      (model) => model.homeSections,
     );
     final topPadding = MediaQuery.of(context).padding.top;
 
@@ -293,12 +276,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               _buildWeatherHeader(),
               if (!_isLoading) ..._buildRealtimeInfo(),
               if (homeSections.isNotEmpty) ...[
-                if (homeSections.contains(HomeDisplaySection.radar))
-                  _buildRadarMap(),
-                if (homeSections.contains(HomeDisplaySection.forecast))
-                  _buildForecast(),
-                if (homeSections.contains(HomeDisplaySection.history))
-                  _buildHistoryTimeline(),
+                if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
+                if (homeSections.contains(HomeDisplaySection.forecast)) _buildForecast(),
+                if (homeSections.contains(HomeDisplaySection.history)) _buildHistoryTimeline(),
               ] else if (GlobalProviders.location.code != null)
                 Padding(
                   padding: const EdgeInsets.all(16),

@@ -39,6 +39,13 @@ class PreferenceKeys {
   static const notifyTsunami = 'pref:notify:tsunami';
   static const notifyAnnouncement = 'pref:notify:announcement';
   // #endregion
+
+  // #region ETag Cache
+  static const weatherEtag = 'weather-etag';
+  static const weatherCache = 'weather-cache';
+  static const forecastEtag = 'forecast-etag';
+  static const forecastCache = 'forecast-cache';
+  // #endregion
 }
 
 class Preference {
