@@ -216,12 +216,12 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      Preference.instance.setString(etagKey, etag);
+      await Preference.instance.setString(etagKey, etag);
       TalkerManager.instance.debug('🌐 Station API: Saved ETag: $etag (host: $host)');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(cacheKey, res.body);
     TalkerManager.instance.debug('🌐 Station API: Saved cached data (host: $host)');
 
     return json.map((key, value) {
@@ -277,6 +277,7 @@ class ExpTech {
     TalkerManager.instance.debug('🌐 Radar List API: GET $requestUrl');
 
     final headers = <String, String>{};
+    await Preference.reload();
     final cachedEtag = Preference.instance.getString(PreferenceKeys.radarListEtag);
     if (cachedEtag != null) {
       headers['If-None-Match'] = cachedEtag;
@@ -306,12 +307,12 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      Preference.instance.setString(PreferenceKeys.radarListEtag, etag);
+      await Preference.instance.setString(PreferenceKeys.radarListEtag, etag);
       TalkerManager.instance.debug('🌐 Radar List API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
-    Preference.instance.setString(PreferenceKeys.radarListCache, res.body);
+    await Preference.instance.setString(PreferenceKeys.radarListCache, res.body);
     TalkerManager.instance.debug('🌐 Radar List API: Saved cached data');
 
     return jsonData.map((item) => item.toString()).toList();
@@ -378,12 +379,12 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      Preference.instance.setString(PreferenceKeys.weatherEtag, etag);
+      await Preference.instance.setString(PreferenceKeys.weatherEtag, etag);
       TalkerManager.instance.debug('🌐 API: Saved ETag: $etag');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    Preference.instance.setString(PreferenceKeys.weatherCache, res.body);
+    await Preference.instance.setString(PreferenceKeys.weatherCache, res.body);
     TalkerManager.instance.debug('🌐 API: Saved cached data');
 
     TalkerManager.instance.debug('🌐 API: JSON decoded successfully');
@@ -426,12 +427,12 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      Preference.instance.setString(PreferenceKeys.forecastEtag, etag);
+      await Preference.instance.setString(PreferenceKeys.forecastEtag, etag);
       TalkerManager.instance.debug('🌐 Forecast API: Saved ETag: $etag');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    Preference.instance.setString(PreferenceKeys.forecastCache, res.body);
+    await Preference.instance.setString(PreferenceKeys.forecastCache, res.body);
     TalkerManager.instance.debug('🌐 Forecast API: Saved cached data');
 
     TalkerManager.instance.debug('🌐 Forecast API: Response JSON: $json');

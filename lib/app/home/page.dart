@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   final _locationButtonKey = GlobalKey();
 
-  Key? _mapKey;
+  Key _mapKey = UniqueKey();
   bool _isLoading = false;
   bool _isOutOfService = false;
   bool _wasVisible = true;
@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   HomeMode _currentMode = HomeMode.localActive;
 
   String? _lastRefreshCode;
+  bool _isFirstRefresh = true;
 
   History? get _thunderstorm => _realtimeRegion
       ?.where((e) => e.type == HistoryType.thunderstorm)
@@ -118,11 +119,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     setState(() {
       _isLoading = true;
       _isOutOfService = isOutOfService;
-      if (_lastRefreshCode != code) {
+      if (!_isFirstRefresh && _lastRefreshCode != code) {
         _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
         _weather = null;
         _forecast = null;
       }
+      _isFirstRefresh = false;
     });
 
     _refreshIndicatorKey.currentState?.show();
