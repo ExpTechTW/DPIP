@@ -46,6 +46,12 @@ class PreferenceKeys {
   static const forecastEtag = 'forecast-etag';
   static const forecastCache = 'forecast-cache';
   // #endregion
+
+  // #region Network
+  static const proxyEnabled = 'network:proxy:enabled';
+  static const proxyHost = 'network:proxy:host';
+  static const proxyPort = 'network:proxy:port';
+  // #endregion
 }
 
 class Preference {
@@ -156,5 +162,16 @@ class Preference {
 
   static String? get notifyAnnouncement => instance.getString(PreferenceKeys.notifyAnnouncement);
   static set notifyAnnouncement(String? value) => instance.set(PreferenceKeys.notifyAnnouncement, value);
+  // #endregion
+
+  // #region Network
+  static bool? get proxyEnabled => instance.getBool(PreferenceKeys.proxyEnabled);
+  static set proxyEnabled(bool? value) => instance.set(PreferenceKeys.proxyEnabled, value);
+
+  static String? get proxyHost => instance.getString(PreferenceKeys.proxyHost);
+  static set proxyHost(String? value) => instance.set(PreferenceKeys.proxyHost, value);
+
+  static int? get proxyPort => instance.getInt(PreferenceKeys.proxyPort);
+  static set proxyPort(int? value) => instance.set(PreferenceKeys.proxyPort, value);
   // #endregion
 }

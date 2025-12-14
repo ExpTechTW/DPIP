@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/model/announcement.dart';
@@ -46,7 +47,27 @@ class _GzipClient extends http.BaseClient {
   void close() => _inner.close();
 }
 
-final http.Client _sharedClient = _GzipClient(http.Client());
+/// 創建帶有代理設定的 HTTP Client
+http.Client _createHttpClient() {
+  final httpClient = HttpClient();
+
+  // 從 Preference 讀取代理設定
+  final proxyEnabled = Preference.proxyEnabled ?? false;
+  final proxyHost = Preference.proxyHost;
+  final proxyPort = Preference.proxyPort;
+
+  if (proxyEnabled && proxyHost != null && proxyPort != null) {
+    httpClient.findProxy = (uri) {
+      return 'PROXY $proxyHost:$proxyPort';
+    };
+    // 允許代理連接到 HTTPS
+    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) => false;
+  }
+
+  return IOClient(httpClient);
+}
+
+final http.Client _sharedClient = _GzipClient(_createHttpClient());
 
 class ExpTech {
   String? apikey;

@@ -32,6 +32,7 @@ import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
+import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
@@ -124,6 +125,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
     TypedGoRoute<SettingsLocaleSelectRoute>(path: '/settings/locale/select'),
     TypedGoRoute<SettingsUnitRoute>(path: '/settings/unit'),
     TypedGoRoute<SettingsMapRoute>(path: '/settings/map'),
+    TypedGoRoute<SettingsProxyRoute>(path: '/settings/proxy'),
     TypedGoRoute<SettingsNotifyRoute>(
       path: '/settings/notify',
       routes: <TypedGoRoute<GoRouteData>>[
@@ -175,6 +177,7 @@ class SettingsShellRoute extends ShellRouteData {
       '/settings/locale/select' => '語言'.i18n,
       '/settings/unit' => '單位'.i18n,
       '/settings/map' => '地圖'.i18n,
+      '/settings/proxy' => 'HTTP 代理'.i18n,
       '/settings/notify' => '通知'.i18n,
       '/settings/notify/eew' => '緊急地震速報'.i18n,
       '/settings/notify/monitor' => '強震監視器'.i18n,
@@ -311,6 +314,17 @@ class SettingsMapRoute extends GoRouteData with $SettingsMapRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const Material(child: SettingsMapPage());
+  }
+}
+
+/// Settings proxy route - displays HTTP proxy settings.
+class SettingsProxyRoute extends GoRouteData with $SettingsProxyRoute {
+  /// Creates a [SettingsProxyRoute].
+  const SettingsProxyRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const Material(child: SettingsProxyPage());
   }
 }
 

@@ -6,6 +6,7 @@ import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/map/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
+import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/i18n.dart';
@@ -168,6 +169,23 @@ class SettingsIndexPage extends StatelessWidget {
       ],
     );
 
+    final network = ListSection(
+      title: '網路'.i18n,
+      children: [
+        ListSectionTile(
+          icon: Symbols.settings_ethernet_rounded,
+          title: 'HTTP 代理'.i18n,
+          subtitle: Text(
+            Preference.proxyEnabled == true
+                ? '${Preference.proxyHost ?? ''}:${Preference.proxyPort ?? ''}'
+                : '未啟用'.i18n,
+          ),
+          trailing: const Icon(Symbols.chevron_right_rounded),
+          onTap: () => context.push(SettingsProxyPage.route),
+        ),
+      ],
+    );
+
     final debug = ListSection(
       title: '除錯'.i18n,
       children: [
@@ -205,7 +223,7 @@ class SettingsIndexPage extends StatelessWidget {
 
     return ListView(
       padding: EdgeInsets.only(top: 16, bottom: 16 + context.padding.bottom),
-      children: [location, userInterface, notification, information, links, debug, footer],
+      children: [location, userInterface, notification, network, information, links, debug, footer],
     );
   }
 }

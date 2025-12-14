@@ -50,7 +50,7 @@ class Routes {
 
   static Uri ntp() => Uri.parse("${lb.replaceAll("api", "")}ntp");
 
-  static Uri eew() => Uri.parse('$lb/v2/eq/eew?type=cwa');
+  static Uri eew() => Uri.parse('$lb/v2/eq/eew');
 
   static Uri weatherRealtimeByCoords(double lat, double lon) =>
       Uri.parse('$onlyapi/v3/weather/realtime/${lat.toStringAsFixed(2)},${lon.toStringAsFixed(2)}');
