@@ -186,13 +186,50 @@ class ExpTech {
   Future<Map<String, Station>> getStations() async {
     final requestUrl = Routes.station();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Station API: GET $requestUrl');
+
+    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
+    final headers = <String, String>{};
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.stationEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 Station API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug('🌐 Station API: Response status=${res.statusCode}, body length=${res.body.length}');
+
+    // 處理 304 Not Modified - 使用快取的資料
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.stationCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 Station API: Using cached data (304 Not Modified)');
+        final json = jsonDecode(cachedData) as Map<String, dynamic>;
+        return json.map((key, value) {
+          return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
+        });
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
-    return (jsonDecode(res.body) as Map<String, dynamic>).map((key, value) {
+    // 儲存 ETag 和資料
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      Preference.instance.setString(PreferenceKeys.stationEtag, etag);
+      TalkerManager.instance.debug('🌐 Station API: Saved ETag: $etag');
+    }
+
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
+    Preference.instance.setString(PreferenceKeys.stationCache, res.body);
+    TalkerManager.instance.debug('🌐 Station API: Saved cached data');
+
+    return json.map((key, value) {
       return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
     });
   }
@@ -242,13 +279,48 @@ class ExpTech {
   Future<List<String>> getRadarList() async {
     final requestUrl = Routes.radarList();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Radar List API: GET $requestUrl');
+
+    // 準備 headers，如果有儲存的 ETag 則添加 If-None-Match
+    final headers = <String, String>{};
+    final cachedEtag = Preference.instance.getString(PreferenceKeys.radarListEtag);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug('🌐 Radar List API: Using ETag: $cachedEtag');
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Radar List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    // 處理 304 Not Modified - 使用快取的資料
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(PreferenceKeys.radarListCache);
+      if (cachedData != null) {
+        TalkerManager.instance.debug('🌐 Radar List API: Using cached data (304 Not Modified)');
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => item.toString()).toList();
+      } else {
+        throw HttpException('304 Not Modified but no cached data available', uri: requestUrl);
+      }
+    }
 
     if (res.statusCode != 200) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
+    // 儲存 ETag 和資料
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      Preference.instance.setString(PreferenceKeys.radarListEtag, etag);
+      TalkerManager.instance.debug('🌐 Radar List API: Saved ETag: $etag');
+    }
+
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    Preference.instance.setString(PreferenceKeys.radarListCache, res.body);
+    TalkerManager.instance.debug('🌐 Radar List API: Saved cached data');
 
     return jsonData.map((item) => item.toString()).toList();
   }

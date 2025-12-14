@@ -127,7 +127,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
-    await Future.wait([_fetchWeather(code), _fetchRealtimeRegion(code), _fetchHistory(code, isOutOfService)]);
+    final homeSections = context.read<SettingsUserInterfaceModel>().homeSections;
+
+    final futures = <Future>[
+      _fetchWeather(code),
+      _fetchRealtimeRegion(code),
+    ];
+
+    if (homeSections.contains(HomeDisplaySection.history)) {
+      futures.add(_fetchHistory(code, isOutOfService));
+    } else {
+      if (mounted) {
+        setState(() {
+          _history = null;
+        });
+      }
+    }
+
+    await Future.wait(futures);
 
     if (mounted) {
       setState(() => _isLoading = false);

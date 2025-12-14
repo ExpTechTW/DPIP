@@ -45,6 +45,10 @@ class PreferenceKeys {
   static const weatherCache = 'weather-cache';
   static const forecastEtag = 'forecast-etag';
   static const forecastCache = 'forecast-cache';
+  static const radarListEtag = 'radar-list-etag';
+  static const radarListCache = 'radar-list-cache';
+  static const stationEtag = 'station-etag';
+  static const stationCache = 'station-cache';
   // #endregion
 
   // #region Network
