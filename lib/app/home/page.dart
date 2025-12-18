@@ -290,6 +290,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: ListView(
             padding: EdgeInsets.only(
               top: _locationButtonHeight != null ? 24 + topPadding + _locationButtonHeight! : 0,
+              bottom: MediaQuery.of(context).padding.bottom,
             ),
             children: [
               _buildWeatherHeader(),
