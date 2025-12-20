@@ -172,7 +172,7 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
-      return int.parse(res.body);
+      return double.parse(res.body).toInt();
     } else {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
