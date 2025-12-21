@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:zstandard/zstandard.dart';
 
 import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/utils/log.dart';
@@ -32,13 +33,42 @@ import 'package:dpip/utils/extensions/string.dart';
 
 class _GzipClient extends http.BaseClient {
   final http.Client _inner;
+  final Zstandard _zstd = Zstandard();
 
   _GzipClient(this._inner);
 
   @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    request.headers['Accept-Encoding'] = 'gzip, deflate';
-    return _inner.send(request);
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    request.headers['Accept-Encoding'] = 'gzip, deflate, zstd';
+    final response = await _inner.send(request);
+
+    final contentEncoding = response.headers['content-encoding'] ?? response.headers['Content-Encoding'];
+    if (contentEncoding?.toLowerCase() == 'zstd') {
+      final compressedBody = await response.stream.toBytes();
+
+      final decompressedBody = await _zstd.decompress(compressedBody);
+
+      if (decompressedBody == null) {
+        throw HttpException('Failed to decompress zstd response', uri: request.url);
+      }
+
+      final headers = Map<String, String>.from(response.headers);
+      headers.remove('content-encoding');
+      headers.remove('Content-Encoding');
+
+      return http.StreamedResponse(
+        Stream.value(decompressedBody),
+        response.statusCode,
+        contentLength: decompressedBody.length,
+        headers: headers,
+        reasonPhrase: response.reasonPhrase,
+        request: response.request,
+        isRedirect: response.isRedirect,
+        persistentConnection: response.persistentConnection,
+      );
+    }
+
+    return response;
   }
 
   @override
@@ -539,7 +569,9 @@ class ExpTech {
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
 
-    TalkerManager.instance.debug('🌐 Realtime List API: Response status=${res.statusCode}, body length=${res.body.length}');
+    TalkerManager.instance.debug(
+      '🌐 Realtime List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
 
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.realtimeListCache);
@@ -584,7 +616,9 @@ class ExpTech {
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
 
-    TalkerManager.instance.debug('🌐 History List API: Response status=${res.statusCode}, body length=${res.body.length}');
+    TalkerManager.instance.debug(
+      '🌐 History List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
 
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.historyListCache);
@@ -629,7 +663,9 @@ class ExpTech {
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
 
-    TalkerManager.instance.debug('🌐 Realtime Region API: Response status=${res.statusCode}, body length=${res.body.length}');
+    TalkerManager.instance.debug(
+      '🌐 Realtime Region API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
 
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.realtimeRegionCache);
@@ -674,7 +710,9 @@ class ExpTech {
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
 
-    TalkerManager.instance.debug('🌐 History Region API: Response status=${res.statusCode}, body length=${res.body.length}');
+    TalkerManager.instance.debug(
+      '🌐 History Region API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
 
     if (res.statusCode == 304) {
       final cachedData = Preference.instance.getString(PreferenceKeys.historyRegionCache);
