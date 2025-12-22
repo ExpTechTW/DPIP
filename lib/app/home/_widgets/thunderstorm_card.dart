@@ -6,6 +6,7 @@ import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
+import 'package:dpip/utils/responsive_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -22,8 +23,8 @@ class ThunderstormCard extends StatelessWidget {
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth;
 
-        final contentMaxWidth = maxWidth >= 600
-            ? min(maxWidth * 0.9, 720.0)
+        final contentMaxWidth = maxWidth >= ResponsiveBreakpoints.tablet
+            ? min(maxWidth * ResponsiveConstraints.contentPaddingMultiplier, ResponsiveConstraints.mapContentMaxWidth)
             : maxWidth;
 
         return Center(

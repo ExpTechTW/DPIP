@@ -18,6 +18,7 @@ import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:geojson_vi/geojson_vi.dart';
@@ -1304,61 +1305,50 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
       builder: (context, activeEew, child) {
         return Stack(
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final maxWidth = constraints.maxWidth;
-                final contentMaxWidth = maxWidth >= 600
-                    ? min(maxWidth * 0.9, 720.0)
-                    : maxWidth;
+            ResponsiveContainer(
+              maxWidth: 720,
+              child: MorphingSheet(
+                title: '強震監視器'.i18n,
+                borderRadius: BorderRadius.circular(16),
+                elevation: 4,
+                borderWidth: activeEew.isNotEmpty ? 2 : null,
+                borderColor: activeEew.isNotEmpty ? context.colors.error : null,
+                backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
+                partialBuilder: (context, controller, sheetController) {
+                  if (activeEew.isEmpty) {
+                    return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
+                  }
 
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: contentMaxWidth),
-                    child: MorphingSheet(
-                      title: '強震監視器'.i18n,
-                      borderRadius: BorderRadius.circular(16),
-                      elevation: 4,
-                      borderWidth: activeEew.isNotEmpty ? 2 : null,
-                      borderColor: activeEew.isNotEmpty ? context.colors.error : null,
-                      backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
-                      partialBuilder: (context, controller, sheetController) {
-                        if (activeEew.isEmpty) {
-                          return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
-                        }
+                  final data = activeEew.first;
+                  final hasLocation = GlobalProviders.location.coordinates != null;
 
-                        final data = activeEew.first;
-                        final hasLocation = GlobalProviders.location.coordinates != null;
+                  // Calculate location-specific info if available
+                  if (hasLocation) {
+                    final info = eewLocationInfo(
+                      data.info.magnitude,
+                      data.info.depth,
+                      data.info.latitude,
+                      data.info.longitude,
+                      GlobalProviders.location.coordinates!.latitude,
+                      GlobalProviders.location.coordinates!.longitude,
+                    );
 
-                        // Calculate location-specific info if available
-                        if (hasLocation) {
-                          final info = eewLocationInfo(
-                            data.info.magnitude,
-                            data.info.depth,
-                            data.info.latitude,
-                            data.info.longitude,
-                            GlobalProviders.location.coordinates!.latitude,
-                            GlobalProviders.location.coordinates!.longitude,
-                          );
+                    localIntensity = intensityFloatToInt(info.i);
+                    localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
-                          localIntensity = intensityFloatToInt(info.i);
-                          localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
+                    WidgetsBinding.instance.addPostFrameCallback((_) => _updateCountdown());
+                    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+                  }
 
-                          WidgetsBinding.instance.addPostFrameCallback((_) => _updateCountdown());
-                          _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
-                        }
-
-                        return InkWell(
-                          onTap: _toggleCollapse,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: _buildEewContent(data, activeEew.length, hasLocation),
-                          ),
-                        );
-                      },
+                  return InkWell(
+                    onTap: _toggleCollapse,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: _buildEewContent(data, activeEew.length, hasLocation),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             Positioned(
               top: 26,
