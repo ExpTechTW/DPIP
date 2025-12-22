@@ -44,6 +44,7 @@ class ReportMapLayerManager extends MapLayerManager {
 
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
+  final dataNotifier = ValueNotifier<int>(0);
 
   DateTime? _lastFetchTime;
 
@@ -103,6 +104,7 @@ class ReportMapLayerManager extends MapLayerManager {
     if (!context.mounted) return;
 
     GlobalProviders.data.setPartialReport(reportList);
+    dataNotifier.value++;
     _lastFetchTime = DateTime.now();
   }
 
@@ -328,19 +330,22 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return MorphingSheet(
-      controller: morphingSheetController,
-      title: '地震報告'.i18n,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 4,
-      partialBuilder: (context, controller, sheetController) {
-        if (GlobalProviders.data.partialReport.isEmpty) {
-          return const SizedBox.shrink();
-        }
+    return ValueListenableBuilder(
+      valueListenable: widget.manager.dataNotifier,
+      builder: (context, value, child) {
+        return MorphingSheet(
+          controller: morphingSheetController,
+          title: '地震報告'.i18n,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 4,
+          partialBuilder: (context, controller, sheetController) {
+            if (GlobalProviders.data.partialReport.isEmpty) {
+              return const SizedBox.shrink();
+            }
 
-        return ValueListenableBuilder(
-          valueListenable: widget.manager.currentReport,
-          builder: (context, currentReport, child) {
+            return ValueListenableBuilder(
+              valueListenable: widget.manager.currentReport,
+              builder: (context, currentReport, child) {
             // Show the first report from partial report list
             if (currentReport == null) {
               final report = GlobalProviders.data.partialReport.first;
@@ -834,4 +839,5 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
       },
     );
   }
-}
+);
+}}
