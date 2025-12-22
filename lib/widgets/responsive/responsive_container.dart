@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:dpip/utils/responsive_constants.dart';
 
 enum ResponsiveMode {
   content,
@@ -25,11 +24,29 @@ class ResponsiveContainer extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final contentMaxWidth = width >= ResponsiveBreakpoints.tablet
-            ? min(width * 0.9, maxWidth ?? ResponsiveConstraints.homeContentMaxWidth)
-            : width;
+        final isLargeTablet = width >= 900;
 
-        return Center(
+        double contentMaxWidth;
+        Alignment alignment;
+
+        switch (mode) {
+          case ResponsiveMode.panel:
+            contentMaxWidth = maxWidth ?? 550;
+            alignment = isLargeTablet
+                ? Alignment.centerRight
+                : Alignment.center;
+            break;
+
+          case ResponsiveMode.content:
+          default:
+            contentMaxWidth = width >= 600
+                ? min(width * 0.9, maxWidth ?? 750)
+                : width;
+            alignment = Alignment.center;
+        }
+
+        return Align(
+          alignment: alignment,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: contentMaxWidth),
             child: child,
