@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
