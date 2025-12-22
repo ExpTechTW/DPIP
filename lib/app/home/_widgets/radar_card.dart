@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
@@ -68,91 +70,108 @@ class _RadarMapCardState extends State<RadarMapCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        IgnorePointer(
-          child: Container(
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
-              border: Border.all(color: context.colors.outlineVariant),
-              borderRadius: BorderRadius.circular(16),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+
+        final contentMaxWidth = maxWidth >= 600
+            ? min(maxWidth * 0.9, 720.0)
+            : maxWidth;
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: contentMaxWidth
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Layout.col.min(
-                children: [
-                  SizedBox(
-                    height: 200,
-                    child: DpipMap(
-                      key: _key,
-                      onMapCreated: (controller) => mapController = controller,
-                      onStyleLoadedCallback: () => _setupMapLayers(),
-                      dragEnabled: false,
-                      rotateGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
-                      focusUserLocationWhenUpdated: true,
+            child: Stack(
+              children: [
+                IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: context.colors.surfaceContainer,
+                      border: Border.all(color: context.colors.outlineVariant),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Layout.row.between(
-                      children: [
-                        Layout.row[8](
-                          children: [
-                            const Icon(Symbols.radar, size: 24),
-                            Text('雷達回波'.i18n, style: context.texts.titleMedium),
-                            FutureBuilder(
-                              future: radarListFuture,
-                              builder: (context, snapshot) {
-                                final data = snapshot.data;
-
-                                if (data == null) return const SizedBox.shrink();
-
-                                final style = context.texts.labelSmall?.copyWith(
-                                  color: context.colors.onSurfaceVariant,
-                                );
-
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: context.colors.surfaceContainer,
-                                    border: Border.all(color: context.colors.outlineVariant),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Layout.row[4](
-                                    children: [
-                                      Icon(
-                                        Symbols.schedule_rounded,
-                                        size: (style?.fontSize ?? 12) * 1.25,
-                                        color: context.colors.onSurfaceVariant,
-                                      ),
-                                      Text(data.last.toSimpleDateTimeString(), style: style),
-                                    ],
-                                  ),
-                                );
-                              },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Layout.col.min(
+                        children: [
+                          SizedBox(
+                            height: 200,
+                            child: DpipMap(
+                              key: _key,
+                              onMapCreated: (controller) => mapController = controller,
+                              onStyleLoadedCallback: () => _setupMapLayers(),
+                              dragEnabled: false,
+                              rotateGesturesEnabled: false,
+                              zoomGesturesEnabled: false,
+                              focusUserLocationWhenUpdated: true,
                             ),
-                          ],
-                        ),
-                        const Icon(Symbols.chevron_right_rounded, size: 24),
-                      ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: Layout.row.between(
+                              children: [
+                                Layout.row[8](
+                                  children: [
+                                    const Icon(Symbols.radar, size: 24),
+                                    Text('雷達回波'.i18n, style: context.texts.titleMedium),
+                                    FutureBuilder(
+                                      future: radarListFuture,
+                                      builder: (context, snapshot) {
+                                        final data = snapshot.data;
+
+                                        if (data == null) return const SizedBox.shrink();
+
+                                        final style = context.texts.labelSmall?.copyWith(
+                                          color: context.colors.onSurfaceVariant,
+                                        );
+
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: context.colors.surfaceContainer,
+                                            border: Border.all(color: context.colors.outlineVariant),
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          child: Layout.row[4](
+                                            children: [
+                                              Icon(
+                                                Symbols.schedule_rounded,
+                                                size: (style?.fontSize ?? 12) * 1.25,
+                                                color: context.colors.onSurfaceVariant,
+                                              ),
+                                              Text(data.last.toSimpleDateTimeString(), style: style),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const Icon(Symbols.chevron_right_rounded, size: 24),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Positioned.fill(
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        Positioned.fill(
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
