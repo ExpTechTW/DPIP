@@ -14,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:dpip/core/i18n.dart';
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;
@@ -65,12 +66,12 @@ class ReportSheetContent extends StatelessWidget {
             ),
             ActionChip(
               avatar: const Icon(Symbols.replay),
-              label: Text('重播'),
+              label: Text('重播'.i18n),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MapMonitorPage(data: report.time.millisecondsSinceEpoch - 5000),
+                    builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 5000),
                   ),
                 );
               },

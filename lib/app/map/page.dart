@@ -29,7 +29,7 @@ class MapPageOptions {
   factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
     final layers = queryParameters['layers']?.split(',');
     final report = queryParameters['report'];
-    final replay = queryParameters['replay'] != null ? int.tryParse(queryParameters['replay']!) : null;
+    final replay = int.tryParse(queryParameters['replay'] ?? '');
 
     return MapPageOptions(
       initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
@@ -298,16 +298,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 }
 
 class MapMonitorPage extends StatelessWidget {
-  final int data;
+  final int replayTimestamp;
 
-  const MapMonitorPage({super.key, required this.data});
+  const MapMonitorPage({super.key, required this.replayTimestamp});
 
   @override
   Widget build(BuildContext context) {
     return MapPage(
       options: MapPageOptions(
         initialLayers: {MapLayer.monitor},
-        replayTimestamp: data,
+        replayTimestamp: replayTimestamp,
       ),
     );
   }

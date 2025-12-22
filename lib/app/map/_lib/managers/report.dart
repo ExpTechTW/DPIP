@@ -624,12 +624,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     ),
                     ActionChip(
                         avatar: const Icon(Symbols.replay),
-                        label: const Text('重播'),
+                        label: Text('重播'.i18n),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MapMonitorPage(data: report.time.millisecondsSinceEpoch - 5000),
+                              builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 5000),
                             ),
                           );
                         },
@@ -838,6 +838,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
         );
       },
     );
+    }
+  );
   }
-);
-}}
+}
