@@ -14,6 +14,7 @@ import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
@@ -616,7 +617,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         launchUrl(report.reportUrl);
                       },
                     ),
-                    /* ActionChip(
+                    ActionChip(
                         avatar: const Icon(Symbols.replay),
                         label: const Text('重播'),
                         onPressed: () {
@@ -627,7 +628,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             ),
                           );
                         },
-                      ), */
+                      ),
                   ],
                 ),
                 const Divider(),

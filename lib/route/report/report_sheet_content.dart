@@ -1,4 +1,5 @@
 import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
@@ -62,7 +63,7 @@ class ReportSheetContent extends StatelessWidget {
                 launchUrl(report.reportUrl);
               },
             ),
-            /* ActionChip(
+            ActionChip(
               avatar: const Icon(Symbols.replay),
               label: Text('重播'),
               onPressed: () {
@@ -73,7 +74,7 @@ class ReportSheetContent extends StatelessWidget {
                   ),
                 );
               },
-            ), */
+            ),
           ],
         ),
         const Divider(),
