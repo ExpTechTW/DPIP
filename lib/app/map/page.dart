@@ -29,7 +29,7 @@ class MapPageOptions {
   factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
     final layers = queryParameters['layers']?.split(',');
     final report = queryParameters['report'];
-    final replay = int.tryParse(queryParameters['replay'] ?? '');
+    final replay = queryParameters['replay'];
 
     return MapPageOptions(
       initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
