@@ -199,9 +199,25 @@ class ExpTech {
   Future<int> getNtp() async {
     final requestUrl = Routes.ntp();
 
+    final t1 = DateTime.now().microsecondsSinceEpoch;
+
     final res = await _sharedClient.get(requestUrl);
 
+    final t4 = DateTime.now().microsecondsSinceEpoch;
+
     if (res.statusCode == 200) {
+      final t2Header = res.headers['x-ntp-t2'];
+      final t3Header = res.headers['x-ntp-t3'];
+
+      final t2 = t2Header != null ? (double.parse(t2Header) * 1000).toInt() : null;
+      final t3 = t3Header != null ? (double.parse(t3Header) * 1000).toInt() : null;
+
+      if (t2 != null && t3 != null) {
+        final offset = ((t2 - t1) + (t3 - t4)) / 2;
+        final serverTime = (t3 + offset).toInt();
+        return serverTime ~/ 1000;
+      }
+
       return double.parse(res.body).toInt();
     } else {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);

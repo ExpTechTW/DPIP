@@ -306,7 +306,7 @@ class DpipDataModel extends _DpipDataModel {
           cleanUp: (successValue) {
             switch (successValue) {
               case int():
-                setTimeOffset(DateTime.now().millisecondsSinceEpoch - successValue);
+                setTimeOffset(successValue - DateTime.now().millisecondsSinceEpoch);
               case Map<String, Station>():
                 setStation(successValue);
             }
@@ -314,7 +314,7 @@ class DpipDataModel extends _DpipDataModel {
         );
 
         final [ntp as int, stations as Map<String, Station>] = data;
-        setTimeOffset(DateTime.now().millisecondsSinceEpoch - ntp);
+        setTimeOffset(ntp - DateTime.now().millisecondsSinceEpoch);
         setStation(stations);
       } catch (e, s) {
         TalkerManager.instance.error('everyMinuteCallback', e, s);
