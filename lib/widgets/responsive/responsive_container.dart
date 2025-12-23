@@ -24,7 +24,7 @@ class ResponsiveContainer extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final isLargeTablet = width >= 900;
+        final isLargeTablet = width >= 800;
 
         double contentMaxWidth;
         Alignment alignment;
