@@ -771,7 +771,7 @@ class ExpTech {
   }
 
   Future<List<GithubRelease>> getReleases() async {
-    final requestUrl = 'https://api.github.com/repos/ExpTechTW/DPIP/releases'.asUri;
+    final requestUrl = 'https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases'.asUri;
 
     final res = await _sharedClient.get(requestUrl);
 

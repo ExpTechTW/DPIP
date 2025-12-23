@@ -289,25 +289,25 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.310...HEAD
-[3.1.310]: https://github.com/exptechtw/dpip/compare/v3.1.3...v3.1.310
-[3.1.306]: https://github.com/exptechtw/dpip/compare/v3.1.004...v3.1.306
-[3.1.104]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
-[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
-[3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
-[3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
-[3.0.2]: https://github.com/exptechtw/dpip/compare/v3.0.014...v3.0.2
-[3.0.014]: https://github.com/exptechtw/dpip/compare/v3.0.013(2)...v3.0.014
-[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012(1)...v3.0.013(2)
-[3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012(1)
-[3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
-[3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
-[3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
-[3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
-[3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
-[3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
-[3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
-[3.0.004]: https://github.com/exptechtw/dpip/compare/v3.0.003...v3.0.004
-[3.0.003]: https://github.com/exptechtw/dpip/compare/v3.0.002...v3.0.003
-[3.0.002]: https://github.com/exptechtw/dpip/compare/v3.0.001...v3.0.002
-[3.0.001]: https://github.com/exptechtw/dpip/compare/2.5.500...v3.0.001
+[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.310...HEAD
+[3.1.310]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.3...v3.1.310
+[3.1.306]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.004...v3.1.306
+[3.1.104]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.003...v3.1.104
+[3.1.103]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.001...v3.1.103
+[3.1.001]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.0...v3.1.001
+[3.1.0]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.2...v3.1.0
+[3.0.2]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.014...v3.0.2
+[3.0.014]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.013(2)...v3.0.014
+[3.0.013]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.012(1)...v3.0.013(2)
+[3.0.012]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.011...v3.0.012(1)
+[3.0.011]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.010...v3.0.011
+[3.0.010]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.009...v3.0.010
+[3.0.009]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.008...v3.0.009
+[3.0.008]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.007...v3.0.008
+[3.0.007]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.006...v3.0.007
+[3.0.006]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.005...v3.0.006
+[3.0.005]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.004...v3.0.005
+[3.0.004]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.003...v3.0.004
+[3.0.003]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.002...v3.0.003
+[3.0.002]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.001...v3.0.002
+[3.0.001]: https://github.com/exptechtw/dpip-pocket/compare/2.5.500...v3.0.001
