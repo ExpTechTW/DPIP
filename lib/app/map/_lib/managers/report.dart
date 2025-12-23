@@ -629,7 +629,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 5000),
+                              builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 2000),
                             ),
                           );
                         },

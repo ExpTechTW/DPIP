@@ -71,7 +71,7 @@ class ReportSheetContent extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 5000),
+                    builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 2000),
                   ),
                 );
               },
