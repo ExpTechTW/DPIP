@@ -1389,7 +1389,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   timeText,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: isStale ? Colors.red : context.colors.onSurface,
+                                    color: widget.manager.isReplayMode ? Colors.orange : (isStale ? Colors.red : context.colors.onSurface),
                                     fontSize: 16,
                                   ),
                                 ),

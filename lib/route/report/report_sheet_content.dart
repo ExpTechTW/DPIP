@@ -1,4 +1,6 @@
 import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/app/map/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
@@ -62,18 +64,18 @@ class ReportSheetContent extends StatelessWidget {
                 launchUrl(report.reportUrl);
               },
             ),
-            /* ActionChip(
+            ActionChip(
               avatar: const Icon(Symbols.replay),
-              label: Text('重播'),
+              label: Text('重播'.i18n),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MapMonitorPage(data: report.time.millisecondsSinceEpoch - 5000),
+                    builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 2000),
                   ),
                 );
               },
-            ), */
+            ),
           ],
         ),
         const Divider(),

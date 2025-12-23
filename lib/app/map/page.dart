@@ -22,16 +22,19 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 class MapPageOptions {
   final Set<MapLayer>? initialLayers;
   final String? reportId;
+  final int? replayTimestamp;
 
-  MapPageOptions({this.initialLayers, this.reportId});
+  MapPageOptions({this.initialLayers, this.reportId, this.replayTimestamp});
 
   factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
     final layers = queryParameters['layers']?.split(',');
     final report = queryParameters['report'];
+    final replay = queryParameters['replay'];
 
     return MapPageOptions(
       initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
       reportId: report,
+      replayTimestamp: replay == null ? null : int.tryParse(replay),
     );
   }
 }
@@ -48,6 +51,7 @@ class MapPage extends StatefulWidget {
 
     if (options.initialLayers != null) parameters.add('layers=${options.initialLayers!.map((e) => e.name).join(',')}');
     if (options.reportId != null) parameters.add('report=${options.reportId}');
+    if (options.replayTimestamp != null) parameters.add('replay=${options.replayTimestamp}');
 
     return "/map?${parameters.join('&')}";
   }
@@ -63,7 +67,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
-  late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
+  late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? (widget.options?.replayTimestamp != null ? {MapLayer.monitor} : {});
   Future<void>? _toggleLayerOperation;
 
   void _setupTicker() {
@@ -226,7 +230,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       manager.dispose();
     }
 
-    _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    _managers[MapLayer.monitor] = MonitorMapLayerManager(
+      context,
+      controller,
+      isReplayMode: widget.options?.replayTimestamp != null,
+      replayTimestamp: widget.options?.replayTimestamp,
+    );
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
     _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(
@@ -285,5 +294,21 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     GlobalProviders.map.updateIntervalNotifier.removeListener(_setupTicker);
 
     super.dispose();
+  }
+}
+
+class MapMonitorPage extends StatelessWidget {
+  final int replayTimestamp;
+
+  const MapMonitorPage({super.key, required this.replayTimestamp});
+
+  @override
+  Widget build(BuildContext context) {
+    return MapPage(
+      options: MapPageOptions(
+        initialLayers: {MapLayer.monitor},
+        replayTimestamp: replayTimestamp,
+      ),
+    );
   }
 }
