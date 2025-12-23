@@ -5,6 +5,7 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/weather_icon.dart';
+import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -59,19 +60,9 @@ class WeatherHeader extends StatelessWidget {
         exp(17.27 * weather.data.temperature / (weather.data.temperature + 237.3));
     final feelsLike = weather.data.temperature + 0.33 * e - 0.7 * weather.data.wind.speed - 4.0;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxWidth = constraints.maxWidth;
-
-        final contentMaxWidth = maxWidth < 600
-            ? maxWidth * 0.95
-            : maxWidth;
-
-        return Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: contentMaxWidth,
-            ),
+    return ResponsiveContainer(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               spacing: 12,
               children: [
@@ -260,9 +251,7 @@ class WeatherHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        );
-      },
+        ),
     );
   }
 
