@@ -152,7 +152,7 @@ Tools • Dart 3.9.0 • DevTools 2.48.0
 
 衷心感謝所有讓 DPIP 成為可能的貢獻者：
 
-<a href="https://github.com/exptechtw/dpip-Pocket/graphs/contributors"><img src="https://contrib.rocks/image?repo=exptechtw/dpip-Pocket" ></a>
+<a href="https://github.com/exptechtw/DPIP-Pocket/graphs/contributors"><img src="https://contrib.rocks/image?repo=exptechtw/DPIP-Pocket" ></a>
 
 ## 開放原始碼授權
 
