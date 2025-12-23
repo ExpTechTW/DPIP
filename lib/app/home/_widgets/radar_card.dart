@@ -9,6 +9,7 @@ import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/layout.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -68,91 +69,94 @@ class _RadarMapCardState extends State<RadarMapCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        IgnorePointer(
-          child: Container(
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
-              border: Border.all(color: context.colors.outlineVariant),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Layout.col.min(
-                children: [
-                  SizedBox(
-                    height: 200,
-                    child: DpipMap(
-                      key: _key,
-                      onMapCreated: (controller) => mapController = controller,
-                      onStyleLoadedCallback: () => _setupMapLayers(),
-                      dragEnabled: false,
-                      rotateGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
-                      focusUserLocationWhenUpdated: true,
+    return ResponsiveContainer(
+      maxWidth: 720,
+      child: Stack(
+        children: [
+          IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                color: context.colors.surfaceContainer,
+                border: Border.all(color: context.colors.outlineVariant),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Layout.col.min(
+                  children: [
+                    SizedBox(
+                      height: 200,
+                      child: DpipMap(
+                        key: _key,
+                        onMapCreated: (controller) => mapController = controller,
+                        onStyleLoadedCallback: () => _setupMapLayers(),
+                        dragEnabled: false,
+                        rotateGesturesEnabled: false,
+                        zoomGesturesEnabled: false,
+                        focusUserLocationWhenUpdated: true,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Layout.row.between(
-                      children: [
-                        Layout.row[8](
-                          children: [
-                            const Icon(Symbols.radar, size: 24),
-                            Text('雷達回波'.i18n, style: context.texts.titleMedium),
-                            FutureBuilder(
-                              future: radarListFuture,
-                              builder: (context, snapshot) {
-                                final data = snapshot.data;
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Layout.row.between(
+                        children: [
+                          Layout.row[8](
+                            children: [
+                              const Icon(Symbols.radar, size: 24),
+                              Text('雷達回波'.i18n, style: context.texts.titleMedium),
+                              FutureBuilder(
+                                future: radarListFuture,
+                                builder: (context, snapshot) {
+                                  final data = snapshot.data;
 
-                                if (data == null) return const SizedBox.shrink();
+                                  if (data == null) return const SizedBox.shrink();
 
-                                final style = context.texts.labelSmall?.copyWith(
-                                  color: context.colors.onSurfaceVariant,
-                                );
+                                  final style = context.texts.labelSmall?.copyWith(
+                                    color: context.colors.onSurfaceVariant,
+                                  );
 
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: context.colors.surfaceContainer,
-                                    border: Border.all(color: context.colors.outlineVariant),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Layout.row[4](
-                                    children: [
-                                      Icon(
-                                        Symbols.schedule_rounded,
-                                        size: (style?.fontSize ?? 12) * 1.25,
-                                        color: context.colors.onSurfaceVariant,
-                                      ),
-                                      Text(data.last.toSimpleDateTimeString(), style: style),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const Icon(Symbols.chevron_right_rounded, size: 24),
-                      ],
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: context.colors.surfaceContainer,
+                                      border: Border.all(color: context.colors.outlineVariant),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Layout.row[4](
+                                      children: [
+                                        Icon(
+                                          Symbols.schedule_rounded,
+                                          size: (style?.fontSize ?? 12) * 1.25,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                        Text(data.last.toSimpleDateTimeString(), style: style),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const Icon(Symbols.chevron_right_rounded, size: 24),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Positioned.fill(
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
-              borderRadius: BorderRadius.circular(16),
+          Positioned.fill(
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
