@@ -31,7 +31,7 @@ class ResponsiveContainer extends StatelessWidget {
 
         switch (mode) {
           case ResponsiveMode.panel:
-            contentMaxWidth = maxWidth ?? 550;
+            contentMaxWidth = (maxWidth ?? constraints.maxWidth * 0.45);
             alignment = isLargeTablet
                 ? Alignment.centerRight
                 : Alignment.center;
