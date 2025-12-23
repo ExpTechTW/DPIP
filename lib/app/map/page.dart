@@ -34,7 +34,7 @@ class MapPageOptions {
     return MapPageOptions(
       initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
       reportId: report,
-      replayTimestamp: replay,
+      replayTimestamp: replay == null ? null : int.tryParse(replay),
     );
   }
 }
