@@ -337,6 +337,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
         return ResponsiveContainer(
           mode: ResponsiveMode.panel,
           child: MorphingSheet(
+            key: ValueKey(value),
             controller: morphingSheetController,
             title: '地震報告'.i18n,
             borderRadius: BorderRadius.circular(16),
