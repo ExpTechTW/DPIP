@@ -143,7 +143,7 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Github',
           subtitle: const Text('ExpTechTW'),
           trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () => launchUrl(Uri.parse('https://github.com/ExpTechTW')),
+          onTap: () => launchUrl(Uri.parse('https://github.com/ExpTechTW/DPIP-Pocket')),
         ),
         ListSectionTile(
           icon: SimpleIcons.discord,
