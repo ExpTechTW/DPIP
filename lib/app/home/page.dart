@@ -32,6 +32,7 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'home_display_mode.dart';
 
@@ -383,34 +384,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildHistoryTimeline() {
-    return Builder(
-      builder: (context) {
-        final history = _history;
+    return ResponsiveContainer(
+      child: Builder(
+        builder: (context) {
+          final history = _history;
 
-        if (history == null || history.isEmpty) {
+          if (history == null || history.isEmpty) {
+            return Column(
+              children: [
+                DateTimelineItem(
+                  TZDateTime.now(UTC).toLocaleFullDateString(context),
+                  first: true,
+                  last: true,
+                  mode: _currentMode,
+                  onModeChanged: _onModeChanged,
+                  isOutOfService: _isOutOfService,
+                ),
+              ],
+            );
+          }
+
+          final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
+
           return Column(
-            children: [
-              DateTimelineItem(
-                TZDateTime.now(UTC).toLocaleFullDateString(context),
-                first: true,
-                last: true,
-                mode: _currentMode,
-                onModeChanged: _onModeChanged,
-                isOutOfService: _isOutOfService,
-              ),
-            ],
+            children: grouped.entries
+                .sorted((a, b) => b.key.compareTo(a.key))
+                .mapIndexed((index, entry) => _buildHistoryGroup(entry, index, history))
+                .toList(),
           );
-        }
-
-        final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
-
-        return Column(
-          children: grouped.entries
-              .sorted((a, b) => b.key.compareTo(a.key))
-              .mapIndexed((index, entry) => _buildHistoryGroup(entry, index, history))
-              .toList(),
-        );
-      },
+        },
+      ),
     );
   }
 
