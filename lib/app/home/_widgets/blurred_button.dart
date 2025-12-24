@@ -65,6 +65,7 @@ class BlurredIconButton extends StatelessWidget {
   final double elevation;
   final double sigmaX;
   final double sigmaY;
+  final String? tooltip;
 
   const BlurredIconButton({
     super.key,
@@ -74,6 +75,7 @@ class BlurredIconButton extends StatelessWidget {
     this.elevation = 0,
     this.sigmaX = 8,
     this.sigmaY = 8,
+    this.tooltip,
   });
 
   @override
@@ -96,6 +98,7 @@ class BlurredIconButton extends StatelessWidget {
             ),
             onPressed: onPressed,
             icon: icon,
+            tooltip: tooltip,
           ),
         ),
       ),

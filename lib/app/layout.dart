@@ -32,6 +32,7 @@ class AppLayout extends StatelessWidget {
                 builder: (context, layers, child) {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
+                    tooltip: '地圖',
                     onPressed: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: layers))),
                     elevation: 2,
                   );
@@ -45,6 +46,7 @@ class AppLayout extends StatelessWidget {
             child: SafeArea(
               child: BlurredIconButton(
                 icon: const Icon(Symbols.settings_rounded),
+                tooltip: '設定',
                 onPressed: () => context.push('/settings'),
                 elevation: 2,
               ),

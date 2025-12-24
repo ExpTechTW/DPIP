@@ -384,6 +384,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         trailing: IconButton(
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
+                          tooltip: '刪除',
                           onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
                         ),
                         enabled: !model.auto && loadingCode == null,
