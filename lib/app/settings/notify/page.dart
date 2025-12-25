@@ -31,11 +31,12 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     EewNotifyType.all => '接收全部'.i18n,
   };
 
-  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) => switch (value) {
-    EarthquakeNotifyType.off => '關閉'.i18n,
-    EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
-    EarthquakeNotifyType.all => '接收全部'.i18n,
-  };
+  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) =>
+      switch (value) {
+        EarthquakeNotifyType.off => '關閉'.i18n,
+        EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
+        EarthquakeNotifyType.all => '接收全部'.i18n,
+      };
 
   String getWeatherNotifyTypeName(WeatherNotifyType value) => switch (value) {
     WeatherNotifyType.off => '關閉'.i18n,
@@ -79,7 +80,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
         }
       });
       ExpTech()
@@ -103,7 +106,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         }
                       })
                       .catchError((updateError) {
-                        TalkerManager.instance.error('Failed to update location: $updateError');
+                        TalkerManager.instance.error(
+                          'Failed to update location: $updateError',
+                        );
                       });
                 });
               }
@@ -132,14 +137,18 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               ),
             ),
             ListView(
-              padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+              padding: EdgeInsets.only(
+                top: 8,
+                bottom: 16 + context.padding.bottom,
+              ),
               children: [
                 if (!enabled)
                   SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     content: '請先設定所在地來使用通知功能'.i18n,
                     trailing: TextButton(
-                      onPressed: () => const SettingsLocationRoute().push(context),
+                      onPressed: () =>
+                          const SettingsLocationRoute().push(context),
                       child: Text('設定'.i18n),
                     ),
                   ),
@@ -155,7 +164,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.crisis_alert_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyEewRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyEewRoute().push(context),
                         );
                       },
                     ),
@@ -173,7 +183,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.monitor_heart_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyMonitorRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyMonitorRoute().push(context),
                         );
                       },
                     ),
@@ -186,7 +197,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.docs_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyReportRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyReportRoute().push(context),
                         );
                       },
                     ),
@@ -195,11 +207,14 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, intensity, child) {
                         return ListSectionTile(
                           title: '震度速報'.i18n,
-                          subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                          subtitle: Text(
+                            getEarthquakeNotifyTypeName(intensity),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.summarize_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyIntensityRoute().push(context),
+                          onTap: () => const SettingsNotifyIntensityRoute()
+                              .push(context),
                         );
                       },
                     ),
@@ -213,11 +228,14 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, thunderstorm, child) {
                         return ListSectionTile(
                           title: '雷雨即時訊息'.i18n,
-                          subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                          subtitle: Text(
+                            getWeatherNotifyTypeName(thunderstorm),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.thunderstorm_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyThunderstormRoute().push(context),
+                          onTap: () => const SettingsNotifyThunderstormRoute()
+                              .push(context),
                         );
                       },
                     ),
@@ -226,11 +244,14 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, weatherAdvisory, child) {
                         return ListSectionTile(
                           title: '天氣警特報'.i18n,
-                          subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                          subtitle: Text(
+                            getWeatherNotifyTypeName(weatherAdvisory),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.warning_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAdvisoryRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyAdvisoryRoute().push(context),
                         );
                       },
                     ),
@@ -243,7 +264,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.directions_run_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyEvacuationRoute().push(context),
+                          onTap: () => const SettingsNotifyEvacuationRoute()
+                              .push(context),
                         );
                       },
                     ),
@@ -261,7 +283,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.tsunami_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyTsunamiRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyTsunamiRoute().push(context),
                         );
                       },
                     ),
@@ -279,7 +302,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.campaign_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAnnouncementRoute().push(context),
+                          onTap: () => const SettingsNotifyAnnouncementRoute()
+                              .push(context),
                         );
                       },
                     ),

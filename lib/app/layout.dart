@@ -8,8 +8,11 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 class NavigationLocation extends NavigationDrawerDestination {
-  NavigationLocation({super.key, required Icon super.icon, required super.label})
-    : super(selectedIcon: Icon(icon.icon, fill: 1));
+  NavigationLocation({
+    super.key,
+    required Icon super.icon,
+    required super.label,
+  }) : super(selectedIcon: Icon(icon.icon, fill: 1));
 }
 
 class AppLayout extends StatelessWidget {
@@ -33,7 +36,11 @@ class AppLayout extends StatelessWidget {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
                     tooltip: '地圖',
-                    onPressed: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: layers))),
+                    onPressed: () => context.push(
+                      MapPage.route(
+                        options: MapPageOptions(initialLayers: layers),
+                      ),
+                    ),
                     elevation: 2,
                   );
                 },

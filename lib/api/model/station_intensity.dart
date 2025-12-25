@@ -17,9 +17,14 @@ class StationIntensity {
   @JsonKey(name: 'int')
   final int intensity;
 
-  StationIntensity({required this.lon, required this.lat, required this.intensity});
+  StationIntensity({
+    required this.lon,
+    required this.lat,
+    required this.intensity,
+  });
 
-  factory StationIntensity.fromJson(Map<String, dynamic> json) => _$StationIntensityFromJson(json);
+  factory StationIntensity.fromJson(Map<String, dynamic> json) =>
+      _$StationIntensityFromJson(json);
 
   LatLng get latlng => LatLng(lat, lon);
 

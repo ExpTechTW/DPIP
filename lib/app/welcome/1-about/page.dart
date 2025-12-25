@@ -15,7 +15,10 @@ class WelcomeAboutPage extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text('下一步'.i18n), onPressed: () => context.push(WelcomeExpTechPage.route)),
+          child: FilledButton(
+            child: Text('下一步'.i18n),
+            onPressed: () => context.push(WelcomeExpTechPage.route),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -31,7 +34,11 @@ class WelcomeAboutPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset('assets/DPIP.png', width: 120, height: 120),
+                      child: Image.asset(
+                        'assets/DPIP.png',
+                        width: 120,
+                        height: 120,
+                      ),
                     ),
                   ),
                   Padding(
@@ -52,14 +59,18 @@ class WelcomeAboutPage extends StatelessWidget {
                         Text(
                           'Disaster Prevention Information Platform',
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           '防災資訊平台'.i18n,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -78,7 +89,8 @@ class WelcomeAboutPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  'DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。'.i18n,
+                  'DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。'
+                      .i18n,
                   style: context.theme.textTheme.bodyLarge,
                   textAlign: TextAlign.left,
                 ),

@@ -10,7 +10,14 @@ const kDepthColor6 = Color(0xFF0000C8);
 
 Color getDepthColor(double depth) {
   final depthList = [5, 15, 30, 50, 100, 150];
-  final colorList = [kDepthColor1, kDepthColor2, kDepthColor3, kDepthColor4, kDepthColor5, kDepthColor6];
+  final colorList = [
+    kDepthColor1,
+    kDepthColor2,
+    kDepthColor3,
+    kDepthColor4,
+    kDepthColor5,
+    kDepthColor6,
+  ];
 
   if (depth <= depthList.first) return colorList.first;
 
@@ -18,7 +25,8 @@ Color getDepthColor(double depth) {
 
   for (int i = 0; i < depthList.length - 1; i++) {
     if (depth >= depthList[i] && depth < depthList[i + 1]) {
-      final double localT = (depth - depthList[i]) / (depthList[i + 1] - depthList[i]);
+      final double localT =
+          (depth - depthList[i]) / (depthList[i + 1] - depthList[i]);
       return Color.lerp(colorList[i], colorList[i + 1], localT)!;
     }
   }

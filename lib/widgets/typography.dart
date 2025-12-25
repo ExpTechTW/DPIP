@@ -27,29 +27,51 @@ class DisplayText extends StatelessWidget {
   ///
   /// Uses the theme's `displaySmall` text style. The [color], [weight], and [style] parameters can be used to customize
   /// the appearance, and will be merged with the theme's base style.
-  DisplayText.small(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.displaySmall);
+  DisplayText.small(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.displaySmall);
 
   /// Creates a medium display text widget.
   ///
   /// Uses the theme's `displayMedium` text style. The [color], [weight], and [style] parameters can be used to
   /// customize the appearance, and will be merged with the theme's base style.
-  DisplayText.medium(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.displayMedium);
+  DisplayText.medium(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.displayMedium);
 
   /// Creates a large display text widget.
   ///
   /// Uses the theme's `displayLarge` text style. The [color], [weight], and [style] parameters can be used to customize
   /// the appearance, and will be merged with the theme's base style.
-  DisplayText.large(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.displayLarge);
+  DisplayText.large(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.displayLarge);
 
   @override
   Widget build(BuildContext context) {
-    return Text(data, style: _textStyleGetter(context)?.merge(style), textAlign: align);
+    return Text(
+      data,
+      style: _textStyleGetter(context)?.merge(style),
+      textAlign: align,
+    );
   }
 }
 
@@ -77,29 +99,51 @@ class HeadLineText extends StatelessWidget {
   ///
   /// Uses the theme's `headlineSmall` text style. The [color], [weight], and [style] parameters can be used to
   /// customize the appearance, and will be merged with the theme's base style.
-  HeadLineText.small(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.headlineSmall);
+  HeadLineText.small(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.headlineSmall);
 
   /// Creates a medium headline text widget.
   ///
   /// Uses the theme's `headlineMedium` text style. The [color], [weight], and [style] parameters can be used to
   /// customize the appearance, and will be merged with the theme's base style.
-  HeadLineText.medium(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.headlineMedium);
+  HeadLineText.medium(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.headlineMedium);
 
   /// Creates a large headline text widget.
   ///
   /// Uses the theme's `headlineLarge` text style. The [color], [weight], and [style] parameters can be used to
   /// customize the appearance, and will be merged with the theme's base style.
-  HeadLineText.large(this.data, {super.key, Color? color, FontWeight? weight, TextStyle? style, this.align})
-    : style = TextStyle(color: color, fontWeight: weight).merge(style),
-      _textStyleGetter = ((context) => context.texts.headlineLarge);
+  HeadLineText.large(
+    this.data, {
+    super.key,
+    Color? color,
+    FontWeight? weight,
+    TextStyle? style,
+    this.align,
+  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+       _textStyleGetter = ((context) => context.texts.headlineLarge);
 
   @override
   Widget build(BuildContext context) {
-    return Text(data, style: _textStyleGetter(context)?.merge(style), textAlign: align);
+    return Text(
+      data,
+      style: _textStyleGetter(context)?.merge(style),
+      textAlign: align,
+    );
   }
 }
 
@@ -136,7 +180,11 @@ class TitleText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleSmall);
 
   /// Creates a medium title text widget.
@@ -151,7 +199,11 @@ class TitleText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleMedium);
 
   /// Creates a large title text widget.
@@ -166,7 +218,11 @@ class TitleText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleLarge);
 
   @override
@@ -212,7 +268,11 @@ class BodyText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodySmall);
 
   /// Creates a medium body text widget.
@@ -227,7 +287,11 @@ class BodyText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodyMedium);
 
   /// Creates a large body text widget.
@@ -242,7 +306,11 @@ class BodyText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodyLarge);
 
   @override
@@ -288,7 +356,11 @@ class LabelText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelSmall);
 
   /// Creates a medium label text widget.
@@ -303,7 +375,11 @@ class LabelText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelMedium);
 
   /// Creates a large label text widget.
@@ -318,7 +394,11 @@ class LabelText extends StatelessWidget {
     double? leading,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight, height: leading).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         height: leading,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelLarge);
 
   @override

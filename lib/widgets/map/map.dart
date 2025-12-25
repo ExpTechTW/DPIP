@@ -74,7 +74,10 @@ class DpipMap extends StatefulWidget {
   const DpipMap({
     super.key,
     this.baseMapType = BaseMapType.exptech,
-    this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: kTaiwanZoom),
+    this.initialCameraPosition = const CameraPosition(
+      target: kTaiwanCenter,
+      zoom: kTaiwanZoom,
+    ),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
@@ -136,7 +139,9 @@ class DpipMapState extends State<DpipMap> {
 
       if (!mounted) return;
 
-      if (_isMapReady && widget.focusUserLocationWhenUpdated && location != null) {
+      if (_isMapReady &&
+          widget.focusUserLocationWhenUpdated &&
+          location != null) {
         try {
           await Future.delayed(const Duration(milliseconds: 100));
           if (!mounted) return;
@@ -173,7 +178,10 @@ class DpipMapState extends State<DpipMap> {
     final controller = _controller;
     if (controller == null) return;
 
-    final layers = [...MapStyle.osmLayers(colors), ...MapStyle.exptechLayers(colors)];
+    final layers = [
+      ...MapStyle.osmLayers(colors),
+      ...MapStyle.exptechLayers(colors),
+    ];
 
     for (final layer in layers) {
       if (layer['type'] == 'background') continue;
@@ -201,7 +209,9 @@ class DpipMapState extends State<DpipMap> {
       _stylePathFuture = MapStyle(context, baseMap: widget.baseMapType).save();
     } else if (_lastColors != context.colors) {
       _setThemeColorFuture?.cancel();
-      _setThemeColorFuture = CancelableOperation.fromFuture(setThemeColors(context.colors));
+      _setThemeColorFuture = CancelableOperation.fromFuture(
+        setThemeColors(context.colors),
+      );
     }
 
     _lastColors = context.colors;
@@ -209,7 +219,10 @@ class DpipMapState extends State<DpipMap> {
 
   @override
   Widget build(BuildContext context) {
-    final double adjustedZoomValue = DpipMap.adjustedZoom(context, widget.initialCameraPosition.zoom);
+    final double adjustedZoomValue = DpipMap.adjustedZoom(
+      context,
+      widget.initialCameraPosition.zoom,
+    );
 
     return FutureBuilder(
       future: _stylePathFuture,
@@ -223,9 +236,14 @@ class DpipMapState extends State<DpipMap> {
         return ColoredBox(
           color: context.colors.surface,
           child: MapLibreMap(
-            minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
+            minMaxZoomPreference:
+                widget.minMaxZoomPreference ??
+                const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
             trackCameraPosition: true,
-            initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
+            initialCameraPosition: CameraPosition(
+              target: widget.initialCameraPosition.target,
+              zoom: adjustedZoomValue,
+            ),
             styleString: styleString,
             tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
             scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,

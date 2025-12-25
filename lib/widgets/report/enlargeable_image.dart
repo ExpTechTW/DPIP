@@ -39,7 +39,11 @@ class EnlargeableImage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return ImageViewerRoute(heroTag: heroTag, imageUrl: imageUrl, imageName: imageName);
+                            return ImageViewerRoute(
+                              heroTag: heroTag,
+                              imageUrl: imageUrl,
+                              imageName: imageName,
+                            );
                           },
                         ),
                       );

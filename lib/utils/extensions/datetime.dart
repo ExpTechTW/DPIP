@@ -24,7 +24,10 @@ DateFormat _getDateFormat(String pattern, [String? locale]) {
   // Construct cache key from translated pattern and locale
   final key = locale != null ? '$translatedPattern-$locale' : translatedPattern;
 
-  return _dateFormatCache.putIfAbsent(key, () => DateFormat(translatedPattern, locale));
+  return _dateFormatCache.putIfAbsent(
+    key,
+    () => DateFormat(translatedPattern, locale),
+  );
 }
 
 /// Extension on [DateTime] that provides convenient utilities for formatting dates and times.
@@ -41,13 +44,16 @@ extension DateTimeExtension on DateTime {
   ///
   /// Returns a string in the format "yyyy/MM/dd (EEEE)" (e.g., "2024/12/25 (Wednesday)"). The day of the week is
   /// localized according to [context]'s locale.
-  String toLocaleFullDateString(BuildContext context) =>
-      _getDateFormat('yyyy/MM/dd (EEEE)', context.locale.toLanguageTag()).format(this);
+  String toLocaleFullDateString(BuildContext context) => _getDateFormat(
+    'yyyy/MM/dd (EEEE)',
+    context.locale.toLanguageTag(),
+  ).format(this);
 
   /// Formats this date and time as a full string.
   ///
   /// Returns a string in the format "yyyy/MM/dd HH:mm:ss" (e.g., "2024/12/25 14:30:45").
-  String toDateTimeString() => _getDateFormat('yyyy/MM/dd HH:mm:ss').format(this);
+  String toDateTimeString() =>
+      _getDateFormat('yyyy/MM/dd HH:mm:ss').format(this);
 
   /// Formats the time portion of this date as a string.
   ///
@@ -57,7 +63,8 @@ extension DateTimeExtension on DateTime {
   /// Formats this date and time as a full simple string.
   ///
   /// Returns a string in the format "MM/dd HH:mm:ss" (e.g., "12/25 14:30:45").
-  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
+  String toFullSimpleDateTimeString() =>
+      _getDateFormat('MM/dd HH:mm:ss').format(this);
 }
 
 /// Extension on [TZDateTime] that provides convenient utilities for formatting timezone-aware dates and times.
@@ -74,15 +81,19 @@ extension TZDateTimeExtension on TZDateTime {
   ///
   /// Returns a string in the format "yyyy/MM/dd (EEEE)" (e.g., "2024/12/25 (Wednesday)"). The day of the week is
   /// localized according to [context]'s locale.
-  String toLocaleFullDateString(BuildContext context) =>
-      _getDateFormat('yyyy/MM/dd (EEEE)', context.locale.toLanguageTag()).format(this);
+  String toLocaleFullDateString(BuildContext context) => _getDateFormat(
+    'yyyy/MM/dd (EEEE)',
+    context.locale.toLanguageTag(),
+  ).format(this);
 
   /// Formats this date and time as a locale-aware full string.
   ///
   /// Returns a string in the format "yyyy/MM/dd HH:mm:ss" (e.g., "2024/12/25 14:30:45"). The format is localized
   /// according to [context]'s locale.
-  String toLocaleDateTimeString(BuildContext context) =>
-      _getDateFormat('yyyy/MM/dd HH:mm:ss', context.locale.toLanguageTag()).format(this);
+  String toLocaleDateTimeString(BuildContext context) => _getDateFormat(
+    'yyyy/MM/dd HH:mm:ss',
+    context.locale.toLanguageTag(),
+  ).format(this);
 
   /// Formats the time portion of this date as a locale-aware string.
   ///
@@ -94,5 +105,6 @@ extension TZDateTimeExtension on TZDateTime {
   /// Formats this date and time as a full simple string.
   ///
   /// Returns a string in the format "MM/dd HH:mm:ss" (e.g., "12/25 14:30:45").
-  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
+  String toFullSimpleDateTimeString() =>
+      _getDateFormat('MM/dd HH:mm:ss').format(this);
 }

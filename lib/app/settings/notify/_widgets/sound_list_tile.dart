@@ -13,7 +13,12 @@ class SoundListTile extends StatefulWidget {
   final Widget? subtitle;
   final String type;
 
-  const SoundListTile({super.key, required this.title, required this.type, this.subtitle});
+  const SoundListTile({
+    super.key,
+    required this.title,
+    required this.type,
+    this.subtitle,
+  });
 
   @override
   State<SoundListTile> createState() => _SoundListTileState();
@@ -48,7 +53,9 @@ class _SoundListTileState extends State<SoundListTile> {
     return ListSectionTile(
       title: widget.title,
       subtitle: widget.subtitle,
-      trailing: _enabled ? const Icon(Symbols.play_circle_rounded) : const LoadingIcon(),
+      trailing: _enabled
+          ? const Icon(Symbols.play_circle_rounded)
+          : const LoadingIcon(),
       enabled: _enabled,
       onTap: onTap,
     );

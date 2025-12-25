@@ -15,13 +15,18 @@ Future<void> updateInfoToServer() async {
   try {
     if (latitude == null || longitude == null) return;
     if (Preference.notifyToken != '' &&
-        DateTime.now().millisecondsSinceEpoch - (Preference.lastUpdateToServerTime ?? 0) > 86400 * 1 * 1000) {
+        DateTime.now().millisecondsSinceEpoch -
+                (Preference.lastUpdateToServerTime ?? 0) >
+            86400 * 1 * 1000) {
       final random = Random();
       final int rand = random.nextInt(2);
 
       if (rand != 0) return;
 
-      ExpTech().updateDeviceLocation(token: Preference.notifyToken, coordinates: LatLng(latitude, longitude));
+      ExpTech().updateDeviceLocation(
+        token: Preference.notifyToken,
+        coordinates: LatLng(latitude, longitude),
+      );
     }
 
     _performNetworkCheck();
@@ -35,9 +40,17 @@ Future<void> _performNetworkCheck() async {
     final countryData = await IpCountryLookup().getIpLocationData();
 
     final ping = Ping('lb.exptech.dev', count: 3, timeout: 3, interval: 1);
-    final List<int?> lb_ping = await ping.stream.take(3).map((event) => event.response?.time?.inMilliseconds).toList();
+    final List<int?> lb_ping = await ping.stream
+        .take(3)
+        .map((event) => event.response?.time?.inMilliseconds)
+        .toList();
 
-    final ping_dev = Ping('lb-dev.exptech.dev', count: 3, timeout: 3, interval: 1);
+    final ping_dev = Ping(
+      'lb-dev.exptech.dev',
+      count: 3,
+      timeout: 3,
+      interval: 1,
+    );
     final List<int?> lb_dev_ping = await ping_dev.stream
         .take(3)
         .map((event) => event.response?.time?.inMilliseconds)

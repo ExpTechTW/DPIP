@@ -14,7 +14,13 @@ class DetailFieldTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 4),
           child,
         ],

@@ -23,7 +23,8 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
           builder: (context, value, child) {
             return EarthquakeNotifySection(
               value: value,
-              onChanged: (value) => context.read<SettingsNotificationModel>().setIntensity(value),
+              onChanged: (value) =>
+                  context.read<SettingsNotificationModel>().setIntensity(value),
             );
           },
         ),
@@ -44,7 +45,8 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,
-          content: '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求'.i18n,
+          content:
+              '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求'.i18n,
         ),
       ],
     );

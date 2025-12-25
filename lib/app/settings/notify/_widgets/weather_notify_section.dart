@@ -10,7 +10,11 @@ class WeatherNotifySection extends StatefulWidget {
   final WeatherNotifyType value;
   final Future Function(WeatherNotifyType value) onChanged;
 
-  const WeatherNotifySection({super.key, required this.value, required this.onChanged});
+  const WeatherNotifySection({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   State<WeatherNotifySection> createState() => _WeatherNotifySectionState();
@@ -28,14 +32,21 @@ class _WeatherNotifySectionState extends State<WeatherNotifySection> {
   @override
   Widget build(BuildContext context) {
     final values = {
-      WeatherNotifyType.local: (title: '接收所在地'.i18n, icon: Symbols.notifications_rounded),
-      WeatherNotifyType.off: (title: '關閉'.i18n, icon: Symbols.notifications_off_rounded),
+      WeatherNotifyType.local: (
+        title: '接收所在地'.i18n,
+        icon: Symbols.notifications_rounded,
+      ),
+      WeatherNotifyType.off: (
+        title: '關閉'.i18n,
+        icon: Symbols.notifications_off_rounded,
+      ),
     };
 
     return ListSection(
       title: '接收類別'.i18n,
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
+        for (final MapEntry(key: item, value: (:title, :icon))
+            in values.entries)
           ListSectionTile(
             title: title,
             icon: icon,

@@ -26,13 +26,17 @@ class MapPageOptions {
 
   MapPageOptions({this.initialLayers, this.reportId, this.replayTimestamp});
 
-  factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
+  factory MapPageOptions.fromQueryParameters(
+    Map<String, String> queryParameters,
+  ) {
     final layers = queryParameters['layers']?.split(',');
     final report = queryParameters['report'];
     final replay = queryParameters['replay'];
 
     return MapPageOptions(
-      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
+      initialLayers: layers
+          ?.map((layer) => MapLayer.values.byName(layer))
+          .toSet(),
       reportId: report,
       replayTimestamp: replay == null ? null : int.tryParse(replay),
     );
@@ -49,9 +53,13 @@ class MapPage extends StatefulWidget {
 
     final parameters = [];
 
-    if (options.initialLayers != null) parameters.add('layers=${options.initialLayers!.map((e) => e.name).join(',')}');
+    if (options.initialLayers != null)
+      parameters.add(
+        'layers=${options.initialLayers!.map((e) => e.name).join(',')}',
+      );
     if (options.reportId != null) parameters.add('report=${options.reportId}');
-    if (options.replayTimestamp != null) parameters.add('replay=${options.replayTimestamp}');
+    if (options.replayTimestamp != null)
+      parameters.add('replay=${options.replayTimestamp}');
 
     return "/map?${parameters.join('&')}";
   }
@@ -67,22 +75,34 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
-  late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? (widget.options?.replayTimestamp != null ? {MapLayer.monitor} : {});
+  late Set<MapLayer> _activeLayers =
+      widget.options?.initialLayers ??
+      (widget.options?.replayTimestamp != null ? {MapLayer.monitor} : {});
   Future<void>? _toggleLayerOperation;
 
   void _setupTicker() {
     _ticker?.cancel();
-    _ticker = Timer.periodic(Duration(milliseconds: 1000 ~/ GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      for (final layer in _activeLayers) {
-        _managers[layer]?.tick();
-      }
-    });
+    _ticker = Timer.periodic(
+      Duration(
+        milliseconds: 1000 ~/ GlobalProviders.map.updateIntervalNotifier.value,
+      ),
+      (timer) {
+        for (final layer in _activeLayers) {
+          _managers[layer]?.tick();
+        }
+      },
+    );
   }
 
   Set<MapLayer> get activeLayers => _activeLayers;
 
   MapLayer? get primaryLayer {
-    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind, MapLayer.lightning]) {
+    for (final layer in [
+      MapLayer.temperature,
+      MapLayer.precipitation,
+      MapLayer.wind,
+      MapLayer.lightning,
+    ]) {
       if (_activeLayers.contains(layer)) {
         return layer;
       }
@@ -104,12 +124,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   void _setupWeatherLayerTimeSync() {
-    final temperatureManager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+    final temperatureManager = getLayerManager<TemperatureMapLayerManager>(
+      MapLayer.temperature,
+    );
     temperatureManager?.onTimeChanged = (time) {
       syncTimeToRadar(time);
     };
 
-    final precipitationManager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+    final precipitationManager = getLayerManager<PrecipitationMapLayerManager>(
+      MapLayer.precipitation,
+    );
     precipitationManager?.onTimeChanged = (time) {
       syncTimeToRadar(time);
     };
@@ -119,30 +143,40 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       syncTimeToRadar(time);
     };
 
-    final lightningManager = getLayerManager<LightningMapLayerManager>(MapLayer.lightning);
+    final lightningManager = getLayerManager<LightningMapLayerManager>(
+      MapLayer.lightning,
+    );
     lightningManager?.onTimeChanged = (time) {
       syncTimeToRadar(time);
     };
   }
 
   Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
-    if (!_activeLayers.contains(MapLayer.radar) || !kWeatherLayers.contains(newLayer) || newLayer == MapLayer.radar) {
+    if (!_activeLayers.contains(MapLayer.radar) ||
+        !kWeatherLayers.contains(newLayer) ||
+        newLayer == MapLayer.radar) {
       return;
     }
 
     String? newTime;
     switch (newLayer) {
       case MapLayer.temperature:
-        final manager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+        final manager = getLayerManager<TemperatureMapLayerManager>(
+          MapLayer.temperature,
+        );
         newTime = manager?.currentTemperatureTime.value;
       case MapLayer.precipitation:
-        final manager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+        final manager = getLayerManager<PrecipitationMapLayerManager>(
+          MapLayer.precipitation,
+        );
         newTime = manager?.currentPrecipitationTime.value;
       case MapLayer.wind:
         final manager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
         newTime = manager?.currentWindTime.value;
       case MapLayer.lightning:
-        final manager = getLayerManager<LightningMapLayerManager>(MapLayer.lightning);
+        final manager = getLayerManager<LightningMapLayerManager>(
+          MapLayer.lightning,
+        );
         newTime = manager?.currentLightningTime.value;
       default:
     }
@@ -157,7 +191,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return manager is T ? manager : null;
   }
 
-  Future<void> toggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
+  Future<void> toggleLayer(
+    MapLayer layer,
+    bool show,
+    Set<MapLayer> activeLayers,
+  ) async {
     // Wait for any pending operations to complete
     await _toggleLayerOperation;
 
@@ -166,7 +204,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     await _toggleLayerOperation;
   }
 
-  Future<void> _performToggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
+  Future<void> _performToggleLayer(
+    MapLayer layer,
+    bool show,
+    Set<MapLayer> activeLayers,
+  ) async {
     if (!mounted) return;
 
     // Update state immediately to prevent race conditions
@@ -188,7 +230,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       }
 
       if (_activeLayers.isEmpty) {
-        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await _controller.animateCamera(
+          CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+        );
       }
     } catch (e, s) {
       // Revert state on error
@@ -236,17 +280,30 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       isReplayMode: widget.options?.replayTimestamp != null,
       replayTimestamp: widget.options?.replayTimestamp,
     );
-    _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
+    _managers[MapLayer.report] = ReportMapLayerManager(
+      context,
+      controller,
+      initialReportId: widget.options?.reportId,
+    );
     _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(
       context,
       controller,
       getActiveLayerCount: () => _activeLayers.length,
     );
-    _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
-    _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
+    _managers[MapLayer.temperature] = TemperatureMapLayerManager(
+      context,
+      controller,
+    );
+    _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(
+      context,
+      controller,
+    );
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
-    _managers[MapLayer.lightning] = LightningMapLayerManager(context, controller);
+    _managers[MapLayer.lightning] = LightningMapLayerManager(
+      context,
+      controller,
+    );
 
     _setupWeatherLayerTimeSync();
 
@@ -265,7 +322,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(baseMapType: _baseMapType, onMapCreated: onMapCreated, onStyleLoadedCallback: onStyleLoaded),
+          DpipMap(
+            baseMapType: _baseMapType,
+            onMapCreated: onMapCreated,
+            onStyleLoadedCallback: onStyleLoaded,
+          ),
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,

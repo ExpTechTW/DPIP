@@ -41,7 +41,11 @@ import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 class ReportMapLayerManager extends MapLayerManager {
   String? initialReportId;
 
-  ReportMapLayerManager(super.context, super.controller, {this.initialReportId});
+  ReportMapLayerManager(
+    super.context,
+    super.controller, {
+    this.initialReportId,
+  });
 
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
@@ -59,7 +63,9 @@ class ReportMapLayerManager extends MapLayerManager {
 
       PartialEarthquakeReport? report;
       if (reportId != null) {
-        report = GlobalProviders.data.partialReport.firstWhereOrNull((r) => r.id == reportId);
+        report = GlobalProviders.data.partialReport.firstWhereOrNull(
+          (r) => r.id == reportId,
+        );
       }
 
       currentReport.value = report;
@@ -79,7 +85,13 @@ class ReportMapLayerManager extends MapLayerManager {
   Future<void> _focus([EarthquakeReport? report]) async {
     if (report != null) {
       await controller.animateCamera(
-        CameraUpdate.newLatLngBounds(report.bounds, left: 48, right: 48, top: 96, bottom: 192),
+        CameraUpdate.newLatLngBounds(
+          report.bounds,
+          left: 48,
+          right: 48,
+          top: 96,
+          bottom: 192,
+        ),
       );
       return;
     }
@@ -89,14 +101,25 @@ class ReportMapLayerManager extends MapLayerManager {
 
     for (final report in data) {
       if (bounds.isEmpty) {
-        bounds = [report.latitude, report.longitude, report.latitude, report.longitude];
+        bounds = [
+          report.latitude,
+          report.longitude,
+          report.latitude,
+          report.longitude,
+        ];
       } else {
         bounds.expandBounds(report.latlng);
       }
     }
 
     await controller.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds.asLatLngBounds, left: 48, right: 48, top: 96, bottom: 192),
+      CameraUpdate.newLatLngBounds(
+        bounds.asLatLngBounds,
+        left: 48,
+        right: 48,
+        top: 96,
+        bottom: 192,
+      ),
     );
   }
 
@@ -119,14 +142,20 @@ class ReportMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.report();
       final layerId = MapLayerIds.report();
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (isSourceExists && isLayerExists) return;
 
       if (!isSourceExists) {
         final data = GeoJsonBuilder()
-            .setFeatures(GlobalProviders.data.partialReport.reversed.map((report) => report.toGeoJsonFeature()))
+            .setFeatures(
+              GlobalProviders.data.partialReport.reversed.map(
+                (report) => report.toGeoJsonFeature(),
+              ),
+            )
             .build();
 
         final properties = GeojsonSourceProperties(data: data);
@@ -152,9 +181,15 @@ class ReportMapLayerManager extends MapLayerManager {
             Expressions.interpolate,
             ['linear'],
             [Expressions.get, 'time'],
-            DateTime.now().millisecondsSinceEpoch - const Duration(days: 14).inMilliseconds,
+            DateTime.now().millisecondsSinceEpoch -
+                const Duration(days: 14).inMilliseconds,
             0.2,
-            GlobalProviders.data.partialReport.first.time.millisecondsSinceEpoch,
+            GlobalProviders
+                .data
+                .partialReport
+                .first
+                .time
+                .millisecondsSinceEpoch,
             1.0,
           ],
           iconAllowOverlap: true,
@@ -163,7 +198,12 @@ class ReportMapLayerManager extends MapLayerManager {
           visibility: visible && initialReportId == null ? 'visible' : 'none',
         );
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          layerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
       }
 
       didSetup = true;
@@ -209,7 +249,9 @@ class ReportMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+      if (_lastFetchTime == null ||
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+        await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager.show', e, s);
     }
@@ -237,7 +279,10 @@ class ReportMapLayerManager extends MapLayerManager {
     setReport(null);
   }
 
-  Future<void> _addReport(PartialEarthquakeReport? partial, {bool focus = true}) async {
+  Future<void> _addReport(
+    PartialEarthquakeReport? partial, {
+    bool focus = true,
+  }) async {
     if (partial == null) return;
 
     var report = GlobalProviders.data.report[partial.id];
@@ -250,10 +295,16 @@ class ReportMapLayerManager extends MapLayerManager {
         GlobalProviders.data.setReport(partial.id, report);
       }
 
-      final layerId = MapLayerIds.report(report.time.millisecondsSinceEpoch.toString());
-      final sourceId = MapSourceIds.report(report.time.millisecondsSinceEpoch.toString());
+      final layerId = MapLayerIds.report(
+        report.time.millisecondsSinceEpoch.toString(),
+      );
+      final sourceId = MapSourceIds.report(
+        report.time.millisecondsSinceEpoch.toString(),
+      );
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (isSourceExists && isLayerExists) return;
@@ -276,7 +327,12 @@ class ReportMapLayerManager extends MapLayerManager {
           symbolZOrder: 'source',
         );
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          layerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
       }
 
       if (focus) await _focus(report);
@@ -287,15 +343,24 @@ class ReportMapLayerManager extends MapLayerManager {
     }
   }
 
-  Future<void> _removeReport(PartialEarthquakeReport? report, {bool focus = true}) async {
+  Future<void> _removeReport(
+    PartialEarthquakeReport? report, {
+    bool focus = true,
+  }) async {
     if (report == null) return;
 
     try {
-      final layerId = MapLayerIds.report(report.time.millisecondsSinceEpoch.toString());
-      final sourceId = MapSourceIds.report(report.time.millisecondsSinceEpoch.toString());
+      final layerId = MapLayerIds.report(
+        report.time.millisecondsSinceEpoch.toString(),
+      );
+      final sourceId = MapSourceIds.report(
+        report.time.millisecondsSinceEpoch.toString(),
+      );
 
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
 
       if (isLayerExists) {
         await controller.removeLayer(layerId);
@@ -355,7 +420,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     final report = GlobalProviders.data.partialReport.first;
 
                     final locationString = report.extractLocation();
-                    final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+                    final location =
+                        Location.tryParse(locationString)?.dynamicName ??
+                        locationString;
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -367,27 +434,45 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             spacing: 4,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 child: Row(
                                   spacing: 8,
                                   children: [
-                                    Icon(Symbols.docs_rounded, size: 24, color: context.colors.onSurface),
+                                    Icon(
+                                      Symbols.docs_rounded,
+                                      size: 24,
+                                      color: context.colors.onSurface,
+                                    ),
                                     Expanded(
                                       child: Text(
                                         '近期的地震報告'.i18n,
-                                        style: context.texts.titleMedium?.copyWith(color: context.colors.onSurface),
+                                        style: context.texts.titleMedium
+                                            ?.copyWith(
+                                              color: context.colors.onSurface,
+                                            ),
                                       ),
                                     ),
                                     Text(
                                       '更多'.i18n,
-                                      style: context.texts.labelSmall?.copyWith(color: context.colors.outline),
+                                      style: context.texts.labelSmall?.copyWith(
+                                        color: context.colors.outline,
+                                      ),
                                     ),
-                                    Icon(Symbols.swipe_up_rounded, size: 16, color: context.colors.outline),
+                                    Icon(
+                                      Symbols.swipe_up_rounded,
+                                      size: 16,
+                                      color: context.colors.outline,
+                                    ),
                                   ],
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Row(
                                   spacing: 8,
                                   children: [
@@ -400,24 +485,36 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     Expanded(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             report.hasNumber
-                                                ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
+                                                ? '編號 {number} 顯著有感地震'.i18n
+                                                      .args({
+                                                        'number': report.number,
+                                                      })
                                                 : location,
                                             style: context.texts.titleMedium,
                                           ),
                                           Text(
-                                            report.time.toLocaleDateTimeString(context),
-                                            style: context.texts.bodyMedium?.copyWith(
-                                              color: context.colors.onSurfaceVariant,
+                                            report.time.toLocaleDateTimeString(
+                                              context,
                                             ),
+                                            style: context.texts.bodyMedium
+                                                ?.copyWith(
+                                                  color: context
+                                                      .colors
+                                                      .onSurfaceVariant,
+                                                ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Text('M ${report.magnitude.toStringAsFixed(1)}', style: context.texts.titleMedium),
+                                    Text(
+                                      'M ${report.magnitude.toStringAsFixed(1)}',
+                                      style: context.texts.titleMedium,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -431,7 +528,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   // Show the current report with details
 
                   final locationString = currentReport.extractLocation();
-                  final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+                  final location =
+                      Location.tryParse(locationString)?.dynamicName ??
+                      locationString;
 
                   return Padding(
                     padding: const EdgeInsets.all(12),
@@ -451,14 +550,27 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 children: [
                                   Text(
                                     currentReport.hasNumber
-                                        ? '編號 {number} 顯著有感地震'.i18n.args({'number': currentReport.number})
+                                        ? '編號 {number} 顯著有感地震'.i18n.args({
+                                            'number': currentReport.number,
+                                          })
                                         : '小區域有感地震'.i18n,
-                                    style: context.texts.labelMedium?.copyWith(color: context.colors.outline),
+                                    style: context.texts.labelMedium?.copyWith(
+                                      color: context.colors.outline,
+                                    ),
                                   ),
-                                  Text(location, style: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.w500)),
                                   Text(
-                                    currentReport.time.toLocaleDateTimeString(context),
-                                    style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                                    location,
+                                    style: context.texts.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    currentReport.time.toLocaleDateTimeString(
+                                      context,
+                                    ),
+                                    style: context.texts.bodyMedium?.copyWith(
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -476,30 +588,40 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '地震規模'.i18n,
-                                    style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                                    style: context.texts.bodyMedium?.copyWith(
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
                                   ),
                                   Text(
                                     'M ${currentReport.magnitude.toStringAsFixed(1)}',
-                                    style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                                    style: context.texts.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                             Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '震源深度'.i18n,
-                                    style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                                    style: context.texts.bodyMedium?.copyWith(
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
                                   ),
                                   Text(
                                     '${currentReport.depth}km',
-                                    style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                                    style: context.texts.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -518,7 +640,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 builder: (context, currentReport, child) {
                   if (currentReport == null) {
                     final grouped = GlobalProviders.data.partialReport
-                        .groupListsBy((report) => report.time.toLocaleFullDateString(context))
+                        .groupListsBy(
+                          (report) =>
+                              report.time.toLocaleFullDateString(context),
+                        )
                         .entries
                         .toList();
 
@@ -530,7 +655,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           leading: BackButton(
                             onPressed: () {
                               sheetController.collapse();
-                              controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
+                              controller.animateTo(
+                                0,
+                                duration: Durations.short4,
+                                curve: Easing.emphasizedDecelerate,
+                              );
                             },
                           ),
                           floating: true,
@@ -538,17 +667,25 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           pinned: true,
                         ),
                         SliverPadding(
-                          padding: EdgeInsets.only(bottom: context.padding.bottom),
+                          padding: EdgeInsets.only(
+                            bottom: context.padding.bottom,
+                          ),
                           sliver: SliverList.builder(
                             itemCount: grouped.length,
                             itemBuilder: (context, index) {
-                              final MapEntry(key: date, value: reports) = grouped[index];
+                              final MapEntry(key: date, value: reports) =
+                                  grouped[index];
 
                               return ListSection(
                                 title: date,
                                 children: reports.map((report) {
-                                  final locationString = report.extractLocation();
-                                  final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+                                  final locationString = report
+                                      .extractLocation();
+                                  final location =
+                                      Location.tryParse(
+                                        locationString,
+                                      )?.dynamicName ??
+                                      locationString;
 
                                   return ListSectionTile(
                                     leading: IntensityBox(
@@ -583,10 +720,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   late List<Widget> content;
 
                   if (report == null) {
-                    content = [const Center(child: CircularProgressIndicator())];
+                    content = [
+                      const Center(child: CircularProgressIndicator()),
+                    ];
                   } else {
                     final locationString = report.getLocation();
-                    final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+                    final location =
+                        Location.tryParse(locationString)?.dynamicName ??
+                        locationString;
 
                     content = [
                       Padding(
@@ -601,11 +742,22 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 children: [
                                   Text(
                                     report.hasNumber
-                                        ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
+                                        ? '編號 {number} 顯著有感地震'.i18n.args({
+                                            'number': report.number,
+                                          })
                                         : '小區域有感地震'.i18n,
-                                    style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
+                                    style: TextStyle(
+                                      color: context.colors.onSurfaceVariant,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                  Text(location, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    location,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -616,10 +768,15 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         spacing: 8,
                         children: [
                           ActionChip(
-                            avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
+                            avatar: Icon(
+                              Symbols.open_in_new,
+                              color: context.colors.onPrimary,
+                            ),
                             label: Text('報告頁面'.i18n),
                             backgroundColor: context.colors.primary,
-                            labelStyle: TextStyle(color: context.colors.onPrimary),
+                            labelStyle: TextStyle(
+                              color: context.colors.onPrimary,
+                            ),
                             side: BorderSide(color: context.colors.primary),
                             onPressed: () {
                               launchUrl(report.reportUrl);
@@ -632,7 +789,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapMonitorPage(replayTimestamp: report.time.millisecondsSinceEpoch - 2000),
+                                  builder: (context) => MapMonitorPage(
+                                    replayTimestamp:
+                                        report.time.millisecondsSinceEpoch -
+                                        2000,
+                                  ),
                                 ),
                               );
                             },
@@ -644,14 +805,20 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         label: '發震時間'.i18n,
                         child: Text(
                           DateFormat('yyyy/MM/dd HH:mm:ss').format(report.time),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       DetailFieldTile(
                         label: '位於'.i18n,
                         child: Text(
                           report.convertLatLon(),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Row(
@@ -667,12 +834,17 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     margin: const EdgeInsets.only(right: 6),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
-                                      color: MagnitudeColor.magnitude(report.magnitude),
+                                      color: MagnitudeColor.magnitude(
+                                        report.magnitude,
+                                      ),
                                     ),
                                   ),
                                   Text(
                                     'M ${report.magnitude}',
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -694,7 +866,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   ),
                                   Text(
                                     '${report.depth} km',
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -708,17 +883,28 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            for (final MapEntry(key: areaName, value: area) in report.list.entries)
+                            for (final MapEntry(key: areaName, value: area)
+                                in report.list.entries)
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                                 child: Column(
                                   children: [
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(top: 8),
-                                          child: Text(areaName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          padding: const EdgeInsets.only(
+                                            top: 8,
+                                          ),
+                                          child: Text(
+                                            areaName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
                                         const SizedBox(width: 20),
                                         Expanded(
@@ -726,29 +912,55 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                             spacing: 8,
                                             runSpacing: 8,
                                             children: [
-                                              for (final MapEntry(key: townName, value: town) in area.town.entries)
+                                              for (final MapEntry(
+                                                    key: townName,
+                                                    value: town,
+                                                  )
+                                                  in area.town.entries)
                                                 ActionChip(
-                                                  padding: const EdgeInsets.all(4),
-                                                  side: BorderSide(color: IntensityColor.intensity(town.intensity)),
-                                                  backgroundColor: IntensityColor.intensity(
-                                                    town.intensity,
-                                                  ).withValues(alpha: 0.16),
-                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  side: BorderSide(
+                                                    color:
+                                                        IntensityColor.intensity(
+                                                          town.intensity,
+                                                        ),
+                                                  ),
+                                                  backgroundColor:
+                                                      IntensityColor.intensity(
+                                                        town.intensity,
+                                                      ).withValues(alpha: 0.16),
+                                                  materialTapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap,
                                                   avatar: AspectRatio(
                                                     aspectRatio: 1,
                                                     child: Container(
                                                       decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(6),
-                                                        color: IntensityColor.intensity(town.intensity),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              6,
+                                                            ),
+                                                        color:
+                                                            IntensityColor.intensity(
+                                                              town.intensity,
+                                                            ),
                                                       ),
                                                       child: Center(
                                                         child: Text(
-                                                          town.intensity.asIntensityDisplayLabel,
+                                                          town
+                                                              .intensity
+                                                              .asIntensityDisplayLabel,
                                                           style: TextStyle(
                                                             height: 1,
                                                             fontSize: 15,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: IntensityColor.onIntensity(town.intensity),
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                IntensityColor.onIntensity(
+                                                                  town.intensity,
+                                                                ),
                                                           ),
                                                         ),
                                                       ),
@@ -757,9 +969,15 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                                   label: Text(townName),
                                                   onPressed: () {
                                                     sheetController.collapse();
-                                                    widget.manager.controller.animateCamera(
-                                                      CameraUpdate.newLatLng(LatLng(town.lat, town.lon)),
-                                                    );
+                                                    widget.manager.controller
+                                                        .animateCamera(
+                                                          CameraUpdate.newLatLng(
+                                                            LatLng(
+                                                              town.lat,
+                                                              town.lon,
+                                                            ),
+                                                          ),
+                                                        );
                                                   },
                                                 ),
                                             ],
@@ -824,7 +1042,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         leading: BackButton(
                           onPressed: () {
                             widget.manager.setReport(null);
-                            controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
+                            controller.animateTo(
+                              0,
+                              duration: Durations.short4,
+                              curve: Easing.emphasizedDecelerate,
+                            );
                           },
                         ),
                         floating: true,
@@ -832,7 +1054,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         pinned: true,
                       ),
                       SliverPadding(
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, context.padding.bottom),
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          0,
+                          16,
+                          context.padding.bottom,
+                        ),
                         sliver: SliverList.list(children: content),
                       ),
                     ],
@@ -842,7 +1069,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
             },
           ),
         );
-      }
+      },
     );
   }
 }

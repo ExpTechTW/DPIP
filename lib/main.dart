@@ -31,8 +31,13 @@ void main() async {
   // iOS 14 以下改回用 StoreKit1
   InAppPurchaseStoreKitPlatform.enableStoreKit1();
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent));
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
+  );
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
+    overlays: [SystemUiOverlay.top],
+  );
 
   FlutterError.onError = (FlutterErrorDetails details) {
     talker.handle(details.exception, details.stack);
@@ -45,7 +50,9 @@ void main() async {
   talker.log('⏳ 2. 啟動 Global...');
   await Global.init();
   final globalInitEnd = DateTime.now();
-  talker.log('✅ 2. Global 完成。耗時: ${globalInitEnd.difference(globalInitStart).inMilliseconds}ms');
+  talker.log(
+    '✅ 2. Global 完成。耗時: ${globalInitEnd.difference(globalInitStart).inMilliseconds}ms',
+  );
 
   await Preference.init();
   final isFirstLaunch = Preference.instance.getBool('isFirstLaunch') ?? true;
@@ -57,12 +64,20 @@ void main() async {
   await Future.wait([
     _loggedTask('DeviceInfo.init', DeviceInfo.init()),
     _loggedTask('AppLocalizations.load', AppLocalizations.load()),
-    _loggedTask('LocationNameLocalizations.load', LocationNameLocalizations.load()),
-    _loggedTask('WeatherStationLocalizations.load', WeatherStationLocalizations.load()),
+    _loggedTask(
+      'LocationNameLocalizations.load',
+      LocationNameLocalizations.load(),
+    ),
+    _loggedTask(
+      'WeatherStationLocalizations.load',
+      WeatherStationLocalizations.load(),
+    ),
   ]);
 
   final futureWaitEnd = DateTime.now();
-  talker.log('✅ 3.並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitEnd.difference(futureWaitStart).inMilliseconds}ms');
+  talker.log(
+    '✅ 3.並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitEnd.difference(futureWaitStart).inMilliseconds}ms',
+  );
 
   if (isFirstLaunch) {
     talker.log('🟣 首次啟動 → 前置初始化 FCM + 通知');
@@ -76,7 +91,9 @@ void main() async {
 
   final overallEndTime = DateTime.now();
   talker.log('--- 冷啟動偵測結束 ---');
-  talker.log('🚨 總初始化耗時 (runApp 前): ${overallEndTime.difference(overallStartTime).inMilliseconds}ms');
+  talker.log(
+    '🚨 總初始化耗時 (runApp 前): ${overallEndTime.difference(overallStartTime).inMilliseconds}ms',
+  );
 
   runApp(
     I18n(
@@ -110,27 +127,33 @@ void main() async {
   );
   if (!isFirstLaunch) {
     talker.log('🟢 非首次啟動 → 通知與 FCM 改為背景初始化');
-    unawaited(Future(() async {
-      try {
-        await fcmInit();
-        await notifyInit();
-        await updateInfoToServer();
-      } catch (e, st) {
-        talker.error('背景初始化失敗: $e\n$st');
-      }
-    }));
+    unawaited(
+      Future(() async {
+        try {
+          await fcmInit();
+          await notifyInit();
+          await updateInfoToServer();
+        } catch (e, st) {
+          talker.error('背景初始化失敗: $e\n$st');
+        }
+      }),
+    );
   }
   final locationInitStart = DateTime.now();
   talker.log('🚀 5. 啟動 LocationServiceManager (並行背景執行)...');
   final locationFuture = LocationServiceManager.initalize();
 
-  locationFuture.whenComplete(() {
-    final locationInitEnd = DateTime.now();
-    final locationDuration = locationInitEnd.difference(locationInitStart).inMilliseconds;
-    talker.log('✅ 5. LocationServiceManager 完成。耗時: ${locationDuration}ms');
-  }).catchError((e) {
-    talker.error('❌ 5. LocationServiceManager 失敗。錯誤: $e');
-  });
+  locationFuture
+      .whenComplete(() {
+        final locationInitEnd = DateTime.now();
+        final locationDuration = locationInitEnd
+            .difference(locationInitStart)
+            .inMilliseconds;
+        talker.log('✅ 5. LocationServiceManager 完成。耗時: ${locationDuration}ms');
+      })
+      .catchError((e) {
+        talker.error('❌ 5. LocationServiceManager 失敗。錯誤: $e');
+      });
 }
 
 Future<T> _loggedTask<T>(String taskName, Future<T> future) async {

@@ -21,17 +21,20 @@ class SettingsLayoutPage extends StatelessWidget {
               SwitchListTile(
                 title: Text('雷達回波'.i18n),
                 value: model.isEnabled(HomeDisplaySection.radar),
-                onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),
+                onChanged: (v) =>
+                    model.toggleSection(HomeDisplaySection.radar, v),
               ),
               SwitchListTile(
                 title: Text('天氣預報(24h)'.i18n),
                 value: model.isEnabled(HomeDisplaySection.forecast),
-                onChanged: (v) => model.toggleSection(HomeDisplaySection.forecast, v),
+                onChanged: (v) =>
+                    model.toggleSection(HomeDisplaySection.forecast, v),
               ),
               SwitchListTile(
                 title: Text('歷史事件'.i18n),
                 value: model.isEnabled(HomeDisplaySection.history),
-                onChanged: (v) => model.toggleSection(HomeDisplaySection.history, v),
+                onChanged: (v) =>
+                    model.toggleSection(HomeDisplaySection.history, v),
               ),
             ];
             return Column(

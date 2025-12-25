@@ -12,7 +12,11 @@ class PositionedBackButton extends StatelessWidget {
       top: 24,
       left: 24,
       child: SafeArea(
-        child: BlurredIconButton(icon: const Icon(Symbols.arrow_back_rounded), onPressed: context.pop, elevation: 2),
+        child: BlurredIconButton(
+          icon: const Icon(Symbols.arrow_back_rounded),
+          onPressed: context.pop,
+          elevation: 2,
+        ),
       ),
     );
   }

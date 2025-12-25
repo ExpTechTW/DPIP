@@ -44,7 +44,8 @@ class LocationServiceManager {
 
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) return;
+        permission == LocationPermission.deniedForever)
+      return;
 
     try {
       await stop();
@@ -52,23 +53,33 @@ class LocationServiceManager {
       await LocationService._$task();
       await start();
     } catch (e, s) {
-      TalkerManager.instance.error('👷 location service initialization failed', e, s);
+      TalkerManager.instance.error(
+        '👷 location service initialization failed',
+        e,
+        s,
+      );
     }
   }
 
   static Duration _getUpdateInterval() {
     final minutes = Preference.instance.getInt(_kPrefKeyUpdateInterval);
-    return minutes != null ? Duration(minutes: minutes) : kDefaultUpdateInterval;
+    return minutes != null
+        ? Duration(minutes: minutes)
+        : kDefaultUpdateInterval;
   }
 
   static Future<void> _setUpdateInterval(Duration interval) async {
-    await Preference.instance.setInt(_kPrefKeyUpdateInterval, interval.inMinutes);
+    await Preference.instance.setInt(
+      _kPrefKeyUpdateInterval,
+      interval.inMinutes,
+    );
   }
 
   static Duration _calculateNextInterval(double? distanceInMeters) {
     if (distanceInMeters == null) return kDefaultUpdateInterval;
     if (distanceInMeters >= kHighMovementThreshold) return kMinUpdateInterval;
-    if (distanceInMeters >= kLowMovementThreshold) return kDefaultUpdateInterval;
+    if (distanceInMeters >= kLowMovementThreshold)
+      return kDefaultUpdateInterval;
 
     final currentInterval = _getUpdateInterval();
     final newInterval = Duration(minutes: currentInterval.inMinutes + 5);
@@ -107,7 +118,11 @@ class LocationServiceManager {
             rescheduleOnReboot: true,
           );
         } catch (e2, s2) {
-          TalkerManager.instance.error('👷 starting inexact alarm also FAILED', e2, s2);
+          TalkerManager.instance.error(
+            '👷 starting inexact alarm also FAILED',
+            e2,
+            s2,
+          );
         }
       }
     }
@@ -182,7 +197,8 @@ class LocationService {
       }
 
       final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
         TalkerManager.instance.warning(
           '⚙️::BackgroundLocationService location permission not granted, stopping service',
         );
@@ -195,7 +211,9 @@ class LocationService {
         TalkerManager.instance.warning(
           '⚙️::BackgroundLocationService location service is disabled, skipping this update',
         );
-        await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
+        await LocationServiceManager._rescheduleAlarm(
+          LocationServiceManager.kDefaultUpdateInterval,
+        );
         return;
       }
 
@@ -212,8 +230,12 @@ class LocationService {
       }
 
       final previousLocation = _$location;
-      final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
-      final nextInterval = LocationServiceManager._calculateNextInterval(distanceInMeters);
+      final distanceInMeters = previousLocation != null
+          ? coordinates.to(previousLocation)
+          : null;
+      final nextInterval = LocationServiceManager._calculateNextInterval(
+        distanceInMeters,
+      );
       await LocationServiceManager._setUpdateInterval(nextInterval);
 
       await _$updatePosition(coordinates);
@@ -221,10 +243,19 @@ class LocationService {
       final fcmToken = Preference.notifyToken;
       if (fcmToken.isNotEmpty) {
         try {
-          await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: coordinates);
-          TalkerManager.instance.info('⚙️::BackgroundLocationService location updated on server');
+          await ExpTech().updateDeviceLocation(
+            token: fcmToken,
+            coordinates: coordinates,
+          );
+          TalkerManager.instance.info(
+            '⚙️::BackgroundLocationService location updated on server',
+          );
         } catch (e, s) {
-          TalkerManager.instance.error('⚙️::BackgroundLocationService failed to update location on server', e, s);
+          TalkerManager.instance.error(
+            '⚙️::BackgroundLocationService failed to update location on server',
+            e,
+            s,
+          );
         }
       }
 
@@ -236,10 +267,16 @@ class LocationService {
 
       await _$dismissNotification();
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService task FAILED', e, s);
+      TalkerManager.instance.error(
+        '⚙️::BackgroundLocationService task FAILED',
+        e,
+        s,
+      );
       await _$dismissNotification();
       try {
-        await LocationServiceManager._rescheduleAlarm(LocationServiceManager.kDefaultUpdateInterval);
+        await LocationServiceManager._rescheduleAlarm(
+          LocationServiceManager.kDefaultUpdateInterval,
+        );
       } catch (_) {}
     }
   }
@@ -260,32 +297,52 @@ class LocationService {
         ),
       );
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to show notification', e, s);
+      TalkerManager.instance.error(
+        '⚙️::BackgroundLocationService failed to show notification',
+        e,
+        s,
+      );
     }
   }
 
   @pragma('vm:entry-point')
   static Future<void> _$dismissNotification() async {
     try {
-      await AwesomeNotifications().dismiss(LocationServiceManager.kNotificationId);
-      await AwesomeNotifications().cancel(LocationServiceManager.kNotificationId);
-      await AwesomeNotifications().dismissNotificationsByChannelKey('background');
+      await AwesomeNotifications().dismiss(
+        LocationServiceManager.kNotificationId,
+      );
+      await AwesomeNotifications().cancel(
+        LocationServiceManager.kNotificationId,
+      );
+      await AwesomeNotifications().dismissNotificationsByChannelKey(
+        'background',
+      );
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService failed to dismiss notification', e, s);
+      TalkerManager.instance.error(
+        '⚙️::BackgroundLocationService failed to dismiss notification',
+        e,
+        s,
+      );
     }
   }
 
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService location permission not granted');
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      TalkerManager.instance.warning(
+        '⚙️::BackgroundLocationService location permission not granted',
+      );
       return null;
     }
 
-    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    final isLocationServiceEnabled =
+        await Geolocator.isLocationServiceEnabled();
     if (!isLocationServiceEnabled) {
-      TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is not available');
+      TalkerManager.instance.warning(
+        '⚙️::BackgroundLocationService location service is not available',
+      );
       return null;
     }
 
@@ -307,7 +364,10 @@ class LocationService {
         ),
       );
       if (lowAccuracyPosition.accuracy <= 500) {
-        return LatLng(lowAccuracyPosition.latitude, lowAccuracyPosition.longitude);
+        return LatLng(
+          lowAccuracyPosition.latitude,
+          lowAccuracyPosition.longitude,
+        );
       }
     } catch (_) {}
 
@@ -318,7 +378,10 @@ class LocationService {
           timeLimit: Duration(seconds: 15),
         ),
       );
-      return LatLng(mediumAccuracyPosition.latitude, mediumAccuracyPosition.longitude);
+      return LatLng(
+        mediumAccuracyPosition.latitude,
+        mediumAccuracyPosition.longitude,
+      );
     } catch (_) {}
 
     try {
@@ -330,12 +393,17 @@ class LocationService {
       );
       return LatLng(currentPosition.latitude, currentPosition.longitude);
     } catch (e) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService all location strategies failed', e);
+      TalkerManager.instance.error(
+        '⚙️::BackgroundLocationService all location strategies failed',
+        e,
+      );
       return null;
     }
   }
 
-  static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
+  static ({String code, Location location})? _$getLocationFromCoordinates(
+    LatLng target,
+  ) {
     final geoJsonData = _$geoJsonData;
     final locationData = _$locationData;
 
@@ -359,8 +427,10 @@ class LocationService {
           final double yi = polygon[i][1];
           final double xj = polygon[j][0];
           final double yj = polygon[j][1];
-          final bool intersect = ((yi > target.latitude) != (yj > target.latitude)) &&
-              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+          final bool intersect =
+              ((yi > target.latitude) != (yj > target.latitude)) &&
+              (target.longitude <
+                  (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
           if (intersect) isInside = !isInside;
           j = i;
         }
@@ -378,8 +448,10 @@ class LocationService {
             final double yi = polygon[i][1];
             final double xj = polygon[j][0];
             final double yj = polygon[j][1];
-            final bool intersect = ((yi > target.latitude) != (yj > target.latitude)) &&
-                (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+            final bool intersect =
+                ((yi > target.latitude) != (yj > target.latitude)) &&
+                (target.longitude <
+                    (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
             if (intersect) isInside = !isInside;
             j = i;
           }
@@ -405,7 +477,9 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$updatePosition(LatLng? position) async {
     _$location = position;
-    final result = position != null ? _$getLocationFromCoordinates(position) : null;
+    final result = position != null
+        ? _$getLocationFromCoordinates(position)
+        : null;
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;

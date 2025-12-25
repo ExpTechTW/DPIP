@@ -17,8 +17,11 @@ Future<void> updateLocationFromGPS() async {
   }
 
   final now = DateTime.now();
-  if (_lastUpdateTime != null && now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
-    TalkerManager.instance.debug('📍 [GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)');
+  if (_lastUpdateTime != null &&
+      now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
+    TalkerManager.instance.debug(
+      '📍 [GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)',
+    );
     return;
   }
 
@@ -33,7 +36,8 @@ Future<void> updateLocationFromGPS() async {
     }
 
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       TalkerManager.instance.debug('📍 [GPS] Location permission denied');
       _clearLocation();
       return;
@@ -41,9 +45,14 @@ Future<void> updateLocationFromGPS() async {
 
     Position? position = await Geolocator.getLastKnownPosition();
     if (position == null) {
-      TalkerManager.instance.debug('📍 [GPS] No last known position, getting current position');
+      TalkerManager.instance.debug(
+        '📍 [GPS] No last known position, getting current position',
+      );
       position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 10)),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 10),
+        ),
       );
     }
 

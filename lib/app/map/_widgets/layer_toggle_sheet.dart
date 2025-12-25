@@ -13,7 +13,8 @@ import 'package:dpip/widgets/ui/labeled_divider.dart';
 class LayerToggleSheet extends StatefulWidget {
   final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers) onLayerChanged;
+  final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers)
+  onLayerChanged;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const LayerToggleSheet({
@@ -126,7 +127,11 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 checked: _activeLayers.contains(MapLayer.report),
                 onChanged: (_) => _toggleLayer(MapLayer.report),
               ),
-              LayerToggle(label: '海嘯'.i18n, checked: _activeLayers.contains(MapLayer.tsunami), onChanged: null),
+              LayerToggle(
+                label: '海嘯'.i18n,
+                checked: _activeLayers.contains(MapLayer.tsunami),
+                onChanged: null,
+              ),
             ],
           ),
           LabeledDivider(label: '氣象'.i18n),
@@ -144,13 +149,15 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 label: '氣溫'.i18n,
                 checked: _activeLayers.contains(MapLayer.temperature),
                 onChanged: (_) => _toggleLayer(MapLayer.temperature),
-                onLongPress: (_) => _toggleLayer(MapLayer.temperature, overlay: true),
+                onLongPress: (_) =>
+                    _toggleLayer(MapLayer.temperature, overlay: true),
               ),
               LayerToggle(
                 label: '降水'.i18n,
                 checked: _activeLayers.contains(MapLayer.precipitation),
                 onChanged: (_) => _toggleLayer(MapLayer.precipitation),
-                onLongPress: (_) => _toggleLayer(MapLayer.precipitation, overlay: true),
+                onLongPress: (_) =>
+                    _toggleLayer(MapLayer.precipitation, overlay: true),
               ),
               LayerToggle(
                 label: '風向/風速'.i18n,
@@ -162,7 +169,8 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 label: '閃電'.i18n,
                 checked: _activeLayers.contains(MapLayer.lightning),
                 onChanged: (_) => _toggleLayer(MapLayer.lightning),
-                onLongPress: (_) => _toggleLayer(MapLayer.lightning, overlay: true),
+                onLongPress: (_) =>
+                    _toggleLayer(MapLayer.lightning, overlay: true),
               ),
             ],
           ),

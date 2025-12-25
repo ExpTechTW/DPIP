@@ -104,5 +104,6 @@ extension BuildContextExtension on BuildContext {
   ///   builder: (context) => MyBottomSheet(),
   /// );
   /// ```
-  BoxConstraints get bottomSheetConstraints => BoxConstraints(maxHeight: dimension.height - 72, maxWidth: 640);
+  BoxConstraints get bottomSheetConstraints =>
+      BoxConstraints(maxHeight: dimension.height - 72, maxWidth: 640);
 }

@@ -24,8 +24,12 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
   void initState() {
     super.initState();
     _enabled = Preference.proxyEnabled ?? false;
-    _hostController = TextEditingController(text: Preference.proxyHost ?? 'localhost');
-    _portController = TextEditingController(text: Preference.proxyPort?.toString() ?? '9090');
+    _hostController = TextEditingController(
+      text: Preference.proxyHost ?? 'localhost',
+    );
+    _portController = TextEditingController(
+      text: Preference.proxyPort?.toString() ?? '9090',
+    );
   }
 
   @override
@@ -37,7 +41,9 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
 
   void _saveSettings() {
     Preference.proxyEnabled = _enabled;
-    Preference.proxyHost = _hostController.text.trim().isEmpty ? null : _hostController.text.trim();
+    Preference.proxyHost = _hostController.text.trim().isEmpty
+        ? null
+        : _hostController.text.trim();
     final portText = _portController.text.trim();
     Preference.proxyPort = portText.isEmpty ? null : int.tryParse(portText);
 
@@ -75,7 +81,10 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
             ),
             if (_enabled) ...[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -104,7 +113,10 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

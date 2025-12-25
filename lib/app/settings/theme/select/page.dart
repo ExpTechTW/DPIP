@@ -26,9 +26,13 @@ class SettingsThemeSelectPage extends StatelessWidget {
               builder: (context, themeMode, child) => ListSectionTile(
                 icon: Symbols.light_mode_rounded,
                 title: '淺色'.i18n,
-                trailing: Icon(themeMode == ThemeMode.light ? Symbols.check : null),
+                trailing: Icon(
+                  themeMode == ThemeMode.light ? Symbols.check : null,
+                ),
                 onTap: () {
-                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.light);
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(
+                    ThemeMode.light,
+                  );
                   context.pop();
                 },
               ),
@@ -38,9 +42,13 @@ class SettingsThemeSelectPage extends StatelessWidget {
               builder: (context, themeMode, child) => ListSectionTile(
                 icon: Symbols.dark_mode_rounded,
                 title: '深色'.i18n,
-                trailing: Icon(themeMode == ThemeMode.dark ? Symbols.check : null),
+                trailing: Icon(
+                  themeMode == ThemeMode.dark ? Symbols.check : null,
+                ),
                 onTap: () {
-                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.dark);
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(
+                    ThemeMode.dark,
+                  );
                   context.pop();
                 },
               ),
@@ -50,13 +58,19 @@ class SettingsThemeSelectPage extends StatelessWidget {
               builder: (context, themeMode, child) => ListSectionTile(
                 icon: Symbols.devices_rounded,
                 title: '跟隨系統主題'.i18n,
-                subtitle: Text(switch (MediaQuery.of(context).platformBrightness) {
+                subtitle: Text(switch (MediaQuery.of(
+                  context,
+                ).platformBrightness) {
                   Brightness.light => '淺色'.i18n,
                   Brightness.dark => '深色'.i18n,
                 }),
-                trailing: Icon(themeMode == ThemeMode.system ? Symbols.check : null),
+                trailing: Icon(
+                  themeMode == ThemeMode.system ? Symbols.check : null,
+                ),
                 onTap: () {
-                  context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.system);
+                  context.read<SettingsUserInterfaceModel>().setThemeMode(
+                    ThemeMode.system,
+                  );
                   context.pop();
                 },
               ),

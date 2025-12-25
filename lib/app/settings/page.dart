@@ -30,8 +30,10 @@ class SettingsIndexPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appInfo = '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
-    final deviceInfo = '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
+    final appInfo =
+        '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
+    final deviceInfo =
+        '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     final location = ListSection(
       title: '位置'.i18n,
@@ -143,14 +145,16 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Github',
           subtitle: const Text('ExpTechTW'),
           trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () => launchUrl(Uri.parse('https://github.com/ExpTechTW/DPIP-Pocket')),
+          onTap: () =>
+              launchUrl(Uri.parse('https://github.com/ExpTechTW/DPIP-Pocket')),
         ),
         ListSectionTile(
           icon: SimpleIcons.discord,
           title: 'Discord',
           subtitle: const Text('.gg/exptech-studio'),
           trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () => launchUrl(Uri.parse('https://discord.gg/exptech-studio')),
+          onTap: () =>
+              launchUrl(Uri.parse('https://discord.gg/exptech-studio')),
         ),
         ListSectionTile(
           icon: SimpleIcons.threads,
@@ -164,7 +168,8 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Youtube',
           subtitle: const Text('@exptechtw'),
           trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () => launchUrl(Uri.parse('https://www.youtube.com/@exptechtw/live')),
+          onTap: () =>
+              launchUrl(Uri.parse('https://www.youtube.com/@exptechtw/live')),
         ),
       ],
     );
@@ -223,7 +228,16 @@ class SettingsIndexPage extends StatelessWidget {
 
     return ListView(
       padding: EdgeInsets.only(top: 16, bottom: 16 + context.padding.bottom),
-      children: [location, userInterface, notification, network, information, links, debug, footer],
+      children: [
+        location,
+        userInterface,
+        notification,
+        network,
+        information,
+        links,
+        debug,
+        footer,
+      ],
     );
   }
 }

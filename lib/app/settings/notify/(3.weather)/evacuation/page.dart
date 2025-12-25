@@ -23,7 +23,9 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
           builder: (context, value, child) {
             return WeatherNotifySection(
               value: value,
-              onChanged: (value) => context.read<SettingsNotificationModel>().setEvacuation(value),
+              onChanged: (value) => context
+                  .read<SettingsNotificationModel>()
+                  .setEvacuation(value),
             );
           },
         ),
@@ -35,12 +37,17 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
               subtitle: Text('所在地(鄉鎮)發布防災警訊時'.i18n),
               type: 'evacuation_major-important-v2',
             ),
-            SoundListTile(title: '一般'.i18n, subtitle: Text('所在地(鄉鎮)發布防災資訊時'.i18n), type: 'evacuation_minor-general-v2'),
+            SoundListTile(
+              title: '一般'.i18n,
+              subtitle: Text('所在地(鄉鎮)發布防災資訊時'.i18n),
+              type: 'evacuation_minor-general-v2',
+            ),
           ],
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,
-          content: '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求'.i18n,
+          content:
+              '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求'.i18n,
         ),
       ],
     );

@@ -11,7 +11,8 @@ class ServerStatus {
 
   ServerStatus({required this.time, required this.services});
 
-  factory ServerStatus.fromJson(Map<String, dynamic> json) => _$ServerStatusFromJson(json);
+  factory ServerStatus.fromJson(Map<String, dynamic> json) =>
+      _$ServerStatusFromJson(json);
 
   Map<String, dynamic> toJson() => _$ServerStatusToJson(this);
 
@@ -28,7 +29,8 @@ class ServiceStatus {
 
   ServiceStatus({required this.status, required this.count});
 
-  factory ServiceStatus.fromJson(Map<String, dynamic> json) => _$ServiceStatusFromJson(json);
+  factory ServiceStatus.fromJson(Map<String, dynamic> json) =>
+      _$ServiceStatusFromJson(json);
 
   Map<String, dynamic> toJson() => _$ServiceStatusToJson(this);
 }

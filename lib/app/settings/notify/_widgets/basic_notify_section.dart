@@ -10,7 +10,11 @@ class BasicNotifySection extends StatefulWidget {
   final BasicNotifyType value;
   final Future Function(BasicNotifyType value) onChanged;
 
-  const BasicNotifySection({super.key, required this.value, required this.onChanged});
+  const BasicNotifySection({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   State<BasicNotifySection> createState() => _BasicNotifySectionState();
@@ -28,14 +32,21 @@ class _BasicNotifySectionState extends State<BasicNotifySection> {
   @override
   Widget build(BuildContext context) {
     final values = {
-      BasicNotifyType.all: (title: '接收全部'.i18n, icon: Symbols.notifications_rounded),
-      BasicNotifyType.off: (title: '關閉'.i18n, icon: Symbols.notifications_off_rounded),
+      BasicNotifyType.all: (
+        title: '接收全部'.i18n,
+        icon: Symbols.notifications_rounded,
+      ),
+      BasicNotifyType.off: (
+        title: '關閉'.i18n,
+        icon: Symbols.notifications_off_rounded,
+      ),
     };
 
     return ListSection(
       title: '接收類別'.i18n,
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
+        for (final MapEntry(key: item, value: (:title, :icon))
+            in values.entries)
           ListSectionTile(
             title: title,
             icon: icon,

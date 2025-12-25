@@ -52,7 +52,9 @@ class TemperatureMapLayerManager extends MapLayerManager {
   // Label layout constants for temperature labels
   static const double kLabelBaseOffset = 1.0;
   static const double kLabelLineHeight = 1.1;
-  final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
+  final currentTemperatureTime = ValueNotifier<String?>(
+    GlobalProviders.data.temperature.firstOrNull,
+  );
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
@@ -71,7 +73,11 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
       onTimeChanged?.call(time);
     } catch (e, s) {
-      TalkerManager.instance.error('TemperatureMapLayerManager.setTemperatureTime', e, s);
+      TalkerManager.instance.error(
+        'TemperatureMapLayerManager.setTemperatureTime',
+        e,
+        s,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -82,9 +88,13 @@ class TemperatureMapLayerManager extends MapLayerManager {
       final location = GlobalProviders.location.coordinates;
 
       if (location != null && location.isValid) {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(location, 7.4),
+        );
       } else {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+        );
       }
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager._focus', e, s);
@@ -93,14 +103,19 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     try {
-      final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
+      final temperatureList = (await ExpTech().getWeatherList()).reversed
+          .toList();
       if (!context.mounted) return;
 
       GlobalProviders.data.setTemperature(temperatureList);
       currentTemperatureTime.value ??= temperatureList.first;
       _lastFetchTime = DateTime.now();
     } catch (e, s) {
-      TalkerManager.instance.error('TemperatureMapLayerManager._fetchData', e, s);
+      TalkerManager.instance.error(
+        'TemperatureMapLayerManager._fetchData',
+        e,
+        s,
+      );
     }
   }
 
@@ -120,7 +135,9 @@ class TemperatureMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.temperature(time);
       final layerId = MapLayerIds.temperature(time);
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (!isSourceExists) {
@@ -210,7 +227,11 @@ class TemperatureMapLayerManager extends MapLayerManager {
         );
 
         final labelValueProps = SymbolLayerProperties(
-          textField: [Expressions.concat, temperature, if (GlobalProviders.ui.useFahrenheit) '℉' else '℃'],
+          textField: [
+            Expressions.concat,
+            temperature,
+            if (GlobalProviders.ui.useFahrenheit) '℉' else '℃',
+          ],
           textSize: 10,
           textColor: colors.onSurfaceVariant.toHexStringRGB(),
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
@@ -223,7 +244,12 @@ class TemperatureMapLayerManager extends MapLayerManager {
           visibility: visible ? 'visible' : 'none',
         );
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          layerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
         await controller.addLayer(
           sourceId,
           '$layerId-label-name',
@@ -280,7 +306,9 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+      if (_lastFetchTime == null ||
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+        await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.show', e, s);
     }
@@ -332,7 +360,10 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
+                  final grouped = times
+                      .groupListsBy((time) => time.date)
+                      .entries
+                      .toList();
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -344,17 +375,21 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentTemperatureTime,
                           builder: (context, currentTemperatureTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               scrollDirection: Axis.horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) = grouped[index];
+                                final MapEntry(key: date, value: group) =
+                                    grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected = time.value == currentTemperatureTime;
+                                  final isSelected =
+                                      time.value == currentTemperatureTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(
@@ -365,14 +400,20 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                                           showCheckmark: !isLoading,
                                           label: Text(time.time),
                                           side: BorderSide(
-                                            color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                            color: isSelected
+                                                ? context.colors.primary
+                                                : context.colors.outlineVariant,
                                           ),
-                                          avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                          avatar: isSelected && isLoading
+                                              ? const LoadingIcon()
+                                              : null,
                                           onSelected: isLoading
                                               ? null
                                               : (selected) {
                                                   if (!selected) return;
-                                                  manager.setTemperatureTime(time.value);
+                                                  manager.setTemperatureTime(
+                                                    time.value,
+                                                  );
                                                 },
                                         );
                                       },
@@ -383,11 +424,19 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                                 children.add(
                                   const Padding(
                                     padding: EdgeInsets.only(right: 8),
-                                    child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                                    child: VerticalDivider(
+                                      width: 16,
+                                      indent: 8,
+                                      endIndent: 8,
+                                    ),
                                   ),
                                 );
 
-                                return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 8,
+                                  children: children,
+                                );
                               },
                             );
                           },
@@ -397,7 +446,10 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Row(
                     spacing: 8,
                     children: [
@@ -425,13 +477,34 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                     unit: useFahrenheit ? '℉' : '℃',
                     appendUnit: true,
                     items: [
-                      ColorLegendItem(color: const Color(0xff4d4e51), value: useFahrenheit ? -20.asFahrenheit : -20),
-                      ColorLegendItem(color: const Color(0xff0000ff), value: useFahrenheit ? -10.asFahrenheit : -10),
-                      ColorLegendItem(color: const Color(0xff6495ED), value: useFahrenheit ? 0.asFahrenheit : 0),
-                      ColorLegendItem(color: const Color(0xff95d07e), value: useFahrenheit ? 10.asFahrenheit : 10),
-                      ColorLegendItem(color: const Color(0xfff6e78b), value: useFahrenheit ? 20.asFahrenheit : 20),
-                      ColorLegendItem(color: const Color(0xffff4500), value: useFahrenheit ? 30.asFahrenheit : 30),
-                      ColorLegendItem(color: const Color(0xff8B0000), value: useFahrenheit ? 40.asFahrenheit : 40),
+                      ColorLegendItem(
+                        color: const Color(0xff4d4e51),
+                        value: useFahrenheit ? -20.asFahrenheit : -20,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xff0000ff),
+                        value: useFahrenheit ? -10.asFahrenheit : -10,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xff6495ED),
+                        value: useFahrenheit ? 0.asFahrenheit : 0,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xff95d07e),
+                        value: useFahrenheit ? 10.asFahrenheit : 10,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xfff6e78b),
+                        value: useFahrenheit ? 20.asFahrenheit : 20,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xffff4500),
+                        value: useFahrenheit ? 30.asFahrenheit : 30,
+                      ),
+                      ColorLegendItem(
+                        color: const Color(0xff8B0000),
+                        value: useFahrenheit ? 40.asFahrenheit : 40,
+                      ),
                     ],
                   );
                 },

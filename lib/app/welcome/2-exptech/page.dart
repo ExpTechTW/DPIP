@@ -15,7 +15,10 @@ class WelcomeExpTechPage extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text('下一步'.i18n), onPressed: () => context.push(WelcomeNoticePage.route)),
+          child: FilledButton(
+            child: Text('下一步'.i18n),
+            onPressed: () => context.push(WelcomeNoticePage.route),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -31,7 +34,11 @@ class WelcomeExpTechPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset('assets/ExpTech.png', width: 120, height: 120),
+                      child: Image.asset(
+                        'assets/ExpTech.png',
+                        width: 120,
+                        height: 120,
+                      ),
                     ),
                   ),
                   Padding(
@@ -52,14 +59,18 @@ class WelcomeExpTechPage extends StatelessWidget {
                         Text(
                           '©2024 ExpTech Studio Ltd.',
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           '防災資訊平台'.i18n,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -81,17 +92,22 @@ class WelcomeExpTechPage extends StatelessWidget {
                   children: [
                     Text(
                       '我們是誰？'.i18n,
-                      style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: context.theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。'.i18n,
+                      'ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。'
+                          .i18n,
                       style: context.theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       '我們的初衷'.i18n,
-                      style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: context.theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(

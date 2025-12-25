@@ -28,8 +28,13 @@ class ListSectionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: icon != null ? Icon(icon, weight: 600, color: context.colors.secondary) : leading,
-      title: Text(title, style: titleStyle ?? const TextStyle(fontWeight: FontWeight.bold)),
+      leading: icon != null
+          ? Icon(icon, weight: 600, color: context.colors.secondary)
+          : leading,
+      title: Text(
+        title,
+        style: titleStyle ?? const TextStyle(fontWeight: FontWeight.bold),
+      ),
       subtitle: subtitle,
       trailing: trailing,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),

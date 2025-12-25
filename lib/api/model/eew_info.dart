@@ -42,7 +42,8 @@ class EewInfo {
 
   LatLng get latlng => LatLng(latitude, longitude);
 
-  factory EewInfo.fromJson(Map<String, dynamic> json) => _$EewInfoFromJson(json);
+  factory EewInfo.fromJson(Map<String, dynamic> json) =>
+      _$EewInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$EewInfoToJson(this);
 
@@ -61,6 +62,14 @@ class EewInfo {
 
   @override
   int get hashCode {
-    return Object.hash(time, longitude, latitude, depth, magnitude, location, max);
+    return Object.hash(
+      time,
+      longitude,
+      latitude,
+      depth,
+      magnitude,
+      location,
+      max,
+    );
   }
 }

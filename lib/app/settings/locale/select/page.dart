@@ -27,7 +27,9 @@ class SettingsLocaleSelectPage extends StatefulWidget {
 
 class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
   List<CrowdinLocalizationProgress> progress = [];
-  List<Locale> localeList = I18n.supportedLocales.where((e) => !['zh'].contains(e.toLanguageTag())).toList();
+  List<Locale> localeList = I18n.supportedLocales
+      .where((e) => !['zh'].contains(e.toLanguageTag()))
+      .toList();
 
   @override
   void initState() {
@@ -49,12 +51,19 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
               Selector<SettingsUserInterfaceModel, Locale?>(
                 selector: (_, model) => model.locale,
                 builder: (context, locale, child) {
-                  final p = progress.firstWhereOrNull((e) => e.id == item.toLanguageTag());
+                  final p = progress.firstWhereOrNull(
+                    (e) => e.id == item.toLanguageTag(),
+                  );
 
-                  final translated = p != null ? NumberFormat('#.#%').format(p.translation / 100) : '...';
-                  final approved = p != null ? NumberFormat('#.#%').format(p.approval / 100) : '...';
+                  final translated = p != null
+                      ? NumberFormat('#.#%').format(p.translation / 100)
+                      : '...';
+                  final approved = p != null
+                      ? NumberFormat('#.#%').format(p.approval / 100)
+                      : '...';
 
-                  final isSelected = item.toLanguageTag() == locale?.toLanguageTag();
+                  final isSelected =
+                      item.toLanguageTag() == locale?.toLanguageTag();
 
                   return ListSectionTile(
                     title: item.nativeName,
@@ -69,7 +78,9 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                 }),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
                                 child: p != null
                                     ? Stack(
                                         children: [
@@ -86,7 +97,9 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                           ),
                                         ],
                                       )
-                                    : const LinearProgressIndicator(year2023: false),
+                                    : const LinearProgressIndicator(
+                                        year2023: false,
+                                      ),
                               ),
                             ],
                           )
@@ -111,7 +124,9 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                     trailing: Icon(isSelected ? Symbols.check_rounded : null),
                     onTap: () {
                       context.locale = item;
-                      context.read<SettingsUserInterfaceModel>().setLocale(item);
+                      context.read<SettingsUserInterfaceModel>().setLocale(
+                        item,
+                      );
                       context.pop();
                     },
                   );

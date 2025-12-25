@@ -10,10 +10,15 @@ class EarthquakeNotifySection extends StatefulWidget {
   final EarthquakeNotifyType value;
   final Future Function(EarthquakeNotifyType value) onChanged;
 
-  const EarthquakeNotifySection({super.key, required this.value, required this.onChanged});
+  const EarthquakeNotifySection({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
-  State<EarthquakeNotifySection> createState() => _EarthquakeNotifySectionState();
+  State<EarthquakeNotifySection> createState() =>
+      _EarthquakeNotifySectionState();
 }
 
 class _EarthquakeNotifySectionState extends State<EarthquakeNotifySection> {
@@ -28,15 +33,25 @@ class _EarthquakeNotifySectionState extends State<EarthquakeNotifySection> {
   @override
   Widget build(BuildContext context) {
     final values = {
-      EarthquakeNotifyType.all: (title: '接收全部'.i18n, icon: Symbols.notification_add_rounded),
-      EarthquakeNotifyType.localIntensityAbove1: (title: '所在地震度1以上'.i18n, icon: Symbols.notifications_rounded),
-      EarthquakeNotifyType.off: (title: '關閉'.i18n, icon: Symbols.notifications_off_rounded),
+      EarthquakeNotifyType.all: (
+        title: '接收全部'.i18n,
+        icon: Symbols.notification_add_rounded,
+      ),
+      EarthquakeNotifyType.localIntensityAbove1: (
+        title: '所在地震度1以上'.i18n,
+        icon: Symbols.notifications_rounded,
+      ),
+      EarthquakeNotifyType.off: (
+        title: '關閉'.i18n,
+        icon: Symbols.notifications_off_rounded,
+      ),
     };
 
     return ListSection(
       title: '接收類別'.i18n,
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
+        for (final MapEntry(key: item, value: (:title, :icon))
+            in values.entries)
           ListSectionTile(
             title: title,
             icon: icon,

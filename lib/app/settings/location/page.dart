@@ -36,7 +36,8 @@ class SettingsLocationPage extends StatefulWidget {
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
 }
 
-class _SettingsLocationPageState extends State<SettingsLocationPage> with WidgetsBindingObserver {
+class _SettingsLocationPageState extends State<SettingsLocationPage>
+    with WidgetsBindingObserver {
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
@@ -49,7 +50,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       Permission.location.status,
       Permission.locationAlways.status,
       // if (Platform.isAndroid) Autostarter.checkAutoStartState(),
-      if (Platform.isAndroid) DisableBatteryOptimization.isBatteryOptimizationDisabled,
+      if (Platform.isAndroid)
+        DisableBatteryOptimization.isBatteryOptimizationDisabled,
     ]);
 
     if (!mounted) return;
@@ -59,7 +61,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       locationPermission = values[1] as PermissionStatus?;
       locationAlwaysPermission = values[2] as PermissionStatus?;
       autoStartPermission = true;
-      batteryOptimizationPermission = !Platform.isAndroid || (values[3] as bool? ?? true);
+      batteryOptimizationPermission =
+          !Platform.isAndroid || (values[3] as bool? ?? true);
     });
   }
 
@@ -79,14 +82,19 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     };
 
     final content = switch (type) {
-      Permission.notification => '自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。'.i18n,
-      Permission.location => '自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。'.i18n,
+      Permission.notification =>
+        '自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。'.i18n,
+      Permission.location =>
+        '自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。'.i18n,
       Permission.locationAlways =>
         Platform.isIOS
-            ? '自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。'.i18n
-            : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'.i18n,
+            ? '自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。'
+                  .i18n
+            : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'
+                  .i18n,
       'auto-start' => '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
-      'battery-optimization' => '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      'battery-optimization' =>
+        '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
       _ => '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
     };
 
@@ -120,25 +128,33 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
   Future<bool> requestPermissions() async {
     if (!await Permission.notification.request().isGranted) {
-      TalkerManager.instance.warning('🧪 failed notification (NOTIFICATION) permission test');
+      TalkerManager.instance.warning(
+        '🧪 failed notification (NOTIFICATION) permission test',
+      );
       await showPermissionDialog(Permission.notification);
       return false;
     }
 
     if (!await Permission.location.request().isGranted) {
-      TalkerManager.instance.warning('🧪 failed location (ACCESS_COARSE_LOCATION) permission test');
+      TalkerManager.instance.warning(
+        '🧪 failed location (ACCESS_COARSE_LOCATION) permission test',
+      );
       showPermissionDialog(Permission.location);
       return false;
     }
 
     if (!await Permission.locationWhenInUse.request().isGranted) {
-      TalkerManager.instance.warning('🧪 failed location when in use (ACCESS_FINE_LOCATION) permission test');
+      TalkerManager.instance.warning(
+        '🧪 failed location when in use (ACCESS_FINE_LOCATION) permission test',
+      );
       showPermissionDialog(Permission.locationWhenInUse);
       return false;
     }
 
     if (!await Permission.locationAlways.request().isGranted) {
-      TalkerManager.instance.warning('🧪 failed location always (ACCESS_BACKGROUND_LOCATION) permission test');
+      TalkerManager.instance.warning(
+        '🧪 failed location always (ACCESS_BACKGROUND_LOCATION) permission test',
+      );
       showPermissionDialog(Permission.locationAlways);
       return false;
     }
@@ -164,7 +180,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
     batteryOptimization:
     {
-      final status = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+      final status =
+          await DisableBatteryOptimization.isBatteryOptimizationDisabled;
       if (status == null || status) {
         batteryOptimizationPermission = true;
         break batteryOptimization;
@@ -175,7 +192,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
     manufacturerBatteryOptimization:
     {
-      final status = await DisableBatteryOptimization.isManufacturerBatteryOptimizationDisabled;
+      final status = await DisableBatteryOptimization
+          .isManufacturerBatteryOptimizationDisabled;
       if (status == null || status) break manufacturerBatteryOptimization;
 
       await DisableBatteryOptimization.showEnableAutoStartSettings(
@@ -236,7 +254,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,
-          content: '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'.i18n,
+          content:
+              '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'
+                  .i18n,
         ),
         if (locationAlwaysPermission != null)
           Selector<SettingsLocationModel, bool>(
@@ -256,7 +276,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Symbols.warning_rounded, color: context.colors.error),
+                          child: Icon(
+                            Symbols.warning_rounded,
+                            color: context.colors.error,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -265,7 +288,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
-                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
+                        TextButton(
+                          child: Text('設定'.i18n),
+                          onPressed: () => openAppSettings(),
+                        ),
                       ],
                     ),
                   ),
@@ -291,13 +317,22 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Symbols.warning_rounded, color: context.colors.error),
+                          child: Icon(
+                            Symbols.warning_rounded,
+                            color: context.colors.error,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text('通知功能已被拒絕，請移至設定允許權限。'.i18n, style: TextStyle(color: context.colors.error)),
+                          child: Text(
+                            '通知功能已被拒絕，請移至設定允許權限。'.i18n,
+                            style: TextStyle(color: context.colors.error),
+                          ),
                         ),
-                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
+                        TextButton(
+                          child: Text('設定'.i18n),
+                          onPressed: () => openAppSettings(),
+                        ),
                       ],
                     ),
                   ),
@@ -380,12 +415,17 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         ),
                         leading: isCurrentLoading
                             ? const LoadingIcon()
-                            : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
+                            : Icon(
+                                isSelected ? Symbols.check_rounded : null,
+                                color: context.colors.primary,
+                              ),
                         trailing: IconButton(
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
                           tooltip: '刪除',
-                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
+                          onPressed: isCurrentLoading
+                              ? null
+                              : () => model.unfavorite(code),
                         ),
                         enabled: !model.auto && loadingCode == null,
                         onTap: isSelected
@@ -395,15 +435,27 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                                 try {
                                   await ExpTech().updateDeviceLocation(
                                     token: Preference.notifyToken,
-                                    coordinates: LatLng(location.lat, location.lng),
+                                    coordinates: LatLng(
+                                      location.lat,
+                                      location.lng,
+                                    ),
                                   );
 
                                   if (!context.mounted) return;
                                   model.setCode(code);
                                 } catch (e, s) {
                                   if (!context.mounted) return;
-                                  TalkerManager.instance.error('Failed to set location code', e, s);
-                                  showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
+                                  TalkerManager.instance.error(
+                                    'Failed to set location code',
+                                    e,
+                                    s,
+                                  );
+                                  showToast(
+                                    context,
+                                    ToastWidget.text(
+                                      '設定所在地時發生錯誤，請稍候再試一次。'.i18n,
+                                    ),
+                                  );
                                 }
                                 setState(() => loadingCode = null);
                               },
@@ -413,7 +465,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       title: '新增地點'.i18n,
                       icon: Symbols.add_circle_rounded,
                       enabled: loadingCode == null,
-                      onTap: () => context.push(SettingsLocationSelectPage.route),
+                      onTap: () =>
+                          context.push(SettingsLocationSelectPage.route),
                     ),
                   ],
                 );

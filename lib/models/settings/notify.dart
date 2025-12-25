@@ -90,23 +90,33 @@ enum BasicNotifyType {
 class SettingsNotificationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsNotificationModel');
 
-  String get _eew => Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
+  String get _eew =>
+      Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
 
-  String get _monitor => Preference.notifyMonitor ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _monitor =>
+      Preference.notifyMonitor ??
+      EarthquakeNotifyType.localIntensityAbove1.name;
 
-  String get _report => Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _report =>
+      Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
 
-  String get _intensity => Preference.notifyIntensity ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _intensity =>
+      Preference.notifyIntensity ??
+      EarthquakeNotifyType.localIntensityAbove1.name;
 
-  String get _thunderstorm => Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
+  String get _thunderstorm =>
+      Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
 
-  String get _weatherAdvisory => Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
+  String get _weatherAdvisory =>
+      Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
 
-  String get _evacuation => Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
+  String get _evacuation =>
+      Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
 
   String get _tsunami => Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
 
-  String get _announcement => Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
+  String get _announcement =>
+      Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
   void apply(NotifySettings settings) {
     Preference.notifyEew = settings.eew.name;
@@ -129,7 +139,11 @@ class SettingsNotificationModel extends ChangeNotifier {
   EewNotifyType get eew => EewNotifyType.values.byName(_eew);
 
   Future<void> setEew(EewNotifyType value) async {
-    final result = await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.eew, status: value);
+    final result = await ExpTech().setNotify(
+      token: Preference.notifyToken,
+      channel: NotifyChannel.eew,
+      status: value,
+    );
     GlobalProviders.notification.apply(result);
 
     Preference.notifyEew = value.name;
@@ -140,7 +154,8 @@ class SettingsNotificationModel extends ChangeNotifier {
   /// 強震監視器通知設定
   ///
   /// 預設：所在地震度1以上
-  EarthquakeNotifyType get monitor => EarthquakeNotifyType.values.byName(_monitor);
+  EarthquakeNotifyType get monitor =>
+      EarthquakeNotifyType.values.byName(_monitor);
 
   Future<void> setMonitor(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -151,14 +166,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyMonitor = value.name;
-    _log('Changed ${PreferenceKeys.notifyMonitor} to ${Preference.notifyMonitor}');
+    _log(
+      'Changed ${PreferenceKeys.notifyMonitor} to ${Preference.notifyMonitor}',
+    );
     notifyListeners();
   }
 
   /// 地震報告通知設定
   ///
   /// 預設：所在地震度1以上
-  EarthquakeNotifyType get report => EarthquakeNotifyType.values.byName(_report);
+  EarthquakeNotifyType get report =>
+      EarthquakeNotifyType.values.byName(_report);
 
   Future<void> setReport(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -169,14 +187,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyReport = value.name;
-    _log('Changed ${PreferenceKeys.notifyReport} to ${Preference.notifyReport}');
+    _log(
+      'Changed ${PreferenceKeys.notifyReport} to ${Preference.notifyReport}',
+    );
     notifyListeners();
   }
 
   /// 震度速報通知設定
   ///
   /// 預設：所在地震度1以上
-  EarthquakeNotifyType get intensity => EarthquakeNotifyType.values.byName(_intensity);
+  EarthquakeNotifyType get intensity =>
+      EarthquakeNotifyType.values.byName(_intensity);
 
   Future<void> setIntensity(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -187,14 +208,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyIntensity = value.name;
-    _log('Changed ${PreferenceKeys.notifyIntensity} to ${Preference.notifyIntensity}');
+    _log(
+      'Changed ${PreferenceKeys.notifyIntensity} to ${Preference.notifyIntensity}',
+    );
     notifyListeners();
   }
 
   /// 雷雨即時訊息通知設定
   ///
   /// 預設：接收所在地
-  WeatherNotifyType get thunderstorm => WeatherNotifyType.values.byName(_thunderstorm);
+  WeatherNotifyType get thunderstorm =>
+      WeatherNotifyType.values.byName(_thunderstorm);
 
   Future<void> setThunderstorm(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -205,14 +229,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyThunderstorm = value.name;
-    _log('Changed ${PreferenceKeys.notifyThunderstorm} to ${Preference.notifyThunderstorm}');
+    _log(
+      'Changed ${PreferenceKeys.notifyThunderstorm} to ${Preference.notifyThunderstorm}',
+    );
     notifyListeners();
   }
 
   /// 天氣景警特報通知設定
   ///
   /// 預設：接收所在地
-  WeatherNotifyType get weatherAdvisory => WeatherNotifyType.values.byName(_weatherAdvisory);
+  WeatherNotifyType get weatherAdvisory =>
+      WeatherNotifyType.values.byName(_weatherAdvisory);
 
   Future<void> setWeatherAdvisory(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -223,14 +250,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyWeatherAdvisory = value.name;
-    _log('Changed ${PreferenceKeys.notifyWeatherAdvisory} to ${Preference.notifyWeatherAdvisory}');
+    _log(
+      'Changed ${PreferenceKeys.notifyWeatherAdvisory} to ${Preference.notifyWeatherAdvisory}',
+    );
     notifyListeners();
   }
 
   /// 防災避難通知設定
   ///
   /// 預設：接收全部
-  WeatherNotifyType get evacuation => WeatherNotifyType.values.byName(_evacuation);
+  WeatherNotifyType get evacuation =>
+      WeatherNotifyType.values.byName(_evacuation);
 
   Future<void> setEvacuation(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -241,7 +271,9 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyEvacuation = value.name;
-    _log('Changed ${PreferenceKeys.notifyEvacuation} to ${Preference.notifyEvacuation}');
+    _log(
+      'Changed ${PreferenceKeys.notifyEvacuation} to ${Preference.notifyEvacuation}',
+    );
     notifyListeners();
   }
 
@@ -259,14 +291,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyTsunami = value.name;
-    _log('Changed ${PreferenceKeys.notifyTsunami} to ${Preference.notifyTsunami}');
+    _log(
+      'Changed ${PreferenceKeys.notifyTsunami} to ${Preference.notifyTsunami}',
+    );
     notifyListeners();
   }
 
   /// 公告通知設定
   ///
   /// 預設：接收全部
-  BasicNotifyType get announcement => BasicNotifyType.values.byName(_announcement);
+  BasicNotifyType get announcement =>
+      BasicNotifyType.values.byName(_announcement);
 
   Future<void> setAnnouncement(BasicNotifyType value) async {
     final result = await ExpTech().setNotify(
@@ -277,7 +312,9 @@ class SettingsNotificationModel extends ChangeNotifier {
     GlobalProviders.notification.apply(result);
 
     Preference.notifyAnnouncement = value.name;
-    _log('Changed ${PreferenceKeys.notifyAnnouncement} to ${Preference.notifyAnnouncement}');
+    _log(
+      'Changed ${PreferenceKeys.notifyAnnouncement} to ${Preference.notifyAnnouncement}',
+    );
     notifyListeners();
   }
 }

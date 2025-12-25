@@ -16,7 +16,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   final context = router.routerDelegate.navigatorKey.currentContext;
   if (context == null) {
     _pendingChannelKey = receivedAction.channelKey;
-    TalkerManager.instance.debug('Context not available, stored pending notification: channelKey=$_pendingChannelKey');
+    TalkerManager.instance.debug(
+      'Context not available, stored pending notification: channelKey=$_pendingChannelKey',
+    );
     return;
   }
 
@@ -29,7 +31,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
 void handlePendingNotificationNavigation(BuildContext context) {
   if (_pendingChannelKey == null) return;
 
-  TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
+  TalkerManager.instance.debug(
+    'Handling pending notification: channelKey=$_pendingChannelKey',
+  );
 
   _navigateBasedOnChannelKey(context, _pendingChannelKey);
   _pendingChannelKey = null;
@@ -40,13 +44,19 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
 
   TalkerManager.instance.debug('Navigating based on channelKey: $channelKey');
 
-  if (channelKey.startsWith('eew') || channelKey.startsWith('int_report') || channelKey.startsWith('eq')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
+  if (channelKey.startsWith('eew') ||
+      channelKey.startsWith('int_report') ||
+      channelKey.startsWith('eq')) {
+    context.push(
+      MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})),
+    );
     return;
   }
 
   if (channelKey.startsWith('report')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.report})));
+    context.push(
+      MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.report})),
+    );
     return;
   }
 
@@ -386,14 +396,31 @@ Future<void> notifyInit() async {
       ),
     ],
     channelGroups: [
-      NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報'),
-      NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震'),
-      NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '天氣'),
-      NotificationChannelGroup(channelGroupKey: 'group_tsunami', channelGroupName: '海嘯'),
-      NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_eew',
+        channelGroupName: '地震速報',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_eq',
+        channelGroupName: '地震',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_info',
+        channelGroupName: '天氣',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_tsunami',
+        channelGroupName: '海嘯',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_other',
+        channelGroupName: '其他',
+      ),
     ],
     debug: true,
   );
 
-  AwesomeNotifications().setListeners(onActionReceivedMethod: onActionReceivedMethod);
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: onActionReceivedMethod,
+  );
 }

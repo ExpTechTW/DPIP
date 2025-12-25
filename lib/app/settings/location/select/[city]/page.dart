@@ -24,18 +24,23 @@ class SettingsLocationSelectCityPage extends StatefulWidget {
 
   const SettingsLocationSelectCityPage({super.key, required this.city});
 
-  static String route([String city = ':city']) => '/settings/location/select/$city';
+  static String route([String city = ':city']) =>
+      '/settings/location/select/$city';
 
   @override
-  State<SettingsLocationSelectCityPage> createState() => _SettingsLocationSelectCityPageState();
+  State<SettingsLocationSelectCityPage> createState() =>
+      _SettingsLocationSelectCityPageState();
 }
 
-class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectCityPage> {
+class _SettingsLocationSelectCityPageState
+    extends State<SettingsLocationSelectCityPage> {
   String? _loadingCode;
 
   @override
   Widget build(BuildContext context) {
-    final towns = Global.location.entries.where((e) => e.value.cityWithLevel == widget.city).toList();
+    final towns = Global.location.entries
+        .where((e) => e.value.cityWithLevel == widget.city)
+        .toList();
 
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
@@ -52,9 +57,13 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
 
                   return ListSectionTile(
                     title: town.cityTownWithLevel,
-                    subtitle: Text('$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N'),
+                    subtitle: Text(
+                      '$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N',
+                    ),
                     leading: isLoading ? const LoadingIcon() : null,
-                    trailing: isFavorited ? const Icon(Symbols.star_rounded, fill: 1) : null,
+                    trailing: isFavorited
+                        ? const Icon(Symbols.star_rounded, fill: 1)
+                        : null,
                     enabled: _loadingCode == null,
                     onTap: isFavorited
                         ? null
@@ -82,7 +91,11 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
                               context.popUntil(SettingsLocationPage.route);
                             } catch (e, s) {
                               if (!context.mounted) return;
-                              TalkerManager.instance.error('Failed to set location', e, s);
+                              TalkerManager.instance.error(
+                                'Failed to set location',
+                                e,
+                                s,
+                              );
 
                               setState(() => _loadingCode = null);
 

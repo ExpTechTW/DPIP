@@ -29,7 +29,9 @@ class SettingsUnitPage extends StatelessWidget {
                   subtitle: Text('切換溫度顯示單位為華氏度 (℉)'.i18n),
                   trailing: Switch(
                     value: useFahrenheit,
-                    onChanged: (value) => context.read<SettingsUserInterfaceModel>().setUseFahrenheit(value),
+                    onChanged: (value) => context
+                        .read<SettingsUserInterfaceModel>()
+                        .setUseFahrenheit(value),
                   ),
                 );
               },

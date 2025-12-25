@@ -43,24 +43,34 @@ class SettingsThemePage extends StatelessWidget {
                 return ListSectionTile(
                   icon: Symbols.palette_rounded,
                   title: '主題色'.i18n,
-                  subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'.i18n),
-                  trailing: ColorIndicator(color: model.themeColor ?? context.colors.primary),
+                  subtitle: Text(
+                    model.themeColor != null
+                        ? ColorTools.nameThatColor(model.themeColor!)
+                        : '系統色彩'.i18n,
+                  ),
+                  trailing: ColorIndicator(
+                    color: model.themeColor ?? context.colors.primary,
+                  ),
                   onTap: () async {
                     final result = await showDialog<Color>(
                       context: context,
                       builder: (context) {
-                        Color pickerColor = model.themeColor ?? context.colors.primary;
+                        Color pickerColor =
+                            model.themeColor ?? context.colors.primary;
 
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return AlertDialog(
                               content: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 360),
+                                constraints: const BoxConstraints(
+                                  maxWidth: 360,
+                                ),
                                 child: ColorPicker(
                                   mainAxisSize: MainAxisSize.min,
                                   padding: EdgeInsets.zero,
                                   color: pickerColor,
-                                  onColorChanged: (color) => setState(() => pickerColor = color),
+                                  onColorChanged: (color) =>
+                                      setState(() => pickerColor = color),
                                   enableTonalPalette: true,
                                   enableShadesSelection: false,
                                   showMaterialName: true,
@@ -72,15 +82,24 @@ class SettingsThemePage extends StatelessWidget {
                                     ColorPickerType.accent: false,
                                     ColorPickerType.wheel: true,
                                   },
-                                  copyPasteBehavior: const ColorPickerCopyPasteBehavior(
-                                    copyFormat: ColorPickerCopyFormat.numHexRRGGBB,
-                                    snackBarParseError: true,
-                                    longPressMenu: true,
+                                  copyPasteBehavior:
+                                      const ColorPickerCopyPasteBehavior(
+                                        copyFormat:
+                                            ColorPickerCopyFormat.numHexRRGGBB,
+                                        snackBarParseError: true,
+                                        longPressMenu: true,
+                                      ),
+                                  actionButtons: const ColorPickerActionButtons(
+                                    dialogActionButtons: false,
                                   ),
-                                  actionButtons: const ColorPickerActionButtons(dialogActionButtons: false),
                                 ),
                               ),
-                              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(
+                                24,
+                                24,
+                                24,
+                                8,
+                              ),
                               actionsAlignment: MainAxisAlignment.spaceBetween,
                               actionsOverflowButtonSpacing: 8,
                               actions: [
@@ -98,7 +117,9 @@ class SettingsThemePage extends StatelessWidget {
                                     TextButton(
                                       child: Text('取消'.i18n),
                                       onPressed: () {
-                                        Navigator.of(context).pop(model.themeColor);
+                                        Navigator.of(
+                                          context,
+                                        ).pop(model.themeColor);
                                       },
                                     ),
                                     FilledButton(

@@ -9,7 +9,8 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 class PositionedLayerButton extends StatelessWidget {
   final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers) onLayerChanged;
+  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers)
+  onLayerChanged;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const PositionedLayerButton({

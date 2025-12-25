@@ -49,7 +49,9 @@ class _TyphoonMapState extends State<TyphoonMap> {
       if (isUserLocationValid) {
         await _mapController.addSource(
           'markers-geojson',
-          const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+          const GeojsonSourceProperties(
+            data: {'type': 'FeatureCollection', 'features': []},
+          ),
         );
         await _mapController.setGeoJsonSource('markers-geojson', {
           'type': 'FeatureCollection',
@@ -104,7 +106,10 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   Future<void> _loadTyphoonLayers() async {
-    await _mapController.addSource('typhoon-geojson', GeojsonSourceProperties(data: typhoonData));
+    await _mapController.addSource(
+      'typhoon-geojson',
+      GeojsonSourceProperties(data: typhoonData),
+    );
 
     await _mapController.addLayer(
       'typhoon-geojson',
@@ -174,7 +179,10 @@ class _TyphoonMapState extends State<TyphoonMap> {
     await _mapController.addLayer(
       'typhoon-geojson',
       'typhoon-wind-circle',
-      const FillLayerProperties(fillColor: 'rgba(255, 0, 0, 0.1)', fillOutlineColor: 'rgba(255, 0, 0, 0.6)'),
+      const FillLayerProperties(
+        fillColor: 'rgba(255, 0, 0, 0.1)',
+        fillOutlineColor: 'rgba(255, 0, 0, 0.6)',
+      ),
       filter: [
         'all',
         [
@@ -233,7 +241,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
     _mapController.addSource(
       'radarOverlaySource',
       ImageSourceProperties(
-        url: 'https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}',
+        url:
+            'https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}',
         coordinates: [
           [bounds.southwest.longitude, bounds.northeast.latitude],
           [bounds.northeast.longitude, bounds.northeast.latitude],
@@ -243,7 +252,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
       ),
     );
 
-    _mapController.addLayer('radarOverlaySource', 'radarOverlayLayer', const RasterLayerProperties(rasterOpacity: 1));
+    _mapController.addLayer(
+      'radarOverlaySource',
+      'radarOverlayLayer',
+      const RasterLayerProperties(rasterOpacity: 1),
+    );
   }
 
   @override

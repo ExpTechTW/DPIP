@@ -9,7 +9,8 @@ class ShellWrapper extends StatelessWidget {
   const ShellWrapper(this.child, {super.key});
 
   bool _canPop(BuildContext context) {
-    final lastMatch = context.router.routerDelegate.currentConfiguration.matches.lastOrNull;
+    final lastMatch =
+        context.router.routerDelegate.currentConfiguration.matches.lastOrNull;
 
     if (lastMatch is ShellRouteMatch) {
       return lastMatch.matches.length == 1;
@@ -19,5 +20,6 @@ class ShellWrapper extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => PopScope(canPop: _canPop(context), child: child);
+  Widget build(BuildContext context) =>
+      PopScope(canPop: _canPop(context), child: child);
 }

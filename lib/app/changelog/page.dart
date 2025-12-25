@@ -40,7 +40,9 @@ class _ChangelogPageState extends State<ChangelogPage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_ChangelogPageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('無法載入更新日誌，請稍後再試。'.i18n)));
+      context.scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('無法載入更新日誌，請稍後再試。'.i18n)),
+      );
     }
 
     if (!mounted) return;
@@ -66,7 +68,12 @@ class _ChangelogPageState extends State<ChangelogPage> {
           ),
           if (_releases != null)
             ListView.builder(
-              padding: EdgeInsets.fromLTRB(24, 16, 24, 16 + context.padding.bottom),
+              padding: EdgeInsets.fromLTRB(
+                24,
+                16,
+                24,
+                16 + context.padding.bottom,
+              ),
               itemCount: _releases!.length,
               itemBuilder: (context, index) {
                 final release = _releases![index];
@@ -76,21 +83,32 @@ class _ChangelogPageState extends State<ChangelogPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 8,
                   children: [
-                    if (index > 0) const Divider(height: 32, indent: 8, endIndent: 8),
+                    if (index > 0)
+                      const Divider(height: 32, indent: 8, endIndent: 8),
                     Row(
                       spacing: 8,
                       children: [
-                        Text(release.name, style: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          release.name,
+                          style: context.texts.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         if (release.prerelease)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.orangeAccent),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               'Pre-Release',
-                              style: context.texts.labelSmall?.copyWith(color: Colors.orangeAccent),
+                              style: context.texts.labelSmall?.copyWith(
+                                color: Colors.orangeAccent,
+                              ),
                             ),
                           ),
                       ],

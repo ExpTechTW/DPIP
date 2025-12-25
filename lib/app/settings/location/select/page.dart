@@ -24,7 +24,11 @@ class SettingsLocationSelectPage extends StatelessWidget {
         .whereIndexed(
           (index, e) =>
               index ==
-              entries.indexWhere((v) => (v.value.city == e.value.city) && (v.value.cityLevel == e.value.cityLevel)),
+              entries.indexWhere(
+                (v) =>
+                    (v.value.city == e.value.city) &&
+                    (v.value.cityLevel == e.value.cityLevel),
+              ),
         )
         .toList();
 
@@ -40,10 +44,15 @@ class SettingsLocationSelectPage extends StatelessWidget {
                 builder: (context, currentCode, child) => ListSectionTile(
                   title: location.cityWithLevel,
                   trailing: const Icon(Symbols.chevron_right_rounded),
-                  subtitle: currentCode != null && location.cityWithLevel == currentCode.getLocation().cityWithLevel
+                  subtitle:
+                      currentCode != null &&
+                          location.cityWithLevel ==
+                              currentCode.getLocation().cityWithLevel
                       ? Text('目前所在地'.i18n)
                       : null,
-                  onTap: () => context.push('/settings/location/select/${location.cityWithLevel}'),
+                  onTap: () => context.push(
+                    '/settings/location/select/${location.cityWithLevel}',
+                  ),
                 ),
               ),
           ],

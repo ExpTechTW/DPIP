@@ -10,7 +10,11 @@ class TsunamiNotifySection extends StatefulWidget {
   final TsunamiNotifyType value;
   final Future Function(TsunamiNotifyType value) onChanged;
 
-  const TsunamiNotifySection({super.key, required this.value, required this.onChanged});
+  const TsunamiNotifySection({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   State<TsunamiNotifySection> createState() => _TsunamiNotifySectionState();
@@ -28,14 +32,21 @@ class _TsunamiNotifySectionState extends State<TsunamiNotifySection> {
   @override
   Widget build(BuildContext context) {
     final values = {
-      TsunamiNotifyType.all: (title: '海嘯消息、海嘯警報'.i18n, icon: Symbols.notifications_rounded),
-      TsunamiNotifyType.warningOnly: (title: '只接收海嘯警報'.i18n, icon: Symbols.notification_important_rounded),
+      TsunamiNotifyType.all: (
+        title: '海嘯消息、海嘯警報'.i18n,
+        icon: Symbols.notifications_rounded,
+      ),
+      TsunamiNotifyType.warningOnly: (
+        title: '只接收海嘯警報'.i18n,
+        icon: Symbols.notification_important_rounded,
+      ),
     };
 
     return ListSection(
       title: '接收類別'.i18n,
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
+        for (final MapEntry(key: item, value: (:title, :icon))
+            in values.entries)
           ListSectionTile(
             title: title,
             icon: icon,

@@ -21,7 +21,10 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.forum_rounded),
           title: const Text('開發者想說的話'),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const DPIPInfoPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
+            );
           },
         ),
 

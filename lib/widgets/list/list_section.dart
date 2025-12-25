@@ -11,7 +11,12 @@ class ListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final separatedChildren = children.superJoin(
-      Divider(height: 1, indent: 16, endIndent: 16, color: context.colors.outlineVariant.withValues(alpha: 0.6)),
+      Divider(
+        height: 1,
+        indent: 16,
+        endIndent: 16,
+        color: context.colors.outlineVariant.withValues(alpha: 0.6),
+      ),
     );
 
     final finalChildren = [
@@ -20,7 +25,9 @@ class ListSection extends StatelessWidget {
           padding: const EdgeInsets.only(left: 8, bottom: 4),
           child: Text(
             title!,
-            style: context.theme.textTheme.labelLarge!.copyWith(color: context.theme.colorScheme.outline),
+            style: context.theme.textTheme.labelLarge!.copyWith(
+              color: context.theme.colorScheme.outline,
+            ),
           ),
         ),
       Material(
@@ -77,12 +84,18 @@ class SettingsListTextSection extends StatelessWidget {
         child: Row(
           spacing: 16,
           children: [
-            if (icon != null) Icon(icon, color: iconColor ?? context.theme.colorScheme.onSurfaceVariant),
+            if (icon != null)
+              Icon(
+                icon,
+                color: iconColor ?? context.theme.colorScheme.onSurfaceVariant,
+              ),
             Expanded(
               child: Text(
                 content,
                 style: context.theme.textTheme.bodyMedium!.copyWith(
-                  color: contentColor ?? context.theme.colorScheme.onSurfaceVariant,
+                  color:
+                      contentColor ??
+                      context.theme.colorScheme.onSurfaceVariant,
                 ),
                 textAlign: contentAlignment,
               ),

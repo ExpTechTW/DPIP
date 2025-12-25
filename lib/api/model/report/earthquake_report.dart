@@ -47,7 +47,8 @@ class EarthquakeReport {
     required this.trem,
   });
 
-  factory EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
+  factory EarthquakeReport.fromJson(Map<String, dynamic> json) =>
+      _$EarthquakeReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$EarthquakeReportToJson(this);
 
@@ -72,10 +73,14 @@ class EarthquakeReport {
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id');
+      return Uri.parse(
+        'https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id',
+      );
     }
 
-    return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag');
+    return Uri.parse(
+      'https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag',
+    );
   }
 
   String get reportImageName {
@@ -121,7 +126,9 @@ class EarthquakeReport {
     return '${mapImageBaseName}i.png';
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : '$traceBaseUrl/$intensityMapImageName';
+  String? get intensityMapImageUrl => intensityMapImageName == null
+      ? null
+      : '$traceBaseUrl/$intensityMapImageName';
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
@@ -129,7 +136,8 @@ class EarthquakeReport {
     return '${mapImageBaseName}a.png';
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
+  String? get pgaMapImageUrl =>
+      pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
@@ -137,7 +145,8 @@ class EarthquakeReport {
     return '${mapImageBaseName}v.png';
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
+  String? get pgvMapImageUrl =>
+      pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
   LatLngBounds get bounds {
     final bounds = [latitude, longitude, latitude, longitude];
@@ -148,7 +157,10 @@ class EarthquakeReport {
       }
     }
 
-    return LatLngBounds(southwest: LatLng(bounds[0], bounds[1]), northeast: LatLng(bounds[2], bounds[3]));
+    return LatLngBounds(
+      southwest: LatLng(bounds[0], bounds[1]),
+      northeast: LatLng(bounds[2], bounds[3]),
+    );
   }
 
   int getMaxIntensity() {
@@ -165,7 +177,10 @@ class EarthquakeReport {
 
   String getLocation() {
     if (location.contains('(')) {
-      return location.substring(location.indexOf('(') + 3, location.indexOf(')'));
+      return location.substring(
+        location.indexOf('(') + 3,
+        location.indexOf(')'),
+      );
     } else {
       return location.substring(0, location.indexOf('方') + 1);
     }

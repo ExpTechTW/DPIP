@@ -108,7 +108,13 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, int>(
               selector: (context, model) => model.updateInterval,
               builder: (context, updateInterval, child) {
-                final maxFpsAllowed = WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate
+                final maxFpsAllowed = WidgetsBinding
+                    .instance
+                    .platformDispatcher
+                    .views
+                    .first
+                    .display
+                    .refreshRate
                     .floorToDouble();
 
                 return Layout.col.left[8](
@@ -116,17 +122,25 @@ class SettingsMapPage extends StatelessWidget {
                   children: [
                     Layout.row.left[16](
                       children: [
-                        Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
+                        Icon(
+                          Symbols.animation_rounded,
+                          weight: 600,
+                          color: context.colors.secondary,
+                        ),
                         Expanded(
                           child: Layout.col.left.min(
                             children: [
                               Text(
                                 '動畫幀率'.i18n,
-                                style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                                style: context.texts.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               Text(
                                 '影響強震監視器的震波模擬動畫流暢度'.i18n,
-                                style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                                style: context.texts.bodyMedium?.copyWith(
+                                  color: context.colors.onSurfaceVariant,
+                                ),
                               ),
                             ],
                           ),
@@ -137,27 +151,44 @@ class SettingsMapPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Slider(
-                            value: updateInterval.toDouble().clamp(1, maxFpsAllowed),
+                            value: updateInterval.toDouble().clamp(
+                              1,
+                              maxFpsAllowed,
+                            ),
                             min: 1,
                             max: maxFpsAllowed,
                             divisions: maxFpsAllowed.floor() ~/ 5,
                             onChanged: (value) {
-                              context.read<SettingsMapModel>().setUpdateInterval(value.floor());
+                              context
+                                  .read<SettingsMapModel>()
+                                  .setUpdateInterval(value.floor());
                             },
                             year2023: false,
                           ),
                         ),
-                        SizedBox(width: 28, child: Text('$updateInterval', style: context.texts.labelSmall)),
+                        SizedBox(
+                          width: 28,
+                          child: Text(
+                            '$updateInterval',
+                            style: context.texts.labelSmall,
+                          ),
+                        ),
                       ],
                     ),
                     if (updateInterval > 20)
                       Layout.row.left[8](
                         children: [
-                          Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
+                          Icon(
+                            Symbols.warning_rounded,
+                            color: context.theme.extendedColors.amber,
+                            size: 16,
+                          ),
                           Expanded(
                             child: Text(
                               '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
-                              style: context.texts.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
+                              style: context.texts.bodySmall?.copyWith(
+                                color: context.theme.extendedColors.amber,
+                              ),
                             ),
                           ),
                         ],

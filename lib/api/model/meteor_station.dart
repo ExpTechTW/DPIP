@@ -39,7 +39,8 @@ class MeteorStation {
     required this.windDirection,
   });
 
-  factory MeteorStation.fromJson(Map<String, dynamic> json) => _$MeteorStationFromJson(json);
+  factory MeteorStation.fromJson(Map<String, dynamic> json) =>
+      _$MeteorStationFromJson(json);
   Map<String, dynamic> toJson() => _$MeteorStationToJson(this);
 }
 
@@ -61,6 +62,7 @@ class MeteorStationInfo {
     required this.lng,
   });
 
-  factory MeteorStationInfo.fromJson(Map<String, dynamic> json) => _$MeteorStationInfoFromJson(json);
+  factory MeteorStationInfo.fromJson(Map<String, dynamic> json) =>
+      _$MeteorStationInfoFromJson(json);
   Map<String, dynamic> toJson() => _$MeteorStationInfoToJson(this);
 }

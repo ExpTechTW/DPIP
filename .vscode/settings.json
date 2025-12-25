@@ -2,9 +2,9 @@
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
   "editor.rulers": [
-    120
+    80
   ],
-  "dart.lineLength": 120,
+  "dart.lineLength": 80,
   "markdownlint.config": {
     "no-duplicate-heading": {
       "siblings_only": true

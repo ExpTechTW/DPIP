@@ -97,8 +97,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Preference.version = Global.packageInfo.version;
     context.scaffoldMessenger.showSnackBar(
       SnackBar(
-        content: Text('已更新至 {version}'.i18n.args({'version': 'v${Global.packageInfo.version}'})),
-        action: SnackBarAction(label: '更新日誌'.i18n, onPressed: () => context.push(ChangelogPage.route)),
+        content: Text(
+          '已更新至 {version}'.i18n.args({
+            'version': 'v${Global.packageInfo.version}',
+          }),
+        ),
+        action: SnackBarAction(
+          label: '更新日誌'.i18n,
+          onPressed: () => context.push(ChangelogPage.route),
+        ),
         duration: kPersistSnackBar,
       ),
     );
@@ -114,7 +121,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final isOutOfService = _checkIfOutOfService(code);
 
     if (isOutOfService && !_currentMode.isNational) {
-      _currentMode = _currentMode.isActive ? HomeMode.nationalActive : HomeMode.nationalHistory;
+      _currentMode = _currentMode.isActive
+          ? HomeMode.nationalActive
+          : HomeMode.nationalHistory;
     }
 
     setState(() {
@@ -130,7 +139,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     _refreshIndicatorKey.currentState?.show();
 
-    final homeSections = context.read<SettingsUserInterfaceModel>().homeSections;
+    final homeSections = context
+        .read<SettingsUserInterfaceModel>()
+        .homeSections;
 
     final futures = <Future>[
       _fetchWeather(code),
@@ -193,14 +204,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     try {
       LatLng? coords;
-      if (Preference.locationLatitude != null && Preference.locationLongitude != null) {
-        coords = LatLng(Preference.locationLatitude!, Preference.locationLongitude!);
+      if (Preference.locationLatitude != null &&
+          Preference.locationLongitude != null) {
+        coords = LatLng(
+          Preference.locationLatitude!,
+          Preference.locationLongitude!,
+        );
       } else {
         coords = GlobalProviders.location.coordinates;
       }
 
       if (coords != null) {
-        final weather = await ExpTech().getWeatherRealtimeByCoords(coords.latitude, coords.longitude);
+        final weather = await ExpTech().getWeatherRealtimeByCoords(
+          coords.latitude,
+          coords.longitude,
+        );
         if (mounted) setState(() => _weather = weather);
       } else {
         if (mounted) setState(() => _weather = null);
@@ -211,7 +229,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } catch (e, s) {
       if (!mounted) return;
       TalkerManager.instance.error('_HomePageState._fetchWeather', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
+      context.scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('取得天氣異常'.i18n)),
+      );
     }
   }
 
@@ -233,11 +253,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _fetchHistory(String? code, bool isOutOfService) async {
     try {
-      final shouldUseNational = _currentMode.isNational || isOutOfService || code == null;
+      final shouldUseNational =
+          _currentMode.isNational || isOutOfService || code == null;
       final List<History> history;
 
       if (shouldUseNational) {
-        history = _currentMode.isActive ? await ExpTech().getRealtime() : await ExpTech().getHistory();
+        history = _currentMode.isActive
+            ? await ExpTech().getRealtime()
+            : await ExpTech().getHistory();
       } else {
         history = _currentMode.isActive
             ? await ExpTech().getRealtimeRegion(code)
@@ -248,7 +271,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } catch (e, s) {
       if (!mounted) return;
       TalkerManager.instance.error('_HomePageState._fetchHistory', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得歷史資訊異常'.i18n)));
+      context.scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('取得歷史資訊異常'.i18n)),
+      );
     }
   }
 
@@ -264,14 +289,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
     }
     _wasVisible = isVisible;
-    final homeSections = context.select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
-      (model) => model.homeSections,
-    );
+    final homeSections = context
+        .select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
+          (model) => model.homeSections,
+        );
     final topPadding = MediaQuery.of(context).padding.top;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _locationButtonKey.currentContext != null) {
-        final RenderBox? box = _locationButtonKey.currentContext!.findRenderObject() as RenderBox?;
+        final RenderBox? box =
+            _locationButtonKey.currentContext!.findRenderObject() as RenderBox?;
         if (box != null && box.hasSize) {
           final newHeight = box.size.height;
           if (_locationButtonHeight != newHeight) {
@@ -290,16 +317,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           onRefresh: _refresh,
           child: ListView(
             padding: EdgeInsets.only(
-              top: _locationButtonHeight != null ? 24 + topPadding + _locationButtonHeight! : 0,
+              top: _locationButtonHeight != null
+                  ? 24 + topPadding + _locationButtonHeight!
+                  : 0,
               bottom: MediaQuery.of(context).padding.bottom,
             ),
             children: [
               _buildWeatherHeader(),
               if (!_isLoading) ..._buildRealtimeInfo(),
               if (homeSections.isNotEmpty) ...[
-                if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
-                if (homeSections.contains(HomeDisplaySection.forecast)) _buildForecast(),
-                if (homeSections.contains(HomeDisplaySection.history)) _buildHistoryTimeline(),
+                if (homeSections.contains(HomeDisplaySection.radar))
+                  _buildRadarMap(),
+                if (homeSections.contains(HomeDisplaySection.forecast))
+                  _buildForecast(),
+                if (homeSections.contains(HomeDisplaySection.history))
+                  _buildHistoryTimeline(),
               ] else if (GlobalProviders.location.code != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -339,21 +371,36 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final code = GlobalProviders.location.code;
 
     if (_isLoading) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: WeatherHeader.skeleton(context),
+      );
     }
     if (_weather != null) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader(_weather!));
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: WeatherHeader(_weather!),
+      );
     }
 
     if (_isOutOfService) {
-      return const Padding(padding: EdgeInsets.all(16), child: LocationOutOfServiceCard());
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: LocationOutOfServiceCard(),
+      );
     }
 
     if (code != null) {
-      return Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: WeatherHeader.skeleton(context));
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: WeatherHeader.skeleton(context),
+      );
     }
 
-    return const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard());
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: LocationNotSetCard(),
+    );
   }
 
   List<Widget> _buildRealtimeInfo() {
@@ -364,10 +411,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: GlobalProviders.data.eew.length,
-          itemBuilder: (context, index) =>
-              Padding(padding: const EdgeInsets.all(16), child: EewCard(GlobalProviders.data.eew[index])),
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: EewCard(GlobalProviders.data.eew[index]),
+          ),
         ),
-      if (_thunderstorm != null) Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
+      if (_thunderstorm != null)
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: ThunderstormCard(_thunderstorm!),
+        ),
     ];
   }
 
@@ -404,12 +457,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             );
           }
 
-          final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
+          final grouped = groupBy(
+            history,
+            (e) => e.time.send.toLocaleFullDateString(context),
+          );
 
           return Column(
             children: grouped.entries
                 .sorted((a, b) => b.key.compareTo(a.key))
-                .mapIndexed((index, entry) => _buildHistoryGroup(entry, index, history))
+                .mapIndexed(
+                  (index, entry) => _buildHistoryGroup(entry, index, history),
+                )
                 .toList(),
           );
         },
@@ -417,8 +475,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHistoryGroup(MapEntry<String, List<History>> entry, int index, List<History> allHistory) {
-    final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
+  Widget _buildHistoryGroup(
+    MapEntry<String, List<History>> entry,
+    int index,
+    List<History> allHistory,
+  ) {
+    final historyGroup = entry.value.sorted(
+      (a, b) => b.time.send.compareTo(a.time.send),
+    );
 
     return Column(
       children: [
@@ -430,7 +494,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           isOutOfService: _isOutOfService,
         ),
         ...historyGroup.map((item) {
-          return HistoryTimelineItem(expired: item.isExpired, history: item, last: item == allHistory.last);
+          return HistoryTimelineItem(
+            expired: item.isExpired,
+            history: item,
+            last: item == allHistory.last,
+          );
         }),
       ],
     );
