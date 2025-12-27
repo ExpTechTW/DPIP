@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
@@ -413,12 +414,13 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                 return Section(
                   label: Text('所在地'.i18n),
                   children: [
-                    ...model.favorited.map((code) {
+                    ...model.favorited.mapIndexed((index, code) {
                       final location = Global.location[code]!;
                       final isCurrentLoading = loadingCode == code;
                       final isSelected = code == model.code;
 
                       return SectionListTile(
+                        isFirst: index == 0,
                         leading: isCurrentLoading
                             ? const LoadingIcon()
                             : Icon(

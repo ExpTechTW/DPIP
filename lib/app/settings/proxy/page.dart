@@ -67,116 +67,52 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
           label: Text('HTTP 代理'.i18n),
           children: [
             SectionListTile(
+              isFirst: true,
+              isLast: !_enabled,
               leading: Icon(Symbols.settings_ethernet_rounded),
               title: Text('啟用代理'.i18n),
               subtitle: Text('透過代理伺服器發送所有網路請求'.i18n),
               trailing: Switch(
                 value: _enabled,
                 onChanged: (value) {
-                  setState(() {
-                    _enabled = value;
-                  });
+                  setState(() => _enabled = value);
                   _saveSettings();
                 },
               ),
             ),
             if (_enabled) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '代理主機'.i18n,
-                      style: context.texts.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _hostController,
-                      decoration: InputDecoration(
-                        hintText: 'localhost',
-                        prefixIcon: const Icon(Symbols.dns_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: context.colors.surfaceContainerHighest,
-                      ),
-                      onChanged: (_) => _saveSettings(),
-                    ),
-                  ],
+              SectionListTile(
+                leading: Icon(Symbols.host_rounded),
+                title: Text('代理主機'.i18n),
+                content: TextField(
+                  controller: _hostController,
+                  decoration: InputDecoration(
+                    hintText: 'localhost',
+                    border: OutlineInputBorder(borderRadius: .circular(8)),
+                    visualDensity: .compact,
+                  ),
+                  onChanged: (_) => _saveSettings(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '代理端口'.i18n,
-                      style: context.texts.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _portController,
-                      decoration: InputDecoration(
-                        hintText: '9090',
-                        prefixIcon: const Icon(Symbols.numbers_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: context.colors.surfaceContainerHighest,
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (_) => _saveSettings(),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: context.colors.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
+              SectionListTile(
+                isLast: true,
+                leading: Icon(Symbols.settings_ethernet_rounded),
+                title: Text('代理端口'.i18n),
+                content: TextField(
+                  controller: _portController,
+                  decoration: InputDecoration(
+                    hintText: '9090',
+                    border: OutlineInputBorder(borderRadius: .circular(8)),
+                    visualDensity: .compact,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Symbols.info_rounded,
-                        color: context.colors.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '設定儲存後，需要重新啟動應用程式才能生效'.i18n,
-                          style: context.texts.bodySmall?.copyWith(
-                            color: context.colors.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (_) => _saveSettings(),
                 ),
               ),
             ],
           ],
         ),
+        if (_enabled) SectionText(child: Text('設定儲存後，需要重新啟動應用程式才能生效'.i18n)),
       ],
     );
   }

@@ -43,55 +43,48 @@ class _SettingsLocationSelectCityPageState
 
     final length = towns.length;
 
-    return ListView(
-      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
-      children: [
-        Section(
+    return CustomScrollView(
+      slivers: [
+        SliverSection(
           label: Text(widget.city),
           children: [
             for (final (index, MapEntry(key: code, value: town))
                 in towns.indexed)
-              Selector<SettingsLocationModel, UnmodifiableSetView<String>>(
-                selector: (context, model) => model.favorited,
-                builder: (context, favorited, child) {
-                  final isFavorited = favorited.contains(code);
+              Selector<SettingsLocationModel, bool>(
+                selector: (context, model) => model.isFavorited(code),
+                builder: (context, isFavorited, child) {
                   final isLoading = _loadingCode == code;
 
                   return SectionListTile(
                     isFirst: index == 0,
                     isLast: index == length - 1,
-                    leading: isLoading ? const LoadingIcon() : null,
                     title: Text(town.cityTownWithLevel),
                     subtitle: Text(
                       '$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N',
                     ),
-                    trailing: isFavorited
+                    trailing: isLoading
+                        ? const LoadingIcon()
+                        : isFavorited
                         ? const Icon(Symbols.star_rounded, fill: 1)
                         : null,
                     enabled: _loadingCode == null,
                     onTap: isFavorited
                         ? null
                         : () async {
-                            final model = context.read<SettingsLocationModel>();
-
                             setState(() => _loadingCode = code);
 
                             try {
-                              // 1. 加入收藏列表
-                              model.favorite(code);
+                              context.location.favorite(code);
 
-                              // 2. 更新伺服器位置
                               await ExpTech().updateDeviceLocation(
                                 token: Preference.notifyToken,
                                 coordinates: LatLng(town.lat, town.lng),
                               );
-
-                              // 3. 設定為當前所在地 (會自動寫入 coordinates)
                               if (!context.mounted) return;
-                              model.setCode(code);
 
-                              // 4. 返回所在地設定頁面
+                              context.location.setCode(code);
                               if (!context.mounted) return;
+
                               context.popUntil(SettingsLocationPage.route);
                             } catch (e, s) {
                               if (!context.mounted) return;
@@ -114,6 +107,7 @@ class _SettingsLocationSelectCityPageState
               ),
           ],
         ),
+        SliverPadding(padding: .only(bottom: context.padding.bottom + 16)),
       ],
     );
   }

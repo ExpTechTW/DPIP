@@ -116,37 +116,55 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 // Settings Shell Route and Children
 @TypedShellRoute<SettingsShellRoute>(
   routes: <TypedGoRoute<GoRouteData>>[
-    TypedGoRoute<SettingsIndexRoute>(path: '/settings'),
-    TypedGoRoute<SettingsLayoutRoute>(path: '/settings/layout'),
-    TypedGoRoute<SettingsLocationRoute>(path: '/settings/location'),
-    TypedGoRoute<SettingsLocationSelectRoute>(
-      path: '/settings/location/select',
-    ),
-    TypedGoRoute<SettingsLocationSelectCityRoute>(
-      path: '/settings/location/select/:city',
-    ),
-    TypedGoRoute<SettingsThemeRoute>(path: '/settings/theme'),
-    TypedGoRoute<SettingsThemeSelectRoute>(path: '/settings/theme/select'),
-    TypedGoRoute<SettingsLocaleRoute>(path: '/settings/locale'),
-    TypedGoRoute<SettingsLocaleSelectRoute>(path: '/settings/locale/select'),
-    TypedGoRoute<SettingsUnitRoute>(path: '/settings/unit'),
-    TypedGoRoute<SettingsMapRoute>(path: '/settings/map'),
-    TypedGoRoute<SettingsProxyRoute>(path: '/settings/proxy'),
-    TypedGoRoute<SettingsNotifyRoute>(
-      path: '/settings/notify',
-      routes: <TypedGoRoute<GoRouteData>>[
-        TypedGoRoute<SettingsNotifyEewRoute>(path: 'eew'),
-        TypedGoRoute<SettingsNotifyMonitorRoute>(path: 'monitor'),
-        TypedGoRoute<SettingsNotifyReportRoute>(path: 'report'),
-        TypedGoRoute<SettingsNotifyIntensityRoute>(path: 'intensity'),
-        TypedGoRoute<SettingsNotifyThunderstormRoute>(path: 'thunderstorm'),
-        TypedGoRoute<SettingsNotifyAdvisoryRoute>(path: 'advisory'),
-        TypedGoRoute<SettingsNotifyEvacuationRoute>(path: 'evacuation'),
-        TypedGoRoute<SettingsNotifyTsunamiRoute>(path: 'tsunami'),
-        TypedGoRoute<SettingsNotifyAnnouncementRoute>(path: 'announcement'),
+    TypedGoRoute<SettingsIndexRoute>(
+      path: '/settings',
+      routes: [
+        TypedGoRoute<SettingsLayoutRoute>(path: 'layout'),
+        TypedGoRoute<SettingsLocationRoute>(
+          path: 'location',
+          routes: [
+            TypedGoRoute<SettingsLocationSelectRoute>(
+              path: 'select',
+              routes: [
+                TypedGoRoute<SettingsLocationSelectCityRoute>(
+                  path: ':city',
+                ),
+              ],
+            ),
+          ],
+        ),
+        TypedGoRoute<SettingsThemeRoute>(
+          path: 'theme',
+          routes: [
+            TypedGoRoute<SettingsThemeSelectRoute>(path: 'select'),
+          ],
+        ),
+        TypedGoRoute<SettingsLocaleRoute>(
+          path: 'locale',
+          routes: [
+            TypedGoRoute<SettingsLocaleSelectRoute>(path: 'select'),
+          ],
+        ),
+        TypedGoRoute<SettingsUnitRoute>(path: 'unit'),
+        TypedGoRoute<SettingsMapRoute>(path: 'map'),
+        TypedGoRoute<SettingsProxyRoute>(path: 'proxy'),
+        TypedGoRoute<SettingsNotifyRoute>(
+          path: 'notify',
+          routes: <TypedGoRoute<GoRouteData>>[
+            TypedGoRoute<SettingsNotifyEewRoute>(path: 'eew'),
+            TypedGoRoute<SettingsNotifyMonitorRoute>(path: 'monitor'),
+            TypedGoRoute<SettingsNotifyReportRoute>(path: 'report'),
+            TypedGoRoute<SettingsNotifyIntensityRoute>(path: 'intensity'),
+            TypedGoRoute<SettingsNotifyThunderstormRoute>(path: 'thunderstorm'),
+            TypedGoRoute<SettingsNotifyAdvisoryRoute>(path: 'advisory'),
+            TypedGoRoute<SettingsNotifyEvacuationRoute>(path: 'evacuation'),
+            TypedGoRoute<SettingsNotifyTsunamiRoute>(path: 'tsunami'),
+            TypedGoRoute<SettingsNotifyAnnouncementRoute>(path: 'announcement'),
+          ],
+        ),
+        TypedGoRoute<SettingsDonateRoute>(path: 'donate'),
       ],
     ),
-    TypedGoRoute<SettingsDonateRoute>(path: '/settings/donate'),
   ],
 )
 /// Settings shell route - wraps all settings pages with a common layout.

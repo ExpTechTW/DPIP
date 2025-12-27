@@ -165,6 +165,9 @@ class SectionListTile extends StatelessWidget {
   /// Typically an icon, and is constrained to 28 pixels width.
   final Widget? leading;
 
+  /// Additional label displayed above the title.
+  final Widget? label;
+
   /// The primary content of the tile.
   final Widget? title;
 
@@ -214,6 +217,7 @@ class SectionListTile extends StatelessWidget {
   const SectionListTile({
     super.key,
     this.leading,
+    this.label,
     this.title,
     this.subtitle,
     this.content,
@@ -229,6 +233,7 @@ class SectionListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = this.label;
     final title = this.title;
     final subtitle = this.subtitle;
     final content = this.content;
@@ -260,30 +265,42 @@ class SectionListTile extends StatelessWidget {
                 crossAxisAlignment: .start,
                 spacing: 16,
                 children: [
-                  if (title != null || subtitle != null)
+                  if (label != null || title != null || subtitle != null)
                     Row(
                       spacing: 8,
                       children: [
                         if (leading != null)
                           Padding(
                             padding: .only(right: 4),
-                            child: SizedBox(width: 28, child: leading),
+                            child: ConstrainedBox(
+                              constraints: const .new(minWidth: 28),
+                              child: leading,
+                            ),
                           ),
                         Expanded(
                           child: Column(
+                            mainAxisSize: .min,
                             crossAxisAlignment: .start,
+                            spacing: 2,
                             children: [
+                              if (label != null)
+                                DefaultTextStyle(
+                                  style: context.texts.labelLarge!.copyWith(
+                                    color: context.colors.onSurfaceVariant,
+                                  ),
+                                  child: label,
+                                ),
                               if (title != null)
                                 DefaultTextStyle(
                                   style: context.texts.titleMedium!.copyWith(
-                                    fontWeight: .w500,
+                                    fontWeight: .bold,
                                   ),
                                   child: title,
                                 ),
                               if (subtitle != null)
                                 DefaultTextStyle(
                                   style: context.texts.bodyMedium!.copyWith(
-                                    color: context.colors.outline,
+                                    color: context.colors.onSurfaceVariant,
                                   ),
                                   child: subtitle,
                                 ),

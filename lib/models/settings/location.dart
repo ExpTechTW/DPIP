@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
@@ -178,6 +179,9 @@ class _SettingsLocationModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Check if the provided location is favorited
+  bool isFavorited(String code) => favorited.contains(code);
+
   /// Refreshes the location settings from preferences.
   ///
   /// Updates the [code], [coordinates], and [auto] properties to reflect the current preferences.
@@ -197,3 +201,8 @@ class _SettingsLocationModel extends ChangeNotifier {
 }
 
 class SettingsLocationModel extends _SettingsLocationModel {}
+
+extension SettingsLocationModelExtension on BuildContext {
+  SettingsLocationModel get useLocation => watch<SettingsLocationModel>();
+  SettingsLocationModel get location => read<SettingsLocationModel>();
+}
