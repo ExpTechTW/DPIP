@@ -7,6 +7,8 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+const double ln10 = 2.302585092994046; // Math.log(10)
+
 ({double p, double s, double sT}) calcWaveRadius(
   double depth,
   int time,
@@ -55,6 +57,13 @@ import 'package:maplibre_gl/maplibre_gl.dart';
     prevTable = table;
   }
 
+  if (pDist < 0) {
+    pDist = 0;
+  }
+  if (sDist < 0) {
+    sDist = 0;
+  }
+
   return (p: pDist, s: sDist, sT: sT);
 }
 
@@ -75,7 +84,7 @@ Map<String, dynamic> eewAreaPga(
   double eewMaxI = 0.0;
 
   region.forEach((String key, Location info) {
-    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng));
+    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
     final double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
     final double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
     double i = pgaToFloat(pga);
@@ -99,9 +108,11 @@ double eewAreaPgv(
   double magW,
 ) {
   final double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
-  final double epicenterDistance = epicenterLocation.asLatLng.to(
-    pointLocation.asLatLng,
-  ) / 1000;
+  final double epicenterDistance =
+      epicenterLocation.asLatLng.to(
+        pointLocation.asLatLng,
+      ) /
+      1000;
   final double hypocenterDistance =
       sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   final double x = max(hypocenterDistance, 3);
@@ -271,7 +282,7 @@ WaveTime calculateWaveTime(double depth, double distance) {
   final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
   final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
   var intensity = pgaToFloat(pga);
-  if (intensity > 4.5) {
+  if (intensity >= 4.5) {
     intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
   }
   return (dist: dist, i: intensity);
