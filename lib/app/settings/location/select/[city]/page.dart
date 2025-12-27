@@ -15,8 +15,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class SettingsLocationSelectCityPage extends StatefulWidget {
@@ -42,25 +41,30 @@ class _SettingsLocationSelectCityPageState
         .where((e) => e.value.cityWithLevel == widget.city)
         .toList();
 
+    final length = towns.length;
+
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: widget.city,
+        Section(
+          label: Text(widget.city),
           children: [
-            for (final MapEntry(key: code, value: town) in towns)
+            for (final (index, MapEntry(key: code, value: town))
+                in towns.indexed)
               Selector<SettingsLocationModel, UnmodifiableSetView<String>>(
                 selector: (context, model) => model.favorited,
                 builder: (context, favorited, child) {
                   final isFavorited = favorited.contains(code);
                   final isLoading = _loadingCode == code;
 
-                  return ListSectionTile(
-                    title: town.cityTownWithLevel,
+                  return SectionListTile(
+                    isFirst: index == 0,
+                    isLast: index == length - 1,
+                    leading: isLoading ? const LoadingIcon() : null,
+                    title: Text(town.cityTownWithLevel),
                     subtitle: Text(
                       '$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N',
                     ),
-                    leading: isLoading ? const LoadingIcon() : null,
                     trailing: isFavorited
                         ? const Icon(Symbols.star_rounded, fill: 1)
                         : null,

@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/symbols.dart';
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsProxyPage extends StatefulWidget {
   const SettingsProxyPage({super.key});
@@ -62,12 +63,12 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: 'HTTP 代理'.i18n,
+        Section(
+          label: Text('HTTP 代理'.i18n),
           children: [
-            ListSectionTile(
-              icon: Symbols.settings_ethernet_rounded,
-              title: '啟用代理'.i18n,
+            SectionListTile(
+              leading: Icon(Symbols.settings_ethernet_rounded),
+              title: Text('啟用代理'.i18n),
               subtitle: Text('透過代理伺服器發送所有網路請求'.i18n),
               trailing: Switch(
                 value: _enabled,

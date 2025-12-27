@@ -13,8 +13,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsLocaleSelectPage extends StatefulWidget {
   const SettingsLocaleSelectPage({super.key});
@@ -44,10 +43,10 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: '選擇語言'.i18n,
+        Section(
+          label: Text('選擇語言'.i18n),
           children: [
-            for (final item in localeList)
+            for (final (index, item) in localeList.indexed)
               Selector<SettingsUserInterfaceModel, Locale?>(
                 selector: (_, model) => model.locale,
                 builder: (context, locale, child) {
@@ -65,8 +64,10 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                   final isSelected =
                       item.toLanguageTag() == locale?.toLanguageTag();
 
-                  return ListSectionTile(
-                    title: item.nativeName,
+                  return SectionListTile(
+                    isFirst: index == 0,
+                    isLast: index == localeList.length - 1,
+                    title: Text(item.nativeName),
                     subtitle: (item.toLanguageTag() != 'zh-Hant')
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,19 +88,15 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                           LinearProgressIndicator(
                                             value: p.translation / 100,
                                             color: Colors.blue,
-                                            year2023: false,
                                           ),
                                           LinearProgressIndicator(
                                             value: p.approval / 100,
                                             color: Colors.lightGreen,
                                             backgroundColor: Colors.transparent,
-                                            year2023: false,
                                           ),
                                         ],
                                       )
-                                    : const LinearProgressIndicator(
-                                        year2023: false,
-                                      ),
+                                    : const LinearProgressIndicator(),
                               ),
                             ],
                           )

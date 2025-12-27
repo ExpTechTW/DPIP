@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+
+import 'package:dpip/global.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class SoundListTile extends StatefulWidget {
   final String title;
@@ -50,8 +52,8 @@ class _SoundListTileState extends State<SoundListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListSectionTile(
-      title: widget.title,
+    return SectionListTile(
+      title: Text(widget.title),
       subtitle: widget.subtitle,
       trailing: _enabled
           ? const Icon(Symbols.play_circle_rounded)

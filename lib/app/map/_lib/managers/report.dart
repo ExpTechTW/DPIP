@@ -29,8 +29,7 @@ import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/magnitude_color.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/report/enlargeable_image.dart';
 import 'package:dpip/widgets/report/intensity_box.dart';
@@ -676,8 +675,8 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               final MapEntry(key: date, value: reports) =
                                   grouped[index];
 
-                              return ListSection(
-                                title: date,
+                              return Section(
+                                label: Text(date),
                                 children: reports.map((report) {
                                   final locationString = report
                                       .extractLocation();
@@ -687,14 +686,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       )?.dynamicName ??
                                       locationString;
 
-                                  return ListSectionTile(
+                                  return SectionListTile(
                                     leading: IntensityBox(
                                       intensity: report.intensity,
                                       size: 36,
                                       borderRadius: 8,
                                       border: !report.hasNumber,
                                     ),
-                                    title: location,
+                                    title: Text(location),
                                     subtitle: Text(
                                       '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
                                     ),

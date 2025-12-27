@@ -10,6 +10,12 @@
       "siblings_only": true
     }
   },
+  "[dart]": {
+    "editor.rulers": [
+      80
+    ]
+  },
   "IDX.aI.enableInlineCompletion": true,
-  "IDX.aI.enableCodebaseIndexing": true
+  "IDX.aI.enableCodebaseIndexing": true,
+  "codetogether.virtualCursorJoin": "ownVirtualCursor"
 }

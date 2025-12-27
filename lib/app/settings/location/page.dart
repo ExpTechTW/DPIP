@@ -1,6 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/i18n.dart';
@@ -12,16 +21,8 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 
@@ -237,26 +238,28 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
+        Section(
           children: [
             Selector<SettingsLocationModel, bool>(
               selector: (context, model) => model.auto,
               builder: (context, auto, child) {
-                return ListSectionTile(
-                  title: '自動更新'.i18n,
+                return SectionListTile(
+                  isFirst: true,
+                  isLast: true,
+                  leading: Icon(Symbols.my_location_rounded),
+                  title: Text('自動更新'.i18n),
                   subtitle: Text('定期更新目前的所在地'.i18n),
-                  icon: Symbols.my_location_rounded,
                   trailing: Switch(value: auto, onChanged: toggleAutoLocation),
                 );
               },
             ),
           ],
         ),
-        SettingsListTextSection(
-          icon: Symbols.info_rounded,
-          content:
-              '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'
-                  .i18n,
+        SectionText(
+          child: Text(
+            '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'
+                .i18n,
+          ),
         ),
         if (locationAlwaysPermission != null)
           Selector<SettingsLocationModel, bool>(
@@ -378,16 +381,23 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                   opacity: auto && !batteryOptimizationPermission ? 1 : 0,
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
-                  child: SettingsListTextSection(
-                    icon: Symbols.warning_rounded,
-                    iconColor: context.colors.error,
-                    content: '省電策略已被拒絕，請移至設定允許權限。'.i18n,
-                    contentColor: context.colors.error,
-                    trailing: TextButton(
-                      child: Text('設定'.i18n),
-                      onPressed: () {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                      },
+                  child: SectionText(
+                    leading: Icon(
+                      Symbols.warning_rounded,
+                      color: context.colors.error,
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '省電策略已被拒絕，請移至設定允許權限。'.i18n,
+                          style: TextStyle(color: context.colors.error),
+                        ),
+                        TextButton(
+                          child: Text('設定'.i18n),
+                          onPressed: () =>
+                              DisableBatteryOptimization.showDisableBatteryOptimizationSettings(),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -400,25 +410,25 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
 
             return StatefulBuilder(
               builder: (context, setState) {
-                return ListSection(
-                  title: '所在地'.i18n,
+                return Section(
+                  label: Text('所在地'.i18n),
                   children: [
                     ...model.favorited.map((code) {
                       final location = Global.location[code]!;
                       final isCurrentLoading = loadingCode == code;
                       final isSelected = code == model.code;
 
-                      return ListSectionTile(
-                        title: location.cityTownWithLevel,
-                        subtitle: Text(
-                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
-                        ),
+                      return SectionListTile(
                         leading: isCurrentLoading
                             ? const LoadingIcon()
                             : Icon(
                                 isSelected ? Symbols.check_rounded : null,
                                 color: context.colors.primary,
                               ),
+                        title: Text(location.cityTownWithLevel),
+                        subtitle: Text(
+                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
@@ -461,9 +471,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                               },
                       );
                     }),
-                    ListSectionTile(
-                      title: '新增地點'.i18n,
-                      icon: Symbols.add_circle_rounded,
+                    SectionListTile(
+                      isFirst: model.favorited.isEmpty,
+                      isLast: true,
+                      leading: Icon(Symbols.add_circle_rounded),
+                      title: Text('新增地點'.i18n),
                       enabled: loadingCode == null,
                       onTap: () =>
                           context.push(SettingsLocationSelectPage.route),

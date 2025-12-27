@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class BasicNotifySection extends StatefulWidget {
   final BasicNotifyType value;
@@ -42,14 +43,14 @@ class _BasicNotifySectionState extends State<BasicNotifySection> {
       ),
     };
 
-    return ListSection(
-      title: '接收類別'.i18n,
+    return Section(
+      label: Text('接收類別'.i18n),
       children: [
         for (final MapEntry(key: item, value: (:title, :icon))
             in values.entries)
-          ListSectionTile(
-            title: title,
-            icon: icon,
+          SectionListTile(
+            leading: Icon(icon),
+            title: Text(title),
             trailing: _loading == item
                 ? loading
                 : (widget.value == item)

@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:dpip/app/home/home_display_mode.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../widgets/list/list_section.dart';
-import '../../home/home_display_mode.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsLayoutPage extends StatelessWidget {
   const SettingsLayoutPage({super.key});
@@ -12,8 +14,8 @@ class SettingsLayoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListSection(
-      title: '首頁樣式'.i18n,
+    return Section(
+      label: Text('首頁樣式'.i18n),
       children: [
         Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {

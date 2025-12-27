@@ -6,8 +6,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -184,21 +183,23 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 ),
               ),
               if (subscriptions.isNotEmpty)
-                ListSection(
-                  title: '訂閱制'.i18n,
+                Section(
+                  label: Text('訂閱制'.i18n),
                   children: [
                     for (final product in subscriptions)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title
-                                  .substring(0, product.title.indexOf('('))
-                                  .trim()
-                            : product.title,
-                        titleStyle:
-                            (processingProductId != null &&
-                                processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
+                      SectionListTile(
+                        title: Text(
+                          product.title.contains('(')
+                              ? product.title
+                                    .substring(0, product.title.indexOf('('))
+                                    .trim()
+                              : product.title,
+                          style:
+                              (processingProductId != null &&
+                                  processingProductId != product.id)
+                              ? TextStyle(color: context.theme.disabledColor)
+                              : const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
@@ -246,21 +247,23 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   ],
                 ),
               if (oneTime.isNotEmpty)
-                ListSection(
-                  title: '單次支援'.i18n,
+                Section(
+                  label: Text('單次支援'.i18n),
                   children: [
                     for (final product in oneTime)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title
-                                  .substring(0, product.title.indexOf('('))
-                                  .trim()
-                            : product.title,
-                        titleStyle:
-                            (processingProductId != null &&
-                                processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
+                      SectionListTile(
+                        title: Text(
+                          product.title.contains('(')
+                              ? product.title
+                                    .substring(0, product.title.indexOf('('))
+                                    .trim()
+                              : product.title,
+                          style:
+                              (processingProductId != null &&
+                                  processingProductId != product.id)
+                              ? TextStyle(color: context.theme.disabledColor)
+                              : const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
