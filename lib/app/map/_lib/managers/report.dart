@@ -830,45 +830,59 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               ).format(report.time),
                             ),
                           ),
-                          SectionListTile(
-                            label: Text('地震規模'.i18n),
-                            title: Row(
-                              children: [
-                                Container(
-                                  height: 12,
-                                  width: 12,
-                                  margin: const EdgeInsets.only(right: 6),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: MagnitudeColor.magnitude(
-                                      report.magnitude,
-                                    ),
+                          Row(
+                            spacing: 2,
+                            children: [
+                              Expanded(
+                                child: SectionListTile(
+                                  borderRadius:
+                                      BorderRadius.circular(4) +
+                                      .only(bottomLeft: .circular(16)),
+                                  label: Text('地震規模'.i18n),
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        height: 12,
+                                        width: 12,
+                                        margin: const .only(right: 6),
+                                        decoration: BoxDecoration(
+                                          borderRadius: .circular(10),
+                                          color: MagnitudeColor.magnitude(
+                                            report.magnitude,
+                                          ),
+                                        ),
+                                      ),
+                                      BodyText.large(
+                                        'M ${report.magnitude}',
+                                        weight: .bold,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                BodyText.large(
-                                  'M ${report.magnitude}',
-                                  weight: .bold,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SectionListTile(
-                            isLast: true,
-                            label: Text('震源深度'.i18n),
-                            title: Row(
-                              children: [
-                                Container(
-                                  height: 12,
-                                  width: 12,
-                                  margin: const EdgeInsets.only(right: 6),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: getDepthColor(report.depth),
+                              ),
+                              Expanded(
+                                child: SectionListTile(
+                                  borderRadius:
+                                      BorderRadius.circular(4) +
+                                      .only(bottomRight: .circular(16)),
+                                  label: Text('震源深度'.i18n),
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        height: 12,
+                                        width: 12,
+                                        margin: const .only(right: 6),
+                                        decoration: BoxDecoration(
+                                          borderRadius: .circular(10),
+                                          color: getDepthColor(report.depth),
+                                        ),
+                                      ),
+                                      Text('${report.depth} km'),
+                                    ],
                                   ),
                                 ),
-                                Text('${report.depth} km'),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

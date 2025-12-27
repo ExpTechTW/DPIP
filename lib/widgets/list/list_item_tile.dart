@@ -186,16 +186,25 @@ class SectionListTile extends StatelessWidget {
 
   /// Whether this is the first tile in a section.
   ///
-  /// Controls the top border radius. Set to `true` for rounded top corners.
+  /// When true, the top corners use a 20 pixel radius, otherwise, they use
+  /// a 4 pixel radius. Has no effect if [borderRadius] is provided.
   final bool isFirst;
 
   /// Whether this is the last tile in a section.
   ///
-  /// Controls the bottom border radius. Set to `true` for rounded bottom corners.
+  /// When true, the bottom corners use a 20 pixel radius, otherwise, they use
+  /// a 4 pixel radius. Has no effect if [borderRadius] is provided.
   final bool isLast;
 
   /// Whether the tile is enabled.
   final bool enabled;
+
+  /// Custom border radius for the tile.
+  ///
+  /// When null, the top corners will use a 20 pixel radius if [isFirst] is true
+  /// (4 otherwise), and bottom corners use a 20 pixel radius if [isLast] is
+  /// true (4 otherwise).
+  final BorderRadius? borderRadius;
 
   /// Custom padding for the [content] area.
   ///
@@ -225,6 +234,7 @@ class SectionListTile extends StatelessWidget {
     this.isFirst = false,
     this.isLast = false,
     this.enabled = true,
+    this.borderRadius,
     this.contentPadding,
     this.tileColor,
     this.onTap,
@@ -240,10 +250,12 @@ class SectionListTile extends StatelessWidget {
     final leading = this.leading;
     final trailing = this.trailing;
 
-    final borderRadius = BorderRadius.vertical(
-      top: isFirst ? .circular(20) : .circular(4),
-      bottom: isLast ? .circular(20) : .circular(4),
-    );
+    final borderRadius =
+        this.borderRadius ??
+        BorderRadius.vertical(
+          top: isFirst ? .circular(20) : .circular(4),
+          bottom: isLast ? .circular(20) : .circular(4),
+        );
 
     return Opacity(
       opacity: enabled ? 1 : 0.4,
@@ -251,9 +263,7 @@ class SectionListTile extends StatelessWidget {
         padding: .symmetric(vertical: 1),
         child: Material(
           color: tileColor ?? context.colors.surfaceContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: borderRadius),
           child: InkWell(
             borderRadius: borderRadius,
             onTap: enabled ? onTap : null,
