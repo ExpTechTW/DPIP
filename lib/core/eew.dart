@@ -101,7 +101,7 @@ double eewAreaPgv(
   final double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
   final double epicenterDistance = epicenterLocation.asLatLng.to(
     pointLocation.asLatLng,
-  );
+  ) / 1000;
   final double hypocenterDistance =
       sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   final double x = max(hypocenterDistance, 3);
