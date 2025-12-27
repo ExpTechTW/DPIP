@@ -15,6 +15,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
+import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
@@ -58,6 +59,8 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   bool _isUpdatingEew = false;
   bool _hasActiveEew = false;
+  String? _lastEewId;
+  int? _lastEewSerial;
 
   late final String _rtsSourceId = MapSourceIds.rts();
   late final String _rtsLayerId = MapLayerIds.rts();
@@ -936,8 +939,70 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
 
     try {
+      // Always update wave circles (they change every tick)
       final data = GlobalProviders.data.getEewGeoJson();
       await controller.setGeoJsonSource(_eewSourceId, data);
+
+      // Only update town intensity colors when EEW info changes
+      final activeEew = GlobalProviders.data.activeEew;
+      if (activeEew.isNotEmpty) {
+        final eew = activeEew.first;
+        final needsIntensityUpdate =
+            _lastEewId != eew.id || _lastEewSerial != eew.serial;
+
+        if (needsIntensityUpdate) {
+          _lastEewId = eew.id;
+          _lastEewSerial = eew.serial;
+
+          final intensityData = eewAreaPga(
+            eew.info.latitude,
+            eew.info.longitude,
+            eew.info.depth,
+            eew.info.magnitude,
+            Global.location,
+          );
+
+          final colorEntries = <dynamic>[];
+
+          intensityData.forEach((key, value) {
+            if (key == 'max_i') return;
+            final code = int.tryParse(key);
+            if (code == null) return;
+            final intensity =
+                intensityFloatToInt((value as Map)['i'] as double);
+            if (intensity > 0) {
+              colorEntries.add(code);
+              colorEntries.add(
+                IntensityColor.intensity(intensity).toHexStringRGB(),
+              );
+            }
+          });
+
+          // Only apply if we have color entries
+          if (colorEntries.isNotEmpty) {
+            final fillColorExpression = <dynamic>[
+              'match',
+              ['get', 'CODE'],
+              ...colorEntries,
+              context.colors.surfaceContainerHigh.toHexStringRGB(),
+            ];
+
+            // Hide county fill to show town colors
+            await controller.setLayerProperties(
+              BaseMapLayerIds.exptechCountyFill,
+              const FillLayerProperties(fillOpacity: 0),
+            );
+
+            await controller.setLayerProperties(
+              BaseMapLayerIds.exptechTownFill,
+              FillLayerProperties(
+                fillColor: fillColorExpression,
+                fillOpacity: 1,
+              ),
+            );
+          }
+        }
+      }
     } catch (e, s) {
       TalkerManager.instance.error(
         'MonitorMapLayerManager._updateEewFromCache',
@@ -953,6 +1018,28 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final emptyData = {'type': 'FeatureCollection', 'features': []};
       await controller.setGeoJsonSource(_eewSourceId, emptyData);
+
+      // Reset EEW tracking
+      _lastEewId = null;
+      _lastEewSerial = null;
+
+      // Restore county fill
+      await controller.setLayerProperties(
+        BaseMapLayerIds.exptechCountyFill,
+        FillLayerProperties(
+          fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
+
+      // Reset town fill colors to default
+      await controller.setLayerProperties(
+        BaseMapLayerIds.exptechTownFill,
+        FillLayerProperties(
+          fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._clearEew', e, s);
     } finally {

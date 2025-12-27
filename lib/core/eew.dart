@@ -84,7 +84,8 @@ Map<String, dynamic> eewAreaPga(
   double eewMaxI = 0.0;
 
   region.forEach((String key, Location info) {
-    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
+    final double distSurface =
+        LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
     final double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
     final double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
     double i = pgaToFloat(pga);
@@ -198,20 +199,26 @@ int pgaToIntensity(double pga) {
 }
 
 int intensityFloatToInt(double floatValue) {
-  if (floatValue < 0) {
+  if (floatValue < 0.5) {
     return 0;
+  } else if (floatValue < 1.5) {
+    return 1;
+  } else if (floatValue < 2.5) {
+    return 2;
+  } else if (floatValue < 3.5) {
+    return 3;
   } else if (floatValue < 4.5) {
-    return floatValue.round();
-  } else if (floatValue < 5) {
-    return 5;
+    return 4;
+  } else if (floatValue < 5.0) {
+    return 5; // 5弱
   } else if (floatValue < 5.5) {
-    return 6;
-  } else if (floatValue < 6) {
-    return 7;
+    return 6; // 5強
+  } else if (floatValue < 6.0) {
+    return 7; // 6弱
   } else if (floatValue < 6.5) {
-    return 8;
+    return 8; // 6強
   } else {
-    return 9;
+    return 9; // 7
   }
 }
 
