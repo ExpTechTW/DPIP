@@ -18,6 +18,7 @@ import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/map/intensity_legend.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
@@ -1633,6 +1634,21 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 },
               ),
             ),
+            // Intensity legend - positioned at top right, just below buttons
+            // Show RTS mode when no EEW, show EEW mode during EEW
+            // Hide when sheet is expanded
+            if (_isCollapsed)
+              Positioned(
+                top: 80,
+                right: 16,
+                child: SafeArea(
+                  child: IntensityLegend(
+                    mode: activeEew.isNotEmpty
+                        ? IntensityLegendMode.eew
+                        : IntensityLegendMode.rts,
+                  ),
+                ),
+              ),
             Positioned(
               top: 26,
               left: 95,
