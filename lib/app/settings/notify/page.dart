@@ -12,6 +12,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/list_item_tile.dart';
 
@@ -118,6 +119,62 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     }
   }
 
+  Widget _buildIconContainer({
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(icon, color: color, size: 20),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: context.colors.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Symbols.notifications_rounded,
+              color: context.colors.onPrimaryContainer,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '通知設定'.i18n,
+                  style: context.texts.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '自訂各類通知的接收方式'.i18n,
+                  style: context.texts.bodySmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsLocationModel, String?>(
@@ -143,25 +200,59 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                 bottom: 16 + context.padding.bottom,
               ),
               children: [
+                _buildHeader(context),
                 if (!enabled)
-                  SectionText(
-                    leading: Icon(
-                      Symbols.warning_rounded,
-                      color: context.colors.error,
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.theme.extendedColors.amber
+                          .withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Column(
-                      mainAxisSize: .min,
-                      crossAxisAlignment: .start,
-                      spacing: 8,
+                    child: Row(
                       children: [
-                        Text(
-                          '請先設定所在地來使用通知功能'.i18n,
-                          style: TextStyle(color: context.colors.error),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: context.theme.extendedColors.amber
+                                .withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Symbols.warning_rounded,
+                            color: context.theme.extendedColors.amber,
+                            size: 24,
+                          ),
                         ),
-                        FilledButton.tonal(
-                          onPressed: () =>
-                              const SettingsLocationRoute().push(context),
-                          child: Text('設定'.i18n),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '尚未設定所在地'.i18n,
+                                style: context.texts.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: context.theme.extendedColors.amber,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '請先設定所在地來使用通知功能'.i18n,
+                                style: context.texts.bodySmall?.copyWith(
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              FilledButton.icon(
+                                onPressed: () =>
+                                    const SettingsLocationRoute().push(context),
+                                icon: const Icon(Symbols.location_on_rounded),
+                                label: Text('設定所在地'.i18n),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -175,7 +266,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return SectionListTile(
                           isFirst: true,
                           isLast: true,
-                          leading: Icon(Symbols.crisis_alert_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.crisis_alert_rounded,
+                            color: Colors.red,
+                          ),
                           title: Text('緊急地震速報'.i18n),
                           subtitle: Text(getEewNotifyTypeName(eew)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -195,7 +289,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, monitor, child) {
                         return SectionListTile(
                           isFirst: true,
-                          leading: Icon(Symbols.monitor_heart_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.monitor_heart_rounded,
+                            color: Colors.orange,
+                          ),
                           title: Text('強震監視器'.i18n),
                           subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -209,7 +306,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.report,
                       builder: (context, report, child) {
                         return SectionListTile(
-                          leading: Icon(Symbols.docs_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.docs_rounded,
+                            color: Colors.blue,
+                          ),
                           title: Text('地震報告'.i18n),
                           subtitle: Text(getEarthquakeNotifyTypeName(report)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -224,7 +324,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, intensity, child) {
                         return SectionListTile(
                           isLast: true,
-                          leading: Icon(Symbols.summarize_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.summarize_rounded,
+                            color: Colors.teal,
+                          ),
                           title: Text('震度速報'.i18n),
                           subtitle: Text(
                             getEarthquakeNotifyTypeName(intensity),
@@ -246,7 +349,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, thunderstorm, child) {
                         return SectionListTile(
                           isFirst: true,
-                          leading: Icon(Symbols.thunderstorm_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.thunderstorm_rounded,
+                            color: Colors.purple,
+                          ),
                           title: Text('雷雨即時訊息'.i18n),
                           subtitle: Text(
                             getWeatherNotifyTypeName(thunderstorm),
@@ -262,7 +368,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.weatherAdvisory,
                       builder: (context, weatherAdvisory, child) {
                         return SectionListTile(
-                          leading: Icon(Symbols.warning_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.warning_rounded,
+                            color: Colors.amber,
+                          ),
                           title: Text('天氣警特報'.i18n),
                           subtitle: Text(
                             getWeatherNotifyTypeName(weatherAdvisory),
@@ -279,7 +388,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       builder: (context, evacuation, child) {
                         return SectionListTile(
                           isLast: true,
-                          leading: Icon(Symbols.directions_run_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.directions_run_rounded,
+                            color: Colors.green,
+                          ),
                           title: Text('防災資訊'.i18n),
                           subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -300,7 +412,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return SectionListTile(
                           isFirst: true,
                           isLast: true,
-                          leading: Icon(Symbols.tsunami_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.tsunami_rounded,
+                            color: Colors.cyan,
+                          ),
                           title: Text('海嘯資訊'.i18n),
                           subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -321,7 +436,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return SectionListTile(
                           isFirst: true,
                           isLast: true,
-                          leading: Icon(Symbols.campaign_rounded),
+                          leading: _buildIconContainer(
+                            icon: Symbols.campaign_rounded,
+                            color: Colors.indigo,
+                          ),
                           title: Text('公告'.i18n),
                           subtitle: Text(getBasicNotifyTypeName(announcement)),
                           trailing: const Icon(Symbols.chevron_right_rounded),

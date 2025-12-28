@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_icons/simple_icons.dart';
 import 'package:timezone/timezone.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app/changelog/page.dart';
@@ -330,6 +334,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   _buildRadarMap(),
                 if (homeSections.contains(HomeDisplaySection.forecast))
                   _buildForecast(),
+                _buildCommunityCards(),
                 if (homeSections.contains(HomeDisplaySection.history))
                   _buildHistoryTimeline(),
               ] else if (GlobalProviders.location.code != null)
@@ -364,6 +369,138 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCommunityCards() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildSocialCard(
+                  icon: SimpleIcons.discord,
+                  label: 'Discord',
+                  color: const Color(0xFF5865F2),
+                  onTap: () => launchUrl(Uri.parse('https://exptech.com.tw/dc')),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildSocialCard(
+                  icon: SimpleIcons.threads,
+                  label: 'Threads',
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  onTap: () =>
+                      launchUrl(Uri.parse('https://www.threads.net/@dpip.tw')),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSocialCard(
+                  icon: SimpleIcons.youtube,
+                  label: 'YouTube',
+                  color: const Color(0xFFFF0000),
+                  onTap: () => launchUrl(
+                      Uri.parse('https://www.youtube.com/@exptechtw/live')),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildDonateCard(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialCard({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 18, color: color),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonateCard() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(SettingsDonatePage.route),
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.tertiaryContainer,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Symbols.favorite_rounded,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '贊助我們'.i18n,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

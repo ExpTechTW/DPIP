@@ -56,15 +56,20 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   }
 
   SettingsUserInterfaceModel() {
-    final saved = savedList
-        .map(
-          (s) => HomeDisplaySection.values
-              .cast<HomeDisplaySection?>()
-              .firstWhere((e) => e?.name == s, orElse: () => null),
-        )
-        .whereType<HomeDisplaySection>()
-        .toSet();
-    homeSections = saved;
+    if (savedList.isEmpty) {
+      // 預設全部啟用
+      homeSections = HomeDisplaySection.values.toSet();
+    } else {
+      final saved = savedList
+          .map(
+            (s) => HomeDisplaySection.values
+                .cast<HomeDisplaySection?>()
+                .firstWhere((e) => e?.name == s, orElse: () => null),
+          )
+          .whereType<HomeDisplaySection>()
+          .toSet();
+      homeSections = saved;
+    }
   }
 
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
