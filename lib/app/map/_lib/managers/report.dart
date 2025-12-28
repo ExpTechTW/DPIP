@@ -408,13 +408,11 @@ class _SafeImageSectionState extends State<SafeImageSection> {
 
   void _onImageError() {
     if (_hasError) return;
+    _hasError = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _hasError) return;
-
-      setState(() {
-        _hasError = true;
-      });
+      if (!mounted) return;
+      setState(() {});
     });
   }
 
@@ -428,7 +426,7 @@ class _SafeImageSectionState extends State<SafeImageSection> {
   @override
   Widget build(BuildContext context) {
     if (_hasError) {
-      return _CwaGeneratingView(onRetry: _retry);
+      return _GeneratingView(onRetry: _retry);
     }
 
     return KeyedSubtree(
@@ -438,17 +436,17 @@ class _SafeImageSectionState extends State<SafeImageSection> {
   }
 }
 
-class _CwaGeneratingView  extends StatelessWidget {
+class _GeneratingView extends StatelessWidget {
   final VoidCallback onRetry;
 
-  const _CwaGeneratingView ({
+  const _GeneratingView({
     required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
+    return AspectRatio(
+      aspectRatio: 2334 / 2977,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -1057,20 +1055,22 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ),
                         ],
                       ),
-                      if (report.hasNumber && report.intensityMapImageUrl != null)
+                      if (report.hasNumber &&
+                          report.intensityMapImageUrl != null)
                         Section(
                           label: Text('震度圖'.i18n),
                           children: [
                             Padding(
                               padding: .symmetric(horizontal: 8),
                               child: SafeImageSection(
-                            builder: (onError) =>EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'intensity-image-${report.id}',
-                                imageUrl: report.intensityMapImageUrl!,
-                                imageName: report.intensityMapImageName!,
-                              onLoadFailed: onError,
-                            ),),
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'intensity-image-${report.id}',
+                                  imageUrl: report.intensityMapImageUrl!,
+                                  imageName: report.intensityMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -1081,13 +1081,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             Padding(
                               padding: .symmetric(horizontal: 8),
                               child: SafeImageSection(
-                            builder: (onError) =>EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'pga-image-${report.id}',
-                                imageUrl: report.pgaMapImageUrl!,
-                                imageName: report.pgaMapImageName!,
-                              onLoadFailed: onError,
-                            ),),
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'pga-image-${report.id}',
+                                  imageUrl: report.pgaMapImageUrl!,
+                                  imageName: report.pgaMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -1098,13 +1099,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             Padding(
                               padding: .symmetric(horizontal: 8),
                               child: SafeImageSection(
-                            builder: (onError) =>EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'pgv-image-${report.id}',
-                                imageUrl: report.pgvMapImageUrl!,
-                                imageName: report.pgvMapImageName!,
-                              onLoadFailed: onError,
-                            ),),
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'pgv-image-${report.id}',
+                                  imageUrl: report.pgvMapImageUrl!,
+                                  imageName: report.pgvMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
+                              ),
                             ),
                           ],
                         ),
