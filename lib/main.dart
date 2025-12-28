@@ -28,8 +28,10 @@ void main() async {
   talker.log('--- 冷啟動偵測開始 ---');
   talker.log('🔥 1. (main) 啟動時間: ${overallStartTime.toIso8601String()}');
   WidgetsFlutterBinding.ensureInitialized();
-  // iOS 14 以下改回用 StoreKit1
-  InAppPurchaseStoreKitPlatform.enableStoreKit1();
+  if (Platform.isIOS) {
+    // iOS 14 以下改回用 StoreKit1
+    InAppPurchaseStoreKitPlatform.enableStoreKit1();
+  }
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
@@ -62,22 +64,33 @@ void main() async {
   talker.log('⏳ 3. 啟動 並行任務... (測量總耗時)');
   final futureWaitStart = DateTime.now();
   await Future.wait([
-    _loggedTask('DeviceInfo.init', DeviceInfo.init()),
     _loggedTask('AppLocalizations.load', AppLocalizations.load()),
     _loggedTask(
       'LocationNameLocalizations.load',
       LocationNameLocalizations.load(),
     ),
-    _loggedTask(
-      'WeatherStationLocalizations.load',
-      WeatherStationLocalizations.load(),
-    ),
+    // _loggedTask(
+    //   'WeatherStationLocalizations.load',
+    //   WeatherStationLocalizations.load(),
+    // ),
   ]);
-
   final futureWaitEnd = DateTime.now();
   talker.log(
     '✅ 3.並行任務全部完成。總耗時 (取決於最慢任務): ${futureWaitEnd.difference(futureWaitStart).inMilliseconds}ms',
   );
+
+  if (Platform.isIOS) {
+    await DeviceInfo.init();
+  } else {
+    unawaited(() async {
+        final start = DateTime.now();
+        await DeviceInfo.init();
+        talker.log(
+          '📱 DeviceInfo.init 完成 ${DateTime.now().difference(start).inMilliseconds}ms',
+        );
+      }(),
+    );
+  }
 
   if (isFirstLaunch) {
     talker.log('🟣 首次啟動 → 前置初始化 FCM + 通知');
@@ -126,7 +139,7 @@ void main() async {
     ),
   );
   if (!isFirstLaunch) {
-    talker.log('🟢 非首次啟動 → 通知與 FCM 改為背景初始化');
+    talker.log('🟢 非首次啟動 → FCM + 通知 為背景初始化');
     unawaited(
       Future(() async {
         try {
@@ -140,7 +153,7 @@ void main() async {
     );
   }
   final locationInitStart = DateTime.now();
-  talker.log('🚀 5. 啟動 LocationServiceManager (並行背景執行)...');
+  talker.log('🚀 啟動 LocationServiceManager ...');
   final locationFuture = LocationServiceManager.initalize();
 
   locationFuture
@@ -149,10 +162,10 @@ void main() async {
         final locationDuration = locationInitEnd
             .difference(locationInitStart)
             .inMilliseconds;
-        talker.log('✅ 5. LocationServiceManager 完成。耗時: ${locationDuration}ms');
+        talker.log('✅ LocationServiceManager 完成。耗時: ${locationDuration}ms');
       })
       .catchError((e) {
-        talker.error('❌ 5. LocationServiceManager 失敗。錯誤: $e');
+        talker.error('❌ LocationServiceManager 失敗。錯誤: $e');
       });
 }
 
