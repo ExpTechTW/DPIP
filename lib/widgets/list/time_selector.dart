@@ -7,13 +7,19 @@ class TimeSelector extends StatefulWidget {
   final Function() onTimeExpanded;
   final List<String> timeList;
 
-  const TimeSelector({super.key, required this.onTimeSelected, required this.onTimeExpanded, required this.timeList});
+  const TimeSelector({
+    super.key,
+    required this.onTimeSelected,
+    required this.onTimeExpanded,
+    required this.timeList,
+  });
 
   @override
   State<TimeSelector> createState() => _TimeSelectorState();
 }
 
-class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
+class _TimeSelectorState extends State<TimeSelector>
+    with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late ScrollController _scrollController;
   final double _itemWidth = 80.0;
@@ -26,8 +32,14 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     super.initState();
     _selectedTimestamp = widget.timeList.last;
     _scrollController = ScrollController();
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
   }
 
@@ -47,7 +59,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     if (index != -1) {
       final selectedItemOffset = index * _itemWidth;
       final screenWidth = MediaQuery.of(context).size.width;
-      final scrollOffset = selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
+      final scrollOffset =
+          selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
 
       _scrollController.animateTo(
         scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
@@ -77,7 +90,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
         FilledButton.tonalIcon(
           onPressed: _toggleExpanded,
           label: Text(
-            DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp)),
+            DateFormat(
+              'yyyy/MM/dd HH:mm',
+            ).format(_convertTimestamp(_selectedTimestamp)),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           icon: Icon(_isExpanded ? Icons.expand_more : Icons.expand_less),
@@ -85,8 +100,12 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(context.colors.surface),
             foregroundColor: WidgetStatePropertyAll(context.colors.onSurface),
-            surfaceTintColor: WidgetStatePropertyAll(context.colors.surfaceTint),
-            padding: const WidgetStatePropertyAll(EdgeInsets.fromLTRB(16, 0, 12, 0)),
+            surfaceTintColor: WidgetStatePropertyAll(
+              context.colors.surfaceTint,
+            ),
+            padding: const WidgetStatePropertyAll(
+              EdgeInsets.fromLTRB(16, 0, 12, 0),
+            ),
             elevation: const WidgetStatePropertyAll(2),
           ),
         ),
@@ -100,7 +119,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                 margin: const EdgeInsets.all(8),
                 elevation: 2,
                 surfaceTintColor: context.colors.surfaceTint,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: ListView.builder(
@@ -124,9 +145,14 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             alignment: Alignment.center,
-                            margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 3,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: isSelected ? context.colors.secondary : Colors.transparent,
+                              color: isSelected
+                                  ? context.colors.secondary
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Column(
@@ -135,7 +161,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
                                   style: TextStyle(
-                                    color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
+                                    color: isSelected
+                                        ? context.colors.onSecondary
+                                        : context.colors.onSurface,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -146,7 +174,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                   style: TextStyle(
                                     color: isSelected
                                         ? context.colors.onSecondary
-                                        : context.colors.onSurface.withValues(alpha: 0.7),
+                                        : context.colors.onSurface.withValues(
+                                            alpha: 0.7,
+                                          ),
                                     fontSize: 12,
                                   ),
                                   child: Text(DateFormat('MM/dd').format(time)),

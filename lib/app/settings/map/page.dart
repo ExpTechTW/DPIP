@@ -1,4 +1,3 @@
-import 'package:dpip/widgets/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -10,8 +9,8 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/layout.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class SettingsMapPage extends StatelessWidget {
@@ -62,15 +61,16 @@ class SettingsMapPage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: '地圖'.i18n,
+        Section(
+          label: Text('地圖'.i18n),
           children: [
             Selector<SettingsMapModel, BaseMapType>(
               selector: (context, model) => model.baseMap,
               builder: (context, baseMapType, child) {
-                return ListSectionTile(
-                  icon: Symbols.layers_rounded,
-                  title: '底圖'.i18n,
+                return SectionListTile(
+                  isFirst: true,
+                  leading: Icon(Symbols.layers_rounded),
+                  title: Text('底圖'.i18n),
                   subtitle: Text(baseMapLabels[baseMapType]!),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => showLayerSheet(context),
@@ -80,9 +80,9 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, Set<MapLayer>>(
               selector: (context, model) => model.layers,
               builder: (context, layers, child) {
-                return ListSectionTile(
-                  icon: Symbols.layers_rounded,
-                  title: '初始圖層'.i18n,
+                return SectionListTile(
+                  leading: Icon(Symbols.layers_rounded),
+                  title: Text('初始圖層'.i18n),
                   subtitle: Text(layers.map((e) => layerLabels[e]!).join(', ')),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => showLayerSheet(context),
@@ -92,9 +92,9 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, bool>(
               selector: (context, model) => model.autoZoom,
               builder: (context, autoZoom, child) {
-                return ListSectionTile(
-                  icon: Symbols.zoom_in_map_rounded,
-                  title: '自動縮放'.i18n,
+                return SectionListTile(
+                  leading: Icon(Symbols.zoom_in_map_rounded),
+                  title: Text('自動縮放'.i18n),
                   subtitle: Text('接收到檢知時自動縮放地圖(監視器模式下)'.i18n),
                   trailing: Switch(
                     value: autoZoom,
@@ -108,61 +108,59 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, int>(
               selector: (context, model) => model.updateInterval,
               builder: (context, updateInterval, child) {
-                final maxFpsAllowed = WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate
+                final maxFpsAllowed = WidgetsBinding
+                    .instance
+                    .platformDispatcher
+                    .views
+                    .first
+                    .display
+                    .refreshRate
                     .floorToDouble();
 
-                return Layout.col.left[8](
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Layout.row.left[16](
-                      children: [
-                        Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
-                        Expanded(
-                          child: Layout.col.left.min(
-                            children: [
-                              Text(
-                                '動畫幀率'.i18n,
-                                style: context.texts.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                '影響強震監視器的震波模擬動畫流暢度'.i18n,
-                                style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
+                return SectionListTile(
+                  isLast: true,
+                  leading: Icon(Symbols.animation_rounded),
+                  title: Text('動畫幀率'.i18n),
+                  subtitle: Text('影響強震監視器的震波模擬動畫流暢度'.i18n),
+                  content: Column(
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .start,
+                    children: [
+                      Slider(
+                        value: updateInterval.toDouble().clamp(
+                          1,
+                          maxFpsAllowed,
                         ),
-                      ],
-                    ),
-                    Layout.row.left[4](
-                      children: [
-                        Expanded(
-                          child: Slider(
-                            value: updateInterval.toDouble().clamp(1, maxFpsAllowed),
-                            min: 1,
-                            max: maxFpsAllowed,
-                            divisions: maxFpsAllowed.floor() ~/ 5,
-                            onChanged: (value) {
-                              context.read<SettingsMapModel>().setUpdateInterval(value.floor());
-                            },
-                            year2023: false,
-                          ),
-                        ),
-                        SizedBox(width: 28, child: Text('$updateInterval', style: context.texts.labelSmall)),
-                      ],
-                    ),
-                    if (updateInterval > 20)
-                      Layout.row.left[8](
-                        children: [
-                          Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
-                          Expanded(
-                            child: Text(
-                              '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
-                              style: context.texts.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
-                            ),
-                          ),
-                        ],
+                        min: 1,
+                        max: maxFpsAllowed,
+                        divisions: maxFpsAllowed.floor() ~/ 5,
+                        label: '$updateInterval',
+                        onChanged: (value) {
+                          context.read<SettingsMapModel>().setUpdateInterval(
+                            value.floor(),
+                          );
+                        },
                       ),
-                  ],
+                      if (updateInterval > 20)
+                        Layout.row.left[8](
+                          children: [
+                            Icon(
+                              Symbols.warning_rounded,
+                              color: context.theme.extendedColors.amber,
+                              size: 16,
+                            ),
+                            Expanded(
+                              child: Text(
+                                '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
+                                style: context.texts.bodySmall?.copyWith(
+                                  color: context.theme.extendedColors.amber,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 );
               },
             ),

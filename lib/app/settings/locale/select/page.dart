@@ -13,8 +13,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsLocaleSelectPage extends StatefulWidget {
   const SettingsLocaleSelectPage({super.key});
@@ -27,7 +26,9 @@ class SettingsLocaleSelectPage extends StatefulWidget {
 
 class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
   List<CrowdinLocalizationProgress> progress = [];
-  List<Locale> localeList = I18n.supportedLocales.where((e) => !['zh'].contains(e.toLanguageTag())).toList();
+  List<Locale> localeList = I18n.supportedLocales
+      .where((e) => !['zh'].contains(e.toLanguageTag()))
+      .toList();
 
   @override
   void initState() {
@@ -42,22 +43,31 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: '選擇語言'.i18n,
+        Section(
+          label: Text('選擇語言'.i18n),
           children: [
-            for (final item in localeList)
+            for (final (index, item) in localeList.indexed)
               Selector<SettingsUserInterfaceModel, Locale?>(
                 selector: (_, model) => model.locale,
                 builder: (context, locale, child) {
-                  final p = progress.firstWhereOrNull((e) => e.id == item.toLanguageTag());
+                  final p = progress.firstWhereOrNull(
+                    (e) => e.id == item.toLanguageTag(),
+                  );
 
-                  final translated = p != null ? NumberFormat('#.#%').format(p.translation / 100) : '...';
-                  final approved = p != null ? NumberFormat('#.#%').format(p.approval / 100) : '...';
+                  final translated = p != null
+                      ? NumberFormat('#.#%').format(p.translation / 100)
+                      : '...';
+                  final approved = p != null
+                      ? NumberFormat('#.#%').format(p.approval / 100)
+                      : '...';
 
-                  final isSelected = item.toLanguageTag() == locale?.toLanguageTag();
+                  final isSelected =
+                      item.toLanguageTag() == locale?.toLanguageTag();
 
-                  return ListSectionTile(
-                    title: item.nativeName,
+                  return SectionListTile(
+                    isFirst: index == 0,
+                    isLast: index == localeList.length - 1,
+                    title: Text(item.nativeName),
                     subtitle: (item.toLanguageTag() != 'zh-Hant')
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,24 +79,24 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                 }),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
                                 child: p != null
                                     ? Stack(
                                         children: [
                                           LinearProgressIndicator(
                                             value: p.translation / 100,
                                             color: Colors.blue,
-                                            year2023: false,
                                           ),
                                           LinearProgressIndicator(
                                             value: p.approval / 100,
                                             color: Colors.lightGreen,
                                             backgroundColor: Colors.transparent,
-                                            year2023: false,
                                           ),
                                         ],
                                       )
-                                    : const LinearProgressIndicator(year2023: false),
+                                    : const LinearProgressIndicator(),
                               ),
                             ],
                           )
@@ -111,7 +121,9 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                     trailing: Icon(isSelected ? Symbols.check_rounded : null),
                     onTap: () {
                       context.locale = item;
-                      context.read<SettingsUserInterfaceModel>().setLocale(item);
+                      context.read<SettingsUserInterfaceModel>().setLocale(
+                        item,
+                      );
                       context.pop();
                     },
                   );

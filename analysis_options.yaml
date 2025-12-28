@@ -15,5 +15,5 @@ linter:
     public_member_api_docs: warning
 
 formatter:
-  page_width: 120
+  page_width: 80
   trailing_commas: preserve

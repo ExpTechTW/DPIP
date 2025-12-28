@@ -23,21 +23,30 @@ class ExtendedColors {
   late Color onBrownContainer;
 
   ExtendedColors(Brightness brightness) {
-    final blueScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent, brightness: brightness);
+    final blueScheme = ColorScheme.fromSeed(
+      seedColor: Colors.blueAccent,
+      brightness: brightness,
+    );
 
     blue = blueScheme.primary;
     onBlue = blueScheme.onPrimary;
     blueContainer = blueScheme.primaryContainer;
     onBlueContainer = blueScheme.onPrimaryContainer;
 
-    final greenScheme = ColorScheme.fromSeed(seedColor: Colors.green, brightness: brightness);
+    final greenScheme = ColorScheme.fromSeed(
+      seedColor: Colors.green,
+      brightness: brightness,
+    );
 
     green = greenScheme.primary;
     onGreen = greenScheme.onPrimary;
     greenContainer = greenScheme.primaryContainer;
     onGreenContainer = greenScheme.onPrimaryContainer;
 
-    final amberScheme = ColorScheme.fromSeed(seedColor: Colors.amber, brightness: brightness);
+    final amberScheme = ColorScheme.fromSeed(
+      seedColor: Colors.amber,
+      brightness: brightness,
+    );
 
     amber = amberScheme.primary;
     onAmber = amberScheme.onPrimary;
@@ -55,7 +64,10 @@ class ExtendedColors {
     greyContainer = greyScheme.primaryContainer;
     onGreyContainer = greyScheme.onPrimaryContainer;
 
-    final brownScheme = ColorScheme.fromSeed(seedColor: Colors.brown, brightness: brightness);
+    final brownScheme = ColorScheme.fromSeed(
+      seedColor: Colors.brown,
+      brightness: brightness,
+    );
 
     brown = brownScheme.primary;
     onBrown = brownScheme.onPrimary;

@@ -19,11 +19,17 @@ class StationInfo {
   /// 測站安裝時間
   final String time;
 
-  StationInfo({required this.code, required this.longitude, required this.latitude, required this.time});
+  StationInfo({
+    required this.code,
+    required this.longitude,
+    required this.latitude,
+    required this.time,
+  });
 
   LatLng get latlng => LatLng(latitude, longitude);
 
-  factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
+  factory StationInfo.fromJson(Map<String, dynamic> json) =>
+      _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
 }

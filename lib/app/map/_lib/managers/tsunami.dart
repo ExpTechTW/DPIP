@@ -35,7 +35,9 @@ class TsunamiMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.tsunami(currentTsunami.value);
       final layerId = MapLayerIds.tsunami(currentTsunami.value);
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (isSourceExists && isLayerExists) return;
@@ -134,7 +136,9 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
     await refreshTsunami();
     await _mapController.addSource(
       'tsunami-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+      const GeojsonSourceProperties(
+        data: {'type': 'FeatureCollection', 'features': []},
+      ),
     );
 
     if (tsunami != null) {
@@ -178,15 +182,22 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
     await _mapController.removeLayer('tsunami-actual-circles');
     await _mapController.removeLayer('tsunami-actual-labels');
     _blinkTimer?.cancel();
-    await _mapController.setLayerProperties('tsunami', const LineLayerProperties(lineOpacity: 0));
+    await _mapController.setLayerProperties(
+      'tsunami',
+      const LineLayerProperties(lineOpacity: 0),
+    );
     if (tsunami.info.type == 'estimate') {
       final Map<String, String> areaColor = {};
       for (final station in tsunami.info.data) {
         final estimateStation = station as TsunamiEstimate;
-        areaColor[estimateStation.area] = heightToColor(estimateStation.waveHeight);
+        areaColor[estimateStation.area] = heightToColor(
+          estimateStation.waveHeight,
+        );
       }
 
-      _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (
+        timer,
+      ) async {
         if (!mounted) return;
         await _mapController.setLayerProperties(
           'tsunami',
@@ -212,7 +223,9 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
             'name': actualStation.name,
             'id': actualStation.id,
             'waveHeight': actualStation.waveHeight,
-            'arrivalTime': DateFormat('MM/dd HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
+            'arrivalTime': DateFormat(
+              'MM/dd HH:mm',
+            ).format(_convertTimestamp(actualStation.arrivalTime)),
           },
           'geometry': {
             'type': 'Point',
@@ -221,7 +234,10 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
         };
       }).toList();
 
-      await _mapController.setGeoJsonSource('tsunami-data', {'type': 'FeatureCollection', 'features': features});
+      await _mapController.setGeoJsonSource('tsunami-data', {
+        'type': 'FeatureCollection',
+        'features': features,
+      });
 
       await _mapController.addLayer(
         'tsunami-data',
@@ -285,7 +301,9 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
   Future<void> _addUserLocationMarker() async {
     await _mapController.addSource(
       'markers-geojson',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+      const GeojsonSourceProperties(
+        data: {'type': 'FeatureCollection', 'features': []},
+      ),
     );
     await _mapController.addLayer(
       'markers-geojson',
@@ -437,7 +455,9 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                           width: 32,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
+                            color: context.colors.onSurfaceVariant.withValues(
+                              alpha: 0.4,
+                            ),
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
@@ -455,10 +475,13 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            tsunami == null ? '近期無海嘯資訊' : '海嘯警報',
+                                            tsunami == null
+                                                ? '近期無海嘯資訊'
+                                                : '海嘯警報',
                                             style: TextStyle(
                                               fontSize: 28,
                                               fontWeight: FontWeight.bold,
@@ -472,7 +495,8 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500,
-                                                color: context.colors.onSurface.withValues(alpha: 0.8),
+                                                color: context.colors.onSurface
+                                                    .withValues(alpha: 0.8),
                                               ),
                                             ),
                                           const SizedBox(height: 4),
@@ -480,7 +504,12 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             tsunami != null
                                                 ? '${tsunami!.time.toLocaleDateTimeString(context)} $tsunamiStatus'
                                                 : '${getTime()} 更新',
-                                            style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: context
+                                                  .colors
+                                                  .onSurfaceVariant,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -488,13 +517,19 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                     const SizedBox(width: 16),
                                     if (tsunamiOptions.isNotEmpty)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                           color: context.colors.surface,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: context.colors.onSurface.withValues(alpha: 0.1),
+                                              color: context.colors.onSurface
+                                                  .withValues(alpha: 0.1),
                                               blurRadius: 4,
                                               offset: const Offset(0, 2),
                                             ),
@@ -505,26 +540,39 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           onChanged: (String? newValue) async {
                                             if (newValue == null) return;
                                             _selectedOption = newValue;
-                                            tsunami = await ExpTech().getTsunami(newValue);
+                                            tsunami = await ExpTech()
+                                                .getTsunami(newValue);
                                             tsunamiStatus = tsunami?.status == 0
                                                 ? '發布'
                                                 : tsunami?.status == 1
                                                 ? '更新'
                                                 : '解除';
                                             if (tsunami != null) {
-                                              await addTsunamiObservationPoints(tsunami!);
+                                              await addTsunamiObservationPoints(
+                                                tsunami!,
+                                              );
                                             }
                                             setState(() {});
                                           },
-                                          items: tsunamiOptions.reversed.map<DropdownMenuItem<String>>((String value) {
-                                            return DropdownMenuItem<String>(value: value, child: Text(value));
-                                          }).toList(),
+                                          items: tsunamiOptions.reversed
+                                              .map<DropdownMenuItem<String>>((
+                                                String value,
+                                              ) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(value),
+                                                );
+                                              })
+                                              .toList(),
                                           style: TextStyle(
                                             color: context.colors.onSurface,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
                                           ),
-                                          icon: Icon(Icons.arrow_drop_down, color: context.colors.onSurface),
+                                          icon: Icon(
+                                            Icons.arrow_drop_down,
+                                            color: context.colors.onSurface,
+                                          ),
                                           underline: const SizedBox(),
                                           dropdownColor: context.colors.surface,
                                         ),
@@ -534,16 +582,21 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                 const SizedBox(height: 30),
                                 if (tsunami != null)
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         '${tsunami?.content}',
-                                        style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: context.colors.onSurface,
+                                        ),
                                       ),
                                       const SizedBox(height: 20),
                                       if (tsunami?.info.type == 'estimate')
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               '預估海嘯到達時間及波高',
@@ -554,12 +607,15 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                               ),
                                             ),
                                             const SizedBox(height: 10),
-                                            TsunamiEstimateList(tsunamiList: tsunami!.info.data),
+                                            TsunamiEstimateList(
+                                              tsunamiList: tsunami!.info.data,
+                                            ),
                                           ],
                                         )
                                       else
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               '各地觀測到的海嘯',
@@ -570,7 +626,9 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                               ),
                                             ),
                                             const SizedBox(height: 10),
-                                            TsunamiObservedList(tsunamiList: tsunami!.info.data),
+                                            TsunamiObservedList(
+                                              tsunamiList: tsunami!.info.data,
+                                            ),
                                           ],
                                         ),
                                       const SizedBox(height: 15),
@@ -584,16 +642,27 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('發生時間', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
+                                          Text(
+                                            '發生時間',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            tsunami!.eq.time.toLocaleDateTimeString(context),
+                                            tsunami!.eq.time
+                                                .toLocaleDateTimeString(
+                                                  context,
+                                                ),
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -604,31 +673,45 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('位於', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
+                                          Text(
+                                            '位於',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 tsunami!.eq.loc,
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
-                                                  color: context.colors.onSurface,
+                                                  color:
+                                                      context.colors.onSurface,
                                                 ),
                                               ),
                                               Text(
-                                                convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
+                                                convertLatLon(
+                                                  tsunami!.eq.lat,
+                                                  tsunami!.eq.lon,
+                                                ),
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
-                                                  color: context.colors.onSurface,
+                                                  color:
+                                                      context.colors.onSurface,
                                                 ),
                                               ),
                                             ],
@@ -640,18 +723,27 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                         children: [
                                           Expanded(
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
                                                   '規模',
-                                                  style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: context
+                                                        .colors
+                                                        .onSurface,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${tsunami!.eq.mag}',
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
-                                                    color: context.colors.onSurface,
+                                                    color: context
+                                                        .colors
+                                                        .onSurface,
                                                   ),
                                                 ),
                                               ],
@@ -660,18 +752,27 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           const SizedBox(width: 10),
                                           Expanded(
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
                                                   '深度',
-                                                  style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: context
+                                                        .colors
+                                                        .onSurface,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${tsunami!.eq.depth}km',
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
-                                                    color: context.colors.onSurface,
+                                                    color: context
+                                                        .colors
+                                                        .onSurface,
                                                   ),
                                                 ),
                                               ],

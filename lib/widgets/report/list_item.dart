@@ -28,7 +28,9 @@ class ReportListItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
-        splashColor: IntensityColor.intensity(report.intensity).withValues(alpha: 0.16),
+        splashColor: IntensityColor.intensity(
+          report.intensity,
+        ).withValues(alpha: 0.16),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
@@ -54,7 +56,10 @@ class ReportListItem extends StatelessWidget {
                     Text(
                       DateFormat('HH:mm:ss').format(report.time),
                       textAlign: TextAlign.right,
-                      style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
+                      style: TextStyle(
+                        color: context.colors.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -70,16 +75,25 @@ class ReportListItem extends StatelessWidget {
                         child: Container(
                           width: 2,
                           height: first ? height / 2 : height,
-                          color: context.colors.outlineVariant, // Color of the vertical line
+                          color: context
+                              .colors
+                              .outlineVariant, // Color of the vertical line
                         ),
                       )
                     else
                       Container(
                         width: 2,
                         height: first ? height / 2 : height,
-                        color: context.colors.outlineVariant, // Color of the vertical line
+                        color: context
+                            .colors
+                            .outlineVariant, // Color of the vertical line
                       ),
-                    IntensityBox(intensity: report.intensity, size: 36, borderRadius: 36, border: !report.hasNumber),
+                    IntensityBox(
+                      intensity: report.intensity,
+                      size: 36,
+                      borderRadius: 36,
+                      border: !report.hasNumber,
+                    ),
                   ],
                 ),
               ),
@@ -96,7 +110,9 @@ class ReportListItem extends StatelessWidget {
                       report.extractLocation(),
                       style: TextStyle(
                         fontSize: report.hasNumber ? 20 : 18,
-                        fontWeight: report.hasNumber ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: report.hasNumber
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                     const SizedBox(height: 2),

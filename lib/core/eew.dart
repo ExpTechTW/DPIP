@@ -7,14 +7,24 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-({double p, double s, double sT}) calcWaveRadius(double depth, int time, int now) {
+const double ln10 = 2.302585092994046; // Math.log(10)
+
+({double p, double s, double sT}) calcWaveRadius(
+  double depth,
+  int time,
+  int now,
+) {
   double pDist = 0;
   double sDist = 0;
   double sT = 0;
 
   final double t = (now - time) / 1000.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  final timeTable =
+      Global.timeTable[findClosest(
+        Global.timeTable.keys.map(int.parse).toList(),
+        depth,
+      ).toString()]!;
   ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
@@ -47,19 +57,35 @@ import 'package:maplibre_gl/maplibre_gl.dart';
     prevTable = table;
   }
 
+  if (pDist < 0) {
+    pDist = 0;
+  }
+  if (sDist < 0) {
+    sDist = 0;
+  }
+
   return (p: pDist, s: sDist, sT: sT);
 }
 
 int findClosest(List<int> arr, double target) {
-  return arr.reduce((prev, curr) => (curr - target).abs() < (prev - target).abs() ? curr : prev);
+  return arr.reduce(
+    (prev, curr) => (curr - target).abs() < (prev - target).abs() ? curr : prev,
+  );
 }
 
-Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag, Map<String, Location> region) {
+Map<String, dynamic> eewAreaPga(
+  double lat,
+  double lon,
+  double depth,
+  double mag,
+  Map<String, Location> region,
+) {
   final Map<String, dynamic> json = {};
   double eewMaxI = 0.0;
 
   region.forEach((String key, Location info) {
-    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng));
+    final double distSurface =
+        LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
     final double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
     final double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
     double i = pgaToFloat(pga);
@@ -76,14 +102,28 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
   return json;
 }
 
-double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, double depth, double magW) {
+double eewAreaPgv(
+  List<double> epicenterLocation,
+  List<double> pointLocation,
+  double depth,
+  double magW,
+) {
   final double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
-  final double epicenterDistance = epicenterLocation.asLatLng.to(pointLocation.asLatLng);
-  final double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
+  final double epicenterDistance =
+      epicenterLocation.asLatLng.to(
+        pointLocation.asLatLng,
+      ) /
+      1000;
+  final double hypocenterDistance =
+      sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   final double x = max(hypocenterDistance, 3);
   final double gpv600 = pow(
     10,
-    0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x,
+    0.58 * magW +
+        0.0038 * depth -
+        1.29 -
+        log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 -
+        0.002 * x,
   ).toDouble();
   final double pgv400 = gpv600 * 1.31;
   final double pgv = pgv400 * 1.0;
@@ -93,7 +133,11 @@ double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, do
 double sWaveTimeByDistance(double depth, double sDist) {
   double sTime = 0.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  final timeTable =
+      Global.timeTable[findClosest(
+        Global.timeTable.keys.map(int.parse).toList(),
+        depth,
+      ).toString()]!;
   ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
@@ -119,7 +163,11 @@ double sWaveTimeByDistance(double depth, double sDist) {
 double pWaveTimeByDistance(double depth, double pDist) {
   double pTime = 0.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  final timeTable =
+      Global.timeTable[findClosest(
+        Global.timeTable.keys.map(int.parse).toList(),
+        depth,
+      ).toString()]!;
   ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
@@ -151,20 +199,26 @@ int pgaToIntensity(double pga) {
 }
 
 int intensityFloatToInt(double floatValue) {
-  if (floatValue < 0) {
+  if (floatValue < 0.5) {
     return 0;
+  } else if (floatValue < 1.5) {
+    return 1;
+  } else if (floatValue < 2.5) {
+    return 2;
+  } else if (floatValue < 3.5) {
+    return 3;
   } else if (floatValue < 4.5) {
-    return floatValue.round();
-  } else if (floatValue < 5) {
-    return 5;
+    return 4;
+  } else if (floatValue < 5.0) {
+    return 5; // 5弱
   } else if (floatValue < 5.5) {
-    return 6;
-  } else if (floatValue < 6) {
-    return 7;
+    return 6; // 5強
+  } else if (floatValue < 6.0) {
+    return 7; // 6弱
   } else if (floatValue < 6.5) {
-    return 8;
+    return 8; // 6強
   } else {
-    return 9;
+    return 9; // 7
   }
 }
 
@@ -235,7 +289,7 @@ WaveTime calculateWaveTime(double depth, double distance) {
   final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
   final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
   var intensity = pgaToFloat(pga);
-  if (intensity > 4.5) {
+  if (intensity >= 4.5) {
     intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
   }
   return (dist: dist, i: intensity);

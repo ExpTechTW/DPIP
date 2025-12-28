@@ -1,14 +1,15 @@
+import 'package:flutter/material.dart';
+
+import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:flex_color_picker/flex_color_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsThemePage extends StatelessWidget {
   const SettingsThemePage({super.key});
@@ -20,14 +21,15 @@ class SettingsThemePage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        ListSection(
-          title: '主題模式'.i18n,
+        Section(
+          label: Text('主題模式'.i18n),
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return ListSectionTile(
-                  icon: Symbols.dark_mode_rounded,
-                  title: '主題模式'.i18n,
+                return SectionListTile(
+                  isFirst: true,
+                  leading: Icon(Symbols.dark_mode_rounded),
+                  title: Text('主題模式'.i18n),
                   subtitle: Text(switch (model.themeMode) {
                     ThemeMode.light => '淺色'.i18n,
                     ThemeMode.dark => '深色'.i18n,
@@ -40,27 +42,38 @@ class SettingsThemePage extends StatelessWidget {
             ),
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return ListSectionTile(
-                  icon: Symbols.palette_rounded,
-                  title: '主題色'.i18n,
-                  subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'.i18n),
-                  trailing: ColorIndicator(color: model.themeColor ?? context.colors.primary),
+                return SectionListTile(
+                  isLast: true,
+                  leading: Icon(Symbols.palette_rounded),
+                  title: Text('主題色'.i18n),
+                  subtitle: Text(
+                    model.themeColor != null
+                        ? ColorTools.nameThatColor(model.themeColor!)
+                        : '系統色彩'.i18n,
+                  ),
+                  trailing: ColorIndicator(
+                    color: model.themeColor ?? context.colors.primary,
+                  ),
                   onTap: () async {
                     final result = await showDialog<Color>(
                       context: context,
                       builder: (context) {
-                        Color pickerColor = model.themeColor ?? context.colors.primary;
+                        Color pickerColor =
+                            model.themeColor ?? context.colors.primary;
 
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return AlertDialog(
                               content: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 360),
+                                constraints: const BoxConstraints(
+                                  maxWidth: 360,
+                                ),
                                 child: ColorPicker(
                                   mainAxisSize: MainAxisSize.min,
                                   padding: EdgeInsets.zero,
                                   color: pickerColor,
-                                  onColorChanged: (color) => setState(() => pickerColor = color),
+                                  onColorChanged: (color) =>
+                                      setState(() => pickerColor = color),
                                   enableTonalPalette: true,
                                   enableShadesSelection: false,
                                   showMaterialName: true,
@@ -72,15 +85,24 @@ class SettingsThemePage extends StatelessWidget {
                                     ColorPickerType.accent: false,
                                     ColorPickerType.wheel: true,
                                   },
-                                  copyPasteBehavior: const ColorPickerCopyPasteBehavior(
-                                    copyFormat: ColorPickerCopyFormat.numHexRRGGBB,
-                                    snackBarParseError: true,
-                                    longPressMenu: true,
+                                  copyPasteBehavior:
+                                      const ColorPickerCopyPasteBehavior(
+                                        copyFormat:
+                                            ColorPickerCopyFormat.numHexRRGGBB,
+                                        snackBarParseError: true,
+                                        longPressMenu: true,
+                                      ),
+                                  actionButtons: const ColorPickerActionButtons(
+                                    dialogActionButtons: false,
                                   ),
-                                  actionButtons: const ColorPickerActionButtons(dialogActionButtons: false),
                                 ),
                               ),
-                              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(
+                                24,
+                                24,
+                                24,
+                                8,
+                              ),
                               actionsAlignment: MainAxisAlignment.spaceBetween,
                               actionsOverflowButtonSpacing: 8,
                               actions: [
@@ -98,7 +120,9 @@ class SettingsThemePage extends StatelessWidget {
                                     TextButton(
                                       child: Text('取消'.i18n),
                                       onPressed: () {
-                                        Navigator.of(context).pop(model.themeColor);
+                                        Navigator.of(
+                                          context,
+                                        ).pop(model.themeColor);
                                       },
                                     ),
                                     FilledButton(

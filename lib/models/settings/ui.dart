@@ -49,15 +49,19 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   void setUseFahrenheit(bool value) {
     Preference.useFahrenheit = value;
 
-    _log('Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}');
+    _log(
+      'Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}',
+    );
     notifyListeners();
   }
 
   SettingsUserInterfaceModel() {
     final saved = savedList
-        .map((s) => HomeDisplaySection.values
-        .cast<HomeDisplaySection?>()
-        .firstWhere((e) => e?.name == s, orElse: () => null))
+        .map(
+          (s) => HomeDisplaySection.values
+              .cast<HomeDisplaySection?>()
+              .firstWhere((e) => e?.name == s, orElse: () => null),
+        )
         .whereType<HomeDisplaySection>()
         .toSet();
     homeSections = saved;

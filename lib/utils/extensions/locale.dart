@@ -59,5 +59,6 @@ extension NativeLocale on Locale {
   /// final englishLocale = Locale('en');
   /// print(englishLocale.iconLabel); // "EN"
   /// ```
-  String get iconLabel => _iconLabels[toLanguageTag()] ?? toString().substring(0, 2);
+  String get iconLabel =>
+      _iconLabels[toLanguageTag()] ?? toString().substring(0, 2);
 }

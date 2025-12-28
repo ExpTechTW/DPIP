@@ -47,7 +47,8 @@ import 'package:dpip/widgets/shell_wrapper.dart';
 part 'router.g.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _settingsNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _settingsNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 // TypedGoRoute definitions
 
@@ -89,7 +90,8 @@ class WelcomeNoticeRoute extends GoRouteData with $WelcomeNoticeRoute {
 
 /// Welcome Permissions route - displays permissions request page.
 @TypedGoRoute<WelcomePermissionsRoute>(path: '/welcome/permissions')
-class WelcomePermissionsRoute extends GoRouteData with $WelcomePermissionsRoute {
+class WelcomePermissionsRoute extends GoRouteData
+    with $WelcomePermissionsRoute {
   /// Creates a [WelcomePermissionsRoute].
   const WelcomePermissionsRoute();
 
@@ -114,33 +116,55 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 // Settings Shell Route and Children
 @TypedShellRoute<SettingsShellRoute>(
   routes: <TypedGoRoute<GoRouteData>>[
-    TypedGoRoute<SettingsIndexRoute>(path: '/settings'),
-    TypedGoRoute<SettingsLayoutRoute>(path: '/settings/layout'),
-    TypedGoRoute<SettingsLocationRoute>(path: '/settings/location'),
-    TypedGoRoute<SettingsLocationSelectRoute>(path: '/settings/location/select'),
-    TypedGoRoute<SettingsLocationSelectCityRoute>(path: '/settings/location/select/:city'),
-    TypedGoRoute<SettingsThemeRoute>(path: '/settings/theme'),
-    TypedGoRoute<SettingsThemeSelectRoute>(path: '/settings/theme/select'),
-    TypedGoRoute<SettingsLocaleRoute>(path: '/settings/locale'),
-    TypedGoRoute<SettingsLocaleSelectRoute>(path: '/settings/locale/select'),
-    TypedGoRoute<SettingsUnitRoute>(path: '/settings/unit'),
-    TypedGoRoute<SettingsMapRoute>(path: '/settings/map'),
-    TypedGoRoute<SettingsProxyRoute>(path: '/settings/proxy'),
-    TypedGoRoute<SettingsNotifyRoute>(
-      path: '/settings/notify',
-      routes: <TypedGoRoute<GoRouteData>>[
-        TypedGoRoute<SettingsNotifyEewRoute>(path: 'eew'),
-        TypedGoRoute<SettingsNotifyMonitorRoute>(path: 'monitor'),
-        TypedGoRoute<SettingsNotifyReportRoute>(path: 'report'),
-        TypedGoRoute<SettingsNotifyIntensityRoute>(path: 'intensity'),
-        TypedGoRoute<SettingsNotifyThunderstormRoute>(path: 'thunderstorm'),
-        TypedGoRoute<SettingsNotifyAdvisoryRoute>(path: 'advisory'),
-        TypedGoRoute<SettingsNotifyEvacuationRoute>(path: 'evacuation'),
-        TypedGoRoute<SettingsNotifyTsunamiRoute>(path: 'tsunami'),
-        TypedGoRoute<SettingsNotifyAnnouncementRoute>(path: 'announcement'),
+    TypedGoRoute<SettingsIndexRoute>(
+      path: '/settings',
+      routes: [
+        TypedGoRoute<SettingsLayoutRoute>(path: 'layout'),
+        TypedGoRoute<SettingsLocationRoute>(
+          path: 'location',
+          routes: [
+            TypedGoRoute<SettingsLocationSelectRoute>(
+              path: 'select',
+              routes: [
+                TypedGoRoute<SettingsLocationSelectCityRoute>(
+                  path: ':city',
+                ),
+              ],
+            ),
+          ],
+        ),
+        TypedGoRoute<SettingsThemeRoute>(
+          path: 'theme',
+          routes: [
+            TypedGoRoute<SettingsThemeSelectRoute>(path: 'select'),
+          ],
+        ),
+        TypedGoRoute<SettingsLocaleRoute>(
+          path: 'locale',
+          routes: [
+            TypedGoRoute<SettingsLocaleSelectRoute>(path: 'select'),
+          ],
+        ),
+        TypedGoRoute<SettingsUnitRoute>(path: 'unit'),
+        TypedGoRoute<SettingsMapRoute>(path: 'map'),
+        TypedGoRoute<SettingsProxyRoute>(path: 'proxy'),
+        TypedGoRoute<SettingsNotifyRoute>(
+          path: 'notify',
+          routes: <TypedGoRoute<GoRouteData>>[
+            TypedGoRoute<SettingsNotifyEewRoute>(path: 'eew'),
+            TypedGoRoute<SettingsNotifyMonitorRoute>(path: 'monitor'),
+            TypedGoRoute<SettingsNotifyReportRoute>(path: 'report'),
+            TypedGoRoute<SettingsNotifyIntensityRoute>(path: 'intensity'),
+            TypedGoRoute<SettingsNotifyThunderstormRoute>(path: 'thunderstorm'),
+            TypedGoRoute<SettingsNotifyAdvisoryRoute>(path: 'advisory'),
+            TypedGoRoute<SettingsNotifyEvacuationRoute>(path: 'evacuation'),
+            TypedGoRoute<SettingsNotifyTsunamiRoute>(path: 'tsunami'),
+            TypedGoRoute<SettingsNotifyAnnouncementRoute>(path: 'announcement'),
+          ],
+        ),
+        TypedGoRoute<SettingsDonateRoute>(path: 'donate'),
       ],
     ),
-    TypedGoRoute<SettingsDonateRoute>(path: '/settings/donate'),
   ],
 )
 /// Settings shell route - wraps all settings pages with a common layout.
@@ -158,7 +182,9 @@ class SettingsShellRoute extends ShellRouteData {
       SettingsLayout(
         title: title,
         child: Theme(
-          data: context.theme.copyWith(pageTransitionsTheme: kFadeForwardPageTransitionsTheme),
+          data: context.theme.copyWith(
+            pageTransitionsTheme: kFadeForwardPageTransitionsTheme,
+          ),
           child: navigator,
         ),
       ),
@@ -169,7 +195,8 @@ class SettingsShellRoute extends ShellRouteData {
     return switch (path) {
       '/settings/location' => '所在地'.i18n,
       '/settings/location/select' => '新增地點'.i18n,
-      final p when p?.startsWith('/settings/location/select/') == true => '新增地點'.i18n,
+      final p when p?.startsWith('/settings/location/select/') == true =>
+        '新增地點'.i18n,
       '/settings/layout' => '佈局'.i18n,
       '/settings/theme' => '主題'.i18n,
       '/settings/theme/select' => '主題'.i18n,
@@ -217,7 +244,8 @@ class SettingsLocationRoute extends GoRouteData with $SettingsLocationRoute {
 }
 
 /// Settings location select route - displays location selection page.
-class SettingsLocationSelectRoute extends GoRouteData with $SettingsLocationSelectRoute {
+class SettingsLocationSelectRoute extends GoRouteData
+    with $SettingsLocationSelectRoute {
   /// Creates a [SettingsLocationSelectRoute].
   const SettingsLocationSelectRoute();
 
@@ -228,7 +256,8 @@ class SettingsLocationSelectRoute extends GoRouteData with $SettingsLocationSele
 }
 
 /// Settings location select city route - displays city selection page.
-class SettingsLocationSelectCityRoute extends GoRouteData with $SettingsLocationSelectCityRoute {
+class SettingsLocationSelectCityRoute extends GoRouteData
+    with $SettingsLocationSelectCityRoute {
   /// Creates a [SettingsLocationSelectCityRoute].
   const SettingsLocationSelectCityRoute({required this.city});
 
@@ -263,7 +292,8 @@ class SettingsThemeRoute extends GoRouteData with $SettingsThemeRoute {
 }
 
 /// Settings theme select route - displays theme selection page.
-class SettingsThemeSelectRoute extends GoRouteData with $SettingsThemeSelectRoute {
+class SettingsThemeSelectRoute extends GoRouteData
+    with $SettingsThemeSelectRoute {
   /// Creates a [SettingsThemeSelectRoute].
   const SettingsThemeSelectRoute();
 
@@ -285,7 +315,8 @@ class SettingsLocaleRoute extends GoRouteData with $SettingsLocaleRoute {
 }
 
 /// Settings locale select route - displays locale selection page.
-class SettingsLocaleSelectRoute extends GoRouteData with $SettingsLocaleSelectRoute {
+class SettingsLocaleSelectRoute extends GoRouteData
+    with $SettingsLocaleSelectRoute {
   /// Creates a [SettingsLocaleSelectRoute].
   const SettingsLocaleSelectRoute();
 
@@ -351,7 +382,8 @@ class SettingsNotifyEewRoute extends GoRouteData with $SettingsNotifyEewRoute {
 }
 
 /// Settings notify monitor route - displays seismic monitor notification settings.
-class SettingsNotifyMonitorRoute extends GoRouteData with $SettingsNotifyMonitorRoute {
+class SettingsNotifyMonitorRoute extends GoRouteData
+    with $SettingsNotifyMonitorRoute {
   /// Creates a [SettingsNotifyMonitorRoute].
   const SettingsNotifyMonitorRoute();
 
@@ -362,7 +394,8 @@ class SettingsNotifyMonitorRoute extends GoRouteData with $SettingsNotifyMonitor
 }
 
 /// Settings notify report route - displays earthquake report notification settings.
-class SettingsNotifyReportRoute extends GoRouteData with $SettingsNotifyReportRoute {
+class SettingsNotifyReportRoute extends GoRouteData
+    with $SettingsNotifyReportRoute {
   /// Creates a [SettingsNotifyReportRoute].
   const SettingsNotifyReportRoute();
 
@@ -373,7 +406,8 @@ class SettingsNotifyReportRoute extends GoRouteData with $SettingsNotifyReportRo
 }
 
 /// Settings notify intensity route - displays intensity notification settings.
-class SettingsNotifyIntensityRoute extends GoRouteData with $SettingsNotifyIntensityRoute {
+class SettingsNotifyIntensityRoute extends GoRouteData
+    with $SettingsNotifyIntensityRoute {
   /// Creates a [SettingsNotifyIntensityRoute].
   const SettingsNotifyIntensityRoute();
 
@@ -384,7 +418,8 @@ class SettingsNotifyIntensityRoute extends GoRouteData with $SettingsNotifyInten
 }
 
 /// Settings notify thunderstorm route - displays thunderstorm notification settings.
-class SettingsNotifyThunderstormRoute extends GoRouteData with $SettingsNotifyThunderstormRoute {
+class SettingsNotifyThunderstormRoute extends GoRouteData
+    with $SettingsNotifyThunderstormRoute {
   /// Creates a [SettingsNotifyThunderstormRoute].
   const SettingsNotifyThunderstormRoute();
 
@@ -395,7 +430,8 @@ class SettingsNotifyThunderstormRoute extends GoRouteData with $SettingsNotifyTh
 }
 
 /// Settings notify advisory route - displays weather advisory notification settings.
-class SettingsNotifyAdvisoryRoute extends GoRouteData with $SettingsNotifyAdvisoryRoute {
+class SettingsNotifyAdvisoryRoute extends GoRouteData
+    with $SettingsNotifyAdvisoryRoute {
   /// Creates a [SettingsNotifyAdvisoryRoute].
   const SettingsNotifyAdvisoryRoute();
 
@@ -406,7 +442,8 @@ class SettingsNotifyAdvisoryRoute extends GoRouteData with $SettingsNotifyAdviso
 }
 
 /// Settings notify evacuation route - displays evacuation notification settings.
-class SettingsNotifyEvacuationRoute extends GoRouteData with $SettingsNotifyEvacuationRoute {
+class SettingsNotifyEvacuationRoute extends GoRouteData
+    with $SettingsNotifyEvacuationRoute {
   /// Creates a [SettingsNotifyEvacuationRoute].
   const SettingsNotifyEvacuationRoute();
 
@@ -417,7 +454,8 @@ class SettingsNotifyEvacuationRoute extends GoRouteData with $SettingsNotifyEvac
 }
 
 /// Settings notify tsunami route - displays tsunami notification settings.
-class SettingsNotifyTsunamiRoute extends GoRouteData with $SettingsNotifyTsunamiRoute {
+class SettingsNotifyTsunamiRoute extends GoRouteData
+    with $SettingsNotifyTsunamiRoute {
   /// Creates a [SettingsNotifyTsunamiRoute].
   const SettingsNotifyTsunamiRoute();
 
@@ -428,7 +466,8 @@ class SettingsNotifyTsunamiRoute extends GoRouteData with $SettingsNotifyTsunami
 }
 
 /// Settings notify announcement route - displays announcement notification settings.
-class SettingsNotifyAnnouncementRoute extends GoRouteData with $SettingsNotifyAnnouncementRoute {
+class SettingsNotifyAnnouncementRoute extends GoRouteData
+    with $SettingsNotifyAnnouncementRoute {
   /// Creates a [SettingsNotifyAnnouncementRoute].
   const SettingsNotifyAnnouncementRoute();
 
@@ -526,7 +565,9 @@ final router = GoRouter(
   redirect: (context, state) {
     // Handle initial location logic
     if (state.matchedLocation == '/' || state.matchedLocation.isEmpty) {
-      return Preference.isFirstLaunch ? const WelcomeRoute().location : const HomeRoute().location;
+      return Preference.isFirstLaunch
+          ? const WelcomeRoute().location
+          : const HomeRoute().location;
     }
     return null;
   },

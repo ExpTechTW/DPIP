@@ -48,7 +48,9 @@ class SheetContainer extends StatelessWidget {
                     if (description != null)
                       Text(
                         description!,
-                        style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                        style: context.texts.bodyMedium?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
                       ),
                   ],
                 ),

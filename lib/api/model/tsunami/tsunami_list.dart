@@ -7,6 +7,7 @@ class TsunamiList {
   final String id;
 
   TsunamiList({required this.id});
-  factory TsunamiList.fromJson(Map<String, dynamic> json) => _$TsunamiListFromJson(json);
+  factory TsunamiList.fromJson(Map<String, dynamic> json) =>
+      _$TsunamiListFromJson(json);
   Map<String, dynamic> toJson() => _$TsunamiListToJson(this);
 }

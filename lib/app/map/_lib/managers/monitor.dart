@@ -15,8 +15,10 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
+import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/map/intensity_legend.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +60,8 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   bool _isUpdatingEew = false;
   bool _hasActiveEew = false;
+  String? _lastEewId;
+  int? _lastEewSerial;
 
   late final String _rtsSourceId = MapSourceIds.rts();
   late final String _rtsLayerId = MapLayerIds.rts();
@@ -83,7 +87,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   bool _dataStatus() {
-    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 12000;
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) <
+        12000;
   }
 
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
@@ -137,7 +142,8 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       try {
         // Cache blink conditions at the start of each blink cycle to ensure consistency
-        final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+        final hasBoxData =
+            (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
         final hasBoxFlag = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
         final shouldBlinkBoxes = hasBoxData && hasBoxFlag;
 
@@ -156,13 +162,20 @@ class MonitorMapLayerManager extends MapLayerManager {
         // Epicenter blinking - independent of boxes
         if (shouldBlinkEpicenter) {
           _isEpicenterVisible = !_isEpicenterVisible;
-          await controller.setLayerVisibility(_epicenterLayerId, _isEpicenterVisible);
+          await controller.setLayerVisibility(
+            _epicenterLayerId,
+            _isEpicenterVisible,
+          );
         } else {
           _isEpicenterVisible = false;
           await controller.setLayerVisibility(_epicenterLayerId, false);
         }
       } catch (e, s) {
-        TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
+        TalkerManager.instance.error(
+          'MonitorMapLayerManager._blinkTimer',
+          e,
+          s,
+        );
       }
     });
   }
@@ -172,15 +185,22 @@ class MonitorMapLayerManager extends MapLayerManager {
   /// RTS data hasn't changed. Returns empty list if no detection areas exist.
   List<LatLng> _getFocusBounds() {
     final rts = GlobalProviders.data.rts;
-    if (_cachedBounds != null && _lastRtsTime == rts?.time) return _cachedBounds!;
+    if (_cachedBounds != null && _lastRtsTime == rts?.time)
+      return _cachedBounds!;
 
     final coords = (rts?.box.isEmpty ?? true)
         ? <LatLng>[]
         : [
             for (final area in Global.boxGeojson.features)
-              if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
-                for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
-                  LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()),
+              if (area?.properties?['ID'] case final id
+                  when rts!.box.containsKey(id.toString()))
+                for (final coord
+                    in (area!.geometry! as GeoJSONPolygon).coordinates[0]
+                        as List)
+                  LatLng(
+                    (coord[1] as num).toDouble(),
+                    (coord[0] as num).toDouble(),
+                  ),
           ];
 
     _cachedBounds = coords;
@@ -203,10 +223,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs(),
     );
 
-    const minBoundSize = 0.0001; // ~11 meters - safety check for division by zero
+    const minBoundSize =
+        0.0001; // ~11 meters - safety check for division by zero
     if (lastLatDiff < minBoundSize || lastLngDiff < minBoundSize) return true;
 
-    return (latDiff - lastLatDiff).abs() / lastLatDiff > 0.1 || (lngDiff - lastLngDiff).abs() / lastLngDiff > 0.1;
+    return (latDiff - lastLatDiff).abs() / lastLatDiff > 0.1 ||
+        (lngDiff - lastLngDiff).abs() / lastLngDiff > 0.1;
   }
 
   /// Calculates the bounding box from coordinates and animates the map camera
@@ -236,7 +258,10 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
     }
 
-    final bounds = LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng));
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
     if (!_shouldZoomToBounds(bounds)) return;
 
     await controller.animateCamera(
@@ -252,7 +277,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     _lastZoomBounds = bounds;
   }
 
-  Future<void> _focusReset() => controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+  Future<void> _focusReset() => controller.animateCamera(
+    CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+  );
 
   /// Automatically adjusts the map camera to fit all detection areas (boxes)
   /// when RTS data contains detection zones. Runs every 2 seconds when enabled.
@@ -298,7 +325,10 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     try {
       // Single batch query for sources and layers
-      final results = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
+      final results = await Future.wait([
+        controller.getSourceIds(),
+        controller.getLayerIds(),
+      ]);
       final sources = results[0];
       final layers = results[1];
 
@@ -320,7 +350,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       // Check layer existence
       final isRtsLayerExists = existingLayers.contains(rtsLayerId);
-      final isIntensity0LayerExists = existingLayers.contains(intensity0LayerId);
+      final isIntensity0LayerExists = existingLayers.contains(
+        intensity0LayerId,
+      );
       final isIntensityLayerExists = existingLayers.contains(intensityLayerId);
       final isBoxLayerExists = existingLayers.contains(boxLayerId);
       final isEewLayerExists =
@@ -336,27 +368,46 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (!existingSources.contains(rtsSourceId)) {
         sourceAdditions.add(
-          controller.addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson())),
+          controller.addSource(
+            rtsSourceId,
+            GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson()),
+          ),
         );
       }
 
       if (!existingSources.contains(intensity0SourceId)) {
-        sourceAdditions.add(controller.addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData)));
+        sourceAdditions.add(
+          controller.addSource(
+            intensity0SourceId,
+            GeojsonSourceProperties(data: intensityData),
+          ),
+        );
       }
 
       if (!existingSources.contains(intensitySourceId)) {
-        sourceAdditions.add(controller.addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData)));
+        sourceAdditions.add(
+          controller.addSource(
+            intensitySourceId,
+            GeojsonSourceProperties(data: intensityData),
+          ),
+        );
       }
 
       if (!existingSources.contains(boxSourceId)) {
         sourceAdditions.add(
-          controller.addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson())),
+          controller.addSource(
+            boxSourceId,
+            GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson()),
+          ),
         );
       }
 
       if (!existingSources.contains(eewSourceId)) {
         sourceAdditions.add(
-          controller.addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson())),
+          controller.addSource(
+            eewSourceId,
+            GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson()),
+          ),
         );
       }
 
@@ -505,7 +556,12 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
 
         final layerAdditions = <Future<void>>[
-          controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation),
+          controller.addLayer(
+            rtsSourceId,
+            rtsLayerId,
+            properties,
+            belowLayerId: BaseMapLayerIds.userLocation,
+          ),
           controller.addLayer(
             rtsSourceId,
             '$rtsLayerId-label-id',
@@ -655,7 +711,12 @@ class MonitorMapLayerManager extends MapLayerManager {
           lineSortKey: [Expressions.get, 'i'],
         );
 
-        await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          boxSourceId,
+          boxLayerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
       }
 
       if (!isEewLayerExists) {
@@ -764,11 +825,14 @@ class MonitorMapLayerManager extends MapLayerManager {
     _lastDisplayedSecond = currentSecond;
 
     final lastDataReceivedTime = _lastDataReceivedTime;
-    final isStale = lastDataReceivedTime != null && (currentTime - lastDataReceivedTime) > 3000;
+    final isStale =
+        lastDataReceivedTime != null &&
+        (currentTime - lastDataReceivedTime) > 3000;
 
     if (lastDataReceivedTime != null) {
       if (isStale) {
-        displayTimeNotifier.value = '${lastDataReceivedTime.toFullSimpleDateTimeString()}|STALE';
+        displayTimeNotifier.value =
+            '${lastDataReceivedTime.toFullSimpleDateTimeString()}|STALE';
       } else {
         displayTimeNotifier.value = currentTime.toFullSimpleDateTimeString();
       }
@@ -806,32 +870,66 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final existingSources = (await controller.getSourceIds()).toSet();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-      final hasRtsData = (_cachedRtsGeoJson?['features'] as List?)?.isNotEmpty ?? false;
-      final hasIntensityData = (_cachedIntensityGeoJson?['features'] as List?)?.isNotEmpty ?? false;
-      final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasRtsData =
+          (_cachedRtsGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasIntensityData =
+          (_cachedIntensityGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasBoxData =
+          (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
 
       await Future.wait([
         if (hasRtsData && existingSources.contains(_rtsSourceId))
           controller.setGeoJsonSource(_rtsSourceId, _cachedRtsGeoJson!),
         if (hasIntensityData && existingSources.contains(_intensitySourceId))
-          controller.setGeoJsonSource(_intensitySourceId, _cachedIntensityGeoJson!),
+          controller.setGeoJsonSource(
+            _intensitySourceId,
+            _cachedIntensityGeoJson!,
+          ),
         if (hasIntensityData && existingSources.contains(_intensity0SourceId))
-          controller.setGeoJsonSource(_intensity0SourceId, _cachedIntensityGeoJson!),
+          controller.setGeoJsonSource(
+            _intensity0SourceId,
+            _cachedIntensityGeoJson!,
+          ),
         if (hasBoxData && existingSources.contains(_boxSourceId))
           controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
 
         controller.setLayerVisibility(_rtsLayerId, hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label-id', hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label-loc', hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label-detail-i', hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label-detail-pga', hasRtsData && !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label-detail-pgv', hasRtsData && !hasBox),
-        controller.setLayerVisibility(_intensityLayerId, hasIntensityData && hasBox),
-        controller.setLayerVisibility(_intensity0LayerId, hasIntensityData && hasBox),
+        controller.setLayerVisibility(
+          '$_rtsLayerId-label-id',
+          hasRtsData && !hasBox,
+        ),
+        controller.setLayerVisibility(
+          '$_rtsLayerId-label-loc',
+          hasRtsData && !hasBox,
+        ),
+        controller.setLayerVisibility(
+          '$_rtsLayerId-label-detail-i',
+          hasRtsData && !hasBox,
+        ),
+        controller.setLayerVisibility(
+          '$_rtsLayerId-label-detail-pga',
+          hasRtsData && !hasBox,
+        ),
+        controller.setLayerVisibility(
+          '$_rtsLayerId-label-detail-pgv',
+          hasRtsData && !hasBox,
+        ),
+        controller.setLayerVisibility(
+          _intensityLayerId,
+          hasIntensityData && hasBox,
+        ),
+        controller.setLayerVisibility(
+          _intensity0LayerId,
+          hasIntensityData && hasBox,
+        ),
         controller.setLayerVisibility(_boxLayerId, hasBoxData && hasBox),
       ]);
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsFromCache', e, s);
+      TalkerManager.instance.error(
+        'MonitorMapLayerManager._updateRtsFromCache',
+        e,
+        s,
+      );
     }
   }
 
@@ -842,10 +940,76 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
 
     try {
+      // Always update wave circles (they change every tick)
       final data = GlobalProviders.data.getEewGeoJson();
       await controller.setGeoJsonSource(_eewSourceId, data);
+
+      // Only update town intensity colors when EEW info changes
+      final activeEew = GlobalProviders.data.activeEew;
+      if (activeEew.isNotEmpty) {
+        final eew = activeEew.first;
+        final needsIntensityUpdate =
+            _lastEewId != eew.id || _lastEewSerial != eew.serial;
+
+        if (needsIntensityUpdate) {
+          _lastEewId = eew.id;
+          _lastEewSerial = eew.serial;
+
+          final intensityData = eewAreaPga(
+            eew.info.latitude,
+            eew.info.longitude,
+            eew.info.depth,
+            eew.info.magnitude,
+            Global.location,
+          );
+
+          final colorEntries = <dynamic>[];
+
+          intensityData.forEach((key, value) {
+            if (key == 'max_i') return;
+            final code = int.tryParse(key);
+            if (code == null) return;
+            final intensity =
+                intensityFloatToInt((value as Map)['i'] as double);
+            if (intensity > 0) {
+              colorEntries.add(code);
+              colorEntries.add(
+                IntensityColor.intensity(intensity).toHexStringRGB(),
+              );
+            }
+          });
+
+          // Only apply if we have color entries
+          if (colorEntries.isNotEmpty) {
+            final fillColorExpression = <dynamic>[
+              'match',
+              ['get', 'CODE'],
+              ...colorEntries,
+              context.colors.surfaceContainerHigh.toHexStringRGB(),
+            ];
+
+            // Hide county fill to show town colors
+            await controller.setLayerProperties(
+              BaseMapLayerIds.exptechCountyFill,
+              const FillLayerProperties(fillOpacity: 0),
+            );
+
+            await controller.setLayerProperties(
+              BaseMapLayerIds.exptechTownFill,
+              FillLayerProperties(
+                fillColor: fillColorExpression,
+                fillOpacity: 1,
+              ),
+            );
+          }
+        }
+      }
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateEewFromCache', e, s);
+      TalkerManager.instance.error(
+        'MonitorMapLayerManager._updateEewFromCache',
+        e,
+        s,
+      );
     } finally {
       _isUpdatingEew = false;
     }
@@ -855,6 +1019,28 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final emptyData = {'type': 'FeatureCollection', 'features': []};
       await controller.setGeoJsonSource(_eewSourceId, emptyData);
+
+      // Reset EEW tracking
+      _lastEewId = null;
+      _lastEewSerial = null;
+
+      // Restore county fill
+      await controller.setLayerProperties(
+        BaseMapLayerIds.exptechCountyFill,
+        FillLayerProperties(
+          fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
+
+      // Reset town fill colors to default
+      await controller.setLayerProperties(
+        BaseMapLayerIds.exptechTownFill,
+        FillLayerProperties(
+          fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._clearEew', e, s);
     } finally {
@@ -1031,19 +1217,27 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   }
 
   void _updateCountdown() {
-    final remainingSeconds = ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
+    final remainingSeconds =
+        ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
   }
 
   // Build common alert badge with count indicator
-  Widget _buildAlertBadge(int eewCount, {double iconSize = 16, bool showLabel = false}) {
+  Widget _buildAlertBadge(
+    int eewCount, {
+    double iconSize = 16,
+    bool showLabel = false,
+  }) {
     final colors = context.colors;
     final theme = context.texts;
 
     return Container(
-      decoration: BoxDecoration(color: colors.error, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: colors.error,
+        borderRadius: BorderRadius.circular(8),
+      ),
       padding: eewCount > 1 || showLabel
           ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
           : const EdgeInsets.fromLTRB(8, 6, 8, 6),
@@ -1051,11 +1245,19 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
         mainAxisSize: MainAxisSize.min,
         spacing: 4,
         children: [
-          Icon(Symbols.crisis_alert_rounded, color: colors.onError, weight: 700, size: iconSize),
+          Icon(
+            Symbols.crisis_alert_rounded,
+            color: colors.onError,
+            weight: 700,
+            size: iconSize,
+          ),
           if (showLabel)
             Text(
               'EEW'.i18n,
-              style: theme.labelLarge!.copyWith(color: colors.onError, fontWeight: FontWeight.bold),
+              style: theme.labelLarge!.copyWith(
+                color: colors.onError,
+                fontWeight: FontWeight.bold,
+              ),
             )
           else if (eewCount > 1)
             RichText(
@@ -1063,7 +1265,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 children: [
                   TextSpan(
                     text: '1',
-                    style: theme.labelMedium!.copyWith(color: colors.onError, fontWeight: FontWeight.bold),
+                    style: theme.labelMedium!.copyWith(
+                      color: colors.onError,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: '/$eewCount',
@@ -1099,11 +1304,18 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   _buildAlertBadge(eewCount),
                   Text(
                     '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
-                    style: theme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer),
+                    style: theme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colors.onErrorContainer,
+                    ),
                   ),
                 ],
               ),
-              Icon(Symbols.expand_less_rounded, color: colors.onErrorContainer, size: 24),
+              Icon(
+                Symbols.expand_less_rounded,
+                color: colors.onErrorContainer,
+                size: 24,
+              ),
             ],
           ),
           Padding(
@@ -1113,15 +1325,29 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       StyledText(
-                        text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
-                          'magnitude': data.info.magnitude.toStringAsFixed(1),
-                          'intensity': localIntensity.asIntensityLabel,
-                        }),
-                        style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                        tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                        text:
+                            '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'
+                                .i18n
+                                .args({
+                                  'magnitude': data.info.magnitude
+                                      .toStringAsFixed(1),
+                                  'intensity': localIntensity.asIntensityLabel,
+                                }),
+                        style: theme.bodyMedium!.copyWith(
+                          color: colors.onErrorContainer,
+                        ),
+                        tags: {
+                          'bold': StyledTextTag(
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        },
                       ),
                       Text(
-                        countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                        countdown > 0
+                            ? '{countdown}秒後抵達'.i18n.args({
+                                'countdown': countdown,
+                              })
+                            : '已抵達'.i18n,
                         style: theme.bodyMedium!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colors.onErrorContainer,
@@ -1132,12 +1358,23 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     ],
                   )
                 : StyledText(
-                    text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
-                      'magnitude': data.info.magnitude.toStringAsFixed(1),
-                      'depth': data.info.depth.toStringAsFixed(1),
-                    }),
-                    style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
-                    tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                    text:
+                        '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'
+                            .i18n
+                            .args({
+                              'magnitude': data.info.magnitude.toStringAsFixed(
+                                1,
+                              ),
+                              'depth': data.info.depth.toStringAsFixed(1),
+                            }),
+                    style: theme.bodyMedium!.copyWith(
+                      color: colors.onErrorContainer,
+                    ),
+                    tags: {
+                      'bold': StyledTextTag(
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    },
                   ),
           ),
         ],
@@ -1156,11 +1393,17 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   _buildAlertBadge(eewCount, iconSize: 22, showLabel: true),
                   Text(
                     '第 {serial} 報'.i18n.args({'serial': data.serial}),
-                    style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
+                    style: theme.bodyLarge!.copyWith(
+                      color: colors.onErrorContainer,
+                    ),
                   ),
                 ],
               ),
-              Icon(Symbols.expand_more_rounded, color: colors.onErrorContainer, size: 24),
+              Icon(
+                Symbols.expand_more_rounded,
+                color: colors.onErrorContainer,
+                size: 24,
+              ),
             ],
           ),
           Padding(
@@ -1184,7 +1427,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           'depth': data.info.depth.toStringAsFixed(1),
                         }),
               style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
-              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+              tags: {
+                'bold': StyledTextTag(
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              },
             ),
           ),
           if (hasLocation) _buildLocationDetails(),
@@ -1218,7 +1465,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       children: [
                         Text(
                           '所在地預估'.i18n,
-                          style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6)),
+                          style: theme.labelLarge!.copyWith(
+                            color: colors.onErrorContainer.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -1237,7 +1488,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     ),
                   ),
                 ),
-                VerticalDivider(color: colors.onErrorContainer.withValues(alpha: 0.4), width: 24),
+                VerticalDivider(
+                  color: colors.onErrorContainer.withValues(alpha: 0.4),
+                  width: 24,
+                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -1247,7 +1501,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       children: [
                         Text(
                           '震波'.i18n,
-                          style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6)),
+                          style: theme.labelLarge!.copyWith(
+                            color: colors.onErrorContainer.withValues(
+                              alpha: 0.6,
+                            ),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -1257,18 +1515,25 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                     children: [
                                       TextSpan(
                                         text: countdown.toString(),
-                                        style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15),
+                                        style: TextStyle(
+                                          fontSize:
+                                              theme.displayMedium!.fontSize! *
+                                              1.15,
+                                        ),
                                       ),
                                       TextSpan(
                                         text: ' 秒'.i18n,
-                                        style: TextStyle(fontSize: theme.labelLarge!.fontSize),
+                                        style: TextStyle(
+                                          fontSize: theme.labelLarge!.fontSize,
+                                        ),
                                       ),
                                     ],
                                     style: theme.displayMedium!.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: colors.onErrorContainer,
                                       height: 1,
-                                      leadingDistribution: TextLeadingDistribution.even,
+                                      leadingDistribution:
+                                          TextLeadingDistribution.even,
                                     ),
                                   ),
                                   textAlign: TextAlign.center,
@@ -1276,11 +1541,13 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                               : Text(
                                   '抵達'.i18n,
                                   style: theme.displayMedium!.copyWith(
-                                    fontSize: theme.displayMedium!.fontSize! * 0.81,
+                                    fontSize:
+                                        theme.displayMedium!.fontSize! * 0.81,
                                     fontWeight: FontWeight.bold,
                                     color: colors.onErrorContainer,
                                     height: 1,
-                                    leadingDistribution: TextLeadingDistribution.even,
+                                    leadingDistribution:
+                                        TextLeadingDistribution.even,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -1312,14 +1579,20 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 elevation: 4,
                 borderWidth: activeEew.isNotEmpty ? 2 : null,
                 borderColor: activeEew.isNotEmpty ? context.colors.error : null,
-                backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
+                backgroundColor: activeEew.isNotEmpty
+                    ? context.colors.errorContainer
+                    : null,
                 partialBuilder: (context, controller, sheetController) {
                   if (activeEew.isEmpty) {
-                    return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
+                    return Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text('目前沒有生效中的地震速報'.i18n),
+                    );
                   }
 
                   final data = activeEew.first;
-                  final hasLocation = GlobalProviders.location.coordinates != null;
+                  final hasLocation =
+                      GlobalProviders.location.coordinates != null;
 
                   // Calculate location-specific info if available
                   if (hasLocation) {
@@ -1333,22 +1606,49 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     );
 
                     localIntensity = intensityFloatToInt(info.i);
-                    localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
+                    localArrivalTime =
+                        (data.info.time +
+                                sWaveTimeByDistance(data.info.depth, info.dist))
+                            .floor();
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) => _updateCountdown());
-                    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) => _updateCountdown(),
+                    );
+                    _timer ??= Timer.periodic(
+                      const Duration(seconds: 1),
+                      (_) => _updateCountdown(),
+                    );
                   }
 
                   return InkWell(
                     onTap: _toggleCollapse,
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: _buildEewContent(data, activeEew.length, hasLocation),
+                      child: _buildEewContent(
+                        data,
+                        activeEew.length,
+                        hasLocation,
+                      ),
                     ),
                   );
                 },
               ),
             ),
+            // Intensity legend - positioned at top right, just below buttons
+            // Show RTS mode when no EEW, show EEW mode during EEW
+            // Hide when sheet is expanded
+            if (_isCollapsed)
+              Positioned(
+                top: 80,
+                right: 16,
+                child: SafeArea(
+                  child: IntensityLegend(
+                    mode: activeEew.isNotEmpty
+                        ? IntensityLegendMode.eew
+                        : IntensityLegendMode.rts,
+                  ),
+                ),
+              ),
             Positioned(
               top: 26,
               left: 95,
@@ -1360,13 +1660,17 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     valueListenable: widget.manager.displayTimeNotifier,
                     builder: (context, displayTime, child) {
                       final isStale = displayTime.endsWith('|STALE');
-                      final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
+                      final timeText = isStale
+                          ? displayTime.replaceAll('|STALE', '')
+                          : displayTime;
 
                       return ValueListenableBuilder<double>(
                         valueListenable: widget.manager.pingNotifier,
                         builder: (context, ping, child) {
                           final isDataOk = widget.manager.dataStatus;
-                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(0)}ms';
+                          final pingText = (!isDataOk)
+                              ? 'N/A'
+                              : '${ping.toStringAsFixed(0)}ms';
                           final pingColor = (!isDataOk)
                               ? Colors.red
                               : (ping > 5000)
@@ -1378,7 +1682,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           return Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: context.colors.surface.withValues(alpha: 0.5),
+                              color: context.colors.surface.withValues(
+                                alpha: 0.5,
+                              ),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Row(
@@ -1389,7 +1695,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   timeText,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: widget.manager.isReplayMode ? Colors.orange : (isStale ? Colors.red : context.colors.onSurface),
+                                    color: widget.manager.isReplayMode
+                                        ? Colors.orange
+                                        : (isStale
+                                              ? Colors.red
+                                              : context.colors.onSurface),
                                     fontSize: 16,
                                   ),
                                 ),
@@ -1399,7 +1709,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   child: Text(
                                     pingText,
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: pingColor),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: pingColor,
+                                    ),
                                   ),
                                 ),
                               ],

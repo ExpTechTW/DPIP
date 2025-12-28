@@ -36,7 +36,8 @@ class _EewCardState extends State<EewCard> {
   void _updateCountdown() {
     if (localArrivalTime == null) return;
 
-    final remainingSeconds = ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000).floor();
+    final remainingSeconds =
+        ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000).floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
@@ -57,11 +58,17 @@ class _EewCardState extends State<EewCard> {
       );
 
       localIntensity = intensityFloatToInt(info.i);
-      localArrivalTime = (widget.data.info.time + sWaveTimeByDistance(widget.data.info.depth, info.dist)).floor();
+      localArrivalTime =
+          (widget.data.info.time +
+                  sWaveTimeByDistance(widget.data.info.depth, info.dist))
+              .floor();
     }
 
     _updateCountdown();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateCountdown(),
+    );
   }
 
   @override
@@ -99,7 +106,12 @@ class _EewCardState extends State<EewCard> {
                               mainAxisSize: MainAxisSize.min,
                               spacing: 4,
                               children: [
-                                Icon(Symbols.crisis_alert_rounded, color: context.colors.onError, weight: 700, size: 22),
+                                Icon(
+                                  Symbols.crisis_alert_rounded,
+                                  color: context.colors.onError,
+                                  weight: 700,
+                                  size: 22,
+                                ),
                                 Text(
                                   'EEW'.i18n,
                                   style: context.texts.labelLarge!.copyWith(
@@ -111,12 +123,20 @@ class _EewCardState extends State<EewCard> {
                             ),
                           ),
                           Text(
-                            '第 {serial} 報'.i18n.args({'serial': widget.data.serial}),
-                            style: context.texts.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                            '第 {serial} 報'.i18n.args({
+                              'serial': widget.data.serial,
+                            }),
+                            style: context.texts.bodyLarge!.copyWith(
+                              color: context.colors.onErrorContainer,
+                            ),
                           ),
                         ],
                       ),
-                      Icon(Symbols.chevron_right_rounded, color: context.colors.onErrorContainer, size: 24),
+                      Icon(
+                        Symbols.chevron_right_rounded,
+                        color: context.colors.onErrorContainer,
+                        size: 24,
+                      ),
                     ],
                   ),
                   Padding(
@@ -124,23 +144,34 @@ class _EewCardState extends State<EewCard> {
                     child: StyledText(
                       text: localIntensity != null
                           ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                          .i18n
-                          .args({
-                        'time': widget.data.info.time.toSimpleDateTimeString(),
-                        'location': widget.data.info.location,
-                        'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
-                        'intensity': localIntensity!.asIntensityLabel,
-                      })
+                                .i18n
+                                .args({
+                                  'time': widget.data.info.time
+                                      .toSimpleDateTimeString(),
+                                  'location': widget.data.info.location,
+                                  'magnitude': widget.data.info.magnitude
+                                      .toStringAsFixed(1),
+                                  'intensity': localIntensity!.asIntensityLabel,
+                                })
                           : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
-                          .i18n
-                          .args({
-                        'time': widget.data.info.time.toSimpleDateTimeString(),
-                        'location': widget.data.info.location,
-                        'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
-                        'depth': widget.data.info.depth.toStringAsFixed(1),
-                      }),
-                      style: context.texts.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                      tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                                .i18n
+                                .args({
+                                  'time': widget.data.info.time
+                                      .toSimpleDateTimeString(),
+                                  'location': widget.data.info.location,
+                                  'magnitude': widget.data.info.magnitude
+                                      .toStringAsFixed(1),
+                                  'depth': widget.data.info.depth
+                                      .toStringAsFixed(1),
+                                }),
+                      style: context.texts.bodyLarge!.copyWith(
+                        color: context.colors.onErrorContainer,
+                      ),
+                      tags: {
+                        'bold': StyledTextTag(
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      },
                     ),
                   ),
                   Selector<SettingsLocationModel, String?>(
@@ -162,24 +193,37 @@ class _EewCardState extends State<EewCard> {
                                   padding: const EdgeInsets.all(4),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
                                         '所在地預估'.i18n,
-                                        style: context.texts.labelLarge!.copyWith(
-                                          color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                        ),
+                                        style: context.texts.labelLarge!
+                                            .copyWith(
+                                              color: context
+                                                  .colors
+                                                  .onErrorContainer
+                                                  .withValues(alpha: 0.6),
+                                            ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                        padding: const EdgeInsets.only(
+                                          top: 12,
+                                          bottom: 8,
+                                        ),
                                         child: Text(
                                           localIntensity!.asIntensityLabel,
-                                          style: context.texts.displayMedium!.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: context.colors.onErrorContainer,
-                                            height: 1,
-                                            leadingDistribution: TextLeadingDistribution.even,
-                                          ),
+                                          style: context.texts.displayMedium!
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: context
+                                                    .colors
+                                                    .onErrorContainer,
+                                                height: 1,
+                                                leadingDistribution:
+                                                    TextLeadingDistribution
+                                                        .even,
+                                              ),
                                           textAlign: TextAlign.center,
                                         ),
                                       ),
@@ -187,57 +231,101 @@ class _EewCardState extends State<EewCard> {
                                   ),
                                 ),
                               ),
-                              VerticalDivider(color: context.colors.onErrorContainer.withValues(alpha: 0.4), width: 24),
+                              VerticalDivider(
+                                color: context.colors.onErrorContainer
+                                    .withValues(alpha: 0.4),
+                                width: 24,
+                              ),
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(4),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
                                         '震波'.i18n,
-                                        style: context.texts.labelLarge!.copyWith(
-                                          color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                        ),
+                                        style: context.texts.labelLarge!
+                                            .copyWith(
+                                              color: context
+                                                  .colors
+                                                  .onErrorContainer
+                                                  .withValues(alpha: 0.6),
+                                            ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                        padding: const EdgeInsets.only(
+                                          top: 12,
+                                          bottom: 8,
+                                        ),
                                         child: (countdown > 0)
                                             ? RichText(
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: countdown.toString(),
-                                                style: TextStyle(
-                                                  fontSize: context.texts.displayMedium!.fontSize! * 1.15,
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: countdown
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            context
+                                                                .texts
+                                                                .displayMedium!
+                                                                .fontSize! *
+                                                            1.15,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: ' 秒'.i18n,
+                                                      style: TextStyle(
+                                                        fontSize: context
+                                                            .texts
+                                                            .labelLarge!
+                                                            .fontSize,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  style: context
+                                                      .texts
+                                                      .displayMedium!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: context
+                                                            .colors
+                                                            .onErrorContainer,
+                                                        height: 1,
+                                                        leadingDistribution:
+                                                            TextLeadingDistribution
+                                                                .even,
+                                                      ),
                                                 ),
-                                              ),
-                                              TextSpan(
-                                                text: ' 秒'.i18n,
-                                                style: TextStyle(fontSize: context.texts.labelLarge!.fontSize),
-                                              ),
-                                            ],
-                                            style: context.texts.displayMedium!.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: context.colors.onErrorContainer,
-                                              height: 1,
-                                              leadingDistribution: TextLeadingDistribution.even,
-                                            ),
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        )
+                                                textAlign: TextAlign.center,
+                                              )
                                             : Text(
-                                          '抵達'.i18n,
-                                          style: context.texts.displayMedium!.copyWith(
-                                            fontSize: context.texts.displayMedium!.fontSize! * 0.92,
-                                            fontWeight: FontWeight.bold,
-                                            color: context.colors.onErrorContainer,
-                                            height: 1,
-                                            leadingDistribution: TextLeadingDistribution.even,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
+                                                '抵達'.i18n,
+                                                style: context
+                                                    .texts
+                                                    .displayMedium!
+                                                    .copyWith(
+                                                      fontSize:
+                                                          context
+                                                              .texts
+                                                              .displayMedium!
+                                                              .fontSize! *
+                                                          0.92,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: context
+                                                          .colors
+                                                          .onErrorContainer,
+                                                      height: 1,
+                                                      leadingDistribution:
+                                                          TextLeadingDistribution
+                                                              .even,
+                                                    ),
+                                                textAlign: TextAlign.center,
+                                              ),
                                       ),
                                     ],
                                   ),
@@ -257,7 +345,11 @@ class _EewCardState extends State<EewCard> {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor}))),
+                onTap: () => context.push(
+                  MapPage.route(
+                    options: MapPageOptions(initialLayers: {MapLayer.monitor}),
+                  ),
+                ),
                 splashColor: context.colors.error.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),

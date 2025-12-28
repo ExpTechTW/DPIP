@@ -63,7 +63,8 @@ class TsunamiActual {
     required this.arrivalTime,
   });
 
-  factory TsunamiActual.fromJson(Map<String, dynamic> json) => _$TsunamiActualFromJson(json);
+  factory TsunamiActual.fromJson(Map<String, dynamic> json) =>
+      _$TsunamiActualFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiActualToJson(this);
 }

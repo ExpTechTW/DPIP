@@ -18,7 +18,8 @@ class NotificationRecord {
     required this.critical,
   });
 
-  factory NotificationRecord.fromJson(Map<String, dynamic> json) => _$NotificationRecordFromJson(json);
+  factory NotificationRecord.fromJson(Map<String, dynamic> json) =>
+      _$NotificationRecordFromJson(json);
 
   Map<String, dynamic> toJson() => _$NotificationRecordToJson(this);
 }

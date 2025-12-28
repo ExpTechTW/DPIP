@@ -6,8 +6,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -31,7 +30,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   Completer<List<ProductDetails>> products = Completer();
 
-  final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
+  final Set<String> _kIds = <String>{
+    's_donation75',
+    'donation100',
+    'donation300',
+    'donation1000',
+  };
   StreamSubscription<List<PurchaseDetails>>? subscription;
 
   Future<void> refresh() async {
@@ -47,7 +51,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
       return;
     }
 
-    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
+    final ProductDetailsResponse response = await InAppPurchase.instance
+        .queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
       products.completeError('找不到商品，請稍候再試'.i18n);
       return;
@@ -72,7 +77,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   }
 
   void onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
-    final bool hasAnyPending = purchaseDetailsList.any((detail) => detail.status == PurchaseStatus.pending);
+    final bool hasAnyPending = purchaseDetailsList.any(
+      (detail) => detail.status == PurchaseStatus.pending,
+    );
 
     if (mounted) {
       setState(() {
@@ -133,7 +140,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 spacing: 16,
                 children: [
                   Text(error.toString()),
-                  FilledButton.tonal(onPressed: refresh, child: Text('重新載入'.i18n)),
+                  FilledButton.tonal(
+                    onPressed: refresh,
+                    child: Text('重新載入'.i18n),
+                  ),
                 ],
               ),
             );
@@ -144,7 +154,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 16,
-                children: [const CircularProgressIndicator(), Text('正在載入商店物品中'.i18n)],
+                children: [
+                  const CircularProgressIndicator(),
+                  Text('正在載入商店物品中'.i18n),
+                ],
               ),
             );
           }
@@ -163,71 +176,100 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 child: Text(
                   'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'
                       .i18n,
-                  style: context.texts.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                  style: context.texts.bodyMedium?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.justify,
                 ),
               ),
               if (subscriptions.isNotEmpty)
-                ListSection(
-                  title: '訂閱制'.i18n,
+                Section(
+                  label: Text('訂閱制'.i18n),
                   children: [
                     for (final product in subscriptions)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
-                        titleStyle: (processingProductId != null && processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
+                      SectionListTile(
+                        title: Text(
+                          product.title.contains('(')
+                              ? product.title
+                                    .substring(0, product.title.indexOf('('))
+                                    .trim()
+                              : product.title,
+                          style:
+                              (processingProductId != null &&
+                                  processingProductId != product.id)
+                              ? TextStyle(color: context.theme.disabledColor)
+                              : const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
-                            color: (processingProductId != null && processingProductId != product.id)
+                            color:
+                                (processingProductId != null &&
+                                    processingProductId != product.id)
                                 ? context.theme.disabledColor
                                 : context.texts.bodySmall?.color,
                           ),
                         ),
                         trailing: (purchasedProductIds.contains(product.id))
-                            ? Icon(Symbols.check_rounded, color: context.colors.primary)
+                            ? Icon(
+                                Symbols.check_rounded,
+                                color: context.colors.primary,
+                              )
                             : (processingProductId == product.id)
                             ? const CircularProgressIndicator.adaptive()
                             : Text(
                                 '{price}/月'.i18n.args({'price': product.price}),
                                 style: TextStyle(
-                                  color: (processingProductId != null && processingProductId != product.id)
+                                  color:
+                                      (processingProductId != null &&
+                                          processingProductId != product.id)
                                       ? context.theme.disabledColor
                                       : context.texts.bodyMedium?.color,
                                 ),
                               ),
-                        onTap: isPending || purchasedProductIds.contains(product.id)
+                        onTap:
+                            isPending ||
+                                purchasedProductIds.contains(product.id)
                             ? null
                             : () {
                                 setState(() {
                                   isPending = true;
                                   processingProductId = product.id;
                                 });
-                                final purchaseParam = PurchaseParam(productDetails: product);
-                                InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
+                                final purchaseParam = PurchaseParam(
+                                  productDetails: product,
+                                );
+                                InAppPurchase.instance.buyNonConsumable(
+                                  purchaseParam: purchaseParam,
+                                );
                               },
                       ),
                   ],
                 ),
               if (oneTime.isNotEmpty)
-                ListSection(
-                  title: '單次支援'.i18n,
+                Section(
+                  label: Text('單次支援'.i18n),
                   children: [
                     for (final product in oneTime)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
-                        titleStyle: (processingProductId != null && processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
+                      SectionListTile(
+                        title: Text(
+                          product.title.contains('(')
+                              ? product.title
+                                    .substring(0, product.title.indexOf('('))
+                                    .trim()
+                              : product.title,
+                          style:
+                              (processingProductId != null &&
+                                  processingProductId != product.id)
+                              ? TextStyle(color: context.theme.disabledColor)
+                              : const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
-                            color: (processingProductId != null && processingProductId != product.id)
+                            color:
+                                (processingProductId != null &&
+                                    processingProductId != product.id)
                                 ? context.theme.disabledColor
                                 : context.texts.bodySmall?.color,
                           ),
@@ -237,7 +279,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                             : Text(
                                 product.price,
                                 style: TextStyle(
-                                  color: (processingProductId != null && processingProductId != product.id)
+                                  color:
+                                      (processingProductId != null &&
+                                          processingProductId != product.id)
                                       ? context.theme.disabledColor
                                       : context.texts.bodyMedium?.color,
                                 ),
@@ -249,8 +293,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                   isPending = true;
                                   processingProductId = product.id;
                                 });
-                                final purchaseParam = PurchaseParam(productDetails: product);
-                                InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
+                                final purchaseParam = PurchaseParam(
+                                  productDetails: product,
+                                );
+                                InAppPurchase.instance.buyConsumable(
+                                  purchaseParam: purchaseParam,
+                                );
                               },
                       ),
                   ],
@@ -266,35 +314,65 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        final bool available = await InAppPurchase.instance.isAvailable();
+                        final bool available = await InAppPurchase.instance
+                            .isAvailable();
                         if (!context.mounted) return;
 
                         if (!available) {
-                          final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+                          final storeName = Platform.isIOS
+                              ? 'App Store'
+                              : 'Google Play';
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))),
+                            SnackBar(
+                              content: Text(
+                                '無法連線至 {store}，請稍後再試。'.i18n.args({
+                                  'store': storeName,
+                                }),
+                              ),
+                            ),
                           );
                           return;
                         }
                         InAppPurchase.instance.restorePurchases();
 
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)),
+                        );
                       },
-                      child: Text('恢復購買'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                      child: Text(
+                        '恢復購買'.i18n,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     InkWell(
                       onTap: () {
-                        launchUrl(Uri.parse('https://exptech.dev/tos')); // 替換為你的 Terms URL
+                        launchUrl(
+                          Uri.parse('https://exptech.dev/tos'),
+                        ); // 替換為你的 Terms URL
                       },
-                      child: Text('使用條款'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                      child: Text(
+                        '使用條款'.i18n,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     InkWell(
                       onTap: () {
-                        launchUrl(Uri.parse('https://exptech.dev/privacy')); // 替換為你的 Privacy URL
+                        launchUrl(
+                          Uri.parse('https://exptech.dev/privacy'),
+                        ); // 替換為你的 Privacy URL
                       },
-                      child: Text('隱私權政策'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                      child: Text(
+                        '隱私權政策'.i18n,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),

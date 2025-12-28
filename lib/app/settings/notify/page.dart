@@ -1,18 +1,19 @@
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/i18n.dart';
-import 'package:dpip/router.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/models/settings/notify.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
+import 'package:dpip/widgets/list/list_item_tile.dart';
 
 class SettingsNotifyPage extends StatefulWidget {
   const SettingsNotifyPage({super.key});
@@ -31,11 +32,12 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     EewNotifyType.all => '接收全部'.i18n,
   };
 
-  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) => switch (value) {
-    EarthquakeNotifyType.off => '關閉'.i18n,
-    EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
-    EarthquakeNotifyType.all => '接收全部'.i18n,
-  };
+  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) =>
+      switch (value) {
+        EarthquakeNotifyType.off => '關閉'.i18n,
+        EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
+        EarthquakeNotifyType.all => '接收全部'.i18n,
+      };
 
   String getWeatherNotifyTypeName(WeatherNotifyType value) => switch (value) {
     WeatherNotifyType.off => '關閉'.i18n,
@@ -79,7 +81,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
         }
       });
       ExpTech()
@@ -103,7 +107,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         }
                       })
                       .catchError((updateError) {
-                        TalkerManager.instance.error('Failed to update location: $updateError');
+                        TalkerManager.instance.error(
+                          'Failed to update location: $updateError',
+                        );
                       });
                 });
               }
@@ -128,158 +134,200 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading && enabled ? 1 : 0,
                 duration: Durations.short4,
-                child: const LinearProgressIndicator(year2023: false),
+                child: const LinearProgressIndicator(),
               ),
             ),
             ListView(
-              padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+              padding: EdgeInsets.only(
+                top: 8,
+                bottom: 16 + context.padding.bottom,
+              ),
               children: [
                 if (!enabled)
-                  SettingsListTextSection(
-                    icon: Symbols.warning_rounded,
-                    content: '請先設定所在地來使用通知功能'.i18n,
-                    trailing: TextButton(
-                      onPressed: () => const SettingsLocationRoute().push(context),
-                      child: Text('設定'.i18n),
+                  SectionText(
+                    leading: Icon(
+                      Symbols.warning_rounded,
+                      color: context.colors.error,
+                    ),
+                    child: Column(
+                      mainAxisSize: .min,
+                      crossAxisAlignment: .start,
+                      spacing: 8,
+                      children: [
+                        Text(
+                          '請先設定所在地來使用通知功能'.i18n,
+                          style: TextStyle(color: context.colors.error),
+                        ),
+                        FilledButton.tonal(
+                          onPressed: () =>
+                              const SettingsLocationRoute().push(context),
+                          child: Text('設定'.i18n),
+                        ),
+                      ],
                     ),
                   ),
-                ListSection(
-                  title: '地震速報'.i18n,
+                Section(
+                  label: Text('地震速報'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, EewNotifyType>(
                       selector: (_, model) => model.eew,
                       builder: (context, eew, child) {
-                        return ListSectionTile(
-                          title: '緊急地震速報'.i18n,
+                        return SectionListTile(
+                          isFirst: true,
+                          isLast: true,
+                          leading: Icon(Symbols.crisis_alert_rounded),
+                          title: Text('緊急地震速報'.i18n),
                           subtitle: Text(getEewNotifyTypeName(eew)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.crisis_alert_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyEewRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyEewRoute().push(context),
                         );
                       },
                     ),
                   ],
                 ),
-                ListSection(
-                  title: '地震'.i18n,
+                Section(
+                  label: Text('地震'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.monitor,
                       builder: (context, monitor, child) {
-                        return ListSectionTile(
-                          title: '強震監視器'.i18n,
+                        return SectionListTile(
+                          isFirst: true,
+                          leading: Icon(Symbols.monitor_heart_rounded),
+                          title: Text('強震監視器'.i18n),
                           subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.monitor_heart_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyMonitorRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyMonitorRoute().push(context),
                         );
                       },
                     ),
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.report,
                       builder: (context, report, child) {
-                        return ListSectionTile(
-                          title: '地震報告'.i18n,
+                        return SectionListTile(
+                          leading: Icon(Symbols.docs_rounded),
+                          title: Text('地震報告'.i18n),
                           subtitle: Text(getEarthquakeNotifyTypeName(report)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.docs_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyReportRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyReportRoute().push(context),
                         );
                       },
                     ),
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.intensity,
                       builder: (context, intensity, child) {
-                        return ListSectionTile(
-                          title: '震度速報'.i18n,
-                          subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                        return SectionListTile(
+                          isLast: true,
+                          leading: Icon(Symbols.summarize_rounded),
+                          title: Text('震度速報'.i18n),
+                          subtitle: Text(
+                            getEarthquakeNotifyTypeName(intensity),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.summarize_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyIntensityRoute().push(context),
+                          onTap: () => const SettingsNotifyIntensityRoute()
+                              .push(context),
                         );
                       },
                     ),
                   ],
                 ),
-                ListSection(
-                  title: '天氣'.i18n,
+                Section(
+                  label: Text('天氣'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.thunderstorm,
                       builder: (context, thunderstorm, child) {
-                        return ListSectionTile(
-                          title: '雷雨即時訊息'.i18n,
-                          subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                        return SectionListTile(
+                          isFirst: true,
+                          leading: Icon(Symbols.thunderstorm_rounded),
+                          title: Text('雷雨即時訊息'.i18n),
+                          subtitle: Text(
+                            getWeatherNotifyTypeName(thunderstorm),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.thunderstorm_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyThunderstormRoute().push(context),
+                          onTap: () => const SettingsNotifyThunderstormRoute()
+                              .push(context),
                         );
                       },
                     ),
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.weatherAdvisory,
                       builder: (context, weatherAdvisory, child) {
-                        return ListSectionTile(
-                          title: '天氣警特報'.i18n,
-                          subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                        return SectionListTile(
+                          leading: Icon(Symbols.warning_rounded),
+                          title: Text('天氣警特報'.i18n),
+                          subtitle: Text(
+                            getWeatherNotifyTypeName(weatherAdvisory),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.warning_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAdvisoryRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyAdvisoryRoute().push(context),
                         );
                       },
                     ),
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.evacuation,
                       builder: (context, evacuation, child) {
-                        return ListSectionTile(
-                          title: '防災資訊'.i18n,
+                        return SectionListTile(
+                          isLast: true,
+                          leading: Icon(Symbols.directions_run_rounded),
+                          title: Text('防災資訊'.i18n),
                           subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.directions_run_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyEvacuationRoute().push(context),
+                          onTap: () => const SettingsNotifyEvacuationRoute()
+                              .push(context),
                         );
                       },
                     ),
                   ],
                 ),
-                ListSection(
-                  title: '海嘯'.i18n,
+                Section(
+                  label: Text('海嘯'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, TsunamiNotifyType>(
                       selector: (_, model) => model.tsunami,
                       builder: (context, tsunami, child) {
-                        return ListSectionTile(
-                          title: '海嘯資訊'.i18n,
+                        return SectionListTile(
+                          isFirst: true,
+                          isLast: true,
+                          leading: Icon(Symbols.tsunami_rounded),
+                          title: Text('海嘯資訊'.i18n),
                           subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.tsunami_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyTsunamiRoute().push(context),
+                          onTap: () =>
+                              const SettingsNotifyTsunamiRoute().push(context),
                         );
                       },
                     ),
                   ],
                 ),
-                ListSection(
-                  title: '其他'.i18n,
+                Section(
+                  label: Text('其他'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, BasicNotifyType>(
                       selector: (_, model) => model.announcement,
                       builder: (context, announcement, child) {
-                        return ListSectionTile(
-                          title: '公告'.i18n,
+                        return SectionListTile(
+                          isFirst: true,
+                          isLast: true,
+                          leading: Icon(Symbols.campaign_rounded),
+                          title: Text('公告'.i18n),
                           subtitle: Text(getBasicNotifyTypeName(announcement)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.campaign_rounded,
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAnnouncementRoute().push(context),
+                          onTap: () => const SettingsNotifyAnnouncementRoute()
+                              .push(context),
                         );
                       },
                     ),

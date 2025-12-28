@@ -18,7 +18,8 @@ class RainTimeSelector extends StatefulWidget {
   State<RainTimeSelector> createState() => _RainTimeSelectorState();
 }
 
-class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerProviderStateMixin {
+class _RainTimeSelectorState extends State<RainTimeSelector>
+    with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late String _selectedInterval;
   late ScrollController _timeScrollController;
@@ -29,8 +30,28 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
   bool _isExpanded = false;
   int _selectIndex = 8;
 
-  final List<String> _intervals = ['3d', '2d', '24h', '12h', '6h', '3h', '1h', '10m', 'now'];
-  List<String> get _intervalTranslations => ['3 天', '3 天', '24 小時', '12 小時', '6 小時', '3 小時', '1 小時', '10 分鐘', '今日'];
+  final List<String> _intervals = [
+    '3d',
+    '2d',
+    '24h',
+    '12h',
+    '6h',
+    '3h',
+    '1h',
+    '10m',
+    'now',
+  ];
+  List<String> get _intervalTranslations => [
+    '3 天',
+    '3 天',
+    '24 小時',
+    '12 小時',
+    '6 小時',
+    '3 小時',
+    '1 小時',
+    '10 分鐘',
+    '今日',
+  ];
 
   @override
   void initState() {
@@ -39,8 +60,14 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
     _selectedInterval = 'now'; // Default to now
     _timeScrollController = ScrollController();
     _intervalScrollController = ScrollController();
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelected();
       _scrollToSelectedInterval();
@@ -67,7 +94,8 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
       final viewportWidth = _timeScrollController.position.viewportDimension;
       final maxScroll = _timeScrollController.position.maxScrollExtent;
 
-      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll =
+          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -88,10 +116,12 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
     final index = _intervals.indexOf(_selectedInterval);
     if (index != -1) {
       final totalWidth = _itemWidth * _intervals.length;
-      final viewportWidth = _intervalScrollController.position.viewportDimension;
+      final viewportWidth =
+          _intervalScrollController.position.viewportDimension;
       final maxScroll = _intervalScrollController.position.maxScrollExtent;
 
-      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll =
+          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -144,15 +174,23 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                     setState(() {
                       _selectedTimestamp = timestamp;
                     });
-                    widget.onSelectionChanged(_selectedTimestamp, _selectedInterval);
+                    widget.onSelectionChanged(
+                      _selectedTimestamp,
+                      _selectedInterval,
+                    );
                     _scrollToSelected();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     alignment: Alignment.center,
-                    margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 3,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? context.colors.secondary : Colors.transparent,
+                      color: isSelected
+                          ? context.colors.secondary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -161,7 +199,9 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                         Text(
                           DateFormat('HH:mm').format(time),
                           style: TextStyle(
-                            color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
+                            color: isSelected
+                                ? context.colors.onSecondary
+                                : context.colors.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -171,7 +211,9 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                           style: TextStyle(
                             color: isSelected
                                 ? context.colors.onSecondary
-                                : context.colors.onSurface.withValues(alpha: 0.7),
+                                : context.colors.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
                             fontSize: 12,
                           ),
                         ),
@@ -213,21 +255,31 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                       _selectedInterval = interval;
                     });
                     _selectIndex = index;
-                    widget.onSelectionChanged(_selectedTimestamp, _selectedInterval);
+                    widget.onSelectionChanged(
+                      _selectedTimestamp,
+                      _selectedInterval,
+                    );
                     _scrollToSelectedInterval();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     alignment: Alignment.center,
-                    margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 3,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? context.colors.secondary : Colors.transparent,
+                      color: isSelected
+                          ? context.colors.secondary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       translation,
                       style: TextStyle(
-                        color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
+                        color: isSelected
+                            ? context.colors.onSecondary
+                            : context.colors.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -260,8 +312,12 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
             style: ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(context.colors.surface),
               foregroundColor: WidgetStatePropertyAll(context.colors.onSurface),
-              surfaceTintColor: WidgetStatePropertyAll(context.colors.surfaceTint),
-              padding: const WidgetStatePropertyAll(EdgeInsets.fromLTRB(16, 0, 12, 0)),
+              surfaceTintColor: WidgetStatePropertyAll(
+                context.colors.surfaceTint,
+              ),
+              padding: const WidgetStatePropertyAll(
+                EdgeInsets.fromLTRB(16, 0, 12, 0),
+              ),
               elevation: const WidgetStatePropertyAll(4),
             ),
           ),
@@ -272,7 +328,13 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
               sizeFactor: _expandAnimation,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Column(children: [_buildTimeSelector(), const SizedBox(height: 8), _buildIntervalSelector()]),
+                child: Column(
+                  children: [
+                    _buildTimeSelector(),
+                    const SizedBox(height: 8),
+                    _buildIntervalSelector(),
+                  ],
+                ),
               ),
             ),
           ),

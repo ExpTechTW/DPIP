@@ -44,7 +44,10 @@ class _RadarMapCardState extends State<RadarMapCard> {
         await controller.removeSource(sourceId);
       }
 
-      await controller.addSource(sourceId, RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+      await controller.addSource(
+        sourceId,
+        RasterSourceProperties(tiles: [newTileUrl], tileSize: 256),
+      );
 
       if (!mounted) return;
 
@@ -88,7 +91,8 @@ class _RadarMapCardState extends State<RadarMapCard> {
                       height: 200,
                       child: DpipMap(
                         key: _key,
-                        onMapCreated: (controller) => mapController = controller,
+                        onMapCreated: (controller) =>
+                            mapController = controller,
                         onStyleLoadedCallback: () => _setupMapLayers(),
                         dragEnabled: false,
                         rotateGesturesEnabled: false,
@@ -97,29 +101,42 @@ class _RadarMapCardState extends State<RadarMapCard> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Layout.row.between(
                         children: [
                           Layout.row[8](
                             children: [
                               const Icon(Symbols.radar, size: 24),
-                              Text('雷達回波'.i18n, style: context.texts.titleMedium),
+                              Text(
+                                '雷達回波'.i18n,
+                                style: context.texts.titleMedium,
+                              ),
                               FutureBuilder(
                                 future: radarListFuture,
                                 builder: (context, snapshot) {
                                   final data = snapshot.data;
 
-                                  if (data == null) return const SizedBox.shrink();
+                                  if (data == null)
+                                    return const SizedBox.shrink();
 
-                                  final style = context.texts.labelSmall?.copyWith(
-                                    color: context.colors.onSurfaceVariant,
-                                  );
+                                  final style = context.texts.labelSmall
+                                      ?.copyWith(
+                                        color: context.colors.onSurfaceVariant,
+                                      );
 
                                   return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: context.colors.surfaceContainer,
-                                      border: Border.all(color: context.colors.outlineVariant),
+                                      border: Border.all(
+                                        color: context.colors.outlineVariant,
+                                      ),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Layout.row[4](
@@ -127,9 +144,13 @@ class _RadarMapCardState extends State<RadarMapCard> {
                                         Icon(
                                           Symbols.schedule_rounded,
                                           size: (style?.fontSize ?? 12) * 1.25,
-                                          color: context.colors.onSurfaceVariant,
+                                          color:
+                                              context.colors.onSurfaceVariant,
                                         ),
-                                        Text(data.last.toSimpleDateTimeString(), style: style),
+                                        Text(
+                                          data.last.toSimpleDateTimeString(),
+                                          style: style,
+                                        ),
                                       ],
                                     ),
                                   );
@@ -150,7 +171,11 @@ class _RadarMapCardState extends State<RadarMapCard> {
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
-                onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
+                onTap: () => context.push(
+                  MapPage.route(
+                    options: MapPageOptions(initialLayers: {MapLayer.radar}),
+                  ),
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),

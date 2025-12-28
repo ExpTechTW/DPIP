@@ -25,9 +25,15 @@ import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class RadarMapLayerManager extends MapLayerManager {
-  RadarMapLayerManager(super.context, super.controller, {this.getActiveLayerCount});
+  RadarMapLayerManager(
+    super.context,
+    super.controller, {
+    this.getActiveLayerCount,
+  });
 
-  final currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
+  final currentRadarTime = ValueNotifier<String?>(
+    GlobalProviders.data.radar.firstOrNull,
+  );
   final isLoading = ValueNotifier<bool>(false);
   final isPlaying = ValueNotifier<bool>(false);
   final playStartTime = ValueNotifier<String?>(null);
@@ -50,19 +56,27 @@ class RadarMapLayerManager extends MapLayerManager {
       final startIndex = radarList.indexOf(playStartTime.value);
       final newCurrentIndex = radarList.indexOf(time);
 
-      if (startIndex != -1 && newCurrentIndex != -1 && newCurrentIndex > startIndex) {
+      if (startIndex != -1 &&
+          newCurrentIndex != -1 &&
+          newCurrentIndex > startIndex) {
         final newStartIndex = newCurrentIndex + 1;
         if (newStartIndex < radarList.length) {
           playStartTime.value = radarList[newStartIndex];
-          TalkerManager.instance.info('Moved start time to right of current time: ${radarList[newStartIndex]}');
+          TalkerManager.instance.info(
+            'Moved start time to right of current time: ${radarList[newStartIndex]}',
+          );
 
           final nextIndex = newStartIndex + 1;
           if (nextIndex < radarList.length) {
             playEndTime.value = radarList[nextIndex];
-            TalkerManager.instance.info('Set end time to next item: ${playEndTime.value}');
+            TalkerManager.instance.info(
+              'Set end time to next item: ${playEndTime.value}',
+            );
           } else {
             playEndTime.value = null;
-            TalkerManager.instance.info('Cleared end time because start time is at the end');
+            TalkerManager.instance.info(
+              'Cleared end time because start time is at the end',
+            );
           }
         }
       }
@@ -80,13 +94,17 @@ class RadarMapLayerManager extends MapLayerManager {
 
     final radarList = GlobalProviders.data.radar;
     final startIndex = radarList.indexOf(time);
-    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value) : -1;
+    final currentIndex = currentRadarTime.value != null
+        ? radarList.indexOf(currentRadarTime.value)
+        : -1;
 
     if (startIndex != -1 && currentIndex != -1 && startIndex < currentIndex) {
       final newCurrentIndex = startIndex - 1;
       if (newCurrentIndex >= 0) {
         updateRadarTime(radarList[newCurrentIndex]);
-        TalkerManager.instance.info('Moved current time to left of start time: ${radarList[newCurrentIndex]}');
+        TalkerManager.instance.info(
+          'Moved current time to left of start time: ${radarList[newCurrentIndex]}',
+        );
       }
     }
 
@@ -96,10 +114,14 @@ class RadarMapLayerManager extends MapLayerManager {
       final nextIndex = startIndex + 1;
       if (nextIndex < radarList.length) {
         playEndTime.value = radarList[nextIndex];
-        TalkerManager.instance.info('Set end time to next item: ${playEndTime.value}');
+        TalkerManager.instance.info(
+          'Set end time to next item: ${playEndTime.value}',
+        );
       } else {
         playEndTime.value = null;
-        TalkerManager.instance.info('Cleared end time because start time is at the end');
+        TalkerManager.instance.info(
+          'Cleared end time because start time is at the end',
+        );
       }
     }
 
@@ -111,7 +133,9 @@ class RadarMapLayerManager extends MapLayerManager {
 
     final radarList = GlobalProviders.data.radar;
     final startIndex = radarList.indexOf(playStartTime.value);
-    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value) : -1;
+    final currentIndex = currentRadarTime.value != null
+        ? radarList.indexOf(currentRadarTime.value)
+        : -1;
 
     return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
   }
@@ -141,7 +165,11 @@ class RadarMapLayerManager extends MapLayerManager {
 
       await _setupAndShowLayer(time);
     } catch (e, s) {
-      TalkerManager.instance.error('RadarMapLayerManager._updateRadarTileUrl', e, s);
+      TalkerManager.instance.error(
+        'RadarMapLayerManager._updateRadarTileUrl',
+        e,
+        s,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -155,15 +183,25 @@ class RadarMapLayerManager extends MapLayerManager {
     final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
     if (!isSourceExists) {
-      final properties = RasterSourceProperties(tiles: [Routes.radarTile(time)], tileSize: 256);
+      final properties = RasterSourceProperties(
+        tiles: [Routes.radarTile(time)],
+        tileSize: 256,
+      );
 
       await controller.addSource(sourceId, properties);
     }
 
     if (!isLayerExists) {
-      final properties = RasterLayerProperties(visibility: visible ? 'visible' : 'none');
+      final properties = RasterLayerProperties(
+        visibility: visible ? 'visible' : 'none',
+      );
 
-      await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.exptechCountyOutline);
+      await controller.addLayer(
+        sourceId,
+        layerId,
+        properties,
+        belowLayerId: BaseMapLayerIds.exptechCountyOutline,
+      );
     } else if (visible) {
       await controller.setLayerVisibility(layerId, true);
     }
@@ -205,7 +243,11 @@ class RadarMapLayerManager extends MapLayerManager {
           await _setupAndShowLayer(time);
           await _hideLayer(time);
         } catch (e, s) {
-          TalkerManager.instance.error('Failed to preload radar layer: $time', e, s);
+          TalkerManager.instance.error(
+            'Failed to preload radar layer: $time',
+            e,
+            s,
+          );
         }
       }
     }
@@ -242,7 +284,9 @@ class RadarMapLayerManager extends MapLayerManager {
     }
 
     if (playStartTime.value == null || playEndTime.value == null) {
-      TalkerManager.instance.error('Cannot start auto-play: missing start or end time');
+      TalkerManager.instance.error(
+        'Cannot start auto-play: missing start or end time',
+      );
       return;
     }
 
@@ -253,7 +297,9 @@ class RadarMapLayerManager extends MapLayerManager {
       _playNext();
     });
 
-    TalkerManager.instance.info('Started radar auto-play from: ${playStartTime.value} to: ${playEndTime.value}');
+    TalkerManager.instance.info(
+      'Started radar auto-play from: ${playStartTime.value} to: ${playEndTime.value}',
+    );
   }
 
   void stopAutoPlay() {
@@ -274,13 +320,20 @@ class RadarMapLayerManager extends MapLayerManager {
 
   void _playNext() {
     final radarList = GlobalProviders.data.radar;
-    if (radarList.isEmpty || currentRadarTime.value == null || _isWaitingForRestart) return;
+    if (radarList.isEmpty ||
+        currentRadarTime.value == null ||
+        _isWaitingForRestart)
+      return;
 
     final currentIndex = radarList.indexOf(currentRadarTime.value);
     if (currentIndex == -1) return;
 
-    final startIndex = playStartTime.value != null ? radarList.indexOf(playStartTime.value) : -1;
-    final endIndex = playEndTime.value != null ? radarList.indexOf(playEndTime.value) : -1;
+    final startIndex = playStartTime.value != null
+        ? radarList.indexOf(playStartTime.value)
+        : -1;
+    final endIndex = playEndTime.value != null
+        ? radarList.indexOf(playEndTime.value)
+        : -1;
 
     if (startIndex == -1 || endIndex == -1) {
       if (playStartTime.value != null) {
@@ -296,10 +349,16 @@ class RadarMapLayerManager extends MapLayerManager {
       _updateRadarTileUrl(nextTime);
     } else {
       _isWaitingForRestart = true;
-      TalkerManager.instance.info('Reached end time, scheduling restart in 1 second');
+      TalkerManager.instance.info(
+        'Reached end time, scheduling restart in 1 second',
+      );
       Timer(const Duration(milliseconds: 1000), () {
-        if (isPlaying.value && playStartTime.value != null && _isWaitingForRestart) {
-          TalkerManager.instance.info('Restarting from start time: ${playStartTime.value}');
+        if (isPlaying.value &&
+            playStartTime.value != null &&
+            _isWaitingForRestart) {
+          TalkerManager.instance.info(
+            'Restarting from start time: ${playStartTime.value}',
+          );
           _updateRadarTileUrl(playStartTime.value!);
           _isWaitingForRestart = false;
         } else {
@@ -316,9 +375,13 @@ class RadarMapLayerManager extends MapLayerManager {
       final location = GlobalProviders.location.coordinates;
 
       if (location != null && location.isValid) {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(location, 7.4),
+        );
       } else {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+        );
         TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
       }
     } catch (e, s) {
@@ -385,7 +448,9 @@ class RadarMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+      if (_lastFetchTime == null ||
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+        await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('RadarMapLayerManager.show', e, s);
     }
@@ -402,7 +467,9 @@ class RadarMapLayerManager extends MapLayerManager {
 
         await controller.removeLayer(layerId).catchError((_) {});
         await controller.removeSource(sourceId).catchError((_) {});
-        TalkerManager.instance.info('Removed radar layer and source for "$time"');
+        TalkerManager.instance.info(
+          'Removed radar layer and source for "$time"',
+        );
       }
 
       _preloadedLayers.clear();
@@ -438,7 +505,11 @@ class _LegendItem extends StatelessWidget {
   final Color color;
   final Color borderColor;
 
-  const _LegendItem({required this.label, required this.color, required this.borderColor});
+  const _LegendItem({
+    required this.label,
+    required this.color,
+    required this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -455,7 +526,13 @@ class _LegendItem extends StatelessWidget {
             border: Border.all(color: borderColor),
           ),
         ),
-        Text(label, style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant, height: 1)),
+        Text(
+          label,
+          style: context.texts.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant,
+            height: 1,
+          ),
+        ),
       ],
     );
   }
@@ -484,7 +561,10 @@ class RadarMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
+                  final grouped = times
+                      .groupListsBy((time) => time.date)
+                      .entries
+                      .toList();
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -500,10 +580,16 @@ class RadarMapLayerSheet extends StatelessWidget {
                               Row(
                                 spacing: 8,
                                 children: [
-                                  Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
+                                  Icon(
+                                    Symbols.radar_rounded,
+                                    size: 24,
+                                    color: context.colors.onSurface,
+                                  ),
                                   Text(
                                     '雷達回波'.i18n,
-                                    style: context.texts.titleMedium?.copyWith(color: context.colors.onSurface),
+                                    style: context.texts.titleMedium?.copyWith(
+                                      color: context.colors.onSurface,
+                                    ),
                                   ),
                                   AnimatedBuilder(
                                     animation: Listenable.merge([
@@ -512,22 +598,41 @@ class RadarMapLayerSheet extends StatelessWidget {
                                       manager.isPlaying,
                                     ]),
                                     builder: (context, child) {
-                                      final currentTime = manager.currentRadarTime.value;
+                                      final currentTime =
+                                          manager.currentRadarTime.value;
 
-                                      if (currentTime == null) return const SizedBox.shrink();
+                                      if (currentTime == null)
+                                        return const SizedBox.shrink();
 
                                       try {
-                                        final timeFormatted = currentTime.toSimpleDateTimeString();
-                                        final timeData = timeFormatted.split(' ');
-                                        final date = timeData.length > 1 ? timeData[0] : '';
-                                        final time = timeData.length > 1 ? timeData[1] : timeData[0];
+                                        final timeFormatted = currentTime
+                                            .toSimpleDateTimeString();
+                                        final timeData = timeFormatted.split(
+                                          ' ',
+                                        );
+                                        final date = timeData.length > 1
+                                            ? timeData[0]
+                                            : '';
+                                        final time = timeData.length > 1
+                                            ? timeData[1]
+                                            : timeData[0];
 
                                         return Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 5,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: context.colors.surfaceContainer.withValues(alpha: 0.6),
-                                            borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: context.colors.outline),
+                                            color: context
+                                                .colors
+                                                .surfaceContainer
+                                                .withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            border: Border.all(
+                                              color: context.colors.outline,
+                                            ),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
@@ -536,30 +641,44 @@ class RadarMapLayerSheet extends StatelessWidget {
                                               Icon(
                                                 Icons.schedule_rounded,
                                                 size: 12,
-                                                color: context.colors.onSurfaceVariant,
+                                                color: context
+                                                    .colors
+                                                    .onSurfaceVariant,
                                               ),
                                               if (date.isNotEmpty) ...[
                                                 Text(
                                                   date,
-                                                  style: context.texts.labelSmall?.copyWith(
-                                                    color: context.colors.onSurfaceVariant,
-                                                    height: 1,
-                                                  ),
+                                                  style: context
+                                                      .texts
+                                                      .labelSmall
+                                                      ?.copyWith(
+                                                        color: context
+                                                            .colors
+                                                            .onSurfaceVariant,
+                                                        height: 1,
+                                                      ),
                                                 ),
                                                 Container(
                                                   width: 0.5,
                                                   height: 14,
-                                                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 2,
+                                                      ),
                                                   color: context.colors.outline,
                                                 ),
                                               ],
                                               Text(
                                                 time,
-                                                style: context.texts.bodySmall?.copyWith(
-                                                  color: context.colors.onSurface,
-                                                  fontWeight: FontWeight.bold,
-                                                  height: 1,
-                                                ),
+                                                style: context.texts.bodySmall
+                                                    ?.copyWith(
+                                                      color: context
+                                                          .colors
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      height: 1,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -582,16 +701,21 @@ class RadarMapLayerSheet extends StatelessWidget {
                                   final startTime = manager.playStartTime.value;
                                   final canPlay = manager.canPlay;
 
-                                  final shouldHide = startTime == null && !isPlaying;
+                                  final shouldHide =
+                                      startTime == null && !isPlaying;
 
                                   if (shouldHide) {
                                     return const SizedBox.shrink();
                                   }
 
                                   return IconButton(
-                                    onPressed: canPlay || isPlaying ? manager.toggleAutoPlay : null,
+                                    onPressed: canPlay || isPlaying
+                                        ? manager.toggleAutoPlay
+                                        : null,
                                     icon: Icon(
-                                      isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
+                                      isPlaying
+                                          ? Symbols.pause_rounded
+                                          : Symbols.play_arrow_rounded,
                                       size: 24,
                                       color: context.colors.primary,
                                     ),
@@ -603,7 +727,10 @@ class RadarMapLayerSheet extends StatelessWidget {
                         ),
                       ),
                       AnimatedBuilder(
-                        animation: Listenable.merge([manager.playStartTime, manager.isPlaying]),
+                        animation: Listenable.merge([
+                          manager.playStartTime,
+                          manager.isPlaying,
+                        ]),
                         builder: (context, child) {
                           final startTime = manager.playStartTime.value;
                           final isPlaying = manager.isPlaying.value;
@@ -617,7 +744,9 @@ class RadarMapLayerSheet extends StatelessWidget {
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                               child: Text(
                                 '長按設定播放起點'.i18n,
-                                style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                                style: context.texts.bodySmall?.copyWith(
+                                  color: context.colors.onSurfaceVariant,
+                                ),
                               ),
                             );
                           }
@@ -652,7 +781,10 @@ class RadarMapLayerSheet extends StatelessWidget {
                           if (isPlaying) {
                             return Container(
                               height: 32,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
                               child: AnimatedBuilder(
                                 animation: Listenable.merge([
                                   manager.currentRadarTime,
@@ -709,8 +841,16 @@ class RadarMapLayerSheet extends StatelessWidget {
                   ColorLegendItem(color: const Color(0xff00ffff), value: 0),
                   ColorLegendItem(color: const Color(0xff00a3ff), value: 5),
                   ColorLegendItem(color: const Color(0xff005bff), value: 10),
-                  ColorLegendItem(color: const Color(0xff0000ff), value: 15, blendTail: false),
-                  ColorLegendItem(color: const Color(0xff00ff00), value: 16, hidden: true),
+                  ColorLegendItem(
+                    color: const Color(0xff0000ff),
+                    value: 15,
+                    blendTail: false,
+                  ),
+                  ColorLegendItem(
+                    color: const Color(0xff00ff00),
+                    value: 16,
+                    hidden: true,
+                  ),
                   ColorLegendItem(color: const Color(0xff00d300), value: 20),
                   ColorLegendItem(color: const Color(0xff00a000), value: 25),
                   ColorLegendItem(color: const Color(0xffccea00), value: 30),
@@ -732,7 +872,8 @@ class RadarMapLayerSheet extends StatelessWidget {
 }
 
 class _AutoScrollingTimeList extends StatefulWidget {
-  final List<MapEntry<String, List<({String date, String time, String value})>>> grouped;
+  final List<MapEntry<String, List<({String date, String time, String value})>>>
+  grouped;
   final String? currentTime;
   final String? startTime;
   final RadarMapLayerManager manager;
@@ -793,10 +934,13 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     final key = _chipKeys[widget.currentTime];
     if (key?.currentContext == null) return;
 
-    final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        key!.currentContext!.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
-    final RenderBox? scrollViewBox = _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
+    final RenderBox? scrollViewBox =
+        _scrollController.position.context.storageContext.findRenderObject()
+            as RenderBox?;
     if (scrollViewBox == null) return;
 
     if (!renderBox.attached) return;
@@ -805,7 +949,10 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     final localPosition = scrollViewBox.globalToLocal(position);
 
     final targetOffset =
-        _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
+        _scrollController.offset +
+        localPosition.dx -
+        (scrollViewBox.size.width / 2) +
+        (renderBox.size.width / 2);
 
     final clampedOffset = targetOffset.clamp(
       _scrollController.position.minScrollExtent,
@@ -813,7 +960,11 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     );
 
     if ((clampedOffset - _scrollController.offset).abs() > 20) {
-      _scrollController.animateTo(clampedOffset, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _scrollController.animateTo(
+        clampedOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
@@ -869,7 +1020,9 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                     label: Text(time.time, style: TextStyle(color: textColor)),
                     backgroundColor: chipColor,
                     side: BorderSide(color: borderColor),
-                    avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                    avatar: isSelected && isLoading
+                        ? const LoadingIcon()
+                        : null,
                     onSelected: isLoading
                         ? null
                         : (selected) {
@@ -884,10 +1037,17 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
         }
 
         children.add(
-          const Padding(padding: EdgeInsets.only(right: 8), child: VerticalDivider(width: 16, indent: 8, endIndent: 8)),
+          const Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+          ),
         );
 
-        return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 8,
+          children: children,
+        );
       },
     );
   }
@@ -932,12 +1092,26 @@ class _RadarProgressBar extends StatelessWidget {
     return Row(
       spacing: 8,
       children: [
-        Icon(Icons.play_circle_rounded, size: 16, color: context.colors.primary),
-        Text('播放進度'.i18n, style: context.texts.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
-        Expanded(child: LinearProgressIndicator(value: progress, year2023: false)),
+        Icon(
+          Icons.play_circle_rounded,
+          size: 16,
+          color: context.colors.primary,
+        ),
+        Text(
+          '播放進度'.i18n,
+          style: context.texts.labelSmall?.copyWith(
+            color: context.colors.onSurface,
+            height: 1,
+          ),
+        ),
+        Expanded(
+          child: LinearProgressIndicator(value: progress, year2023: false),
+        ),
         Text(
           '${(progress * 100).round()}%',
-          style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+          style: context.texts.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
       ],
     );

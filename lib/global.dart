@@ -26,7 +26,9 @@ class Global {
   static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
-  static Future<Map<String, dynamic>> _loadCompressedJson(String assetPath) async {
+  static Future<Map<String, dynamic>> _loadCompressedJson(
+    String assetPath,
+  ) async {
     try {
       final ByteData byteData = await rootBundle.load(assetPath);
       final List<int> compressedBytes = byteData.buffer.asUint8List();
@@ -37,14 +39,21 @@ class Global {
       final String jsonString = utf8.decode(decompressedBytes);
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e, s) {
-      TalkerManager.instance.error('Global._loadCompressedJson($assetPath)', e, s);
+      TalkerManager.instance.error(
+        'Global._loadCompressedJson($assetPath)',
+        e,
+        s,
+      );
       return {};
     }
   }
 
   static Future<Map<String, Location>> loadLocationData() async {
     final data = await _loadCompressedJson('assets/location.json.gz');
-    return data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
+    return data.map(
+      (key, value) =>
+          MapEntry(key, Location.fromJson(value as Map<String, dynamic>)),
+    );
   }
 
   static Future<TimeTable> loadTimeTableData() async {
@@ -68,7 +77,10 @@ class Global {
 
     notifyTestContent = data.map((type, value) {
       final map = value as Map<String, dynamic>;
-      return MapEntry(type, (title: map['title'].toString(), body: map['body'].toString()));
+      return MapEntry(type, (
+        title: map['title'].toString(),
+        body: map['body'].toString(),
+      ));
     });
   }
 

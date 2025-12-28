@@ -25,7 +25,9 @@ extension IterableExtension<T> on Iterable<T> {
   /// Note: Elements not present in [order] will have an index of -1 and will be sorted to the end.
   Iterable<T> orderedBy(Iterable<T> order) {
     final orderList = order.toList();
-    return toList().sorted((a, b) => orderList.indexOf(a) - orderList.indexOf(b));
+    return toList().sorted(
+      (a, b) => orderList.indexOf(a) - orderList.indexOf(b),
+    );
   }
 
   /// Checks whether any element of this iterable satisfies [test].
@@ -66,7 +68,9 @@ extension ListExtension<T> on List<T> {
   /// ```
   List<T> superJoin(T separator) {
     if (isEmpty) return [];
-    return expand((element) => [element, separator]).take(length * 2 - 1).toList();
+    return expand(
+      (element) => [element, separator],
+    ).take(length * 2 - 1).toList();
   }
 }
 
@@ -83,8 +87,10 @@ extension ListDoubleExtension on List<double> {
   /// Converts this list to a [LatLngBounds] object.
   ///
   /// The list must contain at least 4 elements: `[southwestLat, southwestLng, northeastLat, northeastLng]`.
-  LatLngBounds get asLatLngBounds =>
-      LatLngBounds(southwest: LatLng(this[0], this[1]), northeast: LatLng(this[2], this[3]));
+  LatLngBounds get asLatLngBounds => LatLngBounds(
+    southwest: LatLng(this[0], this[1]),
+    northeast: LatLng(this[2], this[3]),
+  );
 
   /// Expands this bounding box to include the given [point].
   ///
@@ -147,6 +153,8 @@ extension SetExtension<T> on Set<T> {
   /// Note: Elements not present in [order] will have an index of -1 and will be sorted to the end.
   Set<T> orderedBy(Iterable<T> order) {
     final orderList = order.toList();
-    return sorted((a, b) => orderList.indexOf(a) - orderList.indexOf(b)).toSet();
+    return sorted(
+      (a, b) => orderList.indexOf(a) - orderList.indexOf(b),
+    ).toSet();
   }
 }

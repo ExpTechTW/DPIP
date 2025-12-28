@@ -22,7 +22,8 @@ class WelcomePermissionPage extends StatefulWidget {
   State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
 }
 
-class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
+class _WelcomePermissionPageState extends State<WelcomePermissionPage>
+    with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   late Future<bool> _autoStartPermission;
   bool _autoStartStatus = false;
@@ -33,12 +34,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     if (!_isNotificationPermission) {
       await Permission.notification.request();
       if (Platform.isIOS) {
-        final NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-          announcement: true,
-          carPlay: true,
-          criticalAlert: true,
-          provisional: true,
-        );
+        final NotificationSettings iosrp = await FirebaseMessaging.instance
+            .requestPermission(
+              announcement: true,
+              carPlay: true,
+              criticalAlert: true,
+              provisional: true,
+            );
         if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
           _isNotificationPermission = true;
         }
@@ -74,7 +76,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       final status = await Permission.notification.status;
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
-      _isNotificationPermission = await AwesomeNotifications().isNotificationAllowed();
+      _isNotificationPermission = await AwesomeNotifications()
+          .isNotificationAllowed();
     }
   }
 
@@ -113,7 +116,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.locationAlways, Permission.photosAddOnly];
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            Permission.photosAddOnly,
+          ];
         }
       } else {
         if (Platform.isAndroid) {
@@ -125,7 +132,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.location, Permission.photosAddOnly];
+          permissions = [
+            Permission.notification,
+            Permission.location,
+            Permission.photosAddOnly,
+          ];
         }
       }
 
@@ -137,7 +148,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     return permissions;
   }
 
-  List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
+  List<PermissionItem> _createPermissionItems(
+    List<Permission> permissions,
+    BuildContext context,
+  ) {
     final items = <PermissionItem>[];
     for (final Permission permission in permissions) {
       IconData icon;
@@ -199,7 +213,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: item.isHighlighted ? Border.all(color: Colors.red, width: 2) : null,
+          border: item.isHighlighted
+              ? Border.all(color: Colors.red, width: 2)
+              : null,
         ),
         child: ListTile(
           leading: CircleAvatar(
@@ -219,11 +235,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       future: item.permission.status,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
+          return const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          );
         }
         final status = snapshot.data ?? PermissionStatus.denied;
 
-        return Switch(value: status.isGranted, onChanged: (value) => _handlePermissionChange(item, value));
+        return Switch(
+          value: status.isGranted,
+          onChanged: (value) => _handlePermissionChange(item, value),
+        );
       },
     );
   }
@@ -245,7 +268,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       setState(() {});
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('權限請求失敗: ${item.text}')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('權限請求失敗: ${item.text}')));
       }
     } finally {
       setState(() {
@@ -268,7 +293,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           _showPermanentlyDeniedDialog(item);
         } else if (status.isGranted) {
           if (Platform.isAndroid) {
-            final shouldContinue = await _showBackgroundLocationExplanationDialog();
+            final shouldContinue =
+                await _showBackgroundLocationExplanationDialog();
 
             if (shouldContinue && mounted) {
               await Permission.locationAlways.request();
@@ -306,12 +332,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         await openAppSettings();
       }
     } else if (Platform.isIOS) {
-      final NotificationSettings iosSettings = await FirebaseMessaging.instance.requestPermission(
-        announcement: true,
-        carPlay: true,
-        criticalAlert: true,
-        provisional: false,
-      );
+      final NotificationSettings iosSettings = await FirebaseMessaging.instance
+          .requestPermission(
+            announcement: true,
+            carPlay: true,
+            criticalAlert: true,
+            provisional: false,
+          );
       if (iosSettings.criticalAlert == AppleNotificationSetting.enabled) {
         _isNotificationPermission = true;
       }
@@ -325,7 +352,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         title: Text('權限請求'.i18n),
         content: Text('需要使用者手動到設定開啟相關權限。'.i18n),
         actions: [
-          TextButton(child: Text('取消'.i18n), onPressed: () => Navigator.of(context).pop()),
+          TextButton(
+            child: Text('取消'.i18n),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           TextButton(
             child: Text('確定'.i18n),
             onPressed: () {
@@ -350,8 +380,14 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               .i18n,
         ),
         actions: [
-          TextButton(child: Text('稍後'.i18n), onPressed: () => Navigator.of(context).pop(false)),
-          FilledButton(child: Text('前往設定'.i18n), onPressed: () => Navigator.of(context).pop(true)),
+          TextButton(
+            child: Text('稍後'.i18n),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          FilledButton(
+            child: Text('前往設定'.i18n),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
         ],
       ),
     );
@@ -378,7 +414,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Icon(Symbols.security_rounded, size: 80, color: context.colors.primary),
+                    child: Icon(
+                      Symbols.security_rounded,
+                      size: 80,
+                      color: context.colors.primary,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -398,14 +438,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                         Text(
                           '我們一直和使用者站在一起，為使用者的隱私而不斷努力。'.i18n,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           '防災資訊平台',
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(alpha: 0.7),
+                            color: context.colors.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -426,8 +470,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                   return const Center(child: Text('No permissions to display'));
                 }
 
-                final permissionItems = _createPermissionItems(snapshot.data!, context);
-                return Column(children: permissionItems.map(_buildPermissionCard).toList());
+                final permissionItems = _createPermissionItems(
+                  snapshot.data!,
+                  context,
+                );
+                return Column(
+                  children: permissionItems.map(_buildPermissionCard).toList(),
+                );
               },
             ),
             // if (Platform.isAndroid)

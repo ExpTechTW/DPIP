@@ -19,7 +19,8 @@ class RealtimeWeatherStation {
     required this.distance,
   });
 
-  factory RealtimeWeatherStation.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherStationFromJson(json);
+  factory RealtimeWeatherStation.fromJson(Map<String, dynamic> json) =>
+      _$RealtimeWeatherStationFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherStationToJson(this);
 }
 
@@ -29,9 +30,14 @@ class RealtimeWeatherWind {
   final double speed;
   final int beaufort;
 
-  RealtimeWeatherWind({required this.direction, required this.speed, required this.beaufort});
+  RealtimeWeatherWind({
+    required this.direction,
+    required this.speed,
+    required this.beaufort,
+  });
 
-  factory RealtimeWeatherWind.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherWindFromJson(json);
+  factory RealtimeWeatherWind.fromJson(Map<String, dynamic> json) =>
+      _$RealtimeWeatherWindFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherWindToJson(this);
 }
 
@@ -42,7 +48,8 @@ class RealtimeWeatherGust {
 
   RealtimeWeatherGust({required this.speed, required this.beaufort});
 
-  factory RealtimeWeatherGust.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherGustFromJson(json);
+  factory RealtimeWeatherGust.fromJson(Map<String, dynamic> json) =>
+      _$RealtimeWeatherGustFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherGustToJson(this);
 }
 
@@ -72,7 +79,8 @@ class RealtimeWeatherData {
     required this.sunshine,
   });
 
-  factory RealtimeWeatherData.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherDataFromJson(json);
+  factory RealtimeWeatherData.fromJson(Map<String, dynamic> json) =>
+      _$RealtimeWeatherDataFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherDataToJson(this);
 }
 
@@ -90,6 +98,7 @@ class RealtimeWeather {
     required this.data,
   });
 
-  factory RealtimeWeather.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherFromJson(json);
+  factory RealtimeWeather.fromJson(Map<String, dynamic> json) =>
+      _$RealtimeWeatherFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherToJson(this);
 }

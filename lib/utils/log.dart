@@ -16,7 +16,9 @@ class CustomLoggerFormatter implements LoggerFormatter {
 class TalkerManager {
   TalkerManager._();
 
-  static final Talker _instance = Talker(logger: TalkerLogger(formatter: const CustomLoggerFormatter()));
+  static final Talker _instance = Talker(
+    logger: TalkerLogger(formatter: const CustomLoggerFormatter()),
+  );
 
   static Talker get instance => _instance;
 }

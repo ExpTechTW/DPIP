@@ -11,7 +11,8 @@ class RankingPage extends StatefulWidget {
   State<RankingPage> createState() => _RankingPageState();
 }
 
-class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin {
+class _RankingPageState extends State<RankingPage>
+    with TickerProviderStateMixin {
   late final controller = TabController(length: 3, vsync: this);
   final scroll = GlobalKey<NestedScrollViewState>();
   bool showFAB = false;
@@ -26,7 +27,8 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
       innerController.addListener(() {
         if (controller.indexIsChanging) return;
 
-        if (innerController.offset == innerController.position.minScrollExtent) {
+        if (innerController.offset ==
+            innerController.position.minScrollExtent) {
           if (showFAB) setState(() => showFAB = false);
         } else {
           if (!showFAB) setState(() => showFAB = true);
@@ -35,7 +37,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
     });
     controller.addListener(() {
       if (!controller.indexIsChanging) return;
-      scroll.currentState?.outerController.animateTo(0, duration: Durations.long2, curve: Easing.standard);
+      scroll.currentState?.outerController.animateTo(
+        0,
+        duration: Durations.long2,
+        curve: Easing.standard,
+      );
       setState(() => showFAB = false);
     });
   }
@@ -68,7 +74,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
           TabBarView(
             controller: controller,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [RankingPrecipitationTab(), RankingTemperatureTab(), RankingWindTab()],
+            children: const [
+              RankingPrecipitationTab(),
+              RankingTemperatureTab(),
+              RankingWindTab(),
+            ],
           ),
           Positioned(
             bottom: 8,
@@ -85,7 +95,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
                     duration: Durations.medium1,
                     curve: Easing.standard,
                   );
-                  scroll.currentState?.outerController.animateTo(0, duration: Durations.long2, curve: Easing.standard);
+                  scroll.currentState?.outerController.animateTo(
+                    0,
+                    duration: Durations.long2,
+                    curve: Easing.standard,
+                  );
                 },
               ),
             ),

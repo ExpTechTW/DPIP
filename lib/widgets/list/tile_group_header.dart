@@ -12,7 +12,11 @@ class ListTileGroupHeader extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Text(
         title,
-        style: TextStyle(color: context.colors.primary, fontSize: 14, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: context.colors.primary,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

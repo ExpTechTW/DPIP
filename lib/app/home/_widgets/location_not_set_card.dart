@@ -25,14 +25,23 @@ class LocationNotSetCard extends StatelessWidget {
           Row(
             spacing: 8,
             children: [
-              Icon(Symbols.not_listed_location_rounded, color: context.colors.onSecondaryContainer, weight: 500),
+              Icon(
+                Symbols.not_listed_location_rounded,
+                color: context.colors.onSecondaryContainer,
+                weight: 500,
+              ),
               Text(
                 '尚未設定所在地'.i18n,
-                style: context.texts.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
+                style: context.texts.bodyMedium!.copyWith(
+                  color: context.colors.onSecondaryContainer,
+                ),
               ),
             ],
           ),
-          TextButton(child: Text('設定'.i18n), onPressed: () => context.push(SettingsLocationPage.route)),
+          TextButton(
+            child: Text('設定'.i18n),
+            onPressed: () => context.push(SettingsLocationPage.route),
+          ),
         ],
       ),
     );

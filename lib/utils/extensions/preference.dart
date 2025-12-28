@@ -51,7 +51,11 @@ extension PreferenceExtension on SharedPreferencesWithCache {
         case List<String>():
           return setStringList(key, value);
         default:
-          throw ArgumentError.value(value, 'value', 'Unsupported type: ${value.runtimeType}');
+          throw ArgumentError.value(
+            value,
+            'value',
+            'Unsupported type: ${value.runtimeType}',
+          );
       }
     } catch (e, s) {
       TalkerManager.instance.error('💾 $key set to "$value" FAILED', e, s);

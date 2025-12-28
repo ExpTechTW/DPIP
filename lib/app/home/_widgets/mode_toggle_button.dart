@@ -45,18 +45,29 @@ class ModeToggleButton extends StatelessWidget {
   final HomeMode currentMode;
   final ValueChanged<HomeMode> onModeChanged;
 
-  const ModeToggleButton({super.key, required this.currentMode, required this.onModeChanged});
+  const ModeToggleButton({
+    super.key,
+    required this.currentMode,
+    required this.onModeChanged,
+  });
 
   void _showModeMenu(BuildContext context) {
     final RenderBox? button = context.findRenderObject() as RenderBox?;
-    final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+    final RenderBox? overlay =
+        Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
 
     if (button == null || overlay == null) return;
 
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(button.size.bottomLeft(Offset.zero), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+        button.localToGlobal(
+          button.size.bottomLeft(Offset.zero),
+          ancestor: overlay,
+        ),
+        button.localToGlobal(
+          button.size.bottomRight(Offset.zero),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );
@@ -75,13 +86,19 @@ class ModeToggleButton extends StatelessWidget {
               Icon(
                 mode.icon,
                 size: 20,
-                color: currentMode == mode ? context.colors.primary : context.colors.onSurfaceVariant,
+                color: currentMode == mode
+                    ? context.colors.primary
+                    : context.colors.onSurfaceVariant,
               ),
               Text(
                 mode.label,
                 style: context.theme.textTheme.bodyMedium?.copyWith(
-                  color: currentMode == mode ? context.colors.primary : context.colors.onSurface,
-                  fontWeight: currentMode == mode ? FontWeight.bold : FontWeight.normal,
+                  color: currentMode == mode
+                      ? context.colors.primary
+                      : context.colors.onSurface,
+                  fontWeight: currentMode == mode
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                 ),
               ),
             ],
@@ -110,8 +127,12 @@ class ModeToggleButton extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: context.colors.outlineVariant.withValues(alpha: 0.4)),
-              color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+              border: Border.all(
+                color: context.colors.outlineVariant.withValues(alpha: 0.4),
+              ),
+              color: context.colors.surfaceContainerHighest.withValues(
+                alpha: 0.6,
+              ),
             ),
             child: InkWell(
               onTap: () => _showModeMenu(context),
@@ -122,12 +143,22 @@ class ModeToggleButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 8,
                   children: [
-                    Icon(currentMode.icon, size: 20, color: context.colors.outline),
+                    Icon(
+                      currentMode.icon,
+                      size: 20,
+                      color: context.colors.outline,
+                    ),
                     Text(
                       currentMode.label,
-                      style: context.theme.textTheme.bodyLarge?.copyWith(color: context.colors.outline),
+                      style: context.theme.textTheme.bodyLarge?.copyWith(
+                        color: context.colors.outline,
+                      ),
                     ),
-                    Icon(Symbols.arrow_drop_down_rounded, size: 20, color: context.colors.outline),
+                    Icon(
+                      Symbols.arrow_drop_down_rounded,
+                      size: 20,
+                      color: context.colors.outline,
+                    ),
                   ],
                 ),
               ),

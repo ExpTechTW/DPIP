@@ -36,7 +36,9 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
                   controller: _controller,
                   padding: const EdgeInsets.all(16),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight + 1),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight + 1,
+                    ),
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -46,7 +48,11 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Column(
                               children: [
-                                Icon(Symbols.monitor_heart_rounded, size: 36, color: context.colors.secondary),
+                                Icon(
+                                  Symbols.monitor_heart_rounded,
+                                  size: 36,
+                                  color: context.colors.secondary,
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   '強震監視器',
@@ -71,9 +77,10 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
                             ),
                             child: Text(
                               '顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。',
-                              style: context.theme.textTheme.bodyLarge!.copyWith(
-                                color: context.colors.onErrorContainer,
-                              ),
+                              style: context.theme.textTheme.bodyLarge!
+                                  .copyWith(
+                                    color: context.colors.onErrorContainer,
+                                  ),
                             ),
                           ),
                           Container(
@@ -84,9 +91,10 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
                             ),
                             child: Text(
                               '強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。',
-                              style: context.theme.textTheme.bodyLarge!.copyWith(
-                                color: context.colors.onErrorContainer,
-                              ),
+                              style: context.theme.textTheme.bodyLarge!
+                                  .copyWith(
+                                    color: context.colors.onErrorContainer,
+                                  ),
                             ),
                           ),
                           Container(
@@ -136,8 +144,14 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(onPressed: () => context.pop(false), child: const Text('不同意')),
-                FilledButton(onPressed: _isAgreeUnlocked ? () => context.pop(true) : null, child: const Text('同意')),
+                TextButton(
+                  onPressed: () => context.pop(false),
+                  child: const Text('不同意'),
+                ),
+                FilledButton(
+                  onPressed: _isAgreeUnlocked ? () => context.pop(true) : null,
+                  child: const Text('同意'),
+                ),
               ],
             ),
           ),

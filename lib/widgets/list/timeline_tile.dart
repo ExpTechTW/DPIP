@@ -52,7 +52,10 @@ class TimeLineTile extends StatelessWidget {
                   Text(
                     DateFormat('HH:mm:ss').format(time),
                     textAlign: TextAlign.right,
-                    style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
+                    style: TextStyle(
+                      color: context.colors.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -69,19 +72,26 @@ class TimeLineTile extends StatelessWidget {
                     child: Container(
                       width: 2,
                       height: first ? height / 2 : height,
-                      color: context.colors.outlineVariant, // Color of the vertical line
+                      color: context
+                          .colors
+                          .outlineVariant, // Color of the vertical line
                     ),
                   )
                 else
                   Container(
                     width: 2,
                     height: first ? height / 2 : height,
-                    color: context.colors.outlineVariant, // Color of the vertical line
+                    color: context
+                        .colors
+                        .outlineVariant, // Color of the vertical line
                   ),
                 Container(
                   height: 42,
                   width: 42,
-                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
                   child: Center(child: icon),
                 ),
               ],

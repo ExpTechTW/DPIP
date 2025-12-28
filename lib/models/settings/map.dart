@@ -8,12 +8,19 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
 
 class SettingsMapModel extends ChangeNotifier {
-  void _log(String message) => TalkerManager.instance.info('[SettingsMapModel] $message');
+  void _log(String message) =>
+      TalkerManager.instance.info('[SettingsMapModel] $message');
 
   final updateIntervalNotifier = ValueNotifier(Preference.mapUpdateFps ?? 10);
-  final baseMapNotifier = ValueNotifier(BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech);
+  final baseMapNotifier = ValueNotifier(
+    BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech,
+  );
   final layersNotifier = ValueNotifier(
-    Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor},
+    Preference.mapLayers
+            ?.split(',')
+            .map((v) => MapLayer.values.byName(v))
+            .toSet() ??
+        {MapLayer.monitor},
   );
   final autoZoomNotifier = ValueNotifier(Preference.mapAutoZoom ?? false);
 
@@ -21,7 +28,9 @@ class SettingsMapModel extends ChangeNotifier {
   void setUpdateInterval(int value) {
     Preference.mapUpdateFps = value;
     updateIntervalNotifier.value = value;
-    _log('Changed ${PreferenceKeys.mapUpdateFps} to ${Preference.mapUpdateFps}');
+    _log(
+      'Changed ${PreferenceKeys.mapUpdateFps} to ${Preference.mapUpdateFps}',
+    );
     notifyListeners();
   }
 
@@ -33,7 +42,8 @@ class SettingsMapModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  UnmodifiableSetView<MapLayer> get layers => UnmodifiableSetView(layersNotifier.value.orderedBy(MapLayer.values));
+  UnmodifiableSetView<MapLayer> get layers =>
+      UnmodifiableSetView(layersNotifier.value.orderedBy(MapLayer.values));
   void setLayers(Set<MapLayer> value) {
     final sorted = value.orderedBy(MapLayer.values);
     Preference.mapLayers = sorted.map((e) => e.name).join(',');
@@ -57,9 +67,15 @@ class SettingsMapModel extends ChangeNotifier {
   /// This method is used to refresh the map settings when the preferences are updated.
   void refresh() {
     updateIntervalNotifier.value = Preference.mapUpdateFps ?? 10;
-    baseMapNotifier.value = BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech;
+    baseMapNotifier.value =
+        BaseMapType.values.asNameMap()[Preference.mapBase] ??
+        BaseMapType.exptech;
     layersNotifier.value =
-        Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor};
+        Preference.mapLayers
+            ?.split(',')
+            .map((v) => MapLayer.values.byName(v))
+            .toSet() ??
+        {MapLayer.monitor};
     autoZoomNotifier.value = Preference.mapAutoZoom ?? false;
   }
 }

@@ -67,12 +67,16 @@ class _PressureMapState extends State<PressureMap> {
 
     await _mapController.addSource(
       'pressure-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+      const GeojsonSourceProperties(
+        data: {'type': 'FeatureCollection', 'features': []},
+      ),
     );
 
     weather_list = await ExpTech().getWeatherList();
 
-    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    final List<WeatherStation> weatherData = await ExpTech().getWeather(
+      weather_list.last,
+    );
 
     pressureDataList = weatherData
         .where((station) => station.data.air.pressure != -99)
@@ -94,7 +98,9 @@ class _PressureMapState extends State<PressureMap> {
     if (isUserLocationValid) {
       await _mapController.addSource(
         'markers-geojson',
-        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+        const GeojsonSourceProperties(
+          data: {'type': 'FeatureCollection', 'features': []},
+        ),
       );
       await _mapController.setGeoJsonSource('markers-geojson', {
         'type': 'FeatureCollection',
@@ -109,8 +115,14 @@ class _PressureMapState extends State<PressureMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      final cameraUpdate = CameraUpdate.newLatLngZoom(
+        LatLng(userLat, userLon),
+        8,
+      );
+      await _mapController.animateCamera(
+        cameraUpdate,
+        duration: const Duration(milliseconds: 1000),
+      );
     }
 
     await _addUserLocationMarker();
@@ -157,7 +169,10 @@ class _PressureMapState extends State<PressureMap> {
         )
         .toList();
 
-    await _mapController.setGeoJsonSource('pressure-data', {'type': 'FeatureCollection', 'features': features});
+    await _mapController.setGeoJsonSource('pressure-data', {
+      'type': 'FeatureCollection',
+      'features': features,
+    });
 
     await _mapController.removeLayer('pressure-circles');
     await _mapController.addLayer(
@@ -193,12 +208,20 @@ class _PressureMapState extends State<PressureMap> {
       ),
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['pressure-circles'], null);
+    _mapController.onFeatureTapped.add((
+      dynamic feature,
+      Point<double> point,
+      LatLng latLng,
+      String layerId,
+    ) async {
+      final features = await _mapController.queryRenderedFeatures(point, [
+        'pressure-circles',
+      ], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        if (_selectedStationId != null)
+          AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });
@@ -272,7 +295,9 @@ class _PressureMapState extends State<PressureMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 12))).toList(),
+        children: labels
+            .map((label) => Text(label, style: const TextStyle(fontSize: 12)))
+            .toList(),
       ),
     );
   }
@@ -330,7 +355,8 @@ class _PressureMapState extends State<PressureMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech()
+                    .getWeather(time);
 
                 pressureDataList = [];
 
@@ -366,9 +392,15 @@ class _PressureMapState extends State<PressureMap> {
               return Container(
                 decoration: BoxDecoration(
                   color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -379,7 +411,10 @@ class _PressureMapState extends State<PressureMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                       AdvancedWeatherChart(
                         type: 'pressure',

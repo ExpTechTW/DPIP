@@ -40,7 +40,8 @@ class Routes {
     return Uri.parse(url);
   }
 
-  static Uri report(String reportId) => Uri.parse('$api/v2/eq/report/$reportId');
+  static Uri report(String reportId) =>
+      Uri.parse('$api/v2/eq/report/$reportId');
 
   static Uri tsunamiList() => Uri.parse('$onlyapi/v1/tsunami/list');
 
@@ -52,9 +53,11 @@ class Routes {
 
   static Uri eew() => Uri.parse('$lb/v2/eq/eew');
 
-  static Uri weatherRealtimeByCoords(double lat, double lon) =>
-      Uri.parse('$onlyapi/v3/weather/realtime/${lat.toStringAsFixed(2)},${lon.toStringAsFixed(2)}');
-  static Uri weatherForecast(String postalCode) => Uri.parse('$onlyapi/v3/weather/forecast/$postalCode');
+  static Uri weatherRealtimeByCoords(double lat, double lon) => Uri.parse(
+    '$onlyapi/v3/weather/realtime/${lat.toStringAsFixed(2)},${lon.toStringAsFixed(2)}',
+  );
+  static Uri weatherForecast(String postalCode) =>
+      Uri.parse('$onlyapi/v3/weather/forecast/$postalCode');
 
   static Uri station() => Uri.parse('$api/v1/trem/station');
 
@@ -64,9 +67,11 @@ class Routes {
 
   static Uri weatherList() => Uri.parse('$onlyapi/v1/meteor/weather/list');
 
-  static Uri weather(String time) => Uri.parse('$onlyapi/v1/meteor/weather/$time');
+  static Uri weather(String time) =>
+      Uri.parse('$onlyapi/v1/meteor/weather/$time');
 
-  static Uri meteorStation(String id) => Uri.parse('$onlyapi/v1/meteor/station/$id');
+  static Uri meteorStation(String id) =>
+      Uri.parse('$onlyapi/v1/meteor/station/$id');
 
   static Uri event(String id) => Uri.parse('$onlyapi/v1/dpip/event/$id');
 
@@ -74,21 +79,26 @@ class Routes {
 
   static Uri rain(String time) => Uri.parse('$onlyapi/v1/meteor/rain/$time');
 
-  static Uri typhoonImagesList() => Uri.parse('$onlyapi/v1/meteor/typhoon/images/list');
+  static Uri typhoonImagesList() =>
+      Uri.parse('$onlyapi/v1/meteor/typhoon/images/list');
 
-  static Uri typhoonGeojson() => Uri.parse('$onlyapi/v1/meteor/typhoon/geojson');
+  static Uri typhoonGeojson() =>
+      Uri.parse('$onlyapi/v1/meteor/typhoon/geojson');
 
   static Uri lightningList() => Uri.parse('$onlyapi/v1/meteor/lightning/list');
 
-  static Uri lightning(String time) => Uri.parse('$onlyapi/v1/meteor/lightning/$time');
+  static Uri lightning(String time) =>
+      Uri.parse('$onlyapi/v1/meteor/lightning/$time');
 
   static Uri realtime() => Uri.parse('$onlyapi/v1/dpip/realtime/list');
 
   static Uri history() => Uri.parse('$onlyapi/v1/dpip/history/list');
 
-  static Uri realtimeRegion(String region) => Uri.parse('$onlyapi/v1/dpip/realtime/$region');
+  static Uri realtimeRegion(String region) =>
+      Uri.parse('$onlyapi/v1/dpip/realtime/$region');
 
-  static Uri historyRegion(String region) => Uri.parse('$onlyapi/v1/dpip/history/$region');
+  static Uri historyRegion(String region) =>
+      Uri.parse('$onlyapi/v1/dpip/history/$region');
 
   static Uri support() => Uri.parse('$onlyapi/v1/dpip/support');
 
@@ -98,7 +108,8 @@ class Routes {
 
   static Uri notificationHistory() => Uri.parse('$onlyapi/v1/notify/history');
 
-  static Uri status() => Uri.parse('https://status.exptech.dev/api/v1/status/data?duration=1d');
+  static Uri status() =>
+      Uri.parse('https://status.exptech.dev/api/v1/status/data?duration=1d');
 
   /// 回傳所在地
   ///
@@ -111,7 +122,11 @@ class Routes {
   /// - `token`: FCM Token
   /// - `lat`: 緯度
   /// - `lng`: 經度
-  static Uri location({required String token, required String lat, required String lng}) {
+  static Uri location({
+    required String token,
+    required String lat,
+    required String lng,
+  }) {
     if (token.isEmpty) {
       throw ArgumentError.value(token, 'token', 'Token is empty');
     }
@@ -119,7 +134,9 @@ class Routes {
     final platform = Platform.isIOS ? 1 : 0;
     final version = Global.packageInfo.version;
 
-    return Uri.parse('$onlyapi/v2/location/$platform/$token/$version/$lat,$lng');
+    return Uri.parse(
+      '$onlyapi/v2/location/$platform/$token/$version/$lat,$lng',
+    );
   }
 
   /// ## 取得通知
@@ -134,7 +151,8 @@ class Routes {
   ///
   /// ### 回傳
   /// - `200`: 成功
-  static Uri notify({required String token}) => Uri.parse('https://api-1.exptech.dev/api/v2/notify/$token');
+  static Uri notify({required String token}) =>
+      Uri.parse('https://api-1.exptech.dev/api/v2/notify/$token');
 
   /// ## 設定通知
   ///
@@ -152,7 +170,11 @@ class Routes {
   /// ### 回傳
   /// - `202`: 成功
   /// - `401`: 需要先呼叫 [ExpTech.getLocation]
-  static Uri notifyStatus({required String token, required NotifyChannel channel, required Enum status}) {
+  static Uri notifyStatus({
+    required String token,
+    required NotifyChannel channel,
+    required Enum status,
+  }) {
     if (token.isEmpty) {
       throw ArgumentError.value(token, 'token', 'Token is empty');
     }
@@ -172,7 +194,9 @@ class Routes {
     final type = channel.index;
     final value = status.index;
 
-    return Uri.parse('https://api-1.exptech.dev/api/v2/notify/$token/$type/$value');
+    return Uri.parse(
+      'https://api-1.exptech.dev/api/v2/notify/$token/$type/$value',
+    );
   }
 
   static Uri networkInfo() => Uri.parse('$lb/v1/dpip/networkInfo');

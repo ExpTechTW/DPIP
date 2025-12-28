@@ -44,7 +44,9 @@ class WindMapLayerManager extends MapLayerManager {
   // Label layout constants for wind labels
   static const double kLabelBaseOffset = 2.0;
   static const double kLabelLineHeight = 1.1;
-  final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
+  final currentWindTime = ValueNotifier<String?>(
+    GlobalProviders.data.wind.firstOrNull,
+  );
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
@@ -94,7 +96,9 @@ class WindMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.wind(time);
       final layerId = MapLayerIds.wind(time);
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (!isSourceExists) {
@@ -108,7 +112,11 @@ class WindMapLayerManager extends MapLayerManager {
         }
 
         final features = weatherData
-            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+            .where(
+              (station) =>
+                  station.data.wind.direction != -99 &&
+                  station.data.wind.speed != -99,
+            )
             .map((station) => station.toFeatureBuilder())
             .toList();
 
@@ -173,7 +181,12 @@ class WindMapLayerManager extends MapLayerManager {
           visibility: visible ? 'visible' : 'none',
         );
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          layerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
         await controller.addLayer(
           sourceId,
           '$layerId-label-name',
@@ -234,7 +247,9 @@ class WindMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+      if (_lastFetchTime == null ||
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+        await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.show', e, s);
     }
@@ -286,18 +301,27 @@ class WindMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
+                  final grouped = times
+                      .groupListsBy((time) => time.date)
+                      .entries
+                      .toList();
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Row(
                           spacing: 8,
                           children: [
                             const Icon(Symbols.wind_power_rounded, size: 24),
-                            Text('風向/風速'.i18n, style: context.texts.titleMedium),
+                            Text(
+                              '風向/風速'.i18n,
+                              style: context.texts.titleMedium,
+                            ),
                           ],
                         ),
                       ),
@@ -307,17 +331,21 @@ class WindMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentWindTime,
                           builder: (context, currentWindTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               scrollDirection: Axis.horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) = grouped[index];
+                                final MapEntry(key: date, value: group) =
+                                    grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected = time.value == currentWindTime;
+                                  final isSelected =
+                                      time.value == currentWindTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(
@@ -328,14 +356,20 @@ class WindMapLayerSheet extends StatelessWidget {
                                           showCheckmark: !isLoading,
                                           label: Text(time.time),
                                           side: BorderSide(
-                                            color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                            color: isSelected
+                                                ? context.colors.primary
+                                                : context.colors.outlineVariant,
                                           ),
-                                          avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                          avatar: isSelected && isLoading
+                                              ? const LoadingIcon()
+                                              : null,
                                           onSelected: isLoading
                                               ? null
                                               : (selected) {
                                                   if (!selected) return;
-                                                  manager.setWindTime(time.value);
+                                                  manager.setWindTime(
+                                                    time.value,
+                                                  );
                                                 },
                                         );
                                       },
@@ -346,11 +380,19 @@ class WindMapLayerSheet extends StatelessWidget {
                                 children.add(
                                   const Padding(
                                     padding: EdgeInsets.only(right: 8),
-                                    child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                                    child: VerticalDivider(
+                                      width: 16,
+                                      indent: 8,
+                                      endIndent: 8,
+                                    ),
                                   ),
                                 );
 
-                                return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 8,
+                                  children: children,
+                                );
                               },
                             );
                           },
@@ -374,23 +416,43 @@ class WindMapLayerSheet extends StatelessWidget {
                 unit: 'm/s',
                 items: [
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffffff), size: 20),
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xffffffff),
+                      size: 20,
+                    ),
                     label: '0.1 - 3.3',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff03fff0), size: 20),
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xff03fff0),
+                      size: 20,
+                    ),
                     label: '3.4 - 7.9',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0385ff), size: 20),
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xff0385ff),
+                      size: 20,
+                    ),
                     label: '8.0 - 13.8',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff8000ff), size: 20),
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xff8000ff),
+                      size: 20,
+                    ),
                     label: '13.9 - 32.6',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xffff006b),
+                      size: 20,
+                    ),
                     label: '≥ 32.7',
                   ),
                 ],

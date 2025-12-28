@@ -8,7 +8,13 @@ class LayerToggle extends StatelessWidget {
   final void Function(bool)? onChanged;
   final void Function(bool)? onLongPress;
 
-  const LayerToggle({super.key, required this.checked, required this.label, required this.onChanged, this.onLongPress});
+  const LayerToggle({
+    super.key,
+    required this.checked,
+    required this.label,
+    required this.onChanged,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +26,9 @@ class LayerToggle extends StatelessWidget {
         opacity: isDisabled ? 0.4 : 1.0,
         child: InkWell(
           onTap: onChanged != null ? () => onChanged!(!checked) : null,
-          onLongPress: onLongPress != null ? () => onLongPress!(!checked) : null,
+          onLongPress: onLongPress != null
+              ? () => onLongPress!(!checked)
+              : null,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(6),
@@ -30,7 +38,12 @@ class LayerToggle extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: checked ? context.colors.primary : Colors.transparent, width: 2),
+                    border: Border.all(
+                      color: checked
+                          ? context.colors.primary
+                          : Colors.transparent,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(2),
@@ -39,10 +52,14 @@ class LayerToggle extends StatelessWidget {
                     child: Container(
                       height: 64,
                       width: 64,
-                      color: checked ? context.colors.primaryContainer : context.colors.surfaceContainerHighest,
+                      color: checked
+                          ? context.colors.primaryContainer
+                          : context.colors.surfaceContainerHighest,
                       child: Icon(
                         Symbols.layers_rounded,
-                        color: checked ? context.colors.onPrimaryContainer : context.colors.onSurface,
+                        color: checked
+                            ? context.colors.onPrimaryContainer
+                            : context.colors.onSurface,
                       ),
                     ),
                   ),
@@ -50,7 +67,9 @@ class LayerToggle extends StatelessWidget {
                 Text(
                   label,
                   style: context.theme.textTheme.labelMedium!.copyWith(
-                    color: checked ? context.colors.primary : context.colors.onSurfaceVariant,
+                    color: checked
+                        ? context.colors.primary
+                        : context.colors.onSurfaceVariant,
                     fontWeight: checked ? FontWeight.bold : null,
                   ),
                 ),

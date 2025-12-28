@@ -9,7 +9,10 @@ class TsunamiEstimateList extends StatelessWidget {
 
   String convertTimestamp(int timestamp) {
     final location = tz.getLocation('Asia/Taipei');
-    final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
+    final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(
+      location,
+      timestamp,
+    );
 
     final DateFormat formatter = DateFormat('d日HH:mm');
     final String formattedDate = formatter.format(dateTime);
@@ -57,10 +60,16 @@ class TsunamiEstimateList extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(item.area, style: const TextStyle(fontSize: 18, letterSpacing: 2)),
+                Text(
+                  item.area,
+                  style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                ),
                 Row(
                   children: [
-                    Text(convertTimestamp(item.arrivalTime), style: const TextStyle(fontSize: 12)),
+                    Text(
+                      convertTimestamp(item.arrivalTime),
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     const SizedBox(width: 10),
                     Container(
                       decoration: BoxDecoration(

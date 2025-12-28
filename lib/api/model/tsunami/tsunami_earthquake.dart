@@ -70,7 +70,8 @@ class TsunamiEarthquake {
     required this.author,
   });
 
-  factory TsunamiEarthquake.fromJson(Map<String, dynamic> json) => _$TsunamiEarthquakeFromJson(json);
+  factory TsunamiEarthquake.fromJson(Map<String, dynamic> json) =>
+      _$TsunamiEarthquakeFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiEarthquakeToJson(this);
 }

@@ -14,7 +14,12 @@ class LabeledDivider extends StatelessWidget {
         spacing: 8,
         children: [
           const SizedBox(width: 16, child: Divider()),
-          Text(label, style: context.texts.labelMedium?.copyWith(color: context.colors.outline)),
+          Text(
+            label,
+            style: context.texts.labelMedium?.copyWith(
+              color: context.colors.outline,
+            ),
+          ),
           const Expanded(child: Divider()),
         ],
       ),

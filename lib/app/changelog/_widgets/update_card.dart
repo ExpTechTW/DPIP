@@ -6,7 +6,12 @@ class UpdateCard extends StatelessWidget {
   final String description;
   final VoidCallback? onViewDetails;
 
-  const UpdateCard({super.key, required this.title, required this.description, this.onViewDetails});
+  const UpdateCard({
+    super.key,
+    required this.title,
+    required this.description,
+    this.onViewDetails,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +41,11 @@ class UpdateCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.new_releases, size: 28, color: context.theme.primaryColor),
+                        Icon(
+                          Icons.new_releases,
+                          size: 28,
+                          color: context.theme.primaryColor,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           title,
@@ -51,7 +60,8 @@ class UpdateCard extends StatelessWidget {
                     Text(
                       description,
                       style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                        color: context.theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -61,7 +71,10 @@ class UpdateCard extends StatelessWidget {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(color: Colors.amber.withValues(alpha: 0.2), shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
                 child: const Icon(Icons.update, size: 48, color: Colors.amber),
               ),
             ],

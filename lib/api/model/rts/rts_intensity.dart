@@ -12,7 +12,8 @@ class RtsIntensity {
 
   RtsIntensity({required this.code, required this.i});
 
-  factory RtsIntensity.fromJson(Map<String, dynamic> json) => _$RtsIntensityFromJson(json);
+  factory RtsIntensity.fromJson(Map<String, dynamic> json) =>
+      _$RtsIntensityFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsIntensityToJson(this);
 }

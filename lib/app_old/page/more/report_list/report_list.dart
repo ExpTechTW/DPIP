@@ -31,7 +31,8 @@ class _ReportListPageState extends State<ReportListPage> {
   });
 
   Future<void> refreshReportList() async {
-    if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
+    if (lastFetchTime != null &&
+        DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
       return;
     }
     if (isLoadingEnd) return;
@@ -112,11 +113,17 @@ class _ReportListPageState extends State<ReportListPage> {
         '最大震度: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
       );
     }
-    if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
-      summaries.add('規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
+    if (_magnitudeRange.start > 0 ||
+        (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
+      summaries.add(
+        '規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}',
+      );
     }
-    if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
-      summaries.add('深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
+    if (_depthRange.start > 0 ||
+        (_depthRange.end > 0 && _depthRange.end < 700)) {
+      summaries.add(
+        '深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km',
+      );
     }
 
     return summaries.isEmpty ? '全部' : summaries.join(', ');
@@ -144,11 +151,18 @@ class _ReportListPageState extends State<ReportListPage> {
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Container(
                 width: double.maxFinite,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 child: Wrap(
                   children: [
                     FilterChip(
-                      label: Text(_getFilterSummary() == '全部' ? '篩選器' : _getFilterSummary()),
+                      label: Text(
+                        _getFilterSummary() == '全部'
+                            ? '篩選器'
+                            : _getFilterSummary(),
+                      ),
                       selected: _getFilterSummary() != '全部',
                       onSelected: (_) => _showFilterDialog(),
                     ),
@@ -156,7 +170,9 @@ class _ReportListPageState extends State<ReportListPage> {
                 ),
               ),
             ),
-            shape: Border(bottom: BorderSide(color: context.colors.outlineVariant)),
+            shape: Border(
+              bottom: BorderSide(color: context.colors.outlineVariant),
+            ),
           ),
         ];
       },
@@ -242,7 +258,10 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _intensityRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _intensityRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),
@@ -257,7 +276,10 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _magnitudeRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _magnitudeRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),
@@ -266,10 +288,16 @@ class _ReportListPageState extends State<ReportListPage> {
                       values: _depthRange,
                       max: 700,
                       divisions: 70,
-                      labels: RangeLabels('${_depthRange.start.round()}km', '${_depthRange.end.round()}km'),
+                      labels: RangeLabels(
+                        '${_depthRange.start.round()}km',
+                        '${_depthRange.end.round()}km',
+                      ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _depthRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _depthRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),

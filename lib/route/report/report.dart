@@ -28,11 +28,16 @@ class ReportRoute extends StatefulWidget {
   State<ReportRoute> createState() => _ReportRouteState();
 }
 
-class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin {
+class _ReportRouteState extends State<ReportRoute>
+    with TickerProviderStateMixin {
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
 
-  late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
+  late final backgroundColor = Color.lerp(
+    context.colors.surface,
+    context.colors.surfaceTint,
+    0.08,
+  );
 
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
@@ -40,14 +45,25 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
-    end: BoxDecoration(borderRadius: BorderRadius.zero, boxShadow: kElevationToShadow[4], color: backgroundColor),
+    end: BoxDecoration(
+      borderRadius: BorderRadius.zero,
+      boxShadow: kElevationToShadow[4],
+      color: backgroundColor,
+    ),
   ).chain(CurveTween(curve: Curves.linear));
 
-  final opacityTween = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.linear));
+  final opacityTween = Tween(
+    begin: 0.0,
+    end: 1.0,
+  ).chain(CurveTween(curve: Curves.linear));
 
-  late final sheetInitialSize = context.padding.bottom / context.dimension.height + 0.2;
+  late final sheetInitialSize =
+      context.padding.bottom / context.dimension.height + 0.2;
   final sheetController = DraggableScrollableController();
-  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  late final animController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
   late ScrollController scrollController;
 
   bool isAppBarVisible = false;
@@ -72,7 +88,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
       for (final MapEntry(key: areaName, value: area) in data.list.entries) {
         for (final MapEntry(key: _, value: town) in area.town.entries) {
-          if (cityMaxIntensity[areaName] == null || cityMaxIntensity[areaName]! < town.intensity) {
+          if (cityMaxIntensity[areaName] == null ||
+              cityMaxIntensity[areaName]! < town.intensity) {
             cityMaxIntensity[areaName] = town.intensity;
           }
 
@@ -98,14 +115,20 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         'properties': {
           'intensity': 10, // 10 is for classifying epicenter cross
         },
-        'geometry': {'coordinates': data.latlng.asGeoJsonCooridnate, 'type': 'Point'},
+        'geometry': {
+          'coordinates': data.latlng.asGeoJsonCooridnate,
+          'type': 'Point',
+        },
       });
 
       bounds.expandBounds(data.latlng);
 
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(
-          LatLngBounds(southwest: LatLng(bounds[0], bounds[1]), northeast: LatLng(bounds[2], bounds[3])),
+          LatLngBounds(
+            southwest: LatLng(bounds[0], bounds[1]),
+            northeast: LatLng(bounds[2], bounds[3]),
+          ),
           left: 32,
           right: 32,
           top: 32,
@@ -117,7 +140,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         await controller.moveCamera(CameraUpdate.zoomTo(9));
       }
 
-      await controller.addGeoJsonSource('markers-geojson', {'type': 'FeatureCollection', 'features': markers});
+      await controller.addGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': markers,
+      });
 
       final waves = GeoJsonBuilder();
 
@@ -130,7 +156,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
         if (distance.s < 0) continue;
 
-        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance.s));
+        waves.addFeature(
+          circleFeature(
+            center: LatLng(data.latitude, data.longitude),
+            radius: distance.s,
+          ),
+        );
       }
 
       await controller.addGeoJsonSource('waves-geojson', waves.build());
@@ -197,7 +228,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             'match',
             ['get', 'NAME'],
             ...cityMaxIntensity.entries.expand(
-              (entry) => [entry.key, IntensityColor.intensity(entry.value).toHexStringRGB()],
+              (entry) => [
+                entry.key,
+                IntensityColor.intensity(entry.value).toHexStringRGB(),
+              ],
             ),
             context.colors.surfaceContainerHighest.toHexStringRGB(),
           ],
@@ -205,7 +239,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         ),
       );
 
-      await controller.setLayerProperties('town', const FillLayerProperties(fillOpacity: 0));
+      await controller.setLayerProperties(
+        'town',
+        const FillLayerProperties(fillOpacity: 0),
+      );
 
       setState(() {
         report = data;
@@ -220,10 +257,17 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
   Future<void> focus(LatLng target) async {
     final controller = await mapController.future;
-    sheetController.animateTo(sheetInitialSize, duration: Durations.short4, curve: Easing.standard);
+    sheetController.animateTo(
+      sheetInitialSize,
+      duration: Durations.short4,
+      curve: Easing.standard,
+    );
     scrollController.jumpTo(0);
     controller.animateCamera(
-      CameraUpdate.newLatLngZoom(LatLng(target.latitude - 0.03, target.longitude), 10),
+      CameraUpdate.newLatLngZoom(
+        LatLng(target.latitude - 0.03, target.longitude),
+        10,
+      ),
       duration: const Duration(seconds: 1),
     );
   }
@@ -234,7 +278,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      final double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      final double scrollPosition =
+          ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(
+            0.0,
+            1.0,
+          );
 
       if (scrollPosition > 1e-5) {
         if (!isAppBarVisible) {
@@ -275,21 +323,39 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   if (report!.magnitude >= 6 &&
                       report!.magnitude < 7 &&
                       report!.depth <= 35 &&
-                      (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
+                      (report!.getLocation().endsWith('近海') ||
+                          report!.getLocation().endsWith('海域')))
                     Chip(
-                      avatar: Icon(Symbols.tsunami_rounded, color: context.theme.extendedColors.blue),
-                      label: Text('此地震可能引起若干海面變動', style: TextStyle(color: context.theme.extendedColors.blue)),
+                      avatar: Icon(
+                        Symbols.tsunami_rounded,
+                        color: context.theme.extendedColors.blue,
+                      ),
+                      label: Text(
+                        '此地震可能引起若干海面變動',
+                        style: TextStyle(
+                          color: context.theme.extendedColors.blue,
+                        ),
+                      ),
                       backgroundColor: Colors.blue.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                      side: BorderSide(color: context.theme.extendedColors.blue),
+                      side: BorderSide(
+                        color: context.theme.extendedColors.blue,
+                      ),
                     ),
                   // 不要翻譯這
                   if (report!.magnitude >= 7 &&
                       report!.depth <= 35 &&
-                      (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
+                      (report!.getLocation().endsWith('近海') ||
+                          report!.getLocation().endsWith('海域')))
                     Chip(
-                      avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
-                      label: Text('此地震可能引起海嘯 注意後續資訊', style: TextStyle(color: context.colors.error)),
+                      avatar: Icon(
+                        Symbols.tsunami_rounded,
+                        color: context.colors.error,
+                      ),
+                      label: Text(
+                        '此地震可能引起海嘯 注意後續資訊',
+                        style: TextStyle(color: context.colors.error),
+                      ),
                       backgroundColor: Colors.red.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.colors.error),
@@ -304,7 +370,9 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
               style: ButtonStyle(
                 elevation: const WidgetStatePropertyAll(4),
                 shadowColor: WidgetStatePropertyAll(context.colors.shadow),
-                surfaceTintColor: WidgetStatePropertyAll(context.colors.surfaceTint),
+                surfaceTintColor: WidgetStatePropertyAll(
+                  context.colors.surfaceTint,
+                ),
                 backgroundColor: WidgetStatePropertyAll(context.colors.surface),
               ),
             ),
@@ -331,14 +399,19 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                             children: [
                               const Flexible(
                                 flex: 8,
-                                child: Text('取得地震報告時發生錯誤，請檢查網路狀況後再試一次。', style: TextStyle(fontSize: 16)),
+                                child: Text(
+                                  '取得地震報告時發生錯誤，請檢查網路狀況後再試一次。',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Flexible(
                                 flex: 2,
                                 child: IconButton(
                                   icon: const Icon(Symbols.refresh),
-                                  style: ElevatedButton.styleFrom(foregroundColor: context.colors.onSurface),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: context.colors.onSurface,
+                                  ),
                                   onPressed: () {
                                     refreshReport();
                                   },
@@ -347,7 +420,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                             ],
                           ),
                         )
-                      : ReportSheetContent(report: report!, controller: controller, focus: focus),
+                      : ReportSheetContent(
+                          report: report!,
+                          controller: controller,
+                          focus: focus,
+                        ),
                 );
               },
             ),
@@ -358,7 +435,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             right: 0,
             child: Visibility(
               visible: isAppBarVisible,
-              child: FadeTransition(opacity: animController.drive(opacityTween), child: appBar),
+              child: FadeTransition(
+                opacity: animController.drive(opacityTween),
+                child: appBar,
+              ),
             ),
           ),
         ],

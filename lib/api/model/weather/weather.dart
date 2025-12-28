@@ -17,9 +17,15 @@ class WeatherStation {
 
   final DailyTemperature daily;
 
-  const WeatherStation({required this.id, required this.station, required this.data, required this.daily});
+  const WeatherStation({
+    required this.id,
+    required this.station,
+    required this.data,
+    required this.daily,
+  });
 
-  factory WeatherStation.fromJson(Map<String, dynamic> json) => _$WeatherStationFromJson(json);
+  factory WeatherStation.fromJson(Map<String, dynamic> json) =>
+      _$WeatherStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$WeatherStationToJson(this);
 
@@ -63,7 +69,8 @@ class StationInfo {
     required this.lng,
   });
 
-  factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
+  factory StationInfo.fromJson(Map<String, dynamic> json) =>
+      _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
 
@@ -76,9 +83,14 @@ class WeatherData {
   final Wind wind;
   final AirCondition air;
 
-  const WeatherData({required this.weather, required this.wind, required this.air});
+  const WeatherData({
+    required this.weather,
+    required this.wind,
+    required this.air,
+  });
 
-  factory WeatherData.fromJson(Map<String, dynamic> json) => _$WeatherDataFromJson(json);
+  factory WeatherData.fromJson(Map<String, dynamic> json) =>
+      _$WeatherDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$WeatherDataToJson(this);
 }
@@ -102,9 +114,14 @@ class AirCondition {
   @JsonKey(name: 'relative_humidity')
   final int relativeHumidity;
 
-  const AirCondition({required this.temperature, required this.pressure, required this.relativeHumidity});
+  const AirCondition({
+    required this.temperature,
+    required this.pressure,
+    required this.relativeHumidity,
+  });
 
-  factory AirCondition.fromJson(Map<String, dynamic> json) => _$AirConditionFromJson(json);
+  factory AirCondition.fromJson(Map<String, dynamic> json) =>
+      _$AirConditionFromJson(json);
 
   Map<String, dynamic> toJson() => _$AirConditionToJson(this);
 }
@@ -116,7 +133,8 @@ class DailyTemperature {
 
   const DailyTemperature({required this.high, required this.low});
 
-  factory DailyTemperature.fromJson(Map<String, dynamic> json) => _$DailyTemperatureFromJson(json);
+  factory DailyTemperature.fromJson(Map<String, dynamic> json) =>
+      _$DailyTemperatureFromJson(json);
 
   Map<String, dynamic> toJson() => _$DailyTemperatureToJson(this);
 }
@@ -128,7 +146,8 @@ class TemperatureRecord {
 
   const TemperatureRecord({required this.temperature, required this.time});
 
-  factory TemperatureRecord.fromJson(Map<String, dynamic> json) => _$TemperatureRecordFromJson(json);
+  factory TemperatureRecord.fromJson(Map<String, dynamic> json) =>
+      _$TemperatureRecordFromJson(json);
 
   Map<String, dynamic> toJson() => _$TemperatureRecordToJson(this);
 }

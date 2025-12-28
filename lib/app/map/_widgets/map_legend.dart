@@ -52,7 +52,13 @@ class ColorLegend extends StatelessWidget {
   final String? unit;
   final bool appendUnit;
 
-  const ColorLegend({super.key, required this.items, this.reverse = false, this.appendUnit = false, this.unit});
+  const ColorLegend({
+    super.key,
+    required this.items,
+    this.reverse = false,
+    this.appendUnit = false,
+    this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +74,20 @@ class ColorLegend extends StatelessWidget {
       final next = items.elementAtOrNull(index + 1);
 
       final headColor = item.blendHead
-          ? (previous != null ? Color.alphaBlend(item.color.withValues(alpha: 0.5), previous.color) : item.color)
+          ? (previous != null
+                ? Color.alphaBlend(
+                    item.color.withValues(alpha: 0.5),
+                    previous.color,
+                  )
+                : item.color)
           : item.color;
       final tailColor = item.blendTail
-          ? (next != null ? Color.alphaBlend(item.color.withValues(alpha: 0.5), next.color) : item.color)
+          ? (next != null
+                ? Color.alphaBlend(
+                    item.color.withValues(alpha: 0.5),
+                    next.color,
+                  )
+                : item.color)
           : item.color;
 
       return IntrinsicHeight(
@@ -122,7 +138,9 @@ class ColorLegend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.texts.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
       ],
     );
@@ -142,7 +160,13 @@ class Legend extends StatelessWidget {
   final String? unit;
   final bool appendUnit;
 
-  const Legend({super.key, required this.items, this.reverse = false, this.appendUnit = false, this.unit});
+  const Legend({
+    super.key,
+    required this.items,
+    this.reverse = false,
+    this.appendUnit = false,
+    this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +202,9 @@ class Legend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.texts.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
       ],
     );
