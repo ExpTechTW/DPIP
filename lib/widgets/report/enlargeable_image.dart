@@ -7,6 +7,7 @@ class EnlargeableImage extends StatelessWidget {
   final String heroTag;
   final String imageUrl;
   final String imageName;
+  final VoidCallback? onLoadFailed;
 
   const EnlargeableImage({
     super.key,
@@ -14,6 +15,7 @@ class EnlargeableImage extends StatelessWidget {
     required this.heroTag,
     required this.imageUrl,
     required this.imageName,
+    this.onLoadFailed,
   });
 
   @override
@@ -28,7 +30,13 @@ class EnlargeableImage extends StatelessWidget {
             children: [
               Hero(
                 tag: heroTag,
-                child: CachedNetworkImage(imageUrl: imageUrl),
+                child: CachedNetworkImage(imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) {
+                    onLoadFailed?.call();
+                    return const SizedBox.shrink();
+                  },
+                ),
               ),
               Positioned.fill(
                 child: Material(

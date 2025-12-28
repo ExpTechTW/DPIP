@@ -390,6 +390,79 @@ class ReportMapLayerSheet extends StatefulWidget {
   State<ReportMapLayerSheet> createState() => _ReportMapLayerSheetState();
 }
 
+class SafeImageSection extends StatefulWidget {
+  final Widget Function(VoidCallback onError) builder;
+
+  const SafeImageSection({
+    super.key,
+    required this.builder,
+  });
+
+  @override
+  State<SafeImageSection> createState() => _SafeImageSectionState();
+}
+
+class _SafeImageSectionState extends State<SafeImageSection> {
+  bool _hasError = false;
+  int _retryKey = 0;
+
+  void _onImageError() {
+    if (_hasError) return;
+    _hasError = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {});
+    });
+  }
+
+  void _retry() {
+    setState(() {
+      _hasError = false;
+      _retryKey++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) {
+      return _GeneratingView(onRetry: _retry);
+    }
+
+    return KeyedSubtree(
+      key: ValueKey(_retryKey),
+      child: widget.builder(_onImageError),
+    );
+  }
+}
+
+class _GeneratingView extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _GeneratingView({
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 2334 / 2977,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('CWA 正在製圖中'.i18n),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: Text('重新載入'.i18n),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
   final morphingSheetController = MorphingSheetController();
 
@@ -982,47 +1055,57 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ),
                         ],
                       ),
-                      if (report.hasNumber)
+                      if (report.hasNumber &&
+                          report.intensityMapImageUrl != null)
                         Section(
                           label: Text('震度圖'.i18n),
                           children: [
                             Padding(
                               padding: .symmetric(horizontal: 8),
-                              child: EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'intensity-image-${report.id}',
-                                imageUrl: report.intensityMapImageUrl!,
-                                imageName: report.intensityMapImageName!,
+                              child: SafeImageSection(
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'intensity-image-${report.id}',
+                                  imageUrl: report.intensityMapImageUrl!,
+                                  imageName: report.intensityMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      if (report.hasNumber)
+                      if (report.hasNumber && report.pgaMapImageUrl != null)
                         Section(
                           label: Text('最大地動加速度圖'.i18n),
                           children: [
                             Padding(
                               padding: .symmetric(horizontal: 8),
-                              child: EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'pga-image-${report.id}',
-                                imageUrl: report.pgaMapImageUrl!,
-                                imageName: report.pgaMapImageName!,
+                              child: SafeImageSection(
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'pga-image-${report.id}',
+                                  imageUrl: report.pgaMapImageUrl!,
+                                  imageName: report.pgaMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      if (report.hasNumber)
+                      if (report.hasNumber && report.pgvMapImageUrl != null)
                         Section(
                           label: Text('最大地動速度圖'.i18n),
                           children: [
                             Padding(
                               padding: .symmetric(horizontal: 8),
-                              child: EnlargeableImage(
-                                aspectRatio: 2334 / 2977,
-                                heroTag: 'pgv-image-${report.id}',
-                                imageUrl: report.pgvMapImageUrl!,
-                                imageName: report.pgvMapImageName!,
+                              child: SafeImageSection(
+                                builder: (onError) => EnlargeableImage(
+                                  aspectRatio: 2334 / 2977,
+                                  heroTag: 'pgv-image-${report.id}',
+                                  imageUrl: report.pgvMapImageUrl!,
+                                  imageName: report.pgvMapImageName!,
+                                  onLoadFailed: onError,
+                                ),
                               ),
                             ),
                           ],
