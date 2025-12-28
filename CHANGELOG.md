@@ -8,10 +8,27 @@
 ## [未發布]
 
 ### 新增
+- EEW 震度色塊
 
 ### 更改
+- 設定UI 樣式
 
 ### 修正
+- 部分地點所在地預估震度問題
+- 改善 App 啟動速度 (#490)
+
+## [3.1.401]
+
+### 新增
+- 地震重播
+
+### 更改
+- 支援平板介面
+- 部分網路用量降低
+
+### 修正
+- 地震報告框問題
+- 首頁底部點不到問題
 
 ## [3.1.310]
 
@@ -289,7 +306,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.310...HEAD
+[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.401...HEAD
+[3.1.401]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.310...v3.1.401
 [3.1.310]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.3...v3.1.310
 [3.1.306]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.004...v3.1.306
 [3.1.104]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.003...v3.1.104
