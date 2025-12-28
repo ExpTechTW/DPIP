@@ -1637,18 +1637,17 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             // Intensity legend - positioned at top right, just below buttons
             // Show RTS mode when no EEW, show EEW mode during EEW
             // Hide when sheet is expanded
-            if (_isCollapsed)
-              Positioned(
-                top: 80,
-                right: 16,
-                child: SafeArea(
-                  child: IntensityLegend(
-                    mode: activeEew.isNotEmpty
-                        ? IntensityLegendMode.eew
-                        : IntensityLegendMode.rts,
-                  ),
+            Positioned(
+              top: 80,
+              right: 16,
+              child: SafeArea(
+                child: IntensityLegend(
+                  mode: activeEew.isNotEmpty
+                      ? IntensityLegendMode.eew
+                      : IntensityLegendMode.rts,
                 ),
               ),
+            ),
             Positioned(
               top: 26,
               left: 95,
