@@ -20,23 +20,29 @@ class SettingsLayoutPage extends StatelessWidget {
         Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
             final tiles = [
-              SwitchListTile(
+              SectionListTile(
                 title: Text('雷達回波'.i18n),
-                value: model.isEnabled(HomeDisplaySection.radar),
-                onChanged: (v) =>
-                    model.toggleSection(HomeDisplaySection.radar, v),
+                trailing: Switch(
+                  value: model.isEnabled(HomeDisplaySection.radar),
+                  onChanged: (v) =>
+                      model.toggleSection(HomeDisplaySection.radar, v),
+                ),
               ),
-              SwitchListTile(
+              SectionListTile(
                 title: Text('天氣預報(24h)'.i18n),
-                value: model.isEnabled(HomeDisplaySection.forecast),
-                onChanged: (v) =>
-                    model.toggleSection(HomeDisplaySection.forecast, v),
+                trailing: Switch(
+                  value: model.isEnabled(HomeDisplaySection.forecast),
+                  onChanged: (v) =>
+                      model.toggleSection(HomeDisplaySection.forecast, v),
+                ),
               ),
-              SwitchListTile(
+              SectionListTile(
                 title: Text('歷史事件'.i18n),
-                value: model.isEnabled(HomeDisplaySection.history),
-                onChanged: (v) =>
-                    model.toggleSection(HomeDisplaySection.history, v),
+                trailing: Switch(
+                  value: model.isEnabled(HomeDisplaySection.history),
+                  onChanged: (v) =>
+                      model.toggleSection(HomeDisplaySection.history, v),
+                ),
               ),
             ];
             return Column(
