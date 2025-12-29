@@ -1,0 +1,14 @@
+{
+  "companyAnnouncements": [
+    "Welcome to DPIP development!",
+    "AI usage is prohibited except for documentation.",
+    "Reminder: Code reviews required for all PRs"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(dart run build_runner build:*)"
+    ]
+  }
+}
