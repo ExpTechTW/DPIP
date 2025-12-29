@@ -454,88 +454,97 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildCommunityCards() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+    return ResponsiveContainer(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 標題
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 標題
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Symbols.group_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 18,
+                  ),
                 ),
-                child: Icon(
-                  Symbols.group_rounded,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 18,
+                const SizedBox(width: 10),
+                Text(
+                  '社群'.i18n,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '社群'.i18n,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              ],
+            ),
+            const SizedBox(height: 16),
+            // 社群卡片
+            Row(
+              children: [
+                Expanded(
+                  child: _buildSocialCard(
+                    icon: SimpleIcons.discord,
+                    label: 'Discord',
+                    color: const Color(0xFF5865F2),
+                    onTap: () =>
+                        launchUrl(Uri.parse('https://exptech.com.tw/dc')),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // 社群卡片
-          Row(
-            children: [
-              Expanded(
-                child: _buildSocialCard(
-                  icon: SimpleIcons.discord,
-                  label: 'Discord',
-                  color: const Color(0xFF5865F2),
-                  onTap: () => launchUrl(Uri.parse('https://exptech.com.tw/dc')),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildSocialCard(
+                    icon: SimpleIcons.threads,
+                    label: 'Threads',
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                    onTap: () => launchUrl(
+                      Uri.parse('https://www.threads.net/@dpip.tw'),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildSocialCard(
-                  icon: SimpleIcons.threads,
-                  label: 'Threads',
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  onTap: () =>
-                      launchUrl(Uri.parse('https://www.threads.net/@dpip.tw')),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildSocialCard(
+                    icon: SimpleIcons.youtube,
+                    label: 'YouTube',
+                    color: const Color(0xFFFF0000),
+                    onTap: () => launchUrl(
+                      Uri.parse('https://www.youtube.com/@exptechtw/live'),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSocialCard(
-                  icon: SimpleIcons.youtube,
-                  label: 'YouTube',
-                  color: const Color(0xFFFF0000),
-                  onTap: () => launchUrl(
-                      Uri.parse('https://www.youtube.com/@exptechtw/live')),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildDonateCard(),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildDonateCard(),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -566,8 +575,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ],
             ),
@@ -609,8 +618,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text(
                   '贊助我們'.i18n,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
                 ),
               ],
             ),

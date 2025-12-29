@@ -11,6 +11,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/responsive/responsive_container.dart';
 
 const double _kCompassAccuracyWarning = 25.0;
 const double _kCompassAccuracyDanger = 45.0;
@@ -192,35 +193,37 @@ class _WindCardState extends State<WindCard>
         ? _getWindDirectionAngle(wind.direction)
         : 0.0;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.colors.outlineVariant.withValues(alpha: 0.5),
+    return ResponsiveContainer(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: context.colors.outlineVariant.withValues(alpha: 0.5),
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: _buildCompass(context, windAngle, hasValidDirection),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildCompactWindInfo(
-                context,
-                wind,
-                gust,
-                hasValidDirection,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: _buildCompass(context, windAngle, hasValidDirection),
               ),
-            ),
-            if (_hasCompass) _buildMagneticInfo(context),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildCompactWindInfo(
+                  context,
+                  wind,
+                  gust,
+                  hasValidDirection,
+                ),
+              ),
+              if (_hasCompass) _buildMagneticInfo(context),
+            ],
+          ),
         ),
       ),
     );
