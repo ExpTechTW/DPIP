@@ -1,9 +1,13 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/number.dart';
+import 'package:dpip/utils/log.dart';
 
 /// Extension on [String] that provides convenient utilities for type conversion and formatting.
 ///
@@ -111,4 +115,34 @@ extension StringExtension on String {
   /// final location = '10001'.asLocation; // Location or null
   /// ```
   Location? get asLocation => .tryParse(this);
+
+  /// Launches this string as a URL in the default external application.
+  ///
+  /// Converts this string to a [Uri] and opens it using the platform's default handler. The URL will typically open in
+  /// the default browser, but may open in other applications depending on the URL scheme (e.g., `mailto:` opens in the
+  /// mail client, `tel:` opens in the phone dialer).
+  ///
+  /// Throws a [FormatException] if this string is not a valid URI. May also throw platform-specific exceptions if the
+  /// URL cannot be launched.
+  ///
+  /// Example:
+  /// ```dart
+  /// 'https://example.com'.launch(); // Opens in browser
+  /// 'mailto:user@example.com'.launch(); // Opens mail client
+  /// ```
+  void launch() => launchUrl(asUri);
+
+  /// Copies this string to the system clipboard.
+  ///
+  /// Sets this string as the clipboard data, making it available for pasting in other applications. This is a
+  /// convenience method that wraps [Clipboard.setData] with a [ClipboardData] object containing this string as text.
+  ///
+  /// Example:
+  /// ```dart
+  /// 'Hello, World!'.copy(); // Copies text to clipboard
+  /// userEmail.copy(); // Copies email to clipboard
+  /// ```
+  Future<void> copy() => Clipboard.setData(
+    ClipboardData(text: this),
+  ).catchError((e) => TalkerManager.instance.error(e));
 }

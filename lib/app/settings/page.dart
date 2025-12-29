@@ -1,33 +1,22 @@
 import 'package:flutter/material.dart';
 
-import 'package:clipboard/clipboard.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import 'package:dpip/app/debug/logs/page.dart';
-import 'package:dpip/app/settings/donate/page.dart';
-import 'package:dpip/app/settings/locale/page.dart';
-import 'package:dpip/app/settings/location/page.dart';
-import 'package:dpip/app/settings/map/page.dart';
-import 'package:dpip/app/settings/notify/page.dart';
-import 'package:dpip/app/settings/proxy/page.dart';
-import 'package:dpip/app/settings/theme/page.dart';
-import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color.dart';
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/widgets/list/list_item_tile.dart';
-
-import 'layout/page.dart';
+import 'package:dpip/widgets/typography.dart';
+import 'package:dpip/widgets/ui/icon_container.dart';
 
 class SettingsIndexPage extends StatelessWidget {
   const SettingsIndexPage({super.key});
-
-  static const route = '/settings';
 
   Widget _buildIconContainer({
     required Widget icon,
@@ -95,60 +84,12 @@ class SettingsIndexPage extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
-                Text(
-                  '設定'.i18n,
-                  style: context.texts.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '自訂你的 DPIP 使用體驗'.i18n,
-                  style: context.texts.bodyMedium?.copyWith(
-                    color: context.colors.onSurfaceVariant,
-                  ),
-                ),
+                TitleText.large('設定'.i18n, weight: .bold),
+                BodyText.large('自訂你的 DPIP 使用體驗'.i18n),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionCard({
-    required BuildContext context,
-    required String? label,
-    required List<Widget> children,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: context.colors.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (label != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(
-                label,
-                style: context.texts.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: context.colors.primary,
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Column(children: children),
           ),
         ],
       ),
@@ -168,115 +109,111 @@ class SettingsIndexPage extends StatelessWidget {
         _buildHeader(context),
 
         // 位置
-        _buildSectionCard(
-          context: context,
-          label: '位置'.i18n,
+        Section(
+          label: Text('位置'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
               isLast: true,
               leading: _buildIconContainer(
                 icon: const Icon(Symbols.pin_drop_rounded),
-                color: Colors.red,
+                color: Colors.deepOrangeAccent,
               ),
               title: Text('所在地'.i18n),
               subtitle: Text('設定你的所在地來接收當地的即時資訊'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsLocationPage.route),
+              onTap: () => SettingsLocationRoute().push(context),
             ),
           ],
         ),
 
         // 介面
-        _buildSectionCard(
-          context: context,
-          label: '介面'.i18n,
+        Section(
+          label: Text('介面'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.grid_view_rounded),
-                color: Colors.blue,
+              leading: ContainedIcon(
+                Symbols.grid_view_rounded,
+                color: Colors.lightBlueAccent,
               ),
               title: Text('佈局'.i18n),
               subtitle: Text('調整 DPIP 的佈局樣式'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsLayoutPage.route),
+              onTap: () => SettingsLayoutRoute().push(context),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.brush_rounded),
-                color: Colors.purple,
+              leading: ContainedIcon(
+                Symbols.brush_rounded,
+                color: Colors.indigoAccent,
               ),
               title: Text('主題'.i18n),
               subtitle: Text('調整 DPIP 整體的外觀與顏色'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsThemePage.route),
+              onTap: () => SettingsThemeRoute().push(context),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.translate_rounded),
-                color: Colors.teal,
+              leading: ContainedIcon(
+                Symbols.translate_rounded,
+                color: Colors.tealAccent,
               ),
               title: Text('語言'.i18n),
               subtitle: Text('調整 DPIP 的顯示語言'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsLocalePage.route),
+              onTap: () => SettingsLocaleRoute().push(context),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.percent_rounded),
-                color: Colors.orange,
+              leading: ContainedIcon(
+                Symbols.percent_rounded,
+                color: Colors.orangeAccent,
               ),
               title: Text('單位'.i18n),
               subtitle: Text('調整 DPIP 顯示數值時使用的單位'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsUnitPage.route),
+              onTap: () => SettingsUnitRoute().push(context),
             ),
             SectionListTile(
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.map_rounded),
-                color: Colors.green,
+              leading: ContainedIcon(
+                Symbols.map_rounded,
+                color: Colors.greenAccent,
               ),
               title: Text('地圖'.i18n),
               subtitle: Text('調整 DPIP 地圖的設定'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsMapPage.route),
+              onTap: () => SettingsMapRoute().push(context),
             ),
           ],
         ),
 
         // 通知
-        _buildSectionCard(
-          context: context,
-          label: '通知'.i18n,
+        Section(
+          label: Text('通知'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.notifications_rounded),
-                color: Colors.amber,
+              leading: ContainedIcon(
+                Symbols.notifications_rounded,
+                color: Colors.amberAccent,
               ),
               title: Text('通知'.i18n),
               subtitle: Text('推播通知設定與通知音效測試'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsNotifyPage.route),
+              onTap: () => SettingsNotifyRoute().push(context),
             ),
           ],
         ),
 
         // 網路
-        _buildSectionCard(
-          context: context,
-          label: '網路'.i18n,
+        Section(
+          label: Text('網路'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.settings_ethernet_rounded),
+              leading: ContainedIcon(
+                Symbols.settings_ethernet_rounded,
                 color: Colors.blueGrey,
               ),
               title: Text('HTTP 代理'.i18n),
@@ -286,195 +223,224 @@ class SettingsIndexPage extends StatelessWidget {
                     : '未啟用'.i18n,
               ),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(SettingsProxyPage.route),
+              onTap: () => SettingsProxyRoute().push(context),
             ),
           ],
         ),
 
         // 資訊
-        _buildSectionCard(
-          context: context,
-          label: '資訊'.i18n,
+        Section(
+          label: Text('資訊'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.newspaper_rounded),
-                color: Colors.indigo,
+              leading: ContainedIcon(
+                Symbols.newspaper_rounded,
+                color: Colors.indigoAccent,
               ),
               title: Text('公告'.i18n),
               subtitle: Text('掌握 ExpTech Studio 的最新公告與資訊'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push('/announcement'),
+              onTap: () => AnnouncementRoute().push(context),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.update_rounded),
-                color: Colors.cyan,
+              leading: ContainedIcon(
+                Symbols.update_rounded,
+                color: Colors.cyanAccent,
               ),
               title: Text('更新日誌'.i18n),
               subtitle: Text('瀏覽 DPIP 的歷次更新紀錄'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push('/changelog'),
+              onTap: () => ChangelogRoute().push(context),
             ),
             SectionListTile(
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.book_rounded),
+              leading: ContainedIcon(
+                Symbols.book_rounded,
                 color: Colors.brown,
               ),
               title: Text('第三方套件授權'.i18n),
               subtitle: Text('DPIP 的實現歸功於開放源始碼'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push('/license'),
+              onTap: () => LicenseRoute().push(context),
             ),
           ],
         ),
 
+        const SizedBox(height: 24),
+
         // 贊助
-        _buildDonateCard(context),
+        Section(
+          children: [
+            SectionListTile(
+              leading: ContainedIcon(
+                Symbols.volunteer_activism_rounded,
+                color: Colors.black,
+                backgroundGradient: const LinearGradient(
+                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                  begin: .topLeft,
+                  end: .bottomRight,
+                ),
+              ),
+              title: Text(
+                '贊助我們'.i18n,
+                style: .new(color: Colors.amber[600]),
+              ),
+              subtitle: Text('幫助我們維護伺服器的穩定和長久發展'.i18n),
+              trailing: const Icon(Symbols.chevron_right_rounded),
+              tileColor: Colors.amber.withValues(alpha: 0.16),
+              shape: RoundedRectangleBorder(
+                borderRadius: .circular(20),
+                side: BorderSide(color: Colors.amber.withValues(alpha: 0.6)),
+              ),
+              onTap: () => SettingsDonateRoute().push(context),
+            ),
+          ],
+        ),
 
         // ExpTech Studio 連結
-        _buildSectionCard(
-          context: context,
-          label: 'ExpTech Studio',
+        Section(
+          label: Text('ExpTech Studio'),
           children: [
-            Builder(
-              builder: (context) {
-                final isDark = Theme.of(context).brightness == Brightness.dark;
-                return SectionListTile(
-                  isFirst: true,
-                  leading: _buildIconContainer(
-                    icon: const Icon(SimpleIcons.github),
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                  title: const Text('Github'),
-                  subtitle: const Text('ExpTechTW'),
-                  trailing: const Icon(Symbols.arrow_outward_rounded),
-                  onTap: () => launchUrl(
-                    Uri.parse('https://github.com/ExpTechTW/DPIP-Pocket'),
-                  ),
-                );
-              },
+            SectionListTile(
+              isFirst: true,
+              leading: ContainedIcon(
+                SimpleIcons.github,
+                color: switch (context.theme.brightness) {
+                  .light => SimpleIconColors.github,
+                  .dark => SimpleIconColors.github.inverted,
+                },
+              ),
+              title: const Text('Github'),
+              subtitle: const Text('ExpTechTW'),
+              trailing: const Icon(Symbols.arrow_outward_rounded),
+              onTap: () => 'https://github.com/ExpTechTW/DPIP-Pocket'.launch(),
             ),
-            _buildSocialTile(
-              context: context,
-              icon: const Icon(SimpleIcons.discord),
-              color: const Color(0xFF5865F2),
-              title: 'Discord',
-              subtitle: '.gg/exptech-studio',
-              url: 'https://exptech.com.tw/dc',
+            SectionListTile(
+              leading: ContainedIcon(
+                SimpleIcons.discord,
+                color: switch (context.theme.brightness) {
+                  .light => .new(0xff454FBF),
+                  .dark => .new(0xff5865F2),
+                },
+              ),
+              title: const Text('Discord'),
+              subtitle: const Text('.gg/exptech-studio'),
+              trailing: const Icon(Symbols.arrow_outward_rounded),
+              onTap: () => 'https://discord.gg/exptech-studio'.launch(),
+              onLongPress: () => 'https://discord.gg/exptech-studio'.copy(),
             ),
-            Builder(
-              builder: (context) {
-                final isDark = Theme.of(context).brightness == Brightness.dark;
-                return SectionListTile(
-                  leading: _buildIconContainer(
-                    icon: const Icon(SimpleIcons.threads),
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                  title: const Text('Threads'),
-                  subtitle: const Text('@dpip.tw'),
-                  trailing: const Icon(Symbols.arrow_outward_rounded),
-                  onTap: () =>
-                      launchUrl(Uri.parse('https://www.threads.net/@dpip.tw')),
-                );
-              },
+            SectionListTile(
+              leading: ContainedIcon(
+                SimpleIcons.threads,
+                color: switch (context.theme.brightness) {
+                  .light => SimpleIconColors.threads,
+                  .dark => SimpleIconColors.threads.inverted,
+                },
+              ),
+              title: const Text('Threads'),
+              subtitle: const Text('@dpip.tw'),
+              trailing: const Icon(Symbols.arrow_outward_rounded),
+              onTap: () => 'https://www.threads.net/@dpip.tw'.launch(),
+              onLongPress: () => 'https://www.threads.net/@dpip.tw'.copy(),
             ),
             SectionListTile(
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(SimpleIcons.youtube),
-                color: const Color(0xFFFF0000),
+              leading: ContainedIcon(
+                SimpleIcons.youtube,
+                color: SimpleIconColors.youtube,
               ),
               title: const Text('Youtube'),
               subtitle: const Text('@exptechtw'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => launchUrl(
-                Uri.parse('https://www.youtube.com/@exptechtw/live'),
-              ),
+              onTap: () => 'https://www.youtube.com/@exptechtw/live'.launch(),
+              onLongPress: () =>
+                  'https://www.youtube.com/@exptechtw/live'.copy(),
             ),
           ],
         ),
 
         // 下載
-        _buildSectionCard(
-          context: context,
-          label: '下載'.i18n,
+        Section(
+          label: Text('下載'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
-              leading: _buildIconContainer(
-                icon: const Icon(SimpleIcons.appstore),
-                color: const Color(0xFF0D96F6),
+              leading: ContainedIcon(
+                SimpleIcons.appstore,
+                color: SimpleIconColors.appstore,
               ),
               title: const Text('App Store'),
               subtitle: const Text('iOS'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => launchUrl(
-                Uri.parse('https://apps.apple.com/tw/app/dpip/id6468026362'),
-              ),
+              onTap: () =>
+                  'https://apps.apple.com/tw/app/dpip/id6468026362'.launch(),
+              onLongPress: () =>
+                  'https://apps.apple.com/tw/app/dpip/id6468026362'.copy(),
             ),
             SectionListTile(
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(SimpleIcons.googleplay),
-                color: const Color(0xFF34A853),
+              leading: ContainedIcon(
+                SimpleIcons.googleplay,
+                color: switch (context.theme.brightness) {
+                  .light => SimpleIconColors.googleplay,
+                  .dark => SimpleIconColors.googleplay.inverted,
+                },
               ),
               title: const Text('Google Play'),
               subtitle: const Text('Android'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => launchUrl(
-                Uri.parse(
-                  'https://play.google.com/store/apps/details?id=com.exptech.dpip',
-                ),
-              ),
+              onTap: () =>
+                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'
+                      .launch(),
+              onLongPress: () =>
+                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'
+                      .copy(),
             ),
           ],
         ),
 
         // 除錯
-        _buildSectionCard(
-          context: context,
-          label: '除錯'.i18n,
+        Section(
+          label: Text('除錯'.i18n),
           children: [
             SectionListTile(
               isFirst: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.info_rounded),
-                color: Colors.grey,
+              leading: ContainedIcon(
+                Symbols.info_rounded,
+                color: context.colors.onSurfaceVariant,
               ),
               title: Text('應用程式版本'.i18n),
               trailing: Text(appInfo),
-              onLongPress: () => FlutterClipboard.copy(appInfo),
+              onLongPress: () => appInfo.copy(),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.smartphone_rounded),
-                color: Colors.grey,
+              leading: ContainedIcon(
+                Symbols.smartphone_rounded,
+                color: context.colors.onSurfaceVariant,
               ),
               title: Text('裝置資訊'.i18n),
               trailing: Text(deviceInfo),
-              onLongPress: () => FlutterClipboard.copy(deviceInfo),
+              onLongPress: () => deviceInfo.copy(),
             ),
             SectionListTile(
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.key_rounded),
-                color: Colors.grey,
+              leading: ContainedIcon(
+                Symbols.key_rounded,
+                color: context.colors.onSurfaceVariant,
               ),
               title: Text('複製通知 Token'.i18n),
               trailing: const Icon(Symbols.content_copy_rounded),
-              onTap: () => FlutterClipboard.copy(Preference.notifyToken),
+              onTap: () => Preference.notifyToken.copy(),
             ),
             SectionListTile(
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.bug_report_rounded),
-                color: Colors.grey,
+              leading: ContainedIcon(
+                Symbols.bug_report_rounded,
+                color: context.colors.onSurfaceVariant,
               ),
               title: Text('App 日誌'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => context.push(AppDebugLogsPage.route),
+              onTap: () => AppDebugLogsRoute().push(context),
             ),
           ],
         ),
@@ -485,141 +451,30 @@ class SettingsIndexPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialTile({
-    required BuildContext context,
-    required Widget icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required String url,
-  }) {
-    return SectionListTile(
-      leading: _buildIconContainer(icon: icon, color: color),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Symbols.arrow_outward_rounded),
-      onTap: () => launchUrl(Uri.parse(url)),
-    );
-  }
-
-  Widget _buildDonateCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFFFFD700).withValues(alpha: 0.15),
-            const Color(0xFFFFA500).withValues(alpha: 0.1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () => context.push(SettingsDonatePage.route),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Symbols.volunteer_activism_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '贊助我們'.i18n,
-                        style: context.texts.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFB8860B),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '幫助我們維護伺服器的穩定和長久發展'.i18n,
-                        style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Symbols.chevron_right_rounded,
-                  color: const Color(0xFFB8860B).withValues(alpha: 0.8),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildFooter(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      padding: const .symmetric(horizontal: 16, vertical: 64),
       child: Column(
+        spacing: 4,
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainerHighest,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: context.colors.outlineVariant.withValues(alpha: 0.5),
-              ),
-            ),
-            child: Icon(
-              Symbols.earthquake_rounded,
-              color: context.colors.onSurfaceVariant,
-              size: 32,
-            ),
+            height: 84,
+            width: 84,
+            margin: .only(bottom: 16),
+            decoration: BoxDecoration(borderRadius: .circular(24)),
+            clipBehavior: .antiAlias,
+            child: Image.asset('assets/ExpTech.png'),
           ),
-          const SizedBox(height: 12),
-          Text(
+          TitleText.medium(
             'ExpTech Studio © 2025',
-            style: context.texts.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
+            color: context.colors.onSurfaceVariant,
+            weight: .bold,
+            align: .center,
           ),
-          const SizedBox(height: 4),
-          Text(
-            '任何資訊應以中央氣象署發布之內容為準。'.i18n,
-            style: context.texts.bodySmall?.copyWith(
-              color: context.colors.outline,
-            ),
-            textAlign: TextAlign.center,
+          BodyText.medium(
+            '任何資訊應以中央氣象署發布之內容為準'.i18n,
+            color: context.colors.outline,
+            align: .center,
           ),
         ],
       ),

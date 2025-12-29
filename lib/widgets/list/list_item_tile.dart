@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -199,6 +200,16 @@ class SectionListTile extends StatelessWidget {
   /// Whether the tile is enabled.
   final bool enabled;
 
+  /// Custom shape for the tile.
+  ///
+  /// When provided, this overrides the default rounded rectangle shape and the
+  /// [borderRadius] parameter. Use this when you need more control over the
+  /// tile's appearance, such as beveled corners or custom borders.
+  ///
+  /// If null, the tile uses a [RoundedRectangleBorder] with the [borderRadius]
+  /// value (or computed based on [isFirst] and [isLast]).
+  final ShapeBorder? shape;
+
   /// Custom border radius for the tile.
   ///
   /// When null, the top corners will use a 20 pixel radius if [isFirst] is true
@@ -234,6 +245,7 @@ class SectionListTile extends StatelessWidget {
     this.isFirst = false,
     this.isLast = false,
     this.enabled = true,
+    this.shape,
     this.borderRadius,
     this.contentPadding,
     this.tileColor,
@@ -262,10 +274,12 @@ class SectionListTile extends StatelessWidget {
       child: Padding(
         padding: .symmetric(vertical: 1),
         child: Material(
-          color: tileColor ?? context.colors.surfaceContainer,
-          shape: RoundedRectangleBorder(borderRadius: borderRadius),
+          color: tileColor ?? context.colors.surfaceContainerHigh,
+          shape: shape ?? RoundedRectangleBorder(borderRadius: borderRadius),
+          clipBehavior: .antiAlias,
           child: InkWell(
             borderRadius: borderRadius,
+            highlightColor: context.colors.surfaceTint.withValues(alpha: .16),
             onTap: enabled ? onTap : null,
             onLongPress: enabled ? onLongPress : null,
             child: Padding(
