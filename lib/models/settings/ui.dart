@@ -16,7 +16,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   int? get _themeColor => Preference.themeColor;
   Locale? get _locale => Preference.locale?.asLocale;
   bool get _useFahrenheit => Preference.useFahrenheit ?? false;
-  late Set<HomeDisplaySection> homeSections;
+  late List<HomeDisplaySection> homeSections;
   final savedList = Preference.homeDisplaySections;
 
   ThemeMode get themeMode => ThemeMode.values.byName(_themeMode);
@@ -59,7 +59,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   SettingsUserInterfaceModel() {
     if (savedList.isEmpty) {
       // 預設全部啟用
-      homeSections = HomeDisplaySection.values.toSet();
+      homeSections = HomeDisplaySection.values.toList();
     } else {
       final saved = savedList
           .map(
@@ -68,7 +68,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
                 .firstWhere((e) => e?.name == s, orElse: () => null),
           )
           .whereType<HomeDisplaySection>()
-          .toSet();
+          .toList();
       homeSections = saved;
     }
   }
@@ -76,11 +76,28 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
 
   void toggleSection(HomeDisplaySection section, bool enabled) {
+    final newList = List<HomeDisplaySection>.from(homeSections);
     if (enabled) {
-      homeSections.add(section);
+      if (!newList.contains(section)) {
+        newList.add(section);
+      }
     } else {
-      homeSections.remove(section);
+      newList.remove(section);
     }
+    homeSections = newList;
+    Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
+    notifyListeners();
+  }
+
+  void reorderSection(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final newList = List<HomeDisplaySection>.from(homeSections);
+    final item = newList.removeAt(oldIndex);
+    newList.insert(newIndex, item);
+    homeSections = newList;
+
     Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
     notifyListeners();
   }
