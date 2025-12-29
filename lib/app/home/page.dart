@@ -17,6 +17,7 @@ import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/home/_widgets/date_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/forecast_card.dart';
+import 'package:dpip/app/home/_widgets/hero_weather.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
@@ -24,7 +25,6 @@ import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
 import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
-import 'package:dpip/app/home/_widgets/weather_header.dart';
 import 'package:dpip/app/home/_widgets/wind_card.dart';
 import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
@@ -37,6 +37,7 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/rain_shader_background.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'home_display_mode.dart';
@@ -53,6 +54,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   final _locationButtonKey = GlobalKey();
+  final _scrollController = ScrollController();
 
   Key _mapKey = UniqueKey();
   bool _isLoading = false;
@@ -74,6 +76,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
       .firstOrNull;
 
+  /// 是否正在下雨（用於決定是否顯示雨滴效果）
+  bool get _isRaining {
+    // TODO: 測試完成後移除強制啟用
+    return true;
+    // if (_weather == null) return false;
+    // final code = _weather!.data.weatherCode;
+    // // 雨天代碼範圍：15-35（包含雨、大雨、雷雨）
+    // return code >= 15 && code <= 35;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +99,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -294,11 +307,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
     }
     _wasVisible = isVisible;
+
     final homeSections = context
         .select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
           (model) => model.homeSections,
         );
-    final topPadding = MediaQuery.of(context).padding.top;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _locationButtonKey.currentContext != null) {
@@ -317,48 +330,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     return Stack(
       children: [
+        // 雨滴背景（全螢幕，持續顯示）
+        Positioned.fill(
+          child: RainShaderBackground(
+            animated: _isRaining,
+          ),
+        ),
+        // 主內容
         RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: _refresh,
-          child: ListView(
-            padding: EdgeInsets.only(
-              top: _locationButtonHeight != null
-                  ? 24 + topPadding + _locationButtonHeight!
-                  : 0,
-              bottom: MediaQuery.of(context).padding.bottom,
-            ),
-            children: [
-              _buildWeatherHeader(),
-              if (!_isLoading) ..._buildRealtimeInfo(),
-              if (homeSections.isNotEmpty) ...[
-                if (homeSections.contains(HomeDisplaySection.radar))
-                  _buildRadarMap(),
-                if (!_isLoading && _weather != null) _buildWindCard(),
-                if (homeSections.contains(HomeDisplaySection.forecast))
-                  _buildForecast(),
-                _buildCommunityCards(),
-                if (homeSections.contains(HomeDisplaySection.history))
-                  _buildHistoryTimeline(),
-              ] else if (GlobalProviders.location.code != null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      FilledButton(
-                        onPressed: () => context.push(SettingsLayoutPage.route),
-                        child: Text('前往設定'.i18n),
-                      ),
-                    ],
-                  ),
-                ),
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              // 英雄區塊 - 第一屏簡潔顯示
+              SliverToBoxAdapter(
+                child: _buildHeroSection(),
+              ),
+              // 詳細內容區塊
+              SliverToBoxAdapter(
+                child: _buildContentSection(homeSections),
+              ),
             ],
           ),
         ),
+        // 位置按鈕
         Positioned(
           top: 24,
           left: 0,
@@ -370,6 +366,89 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildHeroSection() {
+    final code = GlobalProviders.location.code;
+
+    // 如果沒有設定位置或服務區域外，顯示提示
+    if (code == null) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.65,
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: LocationNotSetCard(),
+          ),
+        ),
+      );
+    }
+
+    if (_isOutOfService) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.65,
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: LocationOutOfServiceCard(),
+          ),
+        ),
+      );
+    }
+
+    return HeroWeather(
+      weather: _weather,
+      isLoading: _isLoading,
+    );
+  }
+
+  Widget _buildContentSection(Set<HomeDisplaySection> homeSections) {
+    return Column(
+      children: [
+        // 拖曳指示器
+        Container(
+          margin: const EdgeInsets.only(top: 12, bottom: 8),
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        // 實時警報
+        if (!_isLoading) ..._buildRealtimeInfo(),
+        // 其他區塊
+        if (homeSections.isNotEmpty) ...[
+          if (homeSections.contains(HomeDisplaySection.radar))
+            _buildRadarMap(),
+          if (homeSections.contains(HomeDisplaySection.forecast))
+            _buildForecast(),
+          if (!_isLoading && _weather != null) _buildWindCard(),
+          _buildCommunityCards(),
+          if (homeSections.contains(HomeDisplaySection.history))
+            _buildHistoryTimeline(),
+        ] else if (GlobalProviders.location.code != null)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text(
+                  '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => context.push(SettingsLayoutPage.route),
+                  child: Text('前往設定'.i18n),
+                ),
+              ],
+            ),
+          ),
+        // 底部安全區域
+        SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
       ],
     );
   }
@@ -538,42 +617,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildWeatherHeader() {
-    final code = GlobalProviders.location.code;
-
-    if (_isLoading) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: WeatherHeader.skeleton(context),
-      );
-    }
-    if (_weather != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: WeatherHeader(_weather!),
-      );
-    }
-
-    if (_isOutOfService) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: LocationOutOfServiceCard(),
-      );
-    }
-
-    if (code != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: WeatherHeader.skeleton(context),
-      );
-    }
-
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: LocationNotSetCard(),
     );
   }
 

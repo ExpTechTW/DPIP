@@ -85,11 +85,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  shaders:
+    - shaders/rain.frag
   assets:
     # localizations
     - assets/translations/
     # other
     - assets/map/
+    - assets/wallpaper/day/
+    - assets/wallpaper/dusk/
+    - assets/wallpaper/night/
     - assets/DPIP.png
     - assets/ExpTech.png
     - assets/box.json

@@ -66,58 +66,30 @@ class _WindCardState extends State<WindCard> {
     super.dispose();
   }
 
-  /// 將風向字符串轉換為角度（以北為0度，順時針方向）
   double _getWindDirectionAngle(String direction) {
     const directions = {
-      'N': 0.0,
-      'NNE': 22.5,
-      'NE': 45.0,
-      'ENE': 67.5,
-      'E': 90.0,
-      'ESE': 112.5,
-      'SE': 135.0,
-      'SSE': 157.5,
-      'S': 180.0,
-      'SSW': 202.5,
-      'SW': 225.0,
-      'WSW': 247.5,
-      'W': 270.0,
-      'WNW': 292.5,
-      'NW': 315.0,
-      'NNW': 337.5,
       '北': 0.0,
+      '北北東': 22.5,
       '東北': 45.0,
+      '東北東': 67.5,
       '東': 90.0,
+      '東南東': 112.5,
       '東南': 135.0,
+      '南南東': 157.5,
       '南': 180.0,
+      '南南西': 202.5,
       '西南': 225.0,
+      '西南西': 247.5,
       '西': 270.0,
+      '西北西': 292.5,
       '西北': 315.0,
+      '北北西': 337.5,
     };
-    return directions[direction.toUpperCase()] ?? 0.0;
+    return directions[direction.trim()] ?? 0.0;
   }
 
-  /// 獲取風向的中文名稱
   String _getWindDirectionName(String direction) {
-    const directionNames = {
-      'N': '北',
-      'NNE': '北北東',
-      'NE': '東北',
-      'ENE': '東北東',
-      'E': '東',
-      'ESE': '東南東',
-      'SE': '東南',
-      'SSE': '南南東',
-      'S': '南',
-      'SSW': '南南西',
-      'SW': '西南',
-      'WSW': '西南西',
-      'W': '西',
-      'WNW': '西北西',
-      'NW': '西北',
-      'NNW': '北北西',
-    };
-    return directionNames[direction.toUpperCase()] ?? direction;
+    return direction.trim();
   }
 
   /// 獲取蒲福風級描述
@@ -149,8 +121,9 @@ class _WindCardState extends State<WindCard> {
     final gust = widget.weather.data.gust;
     final hasValidDirection =
         wind.direction.isNotEmpty && wind.direction != '-';
-    final windAngle =
-        hasValidDirection ? _getWindDirectionAngle(wind.direction) : 0.0;
+    final windAngle = hasValidDirection
+        ? _getWindDirectionAngle(wind.direction)
+        : 0.0;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -174,7 +147,12 @@ class _WindCardState extends State<WindCard> {
             const SizedBox(width: 12),
             // 中間：風速資訊
             Expanded(
-              child: _buildCompactWindInfo(context, wind, gust, hasValidDirection),
+              child: _buildCompactWindInfo(
+                context,
+                wind,
+                gust,
+                hasValidDirection,
+              ),
             ),
             // 右側：磁場資訊
             if (_hasCompass) _buildMagneticInfo(context),
@@ -199,7 +177,9 @@ class _WindCardState extends State<WindCard> {
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: context.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+            color: context.colors.surfaceContainerHighest.withValues(
+              alpha: 0.5,
+            ),
             border: Border.all(
               color: context.colors.outline.withValues(alpha: 0.2),
               width: 2,
@@ -231,7 +211,9 @@ class _WindCardState extends State<WindCard> {
                           color: isNorth
                               ? Colors.red
                               : context.colors.onSurfaceVariant,
-                          fontWeight: isNorth ? FontWeight.bold : FontWeight.w500,
+                          fontWeight: isNorth
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           fontSize: isNorth ? 14 : 12,
                         ),
                       ),
@@ -270,8 +252,9 @@ class _WindCardState extends State<WindCard> {
             color: hasValidDirection ? Colors.teal : context.colors.outline,
             boxShadow: [
               BoxShadow(
-                color: (hasValidDirection ? Colors.teal : context.colors.outline)
-                    .withValues(alpha: 0.3),
+                color:
+                    (hasValidDirection ? Colors.teal : context.colors.outline)
+                        .withValues(alpha: 0.3),
                 blurRadius: 4,
                 spreadRadius: 1,
               ),
@@ -329,7 +312,8 @@ class _WindCardState extends State<WindCard> {
           children: [
             Text(
               wind.beaufort >= 0
-                  ? '${wind.beaufort}級 ${_getBeaufortDescription(wind.beaufort)}'.i18n
+                  ? '${wind.beaufort}級 ${_getBeaufortDescription(wind.beaufort)}'
+                        .i18n
                   : '-',
               style: context.texts.bodySmall?.copyWith(
                 color: context.colors.onSurfaceVariant,
@@ -358,9 +342,14 @@ class _WindCardState extends State<WindCard> {
   Widget _buildMagneticInfo(BuildContext context) {
     // 使用 compass accuracy（方向誤差角度）
     // 負值表示無效，0-15 高精度，15-25 中等，>25 警告，>45 危險
-    final hasDanger = _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
-    final hasWarning = _compassAccuracy >= _kCompassAccuracyWarning && _compassAccuracy < _kCompassAccuracyDanger;
-    final statusText = _compassAccuracy < 0 ? '–' : '±${_compassAccuracy.round()}°';
+    final hasDanger =
+        _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
+    final hasWarning =
+        _compassAccuracy >= _kCompassAccuracyWarning &&
+        _compassAccuracy < _kCompassAccuracyDanger;
+    final statusText = _compassAccuracy < 0
+        ? '–'
+        : '±${_compassAccuracy.round()}°';
 
     final Color statusColor;
     if (hasDanger) {
@@ -414,9 +403,14 @@ class _WindCardState extends State<WindCard> {
   }
 
   void _showMagneticFieldInfo(BuildContext context) {
-    final hasDanger = _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
-    final hasWarning = _compassAccuracy >= _kCompassAccuracyWarning && _compassAccuracy < _kCompassAccuracyDanger;
-    final valueText = _compassAccuracy < 0 ? '無法測量'.i18n : '±${_compassAccuracy.toStringAsFixed(1)}°';
+    final hasDanger =
+        _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
+    final hasWarning =
+        _compassAccuracy >= _kCompassAccuracyWarning &&
+        _compassAccuracy < _kCompassAccuracyDanger;
+    final valueText = _compassAccuracy < 0
+        ? '無法測量'.i18n
+        : '±${_compassAccuracy.toStringAsFixed(1)}°';
 
     showDialog(
       context: context,
@@ -425,21 +419,21 @@ class _WindCardState extends State<WindCard> {
           hasDanger
               ? Symbols.error_rounded
               : hasWarning
-                  ? Symbols.warning_rounded
-                  : Symbols.check_circle_rounded,
+              ? Symbols.warning_rounded
+              : Symbols.check_circle_rounded,
           color: hasDanger
               ? Colors.red
               : hasWarning
-                  ? Colors.orange
-                  : Colors.green,
+              ? Colors.orange
+              : Colors.green,
           size: 48,
         ),
         title: Text(
           hasDanger
               ? '指北針不可靠'.i18n
               : hasWarning
-                  ? '指北針精度下降'.i18n
-                  : '指北針正常'.i18n,
+              ? '指北針精度下降'.i18n
+              : '指北針正常'.i18n,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -459,8 +453,8 @@ class _WindCardState extends State<WindCard> {
                 color: hasDanger
                     ? Colors.red
                     : hasWarning
-                        ? Colors.orange
-                        : Colors.green,
+                    ? Colors.orange
+                    : Colors.green,
               ),
             ),
             const SizedBox(height: 12),
@@ -475,8 +469,9 @@ class _WindCardState extends State<WindCard> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (hasDanger ? Colors.red : Colors.orange)
-                      .withValues(alpha: 0.1),
+                  color: (hasDanger ? Colors.red : Colors.orange).withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -498,7 +493,6 @@ class _WindCardState extends State<WindCard> {
       ),
     );
   }
-
 }
 
 /// 指北針刻度繪製器
