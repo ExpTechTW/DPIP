@@ -145,10 +145,14 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
             };
 
             lightTheme = lightTheme.copyWith(
-              textTheme: fontTextTheme(lightTheme.textTheme),
+              textTheme: GoogleFonts.latoTextTheme(
+                fontTextTheme(lightTheme.textTheme),
+              ),
             );
             darkTheme = darkTheme.copyWith(
-              textTheme: fontTextTheme(darkTheme.textTheme),
+              textTheme: GoogleFonts.latoTextTheme(
+                fontTextTheme(darkTheme.textTheme),
+              ),
             );
 
             return MaterialApp.router(

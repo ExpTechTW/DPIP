@@ -471,8 +471,7 @@ class Markdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.theme.brightness == Brightness.dark;
 
-    TextStyle applyFont(TextStyle style) =>
-        GoogleFonts.manrope(textStyle: style);
+    TextStyle applyFont(TextStyle style) => GoogleFonts.lato(textStyle: style);
 
     final headlineSmall = applyFont(context.texts.headlineSmall!);
     final titleLarge = applyFont(context.texts.titleLarge!);

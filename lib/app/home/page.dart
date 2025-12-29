@@ -35,6 +35,7 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
@@ -124,7 +125,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         action: SnackBarAction(
           label: '更新日誌'.i18n,
-          onPressed: () => context.push(ChangelogPage.route),
+          onPressed: () => ChangelogRoute().push(context),
         ),
         duration: kPersistSnackBar,
       ),

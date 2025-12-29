@@ -11,14 +11,14 @@ import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/datetime.dart';
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/widgets/markdown.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
 
 class ChangelogPage extends StatefulWidget {
   const ChangelogPage({super.key});
-
-  static const route = '/changelog';
 
   @override
   State<ChangelogPage> createState() => _ChangelogPageState();
@@ -97,7 +97,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
               ),
               Ok(:final value) => SliverMainAxisGroup(
                 slivers: [
-                  for (final release in value)
+                  for (final (index, release) in value.indexed)
                     SliverMainAxisGroup(
                       slivers: [
                         SliverPersistentHeader(
@@ -106,10 +106,21 @@ class _ChangelogPageState extends State<ChangelogPage> {
                         ),
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: const .all(16),
+                            padding: const .symmetric(horizontal: 24),
                             child: Markdown(release.body),
                           ),
                         ),
+                        if (index != value.length - 1)
+                          SliverToBoxAdapter(
+                            child: Center(
+                              child: Icon(
+                                Symbols.more_horiz_rounded,
+                                size: 48,
+                                weight: 700,
+                                color: context.colors.outlineVariant,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                 ],
@@ -161,8 +172,8 @@ class _ReleaseHeaderDelegate extends SliverPersistentHeaderDelegate {
         children: [
           ContainedIcon(
             switch (release.prerelease) {
-              true => Symbols.package_2_rounded,
-              false => Symbols.rocket_rounded,
+              true => Symbols.experiment_rounded,
+              false => Symbols.package_2_rounded,
             },
             color: switch (release.prerelease) {
               true => Colors.orangeAccent,
@@ -177,10 +188,9 @@ class _ReleaseHeaderDelegate extends SliverPersistentHeaderDelegate {
               children: [
                 TitleText.large(release.name, weight: .bold),
                 BodyText.medium(
-                  switch (release.prerelease) {
-                    true => '正式版'.i18n,
-                    false => '先行版'.i18n,
-                  },
+                  DateTime.parse(
+                    release.publishedAt,
+                  ).toLocaleFullDateString(context),
                   color: context.colors.onSurfaceVariant,
                 ),
               ],
