@@ -49,6 +49,8 @@ class ReportMapLayerManager extends MapLayerManager {
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
   final dataNotifier = ValueNotifier<int>(0);
+  final shouldExpandOnReturn = ValueNotifier<bool>(false);
+  double savedScrollOffset = 0.0;
 
   DateTime? _lastFetchTime;
 
@@ -272,9 +274,13 @@ class ReportMapLayerManager extends MapLayerManager {
   }
 
   @override
+  bool get shouldPop => currentReport.value == null;
+
+  @override
   void onPopInvoked() {
     if (currentReport.value == null) return;
 
+    shouldExpandOnReturn.value = true;
     setReport(null);
   }
 
@@ -465,6 +471,37 @@ class _GeneratingView extends StatelessWidget {
 
 class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
   final morphingSheetController = MorphingSheetController();
+  ScrollController? _listScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.manager.shouldExpandOnReturn.addListener(_onShouldExpandChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.manager.shouldExpandOnReturn.removeListener(_onShouldExpandChanged);
+    super.dispose();
+  }
+
+  void _onShouldExpandChanged() {
+    if (!widget.manager.shouldExpandOnReturn.value) return;
+    widget.manager.shouldExpandOnReturn.value = false;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      morphingSheetController.expand().then((_) {
+        if (!mounted) return;
+        final offset = widget.manager.savedScrollOffset;
+        if (_listScrollController != null &&
+            _listScrollController!.hasClients &&
+            offset > 0) {
+          _listScrollController!.jumpTo(offset);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -711,6 +748,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 valueListenable: widget.manager.currentReport,
                 builder: (context, currentReport, child) {
                   if (currentReport == null) {
+                    _listScrollController = controller;
                     final grouped = GlobalProviders.data.partialReport
                         .groupListsBy(
                           (report) =>
@@ -779,6 +817,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       style: context.texts.labelLarge,
                                     ),
                                     onTap: () {
+                                      if (controller.hasClients) {
+                                        widget.manager.savedScrollOffset =
+                                            controller.offset;
+                                      }
                                       widget.manager.setReport(report.id);
                                       sheetController.collapse();
                                     },
@@ -1113,6 +1155,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     ];
                   }
 
+                  if (controller.hasClients && controller.offset != 0) {
+                    controller.jumpTo(0);
+                  }
+
                   return CustomScrollView(
                     controller: controller,
                     slivers: [
@@ -1120,12 +1166,8 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         title: Text('地震報告'.i18n),
                         leading: BackButton(
                           onPressed: () {
+                            widget.manager.shouldExpandOnReturn.value = true;
                             widget.manager.setReport(null);
-                            controller.animateTo(
-                              0,
-                              duration: Durations.short4,
-                              curve: Easing.emphasizedDecelerate,
-                            );
                           },
                         ),
                         floating: true,

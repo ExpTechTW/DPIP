@@ -310,6 +310,17 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setLayers(_activeLayers);
   }
 
+  void _handleBack() {
+    for (final layer in _activeLayers) {
+      final manager = _managers[layer];
+      if (manager != null && !manager.shouldPop) {
+        manager.onPopInvoked();
+        return;
+      }
+    }
+    Navigator.of(context).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -333,7 +344,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             onLayerChanged: toggleLayer,
             onBaseMapChanged: setBaseMapType,
           ),
-          const PositionedBackButton(),
+          PositionedBackButton(onPressed: _handleBack),
           ..._activeLayers.map((layer) {
             final manager = _managers[layer];
             if (manager != null) {
