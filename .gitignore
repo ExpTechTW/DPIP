@@ -12,6 +12,7 @@ build/
 
 # Android related
 **/android/**/gradle-wrapper.jar
+**/android/.kotlin
 **/android/.gradle
 **/android/captures/
 **/android/gradlew
