@@ -1,11 +1,19 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import 'package:m3e_collection/m3e_collection.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:option_result/result.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:dpip/widgets/markdown.dart';
+import 'package:dpip/widgets/typography.dart';
+import 'package:dpip/widgets/ui/icon_container.dart';
 
 class ChangelogPage extends StatefulWidget {
   const ChangelogPage({super.key});
@@ -17,8 +25,17 @@ class ChangelogPage extends StatefulWidget {
 }
 
 class _ChangelogPageState extends State<ChangelogPage> {
-  bool _isLoading = false;
-  List<GithubRelease>? _releases;
+  final _refreshIndicatorKey = GlobalKey<ExpressiveRefreshIndicatorState>();
+  Result<List<GithubRelease>, String>? releases;
+
+  Future<void> _refresh() async {
+    if (_refreshIndicatorKey.currentState case final state?) {
+      state.show();
+    }
+
+    final result = await ExpTech().getReleases();
+    setState(() => releases = result);
+  }
 
   @override
   void initState() {
@@ -26,115 +43,164 @@ class _ChangelogPageState extends State<ChangelogPage> {
     _refresh();
   }
 
-  Future<void> _refresh() async {
-    if (_isLoading) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final v = await ExpTech().getReleases();
-      if (!mounted) return;
-
-      setState(() => _releases = v);
-    } catch (e, s) {
-      if (!mounted) return;
-
-      TalkerManager.instance.error('_ChangelogPageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('無法載入更新日誌，請稍後再試。'.i18n)),
-      );
-    }
-
-    if (!mounted) return;
-
-    setState(() => _isLoading = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('更新日誌'.i18n), elevation: 0),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedOpacity(
-              opacity: _isLoading ? 1 : 0,
-              duration: Durations.short4,
-              child: const LinearProgressIndicator(year2023: false),
+      body: ExpressiveRefreshIndicator.contained(
+        key: _refreshIndicatorKey,
+        backgroundColor: context.colors.primaryContainer,
+        onRefresh: _refresh,
+        edgeOffset: context.padding.top + 64,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBarM3E(
+              variant: .small,
+              title: Text('更新日誌'),
+              pinned: true,
             ),
-          ),
-          if (_releases != null)
-            ListView.builder(
-              padding: EdgeInsets.fromLTRB(
-                24,
-                16,
-                24,
-                16 + context.padding.bottom,
+            switch (releases) {
+              null => SliverFillRemaining(
+                child: Center(
+                  child: ExpressiveLoadingIndicator(),
+                ),
               ),
-              itemCount: _releases!.length,
-              itemBuilder: (context, index) {
-                final release = _releases![index];
-
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 8,
-                  children: [
-                    if (index > 0)
-                      const Divider(height: 32, indent: 8, endIndent: 8),
-                    Row(
-                      spacing: 8,
-                      children: [
-                        Text(
-                          release.name,
-                          style: context.texts.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+              Err(:final value) => SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: .min,
+                    spacing: 8,
+                    children: [
+                      ContainedIcon(
+                        Symbols.error_rounded,
+                        color: context.colors.error,
+                        size: 32,
+                        margin: .only(bottom: 8),
+                      ),
+                      TitleText.large(
+                        '發生錯誤'.i18n,
+                        weight: .bold,
+                        align: .center,
+                      ),
+                      BodyText.large(
+                        value,
+                        color: context.colors.onSurfaceVariant,
+                        align: .center,
+                      ),
+                      FilledButton.tonalIcon(
+                        onPressed: _refresh,
+                        icon: Icon(Symbols.refresh_rounded),
+                        label: Text('再試一次'.i18n),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Ok(:final value) => SliverMainAxisGroup(
+                slivers: [
+                  for (final release in value)
+                    SliverMainAxisGroup(
+                      slivers: [
+                        SliverPersistentHeader(
+                          delegate: _ReleaseHeaderDelegate(release),
+                          pinned: true,
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const .all(16),
+                            child: Markdown(release.body),
                           ),
                         ),
-                        if (release.prerelease)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.orangeAccent),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Pre-Release',
-                              style: context.texts.labelSmall?.copyWith(
-                                color: Colors.orangeAccent,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
-                    MarkdownBody(data: release.body),
-                  ],
-                );
-              },
-            )
-          else if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else
-            Center(
-              child: Column(
-                children: [
-                  Text('無法載入更新日誌，請稍後再試。'.i18n),
-                  FilledButton.tonalIcon(
-                    onPressed: _refresh,
-                    icon: const Icon(Symbols.refresh_rounded),
-                    label: Text('重試'.i18n),
-                  ),
                 ],
               ),
+            },
+            SliverPadding(padding: .only(bottom: context.padding.bottom)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReleaseHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final GithubRelease release;
+
+  const _ReleaseHeaderDelegate(this.release);
+
+  static const height = kToolbarHeight + 32;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          stops: [.5, 1],
+          colors: [
+            context.colors.surface,
+            context.colors.surface.withValues(alpha: 0),
+          ],
+          begin: .topCenter,
+          end: .bottomCenter,
+        ),
+      ),
+      padding: .symmetric(horizontal: 24, vertical: 8),
+      child: Row(
+        spacing: 16,
+        children: [
+          ContainedIcon(
+            switch (release.prerelease) {
+              true => Symbols.package_2_rounded,
+              false => Symbols.rocket_rounded,
+            },
+            color: switch (release.prerelease) {
+              true => Colors.orangeAccent,
+              false => Colors.greenAccent,
+            },
+            size: 28,
+          ),
+          Expanded(
+            child: Column(
+              mainAxisSize: .min,
+              crossAxisAlignment: .start,
+              children: [
+                TitleText.large(release.name, weight: .bold),
+                BodyText.medium(
+                  switch (release.prerelease) {
+                    true => '正式版'.i18n,
+                    false => '先行版'.i18n,
+                  },
+                  color: context.colors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+          if ('v${Global.packageInfo.version}' == release.name)
+            Container(
+              padding: .symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: .circular(8),
+                border: .all(color: context.colors.primary),
+                color: context.colors.primaryContainer,
+              ),
+              child: LabelText.large('目前版本'.i18n),
             ),
         ],
       ),
     );
   }
+
+  @override
+  bool shouldRebuild(covariant _ReleaseHeaderDelegate oldDelegate) => true;
 }

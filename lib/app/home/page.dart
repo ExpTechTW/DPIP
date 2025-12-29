@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:m3e_collection/m3e_collection.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -10,7 +12,6 @@ import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app/changelog/page.dart';
@@ -26,20 +27,21 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/wind_card.dart';
+import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/utils/constants.dart';
 import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/rain_shader_background.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'home_display_mode.dart';
 
 class HomePage extends StatefulWidget {
@@ -337,8 +339,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
         // 主內容
-        RefreshIndicator(
+        ExpressiveRefreshIndicator.contained(
           key: _refreshIndicatorKey,
+          edgeOffset: context.padding.top + kToolbarHeight,
+          backgroundColor: context.colors.primaryContainer,
           onRefresh: _refresh,
           child: CustomScrollView(
             controller: _scrollController,
@@ -421,8 +425,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (!_isLoading) ..._buildRealtimeInfo(),
         // 其他區塊
         if (homeSections.isNotEmpty) ...[
-          if (homeSections.contains(HomeDisplaySection.radar))
-            _buildRadarMap(),
+          if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
           if (homeSections.contains(HomeDisplaySection.forecast))
             _buildForecast(),
           if (!_isLoading && _weather != null) _buildWindCard(),

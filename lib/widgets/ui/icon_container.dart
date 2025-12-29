@@ -64,6 +64,14 @@ class ContainedIcon extends StatelessWidget {
   /// This is used with Material Symbols icons for optical corrections.
   final double? opticalSize;
 
+  /// The padding of the outer Container that contains the Icon.
+  ///
+  /// Defaults to `EdgeInsets.all(8)`
+  final EdgeInsetsGeometry? padding;
+
+  /// The margin of the outer Container that contains the Icon.
+  final EdgeInsetsGeometry? margin;
+
   /// The color of the icon.
   ///
   /// Defaults to the theme's onSurface color if not specified.
@@ -109,6 +117,8 @@ class ContainedIcon extends StatelessWidget {
     this.fill,
     this.grade,
     this.opticalSize,
+    this.padding,
+    this.margin,
     this.color,
     this.shadows,
     this.semanticLabel,
@@ -125,7 +135,8 @@ class ContainedIcon extends StatelessWidget {
     final color = this.color ?? context.colors.onSurface;
 
     return Container(
-      padding: const .all(8),
+      padding: padding ?? const .all(8),
+      margin: margin,
       decoration: BoxDecoration(
         color: backgroundGradient == null
             ? backgroundColor ?? color.withValues(alpha: .16)

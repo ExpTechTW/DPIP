@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:option_result/result.dart';
 import 'package:zstandard/zstandard.dart';
 
 import 'package:dpip/api/model/announcement.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/api/model/eew.dart';
@@ -30,6 +30,7 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/log.dart';
 
 class _GzipClient extends http.BaseClient {
   final http.Client _inner;
@@ -1001,24 +1002,24 @@ class ExpTech {
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
-  Future<List<GithubRelease>> getReleases() async {
-    final requestUrl =
-        'https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases'.asUri;
+  Future<Result<List<GithubRelease>, String>> getReleases() async {
+    try {
+      final requestUrl =
+          'https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases'.asUri;
 
-    final res = await _sharedClient.get(requestUrl);
+      final response = await _sharedClient.get(requestUrl);
 
-    if (res.statusCode != 200) {
-      throw HttpException(
-        'The server returned a status of ${res.statusCode}',
-        uri: requestUrl,
-      );
+      if (!response.ok) {
+        return Err('無法從 GitHub 取得更新紀錄，狀態 ${response.statusCode}');
+      }
+
+      final data = response.list().cast<Map<String, dynamic>>();
+      final releases = data.map(GithubRelease.fromJson).toList();
+
+      return Ok(releases);
+    } catch (e) {
+      return Err('無法從 GitHub 取得更新紀錄');
     }
-
-    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
-
-    return jsonData
-        .map((item) => GithubRelease.fromJson(item as Map<String, dynamic>))
-        .toList();
   }
 
   Future<List<Announcement>> getAnnouncement() async {
