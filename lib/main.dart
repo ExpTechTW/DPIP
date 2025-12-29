@@ -8,6 +8,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/core/update.dart';
 import 'package:dpip/global.dart';
@@ -82,7 +83,8 @@ void main() async {
   if (Platform.isIOS) {
     await DeviceInfo.init();
   } else {
-    unawaited(() async {
+    unawaited(
+      () async {
         final start = DateTime.now();
         await DeviceInfo.init();
         talker.log(
@@ -152,6 +154,7 @@ void main() async {
       }),
     );
   }
+  unawaited(CompassService.instance.initialize());
   final locationInitStart = DateTime.now();
   talker.log('🚀 啟動 LocationServiceManager ...');
   final locationFuture = LocationServiceManager.initalize();

@@ -6,16 +6,12 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/log.dart';
 
-/// 指北針精確度閾值（度）
-/// https://developer.apple.com/documentation/corelocation/clheading/headingaccuracy
-/// 負值表示無效/需要校準
-/// 0-15 表示高精確度
-/// 15-25 表示中等精確度
-/// >25 表示精度下降（警告）
-/// >45 表示不可靠（危險）
 const double _kCompassAccuracyWarning = 25.0;
 const double _kCompassAccuracyDanger = 45.0;
 
@@ -28,40 +24,112 @@ class WindCard extends StatefulWidget {
   State<WindCard> createState() => _WindCardState();
 }
 
-class _WindCardState extends State<WindCard> {
+class _WindCardState extends State<WindCard>
+    with WidgetsBindingObserver, RouteAware {
   StreamSubscription<CompassEvent>? _compassSubscription;
   double _deviceHeading = 0.0;
-  double _compassAccuracy = 0.0; // 方向精確度（度），負值表示無效
+  double _compassAccuracy = 0.0;
   bool _hasCompass = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initCompass();
   }
 
-  Future<void> _initCompass() async {
-    // 檢查裝置是否支援羅盤
-    final isSupported = await FlutterCompass.events != null;
-    if (!isSupported) return;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    TalkerManager.instance.debug(
+      'WindCard.didChangeDependencies: route=$route',
+    );
+    if (route != null) {
+      routeObserver.subscribe(this, route);
+    }
+  }
 
-    setState(() => _hasCompass = true);
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    TalkerManager.instance.debug('WindCard.didChangeAppLifecycleState: $state');
+    if (state == AppLifecycleState.resumed) {
+      _initCompass();
+    } else if (state == AppLifecycleState.paused) {
+      _compassSubscription?.cancel();
+      _compassSubscription = null;
+    }
+  }
 
-    _compassSubscription = FlutterCompass.events?.listen((event) {
+  @override
+  void didPopNext() {
+    TalkerManager.instance.debug('WindCard.didPopNext called');
+    _initCompass();
+  }
+
+  @override
+  void didPush() {
+    TalkerManager.instance.debug(
+      'WindCard.didPush called, hasSubscription=${_compassSubscription != null}',
+    );
+    if (_compassSubscription == null) {
+      _initCompass();
+    }
+  }
+
+  @override
+  void didPushNext() {
+    TalkerManager.instance.debug('WindCard.didPushNext called');
+    _compassSubscription?.cancel();
+    _compassSubscription = null;
+  }
+
+  void _initCompass() {
+    TalkerManager.instance.debug(
+      'WindCard._initCompass called, mounted=$mounted, hasSubscription=${_compassSubscription != null}',
+    );
+
+    if (_compassSubscription != null) {
+      TalkerManager.instance.debug(
+        'WindCard._initCompass: already has subscription, skipping',
+      );
+      return;
+    }
+
+    final compass = CompassService.instance;
+    if (!compass.hasCompass) {
+      TalkerManager.instance.debug(
+        'WindCard._initCompass: compass not available',
+      );
+      return;
+    }
+
+    _deviceHeading = compass.lastHeading;
+    _hasCompass = true;
+    TalkerManager.instance.debug(
+      'WindCard._initCompass: using lastHeading=${compass.lastHeading}',
+    );
+
+    _compassSubscription = compass.events?.listen((event) {
+      TalkerManager.instance.debug(
+        'WindCard: compass event, heading=${event.heading}',
+      );
       if (event.heading != null && mounted) {
         setState(() {
           _deviceHeading = event.heading!;
-          // accuracy: 方向誤差角度（度），負值表示無效/需要校準
           if (event.accuracy != null) {
             _compassAccuracy = event.accuracy!;
           }
         });
       }
     });
+    TalkerManager.instance.debug('WindCard._initCompass: subscription created');
   }
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     _compassSubscription?.cancel();
     super.dispose();
   }
@@ -92,7 +160,6 @@ class _WindCardState extends State<WindCard> {
     return direction.trim();
   }
 
-  /// 獲取蒲福風級描述
   String _getBeaufortDescription(int beaufort) {
     const descriptions = [
       '無風',
@@ -138,14 +205,12 @@ class _WindCardState extends State<WindCard> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // 左側：指北針
             SizedBox(
               width: 80,
               height: 80,
               child: _buildCompass(context, windAngle, hasValidDirection),
             ),
             const SizedBox(width: 12),
-            // 中間：風速資訊
             Expanded(
               child: _buildCompactWindInfo(
                 context,
@@ -154,7 +219,6 @@ class _WindCardState extends State<WindCard> {
                 hasValidDirection,
               ),
             ),
-            // 右側：磁場資訊
             if (_hasCompass) _buildMagneticInfo(context),
           ],
         ),
@@ -167,13 +231,11 @@ class _WindCardState extends State<WindCard> {
     double windAngle,
     bool hasValidDirection,
   ) {
-    // 將裝置朝向轉換為弧度（逆向旋轉以補償裝置旋轉）
     final deviceRotation = -_deviceHeading * math.pi / 180;
 
     return Stack(
       alignment: Alignment.center,
       children: [
-        // 外圈（固定不動）
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -186,13 +248,11 @@ class _WindCardState extends State<WindCard> {
             ),
           ),
         ),
-        // 羅盤內容（根據裝置朝向旋轉）
         Transform.rotate(
           angle: deviceRotation,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // 方位標記
               ...['N', 'E', 'S', 'W'].asMap().entries.map((entry) {
                 final index = entry.key;
                 final label = entry.value;
@@ -221,15 +281,12 @@ class _WindCardState extends State<WindCard> {
                   ),
                 );
               }),
-              // 內圈刻度
               CustomPaint(
                 size: const Size.square(100),
                 painter: _CompassTicksPainter(
                   color: context.colors.outline.withValues(alpha: 0.3),
                 ),
               ),
-              // 風向指針（箭頭指向風的來向，尾巴指向風吹去的方向）
-              // windAngle 是風來的方向
               if (hasValidDirection)
                 Transform.rotate(
                   angle: windAngle * math.pi / 180,
@@ -243,7 +300,6 @@ class _WindCardState extends State<WindCard> {
             ],
           ),
         ),
-        // 中心點（固定不動）
         Container(
           width: 12,
           height: 12,
@@ -261,7 +317,6 @@ class _WindCardState extends State<WindCard> {
             ],
           ),
         ),
-        // 無資料提示
         if (!hasValidDirection)
           Positioned(
             bottom: 8,
@@ -286,7 +341,6 @@ class _WindCardState extends State<WindCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 風向 + 風速
         Row(
           children: [
             Icon(Symbols.air_rounded, size: 16, color: Colors.teal),
@@ -307,7 +361,6 @@ class _WindCardState extends State<WindCard> {
           ],
         ),
         const SizedBox(height: 4),
-        // 風級
         Row(
           children: [
             Text(
@@ -340,8 +393,6 @@ class _WindCardState extends State<WindCard> {
   }
 
   Widget _buildMagneticInfo(BuildContext context) {
-    // 使用 compass accuracy（方向誤差角度）
-    // 負值表示無效，0-15 高精度，15-25 中等，>25 警告，>45 危險
     final hasDanger =
         _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
     final hasWarning =
@@ -495,7 +546,6 @@ class _WindCardState extends State<WindCard> {
   }
 }
 
-/// 指北針刻度繪製器
 class _CompassTicksPainter extends CustomPainter {
   final Color color;
 
@@ -533,7 +583,6 @@ class _CompassTicksPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 風向指針繪製器 (箭頭指向風來向，尾翼朝向圓心)
 class _WindArrowPainter extends CustomPainter {
   final Color color;
 
@@ -544,16 +593,14 @@ class _WindArrowPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    // 陰影
     final shadowPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.25)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
 
-    // === 1. 連桿 (細，從箭頭到尾翼起點，不超過尾翼) ===
     final shaftPath = Path()
-      ..moveTo(center.dx - 1, center.dy - radius * 0.25) // 箭頭底部
-      ..lineTo(center.dx - 1, center.dy + radius * 0.45) // 尾翼起點
+      ..moveTo(center.dx - 1, center.dy - radius * 0.25)
+      ..lineTo(center.dx - 1, center.dy + radius * 0.45)
       ..lineTo(center.dx + 1, center.dy + radius * 0.45)
       ..lineTo(center.dx + 1, center.dy - radius * 0.25)
       ..close();
@@ -561,18 +608,15 @@ class _WindArrowPainter extends CustomPainter {
     canvas.drawPath(shaftPath.shift(const Offset(0.5, 0.5)), shadowPaint);
     canvas.drawPath(shaftPath, Paint()..color = color.withValues(alpha: 0.6));
 
-    // === 2. 尾翼 (小型，遠離圓心) ===
-    final tailStartY = center.dy + radius * 0.45; // 尾翼起點
-    final tailEndY = center.dy + radius * 0.72; // 尾翼終點
+    final tailStartY = center.dy + radius * 0.45;
+    final tailEndY = center.dy + radius * 0.72;
 
-    // 左尾翼
     final leftTailPath = Path()
       ..moveTo(center.dx, tailStartY)
       ..lineTo(center.dx - 10, tailEndY)
       ..lineTo(center.dx, tailEndY - radius * 0.06)
       ..close();
 
-    // 右尾翼
     final rightTailPath = Path()
       ..moveTo(center.dx, tailStartY)
       ..lineTo(center.dx + 10, tailEndY)
@@ -584,7 +628,6 @@ class _WindArrowPainter extends CustomPainter {
     canvas.drawPath(leftTailPath, Paint()..color = color);
     canvas.drawPath(rightTailPath, Paint()..color = color);
 
-    // === 3. 箭頭 (靠近圓心) ===
     final arrowTip = Offset(center.dx, center.dy - radius * 0.42);
     final arrowPath = Path()
       ..moveTo(arrowTip.dx, arrowTip.dy)

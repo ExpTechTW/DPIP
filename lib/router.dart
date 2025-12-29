@@ -50,7 +50,8 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _settingsNavigatorKey =
     GlobalKey<NavigatorState>();
 
-// TypedGoRoute definitions
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 /// Welcome route - displays the welcome/onboarding page.
 @TypedGoRoute<WelcomeRoute>(path: '/welcome')
@@ -572,6 +573,6 @@ final router = GoRouter(
     return null;
   },
   routes: $appRoutes,
-  observers: [TalkerRouteObserver(TalkerManager.instance)],
+  observers: [TalkerRouteObserver(TalkerManager.instance), routeObserver],
   debugLogDiagnostics: true,
 );

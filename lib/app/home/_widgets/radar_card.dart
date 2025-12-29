@@ -4,7 +4,10 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
+import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/extensions/string.dart';
@@ -18,8 +21,6 @@ import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-typedef PositionUpdateCallback = void Function();
-
 class RadarMapCard extends StatefulWidget {
   const RadarMapCard({super.key});
 
@@ -27,9 +28,8 @@ class RadarMapCard extends StatefulWidget {
   State<RadarMapCard> createState() => _RadarMapCardState();
 }
 
-class _RadarMapCardState extends State<RadarMapCard> {
-  late final _key = widget.key ?? UniqueKey();
-
+class _RadarMapCardState extends State<RadarMapCard>
+    with WidgetsBindingObserver, RouteAware {
   MapLibreMapController? _mapController;
   late Future<List<String>> radarListFuture;
 
@@ -75,18 +75,61 @@ class _RadarMapCardState extends State<RadarMapCard> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     radarListFuture = ExpTech().getRadarList();
     _initCompass();
   }
 
-  Future<void> _initCompass() async {
-    final isSupported = await FlutterCompass.events != null;
-    if (!isSupported) return;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      routeObserver.subscribe(this, route);
+    }
+  }
 
-    _compassSubscription = FlutterCompass.events?.listen((event) async {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _initCompass();
+      _updateMapBearing();
+    } else if (state == AppLifecycleState.paused) {
+      _compassSubscription?.cancel();
+      _compassSubscription = null;
+    }
+  }
+
+  @override
+  void didPopNext() {
+    _initCompass();
+    _updateMapBearing();
+  }
+
+  @override
+  void didPush() {
+    if (_compassSubscription == null) {
+      _initCompass();
+    }
+  }
+
+  @override
+  void didPushNext() {
+    _compassSubscription?.cancel();
+    _compassSubscription = null;
+  }
+
+  void _initCompass() {
+    if (_compassSubscription != null) return;
+
+    final compass = CompassService.instance;
+    if (!compass.hasCompass) return;
+
+    _deviceHeading = compass.lastHeading;
+
+    _compassSubscription = compass.events?.listen((event) {
       if (event.heading != null && mounted) {
         final newHeading = event.heading!;
-        // 變化超過 1 度時才更新，避免頻繁刷新
         if ((newHeading - _deviceHeading).abs() > 1) {
           setState(() {
             _deviceHeading = newHeading;
@@ -104,31 +147,25 @@ class _RadarMapCardState extends State<RadarMapCard> {
         CameraUpdate.bearingTo(_deviceHeading),
         duration: const Duration(milliseconds: 150),
       );
-    } catch (e) {
-      // 忽略錯誤
-    }
-  }
-
-  /// 地圖樣式載入完成後初始化方位
-  Future<void> _initMapBearing() async {
-    if (!_mapReady || _mapController == null) return;
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (!mounted || _mapController == null) return;
-    try {
-      await _mapController!.moveCamera(
-        CameraUpdate.bearingTo(_deviceHeading),
-      );
     } catch (_) {}
   }
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     _compassSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final userLocation = GlobalProviders.location.coordinates;
+    final targetLocation = userLocation ?? DpipMap.kTaiwanCenter;
+    final targetZoom =
+        userLocation != null ? DpipMap.kUserLocationZoom : DpipMap.kTaiwanZoom;
+    final bearing = CompassService.instance.lastHeading;
+
     return ResponsiveContainer(
       maxWidth: 720,
       child: Stack(
@@ -147,19 +184,22 @@ class _RadarMapCardState extends State<RadarMapCard> {
                     SizedBox(
                       height: 200,
                       child: DpipMap(
-                        key: _key,
+                        initialCameraPosition: CameraPosition(
+                          target: targetLocation,
+                          zoom: targetZoom,
+                          bearing: bearing,
+                        ),
                         onMapCreated: (controller) =>
                             _mapController = controller,
-                        onStyleLoadedCallback: () async {
+                        onStyleLoadedCallback: () {
                           _mapReady = true;
                           _setupMapLayers();
-                          // 地圖載入完成後立即設置方位
-                          _initMapBearing();
+                          _deviceHeading = CompassService.instance.lastHeading;
                         },
                         dragEnabled: false,
                         rotateGesturesEnabled: false,
                         zoomGesturesEnabled: false,
-                        focusUserLocationWhenUpdated: true,
+                        focusUserLocationWhenUpdated: false,
                       ),
                     ),
                     Padding(
@@ -181,13 +221,14 @@ class _RadarMapCardState extends State<RadarMapCard> {
                                 builder: (context, snapshot) {
                                   final data = snapshot.data;
 
-                                  if (data == null)
+                                  if (data == null) {
                                     return const SizedBox.shrink();
+                                  }
 
-                                  final style = context.texts.labelSmall
-                                      ?.copyWith(
-                                        color: context.colors.onSurfaceVariant,
-                                      );
+                                  final style =
+                                      context.texts.labelSmall?.copyWith(
+                                    color: context.colors.onSurfaceVariant,
+                                  );
 
                                   return Container(
                                     padding: const EdgeInsets.symmetric(
