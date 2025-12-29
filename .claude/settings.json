@@ -1,8 +1,6 @@
 {
   "companyAnnouncements": [
-    "Welcome to DPIP development!",
-    "AI usage is prohibited except for documentation.",
-    "Reminder: Code reviews required for all PRs"
+    "Welcome to DPIP development! AI usage is prohibited except for documentation."
   ],
   "permissions": {
     "allow": [
