@@ -71,12 +71,16 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
       duration: const Duration(milliseconds: 2000),
     )..repeat();
 
-    _refreshIndicatorKey.currentState?.show();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _refreshIndicatorKey.currentState?.show();
+    });
 
     subscription?.cancel();
     subscription = InAppPurchase.instance.purchaseStream.listen(
       onPurchaseUpdate,
       onError: (error) {
+        if (!mounted) return;
         setState(() => isPending = false);
       },
     );
@@ -90,46 +94,41 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
     super.dispose();
   }
 
-  void onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
-    final bool hasAnyPending = purchaseDetailsList.any(
-      (detail) => detail.status == PurchaseStatus.pending,
-    );
+  void onPurchaseUpdate(List<PurchaseDetails> list) {
+    if (!mounted) return;
 
-    if (mounted) {
-      setState(() {
-        isPending = hasAnyPending;
-        if (!hasAnyPending) {
-          processingProductId = null;
-        }
-      });
-    }
+    final hasAnyPending =
+    list.any((d) => d.status == PurchaseStatus.pending);
 
-    for (final purchaseDetails in purchaseDetailsList) {
-      switch (purchaseDetails.status) {
+    setState(() {
+      isPending = hasAnyPending;
+      if (!hasAnyPending) processingProductId = null;
+    });
+
+    for (final d in list) {
+      switch (d.status) {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          if (purchaseDetails.pendingCompletePurchase) {
-            InAppPurchase.instance.completePurchase(purchaseDetails);
+          if (d.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(d);
           }
-          if (mounted) {
+          setState(() {
+            purchasedProductIds.add(d.productID);
+          });
+          break;
+
+        case PurchaseStatus.pending:
+          if (processingProductId == null) {
             setState(() {
-              purchasedProductIds.add(purchaseDetails.productID);
+              processingProductId = d.productID;
             });
           }
           break;
 
         case PurchaseStatus.error:
         case PurchaseStatus.canceled:
-          if (purchaseDetails.pendingCompletePurchase) {
-            InAppPurchase.instance.completePurchase(purchaseDetails);
-          }
-          break;
-
-        case PurchaseStatus.pending:
-          if (processingProductId == null) {
-            setState(() {
-              processingProductId = purchaseDetails.productID;
-            });
+          if (d.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(d);
           }
           break;
       }
