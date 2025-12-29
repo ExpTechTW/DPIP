@@ -1,3 +1,4 @@
+import 'package:dpip/router.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -12,8 +13,6 @@ import 'package:dpip/utils/extensions/build_context.dart';
 
 class SettingsThemePage extends StatelessWidget {
   const SettingsThemePage({super.key});
-
-  static const route = '/settings/theme';
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +106,7 @@ class SettingsThemePage extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.push(SettingsThemeSelectPage.route),
+          onTap: () => SettingsThemeSelectRoute().push(context),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -249,7 +248,8 @@ class SettingsThemePage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   padding: EdgeInsets.zero,
                   color: pickerColor,
-                  onColorChanged: (color) => setState(() => pickerColor = color),
+                  onColorChanged: (color) =>
+                      setState(() => pickerColor = color),
                   enableTonalPalette: true,
                   enableShadesSelection: false,
                   showMaterialName: true,

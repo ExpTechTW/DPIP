@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'main.dart';
@@ -116,11 +117,20 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       builder: (lightDynamic, darkDynamic) {
         return Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
+            final switchTheme = SwitchThemeData(
+              thumbIcon: .resolveWith(
+                (states) => states.contains(WidgetState.selected)
+                    ? Icon(Symbols.check_rounded)
+                    : null,
+              ),
+            );
+
             ThemeData lightTheme = .new(
               colorSchemeSeed: model.themeColor ?? lightDynamic?.primary,
               brightness: .light,
               snackBarTheme: const .new(behavior: .floating),
               pageTransitionsTheme: kZoomPageTransitionsTheme,
+              switchTheme: switchTheme,
               // TODO(kamiya4047): Opt-in to new Material 3 update, remove this after it becomes the default option
               sliderTheme: const .new(year2023: false),
               progressIndicatorTheme: const .new(year2023: false),
@@ -130,6 +140,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               brightness: .dark,
               snackBarTheme: const .new(behavior: .floating),
               pageTransitionsTheme: kZoomPageTransitionsTheme,
+              switchTheme: switchTheme,
               // TODO(kamiya4047): Opt-in to new Material 3 update, remove this after it becomes the default option
               sliderTheme: const .new(year2023: false),
               progressIndicatorTheme: const .new(year2023: false),

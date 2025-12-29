@@ -445,7 +445,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
-                  onPressed: () => context.push(SettingsLayoutPage.route),
+                  onPressed: () => SettingsLayoutRoute().push(context),
                   child: Text('前往設定'.i18n),
                 ),
               ],

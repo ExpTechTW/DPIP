@@ -5,6 +5,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/home/home_display_mode.dart';
 
@@ -83,4 +84,11 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
     notifyListeners();
   }
+}
+
+extension SettingsUserInterfaceModelExtension on BuildContext {
+  SettingsUserInterfaceModel get useUserInterface =>
+      watch<SettingsUserInterfaceModel>();
+  SettingsUserInterfaceModel get userInterface =>
+      read<SettingsUserInterfaceModel>();
 }

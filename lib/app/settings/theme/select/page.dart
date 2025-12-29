@@ -12,15 +12,13 @@ import 'package:dpip/widgets/list/list_item_tile.dart';
 class SettingsThemeSelectPage extends StatelessWidget {
   const SettingsThemeSelectPage({super.key});
 
-  static const route = '/settings/theme/select';
-
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         Section(
-          label: Text('主題色'.i18n),
+          label: Text('主題模式'.i18n),
           children: [
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,

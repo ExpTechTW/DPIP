@@ -1,3 +1,5 @@
+import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/symbols.dart';
@@ -11,52 +13,80 @@ import 'package:dpip/utils/extensions/build_context.dart';
 class SettingsLayoutPage extends StatelessWidget {
   const SettingsLayoutPage({super.key});
 
-  static const route = '/settings/layout';
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsUserInterfaceModel>(
-      builder: (context, model, child) {
-        return ListView(
-          padding: EdgeInsets.only(
-            top: 16,
-            bottom: MediaQuery.of(context).padding.bottom + 16,
-          ),
+    return ListView(
+      padding: EdgeInsets.only(
+        top: 16,
+        bottom: MediaQuery.of(context).padding.bottom + 16,
+      ),
+      children: [
+        _buildHeader(context),
+        const SizedBox(height: 16),
+        Section(
           children: [
-            _buildHeader(context),
-            const SizedBox(height: 16),
-            _buildSectionCard(
-              context,
-              icon: Symbols.radar_rounded,
-              iconColor: Colors.blue,
-              title: '雷達回波'.i18n,
-              subtitle: '顯示即時雷達回波圖'.i18n,
-              value: model.isEnabled(HomeDisplaySection.radar),
-              onChanged: (v) => model.toggleSection(HomeDisplaySection.radar, v),
+            Selector<SettingsUserInterfaceModel, bool>(
+              selector: (context, model) => model.isEnabled(.radar),
+              builder: (context, isEnabled, child) {
+                return SectionListTile(
+                  isFirst: true,
+                  leading: ContainedIcon(
+                    Symbols.radar_rounded,
+                    color: Colors.blueAccent,
+                  ),
+                  title: Text('雷達回波'.i18n),
+                  subtitle: Text('顯示即時雷達回波圖'.i18n),
+                  trailing: Switch(
+                    value: isEnabled,
+                    onChanged: (value) {
+                      context.userInterface.toggleSection(.radar, value);
+                    },
+                  ),
+                );
+              },
             ),
-            _buildSectionCard(
-              context,
-              icon: Symbols.partly_cloudy_day_rounded,
-              iconColor: Colors.orange,
-              title: '天氣預報(24h)'.i18n,
-              subtitle: '顯示未來 24 小時天氣預報'.i18n,
-              value: model.isEnabled(HomeDisplaySection.forecast),
-              onChanged: (v) =>
-                  model.toggleSection(HomeDisplaySection.forecast, v),
+            Selector<SettingsUserInterfaceModel, bool>(
+              selector: (context, model) => model.isEnabled(.forecast),
+              builder: (context, isEnabled, child) {
+                return SectionListTile(
+                  leading: ContainedIcon(
+                    Symbols.radar_rounded,
+                    color: Colors.orangeAccent,
+                  ),
+                  title: Text('天氣預報'.i18n),
+                  subtitle: Text('顯示未來 24 小時的天氣預報'.i18n),
+                  trailing: Switch(
+                    value: isEnabled,
+                    onChanged: (value) {
+                      context.userInterface.toggleSection(.forecast, value);
+                    },
+                  ),
+                );
+              },
             ),
-            _buildSectionCard(
-              context,
-              icon: Symbols.history_rounded,
-              iconColor: Colors.green,
-              title: '歷史事件'.i18n,
-              subtitle: '顯示地震與災害歷史紀錄'.i18n,
-              value: model.isEnabled(HomeDisplaySection.history),
-              onChanged: (v) =>
-                  model.toggleSection(HomeDisplaySection.history, v),
+            Selector<SettingsUserInterfaceModel, bool>(
+              selector: (context, model) => model.isEnabled(.history),
+              builder: (context, isEnabled, child) {
+                return SectionListTile(
+                  isLast: true,
+                  leading: ContainedIcon(
+                    Symbols.history_rounded,
+                    color: Colors.greenAccent,
+                  ),
+                  title: Text('歷史事件'.i18n),
+                  subtitle: Text('顯示地震與災害歷史紀錄'.i18n),
+                  trailing: Switch(
+                    value: isEnabled,
+                    onChanged: (value) {
+                      context.userInterface.toggleSection(.history, value);
+                    },
+                  ),
+                );
+              },
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -143,7 +173,9 @@ class SettingsLayoutPage extends StatelessWidget {
                     icon,
                     color: value
                         ? iconColor
-                        : context.colors.onSurfaceVariant.withValues(alpha: 0.5),
+                        : context.colors.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
                     size: 24,
                   ),
                 ),
@@ -165,8 +197,9 @@ class SettingsLayoutPage extends StatelessWidget {
                       Text(
                         subtitle,
                         style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant
-                              .withValues(alpha: value ? 1 : 0.7),
+                          color: context.colors.onSurfaceVariant.withValues(
+                            alpha: value ? 1 : 0.7,
+                          ),
                         ),
                       ),
                     ],

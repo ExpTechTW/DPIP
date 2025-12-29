@@ -50,11 +50,10 @@ class _ChangelogPageState extends State<ChangelogPage> {
         key: _refreshIndicatorKey,
         backgroundColor: context.colors.primaryContainer,
         onRefresh: _refresh,
-        edgeOffset: context.padding.top + 64,
+        edgeOffset: context.padding.top,
         child: CustomScrollView(
           slivers: [
-            SliverAppBarM3E(
-              variant: .small,
+            SliverAppBar(
               title: Text('更新日誌'),
               pinned: true,
             ),
