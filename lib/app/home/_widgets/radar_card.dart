@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
@@ -11,6 +13,7 @@ import 'package:dpip/widgets/layout.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -27,11 +30,16 @@ class RadarMapCard extends StatefulWidget {
 class _RadarMapCardState extends State<RadarMapCard> {
   late final _key = widget.key ?? UniqueKey();
 
-  late MapLibreMapController mapController;
+  MapLibreMapController? _mapController;
   late Future<List<String>> radarListFuture;
 
+  StreamSubscription<CompassEvent>? _compassSubscription;
+  double _deviceHeading = 0.0;
+  bool _mapReady = false;
+
   Future<void> _setupMapLayers() async {
-    final controller = mapController;
+    final controller = _mapController;
+    if (controller == null) return;
 
     final sourceId = MapSourceIds.radar();
     final layerId = MapLayerIds.radar();
@@ -68,6 +76,55 @@ class _RadarMapCardState extends State<RadarMapCard> {
   void initState() {
     super.initState();
     radarListFuture = ExpTech().getRadarList();
+    _initCompass();
+  }
+
+  Future<void> _initCompass() async {
+    final isSupported = await FlutterCompass.events != null;
+    if (!isSupported) return;
+
+    _compassSubscription = FlutterCompass.events?.listen((event) async {
+      if (event.heading != null && mounted) {
+        final newHeading = event.heading!;
+        // 變化超過 1 度時才更新，避免頻繁刷新
+        if ((newHeading - _deviceHeading).abs() > 1) {
+          setState(() {
+            _deviceHeading = newHeading;
+          });
+          _updateMapBearing();
+        }
+      }
+    });
+  }
+
+  Future<void> _updateMapBearing() async {
+    if (!_mapReady || _mapController == null) return;
+    try {
+      await _mapController!.animateCamera(
+        CameraUpdate.bearingTo(_deviceHeading),
+        duration: const Duration(milliseconds: 150),
+      );
+    } catch (e) {
+      // 忽略錯誤
+    }
+  }
+
+  /// 地圖樣式載入完成後初始化方位
+  Future<void> _initMapBearing() async {
+    if (!_mapReady || _mapController == null) return;
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted || _mapController == null) return;
+    try {
+      await _mapController!.moveCamera(
+        CameraUpdate.bearingTo(_deviceHeading),
+      );
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _compassSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -92,8 +149,13 @@ class _RadarMapCardState extends State<RadarMapCard> {
                       child: DpipMap(
                         key: _key,
                         onMapCreated: (controller) =>
-                            mapController = controller,
-                        onStyleLoadedCallback: () => _setupMapLayers(),
+                            _mapController = controller,
+                        onStyleLoadedCallback: () async {
+                          _mapReady = true;
+                          _setupMapLayers();
+                          // 地圖載入完成後立即設置方位
+                          _initMapBearing();
+                        },
                         dragEnabled: false,
                         rotateGesturesEnabled: false,
                         zoomGesturesEnabled: false,

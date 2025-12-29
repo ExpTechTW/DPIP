@@ -25,6 +25,7 @@ import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
+import 'package:dpip/app/home/_widgets/wind_card.dart';
 import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
@@ -332,6 +333,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               if (homeSections.isNotEmpty) ...[
                 if (homeSections.contains(HomeDisplaySection.radar))
                   _buildRadarMap(),
+                if (!_isLoading && _weather != null) _buildWindCard(),
                 if (homeSections.contains(HomeDisplaySection.forecast))
                   _buildForecast(),
                 _buildCommunityCards(),
@@ -373,10 +375,45 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildCommunityCards() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 標題
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Symbols.group_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '社群'.i18n,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // 社群卡片
           Row(
             children: [
               Expanded(
@@ -434,14 +471,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(16),
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -466,7 +503,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => context.push(SettingsDonatePage.route),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -477,10 +514,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -559,6 +596,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: ThunderstormCard(_thunderstorm!),
         ),
     ];
+  }
+
+  Widget _buildWindCard() {
+    if (_weather == null) return const SizedBox.shrink();
+    return WindCard(_weather!);
   }
 
   Widget _buildRadarMap() {

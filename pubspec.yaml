@@ -33,6 +33,7 @@ dependencies:
   firebase_core: 3.15.2 #4.0.0 升級最低支援iOS 15
   firebase_messaging: 15.2.10
   flex_color_picker: ^3.8.0
+  flutter_compass: ^0.8.1
   flutter:
     sdk: flutter
   flutter_icmp_ping:
