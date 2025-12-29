@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -64,6 +66,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isOutOfService = false;
   bool _wasVisible = true;
   double? _locationButtonHeight;
+  double _blurAmount = 0.0;
 
   RealtimeWeather? _weather;
   Map<String, dynamic>? _forecast;
@@ -95,11 +98,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
     GlobalProviders.location.$code.addListener(_refresh);
+    _scrollController.addListener(_onScroll);
     _refresh();
+  }
+
+  void _onScroll() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final offset = _scrollController.offset;
+    final progress = (offset / (screenHeight * 0.3)).clamp(0.0, 1.0);
+    final newBlur = progress * 15.0;
+    if ((newBlur - _blurAmount).abs() > 0.5) {
+      setState(() => _blurAmount = newBlur);
+    }
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
     _scrollController.dispose();
@@ -333,13 +348,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     return Stack(
       children: [
-        // 雨滴背景（全螢幕，持續顯示）
         Positioned.fill(
           child: RainShaderBackground(
             animated: _isRaining,
           ),
         ),
-        // 主內容
+        if (_blurAmount > 0)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: _blurAmount,
+                  sigmaY: _blurAmount,
+                ),
+                child: ColoredBox(
+                  color: Colors.black.withValues(alpha: _blurAmount / 60),
+                ),
+              ),
+            ),
+          ),
         ExpressiveRefreshIndicator.contained(
           key: _refreshIndicatorKey,
           edgeOffset: context.padding.top + kToolbarHeight,
