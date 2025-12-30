@@ -352,26 +352,23 @@ class ExpTech {
     return json.map((e) => e as String).toList();
   }
 
-  Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
+  Future<Result<List<CrowdinLocalizationProgress>, String>>
+  getLocalizationProgress() async {
     final requestUrl = Routes.locale();
 
-    final res = await _sharedClient.get(requestUrl);
+    final response = await _sharedClient.get(requestUrl);
 
-    if (res.statusCode != 200) {
-      throw HttpException(
-        'The server returned a status of ${res.statusCode}',
-        uri: requestUrl,
-      );
+    if (response.statusCode != 200) {
+      return Err('無法從 Crowdin 取得翻譯狀態');
     }
 
-    final json = jsonDecode(res.body) as List;
-
-    return json
-        .map(
-          (e) =>
-              CrowdinLocalizationProgress.fromJson(e as Map<String, dynamic>),
-        )
+    final data = response.json()['data'] as List;
+    final progress = data
+        .cast<Map<String, dynamic>>()
+        .map((e) => CrowdinLocalizationProgress.fromJson(e))
         .toList();
+
+    return Ok(progress);
   }
 
   Future<List<String>> getRadarList() async {

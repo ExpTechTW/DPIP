@@ -40,6 +40,7 @@ class SettingsThemePage extends StatelessWidget {
                       ),
                       title: Text('主題模式'.i18n),
                       subtitle: Text(themeMode.label.i18n),
+                      trailing: const Icon(Symbols.chevron_right_rounded),
                       onTap: () => const SettingsThemeModeRoute().push(context),
                     );
                   },
@@ -58,6 +59,7 @@ class SettingsThemePage extends StatelessWidget {
                         null => '使用系統配色'.i18n,
                         final v => ColorTools.nameThatColor(v),
                       }),
+                      trailing: const Icon(Symbols.chevron_right_rounded),
                       onTap: () =>
                           const SettingsThemeColorRoute().push(context),
                     );
