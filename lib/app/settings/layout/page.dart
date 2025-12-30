@@ -97,64 +97,6 @@ class SettingsLayoutPage extends StatelessWidget {
                   );
                 },
               ),
-              Selector<SettingsUserInterfaceModel, bool>(
-                selector: (context, model) => model.isEnabled(.forecast),
-                builder: (context, isEnabled, child) {
-                  return SectionListTile(
-                    leading: ContainedIcon(
-                      Symbols.radar_rounded,
-                      color: Colors.orangeAccent,
-                    ),
-                    title: Text('天氣預報'.i18n),
-                    subtitle: Text('顯示未來 24 小時的天氣預報'.i18n),
-                    trailing: Switch(
-                      value: isEnabled,
-                      onChanged: (value) {
-                        context.userInterface.toggleSection(.forecast, value);
-                      },
-                    ),
-                  );
-                },
-              ),
-              Selector<SettingsUserInterfaceModel, bool>(
-                selector: (context, model) => model.isEnabled(.wind),
-                builder: (context, isEnabled, child) {
-                  return SectionListTile(
-                    leading: ContainedIcon(
-                      Symbols.wind_power_rounded,
-                      color: Colors.orangeAccent,
-                    ),
-                    title: Text('風向'.i18n),
-                    subtitle: Text('顯示風向與風力級數'.i18n),
-                    trailing: Switch(
-                      value: isEnabled,
-                      onChanged: (value) {
-                        context.userInterface.toggleSection(.wind, value);
-                      },
-                    ),
-                  );
-                },
-              ),
-              Selector<SettingsUserInterfaceModel, bool>(
-                selector: (context, model) => model.isEnabled(.history),
-                builder: (context, isEnabled, child) {
-                  return SectionListTile(
-                    isLast: true,
-                    leading: ContainedIcon(
-                      Symbols.history_rounded,
-                      color: Colors.greenAccent,
-                    ),
-                    title: Text('歷史事件'.i18n),
-                    subtitle: Text('顯示地震與災害歷史紀錄'.i18n),
-                    trailing: Switch(
-                      value: isEnabled,
-                      onChanged: (value) {
-                        context.userInterface.toggleSection(.history, value);
-                      },
-                    ),
-                  );
-                },
-              ),
             ],
           ],
         );
