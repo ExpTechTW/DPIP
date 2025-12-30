@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
 
 /// A widget that displays text using Material Design 3 display text styles.
 ///

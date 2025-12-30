@@ -1,21 +1,18 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import 'package:m3e_collection/m3e_collection.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:option_result/result.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
-import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/widgets/markdown.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
+import 'package:flutter/material.dart';
+import 'package:m3e_collection/m3e_collection.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:option_result/result.dart';
 
 class ChangelogPage extends StatefulWidget {
   const ChangelogPage({super.key});

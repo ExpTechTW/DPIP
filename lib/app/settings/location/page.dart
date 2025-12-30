@@ -1,16 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
-
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/i18n.dart';
@@ -24,6 +15,13 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:dpip/widgets/list/list_item_tile.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 

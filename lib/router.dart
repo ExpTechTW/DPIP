@@ -1,10 +1,3 @@
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:talker_flutter/talker_flutter.dart';
-
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
@@ -30,9 +23,9 @@ import 'package:dpip/app/settings/notify/(4.tsunami)/tsunami/page.dart';
 import 'package:dpip/app/settings/notify/(5.basic)/announcement/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
+import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
-import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
@@ -41,8 +34,13 @@ import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 part 'router.g.dart';
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Page transitions theme that uses zoom transitions with predictive back gesture support on Android.

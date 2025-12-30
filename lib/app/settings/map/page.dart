@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle_sheet.dart';
 import 'package:dpip/core/i18n.dart';
@@ -11,6 +6,9 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/widgets/layout.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsMapPage extends StatelessWidget {
   const SettingsMapPage({super.key});
@@ -281,7 +279,9 @@ class SettingsMapPage extends StatelessWidget {
                     Symbols.zoom_in_map_rounded,
                     color: model.autoZoom
                         ? Colors.blue
-                        : context.colors.onSurfaceVariant.withValues(alpha: 0.5),
+                        : context.colors.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
                     size: 24,
                   ),
                 ),
@@ -303,8 +303,9 @@ class SettingsMapPage extends StatelessWidget {
                       Text(
                         '接收到檢知時自動縮放地圖(監視器模式下)'.i18n,
                         style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant
-                              .withValues(alpha: model.autoZoom ? 1 : 0.7),
+                          color: context.colors.onSurfaceVariant.withValues(
+                            alpha: model.autoZoom ? 1 : 0.7,
+                          ),
                         ),
                       ),
                     ],
@@ -323,7 +324,11 @@ class SettingsMapPage extends StatelessWidget {
   }
 
   Widget _buildAnimationFpsCard(BuildContext context, SettingsMapModel model) {
-    final maxFpsAllowed = WidgetsBinding.instance.platformDispatcher.views.first
+    final maxFpsAllowed = WidgetsBinding
+        .instance
+        .platformDispatcher
+        .views
+        .first
         .display
         .refreshRate
         .floorToDouble();

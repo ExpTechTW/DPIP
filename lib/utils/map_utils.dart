@@ -1,12 +1,11 @@
 import 'dart:math';
 
-import 'package:geojson_vi/geojson_vi.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:geojson_vi/geojson_vi.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum Units {
   meters,

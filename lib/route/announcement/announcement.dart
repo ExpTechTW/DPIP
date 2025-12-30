@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:intl/intl.dart';
 
 final List<TagType> tagTypes = [
   TagType(id: 0, text: '錯誤'.i18n, color: Colors.red),

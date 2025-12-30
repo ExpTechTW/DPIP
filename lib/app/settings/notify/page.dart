@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -15,6 +9,10 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyPage extends StatefulWidget {
   const SettingsNotifyPage({super.key});
@@ -206,8 +204,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: context.theme.extendedColors.amber
-                          .withValues(alpha: 0.15),
+                      color: context.theme.extendedColors.amber.withValues(
+                        alpha: 0.15,
+                      ),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(

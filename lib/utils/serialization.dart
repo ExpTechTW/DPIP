@@ -5,10 +5,9 @@
 /// may come in different formats from JSON APIs.
 library;
 
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/extensions/string.dart';
+import 'package:timezone/timezone.dart';
 
 /// Parses a boolean-like integer value from JSON.
 ///

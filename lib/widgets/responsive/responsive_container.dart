@@ -36,9 +36,7 @@ class ResponsiveContainer extends StatelessWidget {
             } else {
               contentMaxWidth = width;
             }
-            alignment = isLargeTablet
-                ? Alignment.centerLeft
-                : Alignment.center;
+            alignment = isLargeTablet ? Alignment.centerLeft : Alignment.center;
             break;
 
           case ResponsiveMode.content:

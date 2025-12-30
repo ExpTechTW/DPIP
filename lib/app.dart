@@ -1,18 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dynamic_color/dynamic_color.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-
-import 'main.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
@@ -21,6 +9,17 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dynamic_color/dynamic_color.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
+
+import 'main.dart';
 
 /// The root widget of the application.
 ///
