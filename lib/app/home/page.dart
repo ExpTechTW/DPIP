@@ -28,7 +28,8 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/thunderstorm_shader_background.dart';
+import 'package:dpip/utils/shader_selector.dart';
+import 'package:dpip/utils/wallpaper_selector.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -330,13 +331,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
 
+    final utc8Time = WallpaperSelector.getUtc8Time();
+    final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
+    final shaderType = ShaderSelector.selectShaderType(_weather);
+    final shaderBackground = ShaderSelector.buildShaderBackground(
+      shaderType: shaderType,
+      imagePath: wallpaperPath,
+      weather: _weather,
+    );
+
     return Stack(
       children: [
         Positioned.fill(
-          child: ThunderstormShaderBackground(
-            animated: true,
-            lightningIntensity: 1.0,
-          ),
+          child: shaderBackground,
         ),
         if (_blurAmount > 0)
           Positioned.fill(
