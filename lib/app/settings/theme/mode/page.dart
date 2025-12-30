@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-class SettingsThemeSelectPage extends StatelessWidget {
-  const SettingsThemeSelectPage({super.key});
+class SettingsThemeModePage extends StatelessWidget {
+  const SettingsThemeModePage({super.key});
 
   @override
   Widget build(BuildContext context) {

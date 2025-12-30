@@ -221,8 +221,6 @@ class SectionListTile extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
 
   /// The background color of the tile.
-  ///
-  /// Defaults to the theme's surface container color if not specified.
   final Color? tileColor;
 
   /// Called when the tile is tapped.

@@ -24,8 +24,9 @@ import 'package:dpip/app/settings/notify/(5.basic)/announcement/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/proxy/page.dart';
+import 'package:dpip/app/settings/theme/color/page.dart';
+import 'package:dpip/app/settings/theme/mode/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
-import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
@@ -135,7 +136,8 @@ class HomeRoute extends GoRouteData with $HomeRoute {
         TypedGoRoute<SettingsThemeRoute>(
           path: 'theme',
           routes: [
-            TypedGoRoute<SettingsThemeSelectRoute>(path: 'select'),
+            TypedGoRoute<SettingsThemeModeRoute>(path: 'mode'),
+            TypedGoRoute<SettingsThemeColorRoute>(path: 'color'),
           ],
         ),
         TypedGoRoute<SettingsLocaleRoute>(
@@ -290,15 +292,26 @@ class SettingsThemeRoute extends GoRouteData with $SettingsThemeRoute {
   }
 }
 
-/// Settings theme select route - displays theme selection page.
-class SettingsThemeSelectRoute extends GoRouteData
-    with $SettingsThemeSelectRoute {
-  /// Creates a [SettingsThemeSelectRoute].
-  const SettingsThemeSelectRoute();
+/// Settings theme mode route - displays theme mode selection page.
+class SettingsThemeModeRoute extends GoRouteData with $SettingsThemeModeRoute {
+  /// Creates a [SettingsThemeModeRoute].
+  const SettingsThemeModeRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const Material(child: SettingsThemeSelectPage());
+    return const Material(child: SettingsThemeModePage());
+  }
+}
+
+/// Settings theme color route - displays theme color page.
+class SettingsThemeColorRoute extends GoRouteData
+    with $SettingsThemeColorRoute {
+  /// Creates a [SettingsThemeColorRoute].
+  const SettingsThemeColorRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const Material(child: SettingsThemeColorPage());
   }
 }
 
