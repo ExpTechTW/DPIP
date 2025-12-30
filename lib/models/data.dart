@@ -86,6 +86,17 @@ class _DpipDataModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void appendPartialReport(List<PartialEarthquakeReport> partialReport) {
+    final existingIds = _partialReport.map((r) => r.id).toSet();
+    final newReports = partialReport
+        .where((r) => !existingIds.contains(r.id))
+        .toList();
+    if (newReports.isNotEmpty) {
+      _partialReport = [..._partialReport, ...newReports];
+      notifyListeners();
+    }
+  }
+
   Map<String, EarthquakeReport> _report = {};
 
   UnmodifiableMapView<String, EarthquakeReport> get report =>
