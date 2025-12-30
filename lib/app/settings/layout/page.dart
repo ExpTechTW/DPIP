@@ -62,7 +62,10 @@ class SettingsLayoutPage extends StatelessWidget {
                     title: details.title,
                     subtitle: details.subtitle,
                     value: true,
-                    onChanged: (v) => model.toggleSection(section, v),
+                    onChanged: (section == HomeDisplaySection.history ||
+                            section == HomeDisplaySection.community)
+                        ? null
+                        : (v) => model.toggleSection(section, v),
                     isReorderable: true,
                   );
                 },
@@ -200,7 +203,7 @@ class SettingsLayoutPage extends StatelessWidget {
     required String title,
     required String subtitle,
     required bool value,
-    required ValueChanged<bool> onChanged,
+    required ValueChanged<bool>? onChanged,
     required bool isReorderable,
   }) {
     return Container(
@@ -214,7 +217,7 @@ class SettingsLayoutPage extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => onChanged(!value),
+          onTap: onChanged == null ? null : () => onChanged(!value),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(

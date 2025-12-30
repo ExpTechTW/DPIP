@@ -10,8 +10,8 @@ import 'package:provider/provider.dart';
 enum HomeDisplaySection {
   radar,
   forecast,
-  history,
   wind,
+  history,
   community,
 }
 
