@@ -1,5 +1,5 @@
 class WallpaperSelector {
-  static String? debugWallpaperPath = null;
+  static String debugWallpaperPath = '';
 
   static const List<String> dayWallpapers = [
     'assets/wallpaper/day/autumn_park.jpg',
@@ -34,8 +34,8 @@ class WallpaperSelector {
   }
 
   static String selectWallpaper(DateTime utc8Time) {
-    if (debugWallpaperPath != null) {
-      return debugWallpaperPath!;
+    if (debugWallpaperPath.isNotEmpty) {
+      return debugWallpaperPath;
     }
 
     final hour = utc8Time.hour;

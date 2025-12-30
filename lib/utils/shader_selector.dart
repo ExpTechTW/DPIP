@@ -61,7 +61,7 @@ class ShaderConfig {
 }
 
 class ShaderSelector {
-  static bool debugForceThunderstormFog = false;
+  static bool debugForceThunderstormFog = true;
 
   static bool _isThunderstormCode(int code) {
     return code == 103 ||
@@ -100,7 +100,7 @@ class ShaderSelector {
         showFog: true,
         showRain: false,
         showThunderstorm: true,
-        fogIntensity: 0.2,
+        fogIntensity: 0.6,
       );
     }
 
@@ -150,12 +150,12 @@ class ShaderSelector {
                 imagePath: imagePath,
                 animated: true,
                 lightningIntensity: 1.0,
-                rainAmount: 0.3,
+                rainAmount: 0.5,
               ),
             ),
             Positioned.fill(
               child: Opacity(
-                opacity: config.fogIntensity,
+                opacity: config.fogIntensity * 0.7,
                 child: FogShaderBackground(
                   imagePath: imagePath,
                   animated: true,
