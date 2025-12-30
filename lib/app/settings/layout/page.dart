@@ -29,7 +29,10 @@ class SettingsLayoutPage extends StatelessWidget {
             const SizedBox(height: 16),
             if (enabledSections.isNotEmpty) ...[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Text(
                   '顯示中'.i18n,
                   style: context.texts.labelLarge?.copyWith(
@@ -67,7 +70,10 @@ class SettingsLayoutPage extends StatelessWidget {
             ],
             if (disabledSections.isNotEmpty) ...[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Text(
                   '已隱藏'.i18n,
                   style: context.texts.labelLarge?.copyWith(
@@ -75,79 +81,81 @@ class SettingsLayoutPage extends StatelessWidget {
                   ),
                 ),
               ),
-              ...disabledSections.map((section) {
-                final details = _getSectionDetails(section);
-                return _buildSectionCard(
-                  context,
-                  key: ValueKey(section),
-                  icon: details.icon,
-                  iconColor: details.color,
-                  title: details.title,
-                  subtitle: details.subtitle,
-                  value: false,
-                  onChanged: (v) => model.toggleSection(section, v),
-                  isReorderable: false,
-                );
-              },
-            ),
-            Selector<SettingsUserInterfaceModel, bool>(
-              selector: (context, model) => model.isEnabled(.forecast),
-              builder: (context, isEnabled, child) {
-                return SectionListTile(
-                  leading: ContainedIcon(
-                    Symbols.radar_rounded,
-                    color: Colors.orangeAccent,
-                  ),
-                  title: Text('天氣預報'.i18n),
-                  subtitle: Text('顯示未來 24 小時的天氣預報'.i18n),
-                  trailing: Switch(
-                    value: isEnabled,
-                    onChanged: (value) {
-                      context.userInterface.toggleSection(.forecast, value);
-                    },
-                  ),
-                );
-              },
-            ),
-            Selector<SettingsUserInterfaceModel, bool>(
-              selector: (context, model) => model.isEnabled(.wind),
-              builder: (context, isEnabled, child) {
-                return SectionListTile(
-                  leading: ContainedIcon(
-                    Symbols.wind_power_rounded,
-                    color: Colors.orangeAccent,
-                  ),
-                  title: Text('風向'.i18n),
-                  subtitle: Text('顯示風向與風力級數'.i18n),
-                  trailing: Switch(
-                    value: isEnabled,
-                    onChanged: (value) {
-                      context.userInterface.toggleSection(.wind, value);
-                    },
-                  ),
-                );
-              },
-            ),
-            Selector<SettingsUserInterfaceModel, bool>(
-              selector: (context, model) => model.isEnabled(.history),
-              builder: (context, isEnabled, child) {
-                return SectionListTile(
-                  isLast: true,
-                  leading: ContainedIcon(
-                    Symbols.history_rounded,
-                    color: Colors.greenAccent,
-                  ),
-                  title: Text('歷史事件'.i18n),
-                  subtitle: Text('顯示地震與災害歷史紀錄'.i18n),
-                  trailing: Switch(
-                    value: isEnabled,
-                    onChanged: (value) {
-                      context.userInterface.toggleSection(.history, value);
-                    },
-                  ),
-                );
-              },
-            ),
+              ...disabledSections.map(
+                (section) {
+                  final details = _getSectionDetails(section);
+                  return _buildSectionCard(
+                    context,
+                    key: ValueKey(section),
+                    icon: details.icon,
+                    iconColor: details.color,
+                    title: details.title,
+                    subtitle: details.subtitle,
+                    value: false,
+                    onChanged: (v) => model.toggleSection(section, v),
+                    isReorderable: false,
+                  );
+                },
+              ),
+              Selector<SettingsUserInterfaceModel, bool>(
+                selector: (context, model) => model.isEnabled(.forecast),
+                builder: (context, isEnabled, child) {
+                  return SectionListTile(
+                    leading: ContainedIcon(
+                      Symbols.radar_rounded,
+                      color: Colors.orangeAccent,
+                    ),
+                    title: Text('天氣預報'.i18n),
+                    subtitle: Text('顯示未來 24 小時的天氣預報'.i18n),
+                    trailing: Switch(
+                      value: isEnabled,
+                      onChanged: (value) {
+                        context.userInterface.toggleSection(.forecast, value);
+                      },
+                    ),
+                  );
+                },
+              ),
+              Selector<SettingsUserInterfaceModel, bool>(
+                selector: (context, model) => model.isEnabled(.wind),
+                builder: (context, isEnabled, child) {
+                  return SectionListTile(
+                    leading: ContainedIcon(
+                      Symbols.wind_power_rounded,
+                      color: Colors.orangeAccent,
+                    ),
+                    title: Text('風向'.i18n),
+                    subtitle: Text('顯示風向與風力級數'.i18n),
+                    trailing: Switch(
+                      value: isEnabled,
+                      onChanged: (value) {
+                        context.userInterface.toggleSection(.wind, value);
+                      },
+                    ),
+                  );
+                },
+              ),
+              Selector<SettingsUserInterfaceModel, bool>(
+                selector: (context, model) => model.isEnabled(.history),
+                builder: (context, isEnabled, child) {
+                  return SectionListTile(
+                    isLast: true,
+                    leading: ContainedIcon(
+                      Symbols.history_rounded,
+                      color: Colors.greenAccent,
+                    ),
+                    title: Text('歷史事件'.i18n),
+                    subtitle: Text('顯示地震與災害歷史紀錄'.i18n),
+                    trailing: Switch(
+                      value: isEnabled,
+                      onChanged: (value) {
+                        context.userInterface.toggleSection(.history, value);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ],
         );
       },
@@ -155,7 +163,7 @@ class SettingsLayoutPage extends StatelessWidget {
   }
 
   ({IconData icon, Color color, String title, String subtitle})
-      _getSectionDetails(HomeDisplaySection section) {
+  _getSectionDetails(HomeDisplaySection section) {
     switch (section) {
       case HomeDisplaySection.radar:
         return (
@@ -177,6 +185,13 @@ class SettingsLayoutPage extends StatelessWidget {
           color: Colors.green,
           title: '歷史事件'.i18n,
           subtitle: '顯示地震與災害歷史紀錄'.i18n,
+        );
+      case HomeDisplaySection.wind:
+        return (
+          icon: Symbols.wind_power_rounded,
+          color: Colors.purple,
+          title: '風向'.i18n,
+          subtitle: '顯示風向與風力級數'.i18n,
         );
     }
   }
@@ -258,7 +273,9 @@ class SettingsLayoutPage extends StatelessWidget {
                 if (isReorderable) ...[
                   Icon(
                     Symbols.drag_handle_rounded,
-                    color: context.colors.onSurfaceVariant.withValues(alpha: 0.5),
+                    color: context.colors.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                   const SizedBox(width: 12),
                 ],

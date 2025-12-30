@@ -452,12 +452,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children.add(_buildForecast());
           if (!_isLoading && _weather != null) children.add(_buildWindCard());
           break;
+        case HomeDisplaySection.wind:
+          if (!_isLoading && _weather != null) children.add(_buildWindCard());
+          break;
         case HomeDisplaySection.history:
           children.add(_buildHistoryTimeline());
           break;
       }
     }
-
     if (homeSections.isEmpty && GlobalProviders.location.code != null) {
       children.add(
         Padding(
@@ -477,42 +479,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
           ),
         ),
-        // 實時警報
-        if (!_isLoading) ..._buildRealtimeInfo(),
-        // 其他區塊
-        if (homeSections.isNotEmpty) ...[
-          if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
-          if (homeSections.contains(HomeDisplaySection.forecast))
-            _buildForecast(),
-          if (!_isLoading &&
-              homeSections.contains(HomeDisplaySection.wind) &&
-              _weather != null)
-            _buildWindCard(),
-          _buildCommunityCards(),
-          if (homeSections.contains(HomeDisplaySection.history))
-            _buildHistoryTimeline(),
-        ] else if (GlobalProviders.location.code != null)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(
-                  '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => SettingsLayoutRoute().push(context),
-                  child: Text('前往設定'.i18n),
-                ),
-              ],
-            ),
-          ),
-        // 底部安全區域
-        SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
       );
     };
+    children.add(_buildCommunityCards());
+    children.add(SizedBox(height: MediaQuery.of(context).padding.bottom + 16));
 
     return Column(children: children);
   }
