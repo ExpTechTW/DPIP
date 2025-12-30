@@ -46,10 +46,18 @@ double parseVisibility(dynamic value) {
   return 10.0;
 }
 
-enum ShaderType {
-  none,
-  fog,
-  thunderstorm,
+class ShaderConfig {
+  final bool showFog;
+  final bool showRain;
+  final bool showThunderstorm;
+  final double fogIntensity;
+
+  const ShaderConfig({
+    this.showFog = false,
+    this.showRain = false,
+    this.showThunderstorm = false,
+    this.fogIntensity = 0.0,
+  });
 }
 
 class ShaderSelector {
@@ -84,28 +92,13 @@ class ShaderSelector {
     return code == 105 || code == 205 || code == 305;
   }
 
-  static ShaderType selectShaderType(RealtimeWeather? weather) {
-    if (weather == null) return ShaderType.none;
-
-    final weatherCode = weather.data.weatherCode;
-    final rain = weather.data.rain;
-    final visibility = parseVisibility(weather.data.visibility);
-
-    if (_isThunderstormCode(weatherCode)) {
-      return ShaderType.thunderstorm;
-    }
-
-    if (_isRainCode(weatherCode) || rain > 0) {
-      if (visibility < 5.0) {
-        return ShaderType.fog;
-      }
-    }
-
-    if (visibility < 5.0 || _isFogCode(weatherCode)) {
-      return ShaderType.fog;
-    }
-
-    return ShaderType.none;
+  static ShaderConfig selectShaderConfig(RealtimeWeather? weather) {
+    return const ShaderConfig(
+      showFog: true,
+      showRain: false,
+      showThunderstorm: true,
+      fogIntensity: 0.2,
+    );
   }
 
   static double calculateFogIntensity(double visibility) {
@@ -119,40 +112,99 @@ class ShaderSelector {
   }
 
   static Widget buildShaderBackground({
-    required ShaderType shaderType,
+    required ShaderConfig config,
     required String imagePath,
-    required RealtimeWeather? weather,
     Widget? child,
   }) {
-    switch (shaderType) {
-      case ShaderType.fog:
-        final visibility = parseVisibility(weather?.data.visibility);
-        final intensity = calculateFogIntensity(visibility);
-        return FogShaderBackground(
-          imagePath: imagePath,
-          animated: true,
-          intensity: intensity,
-          speed: 1.0,
-          child: child,
+    if (config.showThunderstorm) {
+      if (config.showFog) {
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: ThunderstormShaderBackground(
+                imagePath: imagePath,
+                animated: true,
+                lightningIntensity: 1.0,
+                rainAmount: 0.3,
+              ),
+            ),
+            Positioned.fill(
+              child: Opacity(
+                opacity: config.fogIntensity,
+                child: FogShaderBackground(
+                  imagePath: imagePath,
+                  animated: true,
+                  intensity: 1.0,
+                  speed: 1.0,
+                ),
+              ),
+            ),
+            Positioned.fill(child: child ?? const SizedBox()),
+          ],
         );
-      case ShaderType.thunderstorm:
-        return ThunderstormShaderBackground(
-          imagePath: imagePath,
-          animated: true,
-          lightningIntensity: 1.0,
-          rainAmount: 0.3,
-          child: child,
-        );
-      case ShaderType.none:
-        return Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(imagePath),
-              fit: BoxFit.cover,
+      }
+      return ThunderstormShaderBackground(
+        imagePath: imagePath,
+        animated: true,
+        lightningIntensity: 1.0,
+        rainAmount: 0.3,
+        child: child,
+      );
+    }
+
+    if (config.showRain && config.showFog) {
+      final fogIntensity = config.fogIntensity * 0.5;
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: ThunderstormShaderBackground(
+              imagePath: imagePath,
+              animated: true,
+              lightningIntensity: 0.0,
+              rainAmount: 0.3,
             ),
           ),
-          child: child,
-        );
+          Positioned.fill(
+            child: FogShaderBackground(
+              imagePath: imagePath,
+              animated: true,
+              intensity: fogIntensity,
+              speed: 1.0,
+            ),
+          ),
+          Positioned.fill(child: child ?? const SizedBox()),
+        ],
+      );
     }
+
+    if (config.showRain) {
+      return ThunderstormShaderBackground(
+        imagePath: imagePath,
+        animated: true,
+        lightningIntensity: 0.0,
+        rainAmount: 0.3,
+        child: child,
+      );
+    }
+
+    if (config.showFog) {
+      return FogShaderBackground(
+        imagePath: imagePath,
+        animated: true,
+        intensity: config.fogIntensity,
+        speed: 1.0,
+        child: child,
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: child,
+    );
   }
 }

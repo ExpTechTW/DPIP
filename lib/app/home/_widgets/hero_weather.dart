@@ -100,6 +100,13 @@ class HeroWeather extends StatelessWidget {
             color: Colors.white,
             height: 1,
             letterSpacing: -2,
+            shadows: [
+              Shadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -110,6 +117,13 @@ class HeroWeather extends StatelessWidget {
               _getWeatherIcon(data.weatherCode),
               size: 24,
               color: Colors.white.withValues(alpha: 0.9),
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
             const SizedBox(width: 8),
             Text(
@@ -117,6 +131,13 @@ class HeroWeather extends StatelessWidget {
               style: context.texts.titleMedium?.copyWith(
                 color: Colors.white.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w400,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
             ),
           ],
@@ -126,6 +147,13 @@ class HeroWeather extends StatelessWidget {
           '體感 ${feelsLike.round()}°'.i18n,
           style: context.texts.bodyMedium?.copyWith(
             color: Colors.white.withValues(alpha: 0.7),
+            shadows: [
+              Shadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
         ),
       ],

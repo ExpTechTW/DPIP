@@ -333,11 +333,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     final utc8Time = WallpaperSelector.getUtc8Time();
     final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
-    final shaderType = ShaderSelector.selectShaderType(_weather);
+    final shaderConfig = ShaderSelector.selectShaderConfig(_weather);
     final shaderBackground = ShaderSelector.buildShaderBackground(
-      shaderType: shaderType,
+      config: shaderConfig,
       imagePath: wallpaperPath,
-      weather: _weather,
     );
 
     return Stack(
