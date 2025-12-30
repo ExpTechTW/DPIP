@@ -91,6 +91,7 @@ flutter:
   uses-material-design: true
   shaders:
     - shaders/rain.frag
+    - shaders/fog.frag
   assets:
     # localizations
     - assets/translations/

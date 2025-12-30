@@ -28,7 +28,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/rain_shader_background.dart';
+import 'package:dpip/widgets/fog_shader_background.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -75,16 +75,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ?.where((e) => e.type == HistoryType.thunderstorm)
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
       .firstOrNull;
-
-  /// 是否正在下雨（用於決定是否顯示雨滴效果）
-  bool get _isRaining {
-    // TODO: 測試完成後移除強制啟用
-    return true;
-    // if (_weather == null) return false;
-    // final code = _weather!.data.weatherCode;
-    // // 雨天代碼範圍：15-35（包含雨、大雨、雷雨）
-    // return code >= 15 && code <= 35;
-  }
 
   @override
   void initState() {
@@ -343,8 +333,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Stack(
       children: [
         Positioned.fill(
-          child: RainShaderBackground(
-            animated: _isRaining,
+          child: FogShaderBackground(
+            animated: true,
+            intensity: 0.4,
+            speed: 1.0,
           ),
         ),
         if (_blurAmount > 0)
