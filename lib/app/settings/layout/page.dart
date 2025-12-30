@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/home/home_display_mode.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -59,6 +58,25 @@ class SettingsLayoutPage extends StatelessWidget {
                     value: isEnabled,
                     onChanged: (value) {
                       context.userInterface.toggleSection(.forecast, value);
+                    },
+                  ),
+                );
+              },
+            ),
+            Selector<SettingsUserInterfaceModel, bool>(
+              selector: (context, model) => model.isEnabled(.wind),
+              builder: (context, isEnabled, child) {
+                return SectionListTile(
+                  leading: ContainedIcon(
+                    Symbols.wind_power_rounded,
+                    color: Colors.orangeAccent,
+                  ),
+                  title: Text('風向'.i18n),
+                  subtitle: Text('顯示風向與風力級數'.i18n),
+                  trailing: Switch(
+                    value: isEnabled,
+                    onChanged: (value) {
+                      context.userInterface.toggleSection(.wind, value);
                     },
                   ),
                 );

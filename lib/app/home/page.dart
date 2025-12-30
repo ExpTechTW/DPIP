@@ -30,7 +30,6 @@ import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/wind_card.dart';
 import 'package:dpip/app/settings/donate/page.dart';
-import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -44,8 +43,6 @@ import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/rain_shader_background.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
-
-import 'home_display_mode.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -456,7 +453,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
           if (homeSections.contains(HomeDisplaySection.forecast))
             _buildForecast(),
-          if (!_isLoading && _weather != null) _buildWindCard(),
+          if (!_isLoading &&
+              homeSections.contains(HomeDisplaySection.wind) &&
+              _weather != null)
+            _buildWindCard(),
           _buildCommunityCards(),
           if (homeSections.contains(HomeDisplaySection.history))
             _buildHistoryTimeline(),

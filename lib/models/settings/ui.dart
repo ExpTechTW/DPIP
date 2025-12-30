@@ -7,7 +7,12 @@ import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../app/home/home_display_mode.dart';
+enum HomeDisplaySection {
+  radar,
+  forecast,
+  history,
+  wind,
+}
 
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
