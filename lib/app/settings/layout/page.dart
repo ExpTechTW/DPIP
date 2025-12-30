@@ -1,7 +1,7 @@
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -20,12 +20,12 @@ class SettingsLayoutPage extends StatelessWidget {
       children: [
         _buildHeader(context),
         const SizedBox(height: 16),
-        Section(
+        SegmentedList(
           children: [
             Selector<SettingsUserInterfaceModel, bool>(
               selector: (context, model) => model.isEnabled(.radar),
               builder: (context, isEnabled, child) {
-                return SectionListTile(
+                return SegmentedListTile(
                   isFirst: true,
                   leading: ContainedIcon(
                     Symbols.radar_rounded,
@@ -45,7 +45,7 @@ class SettingsLayoutPage extends StatelessWidget {
             Selector<SettingsUserInterfaceModel, bool>(
               selector: (context, model) => model.isEnabled(.forecast),
               builder: (context, isEnabled, child) {
-                return SectionListTile(
+                return SegmentedListTile(
                   leading: ContainedIcon(
                     Symbols.radar_rounded,
                     color: Colors.orangeAccent,
@@ -64,7 +64,7 @@ class SettingsLayoutPage extends StatelessWidget {
             Selector<SettingsUserInterfaceModel, bool>(
               selector: (context, model) => model.isEnabled(.wind),
               builder: (context, isEnabled, child) {
-                return SectionListTile(
+                return SegmentedListTile(
                   leading: ContainedIcon(
                     Symbols.wind_power_rounded,
                     color: Colors.orangeAccent,
@@ -83,7 +83,7 @@ class SettingsLayoutPage extends StatelessWidget {
             Selector<SettingsUserInterfaceModel, bool>(
               selector: (context, model) => model.isEnabled(.history),
               builder: (context, isEnabled, child) {
-                return SectionListTile(
+                return SegmentedListTile(
                   isLast: true,
                   leading: ContainedIcon(
                     Symbols.history_rounded,

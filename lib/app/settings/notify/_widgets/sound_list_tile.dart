@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -50,7 +50,7 @@ class _SoundListTileState extends State<SoundListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return SectionListTile(
+    return SegmentedListTile(
       title: Text(widget.title),
       subtitle: widget.subtitle,
       trailing: _enabled

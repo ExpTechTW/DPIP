@@ -3,7 +3,7 @@ import 'package:dpip/app/settings/notify/_widgets/weather_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +28,7 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
             );
           },
         ),
-        Section(
+        SegmentedList(
           label: Text('音效測試'.i18n),
           children: [
             SoundListTile(

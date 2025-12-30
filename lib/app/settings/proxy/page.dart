@@ -1,7 +1,7 @@
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -61,10 +61,10 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        Section(
+        SegmentedList(
           label: Text('HTTP 代理'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               isLast: !_enabled,
               leading: Icon(Symbols.settings_ethernet_rounded),
@@ -79,7 +79,7 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
               ),
             ),
             if (_enabled) ...[
-              SectionListTile(
+              SegmentedListTile(
                 leading: Icon(Symbols.host_rounded),
                 title: Text('代理主機'.i18n),
                 content: TextField(
@@ -92,7 +92,7 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
                   onChanged: (_) => _saveSettings(),
                 ),
               ),
-              SectionListTile(
+              SegmentedListTile(
                 isLast: true,
                 leading: Icon(Symbols.settings_ethernet_rounded),
                 title: Text('代理端口'.i18n),

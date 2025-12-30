@@ -13,7 +13,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -237,12 +237,12 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        Section(
+        SegmentedList(
           children: [
             Selector<SettingsLocationModel, bool>(
               selector: (context, model) => model.auto,
               builder: (context, auto, child) {
-                return SectionListTile(
+                return SegmentedListTile(
                   isFirst: true,
                   isLast: true,
                   leading: Icon(Symbols.my_location_rounded),
@@ -409,7 +409,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
 
             return StatefulBuilder(
               builder: (context, setState) {
-                return Section(
+                return SegmentedList(
                   label: Text('所在地'.i18n),
                   children: [
                     ...model.favorited.mapIndexed((index, code) {
@@ -417,7 +417,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                       final isCurrentLoading = loadingCode == code;
                       final isSelected = code == model.code;
 
-                      return SectionListTile(
+                      return SegmentedListTile(
                         isFirst: index == 0,
                         leading: isCurrentLoading
                             ? const LoadingIcon()
@@ -471,7 +471,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                               },
                       );
                     }),
-                    SectionListTile(
+                    SegmentedListTile(
                       isFirst: model.favorited.isEmpty,
                       isLast: true,
                       leading: Icon(Symbols.add_circle_rounded),

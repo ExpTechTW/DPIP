@@ -1,7 +1,7 @@
 /// Provides section-based list widgets that recreate the Android 16 design.
 ///
-/// This library includes [Section] and [SliverSection] for creating labeled
-/// groups of widgets, [SectionListTile] for individual list items with
+/// This library includes [SegmentedList] and [SliverSegmentedList] for creating labeled
+/// groups of widgets, [SegmentedListTile] for individual list items with
 /// the Android 16 styling, and [SectionText] for informational text blocks.
 library;
 
@@ -26,7 +26,7 @@ import 'package:material_symbols_icons/symbols.dart';
 ///   ],
 /// )
 /// ```
-class Section extends StatelessWidget {
+class SegmentedList extends StatelessWidget {
   /// The optional label displayed at the top of the section.
   final Widget? label;
 
@@ -34,7 +34,7 @@ class Section extends StatelessWidget {
   final List<Widget> children;
 
   /// Creates a section with an optional [label] and required [children].
-  const Section({
+  const SegmentedList({
     super.key,
     this.label,
     required this.children,
@@ -69,14 +69,14 @@ class Section extends StatelessWidget {
   }
 }
 
-/// A sliver variant of [Section] for use in scrollable layouts.
+/// A sliver variant of [SegmentedList] for use in scrollable layouts.
 ///
 /// This widget recreates the section layout from the Android 16
 /// within a [CustomScrollView] or similar scrollable widget, grouping children
 /// under an optional label. The label uses the primary color theme and appears
 /// with padding above the children.
 ///
-/// Use this instead of [Section] when building custom scrollable layouts
+/// Use this instead of [SegmentedList] when building custom scrollable layouts
 /// with slivers for better performance.
 ///
 /// Example:
@@ -93,7 +93,7 @@ class Section extends StatelessWidget {
 ///   ],
 /// )
 /// ```
-class SliverSection extends StatelessWidget {
+class SliverSegmentedList extends StatelessWidget {
   /// The optional label displayed at the top of the section.
   final Widget? label;
 
@@ -101,7 +101,7 @@ class SliverSection extends StatelessWidget {
   final List<Widget> children;
 
   /// Creates a sliver section with an optional [label] and required [children].
-  const SliverSection({
+  const SliverSegmentedList({
     super.key,
     this.label,
     required this.children,
@@ -158,7 +158,7 @@ class SliverSection extends StatelessWidget {
 ///   onTap: () => Navigator.push(...),
 /// )
 /// ```
-class SectionListTile extends StatelessWidget {
+class SegmentedListTile extends StatelessWidget {
   /// An optional widget displayed at the start of the tile.
   ///
   /// Typically an icon, and is constrained to 28 pixels width.
@@ -230,7 +230,7 @@ class SectionListTile extends StatelessWidget {
   final VoidCallback? onLongPress;
 
   /// Creates a section list tile.
-  const SectionListTile({
+  const SegmentedListTile({
     super.key,
     this.leading,
     this.label,

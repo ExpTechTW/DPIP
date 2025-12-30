@@ -6,7 +6,7 @@ import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color.dart';
 import 'package:dpip/utils/extensions/string.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
@@ -107,10 +107,10 @@ class SettingsIndexPage extends StatelessWidget {
         _buildHeader(context),
 
         // 位置
-        Section(
+        SegmentedList(
           label: Text('位置'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               isLast: true,
               leading: _buildIconContainer(
@@ -126,10 +126,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 介面
-        Section(
+        SegmentedList(
           label: Text('介面'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 Symbols.grid_view_rounded,
@@ -140,7 +140,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsLayoutRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.brush_rounded,
                 color: Colors.indigoAccent,
@@ -150,7 +150,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsThemeRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.translate_rounded,
                 color: Colors.tealAccent,
@@ -160,7 +160,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsLocaleRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.percent_rounded,
                 color: Colors.orangeAccent,
@@ -170,7 +170,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsUnitRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 Symbols.map_rounded,
@@ -185,10 +185,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 通知
-        Section(
+        SegmentedList(
           label: Text('通知'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               isLast: true,
               leading: ContainedIcon(
@@ -204,10 +204,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 網路
-        Section(
+        SegmentedList(
           label: Text('網路'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               isLast: true,
               leading: ContainedIcon(
@@ -227,10 +227,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 資訊
-        Section(
+        SegmentedList(
           label: Text('資訊'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 Symbols.newspaper_rounded,
@@ -241,7 +241,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => AnnouncementRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.update_rounded,
                 color: Colors.cyanAccent,
@@ -251,7 +251,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => ChangelogRoute().push(context),
             ),
-            SectionListTile(
+            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 Symbols.book_rounded,
@@ -268,9 +268,9 @@ class SettingsIndexPage extends StatelessWidget {
         const SizedBox(height: 24),
 
         // 贊助
-        Section(
+        SegmentedList(
           children: [
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.volunteer_activism_rounded,
                 color: Colors.black,
@@ -297,10 +297,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // ExpTech Studio 連結
-        Section(
+        SegmentedList(
           label: Text('ExpTech Studio'),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 SimpleIcons.github,
@@ -314,7 +314,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.arrow_outward_rounded),
               onTap: () => 'https://github.com/ExpTechTW/DPIP-Pocket'.launch(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 SimpleIcons.discord,
                 color: switch (context.theme.brightness) {
@@ -328,7 +328,7 @@ class SettingsIndexPage extends StatelessWidget {
               onTap: () => 'https://discord.gg/exptech-studio'.launch(),
               onLongPress: () => 'https://discord.gg/exptech-studio'.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 SimpleIcons.threads,
                 color: switch (context.theme.brightness) {
@@ -342,7 +342,7 @@ class SettingsIndexPage extends StatelessWidget {
               onTap: () => 'https://www.threads.net/@dpip.tw'.launch(),
               onLongPress: () => 'https://www.threads.net/@dpip.tw'.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 SimpleIcons.youtube,
@@ -359,10 +359,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 下載
-        Section(
+        SegmentedList(
           label: Text('下載'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 SimpleIcons.appstore,
@@ -376,7 +376,7 @@ class SettingsIndexPage extends StatelessWidget {
               onLongPress: () =>
                   'https://apps.apple.com/tw/app/dpip/id6468026362'.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 SimpleIcons.googleplay,
@@ -399,10 +399,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 除錯
-        Section(
+        SegmentedList(
           label: Text('除錯'.i18n),
           children: [
-            SectionListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 Symbols.info_rounded,
@@ -412,7 +412,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: Text(appInfo),
               onLongPress: () => appInfo.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.smartphone_rounded,
                 color: context.colors.onSurfaceVariant,
@@ -421,7 +421,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: Text(deviceInfo),
               onLongPress: () => deviceInfo.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               leading: ContainedIcon(
                 Symbols.key_rounded,
                 color: context.colors.onSurfaceVariant,
@@ -430,7 +430,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.content_copy_rounded),
               onTap: () => Preference.notifyToken.copy(),
             ),
-            SectionListTile(
+            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 Symbols.bug_report_rounded,

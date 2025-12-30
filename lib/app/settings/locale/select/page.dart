@@ -5,7 +5,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -41,7 +41,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        Section(
+        SegmentedList(
           label: Text('選擇語言'.i18n),
           children: [
             for (final (index, item) in localeList.indexed)
@@ -62,7 +62,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                   final isSelected =
                       item.toLanguageTag() == locale?.toLanguageTag();
 
-                  return SectionListTile(
+                  return SegmentedListTile(
                     isFirst: index == 0,
                     isLast: index == localeList.length - 1,
                     title: Text(item.nativeName),

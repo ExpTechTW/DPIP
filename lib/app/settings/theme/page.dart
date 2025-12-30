@@ -3,7 +3,7 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/theme.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' show ColorTools;
 import 'package:flutter/material.dart';
@@ -21,12 +21,12 @@ class SettingsThemePage extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 16),
-            Section(
+            SegmentedList(
               children: [
                 Selector<SettingsUserInterfaceModel, ThemeMode>(
                   selector: (context, model) => model.themeMode,
                   builder: (context, themeMode, child) {
-                    return SectionListTile(
+                    return SegmentedListTile(
                       isFirst: true,
                       leading: ContainedIcon(
                         switch (context.theme.brightness) {
@@ -47,7 +47,7 @@ class SettingsThemePage extends StatelessWidget {
                 Selector<SettingsUserInterfaceModel, Color?>(
                   selector: (context, model) => model.themeColor,
                   builder: (context, themeColor, child) {
-                    return SectionListTile(
+                    return SegmentedListTile(
                       isLast: true,
                       leading: ContainedIcon(
                         Symbols.colorize_rounded,

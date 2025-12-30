@@ -1,7 +1,7 @@
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -15,12 +15,12 @@ class SettingsThemeModePage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        Section(
+        SegmentedList(
           label: Text('主題模式'.i18n),
           children: [
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder: (context, themeMode, child) => SectionListTile(
+              builder: (context, themeMode, child) => SegmentedListTile(
                 isFirst: true,
                 leading: Icon(Symbols.light_mode_rounded),
                 title: Text('淺色'.i18n),
@@ -37,7 +37,7 @@ class SettingsThemeModePage extends StatelessWidget {
             ),
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder: (context, themeMode, child) => SectionListTile(
+              builder: (context, themeMode, child) => SegmentedListTile(
                 leading: Icon(Symbols.dark_mode_rounded),
                 title: Text('深色'.i18n),
                 trailing: Icon(
@@ -53,7 +53,7 @@ class SettingsThemeModePage extends StatelessWidget {
             ),
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
-              builder: (context, themeMode, child) => SectionListTile(
+              builder: (context, themeMode, child) => SegmentedListTile(
                 isLast: true,
                 leading: Icon(Symbols.devices_rounded),
                 title: Text('跟隨系統主題'.i18n),

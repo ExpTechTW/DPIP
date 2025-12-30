@@ -1,6 +1,5 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:dpip/utils/log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Extension on [SharedPreferencesWithCache] that provides convenient utilities for preference storage.
 ///
