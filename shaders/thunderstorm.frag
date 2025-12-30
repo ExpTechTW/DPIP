@@ -127,13 +127,13 @@ void main() {
     vec2 sampleUV = UV + vec2(n.x, -n.y);
     vec3 col = sampleTextureSafe(sampleUV);
     
-    float colFade = sin(t * 0.2) * 0.5 + 0.5;
-    col *= mix(vec3(1.0), vec3(0.8, 0.9, 1.3), colFade);
+    float colFade = sin(t * 0.1) * 0.2 + 0.5;
+    col *= mix(vec3(1.0), vec3(0.9, 0.95, 1.1), colFade);
     
     float lt = (T + 3.0) * 0.5;
     float lightning = sin(lt * sin(lt * 10.0));
     lightning *= pow(max(0.0, sin(lt + sin(lt))), 10.0);
-    col *= 1.0 + lightning * iLightningIntensity;
+    col *= 1.0 + lightning * iLightningIntensity * 0.3;
     
     col *= 1.0 - dot(UV - 0.5, UV - 0.5);
     
