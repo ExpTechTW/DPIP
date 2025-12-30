@@ -28,7 +28,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/fog_shader_background.dart';
+import 'package:dpip/widgets/thunderstorm_shader_background.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -333,10 +333,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Stack(
       children: [
         Positioned.fill(
-          child: FogShaderBackground(
+          child: ThunderstormShaderBackground(
             animated: true,
-            intensity: 0.4,
-            speed: 1.0,
+            lightningIntensity: 1.0,
           ),
         ),
         if (_blurAmount > 0)
