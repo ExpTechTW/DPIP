@@ -193,6 +193,13 @@ class SettingsLayoutPage extends StatelessWidget {
           title: '風向'.i18n,
           subtitle: '顯示風向與風力級數'.i18n,
         );
+      case HomeDisplaySection.community:
+        return (
+          icon: Symbols.people_alt_rounded,
+          color: Colors.teal,
+          title: '社群動態'.i18n,
+          subtitle: '顯示來自社群的即時資訊'.i18n,
+        );
     }
   }
 

@@ -12,6 +12,7 @@ enum HomeDisplaySection {
   forecast,
   history,
   wind,
+  community,
 }
 
 class SettingsUserInterfaceModel extends ChangeNotifier {

@@ -450,13 +450,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           break;
         case HomeDisplaySection.forecast:
           children.add(_buildForecast());
-          if (!_isLoading && _weather != null) children.add(_buildWindCard());
           break;
         case HomeDisplaySection.wind:
           if (!_isLoading && _weather != null) children.add(_buildWindCard());
           break;
         case HomeDisplaySection.history:
           children.add(_buildHistoryTimeline());
+          break;
+        case HomeDisplaySection.community:
+          children.add(_buildCommunityCards());
           break;
       }
     }
@@ -481,7 +483,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
       );
     };
-    children.add(_buildCommunityCards());
     children.add(SizedBox(height: MediaQuery.of(context).padding.bottom + 16));
 
     return Column(children: children);
