@@ -1,10 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:async/async.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -12,6 +8,8 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/style.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum BaseMapType { exptech, osm, google }
 
@@ -143,7 +141,9 @@ class DpipMapState extends State<DpipMap> {
           widget.focusUserLocationWhenUpdated &&
           location != null) {
         try {
-          TalkerManager.instance.debug('DpipMap: animating to user location $location, zoom=${DpipMap.kUserLocationZoom}');
+          TalkerManager.instance.debug(
+            'DpipMap: animating to user location $location, zoom=${DpipMap.kUserLocationZoom}',
+          );
           await Future.delayed(const Duration(milliseconds: 100));
           if (!mounted) return;
           await controller.animateCamera(
@@ -156,7 +156,9 @@ class DpipMapState extends State<DpipMap> {
           TalkerManager.instance.debug('地圖相機動畫失敗（可忽略）: $e');
         }
       } else {
-        TalkerManager.instance.debug('DpipMap._updateUserLocation: skipping animation, isMapReady=$_isMapReady, focusUserLocation=${widget.focusUserLocationWhenUpdated}, location=$location');
+        TalkerManager.instance.debug(
+          'DpipMap._updateUserLocation: skipping animation, isMapReady=$_isMapReady, focusUserLocation=${widget.focusUserLocationWhenUpdated}, location=$location',
+        );
       }
     } catch (e, s) {
       TalkerManager.instance.error('🗺️ failed to update user location', e, s);
@@ -234,11 +236,16 @@ class DpipMapState extends State<DpipMap> {
         final styleString = snapshot.data;
 
         if (snapshot.hasError) {
-          TalkerManager.instance.error('DpipMap: style load error', snapshot.error);
+          TalkerManager.instance.error(
+            'DpipMap: style load error',
+            snapshot.error,
+          );
         }
 
         if (styleString == null) {
-          TalkerManager.instance.debug('DpipMap: waiting for style, hasError=${snapshot.hasError}, connectionState=${snapshot.connectionState}');
+          TalkerManager.instance.debug(
+            'DpipMap: waiting for style, hasError=${snapshot.hasError}, connectionState=${snapshot.connectionState}',
+          );
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -266,7 +273,9 @@ class DpipMapState extends State<DpipMap> {
             dragEnabled: widget.dragEnabled ?? true,
             attributionButtonMargins: const Point<double>(-100, -100),
             onMapCreated: (controller) {
-              TalkerManager.instance.debug('DpipMap.onMapCreated: controller received');
+              TalkerManager.instance.debug(
+                'DpipMap.onMapCreated: controller received',
+              );
               _controller = controller;
               widget.onMapCreated?.call(controller);
             },
@@ -274,7 +283,9 @@ class DpipMapState extends State<DpipMap> {
             onMapIdle: widget.onMapIdle,
             onMapLongClick: widget.onMapLongClick,
             onStyleLoadedCallback: () {
-              TalkerManager.instance.debug('DpipMap.onStyleLoadedCallback: style loaded');
+              TalkerManager.instance.debug(
+                'DpipMap.onStyleLoadedCallback: style loaded',
+              );
               _initMap();
               widget.onStyleLoadedCallback?.call();
             },

@@ -9,17 +9,15 @@ library;
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:markdown_widget/markdown_widget.dart' hide ImageViewer;
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:simple_icons/simple_icons.dart';
-
-import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/string.dart';
 
 /// Programming languages supported for syntax highlighting in code blocks.
 ///

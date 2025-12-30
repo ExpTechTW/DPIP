@@ -30,7 +30,8 @@ class EnlargeableImage extends StatelessWidget {
             children: [
               Hero(
                 tag: heroTag,
-                child: CachedNetworkImage(imageUrl: imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   errorWidget: (context, url, error) {
                     onLoadFailed?.call();

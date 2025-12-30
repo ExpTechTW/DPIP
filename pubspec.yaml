@@ -90,7 +90,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   shaders:
-    - shaders/rain.frag
+    - shaders/fog.frag
+    - shaders/thunderstorm.frag
   assets:
     # localizations
     - assets/translations/

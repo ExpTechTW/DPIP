@@ -2,19 +2,15 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:geojson_vi/geojson_vi.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/api/model/rts/rts.dart';
 import 'package:dpip/api/model/station.dart';
-import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/lightning.dart';
+import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/global.dart';
@@ -22,6 +18,8 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:geojson_vi/geojson_vi.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
@@ -84,6 +82,17 @@ class _DpipDataModel extends ChangeNotifier {
   void setPartialReport(List<PartialEarthquakeReport> partialReport) {
     _partialReport = partialReport;
     notifyListeners();
+  }
+
+  void appendPartialReport(List<PartialEarthquakeReport> partialReport) {
+    final existingIds = _partialReport.map((r) => r.id).toSet();
+    final newReports = partialReport
+        .where((r) => !existingIds.contains(r.id))
+        .toList();
+    if (newReports.isNotEmpty) {
+      _partialReport = [..._partialReport, ...newReports];
+      notifyListeners();
+    }
   }
 
   Map<String, EarthquakeReport> _report = {};

@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/core/i18n.dart';
@@ -53,8 +53,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
       return;
     }
 
-    final ProductDetailsResponse response =
-        await InAppPurchase.instance.queryProductDetails(_kIds);
+    final ProductDetailsResponse response = await InAppPurchase.instance
+        .queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
       products.completeError('找不到商品，請稍候再試'.i18n);
       return;
@@ -97,8 +97,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
   void onPurchaseUpdate(List<PurchaseDetails> list) {
     if (!mounted) return;
 
-    final hasAnyPending =
-    list.any((d) => d.status == PurchaseStatus.pending);
+    final hasAnyPending = list.any((d) => d.status == PurchaseStatus.pending);
 
     setState(() {
       isPending = hasAnyPending;
@@ -188,7 +187,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
             ),
             children: [
               _buildHeader(),
-              if (subscriptions.isNotEmpty) _buildSubscriptionSection(subscriptions),
+              if (subscriptions.isNotEmpty)
+                _buildSubscriptionSection(subscriptions),
               if (oneTime.isNotEmpty) _buildOneTimeSection(oneTime),
               _buildFooter(),
             ],
@@ -283,8 +283,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
             ],
           ),
         ),
-        for (final product in subscriptions)
-          _buildSubscriptionCard(product),
+        for (final product in subscriptions) _buildSubscriptionCard(product),
       ],
     );
   }
@@ -357,8 +356,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFFFFD700).withOpacity(isDisabled ? 0.3 : 0.8),
-                            const Color(0xFFFFA500).withOpacity(isDisabled ? 0.3 : 0.8),
+                            const Color(
+                              0xFFFFD700,
+                            ).withOpacity(isDisabled ? 0.3 : 0.8),
+                            const Color(
+                              0xFFFFA500,
+                            ).withOpacity(isDisabled ? 0.3 : 0.8),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -426,9 +429,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                           gradient: isDisabled
                               ? null
                               : const LinearGradient(
-                                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                  colors: [
+                                    Color(0xFFFFD700),
+                                    Color(0xFFFFA500),
+                                  ],
                                 ),
-                          color: isDisabled ? context.theme.disabledColor : null,
+                          color: isDisabled
+                              ? context.theme.disabledColor
+                              : null,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -606,13 +614,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               _buildFooterLink(
                 '恢復購買'.i18n,
                 onTap: () async {
-                  final bool available =
-                      await InAppPurchase.instance.isAvailable();
+                  final bool available = await InAppPurchase.instance
+                      .isAvailable();
                   if (!context.mounted) return;
 
                   if (!available) {
-                    final storeName =
-                        Platform.isIOS ? 'App Store' : 'Google Play';
+                    final storeName = Platform.isIOS
+                        ? 'App Store'
+                        : 'Google Play';
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -637,7 +646,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               ),
               _buildFooterLink(
                 '隱私權政策'.i18n,
-                onTap: () => launchUrl(Uri.parse('https://exptech.dev/privacy')),
+                onTap: () =>
+                    launchUrl(Uri.parse('https://exptech.dev/privacy')),
               ),
             ],
           ),

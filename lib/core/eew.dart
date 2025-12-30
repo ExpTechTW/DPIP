@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/wave_time.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/iterable.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 const double ln10 = 2.302585092994046; // Math.log(10)

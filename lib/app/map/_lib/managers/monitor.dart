@@ -17,8 +17,8 @@ import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/map/intensity_legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
@@ -969,8 +969,9 @@ class MonitorMapLayerManager extends MapLayerManager {
             if (key == 'max_i') return;
             final code = int.tryParse(key);
             if (code == null) return;
-            final intensity =
-                intensityFloatToInt((value as Map)['i'] as double);
+            final intensity = intensityFloatToInt(
+              (value as Map)['i'] as double,
+            );
             if (intensity > 0) {
               colorEntries.add(code);
               colorEntries.add(

@@ -1,20 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
-import 'package:go_router/go_router.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:m3e_collection/m3e_collection.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-import 'package:simple_icons/simple_icons.dart';
-import 'package:timezone/timezone.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
-import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/home/_widgets/date_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/forecast_card.dart';
@@ -28,7 +17,6 @@ import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/wind_card.dart';
 import 'package:dpip/app/settings/donate/page.dart';
-import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -40,10 +28,19 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/rain_shader_background.dart';
+import 'package:dpip/utils/shader_selector.dart';
+import 'package:dpip/utils/wallpaper_selector.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
-
-import 'home_display_mode.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:m3e_collection/m3e_collection.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_icons/simple_icons.dart';
+import 'package:timezone/timezone.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -64,6 +61,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isOutOfService = false;
   bool _wasVisible = true;
   double? _locationButtonHeight;
+  double _blurAmount = 0.0;
 
   RealtimeWeather? _weather;
   Map<String, dynamic>? _forecast;
@@ -79,27 +77,29 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
       .firstOrNull;
 
-  /// 是否正在下雨（用於決定是否顯示雨滴效果）
-  bool get _isRaining {
-    // TODO: 測試完成後移除強制啟用
-    return true;
-    // if (_weather == null) return false;
-    // final code = _weather!.data.weatherCode;
-    // // 雨天代碼範圍：15-35（包含雨、大雨、雷雨）
-    // return code >= 15 && code <= 35;
-  }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
     GlobalProviders.location.$code.addListener(_refresh);
+    _scrollController.addListener(_onScroll);
     _refresh();
+  }
+
+  void _onScroll() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final offset = _scrollController.offset;
+    final progress = (offset / (screenHeight * 0.3)).clamp(0.0, 1.0);
+    final newBlur = progress * 15.0;
+    if ((newBlur - _blurAmount).abs() > 0.5) {
+      setState(() => _blurAmount = newBlur);
+    }
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
     _scrollController.dispose();
@@ -331,15 +331,33 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
     });
 
+    final utc8Time = WallpaperSelector.getUtc8Time();
+    final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
+    final shaderConfig = ShaderSelector.selectShaderConfig(_weather);
+    final shaderBackground = ShaderSelector.buildShaderBackground(
+      config: shaderConfig,
+      imagePath: wallpaperPath,
+    );
+
     return Stack(
       children: [
-        // 雨滴背景（全螢幕，持續顯示）
         Positioned.fill(
-          child: RainShaderBackground(
-            animated: _isRaining,
-          ),
+          child: shaderBackground,
         ),
-        // 主內容
+        if (_blurAmount > 0)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: _blurAmount,
+                  sigmaY: _blurAmount,
+                ),
+                child: ColoredBox(
+                  color: Colors.black.withValues(alpha: _blurAmount / 60),
+                ),
+              ),
+            ),
+          ),
         ExpressiveRefreshIndicator.contained(
           key: _refreshIndicatorKey,
           edgeOffset: context.padding.top + kToolbarHeight,
@@ -459,15 +477,42 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
           ),
         ),
+        // 實時警報
+        if (!_isLoading) ..._buildRealtimeInfo(),
+        // 其他區塊
+        if (homeSections.isNotEmpty) ...[
+          if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
+          if (homeSections.contains(HomeDisplaySection.forecast))
+            _buildForecast(),
+          if (!_isLoading &&
+              homeSections.contains(HomeDisplaySection.wind) &&
+              _weather != null)
+            _buildWindCard(),
+          _buildCommunityCards(),
+          if (homeSections.contains(HomeDisplaySection.history))
+            _buildHistoryTimeline(),
+        ] else if (GlobalProviders.location.code != null)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text(
+                  '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => SettingsLayoutRoute().push(context),
+                  child: Text('前往設定'.i18n),
+                ),
+              ],
+            ),
+          ),
+        // 底部安全區域
+        SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
       );
-    }
-    // 社群區塊 (放在最後)
-    children.add(_buildCommunityCards());
-
-    // 底部安全區域
-    children.add(
-      SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-    );
+    };
 
     return Column(children: children);
   }

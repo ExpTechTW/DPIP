@@ -4,25 +4,31 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class RainShaderBackground extends StatefulWidget {
+class FogShaderBackground extends StatefulWidget {
   final Widget? child;
 
   final bool animated;
 
   final String imagePath;
 
-  const RainShaderBackground({
+  final double intensity;
+
+  final double speed;
+
+  const FogShaderBackground({
     super.key,
     this.child,
     this.animated = true,
     this.imagePath = 'assets/wallpaper/night/city_rooftop_stars.jpg',
+    this.intensity = 0.3,
+    this.speed = 1.0,
   });
 
   @override
-  State<RainShaderBackground> createState() => _RainShaderBackgroundState();
+  State<FogShaderBackground> createState() => _FogShaderBackgroundState();
 }
 
-class _RainShaderBackgroundState extends State<RainShaderBackground>
+class _FogShaderBackgroundState extends State<FogShaderBackground>
     with SingleTickerProviderStateMixin {
   ui.FragmentShader? _shader;
   ui.Image? _image;
@@ -48,7 +54,7 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
   Future<void> _loadAssets() async {
     try {
       final results = await Future.wait([
-        ui.FragmentProgram.fromAsset('shaders/rain.frag'),
+        ui.FragmentProgram.fromAsset('shaders/fog.frag'),
         _loadImage(widget.imagePath),
       ]);
 
@@ -59,7 +65,7 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
         });
       }
     } catch (e) {
-      debugPrint('Failed to load rain shader: $e');
+      debugPrint('Failed to load fog shader: $e');
     }
   }
 
@@ -71,12 +77,14 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
   }
 
   @override
-  void didUpdateWidget(RainShaderBackground oldWidget) {
+  void didUpdateWidget(FogShaderBackground oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.animated != oldWidget.animated) {
       widget.animated ? _controller.repeat() : _controller.stop();
     }
-    if (widget.imagePath != oldWidget.imagePath) {
+    if (widget.imagePath != oldWidget.imagePath ||
+        widget.intensity != oldWidget.intensity ||
+        widget.speed != oldWidget.speed) {
       _loadAssets();
     }
   }
@@ -106,7 +114,9 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
 
         _shader!
           ..setFloat(1, size.width)
-          ..setFloat(2, size.height);
+          ..setFloat(2, size.height)
+          ..setFloat(3, widget.intensity)
+          ..setFloat(4, widget.speed);
 
         return AnimatedBuilder(
           animation: _controller,
@@ -117,7 +127,7 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
 
             return CustomPaint(
               size: size,
-              painter: _ShaderPainter(_shader!, _image!, size),
+              painter: _FogShaderPainter(_shader!, _image!, size),
               child: widget.child,
             );
           },
@@ -127,12 +137,12 @@ class _RainShaderBackgroundState extends State<RainShaderBackground>
   }
 }
 
-class _ShaderPainter extends CustomPainter {
+class _FogShaderPainter extends CustomPainter {
   final ui.FragmentShader shader;
   final ui.Image image;
   final Size viewSize;
 
-  _ShaderPainter(this.shader, this.image, this.viewSize);
+  _FogShaderPainter(this.shader, this.image, this.viewSize);
 
   @override
   void paint(Canvas canvas, Size size) {

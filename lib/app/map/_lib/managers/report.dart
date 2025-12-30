@@ -1,29 +1,20 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/iterable.dart';
 import 'package:dpip/utils/extensions/number.dart';
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
@@ -36,6 +27,13 @@ import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 import 'package:dpip/widgets/typography.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReportMapLayerManager extends MapLayerManager {
   String? initialReportId;
@@ -49,8 +47,16 @@ class ReportMapLayerManager extends MapLayerManager {
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
   final dataNotifier = ValueNotifier<int>(0);
+  final shouldExpandOnReturn = ValueNotifier<bool>(false);
+  double savedScrollOffset = 0.0;
+  String? _lastPartialContentKey;
+  bool _shouldResetScroll = false;
 
   DateTime? _lastFetchTime;
+  int _currentPage = 1;
+  final hasMore = ValueNotifier<bool>(true);
+  final isLoadingMore = ValueNotifier<bool>(false);
+  static const int _pageSize = 50;
 
   Future<void> setReport(String? reportId, {bool focus = true}) async {
     if (isLoading.value) return;
@@ -70,6 +76,7 @@ class ReportMapLayerManager extends MapLayerManager {
       currentReport.value = report;
 
       if (report != null) {
+        _shouldResetScroll = true;
         await _addReport(currentReport.value, focus: focus);
       }
 
@@ -122,13 +129,62 @@ class ReportMapLayerManager extends MapLayerManager {
     );
   }
 
-  Future<void> _fetchData() async {
-    final reportList = await ExpTech().getReportList();
-    if (!context.mounted) return;
+  Future<void> _fetchData({bool reset = false}) async {
+    if (reset) {
+      _currentPage = 1;
+      hasMore.value = true;
+      isLoadingMore.value = false;
+    }
 
-    GlobalProviders.data.setPartialReport(reportList);
-    dataNotifier.value++;
-    _lastFetchTime = DateTime.now();
+    if (isLoadingMore.value || !hasMore.value) return;
+
+    isLoadingMore.value = true;
+
+    try {
+      final reportList = await ExpTech().getReportList(
+        limit: _pageSize,
+        page: _currentPage,
+      );
+      if (!context.mounted) return;
+
+      if (reportList.isEmpty) {
+        hasMore.value = false;
+      } else {
+        if (reset) {
+          GlobalProviders.data.setPartialReport(reportList);
+          _lastPartialContentKey = null;
+        } else {
+          GlobalProviders.data.appendPartialReport(reportList);
+        }
+
+        if (reportList.length < _pageSize) {
+          hasMore.value = false;
+        } else {
+          _currentPage++;
+        }
+
+        dataNotifier.value++;
+      }
+
+      _lastFetchTime = DateTime.now();
+    } catch (e, s) {
+      TalkerManager.instance.error('ReportMapLayerManager._fetchData', e, s);
+    } finally {
+      isLoadingMore.value = false;
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (!isLoadingMore.value && hasMore.value) {
+      await _fetchData();
+    }
+  }
+
+  String? _getPartialContentKey() {
+    final reports = GlobalProviders.data.partialReport;
+    if (reports.isEmpty) return null;
+    final firstReport = reports.first;
+    return '${firstReport.id}-${firstReport.time.millisecondsSinceEpoch}';
   }
 
   @override
@@ -136,7 +192,9 @@ class ReportMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      if (GlobalProviders.data.partialReport.isEmpty) await _fetchData();
+      if (GlobalProviders.data.partialReport.isEmpty) {
+        await _fetchData(reset: true);
+      }
 
       final sourceId = MapSourceIds.report();
       final layerId = MapLayerIds.report();
@@ -249,8 +307,9 @@ class ReportMapLayerManager extends MapLayerManager {
       visible = true;
 
       if (_lastFetchTime == null ||
-          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
-        await _fetchData();
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5) {
+        await _fetchData(reset: true);
+      }
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager.show', e, s);
     }
@@ -272,9 +331,13 @@ class ReportMapLayerManager extends MapLayerManager {
   }
 
   @override
+  bool get shouldPop => currentReport.value == null;
+
+  @override
   void onPopInvoked() {
     if (currentReport.value == null) return;
 
+    shouldExpandOnReturn.value = true;
     setReport(null);
   }
 
@@ -465,19 +528,72 @@ class _GeneratingView extends StatelessWidget {
 
 class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
   final morphingSheetController = MorphingSheetController();
+  ScrollController? _listScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.manager.shouldExpandOnReturn.addListener(_onShouldExpandChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.manager.shouldExpandOnReturn.removeListener(_onShouldExpandChanged);
+    _listScrollController?.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_listScrollController == null || !_listScrollController!.hasClients) {
+      return;
+    }
+
+    final maxScroll = _listScrollController!.position.maxScrollExtent;
+    final currentScroll = _listScrollController!.offset;
+    final delta = 200.0;
+
+    if (maxScroll - currentScroll <= delta) {
+      widget.manager.loadMore();
+    }
+  }
+
+  void _onShouldExpandChanged() {
+    if (!widget.manager.shouldExpandOnReturn.value) return;
+    widget.manager.shouldExpandOnReturn.value = false;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      morphingSheetController.expand().then((_) {
+        if (!mounted) return;
+        final offset = widget.manager.savedScrollOffset;
+        if (_listScrollController != null &&
+            _listScrollController!.hasClients &&
+            offset > 0) {
+          _listScrollController!.jumpTo(offset);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: widget.manager.dataNotifier,
       builder: (context, value, child) {
+        final partialKey = widget.manager._getPartialContentKey();
+        final shouldUpdateKey =
+            partialKey != widget.manager._lastPartialContentKey;
+        if (shouldUpdateKey) {
+          widget.manager._lastPartialContentKey = partialKey;
+        }
+
         return ResponsiveContainer(
           mode: ResponsiveMode.panel,
           child: MorphingSheet(
-            key: ValueKey(value),
+            key: partialKey != null ? ValueKey(partialKey) : null,
             controller: morphingSheetController,
             title: '地震報告'.i18n,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: .circular(16),
             elevation: 4,
             partialBuilder: (context, controller, sheetController) {
               if (GlobalProviders.data.partialReport.isEmpty) {
@@ -497,7 +613,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         locationString;
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const .symmetric(vertical: 8),
                       child: Selector<DpipDataModel, List<String>>(
                         selector: (context, model) => model.radar,
                         builder: (context, radar, child) {
@@ -506,7 +622,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             spacing: 4,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(
+                                padding: const .symmetric(
                                   horizontal: 16,
                                   vertical: 8,
                                 ),
@@ -542,7 +658,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
+                                padding: const .symmetric(
                                   horizontal: 16,
                                 ),
                                 child: Row(
@@ -711,6 +827,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 valueListenable: widget.manager.currentReport,
                 builder: (context, currentReport, child) {
                   if (currentReport == null) {
+                    if (_listScrollController != controller) {
+                      _listScrollController?.removeListener(_onScroll);
+                      _listScrollController = controller;
+                      controller.addListener(_onScroll);
+                    }
+
                     final grouped = GlobalProviders.data.partialReport
                         .groupListsBy(
                           (report) =>
@@ -739,12 +861,57 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           pinned: true,
                         ),
                         SliverPadding(
-                          padding: EdgeInsets.only(
+                          padding: .only(
                             bottom: context.padding.bottom,
                           ),
                           sliver: SliverList.builder(
-                            itemCount: grouped.length,
+                            itemCount: grouped.length + 1,
                             itemBuilder: (context, index) {
+                              if (index == grouped.length) {
+                                return ValueListenableBuilder(
+                                  valueListenable: widget.manager.isLoadingMore,
+                                  builder: (context, isLoadingMoreValue, child) {
+                                    return ValueListenableBuilder(
+                                      valueListenable: widget.manager.hasMore,
+                                      builder: (context, hasMoreValue, child) {
+                                        if (!hasMoreValue &&
+                                            GlobalProviders
+                                                .data
+                                                .partialReport
+                                                .isNotEmpty) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Center(
+                                              child: Text(
+                                                '沒有更多資料'.i18n,
+                                                style: context.texts.bodyMedium
+                                                    ?.copyWith(
+                                                      color: context
+                                                          .colors
+                                                          .onSurfaceVariant,
+                                                    ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        if (isLoadingMoreValue) {
+                                          return const Padding(
+                                            padding: EdgeInsets.all(16),
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          );
+                                        }
+
+                                        return const SizedBox.shrink();
+                                      },
+                                    );
+                                  },
+                                );
+                              }
+
                               final MapEntry(key: date, value: reports) =
                                   grouped[index];
 
@@ -779,6 +946,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       style: context.texts.labelLarge,
                                     ),
                                     onTap: () {
+                                      if (controller.hasClients) {
+                                        widget.manager.savedScrollOffset =
+                                            controller.offset;
+                                      }
                                       widget.manager.setReport(report.id);
                                       sheetController.collapse();
                                     },
@@ -807,7 +978,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
                     content = [
                       Padding(
-                        padding: const .symmetric(horizontal: 24, vertical: 8),
+                        padding: const .symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
                         child: Row(
                           children: [
                             IntensityBox(intensity: report.getMaxIntensity()),
@@ -841,7 +1015,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         ),
                       ),
                       Padding(
-                        padding: const .symmetric(horizontal: 24, vertical: 8),
+                        padding: const .symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
                         child: Wrap(
                           spacing: 8,
                           children: [
@@ -908,9 +1085,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             children: [
                               Expanded(
                                 child: SectionListTile(
-                                  borderRadius:
-                                      BorderRadius.circular(4) +
-                                      .only(bottomLeft: .circular(16)),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: .circular(16),
+                                  ),
                                   label: Text('地震規模'.i18n),
                                   title: Row(
                                     children: [
@@ -935,9 +1112,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               ),
                               Expanded(
                                 child: SectionListTile(
-                                  borderRadius:
-                                      BorderRadius.circular(4) +
-                                      .only(bottomRight: .circular(16)),
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: .circular(16),
+                                  ),
                                   label: Text('震源深度'.i18n),
                                   title: Row(
                                     children: [
@@ -998,9 +1175,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                         aspectRatio: 1,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
+                                            borderRadius: .circular(6),
                                             color: IntensityColor.intensity(
                                               town.intensity,
                                             ),
@@ -1045,7 +1220,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         label: Text('地震報告圖'.i18n),
                         children: [
                           Padding(
-                            padding: .symmetric(horizontal: 8),
+                            padding: const .symmetric(horizontal: 8),
                             child: EnlargeableImage(
                               aspectRatio: 4 / 3,
                               heroTag: 'report-image-${report.id}',
@@ -1061,7 +1236,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           label: Text('震度圖'.i18n),
                           children: [
                             Padding(
-                              padding: .symmetric(horizontal: 8),
+                              padding: const .symmetric(
+                                horizontal: 8,
+                              ),
                               child: SafeImageSection(
                                 builder: (onError) => EnlargeableImage(
                                   aspectRatio: 2334 / 2977,
@@ -1079,7 +1256,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           label: Text('最大地動加速度圖'.i18n),
                           children: [
                             Padding(
-                              padding: .symmetric(horizontal: 8),
+                              padding: const .symmetric(
+                                horizontal: 8,
+                              ),
                               child: SafeImageSection(
                                 builder: (onError) => EnlargeableImage(
                                   aspectRatio: 2334 / 2977,
@@ -1097,7 +1276,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           label: Text('最大地動速度圖'.i18n),
                           children: [
                             Padding(
-                              padding: .symmetric(horizontal: 8),
+                              padding: const .symmetric(
+                                horizontal: 8,
+                              ),
                               child: SafeImageSection(
                                 builder: (onError) => EnlargeableImage(
                                   aspectRatio: 2334 / 2977,
@@ -1113,6 +1294,15 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     ];
                   }
 
+                  if (widget.manager._shouldResetScroll) {
+                    widget.manager._shouldResetScroll = false;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (controller.hasClients) {
+                        controller.jumpTo(0);
+                      }
+                    });
+                  }
+
                   return CustomScrollView(
                     controller: controller,
                     slivers: [
@@ -1120,12 +1310,8 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                         title: Text('地震報告'.i18n),
                         leading: BackButton(
                           onPressed: () {
+                            widget.manager.shouldExpandOnReturn.value = true;
                             widget.manager.setReport(null);
-                            controller.animateTo(
-                              0,
-                              duration: Durations.short4,
-                              curve: Easing.emphasizedDecelerate,
-                            );
                           },
                         ),
                         floating: true,
@@ -1134,7 +1320,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                       ),
                       SliverList.list(children: content),
                       SliverPadding(
-                        padding: .only(bottom: context.padding.bottom + 16),
+                        padding: .only(
+                          bottom: context.padding.bottom + 16,
+                        ),
                       ),
                     ],
                   );

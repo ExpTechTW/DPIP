@@ -162,8 +162,9 @@ class _RadarMapCardState extends State<RadarMapCard>
   Widget build(BuildContext context) {
     final userLocation = GlobalProviders.location.coordinates;
     final targetLocation = userLocation ?? DpipMap.kTaiwanCenter;
-    final targetZoom =
-        userLocation != null ? DpipMap.kUserLocationZoom : DpipMap.kTaiwanZoom;
+    final targetZoom = userLocation != null
+        ? DpipMap.kUserLocationZoom
+        : DpipMap.kTaiwanZoom;
     final bearing = CompassService.instance.lastHeading;
 
     return ResponsiveContainer(
@@ -225,10 +226,10 @@ class _RadarMapCardState extends State<RadarMapCard>
                                     return const SizedBox.shrink();
                                   }
 
-                                  final style =
-                                      context.texts.labelSmall?.copyWith(
-                                    color: context.colors.onSurfaceVariant,
-                                  );
+                                  final style = context.texts.labelSmall
+                                      ?.copyWith(
+                                        color: context.colors.onSurfaceVariant,
+                                      );
 
                                   return Container(
                                     padding: const EdgeInsets.symmetric(

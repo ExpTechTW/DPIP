@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/app.dart';
+import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
-import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/core/update.dart';
 import 'package:dpip/global.dart';

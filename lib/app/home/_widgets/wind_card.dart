@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
-import 'package:flutter_compass/flutter_compass.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/i18n.dart';
@@ -12,6 +8,9 @@ import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 const double _kCompassAccuracyWarning = 25.0;
 const double _kCompassAccuracyDanger = 45.0;
