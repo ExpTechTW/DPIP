@@ -61,6 +61,8 @@ class ShaderConfig {
 }
 
 class ShaderSelector {
+  static bool debugForceThunderstormFog = false;
+
   static bool _isThunderstormCode(int code) {
     return code == 103 ||
         code == 104 ||
@@ -93,11 +95,34 @@ class ShaderSelector {
   }
 
   static ShaderConfig selectShaderConfig(RealtimeWeather? weather) {
-    return const ShaderConfig(
-      showFog: true,
-      showRain: false,
-      showThunderstorm: true,
-      fogIntensity: 0.2,
+    if (debugForceThunderstormFog) {
+      return const ShaderConfig(
+        showFog: true,
+        showRain: false,
+        showThunderstorm: true,
+        fogIntensity: 0.2,
+      );
+    }
+
+    if (weather == null) {
+      return const ShaderConfig();
+    }
+
+    final weatherCode = weather.data.weatherCode;
+    final rain = weather.data.rain;
+    final visibility = parseVisibility(weather.data.visibility);
+
+    final showThunderstorm = _isThunderstormCode(weatherCode);
+    final showRain =
+        (_isRainCode(weatherCode) || rain > 0) && !showThunderstorm;
+    final showFog = visibility < 5.0 || _isFogCode(weatherCode);
+    final fogIntensity = showFog ? calculateFogIntensity(visibility) : 0.0;
+
+    return ShaderConfig(
+      showFog: showFog,
+      showRain: showRain,
+      showThunderstorm: showThunderstorm,
+      fogIntensity: fogIntensity,
     );
   }
 
