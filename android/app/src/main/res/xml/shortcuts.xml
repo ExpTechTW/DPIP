@@ -1,0 +1,17 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+            android:shortcutId="monitor"
+            android:enabled="true"
+            android:icon="@mipmap/ic_launcher"
+            android:shortcutShortLabel="@string/shortcut_monitor_short"
+            android:shortcutLongLabel="@string/shortcut_monitor_long">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.exptech.dpip"
+                android:targetClass="com.exptech.dpip.MainActivity">
+            <extra
+                    android:name="shortcut"
+                    android:value="monitor" />
+        </intent>
+    </shortcut>
+</shortcuts>

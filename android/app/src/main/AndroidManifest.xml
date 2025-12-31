@@ -42,10 +42,18 @@
                 android:screenOrientation="portrait"
                 android:showWhenLocked="true"
                 android:turnScreenOn="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="app" android:host="monitor" />
+            </intent-filter>
             <meta-data
                     android:name="io.flutter.embedding.android.NormalTheme"
-                    android:resource="@style/NormalTheme"
-            />
+                    android:resource="@style/NormalTheme"/>
+            <meta-data
+                    android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
