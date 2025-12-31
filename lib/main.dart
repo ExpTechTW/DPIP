@@ -29,6 +29,7 @@ void main() async {
   talker.log('--- 冷啟動偵測開始 ---');
   talker.log('🔥 1. (main) 啟動時間: ${overallStartTime.toIso8601String()}');
   WidgetsFlutterBinding.ensureInitialized();
+  String? initialShortcut;
   if (Platform.isIOS) {
     // iOS 14 以下改回用 StoreKit1
     InAppPurchaseStoreKitPlatform.enableStoreKit1();
@@ -61,6 +62,7 @@ void main() async {
   final isFirstLaunch = Preference.instance.getBool('isFirstLaunch') ?? true;
   GlobalProviders.init();
   initializeTimeZones();
+  initialShortcut = await getInitialShortcut();
 
   talker.log('⏳ 3. 啟動 並行任務... (測量總耗時)');
   final futureWaitStart = DateTime.now();
@@ -136,7 +138,7 @@ void main() async {
           ChangeNotifierProvider.value(value: GlobalProviders.notification),
           ChangeNotifierProvider.value(value: GlobalProviders.ui),
         ],
-        child: const DpipApp(),
+        child: DpipApp(initialShortcut: initialShortcut),
       ),
     ),
   );
@@ -170,6 +172,18 @@ void main() async {
       .catchError((e) {
         talker.error('❌ LocationServiceManager 失敗。錯誤: $e');
       });
+}
+
+const platform = MethodChannel('com.exptech.dpip/shortcut');
+
+Future<String?> getInitialShortcut() async {
+  try {
+    final result = await platform.invokeMethod<String>('getInitialShortcut');
+    return result;
+  } on PlatformException catch (e) {
+    print('Failed to get initial shortcut: $e');
+    return null;
+  }
 }
 
 Future<T> _loggedTask<T>(String taskName, Future<T> future) async {

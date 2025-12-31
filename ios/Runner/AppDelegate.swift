@@ -16,15 +16,15 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Application Lifecycle
-    
+
     override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication
-            .LaunchOptionsKey: Any]?
-    ) -> Bool {
+            _ application: UIApplication,
+            didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+        ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
         setupFlutterChannels()
         setupLocationManager()
+        setupSiriShortcut()
         
         if let locationKey = launchOptions?[
             UIApplication.LaunchOptionsKey.location] as? NSNumber,
@@ -34,9 +34,30 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         } else if isLocationEnabled {
             startLocationUpdates()
         }
-        
+
         return super.application(
             application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    override func application(
+        _ application: UIApplication,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        handleShortcut(shortcutItem)
+        completionHandler(true)
+    }
+
+    private func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) {
+        UserDefaults.standard.set(shortcutItem.type, forKey: "initialShortcut")
+    }
+    
+    override func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if userActivity.activityType == "com.exptech.dpip.monitor" {
+            UserDefaults.standard.set("monitor", forKey: "initialShortcut")
+        }
+        return true
     }
 
     override func applicationDidEnterBackground(_ application: UIApplication) {
@@ -59,6 +80,21 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         locationChannel?.setMethodCallHandler { [weak self] (call, result) in
             self?.handleLocationChannelCall(call, result: result)
         }
+
+        let shortcutChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/shortcut",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        shortcutChannel.setMethodCallHandler { call, result in
+            if call.method == "getInitialShortcut" {
+                let shortcut = UserDefaults.standard.string(forKey: "initialShortcut")
+                result(shortcut)
+                UserDefaults.standard.removeObject(forKey: "initialShortcut")
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
     }
     
     private func setupLocationManager() {
@@ -68,6 +104,17 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         locationManager.pausesLocationUpdatesAutomatically = false
         isLocationEnabled = UserDefaults.standard.bool(
             forKey: "locationSendingEnabled")
+    }
+    
+    func setupSiriShortcut() {
+        let activity = NSUserActivity(activityType: "com.exptech.dpip.monitor")
+        activity.title = "打開強震監視器"
+        activity.isEligibleForSearch = true
+        activity.isEligibleForPrediction = true
+        activity.persistentIdentifier = NSUserActivityPersistentIdentifier("monitor")
+        
+        self.userActivity = activity
+        activity.becomeCurrent()
     }
     
     // MARK: - APNS Token Handling

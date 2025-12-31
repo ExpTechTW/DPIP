@@ -41,6 +41,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>${DART_DEBUG_BONJOUR_SERVICE}</string>
+	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>DPIP 將利用你的位置資訊，用以自動設定所在地並在地震發生時能較準確地預估所在地的最大震度。</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -51,6 +55,19 @@
 	<string>用於儲存地震報告圖片。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>用於儲存地震報告圖片至您的相簿。</string>
+	<key>NSSiriUsageDescription</key>
+	<string>用於打開捷徑。</string>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeFavorite</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>強震監視器</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>monitor</string>
+		</dict>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -73,10 +90,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-	</array>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>${DART_DEBUG_BONJOUR_SERVICE}</string>
 	</array>
 </dict>
 </plist>
