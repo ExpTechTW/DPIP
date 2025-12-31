@@ -9,18 +9,19 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
 
     private val CHANNEL = "com.exptech.dpip/shortcut"
+    private var initialShortcut: String? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
-                if (call.method == "getInitialShortcut") {
-                    val shortcut = getSharedPreferences("shortcut", MODE_PRIVATE)
-                        .getString("initialShortcut", null)
-                    result.success(shortcut)
-                } else {
-                    result.notImplemented()
+                when (call.method) {
+                    "getInitialShortcut" -> {
+                        result.success(initialShortcut)
+                        initialShortcut = null
+                    }
+                    else -> result.notImplemented()
                 }
             }
     }
@@ -37,12 +38,11 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val shortcut = intent?.getStringExtra("shortcut")
-        if (shortcut != null) {
-            getSharedPreferences("shortcut", MODE_PRIVATE)
-                .edit()
-                .putString("initialShortcut", shortcut)
-                .apply()
+        intent ?: return
+        val shortcutId = intent.getStringExtra("android.intent.extra.shortcut.ID")
+            ?: intent.getStringExtra("shortcut")
+        if (!shortcutId.isNullOrEmpty()) {
+            initialShortcut = shortcutId
         }
     }
 }

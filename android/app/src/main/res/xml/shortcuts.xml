@@ -8,10 +8,8 @@
         <intent
                 android:action="android.intent.action.VIEW"
                 android:targetPackage="com.exptech.dpip"
-                android:targetClass="com.exptech.dpip.MainActivity">
-            <extra
-                    android:name="shortcut"
-                    android:value="monitor" />
+                android:targetClass="com.exptech.dpip.MainActivity" >
+        <extra android:name="shortcut" android:value="monitor" />
         </intent>
     </shortcut>
 </shortcuts>
