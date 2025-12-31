@@ -34,6 +34,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
               title: '重大'.i18n,
               subtitle: Text('海嘯警報發布時'.i18n),
               type: 'tsunami-important-v2',
+              isFirst: true,
             ),
             SoundListTile(
               title: '一般'.i18n,
@@ -44,6 +45,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
               title: '太平洋海嘯消息(無聲通知)'.i18n,
               subtitle: Text('太平洋海嘯消息發布時'.i18n),
               type: 'tsunami-silent-v2',
+              isLast: true,
             ),
           ],
         ),

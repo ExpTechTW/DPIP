@@ -34,11 +34,13 @@ class SettingsNotifyReportPage extends StatelessWidget {
               title: '地震報告(一般)'.i18n,
               subtitle: Text('所在地(縣市)實測震度 3 以上'.i18n),
               type: 'report-general-v2',
+              isFirst: true,
             ),
             SoundListTile(
               title: '地震報告(無聲通知)'.i18n,
               subtitle: Text('所在地(縣市)實測震度 1 以上'.i18n),
               type: 'report-silence-v2',
+              isLast: true,
             ),
           ],
         ),

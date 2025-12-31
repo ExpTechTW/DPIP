@@ -34,6 +34,7 @@ class SettingsNotifyEewPage extends StatelessWidget {
               title: '緊急地震速報(重大)'.i18n,
               subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上'.i18n),
               type: 'eew_alert-important-v2',
+              isFirst: true,
             ),
             SoundListTile(
               title: '緊急地震速報(一般)'.i18n,
@@ -59,6 +60,7 @@ class SettingsNotifyEewPage extends StatelessWidget {
               title: '地震速報(無聲)'.i18n,
               subtitle: Text('所在地(鄉鎮)預估震度 1 以上'.i18n),
               type: 'eew-silence-v2',
+              isLast: true,
             ),
           ],
         ),

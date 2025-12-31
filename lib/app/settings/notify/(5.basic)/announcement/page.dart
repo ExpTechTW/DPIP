@@ -35,6 +35,8 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
               title: '公告'.i18n,
               subtitle: Text('發送公告時'.i18n),
               type: 'announcement-general-v2',
+              isFirst: true,
+              isLast: true,
             ),
           ],
         ),

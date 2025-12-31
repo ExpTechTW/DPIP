@@ -34,6 +34,8 @@ class SettingsNotifyMonitorPage extends StatelessWidget {
               title: '強震監視器(一般)'.i18n,
               subtitle: Text('偵測到晃動'.i18n),
               type: 'eq-v2',
+              isFirst: true,
+              isLast: true,
             ),
           ],
         ),

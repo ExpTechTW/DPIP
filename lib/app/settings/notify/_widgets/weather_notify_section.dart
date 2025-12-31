@@ -41,21 +41,24 @@ class _WeatherNotifySectionState extends State<WeatherNotifySection> {
       ),
     };
 
+    final entry = values.entries.toList();
+
     return SegmentedList(
       label: Text('接收類別'.i18n),
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon))
-            in values.entries)
+        for (int i = 0; i < entry.length; i++)
           SegmentedListTile(
-            leading: Icon(icon),
-            title: Text(title),
-            trailing: _loading == item
+            leading: Icon(entry[i].value.icon),
+            title: Text(entry[i].value.title),
+            trailing: _loading == entry[i].key
                 ? loading
-                : (widget.value == item)
+                : (widget.value == entry[i].key)
                 ? check
                 : empty,
             enabled: _loading == null,
-            onTap: _loading == null ? () => onChanged(item) : null,
+            onTap: _loading == null ? () => onChanged(entry[i].key) : null,
+            isFirst: i == 0,
+            isLast: i == entry.length - 1,
           ),
       ],
     );

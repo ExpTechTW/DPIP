@@ -12,12 +12,16 @@ class SoundListTile extends StatefulWidget {
   final String title;
   final Widget? subtitle;
   final String type;
+  final bool isFirst;
+  final bool isLast;
 
   const SoundListTile({
     super.key,
     required this.title,
     required this.type,
     this.subtitle,
+    this.isFirst = false,
+    this.isLast = false,
   });
 
   @override
@@ -57,6 +61,8 @@ class _SoundListTileState extends State<SoundListTile> {
           ? const Icon(Symbols.play_circle_rounded)
           : const LoadingIcon(),
       enabled: _enabled,
+      isFirst: widget.isFirst,
+      isLast: widget.isLast,
       onTap: onTap,
     );
   }
