@@ -1,7 +1,7 @@
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -41,21 +41,24 @@ class _WeatherNotifySectionState extends State<WeatherNotifySection> {
       ),
     };
 
-    return Section(
+    final entry = values.entries.toList();
+
+    return SegmentedList(
       label: Text('接收類別'.i18n),
       children: [
-        for (final MapEntry(key: item, value: (:title, :icon))
-            in values.entries)
-          SectionListTile(
-            leading: Icon(icon),
-            title: Text(title),
-            trailing: _loading == item
+        for (int i = 0; i < entry.length; i++)
+          SegmentedListTile(
+            leading: Icon(entry[i].value.icon),
+            title: Text(entry[i].value.title),
+            trailing: _loading == entry[i].key
                 ? loading
-                : (widget.value == item)
+                : (widget.value == entry[i].key)
                 ? check
                 : empty,
             enabled: _loading == null,
-            onTap: _loading == null ? () => onChanged(item) : null,
+            onTap: _loading == null ? () => onChanged(entry[i].key) : null,
+            isFirst: i == 0,
+            isLast: i == entry.length - 1,
           ),
       ],
     );

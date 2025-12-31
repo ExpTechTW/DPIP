@@ -3,7 +3,7 @@ import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,13 +28,15 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
             );
           },
         ),
-        Section(
+        SegmentedList(
           label: Text('音效測試'.i18n),
           children: [
             SoundListTile(
               title: '公告'.i18n,
               subtitle: Text('發送公告時'.i18n),
               type: 'announcement-general-v2',
+              isFirst: true,
+              isLast: true,
             ),
           ],
         ),

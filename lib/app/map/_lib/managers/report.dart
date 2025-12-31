@@ -19,7 +19,7 @@ import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/magnitude_color.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/report/enlargeable_image.dart';
 import 'package:dpip/widgets/report/intensity_box.dart';
@@ -917,7 +917,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
                               final length = reports.length;
 
-                              return Section(
+                              return SegmentedList(
                                 label: Text(date),
                                 children: reports.mapIndexed((index, report) {
                                   final locationString = report
@@ -928,7 +928,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       )?.dynamicName ??
                                       locationString;
 
-                                  return SectionListTile(
+                                  return SegmentedListTile(
                                     isFirst: index == 0,
                                     isLast: index == length - 1,
                                     leading: IntensityBox(
@@ -1056,10 +1056,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ],
                         ),
                       ),
-                      Section(
+                      SegmentedList(
                         label: Text('詳細資訊'),
                         children: [
-                          SectionListTile(
+                          SegmentedListTile(
                             isFirst: true,
                             label: Text('發震時間'.i18n),
                             title: Text(
@@ -1068,11 +1068,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               ).format(report.time),
                             ),
                           ),
-                          SectionListTile(
+                          SegmentedListTile(
                             label: Text('位於'.i18n),
                             title: Text(report.convertLatLon()),
                           ),
-                          SectionListTile(
+                          SegmentedListTile(
                             label: Text('發震時間'.i18n),
                             title: Text(
                               DateFormat(
@@ -1084,7 +1084,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             spacing: 2,
                             children: [
                               Expanded(
-                                child: SectionListTile(
+                                child: SegmentedListTile(
                                   borderRadius: BorderRadius.only(
                                     bottomLeft: .circular(16),
                                   ),
@@ -1111,7 +1111,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 ),
                               ),
                               Expanded(
-                                child: SectionListTile(
+                                child: SegmentedListTile(
                                   borderRadius: BorderRadius.only(
                                     bottomRight: .circular(16),
                                   ),
@@ -1136,7 +1136,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ),
                         ],
                       ),
-                      Section(
+                      SegmentedList(
                         label: Text('各地震度'.i18n),
                         children: [
                           for (final (
@@ -1144,7 +1144,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 MapEntry(key: areaName, value: area),
                               )
                               in report.list.entries.indexed)
-                            SectionListTile(
+                            SegmentedListTile(
                               isFirst: index == 0,
                               isLast: index == report.list.length - 1,
                               title: Text(areaName),
@@ -1216,7 +1216,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             ),
                         ],
                       ),
-                      Section(
+                      SegmentedList(
                         label: Text('地震報告圖'.i18n),
                         children: [
                           Padding(
@@ -1232,7 +1232,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                       ),
                       if (report.hasNumber &&
                           report.intensityMapImageUrl != null)
-                        Section(
+                        SegmentedList(
                           label: Text('震度圖'.i18n),
                           children: [
                             Padding(
@@ -1252,7 +1252,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ],
                         ),
                       if (report.hasNumber && report.pgaMapImageUrl != null)
-                        Section(
+                        SegmentedList(
                           label: Text('最大地動加速度圖'.i18n),
                           children: [
                             Padding(
@@ -1272,7 +1272,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ],
                         ),
                       if (report.hasNumber && report.pgvMapImageUrl != null)
-                        Section(
+                        SegmentedList(
                           label: Text('最大地動速度圖'.i18n),
                           children: [
                             Padding(

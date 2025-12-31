@@ -1,7 +1,6 @@
+import 'package:dpip/utils/geojson.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
-import 'package:dpip/utils/geojson.dart';
 
 /// Extension on [LatLng] that provides convenient utilities for GeoJSON conversion and geographic operations.
 ///

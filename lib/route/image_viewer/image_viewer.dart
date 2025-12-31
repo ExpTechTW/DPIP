@@ -1,18 +1,16 @@
 import 'dart:io';
 
-import 'package:dpip/utils/toast.dart';
-import 'package:flutter/material.dart';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:http/http.dart';
-import 'package:gal/gal.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/toast.dart';
+import 'package:flutter/material.dart';
+import 'package:gal/gal.dart';
+import 'package:http/http.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImageViewerRoute extends StatefulWidget {
   final String heroTag;

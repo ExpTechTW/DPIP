@@ -3,7 +3,7 @@ import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,18 +27,20 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
             );
           },
         ),
-        Section(
+        SegmentedList(
           label: Text('音效測試'.i18n),
           children: [
             SoundListTile(
               title: '震度速報(一般)'.i18n,
               subtitle: Text('所在地(鄉鎮)實測震度 3 以上'.i18n),
               type: 'int_report-general-v2',
+              isFirst: true,
             ),
             SoundListTile(
               title: '震度速報(無聲通知)'.i18n,
               subtitle: Text('所在地(鄉鎮)實測震度 1 以上'.i18n),
               type: 'int_report-silence-v2',
+              isLast: true,
             ),
           ],
         ),

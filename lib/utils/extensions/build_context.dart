@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-
 import 'package:dpip/utils/extensions/go_router.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Extension on [BuildContext] that provides convenient access to commonly used Flutter framework objects and
 /// utilities.
@@ -23,48 +21,30 @@ import 'package:dpip/utils/extensions/go_router.dart';
 /// ```
 extension BuildContextExtension on BuildContext {
   /// Returns the [ThemeData] from the nearest [Theme] ancestor.
-  ///
-  /// This is equivalent to calling `Theme.of(this)`.
   ThemeData get theme => Theme.of(this);
 
   /// Returns the [ColorScheme] from the current theme.
-  ///
-  /// This provides convenient access to the color scheme defined in the theme, which is commonly used for consistent
-  /// color styling throughout the app.
   ColorScheme get colors => theme.colorScheme;
 
   /// Returns the [TextTheme] from the current theme.
-  ///
-  /// This provides convenient access to the text theme defined in the theme, which contains predefined text styles for
-  /// various use cases.
   TextTheme get texts => theme.textTheme;
 
   /// Returns the size of the current media (screen/window).
-  ///
-  /// This is equivalent to calling `MediaQuery.sizeOf(this)`.
   Size get dimension => MediaQuery.sizeOf(this);
 
   /// Returns the padding insets of the current media (e.g., system UI insets).
-  ///
-  /// This is equivalent to calling `MediaQuery.paddingOf(this)`. Useful for accounting for system UI elements like
-  /// notches, status bars, etc.
   EdgeInsets get padding => MediaQuery.paddingOf(this);
 
+  /// Returns the brightness of the current platform
+  Brightness get brightness => MediaQuery.platformBrightnessOf(this);
+
   /// Returns the [NavigatorState] from the nearest [Navigator] ancestor.
-  ///
-  /// This is equivalent to calling `Navigator.of(this)`. Use this to perform navigation operations like push, pop, etc.
   NavigatorState get navigator => Navigator.of(this);
 
   /// Returns the [ScaffoldMessengerState] from the nearest [ScaffoldMessenger] ancestor.
-  ///
-  /// This is equivalent to calling `ScaffoldMessenger.of(this)`. Use this to show snackbars and other scaffold-related
-  /// messages.
   ScaffoldMessengerState get scaffoldMessenger => ScaffoldMessenger.of(this);
 
   /// Returns the [GoRouter] instance from the current context.
-  ///
-  /// This is equivalent to calling `GoRouter.of(this)`. Use this to access the router for navigation operations, such
-  /// as pushing routes, popping routes, or accessing the current route information.
   ///
   /// Example:
   /// ```dart

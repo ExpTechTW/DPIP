@@ -3,7 +3,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -31,11 +31,11 @@ class SettingsLocationSelectPage extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverSection(
+        SliverSegmentedList(
           label: Text('縣市'.i18n),
           children: [
             for (final (index, location) in locations.indexed)
-              SectionListTile(
+              SegmentedListTile(
                 isFirst: index == 0,
                 isLast: index == length - 1,
                 title: Text(location.cityWithLevel),

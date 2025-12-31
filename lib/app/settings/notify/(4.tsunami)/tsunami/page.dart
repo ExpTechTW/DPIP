@@ -3,7 +3,7 @@ import 'package:dpip/app/settings/notify/_widgets/tsunami_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,13 +27,14 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
             );
           },
         ),
-        Section(
+        SegmentedList(
           label: Text('音效測試'.i18n),
           children: [
             SoundListTile(
               title: '重大'.i18n,
               subtitle: Text('海嘯警報發布時'.i18n),
               type: 'tsunami-important-v2',
+              isFirst: true,
             ),
             SoundListTile(
               title: '一般'.i18n,
@@ -44,6 +45,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
               title: '太平洋海嘯消息(無聲通知)'.i18n,
               subtitle: Text('太平洋海嘯消息發布時'.i18n),
               type: 'tsunami-silent-v2',
+              isLast: true,
             ),
           ],
         ),

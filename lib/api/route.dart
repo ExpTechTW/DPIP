@@ -61,7 +61,7 @@ class Routes {
 
   static Uri station() => Uri.parse('$api/v1/trem/station');
 
-  static Uri locale() => Uri.parse('https://exptech.dev/api/dpip/locale');
+  static Uri locale() => Uri.parse('https://exptech.dev/api/v1/dpip/locale');
 
   static Uri radarList() => Uri.parse('$onlyapi/v1/tiles/radar/list');
 

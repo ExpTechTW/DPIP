@@ -8,7 +8,7 @@ import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -256,13 +256,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       ],
                     ),
                   ),
-                Section(
+                SegmentedList(
                   label: Text('地震速報'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, EewNotifyType>(
                       selector: (_, model) => model.eew,
                       builder: (context, eew, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isFirst: true,
                           isLast: true,
                           leading: _buildIconContainer(
@@ -280,13 +280,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                Section(
+                SegmentedList(
                   label: Text('地震'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.monitor,
                       builder: (context, monitor, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isFirst: true,
                           leading: _buildIconContainer(
                             icon: Symbols.monitor_heart_rounded,
@@ -304,7 +304,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.report,
                       builder: (context, report, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           leading: _buildIconContainer(
                             icon: Symbols.docs_rounded,
                             color: Colors.blue,
@@ -321,7 +321,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.intensity,
                       builder: (context, intensity, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isLast: true,
                           leading: _buildIconContainer(
                             icon: Symbols.summarize_rounded,
@@ -340,13 +340,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                Section(
+                SegmentedList(
                   label: Text('天氣'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.thunderstorm,
                       builder: (context, thunderstorm, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isFirst: true,
                           leading: _buildIconContainer(
                             icon: Symbols.thunderstorm_rounded,
@@ -366,7 +366,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.weatherAdvisory,
                       builder: (context, weatherAdvisory, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           leading: _buildIconContainer(
                             icon: Symbols.warning_rounded,
                             color: Colors.amber,
@@ -385,7 +385,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.evacuation,
                       builder: (context, evacuation, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isLast: true,
                           leading: _buildIconContainer(
                             icon: Symbols.directions_run_rounded,
@@ -402,13 +402,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                Section(
+                SegmentedList(
                   label: Text('海嘯'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, TsunamiNotifyType>(
                       selector: (_, model) => model.tsunami,
                       builder: (context, tsunami, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isFirst: true,
                           isLast: true,
                           leading: _buildIconContainer(
@@ -426,13 +426,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                Section(
+                SegmentedList(
                   label: Text('其他'.i18n),
                   children: [
                     Selector<SettingsNotificationModel, BasicNotifyType>(
                       selector: (_, model) => model.announcement,
                       builder: (context, announcement, child) {
-                        return SectionListTile(
+                        return SegmentedListTile(
                           isFirst: true,
                           isLast: true,
                           leading: _buildIconContainer(

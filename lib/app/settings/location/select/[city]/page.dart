@@ -9,7 +9,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -43,7 +43,7 @@ class _SettingsLocationSelectCityPageState
 
     return CustomScrollView(
       slivers: [
-        SliverSection(
+        SliverSegmentedList(
           label: Text(widget.city),
           children: [
             for (final (index, MapEntry(key: code, value: town))
@@ -53,7 +53,7 @@ class _SettingsLocationSelectCityPageState
                 builder: (context, isFavorited, child) {
                   final isLoading = _loadingCode == code;
 
-                  return SectionListTile(
+                  return SegmentedListTile(
                     isFirst: index == 0,
                     isLast: index == length - 1,
                     title: Text(town.cityTownWithLevel),

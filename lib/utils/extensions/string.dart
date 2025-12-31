@@ -1,13 +1,11 @@
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Extension on [String] that provides convenient utilities for type conversion and formatting.
 ///
@@ -19,12 +17,6 @@ extension StringExtension on String {
   /// The string should be in the format "language-country" (e.g., "en-US", "zh-TW"). The method splits the string by
   /// '-' and creates a [Locale] with the language code as the first part and the country code as the optional second
   /// part.
-  ///
-  /// Example:
-  /// ```dart
-  /// final locale = 'zh-TW'.asLocale; // Locale('zh', 'TW')
-  /// final locale2 = 'en'.asLocale; // Locale('en', null)
-  /// ```
   Locale get asLocale {
     final a = split('-');
     return Locale(a[0], a.elementAtOrNull(1));
@@ -33,22 +25,17 @@ extension StringExtension on String {
   /// Converts this string to a [Uri] object.
   ///
   /// Parses this string as a URI. Throws a [FormatException] if the string is not a valid URI.
-  ///
-  /// Example:
-  /// ```dart
-  /// final uri = 'https://example.com'.asUri;
-  /// ```
   Uri get asUri => .parse(this);
 
   /// Converts this string to an integer.
   ///
   /// Parses this string as an integer. Throws a [FormatException] if the string is not a valid integer.
-  ///
-  /// Example:
-  /// ```dart
-  /// final number = '123'.asInt; // 123
-  /// ```
   int get asInt => .parse(this);
+
+  /// Converts this string to a double.
+  ///
+  /// Parses this string as a double. Throws a [FormatException] if the string is not a valid double.
+  double get asDouble => .parse(this);
 
   /// Formats this string as a timestamp and converts it to a locale-aware full date string.
   ///

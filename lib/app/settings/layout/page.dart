@@ -1,7 +1,7 @@
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/list_item_tile.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';

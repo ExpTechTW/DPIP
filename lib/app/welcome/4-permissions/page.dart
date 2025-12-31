@@ -444,15 +444,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Text(
-                          '防災資訊平台',
-                          style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withValues(
-                              alpha: 0.7,
-                            ),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
                       ],
                     ),
                   ),

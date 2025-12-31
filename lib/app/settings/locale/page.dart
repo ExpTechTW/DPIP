@@ -1,18 +1,17 @@
-import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/widgets/list/segmented_list.dart';
+import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsLocalePage extends StatelessWidget {
   const SettingsLocalePage({super.key});
-
-  static const route = '/settings/locale';
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +25,33 @@ class SettingsLocalePage extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 16),
-            _buildLanguageCard(context, model),
-            _buildTranslateCard(context),
+            SegmentedList(
+              children: [
+                SegmentedListTile(
+                  isFirst: true,
+                  leading: ContainedIcon(
+                    Symbols.translate_rounded,
+                    color: Colors.blueAccent,
+                  ),
+                  title: Text('顯示語言'.i18n),
+                  subtitle: Text(model.locale?.nativeName ?? '系統語言'.i18n),
+                  trailing: Icon(Symbols.chevron_right_rounded),
+                  onTap: () => const SettingsLocaleSelectRoute().push(context),
+                ),
+                SegmentedListTile(
+                  isLast: true,
+                  leading: ContainedIcon(
+                    Symbols.groups_rounded,
+                    color: Colors.greenAccent,
+                  ),
+                  title: Text('協助翻譯'.i18n),
+                  subtitle: Text('點擊這裡來幫助我們改進 DPIP 的翻譯'.i18n),
+                  trailing: Icon(Symbols.arrow_outward_rounded),
+                  onTap: () => 'https://crowdin.com/project/dpip'.launch(),
+                  onLongPress: () => 'https://crowdin.com/project/dpip'.copy(),
+                ),
+              ],
+            ),
           ],
         );
       },
@@ -72,131 +96,6 @@ class SettingsLocalePage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageCard(
-    BuildContext context,
-    SettingsUserInterfaceModel model,
-  ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => context.push(SettingsLocaleSelectPage.route),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Symbols.language_rounded,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '顯示語言'.i18n,
-                        style: context.texts.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        model.locale?.nativeName ?? '系統語言'.i18n,
-                        style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Symbols.chevron_right_rounded,
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTranslateCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => launchUrl(Uri.parse('https://crowdin.com/project/dpip')),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Symbols.groups_rounded,
-                    color: Colors.green,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '協助翻譯'.i18n,
-                        style: context.texts.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '點擊這裡來幫助我們改進 DPIP 的翻譯'.i18n,
-                        style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Symbols.arrow_outward_rounded,
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

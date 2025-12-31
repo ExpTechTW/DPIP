@@ -1,6 +1,5 @@
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/widgets/map/map.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Extension on [MapLibreMapController] that provides convenient utilities for map layer and base map management.
 ///

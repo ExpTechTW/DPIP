@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-
-import 'package:timezone/timezone.dart';
+import 'dart:math';
 
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
+import 'package:flutter/material.dart';
+import 'package:timezone/timezone.dart';
 
 /// Extension on [int] that provides convenient utilities for working with integer values.
 ///
@@ -51,20 +51,6 @@ extension IntExtension on int {
     return TZDateTime.fromMillisecondsSinceEpoch(location, this);
   }
 
-  /// Converts this temperature value from Celsius to Fahrenheit.
-  ///
-  /// The conversion formula is: `F = C × 9/5 + 32`. The result is rounded to the nearest integer.
-  ///
-  /// Example:
-  /// ```dart
-  /// final celsius = 25;
-  /// final fahrenheit = celsius.asFahrenheit; // 77
-  ///
-  /// final zeroCelsius = 0;
-  /// final zeroFahrenheit = zeroCelsius.asFahrenheit; // 32
-  /// ```
-  int get asFahrenheit => (this * 9 / 5 + 32).round();
-
   /// Formats this timestamp as a simple date-time string.
   ///
   /// Returns a string in the format "MM/dd HH:mm" (e.g., "12/25 14:30").
@@ -98,11 +84,45 @@ extension IntExtension on int {
       asTZDateTime.toLocaleTimeString(context);
 }
 
+RegExp _trailingRegex = RegExp(r'([.]*0)(?!.*\d)');
+
 /// Extension on [double] that provides convenient utilities for working with double values.
 ///
 /// This extension adds helpful methods and getters to simplify common operations on [double] values, such as unit
 /// conversions and formatting.
 extension DoubleExtension on double {
+  /// Round this to a specific floating precision
+  double precision(int precision) {
+    final mod = pow(10.0, precision);
+    return ((this * mod).round() / mod);
+  }
+
+  /// Round this to a specific floating precision and convert it to a [String] without trailing zeros
+  String precisionString(int precision) {
+    final mod = pow(10.0, precision);
+    final value = ((this * mod).round() / mod).toString();
+
+    return value.replaceAll(_trailingRegex, '');
+  }
+}
+
+/// Extension for number conversions
+extension NumberConvert on num {
+  /// Converts this to a double.
+  double get asDouble => this.toDouble();
+
+  /// Converts this to a integer.
+  int get asInt => this.toInt();
+
+  /// Converts this to a percentage.
+  int get asPercentage => (this * 100).truncate();
+
+  /// Converts this to a TZDateTime in Asia/Taipei Timezone.
+  ///
+  /// This calls [TZDateTime.fromMillisecondsSinceEpoch] under the hood.
+  TZDateTime get asTZDateTime =>
+      .fromMillisecondsSinceEpoch(getLocation('Asia/Taipei'), this.asInt);
+
   /// Converts this temperature value from Celsius to Fahrenheit.
   ///
   /// The conversion formula is: `F = C × 9/5 + 32`. The result preserves decimal precision, returning a [double] value.
