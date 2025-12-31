@@ -312,7 +312,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _wasVisible = isVisible;
 
     final homeSections = context
-        .select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
+        .select<SettingsUserInterfaceModel, List<HomeDisplaySection>>(
           (model) => model.homeSections,
         );
 
@@ -427,55 +427,65 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildContentSection(Set<HomeDisplaySection> homeSections) {
-    return Column(
-      children: [
-        // 拖曳指示器
-        Container(
-          margin: const EdgeInsets.only(top: 12, bottom: 8),
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(2),
+  Widget _buildContentSection(List<HomeDisplaySection> homeSections) {
+    final children = <Widget>[
+      // 拖曳指示器
+      Container(
+        margin: const EdgeInsets.only(top: 12, bottom: 8),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+      // 實時警報
+      if (!_isLoading) ..._buildRealtimeInfo(),
+    ];
+
+    for (final section in homeSections) {
+      switch (section) {
+        case HomeDisplaySection.radar:
+          children.add(_buildRadarMap());
+          break;
+        case HomeDisplaySection.forecast:
+          children.add(_buildForecast());
+          break;
+        case HomeDisplaySection.wind:
+          if (!_isLoading && _weather != null) children.add(_buildWindCard());
+          break;
+        case HomeDisplaySection.history:
+          children.add(_buildHistoryTimeline());
+          break;
+        case HomeDisplaySection.community:
+          children.add(_buildCommunityCards());
+          break;
+      }
+    }
+    if (homeSections.isEmpty && GlobalProviders.location.code != null) {
+      children.add(
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text(
+                '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () => SettingsLayoutRoute().push(context),
+                child: Text('前往設定'.i18n),
+              ),
+            ],
           ),
         ),
-        // 實時警報
-        if (!_isLoading) ..._buildRealtimeInfo(),
-        // 其他區塊
-        if (homeSections.isNotEmpty) ...[
-          if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
-          if (homeSections.contains(HomeDisplaySection.forecast))
-            _buildForecast(),
-          if (!_isLoading &&
-              homeSections.contains(HomeDisplaySection.wind) &&
-              _weather != null)
-            _buildWindCard(),
-          _buildCommunityCards(),
-          if (homeSections.contains(HomeDisplaySection.history))
-            _buildHistoryTimeline(),
-        ] else if (GlobalProviders.location.code != null)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(
-                  '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => SettingsLayoutRoute().push(context),
-                  child: Text('前往設定'.i18n),
-                ),
-              ],
-            ),
-          ),
-        // 底部安全區域
-        SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-      ],
-    );
+      );
+    };
+    children.add(SizedBox(height: MediaQuery.of(context).padding.bottom + 16));
+
+    return Column(children: children);
   }
 
   Widget _buildCommunityCards() {
