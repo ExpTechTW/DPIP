@@ -1,6 +1,7 @@
 import CoreLocation
 import Flutter
 import UIKit
+import Intents
 import UserNotifications
 
 @UIApplicationMain
@@ -18,9 +19,9 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     // MARK: - Application Lifecycle
 
     override func application(
-            _ application: UIApplication,
-            didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-        ) -> Bool {
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
         setupFlutterChannels()
         setupLocationManager()
@@ -52,7 +53,9 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         UserDefaults.standard.set(shortcutItem.type, forKey: "initialShortcut")
     }
     
-    override func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+    override func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         if userActivity.activityType == "com.exptech.dpip.monitor" {
             UserDefaults.standard.set("monitor", forKey: "initialShortcut")
@@ -108,10 +111,11 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     
     func setupSiriShortcut() {
         let activity = NSUserActivity(activityType: "com.exptech.dpip.monitor")
-        activity.title = "打開強震監視器"
+        activity.title = "強震監視器"
         activity.isEligibleForSearch = true
         activity.isEligibleForPrediction = true
         activity.persistentIdentifier = NSUserActivityPersistentIdentifier("monitor")
+        activity.suggestedInvocationPhrase = "強震監視器"
         
         self.userActivity = activity
         activity.becomeCurrent()
