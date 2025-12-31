@@ -253,20 +253,29 @@ class DpipDataModel extends _DpipDataModel {
     notifyListeners();
   }
 
-  void _updateRtsData(Rts rts, List<Eew> eew) {
-    _syncDistance = currentTime - rts.time;
-    setRts(rts);
+  void _updateRtsData(Rts? rts, List<Eew> eew) {
+    if (rts != null) {
+      _syncDistance = currentTime - rts.time;
+      setRts(rts);
+    }
     setEew(eew);
   }
 
-  Future<(Rts, List<Eew>)> _fetchRtsData() async {
-    final data = _isReplayMode
-        ? await Future.wait([
-            ExpTech().getRts(currentTime),
-            ExpTech().getEew(currentTime),
-          ])
-        : await Future.wait([ExpTech().getRts(), ExpTech().getEew()]);
-    return (data[0] as Rts, data[1] as List<Eew>);
+  Future<(Rts?, List<Eew>)> _fetchRtsData() async {
+    try {
+      final data = _isReplayMode
+          ? await Future.wait([
+        ExpTech().getRts(currentTime),
+        ExpTech().getEew(currentTime),
+      ])
+          : await Future.wait([ExpTech().getRts(), ExpTech().getEew()]);
+
+      return (data[0] as Rts, data[1] as List<Eew>);
+    } on Rtsnodata {
+      final eew =
+      _isReplayMode ? await ExpTech().getEew(currentTime) : <Eew>[];
+      return (null, eew);
+    }
   }
 
   Future<void> fetchRtsImmediately() async {
