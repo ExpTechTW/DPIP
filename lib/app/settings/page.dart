@@ -464,7 +464,7 @@ class SettingsIndexPage extends StatelessWidget {
             child: Image.asset('assets/ExpTech.png'),
           ),
           TitleText.medium(
-            'ExpTech Studio © 2025',
+            'ExpTech Studio © 2026',
             color: context.colors.onSurfaceVariant,
             weight: .bold,
             align: .center,
