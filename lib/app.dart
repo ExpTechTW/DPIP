@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/app/welcome/4-permissions/page.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -19,8 +21,6 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-import 'app/map/_lib/utils.dart';
-import 'app/map/page.dart';
 import 'main.dart';
 
 /// The root widget of the application.
@@ -37,7 +37,6 @@ class DpipApp extends StatefulWidget {
 }
 
 class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
-  bool _hasHandledPendingNotification = false;
   bool _hasHandledInitialShortcut = false;
 
   Future<void> _checkUpdate() async {
@@ -82,38 +81,25 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     }
   }
 
-  void _tryHandleStartupNavigation() {
-    if (!mounted) return;
+  void _tryHandleInitialShortcut() {
+    if (_hasHandledInitialShortcut) return;
+    if (widget.initialShortcut == null) return;
 
     final ctx = router.routerDelegate.navigatorKey.currentContext;
-    if (ctx == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _tryHandleStartupNavigation();
-      });
-      return;
-    }
+    if (ctx == null) return;
 
-    if (!_hasHandledInitialShortcut && widget.initialShortcut != null) {
-      _hasHandledInitialShortcut = true;
+    _hasHandledInitialShortcut = true;
 
-      switch (widget.initialShortcut) {
-        case 'monitor':
-          ctx.push(
-            MapPage.route(
-              options: MapPageOptions(
-                initialLayers: {MapLayer.monitor},
-              ),
+    switch (widget.initialShortcut) {
+      case 'monitor':
+        ctx.go(
+          MapPage.route(
+            options: MapPageOptions(
+              initialLayers: {MapLayer.monitor},
             ),
-          );
-          return;
-      }
-    }
-
-    if (!_hasHandledPendingNotification) {
-      _hasHandledPendingNotification = true;
-      Future.delayed(const Duration(milliseconds: 500), () {
-        handlePendingNotificationNavigation(ctx);
-      });
+          ),
+        );
+        break;
     }
   }
 
@@ -132,7 +118,10 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     _checkNotificationPermission();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _tryHandleStartupNavigation();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        handlePendingNotificationNavigation(context);
+      });
+      _tryHandleInitialShortcut();
     });
   }
 
