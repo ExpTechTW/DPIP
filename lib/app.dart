@@ -12,6 +12,7 @@ import 'package:dpip/utils/log.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -39,6 +40,7 @@ class DpipApp extends StatefulWidget {
 class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   bool _hasHandledPendingNotification = false;
   bool _hasHandledInitialShortcut = false;
+  static const _shortcutChannel = MethodChannel('com.exptech.dpip/shortcut');
 
   Future<void> _checkUpdate() async {
     try {
@@ -117,6 +119,35 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     }
   }
 
+  void _onEnterMonitorPage() {
+    if (Platform.isIOS) {
+      _shortcutChannel.invokeMethod('donateMonitor');
+    }
+  }
+
+  void _handleShortcutNavigation(String shortcut) {
+    final ctx = router.routerDelegate.navigatorKey.currentContext;
+    if (ctx == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleShortcutNavigation(shortcut);
+      });
+      return;
+    }
+
+    switch (shortcut) {
+      case 'monitor':
+        ctx.go(
+          MapPage.route(
+            options: MapPageOptions(
+              initialLayers: {MapLayer.monitor},
+            ),
+          ),
+        );
+        break;
+    }
+  }
+
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     GlobalProviders.data.onAppLifecycleStateChanged(state);
@@ -130,10 +161,33 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     GlobalProviders.data.startFetching();
     _checkNotificationPermission();
+    _onEnterMonitorPage();
+
+    _shortcutChannel.setMethodCallHandler((call) async {
+      if (call.method == 'onShortcut') {
+        final value = call.arguments as String?;
+        if (value != null && mounted) {
+          _handleShortcutNavigation(value);
+        }
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _tryHandleStartupNavigation();
+      _handleInitialShortcut();
     });
+  }
+
+  void _handleInitialShortcut() {
+    if (_hasHandledInitialShortcut) return;
+    _hasHandledInitialShortcut = true;
+
+    final shortcut = widget.initialShortcut;
+    if (shortcut != null && shortcut.isNotEmpty) {
+      _handleShortcutNavigation(shortcut);
+      return;
+    }
+
+    _tryHandleStartupNavigation();
   }
 
   @override

@@ -55,8 +55,11 @@
 	<string>用於儲存地震報告圖片。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>用於儲存地震報告圖片至您的相簿。</string>
-	<key>NSSiriUsageDescription</key>
-	<string>用於打開捷徑。</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>OpenMonitorIntentIntent</string>
+		<string>com.exptech.dpip.monitor</string>
+	</array>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
