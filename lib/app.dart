@@ -92,7 +92,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
 
     switch (widget.initialShortcut) {
       case 'monitor':
-        ctx.go(
+        ctx.push(
           MapPage.route(
             options: MapPageOptions(
               initialLayers: {MapLayer.monitor},
