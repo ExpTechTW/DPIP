@@ -25,7 +25,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         GeneratedPluginRegistrant.register(with: self)
         setupFlutterChannels()
         setupLocationManager()
-        setupSiriShortcut()
         
         if let locationKey = launchOptions?[
             UIApplication.LaunchOptionsKey.location] as? NSNumber,
@@ -39,7 +38,8 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         return super.application(
             application, didFinishLaunchingWithOptions: launchOptions)
     }
-    
+
+    // MARK: - Quick Action
     override func application(
         _ application: UIApplication,
         performActionFor shortcutItem: UIApplicationShortcutItem,
@@ -54,6 +54,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         notifyFlutterShortcut(shortcutItem.type)
     }
     
+    // MARK: - NSUserActivity
     override func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
@@ -79,6 +80,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         channel.invokeMethod("onShortcut", arguments: value)
     }
 
+    // MARK: - Background Handling
     override func applicationDidEnterBackground(_ application: UIApplication) {
         startBackgroundTask()
     }
@@ -123,18 +125,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         locationManager.pausesLocationUpdatesAutomatically = false
         isLocationEnabled = UserDefaults.standard.bool(
             forKey: "locationSendingEnabled")
-    }
-    
-    func setupSiriShortcut() {
-        let activity = NSUserActivity(activityType: "com.exptech.dpip.monitor")
-        activity.title = "強震監視器"
-        activity.isEligibleForSearch = true
-        activity.isEligibleForPrediction = true
-        activity.persistentIdentifier = NSUserActivityPersistentIdentifier("monitor")
-        activity.suggestedInvocationPhrase = "強震監視器"
-        
-        self.userActivity = activity
-        activity.becomeCurrent()
     }
     
     // MARK: - APNS Token Handling
