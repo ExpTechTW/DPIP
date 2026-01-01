@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">DPIP</string>
-    <string name="shortcut_monitor_short">強震監視器</string>
-    <string name="shortcut_monitor_long">打開強震監視器</string>
+    <string name="shortcut_monitor_short">Earthquake Monitor</string>
+    <string name="shortcut_monitor_long">Open Earthquake Monitor</string>
 </resources>

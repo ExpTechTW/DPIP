@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DPIP 재해</string>
+    <string name="shortcut_monitor_short">강진 모니터</string>
+    <string name="shortcut_monitor_long">강진 모니터 열기</string>
 </resources>

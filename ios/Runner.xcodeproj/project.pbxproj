@@ -10,7 +10,7 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		5285489F2F06028F0027C627 /* Monitor.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 5285489E2F06028F0027C627 /* Monitor.intentdefinition */; };
+		528548E22F06357A0027C627 /* Monitor.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 528548E12F06357A0027C627 /* Monitor.intentdefinition */; };
 		529C27C82C93F7B200AAFAB6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 529C27C62C93F7B200AAFAB6 /* InfoPlist.strings */; };
 		52FA5E152DC8A9EA0008FEB0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52FA5E142DC8A9EA0008FEB0 /* StoreKit.framework */; };
 		6037C7C000DE0752E32B9E54 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6838AADB908B55100C5691B /* Pods_Runner.framework */; };
@@ -67,7 +67,10 @@
 		4B4531DD011F7A688ACAA691 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5228AD5A2C2EE45D007635F5 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		523A5FD82EB21EC0006F93FC /* Profile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Profile.xcconfig; path = Flutter/Profile.xcconfig; sourceTree = "<group>"; };
-		5285489E2F06028F0027C627 /* Monitor.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = Monitor.intentdefinition; sourceTree = "<group>"; };
+		526767E42F064A19003CE2E4 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = zh_TW; path = zh_TW.lproj/Monitor.intentdefinition; sourceTree = "<group>"; };
+		526767E62F064A3B003CE2E4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Monitor.strings; sourceTree = "<group>"; };
+		526767E82F064A3E003CE2E4 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Monitor.strings; sourceTree = "<group>"; };
+		526767EA2F064A47003CE2E4 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Monitor.strings; sourceTree = "<group>"; };
 		528548A52F06047F0027C627 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
 		529C27C92C93F7B900AAFAB6 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		529C27CC2C93F7BC00AAFAB6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -208,7 +211,7 @@
 				632125282C2EA17900A088F8 /* GoogleService-Info.plist */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				529C27C62C93F7B200AAFAB6 /* InfoPlist.strings */,
-				5285489E2F06028F0027C627 /* Monitor.intentdefinition */,
+				528548E12F06357A0027C627 /* Monitor.intentdefinition */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -476,7 +479,7 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
-				5285489F2F06028F0027C627 /* Monitor.intentdefinition in Sources */,
+				528548E22F06357A0027C627 /* Monitor.intentdefinition in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,6 +494,17 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		528548E12F06357A0027C627 /* Monitor.intentdefinition */ = {
+			isa = PBXVariantGroup;
+			children = (
+				526767E42F064A19003CE2E4 /* zh_TW */,
+				526767E62F064A3B003CE2E4 /* en */,
+				526767E82F064A3E003CE2E4 /* ja */,
+				526767EA2F064A47003CE2E4 /* ko */,
+			);
+			name = Monitor.intentdefinition;
+			sourceTree = "<group>";
+		};
 		529C27C62C93F7B200AAFAB6 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
