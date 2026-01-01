@@ -180,8 +180,8 @@ Future<String?> getInitialShortcut() async {
   try {
     final result = await platform.invokeMethod<String>('getInitialShortcut');
     return result;
-  } on PlatformException catch (e) {
-    print('Failed to get initial shortcut: $e');
+  } on PlatformException catch (e, st) {
+    talker.error('Failed to get initial shortcut', e, st);
     return null;
   }
 }
