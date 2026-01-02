@@ -65,30 +65,30 @@ class Routes {
 
   static Uri radarList() => Uri.parse('$onlyapi/v1/tiles/radar/list');
 
-  static Uri weatherList() => Uri.parse('$onlyapi/v1/meteor/weather/list');
+  static Uri weatherList() => Uri.parse('$onlyapi/v2/meteor/weather/list');
 
   static Uri weather(String time) =>
-      Uri.parse('$onlyapi/v1/meteor/weather/$time');
+      Uri.parse('$onlyapi/v2/meteor/weather/$time');
 
   static Uri meteorStation(String id) =>
-      Uri.parse('$onlyapi/v1/meteor/station/$id');
+      Uri.parse('$onlyapi/v2/meteor/station/$id');
 
   static Uri event(String id) => Uri.parse('$onlyapi/v1/dpip/event/$id');
 
-  static Uri rainList() => Uri.parse('$onlyapi/v1/meteor/rain/list');
+  static Uri rainList() => Uri.parse('$onlyapi/v2/meteor/rain/list');
 
-  static Uri rain(String time) => Uri.parse('$onlyapi/v1/meteor/rain/$time');
+  static Uri rain(String time) => Uri.parse('$onlyapi/v2/meteor/rain/$time');
 
   static Uri typhoonImagesList() =>
-      Uri.parse('$onlyapi/v1/meteor/typhoon/images/list');
+      Uri.parse('$onlyapi/v2/meteor/typhoon/images/list');
 
   static Uri typhoonGeojson() =>
-      Uri.parse('$onlyapi/v1/meteor/typhoon/geojson');
+      Uri.parse('$onlyapi/v2/meteor/typhoon/geojson');
 
-  static Uri lightningList() => Uri.parse('$onlyapi/v1/meteor/lightning/list');
+  static Uri lightningList() => Uri.parse('$onlyapi/v2/meteor/lightning/list');
 
   static Uri lightning(String time) =>
-      Uri.parse('$onlyapi/v1/meteor/lightning/$time');
+      Uri.parse('$onlyapi/v2/meteor/lightning/$time');
 
   static Uri realtime() => Uri.parse('$onlyapi/v1/dpip/realtime/list');
 
