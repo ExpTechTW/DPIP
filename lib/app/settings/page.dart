@@ -443,6 +443,23 @@ class SettingsIndexPage extends StatelessWidget {
           ],
         ),
 
+        SegmentedList(
+          children: [
+            SegmentedListTile(
+              isFirst: true,
+              isLast: true,
+              leading: ContainedIcon(
+                Symbols.science_rounded,
+                color: context.colors.onSurfaceVariant,
+              ),
+              title: Text('實驗性功能'.i18n),
+              subtitle: Text('搶先體驗開發中的新功能'.i18n),
+              trailing: const Icon(Symbols.chevron_right_rounded),
+              onTap: () => SettingsExperimentalRoute().push(context),
+            ),
+          ],
+        ),
+
         // Footer
         _buildFooter(context),
       ],

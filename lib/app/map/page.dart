@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/managers/lightning.dart';
 import 'package:dpip/app/map/_lib/managers/monitor.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MapPageOptions {
@@ -318,7 +320,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         return;
       }
     }
-    Navigator.of(context).pop();
+    context.go(HomePage.route);
   }
 
   @override

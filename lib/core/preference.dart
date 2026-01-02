@@ -64,6 +64,10 @@ class PreferenceKeys {
   static const proxyHost = 'network:proxy:host';
   static const proxyPort = 'network:proxy:port';
   // #endregion
+
+  // #region Experimental
+  static const experimentalLaunchToMonitor = 'experimental:launchToMonitor';
+  // #endregion
 }
 
 class Preference {
@@ -238,5 +242,12 @@ class Preference {
   static int? get proxyPort => instance.getInt(PreferenceKeys.proxyPort);
   static set proxyPort(int? value) =>
       instance.set(PreferenceKeys.proxyPort, value);
+  // #endregion
+
+  // #region Experimental
+  static bool? get experimentalLaunchToMonitor =>
+      instance.getBool(PreferenceKeys.experimentalLaunchToMonitor);
+  static set experimentalLaunchToMonitor(bool? value) =>
+      instance.set(PreferenceKeys.experimentalLaunchToMonitor, value);
   // #endregion
 }

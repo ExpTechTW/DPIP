@@ -27,6 +27,7 @@ import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/theme/color/page.dart';
 import 'package:dpip/app/settings/theme/mode/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
+import 'package:dpip/app/settings/experimental/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
@@ -149,6 +150,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
         TypedGoRoute<SettingsUnitRoute>(path: 'unit'),
         TypedGoRoute<SettingsMapRoute>(path: 'map'),
         TypedGoRoute<SettingsProxyRoute>(path: 'proxy'),
+        TypedGoRoute<SettingsExperimentalRoute>(path: 'experimental'),
         TypedGoRoute<SettingsNotifyRoute>(
           path: 'notify',
           routes: <TypedGoRoute<GoRouteData>>[
@@ -206,6 +208,7 @@ class SettingsShellRoute extends ShellRouteData {
       '/settings/unit' => '單位'.i18n,
       '/settings/map' => '地圖'.i18n,
       '/settings/proxy' => 'HTTP 代理'.i18n,
+      '/settings/experimental' => '實驗性功能'.i18n,
       '/settings/notify' => '通知'.i18n,
       '/settings/notify/eew' => '緊急地震速報'.i18n,
       '/settings/notify/monitor' => '強震監視器'.i18n,
@@ -368,6 +371,18 @@ class SettingsProxyRoute extends GoRouteData with $SettingsProxyRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const Material(child: SettingsProxyPage());
+  }
+}
+
+/// Settings experimental route - displays experimental features settings.
+class SettingsExperimentalRoute extends GoRouteData
+    with $SettingsExperimentalRoute {
+  /// Creates a [SettingsExperimentalRoute].
+  const SettingsExperimentalRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const Material(child: SettingsExperimentalPage());
   }
 }
 
@@ -577,9 +592,14 @@ final router = GoRouter(
   redirect: (context, state) {
     // Handle initial location logic
     if (state.matchedLocation == '/' || state.matchedLocation.isEmpty) {
-      return Preference.isFirstLaunch
-          ? const WelcomeRoute().location
-          : const HomeRoute().location;
+      if (Preference.isFirstLaunch) {
+        return const WelcomeRoute().location;
+      }
+      // Experimental: Launch to monitor if enabled
+      if (Preference.experimentalLaunchToMonitor == true) {
+        return const MapRoute(layers: 'monitor').location;
+      }
+      return const HomeRoute().location;
     }
     return null;
   },
