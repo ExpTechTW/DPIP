@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   String? _lastRefreshCode;
   bool _isFirstRefresh = true;
+  String? _temporaryLocationCode;
 
   History? get _thunderstorm => _realtimeRegion
       ?.where((e) => e.type == HistoryType.thunderstorm)
@@ -192,12 +193,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
+  String? get _effectiveLocationCode =>
+      _temporaryLocationCode ?? GlobalProviders.location.code;
+
   Future<void> _refresh() async {
     if (_isLoading) return;
 
-    await _reloadLocationData();
+    if (_temporaryLocationCode == null) {
+      await _reloadLocationData();
+    }
 
-    final code = GlobalProviders.location.code;
+    final code = _effectiveLocationCode;
 
     final isOutOfService = _checkIfOutOfService(code);
 
@@ -245,6 +251,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  void _onTemporaryLocationChanged(String? code) {
+    setState(() {
+      _temporaryLocationCode = code;
+    });
+    _refresh();
+  }
+
   Future<void> _reloadLocationData() async {
     if (GlobalProviders.location.auto) {
       await updateLocationFromGPS();
@@ -265,6 +278,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _checkIfOutOfService(String? code) {
     if (code == null) return true;
 
+    if (_temporaryLocationCode != null) return false;
+
     final auto = GlobalProviders.location.auto;
     final location = Global.location[code];
 
@@ -283,7 +298,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     try {
       LatLng? coords;
-      if (Preference.locationLatitude != null &&
+
+      if (_temporaryLocationCode != null) {
+        final location = Global.location[_temporaryLocationCode];
+        if (location != null) {
+          coords = LatLng(location.lat, location.lng);
+        }
+      } else if (Preference.locationLatitude != null &&
           Preference.locationLongitude != null) {
         coords = LatLng(
           Preference.locationLatitude!,
@@ -494,7 +515,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: RepaintBoundary(
               child: Align(
                 alignment: Alignment.topCenter,
-                child: const LocationButton(),
+                child: LocationButton(
+                  temporaryCode: _temporaryLocationCode,
+                  onLocationChanged: _onTemporaryLocationChanged,
+                ),
               ),
             ),
           ),
