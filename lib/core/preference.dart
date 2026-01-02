@@ -67,6 +67,7 @@ class PreferenceKeys {
 
   // #region Experimental
   static const experimentalLaunchToMonitor = 'experimental:launchToMonitor';
+  static const experimentalEewAllSource = 'experimental:eewAllSource';
   // #endregion
 }
 
@@ -249,5 +250,10 @@ class Preference {
       instance.getBool(PreferenceKeys.experimentalLaunchToMonitor);
   static set experimentalLaunchToMonitor(bool? value) =>
       instance.set(PreferenceKeys.experimentalLaunchToMonitor, value);
+
+  static bool? get experimentalEewAllSource =>
+      instance.getBool(PreferenceKeys.experimentalEewAllSource);
+  static set experimentalEewAllSource(bool? value) =>
+      instance.set(PreferenceKeys.experimentalEewAllSource, value);
   // #endregion
 }

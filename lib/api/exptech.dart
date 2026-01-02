@@ -225,10 +225,15 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
-      return (jsonDecode(res.body) as List<dynamic>)
-          .map((e) => Eew.fromJson(e as Map<String, dynamic>))
-          .where((e) => e.agency == 'cwa')
-          .toList();
+      final eewList = (jsonDecode(res.body) as List<dynamic>).map(
+        (e) => Eew.fromJson(e as Map<String, dynamic>),
+      );
+
+      if (Preference.experimentalEewAllSource == true) {
+        return eewList.toList();
+      }
+
+      return eewList.where((e) => e.agency == 'cwa').toList();
     } else {
       throw HttpException(
         'The server returned a status of ${res.statusCode}',

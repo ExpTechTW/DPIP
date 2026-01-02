@@ -17,6 +17,7 @@ class SettingsExperimentalPage extends StatefulWidget {
 
 class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
   bool _launchToMonitor = Preference.experimentalLaunchToMonitor ?? false;
+  bool _eewAllSource = Preference.experimentalEewAllSource ?? false;
 
   Future<void> _showEnableWarningDialog({
     required String featureName,
@@ -46,6 +47,21 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
     } else {
       setState(() => _launchToMonitor = false);
       Preference.experimentalLaunchToMonitor = false;
+    }
+  }
+
+  void _toggleEewAllSource(bool value) {
+    if (value) {
+      _showEnableWarningDialog(
+        featureName: '地震速報不限制非 CWA 來源'.i18n,
+        onConfirm: () {
+          setState(() => _eewAllSource = true);
+          Preference.experimentalEewAllSource = true;
+        },
+      );
+    } else {
+      setState(() => _eewAllSource = false);
+      Preference.experimentalEewAllSource = false;
     }
   }
 
@@ -184,6 +200,27 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
                 onChanged: _toggleLaunchToMonitor,
               ),
               onTap: () => _toggleLaunchToMonitor(!_launchToMonitor),
+            ),
+          ],
+        ),
+
+        SegmentedList(
+          label: Text('地震速報'.i18n),
+          children: [
+            SegmentedListTile(
+              isFirst: true,
+              isLast: true,
+              leading: _buildIconContainer(
+                icon: Symbols.earthquake_rounded,
+                color: Colors.orange,
+              ),
+              title: Text('不限制非 CWA 來源'.i18n),
+              subtitle: Text('顯示所有來源的地震速報資料'.i18n),
+              trailing: Switch(
+                value: _eewAllSource,
+                onChanged: _toggleEewAllSource,
+              ),
+              onTap: () => _toggleEewAllSource(!_eewAllSource),
             ),
           ],
         ),
