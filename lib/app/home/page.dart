@@ -817,46 +817,57 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String timeStr = '--:--';
     if (hasData) {
       final dt = DateTime.fromMillisecondsSinceEpoch(weather.time);
+      final hour = dt.hour;
+      final hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+      final period = hour < 12 ? '上午'.i18n : '下午'.i18n;
       timeStr =
-          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+          '$period ${hour12.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     }
 
-    final chipBgColor = context.colors.surfaceContainerHighest;
-    final labelStyle = context.texts.labelSmall?.copyWith(
-      color: context.colors.onSurfaceVariant,
-      fontSize: 10,
-    );
-    final valueStyle = context.texts.labelSmall?.copyWith(
-      color: context.colors.onSurface,
-      fontSize: 11,
-      fontWeight: FontWeight.w500,
-    );
+    String stationLabel = '--';
+    if (hasData) {
+      stationLabel = weather.station.name;
+      if (weather.station.distance >= 0) {
+        stationLabel += '・${weather.station.distance.toStringAsFixed(1)}km';
+      }
+    }
 
-    Widget buildChip(String label, String value, IconData icon) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: chipBgColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 12,
-              color: context.colors.onSurfaceVariant.withValues(alpha: 0.7),
+    Widget buildChip(String label, String value, Color color) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.25),
+                width: 0.5,
+              ),
             ),
-            const SizedBox(width: 4),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(label, style: labelStyle),
-                Text(value, style: valueStyle),
+                Text(
+                  label,
+                  style: context.texts.labelSmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 8,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: context.texts.bodySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
-          ],
+          ),
         ),
       );
     }
@@ -871,52 +882,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Symbols.pin_drop_rounded,
-                        size: 14,
-                        color: context.colors.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '觀測點'.i18n,
-                        style: context.texts.labelMedium?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        hasData ? weather.station.name : '--',
-                        style: context.texts.labelMedium?.copyWith(
-                          color: context.colors.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  Icon(
+                    Symbols.pin_drop_rounded,
+                    size: 14,
+                    color: context.colors.primary,
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Symbols.schedule_rounded,
-                        size: 12,
-                        color: context.colors.onSurfaceVariant,
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      stationLabel,
+                      style: context.texts.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: context.colors.onSurface,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        timeStr,
-                        style: context.texts.labelSmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    timeStr,
+                    style: context.texts.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: context.colors.onSurface,
+                    ),
                   ),
                 ],
               ),
@@ -928,51 +918,44 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   buildChip(
                     '濕度'.i18n,
                     hasData && weather.data.humidity >= 0
-                        ? '${weather.data.humidity.round()}%'
-                        : '--',
-                    Symbols.water_drop_rounded,
+                        ? '${weather.data.humidity.round().toString().padLeft(3)}%'
+                        : '---',
+                    Colors.cyan,
                   ),
                   buildChip(
                     '氣壓'.i18n,
                     hasData && weather.data.pressure >= 0
-                        ? '${weather.data.pressure.round()}hPa'
-                        : '--',
-                    Symbols.compress_rounded,
+                        ? '${weather.data.pressure.round().toString().padLeft(4)}hPa'
+                        : '----',
+                    Colors.purple,
                   ),
                   buildChip(
                     '降雨'.i18n,
                     hasData && weather.data.rain >= 0
-                        ? '${weather.data.rain}mm'
-                        : '--',
-                    Symbols.rainy_rounded,
+                        ? '${weather.data.rain.toStringAsFixed(1).padLeft(5)}mm'
+                        : '----',
+                    Colors.blue,
                   ),
                   buildChip(
                     '能見度'.i18n,
                     hasData && weather.data.visibility >= 0
-                        ? '${weather.data.visibility.round()}km'
+                        ? '${weather.data.visibility.round().toString().padLeft(2)}km'
                         : '--',
-                    Symbols.visibility_rounded,
+                    Colors.amber,
                   ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
                   buildChip(
                     '風速'.i18n,
                     hasData && weather.data.wind.speed >= 0
-                        ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed}m/s'
-                        : '--',
-                    Symbols.air_rounded,
+                        ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed.toStringAsFixed(1)}m/s'
+                        : '----',
+                    Colors.teal,
                   ),
                   buildChip(
                     '陣風'.i18n,
-                    hasData && weather.data.gust.speed > 0
-                        ? '${weather.data.gust.speed}m/s'
-                        : '--',
-                    Symbols.storm_rounded,
+                    hasData && weather.data.gust.speed >= 0
+                        ? '${weather.data.gust.speed.toStringAsFixed(1).padLeft(4)}m/s'
+                        : '----',
+                    Colors.orange,
                   ),
                 ],
               ),
