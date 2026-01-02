@@ -716,121 +716,123 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: context.colors.surfaceContainer,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Symbols.pin_drop_rounded,
-                      size: 14,
-                      color: context.colors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '觀測點'.i18n,
-                      style: context.texts.labelMedium?.copyWith(
+    return ResponsiveContainer(
+      child:  Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Symbols.pin_drop_rounded,
+                        size: 14,
+                        color: context.colors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '觀測點'.i18n,
+                        style: context.texts.labelMedium?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        hasData ? weather.station.name : '--',
+                        style: context.texts.labelMedium?.copyWith(
+                          color: context.colors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Symbols.schedule_rounded,
+                        size: 12,
                         color: context.colors.onSurfaceVariant,
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      hasData ? weather.station.name : '--',
-                      style: context.texts.labelMedium?.copyWith(
-                        color: context.colors.onSurface,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(width: 4),
+                      Text(
+                        timeStr,
+                        style: context.texts.labelSmall?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Symbols.schedule_rounded,
-                      size: 12,
-                      color: context.colors.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      timeStr,
-                      style: context.texts.labelSmall?.copyWith(
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                buildChip(
-                  '濕度'.i18n,
-                  hasData && weather.data.humidity >= 0
-                      ? '${weather.data.humidity.round()}%'
-                      : '--',
-                  Symbols.water_drop_rounded,
-                ),
-                buildChip(
-                  '氣壓'.i18n,
-                  hasData && weather.data.pressure >= 0
-                      ? '${weather.data.pressure.round()}hPa'
-                      : '--',
-                  Symbols.compress_rounded,
-                ),
-                buildChip(
-                  '降雨'.i18n,
-                  hasData && weather.data.rain >= 0
-                      ? '${weather.data.rain}mm'
-                      : '--',
-                  Symbols.rainy_rounded,
-                ),
-                buildChip(
-                  '能見度'.i18n,
-                  hasData && weather.data.visibility >= 0
-                      ? '${weather.data.visibility.round()}km'
-                      : '--',
-                  Symbols.visibility_rounded,
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                buildChip(
-                  '風速'.i18n,
-                  hasData && weather.data.wind.speed >= 0
-                      ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed}m/s'
-                      : '--',
-                  Symbols.air_rounded,
-                ),
-                buildChip(
-                  '陣風'.i18n,
-                  hasData && weather.data.gust.speed > 0
-                      ? '${weather.data.gust.speed}m/s'
-                      : '--',
-                  Symbols.storm_rounded,
-                ),
-              ],
-            ),
-          ],
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  buildChip(
+                    '濕度'.i18n,
+                    hasData && weather.data.humidity >= 0
+                        ? '${weather.data.humidity.round()}%'
+                        : '--',
+                    Symbols.water_drop_rounded,
+                  ),
+                  buildChip(
+                    '氣壓'.i18n,
+                    hasData && weather.data.pressure >= 0
+                        ? '${weather.data.pressure.round()}hPa'
+                        : '--',
+                    Symbols.compress_rounded,
+                  ),
+                  buildChip(
+                    '降雨'.i18n,
+                    hasData && weather.data.rain >= 0
+                        ? '${weather.data.rain}mm'
+                        : '--',
+                    Symbols.rainy_rounded,
+                  ),
+                  buildChip(
+                    '能見度'.i18n,
+                    hasData && weather.data.visibility >= 0
+                        ? '${weather.data.visibility.round()}km'
+                        : '--',
+                    Symbols.visibility_rounded,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  buildChip(
+                    '風速'.i18n,
+                    hasData && weather.data.wind.speed >= 0
+                        ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed}m/s'
+                        : '--',
+                    Symbols.air_rounded,
+                  ),
+                  buildChip(
+                    '陣風'.i18n,
+                    hasData && weather.data.gust.speed > 0
+                        ? '${weather.data.gust.speed}m/s'
+                        : '--',
+                    Symbols.storm_rounded,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
