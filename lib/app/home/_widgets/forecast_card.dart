@@ -201,7 +201,7 @@ class ForecastCard extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(7),
                     border: Border.all(
-                      color: context.colors.outline.withValues(alpha: 0.3),
+                      color: context.colors.outline,
                       width: 1,
                     ),
                   ),
