@@ -776,7 +776,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(item.icon, size: 16, color: item.color),
+                  child: Icon(item.icon, size: 20, color: item.color),
                 ),
               ),
             ),
