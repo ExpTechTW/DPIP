@@ -22,51 +22,21 @@ const reorderableSections = [
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
 
-  String get _themeMode => Preference.themeMode ?? 'system';
-  int? get _themeColor => Preference.themeColor;
-  Locale? get _locale => Preference.locale?.asLocale;
-  bool get _useFahrenheit => Preference.useFahrenheit ?? false;
+  late String _currentThemeMode;
+  late int? _currentThemeColor;
+  late String? _currentLocale;
+  late bool _currentUseFahrenheit;
   late List<HomeDisplaySection> homeSections;
-  final savedList = Preference.homeDisplaySections;
-
-  ThemeMode get themeMode => ThemeMode.values.byName(_themeMode);
-  void setThemeMode(ThemeMode value) {
-    Preference.themeMode = value.name;
-
-    _log('Changed ${PreferenceKeys.themeMode} to ${Preference.themeMode}');
-    notifyListeners();
-  }
-
-  Color? get themeColor => _themeColor == null ? null : Color(_themeColor!);
-  void setThemeColor(Color? color) {
-    final colorInt = color?.toARGB32();
-
-    Preference.themeColor = colorInt;
-
-    _log('Changed ${PreferenceKeys.themeColor} to ${Preference.themeColor}');
-    notifyListeners();
-  }
-
-  Locale? get locale => _locale;
-  void setLocale(Locale? value) {
-    Preference.locale = value?.toLanguageTag();
-    AppLocalizations.locale = value ?? Platform.localeName.asLocale;
-
-    _log('Changed ${PreferenceKeys.locale} to ${Preference.locale}');
-    notifyListeners();
-  }
-
-  bool get useFahrenheit => _useFahrenheit;
-  void setUseFahrenheit(bool value) {
-    Preference.useFahrenheit = value;
-
-    _log(
-      'Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}',
-    );
-    notifyListeners();
-  }
 
   SettingsUserInterfaceModel() {
+    _currentThemeMode = Preference.themeMode ?? 'system';
+    _currentThemeColor = Preference.themeColor;
+    _currentLocale = Preference.locale;
+    _currentUseFahrenheit = Preference.useFahrenheit ?? false;
+
+    _log('Initialized: themeMode=$_currentThemeMode');
+
+    final savedList = Preference.homeDisplaySections;
     if (savedList.isEmpty) {
       homeSections = HomeDisplaySection.values.toList();
     } else {
@@ -80,6 +50,45 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
           .toList();
       homeSections = saved;
     }
+  }
+
+  ThemeMode get themeMode => ThemeMode.values.byName(_currentThemeMode);
+  void setThemeMode(ThemeMode value) {
+    _currentThemeMode = value.name;
+    Preference.themeMode = value.name;
+
+    _log('Changed themeMode to $_currentThemeMode');
+    notifyListeners();
+  }
+
+  Color? get themeColor =>
+      _currentThemeColor == null ? null : Color(_currentThemeColor!);
+  void setThemeColor(Color? color) {
+    final colorInt = color?.toARGB32();
+    _currentThemeColor = colorInt;
+    Preference.themeColor = colorInt;
+
+    _log('Changed themeColor to $_currentThemeColor');
+    notifyListeners();
+  }
+
+  Locale? get locale => _currentLocale?.asLocale;
+  void setLocale(Locale? value) {
+    _currentLocale = value?.toLanguageTag();
+    Preference.locale = _currentLocale;
+    AppLocalizations.locale = value ?? Platform.localeName.asLocale;
+
+    _log('Changed locale to $_currentLocale');
+    notifyListeners();
+  }
+
+  bool get useFahrenheit => _currentUseFahrenheit;
+  void setUseFahrenheit(bool value) {
+    _currentUseFahrenheit = value;
+    Preference.useFahrenheit = value;
+
+    _log('Changed useFahrenheit to $_currentUseFahrenheit');
+    notifyListeners();
   }
 
   bool isEnabled(HomeDisplaySection section) => homeSections.contains(section);
