@@ -9,7 +9,11 @@ import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/forecast_card.dart';
 import 'package:dpip/app/home/_widgets/hero_weather.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
 import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
 import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
@@ -34,7 +38,6 @@ import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
-import 'package:m3e_collection/m3e_collection.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +57,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   final _locationButtonKey = GlobalKey();
-  final _scrollController = ScrollController();
   DraggableScrollableController _sheetController =
       DraggableScrollableController();
 
@@ -65,7 +67,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   double? _locationButtonHeight;
 
   final _blurNotifier = ValueNotifier<double>(0.0);
-  final _sheetSizeNotifier = ValueNotifier<double>(0.5);
+  final _isFullyExpandedNotifier = ValueNotifier<bool>(false);
 
   final _firstCardKey = GlobalKey();
   double? _measuredFirstCardHeight;
@@ -143,13 +145,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onSheetChanged() {
     final size = _sheetController.size;
-    _sheetSizeNotifier.value = size;
     final screenHeight = MediaQuery.of(context).size.height;
     final baseSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
-    final progress = ((size - baseSize) / (0.95 - baseSize)).clamp(0.0, 1.0);
-    final newBlur = progress * 15.0;
-    if ((newBlur - _blurNotifier.value).abs() > 0.3) {
+    final progress = ((size - baseSize) / (1.0 - baseSize)).clamp(0.0, 1.0);
+    final newBlur = (progress * 15.0 / 3.0).round() * 3.0;
+    if ((_blurNotifier.value - newBlur).abs() >= 2.9) {
       _blurNotifier.value = newBlur;
+    }
+    final isFullyExpanded = size >= 0.99;
+    if (_isFullyExpandedNotifier.value != isFullyExpanded) {
+      _isFullyExpandedNotifier.value = isFullyExpanded;
     }
   }
 
@@ -157,10 +162,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void dispose() {
     _sheetController.removeListener(_onSheetChanged);
     _blurNotifier.dispose();
-    _sheetSizeNotifier.dispose();
+    _isFullyExpandedNotifier.dispose();
     WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
-    _scrollController.dispose();
     _sheetController.dispose();
     super.dispose();
   }
@@ -398,10 +402,62 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       imagePath: wallpaperPath,
     );
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
+    final handleHeight = 28.0 / screenHeight;
+    final minSize = handleHeight.clamp(0.03, 0.05);
+    final snapSizes = [minSize, baseSnapSize, 1.0];
+
     return Stack(
       children: [
         Positioned.fill(
-          child: shaderBackground,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onVerticalDragUpdate: (details) {
+              if (!_sheetController.isAttached) return;
+              final delta = -details.primaryDelta! / screenHeight;
+              final newSize = (_sheetController.size + delta).clamp(
+                minSize,
+                1.0,
+              );
+              _sheetController.jumpTo(newSize);
+            },
+            onVerticalDragEnd: (details) {
+              if (!_sheetController.isAttached) return;
+              final currentSize = _sheetController.size;
+              final velocity = details.primaryVelocity ?? 0;
+
+              double targetSnap;
+              if (velocity.abs() > 500) {
+                if (velocity > 0) {
+                  targetSnap =
+                      snapSizes.where((s) => s < currentSize).lastOrNull ??
+                      snapSizes.first;
+                } else {
+                  targetSnap =
+                      snapSizes.where((s) => s > currentSize).firstOrNull ??
+                      snapSizes.last;
+                }
+              } else {
+                targetSnap = snapSizes.first;
+                double minDist = (currentSize - targetSnap).abs();
+                for (final snap in snapSizes) {
+                  final dist = (currentSize - snap).abs();
+                  if (dist < minDist) {
+                    minDist = dist;
+                    targetSnap = snap;
+                  }
+                }
+              }
+
+              _sheetController.animateTo(
+                targetSnap,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+              );
+            },
+            child: shaderBackground,
+          ),
         ),
         Positioned(
           top: 0,
@@ -409,26 +465,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           right: 0,
           child: _buildHeroSection(),
         ),
-        ValueListenableBuilder<double>(
-          valueListenable: _blurNotifier,
-          builder: (context, blurAmount, child) {
-            if (blurAmount <= 0) return const SizedBox.shrink();
-            return Positioned.fill(
-              child: IgnorePointer(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: blurAmount,
-                    sigmaY: blurAmount,
+        Positioned(
+          top: 24,
+          left: 24,
+          child: SafeArea(
+            child: Selector<SettingsMapModel, Set<MapLayer>>(
+              selector: (context, model) => model.layers,
+              builder: (context, layers, child) {
+                return BlurredIconButton(
+                  icon: const Icon(Symbols.map_rounded),
+                  tooltip: '地圖',
+                  onPressed: () => context.push(
+                    MapPage.route(
+                      options: MapPageOptions(initialLayers: layers),
+                    ),
                   ),
-                  child: ColoredBox(
-                    color: Colors.black.withValues(alpha: blurAmount / 60),
-                  ),
-                ),
-              ),
-            );
-          },
+                  elevation: 2,
+                );
+              },
+            ),
+          ),
         ),
-        _buildDraggableSheet(homeSections),
+        Positioned(
+          top: 24,
+          right: 24,
+          child: SafeArea(
+            child: BlurredIconButton(
+              icon: const Icon(Symbols.settings_rounded),
+              tooltip: '設定',
+              onPressed: () => context.push('/settings'),
+              elevation: 2,
+            ),
+          ),
+        ),
         Positioned(
           top: 24,
           left: 0,
@@ -440,6 +509,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
         ),
+        ValueListenableBuilder<double>(
+          valueListenable: _blurNotifier,
+          builder: (context, blurAmount, child) {
+            if (blurAmount <= 0) return const SizedBox.shrink();
+            return Positioned.fill(
+              child: IgnorePointer(
+                child: RepaintBoundary(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: blurAmount,
+                      sigmaY: blurAmount,
+                    ),
+                    child: ColoredBox(
+                      color: Colors.black.withValues(alpha: blurAmount / 45),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        _buildDraggableSheet(homeSections),
       ],
     );
   }
@@ -447,47 +538,51 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildDraggableSheet(Set<HomeDisplaySection> homeSections) {
     final screenHeight = MediaQuery.of(context).size.height;
     final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
-    final initialSize = _measuredFirstCardHeight == null ? 0.05 : baseSnapSize;
+    final handleHeight = 28.0 / screenHeight;
+    final minSize = handleHeight.clamp(0.03, 0.05);
+    final initialSize = _measuredFirstCardHeight == null
+        ? minSize
+        : baseSnapSize;
+    final snapSizes = [minSize, baseSnapSize, 1.0];
 
     return DraggableScrollableSheet(
       key: _sheetKey,
       controller: _sheetController,
       initialChildSize: initialSize,
-      minChildSize: 0.05,
-      maxChildSize: 0.95,
+      minChildSize: minSize,
+      maxChildSize: 1.0,
       snap: true,
-      snapSizes: [0.05, baseSnapSize, 0.95],
+      snapSizes: snapSizes,
       builder: (context, scrollController) {
-        return ListView(
+        return SingleChildScrollView(
           controller: scrollController,
-          padding: EdgeInsets.zero,
-          children: [
-            ValueListenableBuilder<double>(
-              valueListenable: _sheetSizeNotifier,
-              builder: (context, size, child) {
-                final opacity = ((0.95 - size) / 0.1).clamp(0.0, 1.0);
-                if (opacity <= 0) return const SizedBox(height: 12);
-                return Opacity(
-                  opacity: opacity,
-                  child: child,
-                );
-              },
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  width: 32,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.colors.onSurfaceVariant.withValues(
-                      alpha: 0.4,
+          child: Column(
+            children: [
+              ValueListenableBuilder<bool>(
+                valueListenable: _isFullyExpandedNotifier,
+                builder: (context, isFullyExpanded, child) {
+                  return AnimatedOpacity(
+                    opacity: isFullyExpanded ? 0.0 : 1.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        width: 32,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: context.colors.onSurfaceVariant.withValues(
+                            alpha: 0.4,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                  );
+                },
               ),
-            ),
-            _buildContentSection(homeSections),
-          ],
+              _buildContentSection(homeSections),
+            ],
+          ),
         );
       },
     );
@@ -531,27 +626,54 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final List<Widget> allCards = [];
     bool isFirstCardSet = false;
 
-    allCards.add(_buildStationInfo());
+    final stationInfo = _buildStationInfo();
 
     if (!_isLoading) {
-      for (final widget in _buildRealtimeInfo()) {
-        if (!isFirstCardSet) {
-          allCards.add(KeyedSubtree(key: _firstCardKey, child: widget));
-          isFirstCardSet = true;
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _measureFirstCard(),
-          );
-        } else {
-          allCards.add(widget);
+      final realtimeWidgets = _buildRealtimeInfo();
+      if (realtimeWidgets.isNotEmpty) {
+        allCards.add(
+          KeyedSubtree(
+            key: _firstCardKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                stationInfo,
+                realtimeWidgets.first,
+              ],
+            ),
+          ),
+        );
+        isFirstCardSet = true;
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _measureFirstCard(),
+        );
+
+        for (var i = 1; i < realtimeWidgets.length; i++) {
+          allCards.add(realtimeWidgets[i]);
         }
+      } else {
+        allCards.add(stationInfo);
       }
+    } else {
+      allCards.add(stationInfo);
     }
 
     if (homeSections.isNotEmpty) {
       if (homeSections.contains(HomeDisplaySection.radar)) {
         final radarWidget = _buildRadarMap();
         if (!isFirstCardSet) {
-          allCards.add(KeyedSubtree(key: _firstCardKey, child: radarWidget));
+          allCards.add(
+            KeyedSubtree(
+              key: _firstCardKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (allCards.isNotEmpty) allCards.removeLast(),
+                  radarWidget,
+                ],
+              ),
+            ),
+          );
           isFirstCardSet = true;
           WidgetsBinding.instance.addPostFrameCallback(
             (_) => _measureFirstCard(),
@@ -717,7 +839,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     return ResponsiveContainer(
-      child:  Padding(
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         child: Container(
           padding: const EdgeInsets.all(10),
