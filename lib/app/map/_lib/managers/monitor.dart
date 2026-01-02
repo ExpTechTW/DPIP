@@ -91,7 +91,7 @@ class MonitorMapLayerManager extends MapLayerManager {
         12000;
   }
 
-  final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
+  final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.syncTime);
   final displayTimeNotifier = ValueNotifier<String>('N/A');
   final pingNotifier = ValueNotifier<double>(0);
   int? _lastDataReceivedTime;
@@ -791,7 +791,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   @override
   void tick() {
     if (!didSetup || !visible) return;
-
+    _lastDataReceivedTime = GlobalProviders.data.currentTime;
     final hasActiveEew = GlobalProviders.data.activeEew.isNotEmpty;
 
     if (hasActiveEew && !_isUpdatingEew) {

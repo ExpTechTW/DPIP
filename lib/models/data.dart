@@ -236,6 +236,13 @@ class DpipDataModel extends _DpipDataModel {
     notifyListeners();
   }
 
+  int? get syncTime {
+    if (_rts != null) return _rts!.time;
+    if (_isReplayMode) return currentTime;
+
+    return null;
+  }
+
   void setReplayMode(bool isReplay, [int? timestamp]) {
     _isReplayMode = isReplay;
     if (isReplay) {
