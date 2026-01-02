@@ -431,7 +431,6 @@ class SettingsIndexPage extends StatelessWidget {
               onTap: () => Preference.notifyToken.copy(),
             ),
             SegmentedListTile(
-              isLast: true,
               leading: ContainedIcon(
                 Symbols.bug_report_rounded,
                 color: context.colors.onSurfaceVariant,
@@ -440,13 +439,7 @@ class SettingsIndexPage extends StatelessWidget {
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => AppDebugLogsRoute().push(context),
             ),
-          ],
-        ),
-
-        SegmentedList(
-          children: [
             SegmentedListTile(
-              isFirst: true,
               isLast: true,
               leading: ContainedIcon(
                 Symbols.science_rounded,
