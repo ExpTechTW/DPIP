@@ -64,7 +64,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoading = false;
   bool _isOutOfService = false;
   bool _wasVisible = true;
-  double? _locationButtonHeight;
 
   final _blurNotifier = ValueNotifier<double>(0.0);
   final _isFullyExpandedNotifier = ValueNotifier<bool>(false);
@@ -148,8 +147,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final screenHeight = MediaQuery.of(context).size.height;
     final baseSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final progress = ((size - baseSize) / (1.0 - baseSize)).clamp(0.0, 1.0);
-    final newBlur = (progress * 15.0 / 3.0).round() * 3.0;
-    if ((_blurNotifier.value - newBlur).abs() >= 2.9) {
+    final newBlur = (progress * 15.0 / 5.0).round() * 5.0;
+    if ((_blurNotifier.value - newBlur).abs() >= 4.9) {
       _blurNotifier.value = newBlur;
     }
     final isFullyExpanded = size >= 0.99;
@@ -379,21 +378,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           (model) => model.homeSections,
         );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _locationButtonKey.currentContext != null) {
-        final RenderBox? box =
-            _locationButtonKey.currentContext!.findRenderObject() as RenderBox?;
-        if (box != null && box.hasSize) {
-          final newHeight = box.size.height;
-          if (_locationButtonHeight != newHeight) {
-            setState(() {
-              _locationButtonHeight = newHeight;
-            });
-          }
-        }
-      }
-    });
-
     final utc8Time = WallpaperSelector.getUtc8Time();
     final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
     final shaderConfig = ShaderSelector.selectShaderConfig(_weather);
@@ -456,33 +440,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 curve: Curves.easeOut,
               );
             },
-            child: shaderBackground,
+            child: RepaintBoundary(
+              child: shaderBackground,
+            ),
           ),
         ),
         Positioned(
           top: 0,
           left: 0,
           right: 0,
-          child: _buildHeroSection(),
+          child: RepaintBoundary(
+            child: _buildHeroSection(),
+          ),
         ),
         Positioned(
           top: 24,
           left: 24,
           child: SafeArea(
-            child: Selector<SettingsMapModel, Set<MapLayer>>(
-              selector: (context, model) => model.layers,
-              builder: (context, layers, child) {
-                return BlurredIconButton(
-                  icon: const Icon(Symbols.map_rounded),
-                  tooltip: '地圖',
-                  onPressed: () => context.push(
-                    MapPage.route(
-                      options: MapPageOptions(initialLayers: layers),
+            child: RepaintBoundary(
+              child: Selector<SettingsMapModel, Set<MapLayer>>(
+                selector: (context, model) => model.layers,
+                builder: (context, layers, child) {
+                  return BlurredIconButton(
+                    icon: const Icon(Symbols.map_rounded),
+                    tooltip: '地圖',
+                    onPressed: () => context.push(
+                      MapPage.route(
+                        options: MapPageOptions(initialLayers: layers),
+                      ),
                     ),
-                  ),
-                  elevation: 2,
-                );
-              },
+                    elevation: 2,
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -490,11 +480,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           top: 24,
           right: 24,
           child: SafeArea(
-            child: BlurredIconButton(
-              icon: const Icon(Symbols.settings_rounded),
-              tooltip: '設定',
-              onPressed: () => context.push('/settings'),
-              elevation: 2,
+            child: RepaintBoundary(
+              child: BlurredIconButton(
+                icon: const Icon(Symbols.settings_rounded),
+                tooltip: '設定',
+                onPressed: () => context.push('/settings'),
+                elevation: 2,
+              ),
             ),
           ),
         ),
@@ -503,9 +495,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           left: 0,
           right: 0,
           child: SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: LocationButton(key: _locationButtonKey),
+            child: RepaintBoundary(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: LocationButton(key: _locationButtonKey),
+              ),
             ),
           ),
         ),
@@ -513,16 +507,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           valueListenable: _blurNotifier,
           builder: (context, blurAmount, child) {
             if (blurAmount <= 0) return const SizedBox.shrink();
+            final filter = ImageFilter.blur(
+              sigmaX: blurAmount,
+              sigmaY: blurAmount,
+              tileMode: TileMode.clamp,
+            );
             return Positioned.fill(
               child: IgnorePointer(
                 child: RepaintBoundary(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: blurAmount,
-                      sigmaY: blurAmount,
-                    ),
-                    child: ColoredBox(
-                      color: Colors.black.withValues(alpha: blurAmount / 45),
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: filter,
+                      blendMode: BlendMode.srcOver,
+                      child: ColoredBox(
+                        color: Colors.black.withValues(alpha: blurAmount / 50),
+                      ),
                     ),
                   ),
                 ),
@@ -558,29 +557,33 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           controller: scrollController,
           child: Column(
             children: [
-              ValueListenableBuilder<bool>(
-                valueListenable: _isFullyExpandedNotifier,
-                builder: (context, isFullyExpanded, child) {
-                  return AnimatedOpacity(
-                    opacity: isFullyExpanded ? 0.0 : 1.0,
-                    duration: const Duration(milliseconds: 150),
-                    child: Center(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 12),
-                        width: 32,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: context.colors.onSurfaceVariant.withValues(
-                            alpha: 0.4,
+              RepaintBoundary(
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _isFullyExpandedNotifier,
+                  builder: (context, isFullyExpanded, child) {
+                    return AnimatedOpacity(
+                      opacity: isFullyExpanded ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 150),
+                      child: Center(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 12),
+                          width: 32,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: context.colors.onSurfaceVariant.withValues(
+                              alpha: 0.4,
+                            ),
+                            borderRadius: BorderRadius.circular(2),
                           ),
-                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-              _buildContentSection(homeSections),
+              RepaintBoundary(
+                child: _buildContentSection(homeSections),
+              ),
             ],
           ),
         );
