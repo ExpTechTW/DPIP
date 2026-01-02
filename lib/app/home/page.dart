@@ -531,6 +531,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final List<Widget> allCards = [];
     bool isFirstCardSet = false;
 
+    allCards.add(_buildStationInfo());
+
     if (!_isLoading) {
       for (final widget in _buildRealtimeInfo()) {
         if (!isFirstCardSet) {
@@ -566,10 +568,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           _weather != null) {
         allCards.add(_buildWindCard());
       }
-      allCards.add(_buildCommunityCards());
       if (homeSections.contains(HomeDisplaySection.history)) {
         allCards.add(_buildHistoryTimeline());
       }
+      allCards.add(_buildCommunityCards());
     } else if (GlobalProviders.location.code != null) {
       allCards.add(
         Padding(
@@ -602,176 +604,233 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildCommunityCards() {
-    return ResponsiveContainer(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Theme.of(
-              context,
-            ).colorScheme.outlineVariant.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 標題
-            Row(
-              children: [
-                Container(
+    final options = [
+      (
+        icon: SimpleIcons.discord,
+        color: const Color(0xFF5865F2),
+        url: 'https://exptech.com.tw/dc',
+      ),
+      (
+        icon: SimpleIcons.threads,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black,
+        url: 'https://www.threads.net/@dpip.tw',
+      ),
+      (
+        icon: SimpleIcons.youtube,
+        color: const Color(0xFFFF0000),
+        url: 'https://www.youtube.com/@exptechtw/live',
+      ),
+      (
+        icon: Symbols.favorite_rounded,
+        color: Theme.of(context).colorScheme.primary,
+        url: SettingsDonatePage.route,
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: options.map((item) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  if (item.url.startsWith('/')) {
+                    context.push(item.url);
+                  } else {
+                    launchUrl(Uri.parse(item.url));
+                  }
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Ink(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primaryContainer.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Symbols.group_rounded,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '社群'.i18n,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // 社群卡片
-            Row(
-              children: [
-                Expanded(
-                  child: _buildSocialCard(
-                    icon: SimpleIcons.discord,
-                    label: 'Discord',
-                    color: const Color(0xFF5865F2),
-                    onTap: () =>
-                        launchUrl(Uri.parse('https://exptech.com.tw/dc')),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildSocialCard(
-                    icon: SimpleIcons.threads,
-                    label: 'Threads',
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                    onTap: () => launchUrl(
-                      Uri.parse('https://www.threads.net/@dpip.tw'),
+                    color: context.colors.surfaceContainerLow.withValues(
+                      alpha: 0.6,
                     ),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(item.icon, size: 16, color: item.color),
                 ),
-              ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Row(
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildStationInfo() {
+    final weather = _weather;
+    final hasData = weather != null;
+
+    String timeStr = '--:--';
+    if (hasData) {
+      final dt = DateTime.fromMillisecondsSinceEpoch(weather.time);
+      timeStr =
+          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    }
+
+    final chipBgColor = context.colors.surfaceContainerHighest;
+    final labelStyle = context.texts.labelSmall?.copyWith(
+      color: context.colors.onSurfaceVariant,
+      fontSize: 10,
+    );
+    final valueStyle = context.texts.labelSmall?.copyWith(
+      color: context.colors.onSurface,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+    );
+
+    Widget buildChip(String label, String value, IconData icon) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: chipBgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 12,
+              color: context.colors.onSurfaceVariant.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 4),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: _buildSocialCard(
-                    icon: SimpleIcons.youtube,
-                    label: 'YouTube',
-                    color: const Color(0xFFFF0000),
-                    onTap: () => launchUrl(
-                      Uri.parse('https://www.youtube.com/@exptechtw/live'),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildDonateCard(),
-                ),
+                Text(label, style: labelStyle),
+                Text(value, style: valueStyle),
               ],
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildSocialCard({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 18, color: color),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDonateCard() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => context.push(SettingsDonatePage.route),
-        borderRadius: BorderRadius.circular(12),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primaryContainer,
-                Theme.of(context).colorScheme.tertiaryContainer,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Symbols.favorite_rounded,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Symbols.pin_drop_rounded,
+                      size: 14,
+                      color: context.colors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '觀測點'.i18n,
+                      style: context.texts.labelMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      hasData ? weather.station.name : '--',
+                      style: context.texts.labelMedium?.copyWith(
+                        color: context.colors.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '贊助我們'.i18n,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Symbols.schedule_rounded,
+                      size: 12,
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      timeStr,
+                      style: context.texts.labelSmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                buildChip(
+                  '濕度'.i18n,
+                  hasData && weather.data.humidity >= 0
+                      ? '${weather.data.humidity.round()}%'
+                      : '--',
+                  Symbols.water_drop_rounded,
+                ),
+                buildChip(
+                  '氣壓'.i18n,
+                  hasData && weather.data.pressure >= 0
+                      ? '${weather.data.pressure.round()}hPa'
+                      : '--',
+                  Symbols.compress_rounded,
+                ),
+                buildChip(
+                  '降雨'.i18n,
+                  hasData && weather.data.rain >= 0
+                      ? '${weather.data.rain}mm'
+                      : '--',
+                  Symbols.rainy_rounded,
+                ),
+                buildChip(
+                  '能見度'.i18n,
+                  hasData && weather.data.visibility >= 0
+                      ? '${weather.data.visibility.round()}km'
+                      : '--',
+                  Symbols.visibility_rounded,
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                buildChip(
+                  '風速'.i18n,
+                  hasData && weather.data.wind.speed >= 0
+                      ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed}m/s'
+                      : '--',
+                  Symbols.air_rounded,
+                ),
+                buildChip(
+                  '陣風'.i18n,
+                  hasData && weather.data.gust.speed > 0
+                      ? '${weather.data.gust.speed}m/s'
+                      : '--',
+                  Symbols.storm_rounded,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

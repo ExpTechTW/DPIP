@@ -24,98 +24,105 @@ class HistoryTimelineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasDetail = shouldShowArrow(history);
 
-    return InkWell(
-      onTap: hasDetail ? () => handleEventList(context, history) : null,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  Positioned(
-                    top: first ? 42 : 0,
-                    bottom: last ? 0 : 0,
-                    width: 1,
-                    child: Container(color: context.colors.outlineVariant),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Container(
-                      height: 42,
-                      width: 42,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: 36.5,
+          top: 0,
+          bottom: last ? null : -4,
+          height: last ? 4 : null,
+          width: 1,
+          child: Container(color: context.colors.outlineVariant),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainer,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: hasDetail ? () => handleEventList(context, history) : null,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: expired
-                            ? context.colors.surface
+                            ? context.colors.surfaceContainerHighest
                             : context.colors.primaryContainer,
-                        border: expired
-                            ? Border.all(color: context.colors.outlineVariant)
-                            : null,
                       ),
                       child: Icon(
                         getListIcon(history.icon),
+                        size: 20,
                         color: expired
                             ? context.colors.outline
                             : context.colors.onPrimaryContainer,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      DateFormat('HH:mm:ss').format(history.time.send),
-                      style: context.theme.textTheme.labelMedium?.copyWith(
-                        color: context.colors.outline.withValues(
-                          alpha: expired ? 0.6 : 1,
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('HH:mm:ss').format(history.time.send),
+                            style: context.theme.textTheme.labelSmall?.copyWith(
+                              color: context.colors.onSurfaceVariant.withValues(
+                                alpha: expired ? 0.6 : 1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            history.text.content['all']!.subtitle,
+                            style: context.theme.textTheme.titleSmall?.copyWith(
+                              color: context.colors.onSurface.withValues(
+                                alpha: expired ? 0.6 : 1,
+                              ),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            history.text.description['all']!,
+                            style: context.theme.textTheme.bodySmall?.copyWith(
+                              color: context.colors.onSurfaceVariant.withValues(
+                                alpha: expired ? 0.6 : 1,
+                              ),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      history.text.content['all']!.subtitle,
-                      style: context.theme.textTheme.titleMedium?.copyWith(
-                        color: context.colors.onSurface.withValues(
-                          alpha: expired ? 0.6 : 1,
+                    if (hasDetail)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Icon(
+                          Symbols.chevron_right_rounded,
+                          size: 20,
+                          color: context.colors.onSurfaceVariant,
                         ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      history.text.description['all']!,
-                      style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.colors.onSurface.withValues(
-                          alpha: expired ? 0.6 : 1,
-                        ),
-                      ),
-                      textAlign: TextAlign.justify,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
                   ],
                 ),
               ),
             ),
-            if (hasDetail)
-              Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: Icon(
-                  Symbols.chevron_right_rounded,
-                  color: context.colors.outline,
-                ),
-              ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
