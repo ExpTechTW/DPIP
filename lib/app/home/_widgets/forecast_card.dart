@@ -80,7 +80,7 @@ class ForecastCard extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 170,
+                height: 180,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -168,36 +168,33 @@ class ForecastCard extends StatelessWidget {
             ),
             child: _getWeatherIcon(weather, context),
           ),
-          if (pop > 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Symbols.water_drop_rounded,
-                  size: 8,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Symbols.water_drop_rounded,
+                size: 8,
+                color: Colors.blue,
+              ),
+              Text(
+                '$pop%',
+                style: TextStyle(
+                  fontSize: 8,
                   color: Colors.blue,
+                  fontWeight: FontWeight.w600,
                 ),
-                Text(
-                  '$pop%',
-                  style: TextStyle(
-                    fontSize: 8,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            )
-          else
-            const SizedBox(height: 10),
+              ),
+            ],
+          ),
           SizedBox(
-            height: 50,
+            height: 60,
             width: 14,
             child: Stack(
               alignment: Alignment.bottomCenter,
               children: [
                 Container(
                   width: 14,
-                  height: 50,
+                  height: 60,
                   decoration: BoxDecoration(
                     color: context.colors.surfaceContainerHighest.withValues(
                       alpha: 0.4,
@@ -210,7 +207,7 @@ class ForecastCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  bottom: tempPercent * 36,
+                  bottom: tempPercent * 46,
                   child: Container(
                     width: 14,
                     height: 14,
