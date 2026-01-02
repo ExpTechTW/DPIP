@@ -505,13 +505,19 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 API: GET $requestUrl');
 
+    final cacheKey = PreferenceKeys.weatherCache;
+    final etagKey = PreferenceKeys.weatherEtag;
+    final coordsKey = '${PreferenceKeys.weatherCache}:coords';
+    final currentCoords = '$lat:$lon';
+    final cachedCoords = Preference.instance.getString(coordsKey);
+
     final headers = <String, String>{};
-    final cachedEtag = Preference.instance.getString(
-      PreferenceKeys.weatherEtag,
-    );
-    if (cachedEtag != null) {
-      headers['If-None-Match'] = cachedEtag;
-      TalkerManager.instance.debug('🌐 API: Using ETag: $cachedEtag');
+    if (cachedCoords == currentCoords) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug('🌐 API: Using ETag: $cachedEtag');
+      }
     }
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
@@ -521,9 +527,7 @@ class ExpTech {
     );
 
     if (res.statusCode == 304) {
-      final cachedData = Preference.instance.getString(
-        PreferenceKeys.weatherCache,
-      );
+      final cachedData = Preference.instance.getString(cacheKey);
       if (cachedData != null) {
         TalkerManager.instance.debug(
           '🌐 API: Using cached data (304 Not Modified)',
@@ -547,12 +551,13 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      await Preference.instance.setString(PreferenceKeys.weatherEtag, etag);
+      await Preference.instance.setString(etagKey, etag);
       TalkerManager.instance.debug('🌐 API: Saved ETag: $etag');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    await Preference.instance.setString(PreferenceKeys.weatherCache, res.body);
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(coordsKey, currentCoords);
     TalkerManager.instance.debug('🌐 API: Saved cached data');
 
     TalkerManager.instance.debug('🌐 API: JSON decoded successfully');
@@ -568,13 +573,20 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Forecast API: GET $requestUrl');
 
+    final cacheKey = PreferenceKeys.forecastCache;
+    final etagKey = PreferenceKeys.forecastEtag;
+    final regionKey = '${PreferenceKeys.forecastCache}:region';
+    final cachedRegion = Preference.instance.getString(regionKey);
+
     final headers = <String, String>{};
-    final cachedEtag = Preference.instance.getString(
-      PreferenceKeys.forecastEtag,
-    );
-    if (cachedEtag != null) {
-      headers['If-None-Match'] = cachedEtag;
-      TalkerManager.instance.debug('🌐 Forecast API: Using ETag: $cachedEtag');
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 Forecast API: Using ETag: $cachedEtag',
+        );
+      }
     }
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
@@ -584,9 +596,7 @@ class ExpTech {
     );
 
     if (res.statusCode == 304) {
-      final cachedData = Preference.instance.getString(
-        PreferenceKeys.forecastCache,
-      );
+      final cachedData = Preference.instance.getString(cacheKey);
       if (cachedData != null) {
         TalkerManager.instance.debug(
           '🌐 Forecast API: Using cached data (304 Not Modified)',
@@ -609,12 +619,13 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      await Preference.instance.setString(PreferenceKeys.forecastEtag, etag);
+      await Preference.instance.setString(etagKey, etag);
       TalkerManager.instance.debug('🌐 Forecast API: Saved ETag: $etag');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
-    await Preference.instance.setString(PreferenceKeys.forecastCache, res.body);
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
     TalkerManager.instance.debug('🌐 Forecast API: Saved cached data');
 
     TalkerManager.instance.debug('🌐 Forecast API: Response JSON: $json');
@@ -872,16 +883,21 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 Realtime Region API: GET $requestUrl');
 
+    final cacheKey = PreferenceKeys.realtimeRegionCache;
+    final etagKey = PreferenceKeys.realtimeRegionEtag;
+    final regionKey = '${PreferenceKeys.realtimeRegionCache}:region';
+
     final headers = <String, String>{};
     await Preference.reload();
-    final cachedEtag = Preference.instance.getString(
-      PreferenceKeys.realtimeRegionEtag,
-    );
-    if (cachedEtag != null) {
-      headers['If-None-Match'] = cachedEtag;
-      TalkerManager.instance.debug(
-        '🌐 Realtime Region API: Using ETag: $cachedEtag',
-      );
+    final cachedRegion = Preference.instance.getString(regionKey);
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 Realtime Region API: Using ETag: $cachedEtag',
+        );
+      }
     }
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
@@ -891,9 +907,7 @@ class ExpTech {
     );
 
     if (res.statusCode == 304) {
-      final cachedData = Preference.instance.getString(
-        PreferenceKeys.realtimeRegionCache,
-      );
+      final cachedData = Preference.instance.getString(cacheKey);
       if (cachedData != null) {
         TalkerManager.instance.debug(
           '🌐 Realtime Region API: Using cached data (304 Not Modified)',
@@ -919,18 +933,13 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      await Preference.instance.setString(
-        PreferenceKeys.realtimeRegionEtag,
-        etag,
-      );
+      await Preference.instance.setString(etagKey, etag);
       TalkerManager.instance.debug('🌐 Realtime Region API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
-    await Preference.instance.setString(
-      PreferenceKeys.realtimeRegionCache,
-      res.body,
-    );
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
     TalkerManager.instance.debug('🌐 Realtime Region API: Saved cached data');
 
     return jsonData
@@ -943,16 +952,21 @@ class ExpTech {
 
     TalkerManager.instance.debug('🌐 History Region API: GET $requestUrl');
 
+    final cacheKey = PreferenceKeys.historyRegionCache;
+    final etagKey = PreferenceKeys.historyRegionEtag;
+    final regionKey = '${PreferenceKeys.historyRegionCache}:region';
+
     final headers = <String, String>{};
     await Preference.reload();
-    final cachedEtag = Preference.instance.getString(
-      PreferenceKeys.historyRegionEtag,
-    );
-    if (cachedEtag != null) {
-      headers['If-None-Match'] = cachedEtag;
-      TalkerManager.instance.debug(
-        '🌐 History Region API: Using ETag: $cachedEtag',
-      );
+    final cachedRegion = Preference.instance.getString(regionKey);
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 History Region API: Using ETag: $cachedEtag',
+        );
+      }
     }
 
     final res = await _sharedClient.get(requestUrl, headers: headers);
@@ -962,9 +976,7 @@ class ExpTech {
     );
 
     if (res.statusCode == 304) {
-      final cachedData = Preference.instance.getString(
-        PreferenceKeys.historyRegionCache,
-      );
+      final cachedData = Preference.instance.getString(cacheKey);
       if (cachedData != null) {
         TalkerManager.instance.debug(
           '🌐 History Region API: Using cached data (304 Not Modified)',
@@ -990,18 +1002,13 @@ class ExpTech {
 
     final etag = res.headers['etag'] ?? res.headers['ETag'];
     if (etag != null) {
-      await Preference.instance.setString(
-        PreferenceKeys.historyRegionEtag,
-        etag,
-      );
+      await Preference.instance.setString(etagKey, etag);
       TalkerManager.instance.debug('🌐 History Region API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
-    await Preference.instance.setString(
-      PreferenceKeys.historyRegionCache,
-      res.body,
-    );
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
     TalkerManager.instance.debug('🌐 History Region API: Saved cached data');
 
     return jsonData
