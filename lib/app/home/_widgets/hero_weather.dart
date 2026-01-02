@@ -20,26 +20,20 @@ class HeroWeather extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return SizedBox(
-      height: screenHeight,
+      height: screenHeight * 0.5,
       child: Stack(
         children: [
           Positioned(
-            top: statusBarHeight + 100,
-            left: 42,
+            top: statusBarHeight + 80,
+            left: 32,
+            right: 32,
             child: isLoading
                 ? _buildLoadingState(context)
                 : weather != null
                 ? _buildWeatherContent(context)
                 : _buildEmptyState(context),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: bottomPadding + 8,
-            child: _buildScrollHint(context),
           ),
         ],
       ),
@@ -191,26 +185,6 @@ class HeroWeather extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScrollHint(BuildContext context) {
-    return Column(
-      children: [
-        Icon(
-          Symbols.keyboard_arrow_up_rounded,
-          color: Colors.white.withValues(alpha: 0.25),
-          size: 16,
-        ),
-        const SizedBox(height: 2),
-        Text(
-          '向上滑動查看更多'.i18n,
-          style: context.texts.labelSmall?.copyWith(
-            color: Colors.white.withValues(alpha: 0.25),
-            fontSize: 10,
-          ),
         ),
       ],
     );

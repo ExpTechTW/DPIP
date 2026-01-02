@@ -55,13 +55,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   final _locationButtonKey = GlobalKey();
   final _scrollController = ScrollController();
+  DraggableScrollableController _sheetController =
+      DraggableScrollableController();
 
   Key _mapKey = UniqueKey();
   bool _isLoading = false;
   bool _isOutOfService = false;
   bool _wasVisible = true;
   double? _locationButtonHeight;
-  double _blurAmount = 0.0;
+
+  final _blurNotifier = ValueNotifier<double>(0.0);
+  final _sheetSizeNotifier = ValueNotifier<double>(0.5);
+
+  final _firstCardKey = GlobalKey();
+  double? _measuredFirstCardHeight;
+  Key _sheetKey = UniqueKey();
+
+  static const double _defaultFirstCardHeight = 280.0;
 
   RealtimeWeather? _weather;
   Map<String, dynamic>? _forecast;
@@ -81,28 +91,64 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkVersion();
+      _measureFirstCard();
+    });
     GlobalProviders.location.$code.addListener(_refresh);
-    _scrollController.addListener(_onScroll);
+    _sheetController.addListener(_onSheetChanged);
     _refresh();
   }
 
-  void _onScroll() {
+  void _measureFirstCard() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cardContext = _firstCardKey.currentContext;
+      if (cardContext != null) {
+        final box = cardContext.findRenderObject() as RenderBox?;
+        if (box != null && box.hasSize) {
+          final height = box.size.height + 28;
+          if ((_measuredFirstCardHeight == null) ||
+              ((_measuredFirstCardHeight! - height).abs() > 1)) {
+            _sheetController.removeListener(_onSheetChanged);
+            _sheetController.dispose();
+
+            setState(() {
+              _measuredFirstCardHeight = height;
+              _sheetKey = UniqueKey();
+              _sheetController = DraggableScrollableController();
+            });
+
+            _sheetController.addListener(_onSheetChanged);
+          }
+        }
+      }
+    });
+  }
+
+  double get _firstCardHeight =>
+      _measuredFirstCardHeight ?? _defaultFirstCardHeight;
+
+  void _onSheetChanged() {
+    final size = _sheetController.size;
+    _sheetSizeNotifier.value = size;
     final screenHeight = MediaQuery.of(context).size.height;
-    final offset = _scrollController.offset;
-    final progress = (offset / (screenHeight * 0.3)).clamp(0.0, 1.0);
+    final baseSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
+    final progress = ((size - baseSize) / (0.95 - baseSize)).clamp(0.0, 1.0);
     final newBlur = progress * 15.0;
-    if ((newBlur - _blurAmount).abs() > 0.5) {
-      setState(() => _blurAmount = newBlur);
+    if ((newBlur - _blurNotifier.value).abs() > 0.3) {
+      _blurNotifier.value = newBlur;
     }
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _sheetController.removeListener(_onSheetChanged);
+    _blurNotifier.dispose();
+    _sheetSizeNotifier.dispose();
     WidgetsBinding.instance.removeObserver(this);
     GlobalProviders.location.$code.removeListener(_refresh);
     _scrollController.dispose();
+    _sheetController.dispose();
     super.dispose();
   }
 
@@ -344,40 +390,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         Positioned.fill(
           child: shaderBackground,
         ),
-        if (_blurAmount > 0)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: _blurAmount,
-                  sigmaY: _blurAmount,
-                ),
-                child: ColoredBox(
-                  color: Colors.black.withValues(alpha: _blurAmount / 60),
-                ),
-              ),
-            ),
-          ),
-        ExpressiveRefreshIndicator.contained(
-          key: _refreshIndicatorKey,
-          edgeOffset: context.padding.top + kToolbarHeight,
-          backgroundColor: context.colors.primaryContainer,
-          onRefresh: _refresh,
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // 英雄區塊 - 第一屏簡潔顯示
-              SliverToBoxAdapter(
-                child: _buildHeroSection(),
-              ),
-              // 詳細內容區塊
-              SliverToBoxAdapter(
-                child: _buildContentSection(homeSections),
-              ),
-            ],
-          ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: _buildHeroSection(),
         ),
-        // 位置按鈕
+        ValueListenableBuilder<double>(
+          valueListenable: _blurNotifier,
+          builder: (context, blurAmount, child) {
+            if (blurAmount <= 0) return const SizedBox.shrink();
+            return Positioned.fill(
+              child: IgnorePointer(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: blurAmount,
+                    sigmaY: blurAmount,
+                  ),
+                  child: ColoredBox(
+                    color: Colors.black.withValues(alpha: blurAmount / 60),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        _buildDraggableSheet(homeSections),
         Positioned(
           top: 24,
           left: 0,
@@ -393,13 +431,61 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildDraggableSheet(Set<HomeDisplaySection> homeSections) {
+    final baseSnapSize = (_firstCardHeight / MediaQuery.of(context).size.height)
+        .clamp(0.25, 0.6);
+
+    return DraggableScrollableSheet(
+      key: _sheetKey,
+      controller: _sheetController,
+      initialChildSize: baseSnapSize,
+      minChildSize: 0.05,
+      maxChildSize: 0.95,
+      snap: true,
+      snapSizes: [0.05, baseSnapSize, 0.95],
+      builder: (context, scrollController) {
+        return ListView(
+          controller: scrollController,
+          padding: EdgeInsets.zero,
+          children: [
+            ValueListenableBuilder<double>(
+              valueListenable: _sheetSizeNotifier,
+              builder: (context, size, child) {
+                final opacity = ((0.95 - size) / 0.1).clamp(0.0, 1.0);
+                if (opacity <= 0) return const SizedBox(height: 12);
+                return Opacity(
+                  opacity: opacity,
+                  child: child,
+                );
+              },
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  width: 32,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: context.colors.onSurfaceVariant.withValues(
+                      alpha: 0.4,
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+            _buildContentSection(homeSections),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildHeroSection() {
     final code = GlobalProviders.location.code;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // 如果沒有設定位置或服務區域外，顯示提示
     if (code == null) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.65,
+        height: screenHeight * 0.5,
         child: const Center(
           child: Padding(
             padding: EdgeInsets.all(32),
@@ -411,7 +497,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     if (_isOutOfService) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.65,
+        height: screenHeight * 0.5,
         child: const Center(
           child: Padding(
             padding: EdgeInsets.all(32),
@@ -428,50 +514,73 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildContentSection(Set<HomeDisplaySection> homeSections) {
-    return Column(
-      children: [
-        // 拖曳指示器
-        Container(
-          margin: const EdgeInsets.only(top: 12, bottom: 8),
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(2),
+    final List<Widget> allCards = [];
+    bool isFirstCardSet = false;
+
+    if (!_isLoading) {
+      for (final widget in _buildRealtimeInfo()) {
+        if (!isFirstCardSet) {
+          allCards.add(KeyedSubtree(key: _firstCardKey, child: widget));
+          isFirstCardSet = true;
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _measureFirstCard(),
+          );
+        } else {
+          allCards.add(widget);
+        }
+      }
+    }
+
+    if (homeSections.isNotEmpty) {
+      if (homeSections.contains(HomeDisplaySection.radar)) {
+        final radarWidget = _buildRadarMap();
+        if (!isFirstCardSet) {
+          allCards.add(KeyedSubtree(key: _firstCardKey, child: radarWidget));
+          isFirstCardSet = true;
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _measureFirstCard(),
+          );
+        } else {
+          allCards.add(radarWidget);
+        }
+      }
+      if (homeSections.contains(HomeDisplaySection.forecast)) {
+        allCards.add(_buildForecast());
+      }
+      if (!_isLoading &&
+          homeSections.contains(HomeDisplaySection.wind) &&
+          _weather != null) {
+        allCards.add(_buildWindCard());
+      }
+      allCards.add(_buildCommunityCards());
+      if (homeSections.contains(HomeDisplaySection.history)) {
+        allCards.add(_buildHistoryTimeline());
+      }
+    } else if (GlobalProviders.location.code != null) {
+      allCards.add(
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text(
+                '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () => SettingsLayoutRoute().push(context),
+                child: Text('前往設定'.i18n),
+              ),
+            ],
           ),
         ),
-        // 實時警報
-        if (!_isLoading) ..._buildRealtimeInfo(),
-        // 其他區塊
-        if (homeSections.isNotEmpty) ...[
-          if (homeSections.contains(HomeDisplaySection.radar)) _buildRadarMap(),
-          if (homeSections.contains(HomeDisplaySection.forecast))
-            _buildForecast(),
-          if (!_isLoading &&
-              homeSections.contains(HomeDisplaySection.wind) &&
-              _weather != null)
-            _buildWindCard(),
-          _buildCommunityCards(),
-          if (homeSections.contains(HomeDisplaySection.history))
-            _buildHistoryTimeline(),
-        ] else if (GlobalProviders.location.code != null)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(
-                  '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => SettingsLayoutRoute().push(context),
-                  child: Text('前往設定'.i18n),
-                ),
-              ],
-            ),
-          ),
+      );
+    }
+
+    return Column(
+      children: [
+        ...allCards,
         // 底部安全區域
         SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
       ],
