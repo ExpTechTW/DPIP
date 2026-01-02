@@ -1,6 +1,7 @@
 import CoreLocation
 import Flutter
 import UIKit
+import Intents
 import UserNotifications
 
 @UIApplicationMain
@@ -16,11 +17,10 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Application Lifecycle
-    
+
     override func application(
         _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication
-            .LaunchOptionsKey: Any]?
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
         setupFlutterChannels()
@@ -34,11 +34,53 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         } else if isLocationEnabled {
             startLocationUpdates()
         }
-        
+
         return super.application(
             application, didFinishLaunchingWithOptions: launchOptions)
     }
 
+    // MARK: - Quick Action
+    override func application(
+        _ application: UIApplication,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        handleShortcut(shortcutItem)
+        completionHandler(true)
+    }
+
+    private func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) {
+        UserDefaults.standard.set(shortcutItem.type, forKey: "initialShortcut")
+        notifyFlutterShortcut(shortcutItem.type)
+    }
+    
+    // MARK: - NSUserActivity
+    override func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        if userActivity.activityType == "com.exptech.dpip.monitor" ||
+           userActivity.activityType == "OpenMonitorIntentIntent" {
+            UserDefaults.standard.set("monitor", forKey: "initialShortcut")
+            notifyFlutterShortcut("monitor")
+        }
+        return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+    
+    private func notifyFlutterShortcut(_ value: String) {
+        guard let controller =
+            window?.rootViewController as? FlutterViewController
+        else { return }
+
+        let channel = FlutterMethodChannel(
+            name: "com.exptech.dpip/shortcut",
+            binaryMessenger: controller.binaryMessenger
+        )
+        channel.invokeMethod("onShortcut", arguments: value)
+    }
+
+    // MARK: - Background Handling
     override func applicationDidEnterBackground(_ application: UIApplication) {
         startBackgroundTask()
     }
@@ -58,6 +100,21 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
 
         locationChannel?.setMethodCallHandler { [weak self] (call, result) in
             self?.handleLocationChannelCall(call, result: result)
+        }
+
+        let shortcutChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/shortcut",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        shortcutChannel.setMethodCallHandler { call, result in
+            if call.method == "getInitialShortcut" {
+                let shortcut = UserDefaults.standard.string(forKey: "initialShortcut")
+                result(shortcut)
+                UserDefaults.standard.removeObject(forKey: "initialShortcut")
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
         }
     }
     
