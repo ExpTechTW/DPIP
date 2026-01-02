@@ -107,7 +107,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final box = cardContext.findRenderObject() as RenderBox?;
         if (box != null && box.hasSize) {
           final height = box.size.height + 28;
-          if ((_measuredFirstCardHeight == null) ||
+          final isFirstMeasure = _measuredFirstCardHeight == null;
+          if (isFirstMeasure ||
               ((_measuredFirstCardHeight! - height).abs() > 1)) {
             _sheetController.removeListener(_onSheetChanged);
             _sheetController.dispose();
@@ -119,6 +120,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             });
 
             _sheetController.addListener(_onSheetChanged);
+
+            if (isFirstMeasure && mounted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final screenHeight = MediaQuery.of(context).size.height;
+                final targetSize = (height / screenHeight).clamp(0.25, 0.6);
+                _sheetController.animateTo(
+                  targetSize,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                );
+              });
+            }
           }
         }
       }
@@ -432,13 +445,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildDraggableSheet(Set<HomeDisplaySection> homeSections) {
-    final baseSnapSize = (_firstCardHeight / MediaQuery.of(context).size.height)
-        .clamp(0.25, 0.6);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
+    final initialSize = _measuredFirstCardHeight == null ? 0.05 : baseSnapSize;
 
     return DraggableScrollableSheet(
       key: _sheetKey,
       controller: _sheetController,
-      initialChildSize: baseSnapSize,
+      initialChildSize: initialSize,
       minChildSize: 0.05,
       maxChildSize: 0.95,
       snap: true,
