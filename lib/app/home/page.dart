@@ -55,8 +55,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  final _locationButtonKey = GlobalKey();
   DraggableScrollableController _sheetController =
       DraggableScrollableController();
 
@@ -219,8 +217,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
       _isFirstRefresh = false;
     });
-
-    _refreshIndicatorKey.currentState?.show();
 
     final homeSections = context
         .read<SettingsUserInterfaceModel>()
@@ -498,7 +494,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: RepaintBoundary(
               child: Align(
                 alignment: Alignment.topCenter,
-                child: LocationButton(key: _locationButtonKey),
+                child: const LocationButton(),
               ),
             ),
           ),
