@@ -10,9 +10,14 @@ import 'package:provider/provider.dart';
 enum HomeDisplaySection {
   radar,
   forecast,
-  history,
   wind,
 }
+
+const reorderableSections = [
+  HomeDisplaySection.radar,
+  HomeDisplaySection.forecast,
+  HomeDisplaySection.wind,
+];
 
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
@@ -21,7 +26,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   int? get _themeColor => Preference.themeColor;
   Locale? get _locale => Preference.locale?.asLocale;
   bool get _useFahrenheit => Preference.useFahrenheit ?? false;
-  late Set<HomeDisplaySection> homeSections;
+  late List<HomeDisplaySection> homeSections;
   final savedList = Preference.homeDisplaySections;
 
   ThemeMode get themeMode => ThemeMode.values.byName(_themeMode);
@@ -63,8 +68,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
 
   SettingsUserInterfaceModel() {
     if (savedList.isEmpty) {
-      // 預設全部啟用
-      homeSections = HomeDisplaySection.values.toSet();
+      homeSections = HomeDisplaySection.values.toList();
     } else {
       final saved = savedList
           .map(
@@ -73,7 +77,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
                 .firstWhere((e) => e?.name == s, orElse: () => null),
           )
           .whereType<HomeDisplaySection>()
-          .toSet();
+          .toList();
       homeSections = saved;
     }
   }
@@ -86,8 +90,22 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     } else {
       homeSections.remove(section);
     }
-    Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
+    _saveHomeSections();
     notifyListeners();
+  }
+
+  void reorderSection(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = homeSections.removeAt(oldIndex);
+    homeSections.insert(newIndex, item);
+    _saveHomeSections();
+    notifyListeners();
+  }
+
+  void _saveHomeSections() {
+    Preference.homeDisplaySections = homeSections.map((e) => e.name).toList();
   }
 }
 

@@ -224,24 +224,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _isFirstRefresh = false;
     });
 
-    final homeSections = context
-        .read<SettingsUserInterfaceModel>()
-        .homeSections;
-
     final futures = <Future>[
       _fetchWeather(code),
       _fetchRealtimeRegion(code),
+      _fetchHistory(code, isOutOfService),
     ];
-
-    if (homeSections.contains(HomeDisplaySection.history)) {
-      futures.add(_fetchHistory(code, isOutOfService));
-    } else {
-      if (mounted) {
-        setState(() {
-          _history = null;
-        });
-      }
-    }
 
     await Future.wait(futures);
 
@@ -391,7 +378,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _wasVisible = isVisible;
 
     final homeSections = context
-        .select<SettingsUserInterfaceModel, Set<HomeDisplaySection>>(
+        .select<SettingsUserInterfaceModel, List<HomeDisplaySection>>(
           (model) => model.homeSections,
         );
 
@@ -554,7 +541,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildDraggableSheet(Set<HomeDisplaySection> homeSections) {
+  Widget _buildDraggableSheet(List<HomeDisplaySection> homeSections) {
     final screenHeight = MediaQuery.of(context).size.height;
     final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final handleHeight = 28.0 / screenHeight;
@@ -645,104 +632,74 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildContentSection(Set<HomeDisplaySection> homeSections) {
+  Widget _buildContentSection(List<HomeDisplaySection> homeSections) {
     final List<Widget> allCards = [];
-    bool isFirstCardSet = false;
+    final List<Widget> firstCardChildren = [];
 
     final stationInfo = _buildStationInfo();
+    firstCardChildren.add(stationInfo);
+
+    Widget? firstSectionWidget;
+    int? firstSectionIndex;
+    for (var i = 0; i < homeSections.length; i++) {
+      final section = homeSections[i];
+      switch (section) {
+        case HomeDisplaySection.radar:
+          firstSectionWidget = _buildRadarMap();
+          firstSectionIndex = i;
+        case HomeDisplaySection.forecast:
+          firstSectionWidget = _buildForecast();
+          firstSectionIndex = i;
+        case HomeDisplaySection.wind:
+          if (!_isLoading && _weather != null) {
+            firstSectionWidget = _buildWindCard();
+            firstSectionIndex = i;
+          }
+      }
+      if (firstSectionWidget != null) break;
+    }
+
+    if (firstSectionWidget != null) {
+      firstCardChildren.add(firstSectionWidget);
+    }
+
+    allCards.add(
+      KeyedSubtree(
+        key: _firstCardKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: firstCardChildren,
+        ),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureFirstCard());
 
     if (!_isLoading) {
       final realtimeWidgets = _buildRealtimeInfo();
-      if (realtimeWidgets.isNotEmpty) {
-        allCards.add(
-          KeyedSubtree(
-            key: _firstCardKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                stationInfo,
-                realtimeWidgets.first,
-              ],
-            ),
-          ),
-        );
-        isFirstCardSet = true;
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => _measureFirstCard(),
-        );
-
-        for (var i = 1; i < realtimeWidgets.length; i++) {
-          allCards.add(realtimeWidgets[i]);
-        }
-      } else {
-        allCards.add(stationInfo);
-      }
-    } else {
-      allCards.add(stationInfo);
+      allCards.addAll(realtimeWidgets);
     }
 
-    if (homeSections.isNotEmpty) {
-      if (homeSections.contains(HomeDisplaySection.radar)) {
-        final radarWidget = _buildRadarMap();
-        if (!isFirstCardSet) {
-          allCards.add(
-            KeyedSubtree(
-              key: _firstCardKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (allCards.isNotEmpty) allCards.removeLast(),
-                  radarWidget,
-                ],
-              ),
-            ),
-          );
-          isFirstCardSet = true;
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _measureFirstCard(),
-          );
-        } else {
-          allCards.add(radarWidget);
-        }
+    for (var i = 0; i < homeSections.length; i++) {
+      if (i == firstSectionIndex) continue;
+      final section = homeSections[i];
+      switch (section) {
+        case HomeDisplaySection.radar:
+          allCards.add(_buildRadarMap());
+        case HomeDisplaySection.forecast:
+          allCards.add(_buildForecast());
+        case HomeDisplaySection.wind:
+          if (!_isLoading && _weather != null) {
+            allCards.add(_buildWindCard());
+          }
       }
-      if (homeSections.contains(HomeDisplaySection.forecast)) {
-        allCards.add(_buildForecast());
-      }
-      if (!_isLoading &&
-          homeSections.contains(HomeDisplaySection.wind) &&
-          _weather != null) {
-        allCards.add(_buildWindCard());
-      }
-      if (homeSections.contains(HomeDisplaySection.history)) {
-        allCards.add(_buildHistoryTimeline());
-      }
-      allCards.add(_buildCommunityCards());
-    } else if (GlobalProviders.location.code != null) {
-      allCards.add(
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                '您還沒有啟用首頁區塊，請到設定選擇要顯示的內容。'.i18n,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () => SettingsLayoutRoute().push(context),
-                child: Text('前往設定'.i18n),
-              ),
-            ],
-          ),
-        ),
-      );
     }
+
+    allCards.add(_buildHistoryTimeline());
+    allCards.add(_buildCommunityCards());
 
     return Column(
       children: [
         ...allCards,
-        // 底部安全區域
         SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
       ],
     );
