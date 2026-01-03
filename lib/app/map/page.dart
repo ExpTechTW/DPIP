@@ -320,7 +320,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         return;
       }
     }
-    context.go(HomePage.route);
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(HomePage.route);
+    }
   }
 
   @override
