@@ -343,6 +343,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,
+            isReplayMode: widget.options?.replayTimestamp != null,
             onLayerChanged: toggleLayer,
             onBaseMapChanged: setBaseMapType,
           ),
