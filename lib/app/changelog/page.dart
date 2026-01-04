@@ -51,7 +51,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              title: Text('更新日誌'),
+              title: Text('更新日誌'.i18n),
               pinned: true,
             ),
             switch (releases) {
