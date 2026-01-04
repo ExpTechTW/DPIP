@@ -485,7 +485,7 @@ class _WindCardState extends State<WindCard>
           hasDanger
               ? '指北針不可靠'.i18n
               : hasWarning
-              ? '指北針精度下降'.i18n
+              ? '指北針準確度下降'.i18n
               : '指北針正常'.i18n,
         ),
         content: Column(

@@ -184,7 +184,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
         case Permission.photosAddOnly:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = '儲存'.i18n;
-          description = '用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片'.i18n;
+          description = '用於儲存中央氣象署或 ExpTech 提供之資料視覺化圖片'.i18n;
           color = Colors.green;
 
         default:
