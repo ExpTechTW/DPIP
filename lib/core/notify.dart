@@ -1,12 +1,9 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 String? _pendingChannelKey;
 
@@ -47,16 +44,12 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
   if (channelKey.startsWith('eew') ||
       channelKey.startsWith('int_report') ||
       channelKey.startsWith('eq')) {
-    context.push(
-      MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})),
-    );
+    MapRoute(layers: 'monitor').push(context);
     return;
   }
 
   if (channelKey.startsWith('report')) {
-    context.push(
-      MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.report})),
-    );
+    MapRoute(layers: 'report').push(context);
     return;
   }
 

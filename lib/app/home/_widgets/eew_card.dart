@@ -1,17 +1,15 @@
 import 'dart:async';
 
 import 'package:dpip/api/model/eew.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -345,11 +343,7 @@ class _EewCardState extends State<EewCard> {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => context.push(
-                  MapPage.route(
-                    options: MapPageOptions(initialLayers: {MapLayer.monitor}),
-                  ),
-                ),
+                onTap: () => MapRoute(layers: 'monitor').push(context),
                 splashColor: context.colors.error.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),

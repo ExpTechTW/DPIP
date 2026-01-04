@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
@@ -17,7 +16,6 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -275,11 +273,7 @@ class _RadarMapCardState extends State<RadarMapCard>
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
-                onTap: () => context.push(
-                  MapPage.route(
-                    options: MapPageOptions(initialLayers: {MapLayer.radar}),
-                  ),
-                ),
+                onTap: () => MapRoute(layers: 'radar').push(context),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
