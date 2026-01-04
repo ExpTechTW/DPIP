@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zstandard/zstandard.dart';
 
 typedef TimeTable = Map<String, List<({double P, double S, double R})>>;
 
@@ -28,13 +29,24 @@ class Global {
     String assetPath,
   ) async {
     try {
-      final ByteData byteData = await rootBundle.load(assetPath);
-      final List<int> compressedBytes = byteData.buffer.asUint8List();
+      final byteData = await rootBundle.load(assetPath);
+      final bytes = byteData.buffer.asUint8List();
+      late List<int> decompressed;
 
-      final GZipCodec codec = GZipCodec();
-      final List<int> decompressedBytes = codec.decode(compressedBytes);
+      if (assetPath.endsWith('.zst')) {
+        final zstd = Zstandard();
+        final result = await zstd.decompress(bytes);
+        if (result == null) {
+          throw Exception('zstd decompress failed');
+        }
+        decompressed = result;
+      } else if (assetPath.endsWith('.gz')) {
+        decompressed = GZipCodec().decode(bytes);
+      } else {
+        decompressed = bytes;
+      }
 
-      final String jsonString = utf8.decode(decompressedBytes);
+      final jsonString = utf8.decode(decompressed);
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e, s) {
       TalkerManager.instance.error(
@@ -89,7 +101,7 @@ class Global {
   }
 
   static Future<GeoJSONFeatureCollection> loadTownGeojson() async {
-    final data = await _loadCompressedJson('assets/map/town.json.gz');
+    final data = await _loadCompressedJson('assets/map/town.json.zst');
 
     return GeoJSONFeatureCollection.fromMap(data);
   }
@@ -100,7 +112,6 @@ class Global {
       SharedPreferences.getInstance(),
       loadBoxGeojson(),
       loadLocationData(),
-      loadTownGeojson(),
       loadTimeTableData(),
     ]);
 
@@ -108,9 +119,9 @@ class Global {
     preference = (results[1] as SharedPreferences?)!;
     boxGeojson = (results[2] as GeoJSONFeatureCollection?)!;
     location = (results[3] as Map<String, Location>?)!;
-    townGeojson = (results[4] as GeoJSONFeatureCollection?)!;
-    timeTable = (results[5] as TimeTable?)!;
+    timeTable = (results[4] as TimeTable?)!;
 
+    townGeojson = await loadTownGeojson();
     await loadNotifyTestContent();
   }
 }
