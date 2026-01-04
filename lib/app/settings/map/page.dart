@@ -421,7 +421,7 @@ class SettingsMapPage extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
+                      '過高的動畫幀率可能會造成卡頓或裝置發熱'.i18n,
                       style: context.texts.bodySmall?.copyWith(
                         color: context.theme.extendedColors.amber,
                       ),

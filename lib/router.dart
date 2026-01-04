@@ -200,7 +200,7 @@ class SettingsShellRoute extends ShellRouteData {
       '/settings/location/select' => '新增地點'.i18n,
       final p when p?.startsWith('/settings/location/select/') == true =>
         '新增地點'.i18n,
-      '/settings/layout' => '佈局'.i18n,
+      '/settings/layout' => '版面'.i18n,
       '/settings/theme' => '主題'.i18n,
       '/settings/theme/select' => '主題'.i18n,
       '/settings/locale' => '語言'.i18n,

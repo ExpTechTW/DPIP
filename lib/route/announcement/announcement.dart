@@ -69,7 +69,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = '獲取公告時發生錯誤: $e'.i18n;
+        errorMessage = '取得公告時發生錯誤: $e'.i18n;
         isLoading = false;
       });
     }

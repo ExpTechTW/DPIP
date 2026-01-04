@@ -529,7 +529,7 @@ class _WindCardState extends State<WindCard>
                 ),
                 child: Text(
                   hasDanger
-                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子設備或金屬物品。'.i18n
+                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。'.i18n
                       : '附近可能有磁場干擾，指北針方向可能有偏差。'.i18n,
                   style: context.texts.bodySmall,
                 ),
