@@ -61,11 +61,11 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
   }
 
   // if (channelKey.startsWith('announcement')) {
-  //   context.push('/announcement');
+  //   AnnouncementRoute().push(context);
   //   return;
   // }
 
-  context.go('/home');
+  HomeRoute().go(context);
 }
 
 Future<void> notifyInit() async {

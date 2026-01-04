@@ -10,6 +10,7 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
@@ -477,8 +478,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                       leading: Icon(Symbols.add_circle_rounded),
                       title: Text('新增地點'.i18n),
                       enabled: loadingCode == null,
-                      onTap: () =>
-                          context.push(SettingsLocationSelectPage.route),
+                      onTap: () => SettingsLocationSelectRoute().push(context),
                     ),
                   ],
                 );

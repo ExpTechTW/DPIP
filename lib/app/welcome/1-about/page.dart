@@ -1,8 +1,7 @@
-import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class WelcomeAboutPage extends StatelessWidget {
   const WelcomeAboutPage({super.key});
@@ -17,7 +16,7 @@ class WelcomeAboutPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
             child: Text('下一步'.i18n),
-            onPressed: () => context.push(WelcomeExpTechPage.route),
+            onPressed: () => WelcomeExptechRoute().push(context),
           ),
         ),
       ),

@@ -1,12 +1,11 @@
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
-import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -77,7 +76,7 @@ class LocationButton extends StatelessWidget {
         },
         onSettingsPressed: () {
           Navigator.of(sheetContext).pop();
-          context.push(SettingsLocationPage.route);
+          SettingsLocationRoute().push(context);
         },
       ),
     );

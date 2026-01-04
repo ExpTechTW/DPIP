@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/managers/lightning.dart';
 import 'package:dpip/app/map/_lib/managers/monitor.dart';
@@ -14,6 +13,7 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -323,7 +323,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     if (context.canPop()) {
       context.pop();
     } else {
-      context.go(HomePage.route);
+      HomeRoute().go(context);
     }
   }
 

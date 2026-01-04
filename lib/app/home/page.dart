@@ -488,7 +488,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child: BlurredIconButton(
                 icon: const Icon(Symbols.settings_rounded),
                 tooltip: '設定',
-                onPressed: () => context.push('/settings'),
+                onPressed: () => SettingsIndexRoute().push(context),
                 elevation: 2,
               ),
             ),

@@ -1,8 +1,7 @@
-import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class WelcomeNoticePage extends StatelessWidget {
@@ -18,7 +17,7 @@ class WelcomeNoticePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
             child: Text('下一步'.i18n),
-            onPressed: () => context.push(WelcomePermissionPage.route),
+            onPressed: () => WelcomePermissionsRoute().push(context),
           ),
         ),
       ),

@@ -1,5 +1,5 @@
+import 'package:dpip/router.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 Future<void> showLocationDialog(BuildContext context) async {
@@ -17,8 +17,8 @@ Future<void> showLocationDialog(BuildContext context) async {
             child: const Text('前往設定'),
             onPressed: () {
               Navigator.pop(context);
-              context.push('/settings');
-              context.push('/settings/location');
+              SettingsIndexRoute().push(context);
+              SettingsLocationRoute().push(context);
             },
           ),
         ],
