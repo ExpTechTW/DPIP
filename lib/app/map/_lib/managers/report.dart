@@ -1072,14 +1072,6 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             label: Text('位於'.i18n),
                             title: Text(report.convertLatLon()),
                           ),
-                          SegmentedListTile(
-                            label: Text('發震時間'.i18n),
-                            title: Text(
-                              DateFormat(
-                                'yyyy/MM/dd HH:mm:ss',
-                              ).format(report.time),
-                            ),
-                          ),
                           Row(
                             spacing: 2,
                             children: [
