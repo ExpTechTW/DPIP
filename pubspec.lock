@@ -339,6 +339,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+  es_compression:
+    dependency: "direct main"
+    description:
+      name: es_compression
+      sha256: c1ff7af54802631cf5c3942cb67bb99daadcc087f573ca99a9de91002d1a7ece
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.15"
   expressive_refresh:
     dependency: transitive
     description:
@@ -1749,70 +1757,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.3"
-  zstandard:
-    dependency: "direct main"
-    description:
-      name: zstandard
-      sha256: d2cae71d34dfdd014525259be2f84ebc2a738c94cc4232515df44a1415dde9d3
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_android:
-    dependency: transitive
-    description:
-      name: zstandard_android
-      sha256: "7d85d814f147faa7a33d5cd5b5610dea451a57f95b34f98c93723bb2f2efbf98"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_ios:
-    dependency: transitive
-    description:
-      name: zstandard_ios
-      sha256: "50e6b3d05ad6ecf8def65c9fae46d4b786edd89150fd2bb207cdcef918946f0d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_linux:
-    dependency: transitive
-    description:
-      name: zstandard_linux
-      sha256: "66a61f7839016671a18448b73dab1910f7390bd9ab15bc118c8591381103f5b2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_macos:
-    dependency: transitive
-    description:
-      name: zstandard_macos
-      sha256: f4e02dc613f9d0c960edad8a330b41c4e0f0a548aea26668a12f45eebacd6aa1
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_platform_interface:
-    dependency: transitive
-    description:
-      name: zstandard_platform_interface
-      sha256: "0261e2ce3520eace49e5d1e766e69a8c2613d24f0805c94e08544a139ad20e48"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_web:
-    dependency: transitive
-    description:
-      name: zstandard_web
-      sha256: ed0d385dab253fefbe7c42e4eb7b58d3f2425713420402cc3f3b281d5a49e8a7
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
-  zstandard_windows:
-    dependency: transitive
-    description:
-      name: zstandard_windows
-      sha256: "86bbd10b9d563dd22eedd4df94904078ac443d8f941b79a72c4fda534da76461"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.29"
 sdks:
   dart: ">=3.10.0 <4.0.0"
   flutter: ">=3.38.0"

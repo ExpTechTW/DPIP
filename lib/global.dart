@@ -5,11 +5,11 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/utils/extensions/asset_bundle.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:es_compression/zstd.dart';
 import 'package:flutter/services.dart';
 import 'package:geojson_vi/geojson_vi.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zstandard/zstandard.dart';
 
 typedef TimeTable = Map<String, List<({double P, double S, double R})>>;
 
@@ -34,12 +34,7 @@ class Global {
       late List<int> decompressed;
 
       if (assetPath.endsWith('.zst')) {
-        final zstd = Zstandard();
-        final result = await zstd.decompress(bytes);
-        if (result == null) {
-          throw Exception('zstd decompress failed');
-        }
-        decompressed = result;
+        decompressed = zstd.decode(bytes);
       } else if (assetPath.endsWith('.gz')) {
         decompressed = GZipCodec().decode(bytes);
       } else {
