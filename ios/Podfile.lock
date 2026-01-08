@@ -78,9 +78,6 @@ PODS:
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
-  - gal (1.0.0):
-    - Flutter
-    - FlutterMacOS
   - geolocator_apple (1.2.0):
     - Flutter
     - FlutterMacOS
@@ -177,7 +174,6 @@ DEPENDENCIES:
   - flutter_compass (from `.symlinks/plugins/flutter_compass/ios`)
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
-  - gal (from `.symlinks/plugins/gal/darwin`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
@@ -230,8 +226,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_icmp_ping/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
-  gal:
-    :path: ".symlinks/plugins/gal/darwin"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
   in_app_purchase_storekit:
@@ -273,7 +267,6 @@ SPEC CHECKSUMS:
   flutter_compass: cbbd285cea1584c7ac9c4e0c3e1f17cbea55e855
   flutter_icmp_ping: 2b159955eee0c487c766ad83fec224ae35e7c935
   fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
-  gal: 6a522c75909f1244732d4596d11d6a2f86ff37a5
   geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
