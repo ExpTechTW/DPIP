@@ -17,7 +17,7 @@ class IntensityLegend extends StatelessWidget {
 
   List<Color> get _colors => mode == IntensityLegendMode.eew
       ? List.generate(9, (i) => IntensityColor.intensity(i + 1))
-      : List.generate(11, (i) => InstrumentalIntensityColor.intensity(i - 3));
+      : List.generate(11, (i) => InstrumentalIntensityColor.intensity(7 - i));
 
   List<String> get _labels => mode == IntensityLegendMode.eew
       ? const ['1', '2', '3', '4', '5⁻', '5⁺', '6⁻', '6⁺', '7']
@@ -25,82 +25,76 @@ class IntensityLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final width = screenWidth / 2;
-
-    return SizedBox(
-      width: width,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _buildColorBar(width),
-          const SizedBox(height: 2),
-          _buildLabels(width),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: _buildLegendItems(),
     );
   }
 
-  Widget _buildColorBar(double width) {
-    if (mode == IntensityLegendMode.eew) {
-      // EEW mode: discrete color blocks
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: SizedBox(
-          height: 8,
-          width: width,
-          child: Row(
-            children: _colors.map((color) {
-              return Expanded(child: Container(color: color));
-            }).toList(),
-          ),
-        ),
-      );
-    } else {
-      // RTS mode: gradient
-      return Container(
-        height: 8,
-        width: width,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          gradient: LinearGradient(colors: _colors),
-        ),
-      );
-    }
-  }
+  List<Widget> _buildLegendItems() {
+    final colors = mode == IntensityLegendMode.eew ? _colors.reversed.toList() : _colors;
+    final labels = _labels.reversed.toList();
 
-  Widget _buildLabels(double width) {
     if (mode == IntensityLegendMode.eew) {
-      // EEW mode: labels centered under each color block
-      return SizedBox(
-        width: width,
-        child: Row(
-          children: _labels.map((label) {
-            return Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 9),
-                textAlign: TextAlign.center,
-              ),
-            );
-          }).toList(),
-        ),
-      );
+      return List.generate(colors.length, (index) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: 12,
+              width: 16,
+              color: colors[index],
+            ),
+            const SizedBox(width: 6),
+            Text(
+              labels[index],
+              style: const TextStyle(fontSize: 10, height: 1),
+            ),
+          ],
+        );
+      });
     } else {
-      // RTS mode: labels at edges
-      return SizedBox(
-        width: width,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: _labels.map((label) {
-            return Text(
-              label,
-              style: const TextStyle(fontSize: 9),
-            );
-          }).toList(),
+      final labelWidgets = labels.map((label) {
+        return Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 9, height: 1),
+            textAlign: TextAlign.left,
+          ),
+        );
+      }).toList();
+
+      return [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 12.0 * colors.length,
+              width: 16,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                gradient: LinearGradient(
+                  colors: colors,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            SizedBox(
+              height: 12.0 * colors.length,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: labelWidgets,
+              ),
+            ),
+          ],
         ),
-      );
+      ];
     }
   }
 }
