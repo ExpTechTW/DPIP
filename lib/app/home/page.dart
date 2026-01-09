@@ -641,6 +641,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     Widget? firstSectionWidget;
     int? firstSectionIndex;
+
+    if (!_isLoading) {
+      final realtimeWidgets = _buildRealtimeInfo();
+      allCards.addAll(realtimeWidgets);
+    }
     for (var i = 0; i < homeSections.length; i++) {
       final section = homeSections[i];
       switch (section) {
@@ -673,12 +678,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureFirstCard());
-
-    if (!_isLoading) {
-      final realtimeWidgets = _buildRealtimeInfo();
-      allCards.addAll(realtimeWidgets);
-    }
-
     for (var i = 0; i < homeSections.length; i++) {
       if (i == firstSectionIndex) continue;
       final section = homeSections[i];
