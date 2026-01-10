@@ -799,7 +799,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: 0.25)
+                    : const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.3),
                 width: 0.5,
               ),
             ),
@@ -809,14 +811,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text(
                   label,
                   style: context.texts.labelSmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color.fromARGB(255, 60, 60, 60),
+                    fontWeight: FontWeight.w700,
                     fontSize: 8,
                   ),
                 ),
                 Text(
                   value,
                   style: context.texts.bodySmall?.copyWith(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color.fromARGB(255, 60, 60, 60),
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
                   ),
