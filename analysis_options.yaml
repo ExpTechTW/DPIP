@@ -3,6 +3,7 @@ include: package:lint/strict.yaml
 analyzer:
   errors:
     todo: info
+    public_member_api_docs: ignore
   exclude:
     - "**.freezed.dart"
     - "**.g.dart"
