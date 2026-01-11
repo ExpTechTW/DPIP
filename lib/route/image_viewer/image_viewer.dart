@@ -6,6 +6,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
 import 'package:http/http.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -26,6 +27,16 @@ class ImageViewerRoute extends StatefulWidget {
 
   @override
   State<ImageViewerRoute> createState() => _ImageViewerRouteState();
+}
+
+class ImageSaver {
+  static const _channel = MethodChannel('image_saver');
+
+  static Future<void> saveToPhotos(String path) async {
+    await _channel.invokeMethod('saveImage', {
+      'path': path,
+    });
+  }
 }
 
 class _ImageViewerRouteState extends State<ImageViewerRoute> {
@@ -92,26 +103,17 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       final res = await get(Uri.parse(widget.imageUrl));
 
-      // 保存图片到临时目录
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${widget.imageName}');
       await tempFile.writeAsBytes(res.bodyBytes);
 
       try {
-        // 保存到相册
         if (Platform.isAndroid) {
           await Gal.putImage(tempFile.path, album: 'DPIP');
         } else {
-          await Permission.photosAddOnly.request();
-          try {
-            await Gal.putImage(tempFile.path);
-          } catch (_) {
-            final upgrade = await Permission.photos.request();
-            if (upgrade.isGranted) {
-              await Gal.putImage(tempFile.path, album: 'DPIP');
-            }
-          }
+          await ImageSaver.saveToPhotos(tempFile.path);
         }
+        if (!mounted) return;
         showToast(
           context,
           ToastWidget.text(
@@ -120,7 +122,6 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           ),
         );
       } finally {
-        // 清理临时文件
         if (await tempFile.exists()) {
           await tempFile.delete();
         }
