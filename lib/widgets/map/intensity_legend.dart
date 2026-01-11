@@ -44,8 +44,14 @@ class IntensityLegend extends StatelessWidget {
           children: [
             Container(
               height: 12,
-              width: 16,
-              color: colors[index],
+              width: 8,
+              decoration: BoxDecoration(
+                color: colors[index],
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(index == 0 ? 4 : 0),
+                  bottom: Radius.circular(index == colors.length - 1 ? 4 : 0),
+                ),
+              ),
             ),
             const SizedBox(width: 6),
             Text(
@@ -73,7 +79,7 @@ class IntensityLegend extends StatelessWidget {
           children: [
             Container(
               height: 12.0 * colors.length,
-              width: 16,
+              width: 8,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
                 gradient: LinearGradient(
