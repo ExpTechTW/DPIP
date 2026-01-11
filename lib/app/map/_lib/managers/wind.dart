@@ -416,26 +416,10 @@ class WindMapLayerSheet extends StatelessWidget {
                   LegendItem(
                     icon: const OutlinedIcon(
                       Symbols.navigation_rounded,
-                      fill: Color(0xffffffff),
+                      fill: Color(0xffff006b),
                       size: 20,
                     ),
-                    label: '0.1 - 3.3',
-                  ),
-                  LegendItem(
-                    icon: const OutlinedIcon(
-                      Symbols.navigation_rounded,
-                      fill: Color(0xff03fff0),
-                      size: 20,
-                    ),
-                    label: '3.4 - 7.9',
-                  ),
-                  LegendItem(
-                    icon: const OutlinedIcon(
-                      Symbols.navigation_rounded,
-                      fill: Color(0xff0385ff),
-                      size: 20,
-                    ),
-                    label: '8.0 - 13.8',
+                    label: '≥ 32.7',
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
@@ -448,10 +432,26 @@ class WindMapLayerSheet extends StatelessWidget {
                   LegendItem(
                     icon: const OutlinedIcon(
                       Symbols.navigation_rounded,
-                      fill: Color(0xffff006b),
+                      fill: Color(0xff0385ff),
                       size: 20,
                     ),
-                    label: '≥ 32.7',
+                    label: '8.0 - 13.8',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xff03fff0),
+                      size: 20,
+                    ),
+                    label: '3.4 - 7.9',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(
+                      Symbols.navigation_rounded,
+                      fill: Color(0xffffffff),
+                      size: 20,
+                    ),
+                    label: '0.1 - 3.3',
                   ),
                 ],
               ),
