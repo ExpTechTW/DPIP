@@ -2,6 +2,7 @@ import CoreLocation
 import Flutter
 import UIKit
 import Intents
+import Photos
 import UserNotifications
 
 @UIApplicationMain
@@ -112,6 +113,31 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
                 let shortcut = UserDefaults.standard.string(forKey: "initialShortcut")
                 result(shortcut)
                 UserDefaults.standard.removeObject(forKey: "initialShortcut")
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        
+        let imageSaverChannel = FlutterMethodChannel(
+            name: "image_saver",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        imageSaverChannel.setMethodCallHandler { call, result in
+            if call.method == "saveImage",
+               let args = call.arguments as? [String: Any],
+               let path = args["path"] as? String {
+
+                if let image = UIImage(contentsOfFile: path) {
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    result(nil)
+                } else {
+                    result(FlutterError(
+                        code: "INVALID_IMAGE",
+                        message: "Cannot load image from path",
+                        details: nil
+                    ))
+                }
             } else {
                 result(FlutterMethodNotImplemented)
             }

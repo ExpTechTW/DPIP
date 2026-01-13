@@ -107,7 +107,6 @@ void main() async {
   }
 
   final overallEndTime = DateTime.now();
-  talker.log('--- 冷啟動偵測結束 ---');
   talker.log(
     '🚨 總初始化耗時 (runApp 前): ${overallEndTime.difference(overallStartTime).inMilliseconds}ms',
   );
