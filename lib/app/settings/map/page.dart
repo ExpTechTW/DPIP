@@ -65,8 +65,7 @@ class SettingsMapPage extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 16),
-            _buildBaseMapCard(context, model, baseMapLabels),
-            _buildLayersCard(context, model, layerLabels),
+            _buildMapSettingCard(context, model, baseMapLabels, layerLabels),
             _buildAutoZoomCard(context, model),
             _buildAnimationFpsCard(context, model),
           ],
@@ -117,11 +116,13 @@ class SettingsMapPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBaseMapCard(
+  Widget _buildMapSettingCard(
     BuildContext context,
     SettingsMapModel model,
     Map<BaseMapType, String> baseMapLabels,
+    Map<MapLayer, String> layerLabels,
   ) {
+    final layersText = model.layers.map((e) => layerLabels[e]!).join(', ');
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -155,81 +156,15 @@ class SettingsMapPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '底圖'.i18n,
+                        '${'底圖'.i18n} · ${'初始圖層'.i18n}',
                         style: context.texts.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        baseMapLabels[model.baseMap]!,
-                        style: context.texts.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Symbols.chevron_right_rounded,
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLayersCard(
-    BuildContext context,
-    SettingsMapModel model,
-    Map<MapLayer, String> layerLabels,
-  ) {
-    final layersText = model.layers.map((e) => layerLabels[e]!).join(', ');
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => showLayerSheet(context),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Symbols.stacks_rounded,
-                    color: Colors.purple,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '初始圖層'.i18n,
-                        style: context.texts.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        layersText.isEmpty ? '無'.i18n : layersText,
+                        '${baseMapLabels[model.baseMap]!} · '
+                        '${layersText.isEmpty ? '無'.i18n : layersText}',
                         style: context.texts.bodySmall?.copyWith(
                           color: context.colors.onSurfaceVariant,
                         ),
