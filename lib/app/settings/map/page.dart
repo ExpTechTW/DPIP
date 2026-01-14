@@ -156,14 +156,14 @@ class SettingsMapPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${'底圖'.i18n} · ${'初始圖層'.i18n}',
+                        '${'底圖'.i18n} & ${'初始圖層'.i18n}',
                         style: context.texts.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${baseMapLabels[model.baseMap]!} · '
+                        '${baseMapLabels[model.baseMap]!} & '
                         '${layersText.isEmpty ? '無'.i18n : layersText}',
                         style: context.texts.bodySmall?.copyWith(
                           color: context.colors.onSurfaceVariant,
