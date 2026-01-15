@@ -111,9 +111,6 @@ class _WindCardState extends State<WindCard>
     );
 
     _compassSubscription = compass.events?.listen((event) {
-      TalkerManager.instance.debug(
-        'WindCard: compass event, heading=${event.heading}',
-      );
       if (event.heading != null && mounted) {
         setState(() {
           _deviceHeading = event.heading!;
