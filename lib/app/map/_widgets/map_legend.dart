@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/layout.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 
 class ColorLegendItem {
   final Color color;
@@ -52,7 +50,13 @@ class ColorLegend extends StatelessWidget {
   final String? unit;
   final bool appendUnit;
 
-  const ColorLegend({super.key, required this.items, this.reverse = false, this.appendUnit = false, this.unit});
+  const ColorLegend({
+    super.key,
+    required this.items,
+    this.reverse = false,
+    this.appendUnit = false,
+    this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +72,20 @@ class ColorLegend extends StatelessWidget {
       final next = items.elementAtOrNull(index + 1);
 
       final headColor = item.blendHead
-          ? (previous != null ? Color.alphaBlend(item.color.withValues(alpha: 0.5), previous.color) : item.color)
+          ? (previous != null
+                ? Color.alphaBlend(
+                    item.color.withValues(alpha: 0.5),
+                    previous.color,
+                  )
+                : item.color)
           : item.color;
       final tailColor = item.blendTail
-          ? (next != null ? Color.alphaBlend(item.color.withValues(alpha: 0.5), next.color) : item.color)
+          ? (next != null
+                ? Color.alphaBlend(
+                    item.color.withValues(alpha: 0.5),
+                    next.color,
+                  )
+                : item.color)
           : item.color;
 
       return IntrinsicHeight(
@@ -105,7 +119,7 @@ class ColorLegend extends StatelessWidget {
                       style: TextStyle(color: context.colors.outline),
                     ),
                 ],
-                style: context.textTheme.labelSmall?.copyWith(
+                style: context.texts.labelSmall?.copyWith(
                   color: context.colors.onSurfaceVariant,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
@@ -122,7 +136,9 @@ class ColorLegend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
       ],
     );
@@ -142,7 +158,13 @@ class Legend extends StatelessWidget {
   final String? unit;
   final bool appendUnit;
 
-  const Legend({super.key, required this.items, this.reverse = false, this.appendUnit = false, this.unit});
+  const Legend({
+    super.key,
+    required this.items,
+    this.reverse = false,
+    this.appendUnit = false,
+    this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +184,7 @@ class Legend extends StatelessWidget {
                     style: TextStyle(color: context.colors.outline),
                   ),
               ],
-              style: context.textTheme.labelSmall?.copyWith(
+              style: context.texts.labelSmall?.copyWith(
                 color: context.colors.onSurfaceVariant,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
@@ -178,7 +200,9 @@ class Legend extends StatelessWidget {
         if (unit != null && !appendUnit)
           Text(
             '單位：{unit}'.i18n.args({'unit': unit!}),
-            style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurfaceVariant),
+            style: context.texts.labelSmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
       ],
     );

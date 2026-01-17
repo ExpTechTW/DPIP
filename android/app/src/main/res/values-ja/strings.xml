@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DPIP防災</string>
+    <string name="shortcut_monitor_short">強震モニター</string>
+    <string name="shortcut_monitor_long">強震モニターを開く</string>
 </resources>

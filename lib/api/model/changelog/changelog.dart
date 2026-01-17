@@ -56,7 +56,8 @@ class GithubRelease {
     this.reactions,
   });
 
-  factory GithubRelease.fromJson(Map<String, dynamic> json) => _$GithubReleaseFromJson(json);
+  factory GithubRelease.fromJson(Map<String, dynamic> json) =>
+      _$GithubReleaseFromJson(json);
   Map<String, dynamic> toJson() => _$GithubReleaseToJson(this);
 }
 
@@ -98,7 +99,8 @@ class GithubReleaseAsset {
     required this.uploader,
   });
 
-  factory GithubReleaseAsset.fromJson(Map<String, dynamic> json) => _$GithubReleaseAssetFromJson(json);
+  factory GithubReleaseAsset.fromJson(Map<String, dynamic> json) =>
+      _$GithubReleaseAssetFromJson(json);
   Map<String, dynamic> toJson() => _$GithubReleaseAssetToJson(this);
 }
 
@@ -161,7 +163,8 @@ class GithubUser {
     required this.siteAdmin,
   });
 
-  factory GithubUser.fromJson(Map<String, dynamic> json) => _$GithubUserFromJson(json);
+  factory GithubUser.fromJson(Map<String, dynamic> json) =>
+      _$GithubUserFromJson(json);
   Map<String, dynamic> toJson() => _$GithubUserToJson(this);
 }
 
@@ -194,6 +197,7 @@ class GithubReleaseReactions {
     required this.eyes,
   });
 
-  factory GithubReleaseReactions.fromJson(Map<String, dynamic> json) => _$GithubReleaseReactionsFromJson(json);
+  factory GithubReleaseReactions.fromJson(Map<String, dynamic> json) =>
+      _$GithubReleaseReactionsFromJson(json);
   Map<String, dynamic> toJson() => _$GithubReleaseReactionsToJson(this);
 }

@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
@@ -27,8 +24,90 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:es_compression/zstd.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:option_result/result.dart';
 
-final Client _sharedClient = Client();
+class _GzipClient extends http.BaseClient {
+  final http.Client _inner;
+
+  _GzipClient(this._inner);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    request.headers['Accept-Encoding'] = 'gzip, deflate, zstd';
+    final response = await _inner.send(request);
+
+    final contentEncoding =
+        response.headers['content-encoding'] ??
+        response.headers['Content-Encoding'];
+    if (contentEncoding?.toLowerCase() == 'zstd') {
+      final compressedBody = await response.stream.toBytes();
+
+      try {
+        final decompressedBody = zstd.decode(compressedBody);
+
+        final headers = Map<String, String>.from(response.headers);
+        headers.remove('content-encoding');
+        headers.remove('Content-Encoding');
+
+        return http.StreamedResponse(
+          Stream.value(decompressedBody),
+          response.statusCode,
+          contentLength: decompressedBody.length,
+          headers: headers,
+          reasonPhrase: response.reasonPhrase,
+          request: response.request,
+          isRedirect: response.isRedirect,
+          persistentConnection: response.persistentConnection,
+        );
+      } catch (_) {
+        return http.StreamedResponse(
+          Stream.value(compressedBody),
+          response.statusCode,
+          contentLength: compressedBody.length,
+          headers: response.headers,
+          reasonPhrase: response.reasonPhrase,
+          request: response.request,
+          isRedirect: response.isRedirect,
+          persistentConnection: response.persistentConnection,
+        );
+      }
+    }
+
+    return response;
+  }
+
+  @override
+  void close() => _inner.close();
+}
+
+http.Client _createHttpClient() {
+  final httpClient = HttpClient();
+
+  final proxyEnabled = Preference.proxyEnabled ?? false;
+  final proxyHost = Preference.proxyHost;
+  final proxyPort = Preference.proxyPort;
+
+  if (proxyEnabled && proxyHost != null && proxyPort != null) {
+    httpClient.findProxy = (uri) {
+      return 'PROXY $proxyHost:$proxyPort';
+    };
+    httpClient.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => false;
+  }
+
+  return IOClient(httpClient);
+}
+
+final http.Client _sharedClient = _GzipClient(_createHttpClient());
+
+class Rtsnodata implements Exception {
+  const Rtsnodata();
+}
 
 class ExpTech {
   String? apikey;
@@ -41,7 +120,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final json = jsonDecode(res.body);
@@ -73,12 +155,17 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Rts> getRts([int? time]) async {
@@ -98,8 +185,15 @@ class ExpTech {
 
     final res = await _sharedClient.get(requestUrl);
 
+    if (res.statusCode == 404 && time != null) {
+      throw const Rtsnodata();
+    }
+
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     return Rts.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
@@ -123,37 +217,121 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode == 200) {
-      return (jsonDecode(res.body) as List<dynamic>)
-          .map((e) => Eew.fromJson(e as Map<String, dynamic>))
-          .where((e) => e.agency == 'cwa')
-          .toList();
+      final eewList = (jsonDecode(res.body) as List<dynamic>).map(
+        (e) => Eew.fromJson(e as Map<String, dynamic>),
+      );
+
+      if (Preference.experimentalEewAllSource == true) {
+        return eewList.toList();
+      }
+
+      return eewList.where((e) => e.agency == 'cwa').toList();
     } else {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
   }
 
   Future<int> getNtp() async {
     final requestUrl = Routes.ntp();
 
+    final t1 = DateTime.now().microsecondsSinceEpoch;
+
     final res = await _sharedClient.get(requestUrl);
 
+    final t4 = DateTime.now().microsecondsSinceEpoch;
+
     if (res.statusCode == 200) {
-      return int.parse(res.body);
+      final t2Header = res.headers['x-ntp-t2'];
+      final t3Header = res.headers['x-ntp-t3'];
+
+      final t2 = t2Header != null
+          ? (double.parse(t2Header) * 1000).toInt()
+          : null;
+      final t3 = t3Header != null
+          ? (double.parse(t3Header) * 1000).toInt()
+          : null;
+
+      if (t2 != null && t3 != null) {
+        final offset = ((t2 - t1) + (t3 - t4)) / 2;
+        final serverTime = (t3 + offset).toInt();
+        return serverTime ~/ 1000;
+      }
+
+      return double.parse(res.body).toInt();
     } else {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
   }
 
   Future<Map<String, Station>> getStations() async {
     final requestUrl = Routes.station();
+    final host = requestUrl.host;
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Station API: GET $requestUrl');
 
-    if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+    final headers = <String, String>{};
+    final etagKey = '${PreferenceKeys.stationEtag}:$host';
+    final cacheKey = '${PreferenceKeys.stationCache}:$host';
+    final cachedEtag = Preference.instance.getString(etagKey);
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug(
+        '🌐 Station API: Using ETag: $cachedEtag (host: $host)',
+      );
     }
 
-    return (jsonDecode(res.body) as Map<String, dynamic>).map((key, value) {
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Station API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(cacheKey);
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 Station API: Using cached data (304 Not Modified)',
+        );
+        final json = jsonDecode(cachedData) as Map<String, dynamic>;
+        return json.map((key, value) {
+          return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
+        });
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
+
+    if (res.statusCode != 200) {
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug(
+        '🌐 Station API: Saved ETag: $etag (host: $host)',
+      );
+    }
+
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
+    await Preference.instance.setString(cacheKey, res.body);
+    TalkerManager.instance.debug(
+      '🌐 Station API: Saved cached data (host: $host)',
+    );
+
+    return json.map((key, value) {
       return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
     });
   }
@@ -164,7 +342,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
@@ -178,7 +359,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final json = jsonDecode(res.body) as List;
@@ -186,30 +370,85 @@ class ExpTech {
     return json.map((e) => e as String).toList();
   }
 
-  Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
+  Future<Result<List<CrowdinLocalizationProgress>, String>>
+  getLocalizationProgress() async {
     final requestUrl = Routes.locale();
 
-    final res = await _sharedClient.get(requestUrl);
+    final response = await _sharedClient.get(requestUrl);
 
-    if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+    if (response.statusCode != 200) {
+      return Err('無法從 Crowdin 取得翻譯狀態');
     }
 
-    final json = jsonDecode(res.body) as List;
+    final data = response.json()['data'] as List;
+    final progress = data
+        .cast<Map<String, dynamic>>()
+        .map((e) => CrowdinLocalizationProgress.fromJson(e))
+        .toList();
 
-    return json.map((e) => CrowdinLocalizationProgress.fromJson(e as Map<String, dynamic>)).toList();
+    return Ok(progress);
   }
 
   Future<List<String>> getRadarList() async {
     final requestUrl = Routes.radarList();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Radar List API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(
+      PreferenceKeys.radarListEtag,
+    );
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug(
+        '🌐 Radar List API: Using ETag: $cachedEtag',
+      );
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Radar List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(
+        PreferenceKeys.radarListCache,
+      );
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 Radar List API: Using cached data (304 Not Modified)',
+        );
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData.map((item) => item.toString()).toList();
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.radarListEtag, etag);
+      TalkerManager.instance.debug('🌐 Radar List API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(
+      PreferenceKeys.radarListCache,
+      res.body,
+    );
+    TalkerManager.instance.debug('🌐 Radar List API: Saved cached data');
 
     return jsonData.map((item) => item.toString()).toList();
   }
@@ -220,7 +459,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -234,26 +476,153 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => WeatherStation.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => WeatherStation.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<RealtimeWeather> getWeatherRealtime(String region) async {
-    final requestUrl = Routes.weatherRealtime(region);
+  Future<RealtimeWeather> getWeatherRealtimeByCoords(
+    double lat,
+    double lon,
+  ) async {
+    final requestUrl = Routes.weatherRealtimeByCoords(lat, lon);
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 API: GET $requestUrl');
+
+    final cacheKey = PreferenceKeys.weatherCache;
+    final etagKey = PreferenceKeys.weatherEtag;
+    final coordsKey = '${PreferenceKeys.weatherCache}:coords';
+    final currentCoords = '$lat:$lon';
+    final cachedCoords = Preference.instance.getString(coordsKey);
+
+    final headers = <String, String>{};
+    if (cachedCoords == currentCoords) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug('🌐 API: Using ETag: $cachedEtag');
+      }
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(cacheKey);
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 API: Using cached data (304 Not Modified)',
+        );
+        final json = jsonDecode(cachedData) as Map<String, dynamic>;
+        return RealtimeWeather.fromJson(json);
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug('🌐 API: Saved ETag: $etag');
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(coordsKey, currentCoords);
+    TalkerManager.instance.debug('🌐 API: Saved cached data');
 
-    return RealtimeWeather.fromJson(json);
+    TalkerManager.instance.debug('🌐 API: JSON decoded successfully');
+
+    final weather = RealtimeWeather.fromJson(json);
+    TalkerManager.instance.debug('🌐 API: RealtimeWeather.fromJson completed');
+
+    return weather;
+  }
+
+  Future<Map<String, dynamic>> getWeatherForecast(String region) async {
+    final requestUrl = Routes.weatherForecast(region);
+
+    TalkerManager.instance.debug('🌐 Forecast API: GET $requestUrl');
+
+    final cacheKey = PreferenceKeys.forecastCache;
+    final etagKey = PreferenceKeys.forecastEtag;
+    final regionKey = '${PreferenceKeys.forecastCache}:region';
+    final cachedRegion = Preference.instance.getString(regionKey);
+
+    final headers = <String, String>{};
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 Forecast API: Using ETag: $cachedEtag',
+        );
+      }
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Forecast API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(cacheKey);
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 Forecast API: Using cached data (304 Not Modified)',
+        );
+        return jsonDecode(cachedData) as Map<String, dynamic>;
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
+
+    if (res.statusCode != 200) {
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug('🌐 Forecast API: Saved ETag: $etag');
+    }
+
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
+    TalkerManager.instance.debug('🌐 Forecast API: Saved cached data');
+
+    TalkerManager.instance.debug('🌐 Forecast API: Response JSON: $json');
+
+    return json;
   }
 
   Future<List<String>> getRainList() async {
@@ -262,7 +631,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -276,12 +648,17 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => RainStation.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => RainStation.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List> getTyphoonImagesList() async {
@@ -290,7 +667,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -304,7 +684,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -318,7 +701,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final jsonData = jsonDecode(res.body) as Map<String, dynamic>;
@@ -332,68 +718,294 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => Lightning.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => Lightning.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<History>> getRealtime() async {
     final requestUrl = Routes.realtime();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Realtime List API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(
+      PreferenceKeys.realtimeListEtag,
+    );
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug(
+        '🌐 Realtime List API: Using ETag: $cachedEtag',
+      );
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Realtime List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(
+        PreferenceKeys.realtimeListCache,
+      );
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 Realtime List API: Using cached data (304 Not Modified)',
+        );
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData
+            .map((item) => History.fromJson(item as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(
+        PreferenceKeys.realtimeListEtag,
+        etag,
+      );
+      TalkerManager.instance.debug('🌐 Realtime List API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(
+      PreferenceKeys.realtimeListCache,
+      res.body,
+    );
+    TalkerManager.instance.debug('🌐 Realtime List API: Saved cached data');
 
-    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => History.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<History>> getHistory() async {
     final requestUrl = Routes.history();
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 History List API: GET $requestUrl');
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedEtag = Preference.instance.getString(
+      PreferenceKeys.historyListEtag,
+    );
+    if (cachedEtag != null) {
+      headers['If-None-Match'] = cachedEtag;
+      TalkerManager.instance.debug(
+        '🌐 History List API: Using ETag: $cachedEtag',
+      );
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 History List API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(
+        PreferenceKeys.historyListCache,
+      );
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 History List API: Using cached data (304 Not Modified)',
+        );
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData
+            .map((item) => History.fromJson(item as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(PreferenceKeys.historyListEtag, etag);
+      TalkerManager.instance.debug('🌐 History List API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(
+      PreferenceKeys.historyListCache,
+      res.body,
+    );
+    TalkerManager.instance.debug('🌐 History List API: Saved cached data');
 
-    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => History.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<History>> getRealtimeRegion(String region) async {
     final requestUrl = Routes.realtimeRegion(region);
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 Realtime Region API: GET $requestUrl');
+
+    final cacheKey = PreferenceKeys.realtimeRegionCache;
+    final etagKey = PreferenceKeys.realtimeRegionEtag;
+    final regionKey = '${PreferenceKeys.realtimeRegionCache}:region';
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedRegion = Preference.instance.getString(regionKey);
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 Realtime Region API: Using ETag: $cachedEtag',
+        );
+      }
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 Realtime Region API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(cacheKey);
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 Realtime Region API: Using cached data (304 Not Modified)',
+        );
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData
+            .map((item) => History.fromJson(item as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug('🌐 Realtime Region API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
+    TalkerManager.instance.debug('🌐 Realtime Region API: Saved cached data');
 
-    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => History.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<History>> getHistoryRegion(String region) async {
     final requestUrl = Routes.historyRegion(region);
 
-    final res = await _sharedClient.get(requestUrl);
+    TalkerManager.instance.debug('🌐 History Region API: GET $requestUrl');
+
+    final cacheKey = PreferenceKeys.historyRegionCache;
+    final etagKey = PreferenceKeys.historyRegionEtag;
+    final regionKey = '${PreferenceKeys.historyRegionCache}:region';
+
+    final headers = <String, String>{};
+    await Preference.reload();
+    final cachedRegion = Preference.instance.getString(regionKey);
+    if (cachedRegion == region) {
+      final cachedEtag = Preference.instance.getString(etagKey);
+      if (cachedEtag != null) {
+        headers['If-None-Match'] = cachedEtag;
+        TalkerManager.instance.debug(
+          '🌐 History Region API: Using ETag: $cachedEtag',
+        );
+      }
+    }
+
+    final res = await _sharedClient.get(requestUrl, headers: headers);
+
+    TalkerManager.instance.debug(
+      '🌐 History Region API: Response status=${res.statusCode}, body length=${res.body.length}',
+    );
+
+    if (res.statusCode == 304) {
+      final cachedData = Preference.instance.getString(cacheKey);
+      if (cachedData != null) {
+        TalkerManager.instance.debug(
+          '🌐 History Region API: Using cached data (304 Not Modified)',
+        );
+        final List<dynamic> jsonData = jsonDecode(cachedData) as List<dynamic>;
+        return jsonData
+            .map((item) => History.fromJson(item as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw HttpException(
+          '304 Not Modified but no cached data available',
+          uri: requestUrl,
+        );
+      }
+    }
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
+    }
+
+    final etag = res.headers['etag'] ?? res.headers['ETag'];
+    if (etag != null) {
+      await Preference.instance.setString(etagKey, etag);
+      TalkerManager.instance.debug('🌐 History Region API: Saved ETag: $etag');
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+    await Preference.instance.setString(cacheKey, res.body);
+    await Preference.instance.setString(regionKey, region);
+    TalkerManager.instance.debug('🌐 History Region API: Saved cached data');
 
-    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => History.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Map<String, dynamic>> getSupport() async {
@@ -402,24 +1014,33 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
-  Future<List<GithubRelease>> getReleases() async {
-    final requestUrl = 'https://api.github.com/repos/ExpTechTW/DPIP/releases'.asUri;
+  Future<Result<List<GithubRelease>, String>> getReleases() async {
+    try {
+      final requestUrl =
+          'https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases'.asUri;
 
-    final res = await _sharedClient.get(requestUrl);
+      final response = await _sharedClient.get(requestUrl);
 
-    if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      if (!response.ok) {
+        return Err('無法從 GitHub 取得更新紀錄，狀態 ${response.statusCode}');
+      }
+
+      final data = response.list().cast<Map<String, dynamic>>();
+      final releases = data.map(GithubRelease.fromJson).toList();
+
+      return Ok(releases);
+    } catch (e) {
+      return Err('無法從 GitHub 取得更新紀錄');
     }
-
-    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
-
-    return jsonData.map((item) => GithubRelease.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<Announcement>> getAnnouncement() async {
@@ -428,12 +1049,17 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => Announcement.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => Announcement.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<NotificationRecord>> getNotificationHistory() async {
@@ -442,12 +1068,19 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => NotificationRecord.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map(
+          (item) => NotificationRecord.fromJson(item as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   Future<List<ServerStatus>> getStatus() async {
@@ -456,12 +1089,17 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => ServerStatus.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => ServerStatus.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<MeteorStation> getMeteorStation(String id) async {
@@ -470,10 +1108,14 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
-    final Map<String, dynamic> jsonData = jsonDecode(res.body) as Map<String, dynamic>;
+    final Map<String, dynamic> jsonData =
+        jsonDecode(res.body) as Map<String, dynamic>;
 
     return MeteorStation.fromJson(jsonData);
   }
@@ -484,17 +1126,29 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
+    return jsonData
+        .map((item) => History.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   /// 回傳所在地
-  Future<String> updateDeviceLocation({required String token, required LatLng coordinates}) async {
-    final requestUrl = Routes.location(token: token, lat: '${coordinates.latitude}', lng: '${coordinates.longitude}');
+  Future<String> updateDeviceLocation({
+    required String token,
+    required LatLng coordinates,
+  }) async {
+    final requestUrl = Routes.location(
+      token: token,
+      lat: '${coordinates.latitude}',
+      lng: '${coordinates.longitude}',
+    );
 
     final res = await _sharedClient.get(requestUrl);
 
@@ -505,7 +1159,10 @@ class ExpTech {
     } else if (res.statusCode == 202) {
       return '${res.statusCode} $requestUrl';
     } else {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
   }
 
@@ -516,7 +1173,10 @@ class ExpTech {
     final res = await _sharedClient.get(requestUrl);
 
     if (!res.ok) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -530,12 +1190,19 @@ class ExpTech {
     required NotifyChannel channel,
     required Enum status,
   }) async {
-    final requestUrl = Routes.notifyStatus(token: token, channel: channel, status: status);
+    final requestUrl = Routes.notifyStatus(
+      token: token,
+      channel: channel,
+      status: status,
+    );
 
     final res = await _sharedClient.get(requestUrl);
 
     if (!res.ok) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -551,12 +1218,20 @@ class ExpTech {
   }) async {
     final requestUrl = Routes.networkInfo();
 
-    String body = jsonEncode({'ip': ip, 'isp': isp, 'status': status, 'status_dev': status_dev});
+    String body = jsonEncode({
+      'ip': ip,
+      'isp': isp,
+      'status': status,
+      'status_dev': status_dev,
+    });
 
     final res = await _sharedClient.post(requestUrl, body: body);
 
     if (!res.ok) {
-      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+      throw HttpException(
+        'The server returned a status of ${res.statusCode}',
+        uri: requestUrl,
+      );
     }
   }
 }

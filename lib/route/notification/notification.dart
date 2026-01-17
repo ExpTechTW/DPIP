@@ -8,7 +8,8 @@ class NotificationHistoryPage extends StatefulWidget {
   const NotificationHistoryPage({super.key});
 
   @override
-  _NotificationHistoryPageState createState() => _NotificationHistoryPageState();
+  _NotificationHistoryPageState createState() =>
+      _NotificationHistoryPageState();
 }
 
 class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
@@ -27,7 +28,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       final records = await ExpTech().getNotificationHistory();
       notificationRecords = records.reversed.toList();
     } catch (e) {
-      errorMessage = '獲取通知紀錄時發生錯誤 $e';
+      errorMessage = '取得通知紀錄時發生錯誤 $e';
     } finally {
       isLoading = false;
       setState(() {});
@@ -63,7 +64,11 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
               // 導航到詳細資訊頁面
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationDetailPage(record: notificationRecords[index])),
+                MaterialPageRoute(
+                  builder: (context) => NotificationDetailPage(
+                    record: notificationRecords[index],
+                  ),
+                ),
               );
             },
           );
@@ -77,7 +82,11 @@ class NotificationCard extends StatelessWidget {
   final NotificationRecord record;
   final VoidCallback onTap;
 
-  const NotificationCard({super.key, required this.record, required this.onTap});
+  const NotificationCard({
+    super.key,
+    required this.record,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +111,8 @@ class NotificationCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             record.title,
-                            style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            style: context.theme.textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -127,7 +137,9 @@ class NotificationCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: context.theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                color: context.theme.textTheme.bodySmall?.color?.withValues(
+                  alpha: 0.5,
+                ),
               ),
             ],
           ),
@@ -138,8 +150,13 @@ class NotificationCard extends StatelessWidget {
 
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
-      label: Text(record.critical ? '緊急' : '一般', style: const TextStyle(fontWeight: FontWeight.bold)),
-      backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
+      label: Text(
+        record.critical ? '緊急' : '一般',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: record.critical
+          ? Colors.red.withValues(alpha: 0.16)
+          : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
     );
@@ -153,7 +170,10 @@ class NotificationCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           _formatDate(record.time),
-          style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: context.colors.primary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
@@ -168,7 +188,10 @@ class NotificationCard extends StatelessWidget {
               .take(2)
               .map(
                 (area) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blue.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(5),
@@ -181,13 +204,19 @@ class NotificationCard extends StatelessWidget {
           (record.area.length > 2
               ? [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue.withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(color: Colors.blue),
                     ),
-                    child: Text('+${record.area.length - 2}', style: const TextStyle(fontSize: 12)),
+                    child: Text(
+                      '+${record.area.length - 2}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 ]
               : []),
@@ -214,7 +243,12 @@ class NotificationDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(record.title, style: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              record.title,
+              style: context.theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 16),
             _buildDateChip(context),
             const SizedBox(height: 16),
@@ -237,7 +271,9 @@ class NotificationDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.colors.primary.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: context.colors.primary.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -246,7 +282,10 @@ class NotificationDetailPage extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             _formatDate(record.time),
-            style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: context.colors.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -255,8 +294,13 @@ class NotificationDetailPage extends StatelessWidget {
 
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
-      label: Text(record.critical ? '緊急通知' : '一般通知', style: const TextStyle(fontWeight: FontWeight.bold)),
-      backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
+      label: Text(
+        record.critical ? '緊急通知' : '一般通知',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: record.critical
+          ? Colors.red.withValues(alpha: 0.16)
+          : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
     );

@@ -1,11 +1,10 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
 
 class _SettingsLocationModel extends ChangeNotifier {
   /// The underlying [ValueNotifier] for the current location represented as a postal code.
@@ -145,7 +144,8 @@ class _SettingsLocationModel extends ChangeNotifier {
   /// Returns a [UnmodifiableSetView<String>] containing the postal codes of the favorited locations.
   ///
   /// Defaults to an empty [Set] if no favorited locations have been set.
-  UnmodifiableSetView<String> get favorited => UnmodifiableSetView($favorited.value);
+  UnmodifiableSetView<String> get favorited =>
+      UnmodifiableSetView($favorited.value);
 
   /// Adds a location to the list of favorited locations.
   ///
@@ -177,6 +177,9 @@ class _SettingsLocationModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Check if the provided location is favorited
+  bool isFavorited(String code) => favorited.contains(code);
+
   /// Refreshes the location settings from preferences.
   ///
   /// Updates the [code], [coordinates], and [auto] properties to reflect the current preferences.
@@ -184,7 +187,9 @@ class _SettingsLocationModel extends ChangeNotifier {
   /// This method is used to refresh the location settings when the preferences are updated.
   void refresh() {
     $code.value = Preference.locationCode;
-    $coordinates.value = Preference.locationLatitude != null && Preference.locationLongitude != null
+    $coordinates.value =
+        Preference.locationLatitude != null &&
+            Preference.locationLongitude != null
         ? LatLng(Preference.locationLatitude!, Preference.locationLongitude!)
         : null;
     $auto.value = Preference.locationAuto ?? false;
@@ -194,3 +199,8 @@ class _SettingsLocationModel extends ChangeNotifier {
 }
 
 class SettingsLocationModel extends _SettingsLocationModel {}
+
+extension SettingsLocationModelExtension on BuildContext {
+  SettingsLocationModel get useLocation => watch<SettingsLocationModel>();
+  SettingsLocationModel get location => read<SettingsLocationModel>();
+}

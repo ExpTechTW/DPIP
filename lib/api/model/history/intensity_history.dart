@@ -1,5 +1,5 @@
 import 'package:dpip/api/model/history/history.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'intensity_history.g.dart';
@@ -22,7 +22,8 @@ class IntensityHistoryAddition {
     required this.isFinal,
   });
 
-  factory IntensityHistoryAddition.fromJson(Map<String, dynamic> json) => _$IntensityHistoryAdditionFromJson(json);
+  factory IntensityHistoryAddition.fromJson(Map<String, dynamic> json) =>
+      _$IntensityHistoryAdditionFromJson(json);
 
   Map<String, dynamic> toJson() => _$IntensityHistoryAdditionToJson(this);
 }
@@ -43,7 +44,8 @@ class IntensityHistory extends History {
     required this.addition,
   });
 
-  factory IntensityHistory.fromJson(Map<String, dynamic> json) => _$IntensityHistoryFromJson(json);
+  factory IntensityHistory.fromJson(Map<String, dynamic> json) =>
+      _$IntensityHistoryFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$IntensityHistoryToJson(this);

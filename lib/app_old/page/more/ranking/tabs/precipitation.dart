@@ -4,7 +4,7 @@ import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/intervals.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -13,7 +13,8 @@ class RankingPrecipitationTab extends StatefulWidget {
   const RankingPrecipitationTab({super.key});
 
   @override
-  State<RankingPrecipitationTab> createState() => _RankingPrecipitationTabState();
+  State<RankingPrecipitationTab> createState() =>
+      _RankingPrecipitationTabState();
 }
 
 class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
@@ -29,7 +30,9 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
     if (!mounted) return;
 
     data = rainData.asMap().map((_, e) => MapEntry(e.station, e.data));
-    time = DateFormat('yyyy/MM/dd HH:mm:ss').format(parseDateTime(rainTimeList.last));
+    time = DateFormat(
+      'yyyy/MM/dd HH:mm:ss',
+    ).format(parseDateTime(rainTimeList.last));
     rank();
   }
 
@@ -126,7 +129,8 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   ChoiceChip(
                     label: const Text('24 小時'),
                     selected: interval == Intervals.twentyFourHours,
-                    onSelected: (value) => setInterval(Intervals.twentyFourHours),
+                    onSelected: (value) =>
+                        setInterval(Intervals.twentyFourHours),
                   ),
                   ChoiceChip(
                     label: const Text('2 天'),
@@ -144,7 +148,10 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點', style: TextStyle(color: context.colors.onSurfaceVariant)),
+            child: Text(
+              '資料時間：$time\n共 ${ranked.length} 觀測點',
+              style: TextStyle(color: context.colors.onSurfaceVariant),
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -201,14 +208,19 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
                 final leading = index < 3
                     ? Icon(
-                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                        index == 0
+                            ? Symbols.trophy_rounded
+                            : Symbols.workspace_premium_rounded,
                         color: iconColor,
                         size: iconSize,
                         fill: 1,
                       )
                     : Text(
                         '$rank',
-                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
+                        style: TextStyle(
+                          color: foregroundColor,
+                          fontSize: fontSize,
+                        ),
                       );
 
                 final percentage = item.$2 / ranked.first.$2;
@@ -228,14 +240,20 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   const SizedBox(width: 8),
                   Text(
                     '${item.$1.county}${item.$1.town}',
-                    style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withValues(alpha: 0.8)),
+                    style: TextStyle(
+                      fontSize: fontSize / 1.25,
+                      color: foregroundColor.withValues(alpha: 0.8),
+                    ),
                   ),
                 ];
 
                 final content = [
                   Expanded(
                     child: index < 3
-                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: location,
+                          )
                         : Row(children: location),
                   ),
                   Text(
@@ -252,14 +270,20 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 ];
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,

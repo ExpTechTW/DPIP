@@ -5,7 +5,11 @@ import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 import 'package:flutter/material.dart';
 
 typedef MorphingSheetBuilder =
-    Widget Function(BuildContext context, ScrollController controller, MorphingSheetController sheetController);
+    Widget Function(
+      BuildContext context,
+      ScrollController controller,
+      MorphingSheetController sheetController,
+    );
 
 class MorphingSheet extends StatefulWidget {
   final MorphingSheetBuilder? fullBuilder;
@@ -43,7 +47,8 @@ class MorphingSheet extends StatefulWidget {
   State<MorphingSheet> createState() => _MorphingSheetState();
 }
 
-class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProviderStateMixin {
+class _MorphingSheetState extends State<MorphingSheet>
+    with SingleTickerProviderStateMixin {
   late DraggableScrollableController _controller;
   late AnimationController _morphController;
   bool _isSnapping = false;
@@ -101,11 +106,13 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   }
 
   void _measureSizes() {
-    final RenderBox? contentBox = _contentKey.currentContext?.findRenderObject() as RenderBox?;
-    final RenderBox? partialBox = _partialKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? contentBox =
+        _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? partialBox =
+        _partialKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (contentBox != null) {
-      final screenHeight = context.screen.height;
+      final screenHeight = context.dimension.height;
       final isOverflowing = contentBox.size.height > screenHeight * 0.85;
       if (_isOverflowing != isOverflowing) {
         setState(() {
@@ -126,7 +133,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
 
   double get _minChildSize {
     if (_partialSize == null) return _minHeightRatio;
-    final screenHeight = context.screen.height;
+    final screenHeight = context.dimension.height;
 
     // Calculate total height including all padding and margin
     final totalHeight =
@@ -150,7 +157,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
     if (_isSnapping) return;
 
     final position = _controller.size;
-    final morphValue = (position - _minChildSize) / (widget.maxChildSize - _minChildSize);
+    final morphValue =
+        (position - _minChildSize) / (widget.maxChildSize - _minChildSize);
     _morphController.value = morphValue.clamp(0.0, 1.0);
   }
 
@@ -160,10 +168,18 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
 
     try {
       final isExpanding = targetPosition > _controller.size;
-      final curve = isExpanding ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate;
-      final duration = isExpanding ? MorphingSheetController.enterDuration : MorphingSheetController.exitDuration;
+      final curve = isExpanding
+          ? Easing.emphasizedDecelerate
+          : Easing.emphasizedAccelerate;
+      final duration = isExpanding
+          ? MorphingSheetController.enterDuration
+          : MorphingSheetController.exitDuration;
 
-      await _controller.animateTo(targetPosition, duration: duration, curve: curve);
+      await _controller.animateTo(
+        targetPosition,
+        duration: duration,
+        curve: curve,
+      );
     } finally {
       _isSnapping = false;
     }
@@ -191,7 +207,9 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
             bottom: _verticalPadding,
           ),
           child: Container(
-            margin: EdgeInsets.only(bottom: _bottomMargin + context.padding.bottom),
+            margin: EdgeInsets.only(
+              bottom: _bottomMargin + context.padding.bottom,
+            ),
             child: PhysicalModel(
               color: Colors.transparent,
               elevation: widget.elevation,
@@ -202,7 +220,9 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(borderRadius),
                   border: Border.all(
                     width: widget.borderWidth ?? 1,
-                    color: widget.borderColor ?? context.colors.outline.withValues(alpha: 0.2),
+                    color:
+                        widget.borderColor ??
+                        context.colors.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: ClipRRect(
@@ -210,7 +230,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Material(
-                      color: (widget.backgroundColor ?? context.colors.surface).withValues(alpha: 0.6),
+                      color: (widget.backgroundColor ?? context.colors.surface)
+                          .withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(borderRadius),
                       clipBehavior: Clip.antiAlias,
                       child: Stack(
@@ -224,8 +245,12 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      context.colors.surfaceTint.withValues(alpha: 0.04),
-                                      context.colors.surfaceTint.withValues(alpha: 0.12),
+                                      context.colors.surfaceTint.withValues(
+                                        alpha: 0.04,
+                                      ),
+                                      context.colors.surfaceTint.withValues(
+                                        alpha: 0.12,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -241,7 +266,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                   child: widget.partialBuilder(
                                     context,
                                     ScrollController(),
-                                    widget.controller ?? MorphingSheetController(),
+                                    widget.controller ??
+                                        MorphingSheetController(),
                                   ),
                                 ),
                               );
@@ -289,12 +315,16 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                     end: 0.0,
                   ).transform(_morphController.value);
 
-                  final isFullScreen = _morphController.value == 1.0 && _controller.size == widget.maxChildSize;
+                  final isFullScreen =
+                      _morphController.value == 1.0 &&
+                      _controller.size == widget.maxChildSize;
 
                   final borderRadius = !isFullScreen
                       ? Tween<double>(
                           begin: widget.borderRadius?.topLeft.y ?? 16.0,
-                          end: _isOverflowing ? 0.0 : (widget.borderRadius?.topLeft.y ?? 16.0),
+                          end: _isOverflowing
+                              ? 0.0
+                              : (widget.borderRadius?.topLeft.y ?? 16.0),
                         ).transform(_morphController.value)
                       : 0.0;
 
@@ -309,36 +339,62 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                   ).transform(_morphController.value);
 
                   return Padding(
-                    padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding, bottom: bottomPadding),
+                    padding: EdgeInsets.only(
+                      left: horizontalPadding,
+                      right: horizontalPadding,
+                      bottom: bottomPadding,
+                    ),
                     child: Container(
                       margin: EdgeInsets.only(bottom: marginBottom),
                       child: PhysicalModel(
                         color: Colors.transparent,
                         elevation: elevation,
-                        shadowColor: context.colors.shadow.withValues(alpha: 0.6),
+                        shadowColor: context.colors.shadow.withValues(
+                          alpha: 0.6,
+                        ),
                         borderRadius: BorderRadius.circular(borderRadius),
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(borderRadius),
                             border: Border.all(
                               color: context.colors.outline.withValues(
-                                alpha: Tween<double>(begin: 0.2, end: 0.0).transform(_morphController.value),
+                                alpha: Tween<double>(
+                                  begin: 0.2,
+                                  end: 0.0,
+                                ).transform(_morphController.value),
                               ),
-                              width: Tween<double>(begin: 1.0, end: 0.0).transform(_morphController.value),
+                              width: Tween<double>(
+                                begin: 1.0,
+                                end: 0.0,
+                              ).transform(_morphController.value),
                             ),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(borderRadius),
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
-                                sigmaX: Tween<double>(begin: 16, end: 0).transform(_morphController.value),
-                                sigmaY: Tween<double>(begin: 16, end: 0).transform(_morphController.value),
+                                sigmaX: Tween<double>(
+                                  begin: 16,
+                                  end: 0,
+                                ).transform(_morphController.value),
+                                sigmaY: Tween<double>(
+                                  begin: 16,
+                                  end: 0,
+                                ).transform(_morphController.value),
                               ),
                               child: Material(
-                                color: (widget.backgroundColor ?? context.colors.surface).withValues(
-                                  alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
+                                color:
+                                    (widget.backgroundColor ??
+                                            context.colors.surface)
+                                        .withValues(
+                                          alpha: Tween<double>(
+                                            begin: 0.6,
+                                            end: 1.0,
+                                          ).transform(_morphController.value),
+                                        ),
+                                borderRadius: BorderRadius.circular(
+                                  borderRadius,
                                 ),
-                                borderRadius: BorderRadius.circular(borderRadius),
                                 clipBehavior: Clip.antiAlias,
                                 child: Stack(
                                   children: [
@@ -353,8 +409,10 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                                 colors: [
-                                                  context.colors.surfaceTint.withValues(alpha: 0.04),
-                                                  context.colors.surfaceTint.withValues(alpha: 0.12),
+                                                  context.colors.surfaceTint
+                                                      .withValues(alpha: 0.04),
+                                                  context.colors.surfaceTint
+                                                      .withValues(alpha: 0.12),
                                                 ],
                                               ),
                                             ),
@@ -368,7 +426,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                           child: LayoutBuilder(
                                             builder: (context, constraints) {
                                               return SingleChildScrollView(
-                                                physics: const NeverScrollableScrollPhysics(),
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
                                                 padding: EdgeInsets.zero,
                                                 child: SizedBox(
                                                   key: _partialKey,
@@ -376,7 +435,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                                   child: widget.partialBuilder(
                                                     context,
                                                     scrollController,
-                                                    widget.controller ?? MorphingSheetController(),
+                                                    widget.controller ??
+                                                        MorphingSheetController(),
                                                   ),
                                                 ),
                                               );
@@ -385,7 +445,9 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                         ),
                                         Opacity(
                                           opacity: _morphController.value,
-                                          child: _buildFullContent(scrollController),
+                                          child: _buildFullContent(
+                                            scrollController,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -408,7 +470,11 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   }
 
   Widget _buildFullContent(ScrollController scrollController) {
-    final content = widget.fullBuilder!(context, scrollController, widget.controller ?? MorphingSheetController());
+    final content = widget.fullBuilder!(
+      context,
+      scrollController,
+      widget.controller ?? MorphingSheetController(),
+    );
 
     if (!_isOverflowing) {
       return Container(key: _contentKey, child: content);

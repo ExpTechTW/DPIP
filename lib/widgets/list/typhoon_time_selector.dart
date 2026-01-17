@@ -24,7 +24,8 @@ class TyphoonTimeSelector extends StatefulWidget {
   State<TyphoonTimeSelector> createState() => _TyphoonTimeSelectorState();
 }
 
-class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTickerProviderStateMixin {
+class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
+    with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late int _selectedTyphoonId;
   late ScrollController _timeScrollController;
@@ -41,8 +42,14 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
     _selectedTyphoonId = widget.selectedTyphoonId;
     _timeScrollController = ScrollController();
     _typhoonScrollController = ScrollController();
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelected();
       _scrollToSelectedTyphoon();
@@ -69,7 +76,8 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
       final viewportWidth = _timeScrollController.position.viewportDimension;
       final maxScroll = _timeScrollController.position.maxScrollExtent;
 
-      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll =
+          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -93,7 +101,8 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
       final viewportWidth = _typhoonScrollController.position.viewportDimension;
       final maxScroll = _typhoonScrollController.position.maxScrollExtent;
 
-      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll =
+          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -143,15 +152,23 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                   setState(() {
                     _selectedTimestamp = timestamp;
                   });
-                  widget.onSelectionChanged(_selectedTimestamp, _selectedTyphoonId);
+                  widget.onSelectionChanged(
+                    _selectedTimestamp,
+                    _selectedTyphoonId,
+                  );
                   _scrollToSelected();
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   alignment: Alignment.center,
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSelected ? context.colors.secondary : Colors.transparent,
+                    color: isSelected
+                        ? context.colors.secondary
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -160,7 +177,9 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                       Text(
                         DateFormat('HH:mm').format(time),
                         style: TextStyle(
-                          color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
+                          color: isSelected
+                              ? context.colors.onSecondary
+                              : context.colors.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -206,21 +225,31 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                   setState(() {
                     _selectedTyphoonId = typhoonId;
                   });
-                  widget.onSelectionChanged(_selectedTimestamp, _selectedTyphoonId);
+                  widget.onSelectionChanged(
+                    _selectedTimestamp,
+                    _selectedTyphoonId,
+                  );
                   _scrollToSelectedTyphoon();
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   alignment: Alignment.center,
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSelected ? context.colors.secondary : Colors.transparent,
+                    color: isSelected
+                        ? context.colors.secondary
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     widget.typhoonList[index],
                     style: TextStyle(
-                      color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
+                      color: isSelected
+                          ? context.colors.onSecondary
+                          : context.colors.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -256,7 +285,11 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2)),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
               ],
             ),
             child: Row(
@@ -264,17 +297,25 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
               children: [
                 Text(
                   "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonName)",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: context.colors.onSurface),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: context.colors.onSurface,
+                  ),
                 ),
                 const SizedBox(width: 4),
-                Icon(_isExpanded ? Icons.expand_more : Icons.expand_less, color: context.colors.onSurface),
+                Icon(
+                  _isExpanded ? Icons.expand_more : Icons.expand_less,
+                  color: context.colors.onSurface,
+                ),
               ],
             ),
           ),
         ),
         SizeTransition(
           sizeFactor: _expandAnimation,
-          child: Column(children: [_buildTimeSelector(), _buildTyphoonSelector()]),
+          child: Column(
+            children: [_buildTimeSelector(), _buildTyphoonSelector()],
+          ),
         ),
       ],
     );

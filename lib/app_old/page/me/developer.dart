@@ -10,14 +10,20 @@ class DPIPInfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('開發者想說的話'),
-        leading: IconButton(icon: const Icon(Symbols.arrow_back), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: const Icon(Symbols.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [context.colors.primary.withValues(alpha: 0.05), context.colors.surface],
+            colors: [
+              context.colors.primary.withValues(alpha: 0.05),
+              context.colors.surface,
+            ],
           ),
         ),
         child: ListView(
@@ -81,7 +87,12 @@ class DPIPInfoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, String title, List<String> paragraphs, IconData icon) {
+  Widget _buildInfoCard(
+    BuildContext context,
+    String title,
+    List<String> paragraphs,
+    IconData icon,
+  ) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
@@ -108,7 +119,10 @@ class DPIPInfoPage extends StatelessWidget {
             ...paragraphs.map(
               (paragraph) => Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(paragraph, style: context.theme.textTheme.bodyLarge),
+                child: Text(
+                  paragraph,
+                  style: context.theme.textTheme.bodyLarge,
+                ),
               ),
             ),
           ],

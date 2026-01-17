@@ -1,6 +1,6 @@
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -48,7 +48,8 @@ class PartialEarthquakeReport {
     required this.md5,
   });
 
-  factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) => _$PartialEarthquakeReportFromJson(json);
+  factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) =>
+      _$PartialEarthquakeReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$PartialEarthquakeReportToJson(this);
 
@@ -73,10 +74,14 @@ class PartialEarthquakeReport {
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id');
+      return Uri.parse(
+        'https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id',
+      );
     }
 
-    return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag');
+    return Uri.parse(
+      'https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag',
+    );
   }
 
   String get reportImageName {
@@ -113,7 +118,7 @@ class PartialEarthquakeReport {
 
   String get traceBaseUrl {
     final year = time.year.toString();
-    return 'https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/';
+    return 'https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year';
   }
 
   String? get intensityMapImageName {
@@ -122,7 +127,9 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}i.png';
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : '$traceBaseUrl/$intensityMapImageName';
+  String? get intensityMapImageUrl => intensityMapImageName == null
+      ? null
+      : '$traceBaseUrl/$intensityMapImageName';
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
@@ -130,7 +137,8 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}a.png';
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
+  String? get pgaMapImageUrl =>
+      pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
@@ -138,11 +146,15 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}v.png';
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
+  String? get pgvMapImageUrl =>
+      pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
   String extractLocation() {
     if (location.contains('(')) {
-      return location.substring(location.indexOf('(') + 3, location.indexOf(')'));
+      return location.substring(
+        location.indexOf('(') + 3,
+        location.indexOf(')'),
+      );
     } else {
       return location.substring(0, location.indexOf('方') + 1);
     }

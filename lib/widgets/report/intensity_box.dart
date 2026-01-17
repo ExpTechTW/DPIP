@@ -1,5 +1,5 @@
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/number.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +9,13 @@ class IntensityBox extends StatelessWidget {
   final double borderRadius;
   final bool border;
 
-  const IntensityBox({super.key, required this.intensity, this.size = 64, this.borderRadius = 16, this.border = false});
+  const IntensityBox({
+    super.key,
+    required this.intensity,
+    this.size = 64,
+    this.borderRadius = 16,
+    this.border = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,10 @@ class IntensityBox extends StatelessWidget {
       decoration: border
           ? BoxDecoration(
               borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(color: IntensityColor.intensity(intensity), width: 3.0),
+              border: Border.all(
+                color: IntensityColor.intensity(intensity),
+                width: 3.0,
+              ),
             )
           : BoxDecoration(
               borderRadius: BorderRadius.circular(borderRadius),
@@ -29,7 +38,9 @@ class IntensityBox extends StatelessWidget {
         child: Text(
           intensity.asIntensityDisplayLabel,
           style: TextStyle(
-            color: border ? context.colors.onSurface : IntensityColor.onIntensity(intensity),
+            color: border
+                ? context.colors.onSurface
+                : IntensityColor.onIntensity(intensity),
             fontSize: size / 2,
             fontWeight: FontWeight.bold,
           ),

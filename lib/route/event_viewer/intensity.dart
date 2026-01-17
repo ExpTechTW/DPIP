@@ -10,7 +10,7 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
 import 'package:dpip/widgets/map/legend.dart';
@@ -61,7 +61,9 @@ class _IntensityPageState extends State<IntensityPage> {
 
     await _mapController.addSource(
       'markers-geojson',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
+      const GeojsonSourceProperties(
+        data: {'type': 'FeatureCollection', 'features': []},
+      ),
     );
 
     start();
@@ -71,16 +73,21 @@ class _IntensityPageState extends State<IntensityPage> {
     final location = GlobalProviders.location.coordinates;
 
     if (location != null && location.isValid) {
-      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+      await _mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(location, 7.4),
+      );
     } else {
-      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+      await _mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+      );
     }
 
     getEventInfo();
 
     if (!widget.item.addition.isFinal) {
       _update = Timer.periodic(const Duration(seconds: 1), (_) async {
-        data = (await ExpTech().getEvent(widget.item.id))[0] as IntensityHistory;
+        data =
+            (await ExpTech().getEvent(widget.item.id))[0] as IntensityHistory;
         getEventInfo();
         if (data.addition.isFinal == true) {
           _update?.cancel();
@@ -106,7 +113,10 @@ class _IntensityPageState extends State<IntensityPage> {
           'match',
           ['get', 'CODE'],
           ...invertedArea.entries.expand(
-            (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
+            (entry) => [
+              int.parse(entry.key),
+              IntensityColor.intensity(entry.value).toHexStringRGB(),
+            ],
           ),
           context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
@@ -128,7 +138,10 @@ class _IntensityPageState extends State<IntensityPage> {
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text('使用 JMA 震度標準 (0.3秒三分量合成加速度)', style: context.theme.textTheme.labelMedium),
+        Text(
+          '使用 JMA 震度標準 (0.3秒三分量合成加速度)',
+          style: context.theme.textTheme.labelMedium,
+        ),
       ],
     );
   }
@@ -140,7 +153,9 @@ class _IntensityPageState extends State<IntensityPage> {
       width: 300,
       child: Row(
         children: intensities.map((intensity) {
-          return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
+          return Expanded(
+            child: Container(color: IntensityColor.intensity(intensity)),
+          );
         }).toList(),
       ),
     );
@@ -160,7 +175,11 @@ class _IntensityPageState extends State<IntensityPage> {
         children: labels.map((label) {
           return SizedBox(
             width: 300 / 9,
-            child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
           );
         }).toList(),
       ),
@@ -170,7 +189,10 @@ class _IntensityPageState extends State<IntensityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ''), elevation: 0),
+      appBar: AppBar(
+        title: Text(widget.item.text.content['all']?.title ?? ''),
+        elevation: 0,
+      ),
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
@@ -267,10 +289,16 @@ class _IntensityPageState extends State<IntensityPage> {
           const SizedBox(width: 12),
           Row(
             children: [
-              Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                subtitle,
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(width: 8),
               LabelChip(
-                label: "第${data.addition.serial}報${(data.addition.isFinal) ? '(最終)' : ""}",
+                label:
+                    "第${data.addition.serial}報${(data.addition.isFinal) ? '(最終)' : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
@@ -303,19 +331,34 @@ class _IntensityPageState extends State<IntensityPage> {
     );
   }
 
-  Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime, bool isExpired) {
+  Widget _buildTimeBar(
+    BuildContext context,
+    DateTime sendTime,
+    DateTime expireTime,
+    bool isExpired,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: context.colors.surfaceContainerHigh, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildTimeInfo(context, Symbols.schedule_rounded, '發送時間', sendTime)],
+        children: [
+          _buildTimeInfo(context, Symbols.schedule_rounded, '發送時間', sendTime),
+        ],
       ),
     );
   }
 
-  Widget _buildTimeInfo(BuildContext context, IconData icon, String label, DateTime time) {
+  Widget _buildTimeInfo(
+    BuildContext context,
+    IconData icon,
+    String label,
+    DateTime time,
+  ) {
     return Row(
       children: [
         Icon(icon, color: context.colors.secondary),
@@ -323,8 +366,16 @@ class _IntensityPageState extends State<IntensityPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.onSurfaceVariant)),
-            Text(DateFormat('yyyy/MM/dd HH:mm').format(time), style: context.theme.textTheme.bodyLarge),
+            Text(
+              label,
+              style: context.theme.textTheme.labelLarge?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
+            Text(
+              DateFormat('yyyy/MM/dd HH:mm').format(time),
+              style: context.theme.textTheme.bodyLarge,
+            ),
           ],
         ),
       ],
@@ -332,7 +383,10 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(data.area.map((e) => Global.location[e.toString()]!), (e) => e.cityWithLevel);
+    final grouped = groupBy(
+      data.area.map((e) => Global.location[e.toString()]!),
+      (e) => e.cityWithLevel,
+    );
     final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
@@ -346,7 +400,10 @@ class _IntensityPageState extends State<IntensityPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(city, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      city,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
@@ -358,7 +415,8 @@ class _IntensityPageState extends State<IntensityPage> {
                           padding: const EdgeInsets.all(4),
                           side: BorderSide(color: context.colors.outline),
                           backgroundColor: context.colors.surfaceContainerHigh,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                           label: Text(e.townWithLevel),
                         );
                       }).toList(),

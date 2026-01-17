@@ -1,28 +1,42 @@
 import 'dart:io';
 
-import 'package:dpip/utils/toast.dart';
-import 'package:flutter/material.dart';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:http/http.dart';
-import 'package:gal/gal.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/toast.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gal/gal.dart';
+import 'package:http/http.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImageViewerRoute extends StatefulWidget {
   final String heroTag;
   final String imageUrl;
   final String imageName;
 
-  const ImageViewerRoute({super.key, required this.heroTag, required this.imageUrl, required this.imageName});
+  const ImageViewerRoute({
+    super.key,
+    required this.heroTag,
+    required this.imageUrl,
+    required this.imageName,
+  });
 
   @override
   State<ImageViewerRoute> createState() => _ImageViewerRouteState();
+}
+
+class ImageSaver {
+  static const _channel = MethodChannel('image_saver');
+
+  static Future<void> saveToPhotos(String path) async {
+    await _channel.invokeMethod('saveImage', {
+      'path': path,
+    });
+  }
 }
 
 class _ImageViewerRouteState extends State<ImageViewerRoute> {
@@ -67,7 +81,9 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                   },
                 ),
                 FilledButton(
-                  child: Text(status.isPermanentlyDenied ? '設定'.i18n : '再試一次'.i18n),
+                  child: Text(
+                    status.isPermanentlyDenied ? '設定'.i18n : '再試一次'.i18n,
+                  ),
                   onPressed: () {
                     if (status.isPermanentlyDenied) {
                       openAppSettings();
@@ -87,29 +103,25 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       final res = await get(Uri.parse(widget.imageUrl));
 
-      // 保存图片到临时目录
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${widget.imageName}');
       await tempFile.writeAsBytes(res.bodyBytes);
 
       try {
-        // 保存到相册
         if (Platform.isAndroid) {
           await Gal.putImage(tempFile.path, album: 'DPIP');
         } else {
-          await Permission.photosAddOnly.request();
-          try {
-            await Gal.putImage(tempFile.path);
-          } catch (_) {
-            final upgrade = await Permission.photos.request();
-            if (upgrade.isGranted) {
-              await Gal.putImage(tempFile.path, album: 'DPIP');
-            }
-          }
+          await ImageSaver.saveToPhotos(tempFile.path);
         }
-        showToast(context, ToastWidget.text('已儲存圖片'.i18n, icon: const Icon(Symbols.check_rounded)));
+        if (!mounted) return;
+        showToast(
+          context,
+          ToastWidget.text(
+            '已儲存圖片'.i18n,
+            icon: const Icon(Symbols.check_rounded),
+          ),
+        );
       } finally {
-        // 清理临时文件
         if (await tempFile.exists()) {
           await tempFile.delete();
         }
@@ -137,7 +149,9 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           },
         );
       } else {
-        context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('儲存圖片時發生錯誤: $e'.i18n)));
+        context.scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('儲存圖片時發生錯誤: $e'.i18n)),
+        );
       }
     }
   }
@@ -165,7 +179,8 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                   }
                 },
                 onInteractionEnd: (details) {
-                  if (details.pointerCount == 0 && Velocity.zero == details.velocity) {
+                  if (details.pointerCount == 0 &&
+                      Velocity.zero == details.velocity) {
                     if (isUiHidden) {
                       setState(() => isUiHidden = false);
                     } else {
@@ -180,7 +195,11 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     child: CachedNetworkImage(
                       imageUrl: widget.imageUrl,
                       progressIndicatorBuilder: (context, url, progress) {
-                        return Center(child: CircularProgressIndicator(value: progress.progress));
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: progress.progress,
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -200,9 +219,13 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     child: IconButton.filled(
                       icon: const Icon(Symbols.close_rounded),
                       style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
+                        foregroundColor: WidgetStateProperty.all(
+                          context.colors.onSurfaceVariant,
+                        ),
                         backgroundColor: WidgetStateProperty.all(
-                          context.colors.surfaceContainerHighest.withValues(alpha: 0.8),
+                          context.colors.surfaceContainerHighest.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                       ),
                       onPressed: () {
@@ -220,14 +243,20 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                               width: 24,
                               child: Padding(
                                 padding: EdgeInsets.all(4.0),
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               ),
                             )
                           : const Icon(Symbols.save_rounded),
                       label: Text('儲存'.i18n),
                       style: ButtonStyle(
-                        foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
-                        backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
+                        foregroundColor: WidgetStatePropertyAll(
+                          context.colors.onSurfaceVariant,
+                        ),
+                        backgroundColor: WidgetStatePropertyAll(
+                          context.colors.surfaceContainerHighest,
+                        ),
                       ),
                       onPressed: isDownloading
                           ? null

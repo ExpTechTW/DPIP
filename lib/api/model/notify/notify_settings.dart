@@ -28,12 +28,17 @@ class NotifySettings {
       eew: EewNotifyType.values[json[NotifyChannel.eew.index]],
       monitor: EarthquakeNotifyType.values[json[NotifyChannel.monitor.index]],
       report: EarthquakeNotifyType.values[json[NotifyChannel.report.index]],
-      intensity: EarthquakeNotifyType.values[json[NotifyChannel.intensity.index]],
-      thunderstorm: WeatherNotifyType.values[json[NotifyChannel.thunderstorm.index]],
-      weatherAdvisory: WeatherNotifyType.values[json[NotifyChannel.weatherAdvisory.index]],
-      evacuation: WeatherNotifyType.values[json[NotifyChannel.evacuation.index]],
+      intensity:
+          EarthquakeNotifyType.values[json[NotifyChannel.intensity.index]],
+      thunderstorm:
+          WeatherNotifyType.values[json[NotifyChannel.thunderstorm.index]],
+      weatherAdvisory:
+          WeatherNotifyType.values[json[NotifyChannel.weatherAdvisory.index]],
+      evacuation:
+          WeatherNotifyType.values[json[NotifyChannel.evacuation.index]],
       tsunami: TsunamiNotifyType.values[json[NotifyChannel.tsunami.index]],
-      announcement: BasicNotifyType.values[json[NotifyChannel.announcement.index]],
+      announcement:
+          BasicNotifyType.values[json[NotifyChannel.announcement.index]],
     );
   }
 

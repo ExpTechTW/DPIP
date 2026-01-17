@@ -33,7 +33,9 @@ class ThemeRadioTile extends StatelessWidget {
           children: [
             Container(
               height: 96,
-              decoration: BoxDecoration(color: theme.colorScheme.surfaceContainer),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainer,
+              ),
               child: Center(
                 child: Icon(
                   switch (value) {
@@ -52,7 +54,9 @@ class ThemeRadioTile extends StatelessWidget {
                   value: value,
                   groupValue: groupValue,
                   onChanged: onChanged,
-                  fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                  fillColor: WidgetStateProperty.resolveWith<Color>((
+                    Set<WidgetState> states,
+                  ) {
                     if (states.contains(WidgetState.selected)) {
                       return context.colors.primary;
                     }

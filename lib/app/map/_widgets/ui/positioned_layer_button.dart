@@ -9,25 +9,30 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 class PositionedLayerButton extends StatelessWidget {
   final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers) onLayerChanged;
+  final bool isReplayMode;
+  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers)
+  onLayerChanged;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const PositionedLayerButton({
     super.key,
     required this.activeLayers,
     required this.currentBaseMap,
+    required this.isReplayMode,
     required this.onLayerChanged,
     required this.onBaseMapChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (isReplayMode) return const SizedBox.shrink();
     return Positioned(
       top: 24,
       right: 24,
       child: SafeArea(
         child: BlurredIconButton(
           icon: const Icon(Symbols.layers_rounded),
+          tooltip: '圖層',
           elevation: 2,
           onPressed: () => showModalBottomSheet(
             context: context,

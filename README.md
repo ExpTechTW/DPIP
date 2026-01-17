@@ -1,13 +1,13 @@
 [![splash](/.github/assets/splash.png)](#下載)
 
 <div align="center">
-<a href="https://github.com/ExpTechTW/DPIP/tree/main"><img alt="status" src="https://img.shields.io/badge/status-stable-blue.svg"></a>
-<a href="https://github.com/ExpTechTW/DPIP/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/exptechtw/dpip"></a>
-<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml"><img alt="Android Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml/badge.svg"></a>
-<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml"><img alt="iOS Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml/badge.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP-Pocket/tree/main"><img alt="status" src="https://img.shields.io/badge/status-stable-blue.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP-Pocket/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/exptechtw/dpip-pocket"></a>
+<a href="https://github.com/ExpTechTW/DPIP-Pocket/actions/workflows/android.yml"><img alt="Android Build Status" src="https://github.com/ExpTechTW/DPIP-Pocket/actions/workflows/android.yml/badge.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP-Pocket/actions/workflows/ios.yml"><img alt="iOS Build Status" src="https://github.com/ExpTechTW/DPIP-Pocket/actions/workflows/ios.yml/badge.svg"></a>
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/dpip"><img alt="Crowdin Localization" src="https://badges.crowdin.net/dpip/localized.svg"></a>
 <a href="https://good-labs.github.io/greater-good-affirmation"><img alt="Greater Good" src="https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg"></a>
-<img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip">
+<img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip-pocket">
 <a href="https://exptech.dev"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord"  src="https://img.shields.io/discord/926545182407688273?color=%235865F2&logo=discord&logoColor=white"></a>
 </div>
@@ -63,7 +63,7 @@ TREM-Net 是一個自 2022 年 6 月起開始在全臺各地部署的觀測網�
 
 你可以在 [Play Store](https://play.google.com/store/apps/details?id=com.exptech.dpip) 和 [App Store](https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362) 上取得 DPIP。
 
-你也可以從我們的 [Release 頁面](https://github.com/ExpTechTW/DPIP/releases/latest)上取得 DPIP 的安裝包進行手動安裝。
+你也可以從我們的 [Release 頁面](https://github.com/ExpTechTW/DPIP-Pocket/releases/latest)上取得 DPIP 的安裝包進行手動安裝。
 
 ## 翻譯
 
@@ -71,7 +71,7 @@ DPIP 支援多語言，我們正在 Crowdin 平台上進行翻譯。如果你願
 
 你可以[點擊這裡前往我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一份貢獻都將幫助我們將防災資訊傳遞給更多的人！
 
-如果你沒有看到你熟悉的語言，歡迎在我們的 [Issue](https://github.com/ExpTechTW/DPIP/issues) 中提出新的語言請求，我們會盡快為你開啟。
+如果你沒有看到你熟悉的語言，歡迎在我們的 [Issue](https://github.com/ExpTechTW/DPIP-Pocket/issues) 中提出新的語言請求，我們會盡快為你開啟。
 
 ## 從原始碼建置
 
@@ -107,7 +107,7 @@ Tools • Dart 3.9.0 • DevTools 2.48.0
      使用以下指令複製專案：
 
      ```bash
-     git clone https://github.com/ExpTechTW/DPIP.git
+     git clone https://github.com/ExpTechTW/DPIP-Pocket.git
      ```
 
 2. 進入專案目錄
@@ -146,13 +146,13 @@ Tools • Dart 3.9.0 • DevTools 2.48.0
 
 我們歡迎各種形式的貢獻！你可以透過以下方式參與專案：
 
-- 回報問題或提出新功能建議：請在 [Issues](https://github.com/ExpTechTW/DPIP/issues) 中提出
-- 提交程式碼：請 [Fork](https://github.com/ExpTechTW/DPIP/fork) 此倉庫，建立新分支進行修改，然後提交 [Pull Request](https://github.com/ExpTechTW/TREM/pulls)
+- 回報問題或提出新功能建議：請在 [Issues](https://github.com/ExpTechTW/DPIP-Pocket/issues) 中提出
+- 提交程式碼：請 [Fork](https://github.com/ExpTechTW/DPIP-Pocket/fork) 此倉庫，建立新分支進行修改，然後提交 [Pull Request](https://github.com/ExpTechTW/TREM/pulls)
 - 改進文件：協助我們改進現有文件或撰寫新文件
 
 衷心感謝所有讓 DPIP 成為可能的貢獻者：
 
-<a href="https://github.com/exptechtw/dpip/graphs/contributors"><img src="https://contrib.rocks/image?repo=exptechtw/dpip" ></a>
+<a href="https://github.com/exptechtw/DPIP-Pocket/graphs/contributors"><img src="https://contrib.rocks/image?repo=exptechtw/DPIP-Pocket" ></a>
 
 ## 開放原始碼授權
 
@@ -160,10 +160,10 @@ Tools • Dart 3.9.0 • DevTools 2.48.0
 
 ## Star History
 
-<a href="https://star-history.com/#ExpTechTW/DPIP&Date">
+<a href="https://star-history.com/#ExpTechTW/DPIP-Pocket&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP-Pocket&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP-Pocket&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ExpTechTW/DPIP-Pocket&type=Date" />
  </picture>
 </a>

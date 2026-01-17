@@ -1,10 +1,11 @@
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class PositionedBackButton extends StatelessWidget {
-  const PositionedBackButton({super.key});
+  final VoidCallback? onPressed;
+
+  const PositionedBackButton({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,11 @@ class PositionedBackButton extends StatelessWidget {
       top: 24,
       left: 24,
       child: SafeArea(
-        child: BlurredIconButton(icon: const Icon(Symbols.arrow_back_rounded), onPressed: context.pop, elevation: 2),
+        child: BlurredIconButton(
+          icon: const Icon(Symbols.arrow_back_rounded),
+          onPressed: onPressed,
+          elevation: 2,
+        ),
       ),
     );
   }

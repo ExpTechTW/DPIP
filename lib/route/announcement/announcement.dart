@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:intl/intl.dart';
 
 final List<TagType> tagTypes = [
   TagType(id: 0, text: '錯誤'.i18n, color: Colors.red),
@@ -63,14 +61,15 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   Future<void> _fetchAnnouncements() async {
     try {
-      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed.toList();
+      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed
+          .toList();
       setState(() {
         announcements = fetchedAnnouncements;
         isLoading = false;
       });
     } catch (e) {
       setState(() {
-        errorMessage = '獲取公告時發生錯誤: $e'.i18n;
+        errorMessage = '取得公告時發生錯誤: $e'.i18n;
         isLoading = false;
       });
     }
@@ -117,7 +116,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AnnouncementDetailPage(announcement: announcements[index], tagTypes: tagTypes),
+                  builder: (context) => AnnouncementDetailPage(
+                    announcement: announcements[index],
+                    tagTypes: tagTypes,
+                  ),
                 ),
               );
             },
@@ -133,7 +135,12 @@ class AnnouncementCard extends StatelessWidget {
   final List<TagType> tagTypes;
   final VoidCallback onTap;
 
-  const AnnouncementCard({super.key, required this.announcement, required this.tagTypes, required this.onTap});
+  const AnnouncementCard({
+    super.key,
+    required this.announcement,
+    required this.tagTypes,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +161,9 @@ class AnnouncementCard extends StatelessWidget {
                   children: [
                     Text(
                       announcement.title,
-                      style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: context.theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -169,7 +178,9 @@ class AnnouncementCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: context.theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                color: context.theme.textTheme.bodySmall?.color?.withValues(
+                  alpha: 0.5,
+                ),
               ),
             ],
           ),
@@ -199,7 +210,9 @@ class AnnouncementCard extends StatelessWidget {
     return Wrap(
       spacing: 4,
       runSpacing: 4,
-      children: announcement.tags.map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId))).toList(),
+      children: announcement.tags
+          .map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId)))
+          .toList(),
     );
   }
 
@@ -209,7 +222,10 @@ class AnnouncementCard extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      label: Text(
+        tagType.text,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -218,7 +234,11 @@ class AnnouncementDetailPage extends StatelessWidget {
   final Announcement announcement;
   final List<TagType> tagTypes;
 
-  const AnnouncementDetailPage({super.key, required this.announcement, required this.tagTypes});
+  const AnnouncementDetailPage({
+    super.key,
+    required this.announcement,
+    required this.tagTypes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +252,9 @@ class AnnouncementDetailPage extends StatelessWidget {
             children: [
               Text(
                 announcement.title,
-                style: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: context.theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               _buildDateChip(context),
@@ -240,16 +262,26 @@ class AnnouncementDetailPage extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: announcement.tags.map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId))).toList(),
+                children: announcement.tags
+                    .map(
+                      (tagId) =>
+                          _buildGlassyTag(context, _getTagTypeById(tagId)),
+                    )
+                    .toList(),
               ),
               const SizedBox(height: 24),
               MarkdownBody(
                 data: announcement.content,
-                styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                  h1: context.theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                  h2: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                  p: context.theme.textTheme.bodyLarge,
-                ),
+                styleSheet: MarkdownStyleSheet.fromTheme(context.theme)
+                    .copyWith(
+                      h1: context.theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      h2: context.theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      p: context.theme.textTheme.bodyLarge,
+                    ),
               ),
             ],
           ),
@@ -264,7 +296,9 @@ class AnnouncementDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.colors.primary.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: context.colors.primary.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -289,7 +323,10 @@ class AnnouncementDetailPage extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      label: Text(
+        tagType.text,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

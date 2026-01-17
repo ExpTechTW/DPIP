@@ -2,14 +2,20 @@
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
   "editor.rulers": [
-    120
+    80
   ],
-  "dart.lineLength": 120,
+  "dart.lineLength": 80,
   "markdownlint.config": {
     "no-duplicate-heading": {
       "siblings_only": true
     }
   },
+  "[dart]": {
+    "editor.rulers": [
+      80
+    ]
+  },
   "IDX.aI.enableInlineCompletion": true,
-  "IDX.aI.enableCodebaseIndexing": true
+  "IDX.aI.enableCodebaseIndexing": true,
+  "codetogether.virtualCursorJoin": "ownVirtualCursor"
 }

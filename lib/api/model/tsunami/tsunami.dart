@@ -75,7 +75,8 @@ class Tsunami {
     required this.info,
   });
 
-  factory Tsunami.fromJson(Map<String, dynamic> json) => _$TsunamiFromJson(json);
+  factory Tsunami.fromJson(Map<String, dynamic> json) =>
+      _$TsunamiFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiToJson(this);
 }

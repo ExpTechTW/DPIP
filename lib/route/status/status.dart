@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/server_status.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ServerStatusPage extends StatefulWidget {
   const ServerStatusPage({super.key});
@@ -43,7 +41,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('伺服器狀態', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          '伺服器狀態',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -66,11 +67,23 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('錯誤: ${snapshot.error}', style: TextStyle(color: context.colors.error, fontSize: 16)),
+                    child: Text(
+                      '錯誤: ${snapshot.error}',
+                      style: TextStyle(
+                        color: context.colors.error,
+                        fontSize: 16,
+                      ),
+                    ),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
-                    child: Text('沒有可用的資料', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                    child: Text(
+                      '沒有可用的資料',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   );
                 }
 
@@ -98,7 +111,9 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? Colors.black26 : Colors.grey.withValues(alpha: 0.3),
+            color: isDarkMode
+                ? Colors.black26
+                : Colors.grey.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -107,12 +122,18 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: isDarkMode ? Colors.blue[300] : Colors.blue[700]),
+          Icon(
+            Icons.info_outline,
+            color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               '此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。',
-              style: TextStyle(fontSize: 14, color: isDarkMode ? Colors.white70 : Colors.black87),
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
             ),
           ),
         ],
@@ -158,7 +179,9 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? statusColor.withValues(alpha: 0.2) : statusColor.withValues(alpha: 0.1),
+                color: isDarkMode
+                    ? statusColor.withValues(alpha: 0.2)
+                    : statusColor.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
               ),
               child: Row(
@@ -175,9 +198,14 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? statusColor.withValues(alpha: 0.3) : statusColor.withValues(alpha: 0.2),
+                          color: isDarkMode
+                              ? statusColor.withValues(alpha: 0.3)
+                              : statusColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -187,14 +215,19 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                             const SizedBox(width: 6),
                             Text(
                               statusText,
-                              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(width: 8),
                       Icon(
-                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         color: isDarkMode ? Colors.white70 : Colors.grey,
                       ),
                     ],
@@ -208,8 +241,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: status.services.length,
-              separatorBuilder: (context, index) =>
-                  Divider(height: 1, color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
+              separatorBuilder: (context, index) => Divider(
+                height: 1,
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+              ),
               itemBuilder: (context, index) {
                 final entry = status.services.entries.elementAt(index);
                 return _buildServiceTile(entry.key, entry.value, isDarkMode);
@@ -220,7 +255,11 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     );
   }
 
-  Widget _buildServiceTile(String serviceName, ServiceStatus serviceStatus, bool isDarkMode) {
+  Widget _buildServiceTile(
+    String serviceName,
+    ServiceStatus serviceStatus,
+    bool isDarkMode,
+  ) {
     Color getStatusColor(int status) {
       switch (status) {
         case 1:
@@ -253,7 +292,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     return ListTile(
       title: Text(
         serviceName,
-        style: TextStyle(fontWeight: FontWeight.w500, color: isDarkMode ? Colors.white : Colors.black87),
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
       subtitle: Text(
         '延遲: ${serviceStatus.count} ms',
@@ -262,7 +304,9 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isDarkMode ? statusColor.withValues(alpha: 0.3) : statusColor.withValues(alpha: 0.1),
+          color: isDarkMode
+              ? statusColor.withValues(alpha: 0.3)
+              : statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(

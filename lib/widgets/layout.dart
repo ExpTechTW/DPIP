@@ -59,15 +59,22 @@ class _VerticalLayout {
     return widget;
   }
 
-  _VerticalLayout get top => copyWith(mainAxisAlignment: MainAxisAlignment.start);
-  _VerticalLayout get bottom => copyWith(mainAxisAlignment: MainAxisAlignment.end);
-  _VerticalLayout get center => copyWith(mainAxisAlignment: MainAxisAlignment.center);
-  _VerticalLayout get left => copyWith(crossAxisAlignment: CrossAxisAlignment.start);
-  _VerticalLayout get right => copyWith(crossAxisAlignment: CrossAxisAlignment.end);
-  _VerticalLayout get stretch => copyWith(crossAxisAlignment: CrossAxisAlignment.stretch);
+  _VerticalLayout get top =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.start);
+  _VerticalLayout get bottom =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.end);
+  _VerticalLayout get center =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.center);
+  _VerticalLayout get left =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.start);
+  _VerticalLayout get right =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.end);
+  _VerticalLayout get stretch =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.stretch);
   _VerticalLayout get min => copyWith(mainAxisSize: MainAxisSize.min);
   _VerticalLayout get max => copyWith(mainAxisSize: MainAxisSize.max);
-  _VerticalLayout get reverse => copyWith(verticalDirection: VerticalDirection.up);
+  _VerticalLayout get reverse =>
+      copyWith(verticalDirection: VerticalDirection.up);
 
   /// Set the spacing between children.
   _VerticalLayout operator [](double spacing) => copyWith(spacing: spacing);
@@ -161,7 +168,11 @@ class _HorizontalLayout {
     );
   }
 
-  Widget call({Key? key, Iterable<Widget> children = const [], EdgeInsets? padding}) {
+  Widget call({
+    Key? key,
+    Iterable<Widget> children = const [],
+    EdgeInsets? padding,
+  }) {
     final widget = Row(
       key: key,
       mainAxisAlignment: mainAxisAlignment,
@@ -181,18 +192,28 @@ class _HorizontalLayout {
     return widget;
   }
 
-  _HorizontalLayout get left => copyWith(mainAxisAlignment: MainAxisAlignment.start);
-  _HorizontalLayout get right => copyWith(mainAxisAlignment: MainAxisAlignment.end);
-  _HorizontalLayout get between => copyWith(mainAxisAlignment: MainAxisAlignment.spaceBetween);
-  _HorizontalLayout get around => copyWith(mainAxisAlignment: MainAxisAlignment.spaceAround);
-  _HorizontalLayout get evenly => copyWith(mainAxisAlignment: MainAxisAlignment.spaceEvenly);
-  _HorizontalLayout get top => copyWith(crossAxisAlignment: CrossAxisAlignment.start);
-  _HorizontalLayout get bottom => copyWith(crossAxisAlignment: CrossAxisAlignment.end);
-  _HorizontalLayout get center => copyWith(crossAxisAlignment: CrossAxisAlignment.center);
-  _HorizontalLayout get stretch => copyWith(crossAxisAlignment: CrossAxisAlignment.stretch);
+  _HorizontalLayout get left =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.start);
+  _HorizontalLayout get right =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.end);
+  _HorizontalLayout get between =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.spaceBetween);
+  _HorizontalLayout get around =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.spaceAround);
+  _HorizontalLayout get evenly =>
+      copyWith(mainAxisAlignment: MainAxisAlignment.spaceEvenly);
+  _HorizontalLayout get top =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.start);
+  _HorizontalLayout get bottom =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.end);
+  _HorizontalLayout get center =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.center);
+  _HorizontalLayout get stretch =>
+      copyWith(crossAxisAlignment: CrossAxisAlignment.stretch);
   _HorizontalLayout get min => copyWith(mainAxisSize: MainAxisSize.min);
   _HorizontalLayout get max => copyWith(mainAxisSize: MainAxisSize.max);
-  _HorizontalLayout get reverse => copyWith(verticalDirection: VerticalDirection.up);
+  _HorizontalLayout get reverse =>
+      copyWith(verticalDirection: VerticalDirection.up);
 
   /// Set the spacing between children.
   _HorizontalLayout operator [](double spacing) => copyWith(spacing: spacing);

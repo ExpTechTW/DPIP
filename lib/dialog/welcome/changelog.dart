@@ -1,5 +1,5 @@
+import 'package:dpip/router.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class WelcomeChangelogDialog extends StatelessWidget {
@@ -23,7 +23,7 @@ class WelcomeChangelogDialog extends StatelessWidget {
           child: const Text('前往查看'),
           onPressed: () {
             Navigator.pop(context);
-            context.push('/changelog');
+            ChangelogRoute().push(context);
           },
         ),
       ],

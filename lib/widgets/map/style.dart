@@ -1,17 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
 import 'package:crypto/crypto.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:path_provider/path_provider.dart';
-
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MapStyle {
   late Map<String, dynamic> json;
@@ -28,14 +26,23 @@ class MapStyle {
         'Noto Sans TC Bold':
             'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Bold.otf',
       },
-      'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
+      'glyphs':
+          'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
       'sprite': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/sprites',
-      'sources': {...osmSource(), ...googleSource(), ...exptechSource(), ...locationSource()},
+      'sources': {
+        ...osmSource(),
+        ...googleSource(),
+        ...exptechSource(),
+        ...locationSource(),
+      },
       'layers': [
         background(),
         ...osmLayers(context.colors, visible: baseMap == BaseMapType.osm),
         ...googleLayers(visible: baseMap == BaseMapType.google),
-        ...exptechLayers(context.colors, visible: baseMap == BaseMapType.exptech),
+        ...exptechLayers(
+          context.colors,
+          visible: baseMap == BaseMapType.exptech,
+        ),
         locationLayer(),
       ],
     };
@@ -61,10 +68,16 @@ class MapStyle {
     'ne2_shaded': {
       'maxzoom': 6,
       'tileSize': 256,
-      'tiles': ['https://tiles.openfreemap.org/natural_earth/ne2sr/{z}/{x}/{y}.png'],
+      'tiles': [
+        'https://tiles.openfreemap.org/natural_earth/ne2sr/{z}/{x}/{y}.png',
+      ],
       'type': 'raster',
     },
-    'openmaptiles': {'type': 'vector', 'url': 'https://tiles.openfreemap.org/planet', 'volatile': true},
+    'openmaptiles': {
+      'type': 'vector',
+      'url': 'https://tiles.openfreemap.org/planet',
+      'volatile': true,
+    },
   };
 
   static Map<String, dynamic> background() => {
@@ -74,7 +87,10 @@ class MapStyle {
     'layout': {'visibility': 'visible'},
   };
 
-  static List<Map<String, dynamic>> osmLayers(ColorScheme colors, {bool visible = false}) => [
+  static List<Map<String, dynamic>> osmLayers(
+    ColorScheme colors, {
+    bool visible = false,
+  }) => [
     {
       'id': 'osm-landcover-glacier',
       'type': 'fill',
@@ -158,7 +174,10 @@ class MapStyle {
         ['get', 'class'],
         'grass',
       ],
-      'paint': {'fill-color': '#d2e8c2', 'fill-opacity': colors.brightness == Brightness.dark ? 0.2 : 1},
+      'paint': {
+        'fill-color': '#d2e8c2',
+        'fill-opacity': colors.brightness == Brightness.dark ? 0.2 : 1,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -171,7 +190,10 @@ class MapStyle {
         ['get', 'class'],
         'public_park',
       ],
-      'paint': {'fill-color': '#d8e8c8', 'fill-opacity': colors.brightness == Brightness.dark ? 0.4 : 0.8},
+      'paint': {
+        'fill-color': '#d8e8c8',
+        'fill-opacity': colors.brightness == Brightness.dark ? 0.4 : 0.8,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -209,7 +231,10 @@ class MapStyle {
           6,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-other',
@@ -244,7 +269,10 @@ class MapStyle {
           2,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-other-intermittent',
@@ -280,7 +308,10 @@ class MapStyle {
           2,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-stream-canal',
@@ -320,7 +351,10 @@ class MapStyle {
           6,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-stream-canal-intermittent',
@@ -361,7 +395,10 @@ class MapStyle {
           6,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-river',
@@ -399,7 +436,10 @@ class MapStyle {
           6,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-waterway-river-intermittent',
@@ -438,7 +478,10 @@ class MapStyle {
           6,
         ],
       },
-      'layout': {'line-cap': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-water',
@@ -459,8 +502,12 @@ class MapStyle {
         ],
       ],
       'paint': {
-        'fill-color': colors.brightness == Brightness.dark ? colors.surfaceContainer.toHexStringRGB() : '#AECFE2',
-        'fill-outline-color': colors.brightness == Brightness.dark ? colors.outline.toHexStringRGB() : '#AECFE2',
+        'fill-color': colors.brightness == Brightness.dark
+            ? colors.surfaceContainer.toHexStringRGB()
+            : '#AECFE2',
+        'fill-outline-color': colors.brightness == Brightness.dark
+            ? colors.outline.toHexStringRGB()
+            : '#AECFE2',
       },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
@@ -474,7 +521,10 @@ class MapStyle {
         ['get', 'intermittent'],
         1,
       ],
-      'paint': {'fill-color': '#CFE6F7', 'fill-opacity': colors.brightness == Brightness.dark ? 0.3 : 0.7},
+      'paint': {
+        'fill-color': '#CFE6F7',
+        'fill-opacity': colors.brightness == Brightness.dark ? 0.3 : 0.7,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -488,7 +538,9 @@ class MapStyle {
         'ice_shelf',
       ],
       'paint': {
-        'fill-color': colors.brightness == Brightness.dark ? colors.surfaceContainerHigh.toHexStringRGB() : '#fff',
+        'fill-color': colors.brightness == Brightness.dark
+            ? colors.surfaceContainerHigh.toHexStringRGB()
+            : '#fff',
         'fill-opacity': [
           'interpolate',
           ['linear'],
@@ -511,7 +563,10 @@ class MapStyle {
         ['get', 'class'],
         'sand',
       ],
-      'paint': {'fill-color': '#f5eebc', 'fill-opacity': colors.brightness == Brightness.dark ? 0.6 : 1},
+      'paint': {
+        'fill-color': '#f5eebc',
+        'fill-opacity': colors.brightness == Brightness.dark ? 0.6 : 1,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -612,7 +667,11 @@ class MapStyle {
           3,
         ],
       },
-      'layout': {'line-cap': 'round', 'line-join': 'round', 'visibility': visible ? 'visible' : 'none'},
+      'layout': {
+        'line-cap': 'round',
+        'line-join': 'round',
+        'visibility': visible ? 'visible' : 'none',
+      },
     },
     {
       'id': 'osm-boundary_disputed',
@@ -1086,13 +1145,19 @@ class MapStyle {
     },
   };
 
-  static List<Map<String, dynamic>> exptechLayers(ColorScheme colors, {bool visible = false}) => [
+  static List<Map<String, dynamic>> exptechLayers(
+    ColorScheme colors, {
+    bool visible = false,
+  }) => [
     {
       'id': BaseMapLayerIds.exptechGlobalFill,
       'type': 'fill',
       'source': 'exptech',
       'source-layer': 'global',
-      'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
+      'paint': {
+        'fill-color': colors.surfaceContainer.toHexStringRGB(),
+        'fill-opacity': 1,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -1100,7 +1165,10 @@ class MapStyle {
       'type': 'fill',
       'source': 'exptech',
       'source-layer': 'city',
-      'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+      'paint': {
+        'fill-color': colors.surfaceContainerHigh.toHexStringRGB(),
+        'fill-opacity': 1,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
@@ -1108,7 +1176,10 @@ class MapStyle {
       'type': 'fill',
       'source': 'exptech',
       'source-layer': 'town',
-      'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+      'paint': {
+        'fill-color': colors.surfaceContainerHigh.toHexStringRGB(),
+        'fill-opacity': 1,
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {

@@ -8,11 +8,46 @@
 ## [未發布]
 
 ### 新增
+- EEW 震度色塊
+- 風向圖卡
+- 捷徑功能
 
 ### 更改
+- 介面樣式設定
+- 改善 App 啟動速度 (Android) (#490)
+- 地震報告取得更多資料
+- 更改首頁版面排序設定
+- 更新伺服器端點
 
 ### 修正
+- 部分地點所在地預估震度問題
+- 地震報告詳細頁面返回問題
 
+## [3.1.401]
+
+### 新增
+- 地震重播
+
+### 更改
+- 支援平板介面
+- 部分網路用量降低
+
+### 修正
+- 地震報告框問題
+- 首頁底部點不到問題
+
+## [3.1.310]
+
+### 新增
+- 新增首頁樣式設定 (#478)
+
+### 更改
+- 重構天氣測站資訊 (#470)
+- 改善 App 啟動速度 (#475)
+
+### 修正
+- 手動定位 部分地點問題 (#474) (#477)
+- 自動定位異常掛掉問題 (#473) (Android)
 
 ## [3.1.306]
 
@@ -89,7 +124,7 @@
 - 修正系統主題色變更問題。
 - 修正地震速報倒數顯示異常。
 - 修正歷史事件異常。
-- 修正重新載入獲取最新資料。
+- 修正重新載入取得最新資料。
 
 ## [3.0.2] - 2025-08-13
 
@@ -259,7 +294,7 @@
 
 ### 修正
 
-- 修正使用較大顯示器設備時無法接受監控條款的問題。
+- 修正使用較大顯示器裝置時無法接受監控條款的問題。
 - 分開消耗性和非消耗性贊助項目。
 - 移除贊助價格中多餘的貨幣符號。
 - (iOS) 修正裝置資訊值溢出的問題。
@@ -277,24 +312,26 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.306...HEAD
-[3.1.306]: https://github.com/exptechtw/dpip/compare/v3.1.004...v3.1.306
-[3.1.104]: https://github.com/exptechtw/dpip/compare/v3.1.003...v3.1.104
-[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
-[3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
-[3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
-[3.0.2]: https://github.com/exptechtw/dpip/compare/v3.0.014...v3.0.2
-[3.0.014]: https://github.com/exptechtw/dpip/compare/v3.0.013(2)...v3.0.014
-[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012(1)...v3.0.013(2)
-[3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012(1)
-[3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
-[3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
-[3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
-[3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
-[3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
-[3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
-[3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
-[3.0.004]: https://github.com/exptechtw/dpip/compare/v3.0.003...v3.0.004
-[3.0.003]: https://github.com/exptechtw/dpip/compare/v3.0.002...v3.0.003
-[3.0.002]: https://github.com/exptechtw/dpip/compare/v3.0.001...v3.0.002
-[3.0.001]: https://github.com/exptechtw/dpip/compare/2.5.500...v3.0.001
+[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.401...HEAD
+[3.1.401]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.310...v3.1.401
+[3.1.310]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.3...v3.1.310
+[3.1.306]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.004...v3.1.306
+[3.1.104]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.003...v3.1.104
+[3.1.103]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.001...v3.1.103
+[3.1.001]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.0...v3.1.001
+[3.1.0]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.2...v3.1.0
+[3.0.2]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.014...v3.0.2
+[3.0.014]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.013(2)...v3.0.014
+[3.0.013]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.012(1)...v3.0.013(2)
+[3.0.012]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.011...v3.0.012(1)
+[3.0.011]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.010...v3.0.011
+[3.0.010]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.009...v3.0.010
+[3.0.009]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.008...v3.0.009
+[3.0.008]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.007...v3.0.008
+[3.0.007]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.006...v3.0.007
+[3.0.006]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.005...v3.0.006
+[3.0.005]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.004...v3.0.005
+[3.0.004]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.003...v3.0.004
+[3.0.003]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.002...v3.0.003
+[3.0.002]: https://github.com/exptechtw/dpip-pocket/compare/v3.0.001...v3.0.002
+[3.0.001]: https://github.com/exptechtw/dpip-pocket/compare/2.5.500...v3.0.001

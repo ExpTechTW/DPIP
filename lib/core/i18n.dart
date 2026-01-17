@@ -12,7 +12,9 @@ class I18nCsvLoader {
     return _parseCsvTranslations(csvContent);
   }
 
-  static Map<String, Map<String, String>> _parseCsvTranslations(String csvContent) {
+  static Map<String, Map<String, String>> _parseCsvTranslations(
+    String csvContent,
+  ) {
     final lines = LineSplitter.split(csvContent);
     if (lines.isEmpty) return {};
 
@@ -41,7 +43,10 @@ class I18nCsvLoader {
       final key = values[0];
       final translations = values.skip(1).toList();
 
-      result[key] = {for (final langCode in languageCodes) langCode: translations[languageCodes.indexOf(langCode)]};
+      result[key] = {
+        for (final langCode in languageCodes)
+          langCode: translations[languageCodes.indexOf(langCode)],
+      };
     }
 
     return result;
@@ -116,13 +121,16 @@ extension LocationNameLocalizations on String {
   static Future<void> load() async {
     if (_isLoaded) return;
 
-    final translations = await I18nCsvLoader.fromFile('assets/translations/location_names.csv');
+    final translations = await I18nCsvLoader.fromFile(
+      'assets/translations/location_names.csv',
+    );
 
     _locationNames = Translations.byId('zh-Hant', translations);
     _isLoaded = true;
   }
 
-  String get locationName => localize(this, _locationNames, languageTag: AppLocalizations.languageTag);
+  String get locationName =>
+      localize(this, _locationNames, languageTag: AppLocalizations.languageTag);
 }
 
 extension WeatherStationLocalizations on String {
@@ -132,11 +140,17 @@ extension WeatherStationLocalizations on String {
   static Future<void> load() async {
     if (_isLoaded) return;
 
-    final translations = await I18nCsvLoader.fromFile('assets/translations/weather_station_names.csv');
+    final translations = await I18nCsvLoader.fromFile(
+      'assets/translations/weather_station_names.csv',
+    );
 
     _weatherStations = Translations.byId('zh-Hant', translations);
     _isLoaded = true;
   }
 
-  String get weatherStation => localize(this, _weatherStations, languageTag: AppLocalizations.languageTag);
+  String get weatherStation => localize(
+    this,
+    _weatherStations,
+    languageTag: AppLocalizations.languageTag,
+  );
 }

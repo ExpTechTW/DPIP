@@ -45,13 +45,25 @@ class RainData {
 class PrecipitationMapLayerManager extends MapLayerManager {
   PrecipitationMapLayerManager(super.context, super.controller);
 
-  static const precipitationIntervals = ['now', '10m', '1h', '3h', '6h', '12h', '24h', '2d', '3d'];
+  static const precipitationIntervals = [
+    'now',
+    '10m',
+    '1h',
+    '3h',
+    '6h',
+    '12h',
+    '24h',
+    '2d',
+    '3d',
+  ];
 
   // Label layout constants for precipitation labels
   static const double kLabelBaseOffset = 1.0;
   static const double kLabelLineHeight = 1.1;
 
-  final currentPrecipitationTime = ValueNotifier<String?>(GlobalProviders.data.precipitation.firstOrNull);
+  final currentPrecipitationTime = ValueNotifier<String?>(
+    GlobalProviders.data.precipitation.firstOrNull,
+  );
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
 
@@ -71,7 +83,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       onTimeChanged?.call(time);
     } catch (e, s) {
-      TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationTime', e, s);
+      TalkerManager.instance.error(
+        'PrecipitationMapLayerManager.setPrecipitationTime',
+        e,
+        s,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -95,7 +111,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       currentPrecipitationInterval.value = interval;
     } catch (e, s) {
-      TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationInterval', e, s);
+      TalkerManager.instance.error(
+        'PrecipitationMapLayerManager.setPrecipitationInterval',
+        e,
+        s,
+      );
     }
   }
 
@@ -104,9 +124,13 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final location = GlobalProviders.location.coordinates;
 
       if (location != null && location.isValid) {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(location, 7.4),
+        );
       } else {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+        );
       }
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager._focus', e, s);
@@ -115,14 +139,19 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     try {
-      final precipitationList = (await ExpTech().getRainList()).reversed.toList();
+      final precipitationList = (await ExpTech().getRainList()).reversed
+          .toList();
       if (!context.mounted) return;
 
       GlobalProviders.data.setPrecipitation(precipitationList);
       currentPrecipitationTime.value ??= precipitationList.first;
       _lastFetchTime = DateTime.now();
     } catch (e, s) {
-      TalkerManager.instance.error('PrecipitationMapLayerManager._fetchData', e, s);
+      TalkerManager.instance.error(
+        'PrecipitationMapLayerManager._fetchData',
+        e,
+        s,
+      );
     }
   }
 
@@ -144,7 +173,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.precipitation(time);
       final layerId = MapLayerIds.precipitation(time);
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isSourceExists = (await controller.getSourceIds()).contains(
+        sourceId,
+      );
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (!isSourceExists) {
@@ -203,7 +234,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 circleStrokeColor: colors.outlineVariant.toHexStringRGB(),
                 circleStrokeWidth: 0.5,
                 circleStrokeOpacity: 0.75,
-                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+                visibility: interval == currentPrecipitationInterval.value
+                    ? 'visible'
+                    : 'none',
               ),
               '$interval-label-name': SymbolLayerProperties(
                 textField: [Expressions.get, 'name'],
@@ -216,7 +249,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 textAnchor: 'top',
                 textAllowOverlap: true,
                 textIgnorePlacement: true,
-                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+                visibility: interval == currentPrecipitationInterval.value
+                    ? 'visible'
+                    : 'none',
               ),
               '$interval-label-value': SymbolLayerProperties(
                 textField: [
@@ -233,7 +268,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
                 textAnchor: 'top',
                 textAllowOverlap: true,
                 textIgnorePlacement: true,
-                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+                visibility: interval == currentPrecipitationInterval.value
+                    ? 'visible'
+                    : 'none',
               ),
             }),
         };
@@ -242,7 +279,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           properties.entries.map((entry) {
             // Detect label entries more precisely using '-label-' marker
             final isValueLayer = entry.key.contains('-label-');
-            final interval = isValueLayer ? entry.key.split('-label-')[0] : entry.key;
+            final interval = isValueLayer
+                ? entry.key.split('-label-')[0]
+                : entry.key;
 
             return controller.addLayer(
               sourceId,
@@ -274,8 +313,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
-    final hideNameLayerId = '$layerId-${currentPrecipitationInterval.value}-label-name';
-    final hideValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label-value';
+    final hideNameLayerId =
+        '$layerId-${currentPrecipitationInterval.value}-label-name';
+    final hideValueLayerId =
+        '$layerId-${currentPrecipitationInterval.value}-label-value';
 
     try {
       await controller.setLayerVisibility(hideLayerId, false);
@@ -294,8 +335,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final showLayerId = '$layerId-${currentPrecipitationInterval.value}';
-    final showNameLayerId = '$layerId-${currentPrecipitationInterval.value}-label-name';
-    final showValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label-value';
+    final showNameLayerId =
+        '$layerId-${currentPrecipitationInterval.value}-label-name';
+    final showValueLayerId =
+        '$layerId-${currentPrecipitationInterval.value}-label-value';
 
     try {
       await controller.setLayerVisibility(showLayerId, true);
@@ -306,7 +349,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+      if (_lastFetchTime == null ||
+          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+        await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.show', e, s);
     }
@@ -316,7 +361,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   Future<void> remove() async {
     try {
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
-      final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
+      final sourceId = MapSourceIds.precipitation(
+        currentPrecipitationTime.value,
+      );
 
       final removals = <Future<void>>[];
       for (final interval in precipitationIntervals) {
@@ -334,7 +381,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   }
 
   @override
-  Widget build(BuildContext context) => PrecipitationMapLayerSheet(manager: this);
+  Widget build(BuildContext context) =>
+      PrecipitationMapLayerSheet(manager: this);
 }
 
 class PrecipitationMapLayerSheet extends StatelessWidget {
@@ -373,7 +421,10 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
+                  final grouped = times
+                      .groupListsBy((time) => time.date)
+                      .entries
+                      .toList();
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -383,42 +434,59 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                         height: kMinInteractiveDimension,
                         child: ValueListenableBuilder<String?>(
                           valueListenable: manager.currentPrecipitationInterval,
-                          builder: (context, currentPrecipitationInterval, child) {
-                            const intervals = PrecipitationMapLayerManager.precipitationIntervals;
+                          builder:
+                              (context, currentPrecipitationInterval, child) {
+                                const intervals = PrecipitationMapLayerManager
+                                    .precipitationIntervals;
 
-                            return ListView.separated(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              scrollDirection: Axis.horizontal,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              itemCount: intervals.length,
-                              itemBuilder: (context, index) {
-                                final interval = intervals[index];
-                                final isSelected = interval == currentPrecipitationInterval;
+                                return ListView.separated(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  scrollDirection: Axis.horizontal,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  itemCount: intervals.length,
+                                  itemBuilder: (context, index) {
+                                    final interval = intervals[index];
+                                    final isSelected =
+                                        interval ==
+                                        currentPrecipitationInterval;
 
-                                return ValueListenableBuilder<bool>(
-                                  valueListenable: manager.isLoading,
-                                  builder: (context, isLoading, child) {
-                                    return FilterChip(
-                                      selected: isSelected,
-                                      showCheckmark: !isLoading,
-                                      label: Text(getIntervalLabel(interval)),
-                                      side: BorderSide(
-                                        color: isSelected ? context.colors.primary : context.colors.outlineVariant,
-                                      ),
-                                      avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                                      onSelected: isLoading
-                                          ? null
-                                          : (selected) {
-                                              if (!selected) return;
-                                              manager.setPrecipitationInterval(interval);
-                                            },
+                                    return ValueListenableBuilder<bool>(
+                                      valueListenable: manager.isLoading,
+                                      builder: (context, isLoading, child) {
+                                        return FilterChip(
+                                          selected: isSelected,
+                                          showCheckmark: !isLoading,
+                                          label: Text(
+                                            getIntervalLabel(interval),
+                                          ),
+                                          side: BorderSide(
+                                            color: isSelected
+                                                ? context.colors.primary
+                                                : context.colors.outlineVariant,
+                                          ),
+                                          avatar: isSelected && isLoading
+                                              ? const LoadingIcon()
+                                              : null,
+                                          onSelected: isLoading
+                                              ? null
+                                              : (selected) {
+                                                  if (!selected) return;
+                                                  manager
+                                                      .setPrecipitationInterval(
+                                                        interval,
+                                                      );
+                                                },
+                                        );
+                                      },
                                     );
                                   },
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(width: 8),
                                 );
                               },
-                              separatorBuilder: (context, index) => const SizedBox(width: 8),
-                            );
-                          },
                         ),
                       ),
                       SizedBox(
@@ -427,17 +495,21 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentPrecipitationTime,
                           builder: (context, currentPrecipitationTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               scrollDirection: Axis.horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) = grouped[index];
+                                final MapEntry(key: date, value: group) =
+                                    grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected = time.value == currentPrecipitationTime;
+                                  final isSelected =
+                                      time.value == currentPrecipitationTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(
@@ -448,14 +520,20 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                           showCheckmark: !isLoading,
                                           label: Text(time.time),
                                           side: BorderSide(
-                                            color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                            color: isSelected
+                                                ? context.colors.primary
+                                                : context.colors.outlineVariant,
                                           ),
-                                          avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                          avatar: isSelected && isLoading
+                                              ? const LoadingIcon()
+                                              : null,
                                           onSelected: isLoading
                                               ? null
                                               : (selected) {
                                                   if (!selected) return;
-                                                  manager.setPrecipitationTime(time.value);
+                                                  manager.setPrecipitationTime(
+                                                    time.value,
+                                                  );
                                                 },
                                         );
                                       },
@@ -466,11 +544,19 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                 children.add(
                                   const Padding(
                                     padding: EdgeInsets.only(right: 8),
-                                    child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                                    child: VerticalDivider(
+                                      width: 16,
+                                      indent: 8,
+                                      endIndent: 8,
+                                    ),
                                   ),
                                 );
 
-                                return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 8,
+                                  children: children,
+                                );
                               },
                             );
                           },
@@ -480,12 +566,15 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Row(
                     spacing: 8,
                     children: [
                       const Icon(Symbols.water_drop_rounded, size: 24),
-                      Text('降水'.i18n, style: context.textTheme.titleMedium),
+                      Text('降水'.i18n, style: context.texts.titleMedium),
                     ],
                   ),
                 ),
@@ -503,16 +592,16 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
               child: ColorLegend(
                 unit: 'mm',
                 items: [
-                  ColorLegendItem(color: const Color(0xffc2c2c2), value: 0),
-                  ColorLegendItem(color: const Color(0xFF9CFCFF), value: 10),
-                  ColorLegendItem(color: const Color(0xFF059BFF), value: 30),
-                  ColorLegendItem(color: const Color(0xFF39FF03), value: 50),
-                  ColorLegendItem(color: const Color(0xFFFFFB03), value: 100),
-                  ColorLegendItem(color: const Color(0xFFFF9500), value: 200),
-                  ColorLegendItem(color: const Color(0xFFFF0000), value: 300),
-                  ColorLegendItem(color: const Color(0xFFFB00FF), value: 500),
-                  ColorLegendItem(color: const Color(0xFF960099), value: 1000),
                   ColorLegendItem(color: const Color(0xFF000000), value: 2000),
+                  ColorLegendItem(color: const Color(0xFF960099), value: 1000),
+                  ColorLegendItem(color: const Color(0xFFFB00FF), value: 500),
+                  ColorLegendItem(color: const Color(0xFFFF0000), value: 300),
+                  ColorLegendItem(color: const Color(0xFFFF9500), value: 200),
+                  ColorLegendItem(color: const Color(0xFFFFFB03), value: 100),
+                  ColorLegendItem(color: const Color(0xFF39FF03), value: 50),
+                  ColorLegendItem(color: const Color(0xFF059BFF), value: 30),
+                  ColorLegendItem(color: const Color(0xFF9CFCFF), value: 10),
+                  ColorLegendItem(color: const Color(0xffc2c2c2), value: 0),
                 ],
               ),
             ),

@@ -1,13 +1,11 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -23,7 +21,8 @@ class SettingsDonatePage extends StatefulWidget {
   State<SettingsDonatePage> createState() => _SettingsDonatePageState();
 }
 
-class _SettingsDonatePageState extends State<SettingsDonatePage> {
+class _SettingsDonatePageState extends State<SettingsDonatePage>
+    with SingleTickerProviderStateMixin {
   bool isPending = false;
   String? processingProductId;
   final Set<String> purchasedProductIds = {};
@@ -31,7 +30,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   Completer<List<ProductDetails>> products = Completer();
 
-  final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
+  late AnimationController _shimmerController;
+
+  final Set<String> _kIds = <String>{
+    's_donation75',
+    'donation100',
+    'donation300',
+    'donation1000',
+  };
   StreamSubscription<List<PurchaseDetails>>? subscription;
 
   Future<void> refresh() async {
@@ -47,7 +53,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
       return;
     }
 
-    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
+    final ProductDetailsResponse response = await InAppPurchase.instance
+        .queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
       products.completeError('找不到商品，請稍候再試'.i18n);
       return;
@@ -59,56 +66,68 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   @override
   void initState() {
     super.initState();
-    _refreshIndicatorKey.currentState?.show();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _refreshIndicatorKey.currentState?.show();
+    });
 
     subscription?.cancel();
     subscription = InAppPurchase.instance.purchaseStream.listen(
       onPurchaseUpdate,
       onError: (error) {
+        if (!mounted) return;
         setState(() => isPending = false);
       },
     );
     refresh();
   }
 
-  void onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
-    final bool hasAnyPending = purchaseDetailsList.any((detail) => detail.status == PurchaseStatus.pending);
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    subscription?.cancel();
+    super.dispose();
+  }
 
-    if (mounted) {
-      setState(() {
-        isPending = hasAnyPending;
-        if (!hasAnyPending) {
-          processingProductId = null;
-        }
-      });
-    }
+  void onPurchaseUpdate(List<PurchaseDetails> list) {
+    if (!mounted) return;
 
-    for (final purchaseDetails in purchaseDetailsList) {
-      switch (purchaseDetails.status) {
+    final hasAnyPending = list.any((d) => d.status == PurchaseStatus.pending);
+
+    setState(() {
+      isPending = hasAnyPending;
+      if (!hasAnyPending) processingProductId = null;
+    });
+
+    for (final d in list) {
+      switch (d.status) {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          if (purchaseDetails.pendingCompletePurchase) {
-            InAppPurchase.instance.completePurchase(purchaseDetails);
+          if (d.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(d);
           }
-          if (mounted) {
+          setState(() {
+            purchasedProductIds.add(d.productID);
+          });
+          break;
+
+        case PurchaseStatus.pending:
+          if (processingProductId == null) {
             setState(() {
-              purchasedProductIds.add(purchaseDetails.productID);
+              processingProductId = d.productID;
             });
           }
           break;
 
         case PurchaseStatus.error:
         case PurchaseStatus.canceled:
-          if (purchaseDetails.pendingCompletePurchase) {
-            InAppPurchase.instance.completePurchase(purchaseDetails);
-          }
-          break;
-
-        case PurchaseStatus.pending:
-          if (processingProductId == null) {
-            setState(() {
-              processingProductId = purchaseDetails.productID;
-            });
+          if (d.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(d);
           }
           break;
       }
@@ -133,7 +152,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 spacing: 16,
                 children: [
                   Text(error.toString()),
-                  FilledButton.tonal(onPressed: refresh, child: Text('重新載入'.i18n)),
+                  FilledButton.tonal(
+                    onPressed: refresh,
+                    child: Text('重新載入'.i18n),
+                  ),
                 ],
               ),
             );
@@ -144,7 +166,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 16,
-                children: [const CircularProgressIndicator(), Text('正在載入商店物品中'.i18n)],
+                children: [
+                  const CircularProgressIndicator(),
+                  Text('正在載入商店物品中'.i18n),
+                ],
               ),
             );
           }
@@ -157,151 +182,494 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
               .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
 
           return ListView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 16,
+            ),
             children: [
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'
-                      .i18n,
-                  style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
-                  textAlign: TextAlign.justify,
-                ),
-              ),
+              _buildHeader(),
               if (subscriptions.isNotEmpty)
-                ListSection(
-                  title: '訂閱制'.i18n,
-                  children: [
-                    for (final product in subscriptions)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
-                        titleStyle: (processingProductId != null && processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
-                        subtitle: Text(
-                          product.description,
-                          style: TextStyle(
-                            color: (processingProductId != null && processingProductId != product.id)
-                                ? context.theme.disabledColor
-                                : context.textTheme.bodySmall?.color,
-                          ),
-                        ),
-                        trailing: (purchasedProductIds.contains(product.id))
-                            ? Icon(Symbols.check_rounded, color: context.colors.primary)
-                            : (processingProductId == product.id)
-                            ? const CircularProgressIndicator.adaptive()
-                            : Text(
-                                '{price}/月'.i18n.args({'price': product.price}),
-                                style: TextStyle(
-                                  color: (processingProductId != null && processingProductId != product.id)
-                                      ? context.theme.disabledColor
-                                      : context.textTheme.bodyMedium?.color,
-                                ),
-                              ),
-                        onTap: isPending || purchasedProductIds.contains(product.id)
-                            ? null
-                            : () {
-                                setState(() {
-                                  isPending = true;
-                                  processingProductId = product.id;
-                                });
-                                final purchaseParam = PurchaseParam(productDetails: product);
-                                InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
-                              },
-                      ),
-                  ],
-                ),
-              if (oneTime.isNotEmpty)
-                ListSection(
-                  title: '單次支援'.i18n,
-                  children: [
-                    for (final product in oneTime)
-                      ListSectionTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
-                        titleStyle: (processingProductId != null && processingProductId != product.id)
-                            ? TextStyle(color: context.theme.disabledColor)
-                            : const TextStyle(fontWeight: FontWeight.bold),
-                        subtitle: Text(
-                          product.description,
-                          style: TextStyle(
-                            color: (processingProductId != null && processingProductId != product.id)
-                                ? context.theme.disabledColor
-                                : context.textTheme.bodySmall?.color,
-                          ),
-                        ),
-                        trailing: (processingProductId == product.id)
-                            ? const CircularProgressIndicator.adaptive()
-                            : Text(
-                                product.price,
-                                style: TextStyle(
-                                  color: (processingProductId != null && processingProductId != product.id)
-                                      ? context.theme.disabledColor
-                                      : context.textTheme.bodyMedium?.color,
-                                ),
-                              ),
-                        onTap: isPending
-                            ? null
-                            : () {
-                                setState(() {
-                                  isPending = true;
-                                  processingProductId = product.id;
-                                });
-                                final purchaseParam = PurchaseParam(productDetails: product);
-                                InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
-                              },
-                      ),
-                  ],
-                ),
-              // SettingsListTextSection(
-              //   content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
-              //   contentAlignment: TextAlign.justify,
-              // ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        final bool available = await InAppPurchase.instance.isAvailable();
-                        if (!context.mounted) return;
-
-                        if (!available) {
-                          final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))),
-                          );
-                          return;
-                        }
-                        InAppPurchase.instance.restorePurchases();
-
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
-                      },
-                      child: Text('恢復購買'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
-                    ),
-                    const SizedBox(height: 4),
-                    InkWell(
-                      onTap: () {
-                        launchUrl(Uri.parse('https://exptech.dev/tos')); // 替換為你的 Terms URL
-                      },
-                      child: Text('使用條款'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
-                    ),
-                    const SizedBox(height: 4),
-                    InkWell(
-                      onTap: () {
-                        launchUrl(Uri.parse('https://exptech.dev/privacy')); // 替換為你的 Privacy URL
-                      },
-                      child: Text('隱私權政策'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
-                    ),
-                  ],
-                ),
-              ),
+                _buildSubscriptionSection(subscriptions),
+              if (oneTime.isNotEmpty) _buildOneTimeSection(oneTime),
+              _buildFooter(),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            context.colors.primaryContainer.withOpacity(0.5),
+            context.colors.tertiaryContainer.withOpacity(0.5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Symbols.favorite_rounded,
+            size: 48,
+            color: context.colors.primary,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '支持 DPIP'.i18n,
+            style: context.texts.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.colors.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。'
+                .i18n,
+            style: context.texts.bodyMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionSection(List<ProductDetails> subscriptions) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              Icon(
+                Symbols.workspace_premium_rounded,
+                color: const Color(0xFFFFD700),
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '訂閱制'.i18n,
+                style: context.texts.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.colors.onSurface,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '推薦'.i18n,
+                  style: context.texts.labelSmall?.copyWith(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (final product in subscriptions) _buildSubscriptionCard(product),
+      ],
+    );
+  }
+
+  Widget _buildSubscriptionCard(ProductDetails product) {
+    final isDisabled =
+        processingProductId != null && processingProductId != product.id;
+    final isProcessing = processingProductId == product.id;
+    final isPurchased = purchasedProductIds.contains(product.id);
+
+    final title = product.title.contains('(')
+        ? product.title.substring(0, product.title.indexOf('(')).trim()
+        : product.title;
+
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, child) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFFFD700).withOpacity(isDisabled ? 0.3 : 0.15),
+                const Color(0xFFFFA500).withOpacity(isDisabled ? 0.3 : 0.15),
+                const Color(0xFFFFD700).withOpacity(isDisabled ? 0.3 : 0.15),
+              ],
+              stops: [
+                0.0,
+                _shimmerController.value,
+                1.0,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: isDisabled
+                ? null
+                : [
+                    BoxShadow(
+                      color: const Color(0xFFFFD700).withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: isPending || isPurchased
+                  ? null
+                  : () {
+                      setState(() {
+                        isPending = true;
+                        processingProductId = product.id;
+                      });
+                      final purchaseParam = PurchaseParam(
+                        productDetails: product,
+                      );
+                      InAppPurchase.instance.buyNonConsumable(
+                        purchaseParam: purchaseParam,
+                      );
+                    },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(
+                              0xFFFFD700,
+                            ).withOpacity(isDisabled ? 0.3 : 0.8),
+                            const Color(
+                              0xFFFFA500,
+                            ).withOpacity(isDisabled ? 0.3 : 0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Symbols.diamond_rounded,
+                        color: isDisabled ? Colors.grey : Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: context.texts.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isDisabled
+                                  ? context.theme.disabledColor
+                                  : context.colors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            product.description,
+                            style: context.texts.bodySmall?.copyWith(
+                              color: isDisabled
+                                  ? context.theme.disabledColor
+                                  : context.colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isPurchased)
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: context.colors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Symbols.check_rounded,
+                          color: context.colors.onPrimary,
+                          size: 20,
+                        ),
+                      )
+                    else if (isProcessing)
+                      const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isDisabled
+                              ? null
+                              : const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFFD700),
+                                    Color(0xFFFFA500),
+                                  ],
+                                ),
+                          color: isDisabled
+                              ? context.theme.disabledColor
+                              : null,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '{price}/月'.i18n.args({'price': product.price}),
+                          style: context.texts.labelLarge?.copyWith(
+                            color: isDisabled ? Colors.white54 : Colors.black87,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOneTimeSection(List<ProductDetails> oneTime) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+          child: Row(
+            children: [
+              Icon(
+                Symbols.favorite_rounded,
+                color: context.colors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '單次支援'.i18n,
+                style: context.texts.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.colors.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (final product in oneTime) _buildOneTimeCard(product),
+      ],
+    );
+  }
+
+  Widget _buildOneTimeCard(ProductDetails product) {
+    final isDisabled =
+        processingProductId != null && processingProductId != product.id;
+    final isProcessing = processingProductId == product.id;
+
+    final title = product.title.contains('(')
+        ? product.title.substring(0, product.title.indexOf('(')).trim()
+        : product.title;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: isPending
+              ? null
+              : () {
+                  setState(() {
+                    isPending = true;
+                    processingProductId = product.id;
+                  });
+                  final purchaseParam = PurchaseParam(
+                    productDetails: product,
+                  );
+                  InAppPurchase.instance.buyConsumable(
+                    purchaseParam: purchaseParam,
+                  );
+                },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: context.colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Symbols.coffee_rounded,
+                    color: isDisabled
+                        ? context.theme.disabledColor
+                        : context.colors.onPrimaryContainer,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: context.texts.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isDisabled
+                              ? context.theme.disabledColor
+                              : context.colors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        product.description,
+                        style: context.texts.bodySmall?.copyWith(
+                          color: isDisabled
+                              ? context.theme.disabledColor
+                              : context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isProcessing)
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDisabled
+                          ? context.theme.disabledColor
+                          : context.colors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      product.price,
+                      style: context.texts.labelLarge?.copyWith(
+                        color: isDisabled
+                            ? Colors.white54
+                            : context.colors.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Divider(color: context.colors.outlineVariant),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 24,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildFooterLink(
+                '恢復購買'.i18n,
+                onTap: () async {
+                  final bool available = await InAppPurchase.instance
+                      .isAvailable();
+                  if (!context.mounted) return;
+
+                  if (!available) {
+                    final storeName = Platform.isIOS
+                        ? 'App Store'
+                        : 'Google Play';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '無法連線至 {store}，請稍後再試。'.i18n.args({
+                            'store': storeName,
+                          }),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  InAppPurchase.instance.restorePurchases();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)),
+                  );
+                },
+              ),
+              _buildFooterLink(
+                '使用條款'.i18n,
+                onTap: () => launchUrl(Uri.parse('https://exptech.dev/tos')),
+              ),
+              _buildFooterLink(
+                '隱私權政策'.i18n,
+                onTap: () =>
+                    launchUrl(Uri.parse('https://exptech.dev/privacy')),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooterLink(String text, {required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Text(
+          text,
+          style: context.texts.bodySmall?.copyWith(
+            color: context.colors.primary,
+            decoration: TextDecoration.underline,
+            decorationColor: context.colors.primary,
+          ),
+        ),
       ),
     );
   }

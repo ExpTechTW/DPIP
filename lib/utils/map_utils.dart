@@ -1,34 +1,11 @@
 import 'dart:math';
 
-import 'package:geojson_vi/geojson_vi.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-
-List<double> expandBounds(List<double> bounds, LatLng point) {
-  // [南西,北東]
-  //南
-  if (bounds[0] > point.latitude) {
-    bounds[0] = point.latitude;
-  }
-  //西
-  if (bounds[1] > point.longitude) {
-    bounds[1] = point.longitude;
-  }
-  //北
-  if (bounds[2] < point.latitude) {
-    bounds[2] = point.latitude;
-  }
-  //東
-  if (bounds[3] < point.longitude) {
-    bounds[3] = point.longitude;
-  }
-
-  return bounds;
-}
+import 'package:geojson_vi/geojson_vi.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum Units {
   meters,
@@ -113,7 +90,12 @@ double lengthToRadians(double distance, {Units units = Units.kilometers}) {
 /// Takes a [LatLng] and calculates the location of a destination point given a distance in
 /// degrees, radians, miles, or kilometers; and bearing in degrees.
 /// This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
-LatLng destination(LatLng origin, double distance, double bearing, {Units units = Units.kilometers}) {
+LatLng destination(
+  LatLng origin,
+  double distance,
+  double bearing, {
+  Units units = Units.kilometers,
+}) {
   // Handle input
   final longitude1 = degreesToRadians(origin.longitude);
   final latitude1 = degreesToRadians(origin.latitude);
@@ -121,10 +103,16 @@ LatLng destination(LatLng origin, double distance, double bearing, {Units units 
   final radians = lengthToRadians(distance, units: units);
 
   // Main
-  final latitude2 = asin(sin(latitude1) * cos(radians) + cos(latitude1) * sin(radians) * cos(bearingRad));
+  final latitude2 = asin(
+    sin(latitude1) * cos(radians) +
+        cos(latitude1) * sin(radians) * cos(bearingRad),
+  );
   final longitude2 =
       longitude1 +
-      atan2(sin(bearingRad) * sin(radians) * cos(latitude1), cos(radians) - sin(latitude1) * sin(latitude2));
+      atan2(
+        sin(bearingRad) * sin(radians) * cos(latitude1),
+        cos(radians) - sin(latitude1) * sin(latitude2),
+      );
   final lng = radiansToDegrees(longitude2);
   final lat = radiansToDegrees(latitude2);
 
@@ -134,7 +122,12 @@ LatLng destination(LatLng origin, double distance, double bearing, {Units units 
 /// Takes a [LatLng] and calculates the circle polygon given a radius in
 /// degrees, radians, miles, or kilometers; and steps for precision.
 @Deprecated('Use circleFeature()')
-Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
+Map<String, dynamic> circle(
+  LatLng center,
+  double radius, {
+  int steps = 64,
+  Units units = Units.kilometers,
+}) {
   // main
   final coordinates = [];
 
@@ -156,7 +149,10 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
 }
 
 // Precomputed bearing values for circle generation (32 steps)
-final _circleBearings32 = List.generate(32, (i) => degreesToRadians((i * -360) / 32));
+final _circleBearings32 = List.generate(
+  32,
+  (i) => degreesToRadians((i * -360) / 32),
+);
 final _circleSines32 = _circleBearings32.map((b) => sin(b)).toList();
 final _circleCosines32 = _circleBearings32.map((b) => cos(b)).toList();
 
@@ -192,15 +188,30 @@ GeoJsonFeatureBuilder circleFeature({
       final sinBearing = _circleSines32[i];
       final cosBearing = _circleCosines32[i];
 
-      final latitude2 = asin(sinLat1CosRadians + cosLat1SinRadians * cosBearing);
-      final longitude2 = longitude1 + atan2(sinBearing * cosLat1SinRadians, cosRadians - sinLat1 * sin(latitude2));
+      final latitude2 = asin(
+        sinLat1CosRadians + cosLat1SinRadians * cosBearing,
+      );
+      final longitude2 =
+          longitude1 +
+          atan2(
+            sinBearing * cosLat1SinRadians,
+            cosRadians - sinLat1 * sin(latitude2),
+          );
 
-      coordinates.add([radiansToDegrees(longitude2), radiansToDegrees(latitude2)]);
+      coordinates.add([
+        radiansToDegrees(longitude2),
+        radiansToDegrees(latitude2),
+      ]);
     }
   } else {
     // Fallback: original implementation
     for (var i = 0; i < steps; i++) {
-      final point = destination(center, radius, (i * -360) / steps, units: units);
+      final point = destination(
+        center,
+        radius,
+        (i * -360) / steps,
+        units: units,
+      );
       coordinates.add(point.asGeoJsonCooridnate);
     }
   }
@@ -210,7 +221,11 @@ GeoJsonFeatureBuilder circleFeature({
   return polygon.setGeometry(coordinates);
 }
 
-bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, List<List<double>> box) {
+bool checkBoxSkip(
+  Map<String, Eew> eewLastInfo,
+  Map<String, double> eewDist,
+  List<List<double>> box,
+) {
   bool passed = false;
 
   for (final eew in eewLastInfo.keys) {
@@ -256,7 +271,8 @@ String? getTownCodeFromCoordinates(LatLng target) {
 
         final bool intersect =
             ((yi > target.latitude) != (yj > target.latitude)) &&
-            (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+            (target.longitude <
+                (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
         if (intersect) isInside = !isInside;
 
         j = i;
@@ -280,7 +296,8 @@ String? getTownCodeFromCoordinates(LatLng target) {
 
           final bool intersect =
               ((yi > target.latitude) != (yj > target.latitude)) &&
-              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+              (target.longitude <
+                  (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
           if (intersect) isInside = !isInside;
 
           j = i;

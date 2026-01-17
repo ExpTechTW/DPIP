@@ -80,10 +80,16 @@ class MorphingSheetController {
 
     try {
       final isExpanding = targetSize > size;
-      final curve = isExpanding ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate;
+      final curve = isExpanding
+          ? Easing.emphasizedDecelerate
+          : Easing.emphasizedAccelerate;
       final duration = isExpanding ? enterDuration : exitDuration;
 
-      await _draggableController!.animateTo(targetSize, duration: duration, curve: curve);
+      await _draggableController!.animateTo(
+        targetSize,
+        duration: duration,
+        curve: curve,
+      );
     } finally {
       _isSnapping = false;
     }

@@ -271,7 +271,9 @@ class WeatherIcons {
   static IconData getWeatherIcon(int code, bool isDay) {
     final weatherInfo = weatherCodeMap[code];
     if (weatherInfo != null) {
-      final iconName = isDay ? weatherInfo['icon']['day'] : weatherInfo['icon']['night'];
+      final iconName = isDay
+          ? weatherInfo['icon']['day']
+          : weatherInfo['icon']['night'];
       return iconMap[iconName] ?? Symbols.error_rounded;
     }
     return Symbols.error_rounded;

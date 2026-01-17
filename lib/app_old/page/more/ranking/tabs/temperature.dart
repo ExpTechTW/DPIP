@@ -3,7 +3,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -30,8 +30,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
     if (!mounted) return;
 
-    data = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
-    time = DateFormat('yyyy/MM/dd HH:mm:ss').format(parseDateTime(weatherList.last));
+    data = latestWeatherData
+        .where((station) => station.data.air.temperature != -99)
+        .toList();
+    time = DateFormat(
+      'yyyy/MM/dd HH:mm:ss',
+    ).format(parseDateTime(weatherList.last));
     rank();
   }
 
@@ -39,7 +43,9 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     final temp = (merge != MergeType.none)
         ? groupBy(
             data,
-            (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
+            (e) => merge == MergeType.town
+                ? (e.station.county, e.station.town)
+                : e.station.county,
           ).values.map(
             (v) => v.reduce(
               (acc, e) =>
@@ -52,7 +58,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           )
         : data;
 
-    final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
+    final sorted = temp
+        .sorted(
+          (a, b) =>
+              (b.data.air.temperature - a.data.air.temperature).sign.toInt(),
+        )
+        .toList();
     setState(() {
       ranked = reversed ? sorted.reversed.toList() : sorted;
     });
@@ -95,11 +106,28 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text('依')),
-                  ChoiceChip(label: const Text('最高'), selected: !reversed, onSelected: (value) => setReversed(false)),
-                  ChoiceChip(label: const Text('最低'), selected: reversed, onSelected: (value) => setReversed(true)),
-                  const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text('合併至')),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('依'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('最高'),
+                    selected: !reversed,
+                    onSelected: (value) => setReversed(false),
+                  ),
+                  ChoiceChip(
+                    label: const Text('最低'),
+                    selected: reversed,
+                    onSelected: (value) => setReversed(true),
+                  ),
+                  const SizedBox(
+                    height: kToolbarHeight - 16,
+                    child: VerticalDivider(),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('合併至'),
+                  ),
                   ChoiceChip(
                     label: const Text('鄉鎮'),
                     selected: merge == MergeType.town,
@@ -116,7 +144,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點', style: TextStyle(color: context.colors.onSurfaceVariant)),
+            child: Text(
+              '資料時間：$time\n共 ${ranked.length} 觀測點',
+              style: TextStyle(color: context.colors.onSurfaceVariant),
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -173,26 +204,37 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
                 final leading = index < 3
                     ? Icon(
-                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                        index == 0
+                            ? Symbols.trophy_rounded
+                            : Symbols.workspace_premium_rounded,
                         color: iconColor,
                         size: iconSize,
                         fill: 1,
                       )
                     : Text(
                         '$rank',
-                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
+                        style: TextStyle(
+                          color: foregroundColor,
+                          fontSize: fontSize,
+                        ),
                       );
 
                 final percentage = reversed
-                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
-                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
-                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
-                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
+                    ? (ranked.first.data.air.temperature -
+                              item.data.air.temperature) /
+                          (ranked.first.data.air.temperature -
+                              ranked.last.data.air.temperature)
+                    : (item.data.air.temperature -
+                              ranked.last.data.air.temperature) /
+                          (ranked.first.data.air.temperature -
+                              ranked.last.data.air.temperature);
 
                 final location = merge != MergeType.none
                     ? [
                         Text(
-                          merge == MergeType.town ? '${item.station.county}${item.station.town}' : item.station.county,
+                          merge == MergeType.town
+                              ? '${item.station.county}${item.station.town}'
+                              : item.station.county,
                           style: TextStyle(
                             fontSize: fontSize,
                             fontWeight: index == 0
@@ -218,14 +260,20 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                         const SizedBox(width: 8),
                         Text(
                           '${item.station.county}${item.station.town}',
-                          style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withValues(alpha: 0.8)),
+                          style: TextStyle(
+                            fontSize: fontSize / 1.25,
+                            color: foregroundColor.withValues(alpha: 0.8),
+                          ),
                         ),
                       ];
 
                 final content = [
                   Expanded(
                     child: index < 3
-                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: location,
+                          )
                         : Row(children: location),
                   ),
                   Text(
@@ -242,14 +290,20 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 ];
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,

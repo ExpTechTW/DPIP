@@ -1,4 +1,4 @@
-import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/serialization.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rts_station.g.dart';
@@ -21,9 +21,16 @@ class RtsStation {
   @JsonKey(fromJson: parseBoolishInt)
   final bool? alert;
 
-  RtsStation({required this.pga, required this.pgv, required this.i, required this.I, this.alert});
+  RtsStation({
+    required this.pga,
+    required this.pgv,
+    required this.i,
+    required this.I,
+    this.alert,
+  });
 
-  factory RtsStation.fromJson(Map<String, dynamic> json) => _$RtsStationFromJson(json);
+  factory RtsStation.fromJson(Map<String, dynamic> json) =>
+      _$RtsStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsStationToJson(this);
 }

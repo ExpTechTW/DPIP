@@ -30,9 +30,14 @@ class TsunamiEstimate {
   @JsonKey(name: 'wave_height')
   final int waveHeight;
 
-  TsunamiEstimate({required this.area, required this.arrivalTime, required this.waveHeight});
+  TsunamiEstimate({
+    required this.area,
+    required this.arrivalTime,
+    required this.waveHeight,
+  });
 
-  factory TsunamiEstimate.fromJson(Map<String, dynamic> json) => _$TsunamiEstimateFromJson(json);
+  factory TsunamiEstimate.fromJson(Map<String, dynamic> json) =>
+      _$TsunamiEstimateFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiEstimateToJson(this);
 }

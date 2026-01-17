@@ -1,10 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:async/async.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -12,6 +8,8 @@ import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/style.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum BaseMapType { exptech, osm, google }
 
@@ -74,7 +72,10 @@ class DpipMap extends StatefulWidget {
   const DpipMap({
     super.key,
     this.baseMapType = BaseMapType.exptech,
-    this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: kTaiwanZoom),
+    this.initialCameraPosition = const CameraPosition(
+      target: kTaiwanCenter,
+      zoom: kTaiwanZoom,
+    ),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
@@ -126,17 +127,37 @@ class DpipMapState extends State<DpipMap> {
         await updateLocationFromGPS();
       }
 
+      if (!mounted) return;
+
       final location = GlobalProviders.location.coordinates;
 
       final data = location?.toGeoJsonMap() ?? GeoJsonBuilder.empty;
 
       await controller.setGeoJsonSource(BaseMapSourceIds.userLocation, data);
 
-      if (_isMapReady && widget.focusUserLocationWhenUpdated && location != null) {
-        await Future.delayed(const Duration(milliseconds: 100));
-        await controller.animateCamera(
-          CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom),
-          duration: const Duration(milliseconds: 500),
+      if (!mounted) return;
+
+      if (_isMapReady &&
+          widget.focusUserLocationWhenUpdated &&
+          location != null) {
+        try {
+          TalkerManager.instance.debug(
+            'DpipMap: animating to user location $location, zoom=${DpipMap.kUserLocationZoom}',
+          );
+          await Future.delayed(const Duration(milliseconds: 100));
+          if (!mounted) return;
+          await controller.animateCamera(
+            CameraUpdate.newLatLngZoom(location, DpipMap.kUserLocationZoom),
+            duration: const Duration(milliseconds: 500),
+          );
+          TalkerManager.instance.debug('DpipMap: animateCamera completed');
+        } catch (e) {
+          // 忽略相機動畫錯誤，可能是地圖還沒完全初始化
+          TalkerManager.instance.debug('地圖相機動畫失敗（可忽略）: $e');
+        }
+      } else {
+        TalkerManager.instance.debug(
+          'DpipMap._updateUserLocation: skipping animation, isMapReady=$_isMapReady, focusUserLocation=${widget.focusUserLocationWhenUpdated}, location=$location',
         );
       }
     } catch (e, s) {
@@ -163,7 +184,10 @@ class DpipMapState extends State<DpipMap> {
     final controller = _controller;
     if (controller == null) return;
 
-    final layers = [...MapStyle.osmLayers(colors), ...MapStyle.exptechLayers(colors)];
+    final layers = [
+      ...MapStyle.osmLayers(colors),
+      ...MapStyle.exptechLayers(colors),
+    ];
 
     for (final layer in layers) {
       if (layer['type'] == 'background') continue;
@@ -191,7 +215,9 @@ class DpipMapState extends State<DpipMap> {
       _stylePathFuture = MapStyle(context, baseMap: widget.baseMapType).save();
     } else if (_lastColors != context.colors) {
       _setThemeColorFuture?.cancel();
-      _setThemeColorFuture = CancelableOperation.fromFuture(setThemeColors(context.colors));
+      _setThemeColorFuture = CancelableOperation.fromFuture(
+        setThemeColors(context.colors),
+      );
     }
 
     _lastColors = context.colors;
@@ -199,23 +225,45 @@ class DpipMapState extends State<DpipMap> {
 
   @override
   Widget build(BuildContext context) {
-    final double adjustedZoomValue = DpipMap.adjustedZoom(context, widget.initialCameraPosition.zoom);
+    final double adjustedZoomValue = DpipMap.adjustedZoom(
+      context,
+      widget.initialCameraPosition.zoom,
+    );
 
     return FutureBuilder(
       future: _stylePathFuture,
       builder: (context, snapshot) {
         final styleString = snapshot.data;
 
+        if (snapshot.hasError) {
+          TalkerManager.instance.error(
+            'DpipMap: style load error',
+            snapshot.error,
+          );
+        }
+
         if (styleString == null) {
+          TalkerManager.instance.debug(
+            'DpipMap: waiting for style, hasError=${snapshot.hasError}, connectionState=${snapshot.connectionState}',
+          );
           return const Center(child: CircularProgressIndicator());
         }
+
+        TalkerManager.instance.debug('DpipMap: style loaded, building map');
 
         return ColoredBox(
           color: context.colors.surface,
           child: MapLibreMap(
-            minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
+            minMaxZoomPreference:
+                widget.minMaxZoomPreference ??
+                const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
             trackCameraPosition: true,
-            initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
+            initialCameraPosition: CameraPosition(
+              target: widget.initialCameraPosition.target,
+              zoom: adjustedZoomValue,
+              bearing: widget.initialCameraPosition.bearing,
+              tilt: widget.initialCameraPosition.tilt,
+            ),
             styleString: styleString,
             tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
             scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
@@ -225,6 +273,9 @@ class DpipMapState extends State<DpipMap> {
             dragEnabled: widget.dragEnabled ?? true,
             attributionButtonMargins: const Point<double>(-100, -100),
             onMapCreated: (controller) {
+              TalkerManager.instance.debug(
+                'DpipMap.onMapCreated: controller received',
+              );
               _controller = controller;
               widget.onMapCreated?.call(controller);
             },
@@ -232,6 +283,9 @@ class DpipMapState extends State<DpipMap> {
             onMapIdle: widget.onMapIdle,
             onMapLongClick: widget.onMapLongClick,
             onStyleLoadedCallback: () {
+              TalkerManager.instance.debug(
+                'DpipMap.onStyleLoadedCallback: style loaded',
+              );
               _initMap();
               widget.onStyleLoadedCallback?.call();
             },

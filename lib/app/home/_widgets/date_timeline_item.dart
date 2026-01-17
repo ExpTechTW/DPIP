@@ -24,20 +24,29 @@ class DateTimelineItem extends StatelessWidget {
     if (mode == null || onModeChanged == null) return;
 
     final RenderBox? button = context.findRenderObject() as RenderBox?;
-    final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+    final RenderBox? overlay =
+        Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
 
     if (button == null || overlay == null) return;
 
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(button.size.bottomLeft(Offset.zero), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+        button.localToGlobal(
+          button.size.bottomLeft(Offset.zero),
+          ancestor: overlay,
+        ),
+        button.localToGlobal(
+          button.size.bottomRight(Offset.zero),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );
 
     // 如果在服務區外，只顯示全國模式
-    final availableModes = isOutOfService ? HomeMode.values.where((m) => m.isNational).toList() : HomeMode.values;
+    final availableModes = isOutOfService
+        ? HomeMode.values.where((m) => m.isNational).toList()
+        : HomeMode.values;
 
     showMenu<HomeMode>(
       context: context,
@@ -50,11 +59,19 @@ class DateTimelineItem extends StatelessWidget {
           child: Row(
             spacing: 12,
             children: [
-              Icon(m.icon, size: 20, color: mode == m ? context.colors.primary : context.colors.onSurfaceVariant),
+              Icon(
+                m.icon,
+                size: 20,
+                color: mode == m
+                    ? context.colors.primary
+                    : context.colors.onSurfaceVariant,
+              ),
               Text(
                 m.label,
                 style: context.theme.textTheme.bodyMedium?.copyWith(
-                  color: mode == m ? context.colors.primary : context.colors.onSurface,
+                  color: mode == m
+                      ? context.colors.primary
+                      : context.colors.onSurface,
                   fontWeight: mode == m ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -88,13 +105,21 @@ class DateTimelineItem extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Positioned(top: 0, bottom: 0, width: 1, child: Container(color: context.colors.outlineVariant)),
+                      Positioned(
+                        top: 0,
+                        bottom: 0,
+                        width: 1,
+                        child: Container(color: context.colors.outlineVariant),
+                      ),
                       SizedBox(
                         width: 42,
                         child: Container(
                           height: 8,
                           width: 8,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.outlineVariant),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: context.colors.outlineVariant,
+                          ),
                         ),
                       ),
                     ],
@@ -103,7 +128,9 @@ class DateTimelineItem extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 8),
                   child: InkWell(
-                    onTap: mode != null && onModeChanged != null ? () => _showModeMenu(context) : null,
+                    onTap: mode != null && onModeChanged != null
+                        ? () => _showModeMenu(context)
+                        : null,
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -116,19 +143,25 @@ class DateTimelineItem extends StatelessWidget {
                         spacing: 6,
                         children: [
                           if (mode != null) ...[
-                            Icon(mode!.icon, size: 16, color: context.colors.onSecondaryContainer),
+                            Icon(
+                              mode!.icon,
+                              size: 16,
+                              color: context.colors.onSecondaryContainer,
+                            ),
                             Text(
                               mode!.label,
-                              style: context.theme.textTheme.labelMedium?.copyWith(
-                                height: 1,
-                                color: context.colors.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: context.theme.textTheme.labelMedium
+                                  ?.copyWith(
+                                    height: 1,
+                                    color: context.colors.onSecondaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             Container(
                               width: 1,
                               height: 12,
-                              color: context.colors.onSecondaryContainer.withValues(alpha: 0.3),
+                              color: context.colors.onSecondaryContainer
+                                  .withValues(alpha: 0.3),
                             ),
                           ],
                           Text(

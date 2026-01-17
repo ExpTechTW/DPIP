@@ -1,12 +1,9 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 String? _pendingChannelKey;
 
@@ -16,7 +13,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   final context = router.routerDelegate.navigatorKey.currentContext;
   if (context == null) {
     _pendingChannelKey = receivedAction.channelKey;
-    TalkerManager.instance.debug('Context not available, stored pending notification: channelKey=$_pendingChannelKey');
+    TalkerManager.instance.debug(
+      'Context not available, stored pending notification: channelKey=$_pendingChannelKey',
+    );
     return;
   }
 
@@ -29,7 +28,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
 void handlePendingNotificationNavigation(BuildContext context) {
   if (_pendingChannelKey == null) return;
 
-  TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
+  TalkerManager.instance.debug(
+    'Handling pending notification: channelKey=$_pendingChannelKey',
+  );
 
   _navigateBasedOnChannelKey(context, _pendingChannelKey);
   _pendingChannelKey = null;
@@ -40,22 +41,24 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
 
   TalkerManager.instance.debug('Navigating based on channelKey: $channelKey');
 
-  if (channelKey.startsWith('eew') || channelKey.startsWith('int_report') || channelKey.startsWith('eq')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
+  if (channelKey.startsWith('eew') ||
+      channelKey.startsWith('int_report') ||
+      channelKey.startsWith('eq')) {
+    MapRoute(layers: 'monitor').push(context);
     return;
   }
 
   if (channelKey.startsWith('report')) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.report})));
+    MapRoute(layers: 'report').push(context);
     return;
   }
 
   // if (channelKey.startsWith('announcement')) {
-  //   context.push('/announcement');
+  //   AnnouncementRoute().push(context);
   //   return;
   // }
 
-  context.go('/home');
+  HomeRoute().go(context);
 }
 
 Future<void> notifyInit() async {
@@ -213,7 +216,7 @@ Future<void> notifyInit() async {
         channelGroupKey: 'group_eq',
         channelKey: 'report-silence-v2',
         channelName: '地震報告 (無聲通知)',
-        channelDescription: '地震報告所在地震度 3 以下的地區',
+        channelDescription: '地震報告所在地震度 1 以上',
         groupAlertBehavior: GroupAlertBehavior.Children,
         importance: NotificationImportance.Min,
         defaultPrivacy: NotificationPrivacy.Public,
@@ -277,7 +280,7 @@ Future<void> notifyInit() async {
         importance: NotificationImportance.Default,
         defaultPrivacy: NotificationPrivacy.Public,
         playSound: true,
-        soundSource: 'resource://raw/normal',
+        soundSource: 'resource://raw/weather',
         defaultColor: Colors.red,
         ledColor: Colors.red,
         enableVibration: true,
@@ -386,14 +389,31 @@ Future<void> notifyInit() async {
       ),
     ],
     channelGroups: [
-      NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報'),
-      NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震'),
-      NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '天氣'),
-      NotificationChannelGroup(channelGroupKey: 'group_tsunami', channelGroupName: '海嘯'),
-      NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_eew',
+        channelGroupName: '地震速報',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_eq',
+        channelGroupName: '地震',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_info',
+        channelGroupName: '天氣',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_tsunami',
+        channelGroupName: '海嘯',
+      ),
+      NotificationChannelGroup(
+        channelGroupKey: 'group_other',
+        channelGroupName: '其他',
+      ),
     ],
     debug: true,
   );
 
-  AwesomeNotifications().setListeners(onActionReceivedMethod: onActionReceivedMethod);
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: onActionReceivedMethod,
+  );
 }

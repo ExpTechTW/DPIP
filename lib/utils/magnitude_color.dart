@@ -12,7 +12,13 @@ class MagnitudeColor {
 
   static Color magnitude(double mag) {
     final magnitudeList = [2.5, 3.5, 4.5, 6.0, 7.0];
-    final colorList = [magnitude1, magnitude2, magnitude3, magnitude4, magnitude5];
+    final colorList = [
+      magnitude1,
+      magnitude2,
+      magnitude3,
+      magnitude4,
+      magnitude5,
+    ];
 
     if (mag <= magnitudeList.first) {
       return colorList.first;
@@ -24,7 +30,9 @@ class MagnitudeColor {
 
     for (int i = 0; i < magnitudeList.length - 1; i++) {
       if (mag >= magnitudeList[i] && mag < magnitudeList[i + 1]) {
-        final double localT = (mag - magnitudeList[i]) / (magnitudeList[i + 1] - magnitudeList[i]);
+        final double localT =
+            (mag - magnitudeList[i]) /
+            (magnitudeList[i + 1] - magnitudeList[i]);
         return Color.lerp(colorList[i], colorList[i + 1], localT)!;
       }
     }

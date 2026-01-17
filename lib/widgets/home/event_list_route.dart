@@ -1,14 +1,12 @@
-import 'package:dpip/api/model/history/intensity_history.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-
 import 'package:dpip/api/model/history/history.dart';
+import 'package:dpip/api/model/history/intensity_history.dart';
 import 'package:dpip/api/model/history/report_history.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/route/event_viewer/intensity.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 bool shouldShowArrow(History item) {
   return [
@@ -47,7 +45,10 @@ void handleEventList(BuildContext context, History history) {
     case HistoryType.earthquake:
       context.push(
         MapPage.route(
-          options: MapPageOptions(initialLayers: {MapLayer.report}, reportId: (history as ReportHistory).addition.id),
+          options: MapPageOptions(
+            initialLayers: {MapLayer.report},
+            reportId: (history as ReportHistory).addition.id,
+          ),
         ),
       );
 

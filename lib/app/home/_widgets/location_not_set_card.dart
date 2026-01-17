@@ -1,8 +1,7 @@
-import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LocationNotSetCard extends StatelessWidget {
@@ -25,14 +24,23 @@ class LocationNotSetCard extends StatelessWidget {
           Row(
             spacing: 8,
             children: [
-              Icon(Symbols.not_listed_location_rounded, color: context.colors.onSecondaryContainer, weight: 500),
+              Icon(
+                Symbols.not_listed_location_rounded,
+                color: context.colors.onSecondaryContainer,
+                weight: 500,
+              ),
               Text(
                 '尚未設定所在地'.i18n,
-                style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
+                style: context.texts.bodyMedium!.copyWith(
+                  color: context.colors.onSecondaryContainer,
+                ),
               ),
             ],
           ),
-          TextButton(child: Text('設定'.i18n), onPressed: () => context.push(SettingsLocationPage.route)),
+          TextButton(
+            child: Text('設定'.i18n),
+            onPressed: () => SettingsLocationRoute().push(context),
+          ),
         ],
       ),
     );

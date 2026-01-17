@@ -12,12 +12,14 @@ class CustomSheet extends StatefulWidget {
 }
 
 class _CustomSheetState extends State<CustomSheet> {
-  final DraggableScrollableController _controller = DraggableScrollableController();
+  final DraggableScrollableController _controller =
+      DraggableScrollableController();
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = context.screen.height;
-    final defaultInitialSize = (context.bottomSheetConstraints.maxHeight * 0.4) / screenHeight;
+    final screenHeight = context.dimension.height;
+    final defaultInitialSize =
+        (context.bottomSheetConstraints.maxHeight * 0.4) / screenHeight;
 
     return Positioned.fill(
       child: DraggableScrollableSheet(
@@ -36,8 +38,14 @@ class _CustomSheetState extends State<CustomSheet> {
                 surfaceTintColor: context.theme.colorScheme.surfaceTint,
                 elevation: 1,
                 clipBehavior: Clip.hardEdge,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-                child: ListView(controller: scrollController, shrinkWrap: true, children: widget.children),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                ),
+                child: ListView(
+                  controller: scrollController,
+                  shrinkWrap: true,
+                  children: widget.children,
+                ),
               ),
             ),
           );

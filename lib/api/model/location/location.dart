@@ -81,12 +81,13 @@ class Location {
   /// Example: "臺北市 信義區" or "Taipei City Xinyi District"
   ///
   /// This is the most complete form of the location name including all administrative level indicators.
-  String get cityTownWithLevel => '{city}{cityLevel} {town}{townLevel}'.i18n.args({
-    'city': city.locationName,
-    'cityLevel': cityLevel.locationName,
-    'town': town.locationName,
-    'townLevel': townLevel.locationName,
-  });
+  String get cityTownWithLevel =>
+      '{city}{cityLevel} {town}{townLevel}'.i18n.args({
+        'city': city.locationName,
+        'cityLevel': cityLevel.locationName,
+        'town': town.locationName,
+        'townLevel': townLevel.locationName,
+      });
 
   /// Returns the localized location name without administrative levels.
   ///
@@ -94,7 +95,10 @@ class Location {
   /// Example: "臺北 信義" or "Taipei Xinyi"
   ///
   /// This provides a cleaner, shorter display format without the administrative level suffixes.
-  String get cityTown => '{city} {town}'.i18n.args({'city': city.locationName, 'town': town.locationName});
+  String get cityTown => '{city} {town}'.i18n.args({
+    'city': city.locationName,
+    'town': town.locationName,
+  });
 
   /// Returns the localized city name with its administrative level.
   ///
@@ -106,7 +110,10 @@ class Location {
     final key = '$city$cityLevel';
     return _cityWithLevelCache.putIfAbsent(
       key,
-      () => '{city}{cityLevel}'.i18n.args({'city': city.locationName, 'cityLevel': cityLevel.locationName}),
+      () => '{city}{cityLevel}'.i18n.args({
+        'city': city.locationName,
+        'cityLevel': cityLevel.locationName,
+      }),
     );
   }
 
@@ -120,7 +127,10 @@ class Location {
     final key = '$town$townLevel';
     return _townWithLevelCache.putIfAbsent(
       key,
-      () => '{town}{townLevel}'.i18n.args({'town': town.locationName, 'townLevel': townLevel.locationName}),
+      () => '{town}{townLevel}'.i18n.args({
+        'town': town.locationName,
+        'townLevel': townLevel.locationName,
+      }),
     );
   }
 
@@ -173,7 +183,8 @@ class Location {
   /// };
   /// final location = Location.fromJson(json);
   /// ```
-  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
+  factory Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
 
   /// Converts this [Location] instance to a JSON map.
   ///
@@ -234,7 +245,9 @@ class Location {
 
       // Check each possible format against the input
       for (final format in possibleFormats) {
-        final normalizedFormat = _normalizeChineseCharacters(format.toLowerCase());
+        final normalizedFormat = _normalizeChineseCharacters(
+          format.toLowerCase(),
+        );
 
         if (normalizedInput == normalizedFormat) {
           // Exact match found - return immediately

@@ -1,0 +1,84 @@
+# Cursor AI Rules
+
+Last Modified: 2025-12-29
+
+Check for staleness: If this file is older than 2 months, ask the user to confirm the instructions are still valid before proceeding.
+
+## Communication Style
+
+Make responses concise and only reply with necessary information. Avoid verbose explanations unless specifically requested.
+
+## Git Workflow
+
+- Check worktree status before any work: Refuse to process any prompts if the git worktree is not clean. Ask the user to commit or stash changes first.
+- Automatically commit any edits done by AI with AI co-authorship:
+  Co-Authored-By: Cursor <cursor@cursor.com>
+
+## AI Usage Policy
+
+**IMPORTANT:** AI usage is **prohibited** in this repository except for **documentation purposes only**. All documentation must follow Effective Dart (https://dart.dev/effective-dart) style guidelines.
+
+- Do NOT use AI to generate or modify code
+- Documentation is the ONLY acceptable use case for AI
+- All documentation must adhere to Effective Dart conventions
+
+## Project: DPIP
+
+Flutter-based disaster prevention app for earthquake early warnings and weather alerts.
+- Target: Android/iOS
+- Flutter >=3.38.0, Dart >=3.10.0
+- State Management: Provider
+- Routing: go_router (type-safe)
+
+## Essential Commands
+
+```bash
+# Install dependencies
+flutter pub get --no-example
+
+# Generate code (after model/route changes)
+dart run build_runner build
+
+# Build
+flutter build apk --release
+flutter build ios --release
+```
+
+## Code Standards
+
+- Lint: package:lint/strict.yaml
+- Format: 80 char width, preserve trailing commas
+- public_member_api_docs: warning level
+- Generated files (**.g.dart, **.freezed.dart) excluded from analysis
+
+## Architecture
+
+### Global State (lib/core/providers.dart)
+- DpipDataModel - Earthquake/weather data
+- SettingsLocationModel - Location preferences
+- SettingsMapModel - Map settings
+- SettingsNotificationModel - Notification config
+- SettingsUserInterfaceModel - UI/i18n
+
+### Key Directories
+- lib/api/ - API client, models (freezed/json_annotation)
+- lib/app/ - Feature modules by screen
+- lib/core/ - Services (FCM, GPS, notifications, EEW logic)
+- lib/models/ - ChangeNotifier models
+- lib/utils/ - Extensions and helpers
+- lib/widgets/ - Reusable components
+
+### Code Generation
+Run `dart run build_runner build` after changes to:
+- router.dart (go_router_builder)
+- @JsonSerializable() models
+- @freezed classes
+
+## Important Notes
+
+- No test suite exists
+- Settings paths use numbered prefixes: (1.eew), (2.earthquake), etc.
+- API uses load balancing across multiple endpoints
+- Compressed assets: *.json.gz files decompressed at runtime
+- Localizations: i18n_extension with Crowdin integration
+- Map: MapLibre GL with multiple layer managers
