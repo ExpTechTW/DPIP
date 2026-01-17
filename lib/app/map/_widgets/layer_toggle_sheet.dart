@@ -170,6 +170,12 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 onLongPress: (_) =>
                     _toggleLayer(MapLayer.lightning, overlay: true),
               ),
+              LayerToggle(
+                label: '颱風'.i18n,
+                checked: _activeLayers.contains(MapLayer.typhoon),
+                onChanged: (checked) => _toggleLayer(MapLayer.typhoon),
+                onLongPress: (_) => _toggleLayer(MapLayer.typhoon, overlay: true),
+              ),
             ],
           ),
         ],
