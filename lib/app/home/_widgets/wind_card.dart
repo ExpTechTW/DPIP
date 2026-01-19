@@ -10,6 +10,7 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 const double _kCompassAccuracyWarning = 25.0;
@@ -364,8 +365,10 @@ class _WindCardState extends State<WindCard>
           children: [
             Text(
               wind.beaufort >= 0
-                  ? '${wind.beaufort}級 ${_getBeaufortDescription(wind.beaufort)}'
-                        .i18n
+                  ? '{wind}級 {Desc}'.i18n.args({
+                      'wind': wind.beaufort,
+                      'Desc': _getBeaufortDescription(wind.beaufort),
+                    })
                   : '-',
               style: context.texts.bodySmall?.copyWith(
                 color: context.colors.onSurfaceVariant,
@@ -379,7 +382,9 @@ class _WindCardState extends State<WindCard>
                 ),
               ),
               Text(
-                '陣風 ${gust.speed} m/s'.i18n,
+                '陣風 {speed} m/s'.i18n.args({
+                  'speed': gust.speed,
+                }),
                 style: context.texts.bodySmall?.copyWith(
                   color: Colors.purple,
                 ),

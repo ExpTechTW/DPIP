@@ -4,6 +4,7 @@ import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class HeroWeather extends StatelessWidget {
@@ -138,7 +139,9 @@ class HeroWeather extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '體感 ${feelsLike.round()}°'.i18n,
+          '體感 {feelsLike}°'.i18n.args({
+            'feelsLike': feelsLike.round(),
+          }),
           style: context.texts.bodyMedium?.copyWith(
             color: Colors.white.withValues(alpha: 0.7),
             shadows: [
