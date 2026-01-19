@@ -687,7 +687,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         case HomeDisplaySection.forecast:
           allCards.add(_buildForecast());
         case HomeDisplaySection.wind:
-          if (!_isLoading && _weather != null) {
+          if (_weather != null) {
             allCards.add(_buildWindCard());
           }
       }
