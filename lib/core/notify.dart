@@ -165,7 +165,7 @@ Future<void> notifyInit() async {
         importance: NotificationImportance.High,
         defaultPrivacy: NotificationPrivacy.Public,
         playSound: true,
-        soundSource: 'resource://raw/int_report',
+        soundSource: 'resource://raw/report',
         defaultColor: Colors.red,
         ledColor: Colors.red,
         enableVibration: true,
