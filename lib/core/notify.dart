@@ -1,9 +1,14 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
+
+const int _notificationChannelVersion = 1;
+
+const String _channelVersionKey = 'notification_channel_version';
 
 String? _pendingChannelKey;
 
@@ -61,7 +66,46 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
   HomeRoute().go(context);
 }
 
+const List<String> _allChannelKeys = [
+  'eew_alert-important-v2',
+  'eew_alert-general-v2',
+  'eew_alert-silent-v2',
+  'eew-important-v2',
+  'eew-general-v2',
+  'eew-silence-v2',
+  'int_report-general-v2',
+  'int_report-silence-v2',
+  'eq-v2',
+  'report-general-v2',
+  'report-silence-v2',
+  'thunderstorm-important-v2',
+  'thunderstorm-general-v2',
+  'weather_major-important-v2',
+  'weather_minor-general-v2',
+  'evacuation_major-important-v2',
+  'evacuation_minor-general-v2',
+  'tsunami-important-v2',
+  'tsunami-general-v2',
+  'tsunami-silent-v2',
+  'announcement-general-v2',
+  'background',
+];
+
 Future<void> notifyInit() async {
+  final storedVersion = Global.preference.getInt(_channelVersionKey) ?? 0;
+  if (storedVersion < _notificationChannelVersion) {
+    TalkerManager.instance.info(
+      'Notification channel version changed: $storedVersion -> $_notificationChannelVersion, rebuilding channels',
+    );
+    for (final key in _allChannelKeys) {
+      await AwesomeNotifications().removeChannel(key);
+    }
+    await Global.preference.setInt(
+      _channelVersionKey,
+      _notificationChannelVersion,
+    );
+  }
+
   await AwesomeNotifications().initialize(
     'resource://drawable/ic_stat_name',
     [
@@ -311,7 +355,7 @@ Future<void> notifyInit() async {
         importance: NotificationImportance.High,
         defaultPrivacy: NotificationPrivacy.Public,
         playSound: true,
-        soundSource: 'resource://raw/warn',
+        soundSource: 'resource://raw/normal',
         defaultColor: Colors.red,
         ledColor: Colors.red,
         enableVibration: true,
