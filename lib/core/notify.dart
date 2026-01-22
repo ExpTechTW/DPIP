@@ -279,6 +279,7 @@ Future<void> notifyInit() async {
         criticalAlerts: true,
         playSound: true,
         soundSource: 'resource://raw/rain',
+        defaultRingtoneType: DefaultRingtoneType.Alarm,
         defaultColor: Colors.red,
         ledColor: Colors.red,
         enableVibration: true,
