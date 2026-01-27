@@ -36,7 +36,7 @@ class Routes {
     int? maxDepth,
   }) {
     final String url =
-        'https://api.core.exptech.dev/api/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth';
+        'https://api.core.exptech.dev/api/v2/eq/report?limit=$limit&page=$page';
     return Uri.parse(url);
   }
 
