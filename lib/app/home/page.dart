@@ -815,7 +815,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ? Colors.white
                         : const Color.fromARGB(255, 90, 90, 90),
                     fontWeight: FontWeight.w700,
-                    fontSize: 8,
+                    fontSize: 9,
                   ),
                 ),
                 Text(
@@ -825,7 +825,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ? Colors.white
                         : const Color.fromARGB(255, 60, 60, 60),
                     fontWeight: FontWeight.w600,
-                    fontSize: 11,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -850,7 +850,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 children: [
                   Icon(
                     Symbols.pin_drop_rounded,
-                    size: 14,
+                    size: 15,
                     color: context.colors.primary,
                   ),
                   const SizedBox(width: 4),
@@ -858,6 +858,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     child: Text(
                       stationLabel,
                       style: context.texts.labelSmall?.copyWith(
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: context.colors.onSurface,
                       ),
@@ -867,6 +868,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   Text(
                     timeStr,
                     style: context.texts.labelSmall?.copyWith(
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: context.colors.onSurface,
                     ),

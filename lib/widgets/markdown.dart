@@ -515,7 +515,11 @@ class Markdown extends StatelessWidget {
                     sideColor: context.colors.outlineVariant,
                     textColor: context.colors.outline,
                   ),
-                  PConfig(textStyle: bodyMedium),
+                  PConfig(
+                    textStyle: bodyMedium.copyWith(
+                      fontSize: bodyMedium.fontSize! + 2,
+                    ),
+                  ),
                   CodeConfig(style: applyFont(bodyMedium)),
                   PreConfig(
                     wrapper: MarkdownPreWrapper.new,
