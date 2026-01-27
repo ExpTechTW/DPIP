@@ -8,6 +8,14 @@
 ## [未發布]
 
 ### 新增
+
+### 更改
+
+### 修正
+
+## [3.1.402]
+
+### 新增
 - EEW 震度色塊
 - 風向圖卡
 - 捷徑功能
@@ -312,7 +320,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.401...HEAD
+[未發布]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.402...HEAD
+[3.1.402]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.401...v3.1.402
 [3.1.401]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.310...v3.1.401
 [3.1.310]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.3...v3.1.310
 [3.1.306]: https://github.com/exptechtw/dpip-pocket/compare/v3.1.004...v3.1.306

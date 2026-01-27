@@ -25,14 +25,15 @@ import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:es_compression/zstd.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:option_result/result.dart';
+import 'package:zstandard/zstandard.dart';
 
 class _GzipClient extends http.BaseClient {
   final http.Client _inner;
+  final Zstandard _zstd = Zstandard();
 
   _GzipClient(this._inner);
 
@@ -48,7 +49,14 @@ class _GzipClient extends http.BaseClient {
       final compressedBody = await response.stream.toBytes();
 
       try {
-        final decompressedBody = zstd.decode(compressedBody);
+        final decompressedBody = await _zstd.decompress(compressedBody);
+
+        if (decompressedBody == null) {
+          throw HttpException(
+            'Failed to decompress zstd response',
+            uri: request.url,
+          );
+        }
 
         final headers = Map<String, String>.from(response.headers);
         headers.remove('content-encoding');

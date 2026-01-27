@@ -36,12 +36,12 @@ class Routes {
     int? maxDepth,
   }) {
     final String url =
-        '$onlyapi/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth';
+        'https://api.core.exptech.dev/api/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth';
     return Uri.parse(url);
   }
 
   static Uri report(String reportId) =>
-      Uri.parse('$api/v2/eq/report/$reportId');
+      Uri.parse('https://api.core.exptech.dev/api/v2/eq/report/$reportId');
 
   static Uri tsunamiList() => Uri.parse('$onlyapi/v1/tsunami/list');
 

@@ -5,6 +5,7 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class ForecastCard extends StatelessWidget {
@@ -20,7 +21,9 @@ class ForecastCard extends StatelessWidget {
     final period = hour24 < 12 ? '上午'.i18n : '下午'.i18n;
     int hour12 = hour24 % 12;
     if (hour12 == 0) hour12 = 12;
-    return (period, '$hour12時'.i18n);
+    return (period, '{hour12}時'.i18n.args({
+        'hour12': hour12}),
+    );
   }
 
   @override

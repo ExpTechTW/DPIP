@@ -97,9 +97,9 @@ class ShaderSelector {
   static ShaderConfig selectShaderConfig(RealtimeWeather? weather) {
     if (debugForceThunderstormFog) {
       return const ShaderConfig(
-        showFog: true,
+        showFog: false,
         showRain: false,
-        showThunderstorm: true,
+        showThunderstorm: false,
         fogIntensity: 0.6,
       );
     }
