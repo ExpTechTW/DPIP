@@ -255,7 +255,7 @@ class TyphoonMapLayerSheet extends StatelessWidget {
                           spacing: 8,
                           children: [
                             const Icon(Symbols.bolt, size: 24),
-                            Text('颱風'.i18n, style: context.textTheme.titleMedium),
+                            Text('颱風'.i18n, style: context.texts.titleMedium),
                           ],
                         ),
                       ),
