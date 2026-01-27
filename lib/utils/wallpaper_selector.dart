@@ -3,7 +3,6 @@ class WallpaperSelector {
 
   static const List<String> dayWallpapers = [
     'assets/wallpaper/day/autumn_park.jpg',
-    'assets/wallpaper/day/city_foggy.jpg',
     'assets/wallpaper/day/forest_pink_mist.jpg',
     'assets/wallpaper/day/forest_sunray.jpg',
     'assets/wallpaper/day/village_cherry_blossom.jpg',
@@ -24,7 +23,6 @@ class WallpaperSelector {
     'assets/wallpaper/night/halloween_forest.jpg',
     'assets/wallpaper/night/japanese_street_moon.jpg',
     'assets/wallpaper/night/lighthouse_coast.jpg',
-    'assets/wallpaper/night/tokyo_alley_neon.jpg',
     'assets/wallpaper/night/town_hillside.jpg',
   ];
 
