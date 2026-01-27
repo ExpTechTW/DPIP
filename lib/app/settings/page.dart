@@ -230,7 +230,7 @@ class SettingsIndexPage extends StatelessWidget {
         SegmentedList(
           label: Text('資訊'.i18n),
           children: [
-            SegmentedListTile(
+            /*SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 Symbols.newspaper_rounded,
@@ -240,8 +240,9 @@ class SettingsIndexPage extends StatelessWidget {
               subtitle: Text('掌握 ExpTech Studio 的最新公告與資訊'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => AnnouncementRoute().push(context),
-            ),
+            ),*/
             SegmentedListTile(
+              isFirst: true, //公告回歸時，要拿掉
               leading: ContainedIcon(
                 Symbols.update_rounded,
                 color: Colors.cyanAccent,
