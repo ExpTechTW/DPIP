@@ -476,6 +476,7 @@ class Markdown extends StatelessWidget {
     final titleMedium = applyFont(context.texts.titleMedium!);
     final titleSmall = applyFont(context.texts.titleSmall!);
     final bodyMedium = applyFont(context.texts.bodyMedium!);
+    final body = applyFont(context.texts.bodyLarge!);
 
     return MarkdownBlock(
       data: MarkdownUtils.apply(text),
@@ -515,11 +516,7 @@ class Markdown extends StatelessWidget {
                     sideColor: context.colors.outlineVariant,
                     textColor: context.colors.outline,
                   ),
-                  PConfig(
-                    textStyle: bodyMedium.copyWith(
-                      fontSize: bodyMedium.fontSize! + 2,
-                    ),
-                  ),
+                  PConfig(textStyle: body),
                   CodeConfig(style: applyFont(bodyMedium)),
                   PreConfig(
                     wrapper: MarkdownPreWrapper.new,
