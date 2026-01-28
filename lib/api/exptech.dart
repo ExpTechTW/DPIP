@@ -212,13 +212,7 @@ class ExpTech {
 
     if (time != null) {
       requestUrl = Uri.parse(
-        requestUrl
-            .toString()
-            .replaceAll('eew', 'eew/${time ~/ 1000}')
-            .replaceAll('lb-', 'api-')
-            .replaceAll('-3', '-1')
-            .replaceAll('-4', '-2')
-            .replaceAll(RegExp(r'api-\d+'), 'api-1'),
+        'https://api.core.exptech.dev/api/v2/eq/eew/${time ~/ 1000}',
       );
     }
 
