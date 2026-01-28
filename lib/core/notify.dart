@@ -431,14 +431,20 @@ Future<void> notifyInit() async {
   );
 
   if (needsForceUpdate) {
-    for (final channel in _notificationChannels) {
-      await AwesomeNotifications().setChannel(channel, forceUpdate: true);
+    for (var i = 0; i < _notificationChannels.length; i += 5) {
+      final batch = _notificationChannels.skip(i).take(5);
+      for (final channel in batch) {
+        try {
+          await AwesomeNotifications().setChannel(channel, forceUpdate: true);
+        } catch (e, st) {
+          TalkerManager.instance.error('setChannel failed: $channel', e, st);
+        }
+      }
     }
     await Global.preference.setInt(
       _channelVersionKey,
       _notificationChannelVersion,
     );
-    TalkerManager.instance.info('Notification channels force updated');
   }
 
   AwesomeNotifications().setListeners(
