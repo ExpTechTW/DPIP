@@ -36,10 +36,6 @@ dependencies:
   flutter_compass: ^0.8.1
   flutter:
     sdk: flutter
-  flutter_icmp_ping:
-    git:
-      url: https://github.com/ExpTechTW/flutter_icmp_ping.git
-      ref: 6b9daff
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.7
