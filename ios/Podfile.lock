@@ -74,8 +74,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_compass (0.0.1):
     - Flutter
-  - flutter_icmp_ping (0.0.1):
-    - Flutter
   - fluttertoast (0.0.2):
     - Flutter
   - gal (1.0.0):
@@ -175,7 +173,6 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_compass (from `.symlinks/plugins/flutter_compass/ios`)
-  - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gal (from `.symlinks/plugins/gal/darwin`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
@@ -226,8 +223,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_compass:
     :path: ".symlinks/plugins/flutter_compass/ios"
-  flutter_icmp_ping:
-    :path: ".symlinks/plugins/flutter_icmp_ping/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   gal:
@@ -271,7 +266,6 @@ SPEC CHECKSUMS:
   FirebaseSessions: b9a92c1c51bbb81e78fc3142cda6d925d700f8e7
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_compass: b236ab69b61545cce89fd58527f401a7587d5cc1
-  flutter_icmp_ping: 47c1df3440c18ddd39fc457e607bb3b42d4a339f
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   gal: baecd024ebfd13c441269ca7404792a7152fde89
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
