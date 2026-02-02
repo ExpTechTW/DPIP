@@ -48,7 +48,9 @@ class BlurredTextButton extends StatelessWidget {
             child: TextButton(
               style: TextButton.styleFrom(
                 shape: const StadiumBorder(),
-                foregroundColor: context.colors.outline,
+                foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? const Color.fromARGB(199, 250, 250, 250)
+                      : const Color.fromARGB(255, 50, 50, 50),
                 textStyle: textStyle,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
