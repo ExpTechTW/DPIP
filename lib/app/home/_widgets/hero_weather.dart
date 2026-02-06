@@ -111,7 +111,7 @@ class HeroWeather extends StatelessWidget {
             Icon(
               _getWeatherIcon(data.weatherCode),
               size: 24,
-              color: Colors.white.withValues(alpha: 0.9),
+              color: Colors.white.withValues(alpha: 1),
               shadows: [
                 Shadow(
                   color: Colors.black.withValues(alpha: 0.3),
@@ -124,7 +124,7 @@ class HeroWeather extends StatelessWidget {
             Text(
               data.weather,
               style: context.texts.titleMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: Colors.white.withValues(alpha: 1),
                 fontWeight: FontWeight.w400,
                 shadows: [
                   Shadow(
@@ -143,7 +143,7 @@ class HeroWeather extends StatelessWidget {
             'feelsLike': feelsLike.round(),
           }),
           style: context.texts.bodyMedium?.copyWith(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: Colors.white.withValues(alpha: 1),
             shadows: [
               Shadow(
                 color: Colors.black.withValues(alpha: 0.3),
