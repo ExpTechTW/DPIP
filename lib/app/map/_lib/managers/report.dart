@@ -5,6 +5,7 @@ import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/_widgets/ui/positioned_intensity_filter_button.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
@@ -48,6 +49,7 @@ class ReportMapLayerManager extends MapLayerManager {
   final isLoading = ValueNotifier<bool>(false);
   final dataNotifier = ValueNotifier<int>(0);
   final shouldExpandOnReturn = ValueNotifier<bool>(false);
+  final selectedIntensities = ValueNotifier<Set<int>>({});
   double savedScrollOffset = 0.0;
   String? _lastPartialContentKey;
   bool _shouldResetScroll = false;
@@ -178,6 +180,137 @@ class ReportMapLayerManager extends MapLayerManager {
     if (!isLoadingMore.value && hasMore.value) {
       await _fetchData();
     }
+  }
+
+  Future<void> applyIntensityFilter() async {
+    final selected = selectedIntensities.value;
+    final report = currentReport.value;
+
+    if (report != null) {
+      await _applyDetailFilter(report, selected);
+    } else {
+      await _applyListFilter(selected);
+    }
+  }
+
+  Future<void> _applyDetailFilter(
+    PartialEarthquakeReport partial,
+    Set<int> selected,
+  ) async {
+    final fullReport = GlobalProviders.data.report[partial.id];
+    if (fullReport == null) return;
+
+    final layerId = MapLayerIds.report(
+      fullReport.time.millisecondsSinceEpoch.toString(),
+    );
+
+    if (selected.isEmpty) {
+      await controller.setLayerProperties(
+        layerId,
+        const SymbolLayerProperties(iconOpacity: 1.0),
+      );
+      return;
+    }
+
+    await controller.setLayerProperties(
+      layerId,
+      SymbolLayerProperties(
+        iconOpacity: [
+          'match',
+          ['get', 'icon'],
+          for (final i in selected) ...['intensity-$i', 1.0],
+          'cross-7',
+          1.0,
+          0.0,
+        ],
+      ),
+    );
+  }
+
+  Future<void> _applyListFilter(Set<int> selected) async {
+    final layerId = MapLayerIds.report();
+    final reports = GlobalProviders.data.partialReport;
+
+    if (selected.isEmpty) {
+      if (reports.isEmpty) {
+        await controller.setLayerProperties(
+          layerId,
+          const SymbolLayerProperties(iconOpacity: 1.0),
+        );
+      } else {
+        await controller.setLayerProperties(
+          layerId,
+          SymbolLayerProperties(
+            iconOpacity: [
+              Expressions.interpolate,
+              ['linear'],
+              [Expressions.get, 'time'],
+              DateTime.now().millisecondsSinceEpoch -
+                  const Duration(days: 14).inMilliseconds,
+              0.2,
+              reports.first.time.millisecondsSinceEpoch,
+              1.0,
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    if (reports.isEmpty) {
+      await controller.setLayerProperties(
+        layerId,
+        SymbolLayerProperties(
+          iconOpacity: [
+            'match',
+            [Expressions.get, 'intensity'],
+            for (final i in selected) ...[i, 1.0],
+            0.0,
+          ],
+        ),
+      );
+    } else {
+      await controller.setLayerProperties(
+        layerId,
+        SymbolLayerProperties(
+          iconOpacity: [
+            '*',
+            [
+              'match',
+              [Expressions.get, 'intensity'],
+              for (final i in selected) ...[i, 1.0],
+              0.0,
+            ],
+            [
+              Expressions.interpolate,
+              ['linear'],
+              [Expressions.get, 'time'],
+              DateTime.now().millisecondsSinceEpoch -
+                  const Duration(days: 14).inMilliseconds,
+              0.2,
+              reports.first.time.millisecondsSinceEpoch,
+              1.0,
+            ],
+          ],
+        ),
+      );
+    }
+  }
+
+  void toggleIntensity(int intensity) {
+    final current = Set<int>.from(selectedIntensities.value);
+    if (current.contains(intensity)) {
+      current.remove(intensity);
+    } else {
+      current.add(intensity);
+    }
+    selectedIntensities.value = current;
+    applyIntensityFilter();
+  }
+
+  void resetIntensityFilter() {
+    selectedIntensities.value = {};
+    applyIntensityFilter();
   }
 
   String? _getPartialContentKey() {
@@ -400,6 +533,8 @@ class ReportMapLayerManager extends MapLayerManager {
       if (focus) await _focus(report);
 
       await controller.setLayerVisibility(MapLayerIds.report(), false);
+
+      await applyIntensityFilter();
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager._addReport', e, s);
     }
@@ -856,6 +991,23 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               );
                             },
                           ),
+                          actions: [
+                            IconButton(
+                              icon: const Icon(Symbols.filter_list_rounded),
+                              tooltip: '震度篩選',
+                              onPressed: () => showModalBottomSheet(
+                                context: context,
+                                useRootNavigator: true,
+                                useSafeArea: true,
+                                constraints: context.bottomSheetConstraints,
+                                builder: (context) {
+                                  return IntensityFilterSheet(
+                                    manager: widget.manager,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                           floating: true,
                           snap: true,
                           pinned: true,
