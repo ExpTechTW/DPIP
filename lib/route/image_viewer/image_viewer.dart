@@ -8,7 +8,8 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gal/galtp.dart';
+import 'package:gal/gal.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -101,11 +102,30 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         return;
       }
 
-      final res = await get(Uri.parse(widget.imageUrl));
+      final dio = Dio();
+      final res = await dio.get<List<int>>(
+        widget.imageUrl,
+        options: Options(responseType: .bytes),
+      );
+
+      final bytes = res.data;
+
+      if (bytes == null) {
+        context.scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              '儲存圖片時發生錯誤: {msg}'.i18n.args({
+                'msg': res.statusMessage,
+              }),
+            ),
+          ),
+        );
+        return;
+      }
 
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${widget.imageName}');
-      await tempFile.writeAsBytes(res.bodyBytes);
+      await tempFile.writeAsBytes(bytes);
 
       try {
         if (Platform.isAndroid) {

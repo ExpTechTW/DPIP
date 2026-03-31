@@ -1,5 +1,5 @@
 import 'package:dpip/api/model/location/location.dart';
-import 'package:dpip/app/home/_models/home_red_button.dart';
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';

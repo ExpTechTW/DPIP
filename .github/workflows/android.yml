@@ -9,6 +9,8 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       android: ${{ steps.filter.outputs.android }}
     steps:
@@ -27,7 +29,8 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.android == 'true' }}
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v4
 
