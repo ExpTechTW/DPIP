@@ -123,27 +123,32 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: _selectedCity != null
-              ? () => setState(() => _selectedCity = null)
-              : null,
-        ),
-        title: Text('切換區域'.i18n),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Symbols.settings_rounded, size: 20),
-            onPressed: widget.onSettingsPressed,
-            tooltip: '位置設定'.i18n,
+    return Material(
+      borderRadius: const .vertical(top: .circular(16)),
+      clipBehavior: .antiAlias,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: _selectedCity != null
+                ? () => setState(() => _selectedCity = null)
+                : null,
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: _selectedCity == null
-            ? _buildCityList(context)
-            : _buildTownList(context),
+          title: Text('切換區域'.i18n),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Symbols.settings_rounded, size: 20),
+              onPressed: widget.onSettingsPressed,
+              tooltip: '位置設定'.i18n,
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: .only(bottom: context.padding.bottom + 16),
+          child: _selectedCity == null
+              ? _buildCityList(context)
+              : _buildTownList(context),
+        ),
       ),
     );
   }
