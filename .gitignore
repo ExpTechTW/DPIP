@@ -48,7 +48,7 @@ build/
 **/ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/**/GeneratedPluginRegistrant.*
 
 # macOS
 **/macos/Flutter/ephemeral
