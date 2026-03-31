@@ -1,26 +1,30 @@
-import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/api/model/location/location.dart';
-import 'package:dpip/app/home/_widgets/blurred_button.dart';
+import 'package:dpip/app/home/_models/home_red_button.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 class LocationButton extends StatelessWidget {
-  const LocationButton({super.key});
+  final String? temporaryCode;
+  final ValueChanged<String?>? onLocationChanged;
+
+  const LocationButton({
+    super.key,
+    this.temporaryCode,
+    this.onLocationChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<HomeLocationModel, SettingsLocationModel>(
-      builder: (context, homeLocation, settingsLocation, child) {
-        final savedCode = settingsLocation.code;
-        final favorited = settingsLocation.favorited;
-        final temporaryCode = homeLocation.temporaryCode;
+    return Selector<SettingsLocationModel, (String?, Set<String>)>(
+      selector: (context, model) => (model.code, model.favorited),
+      builder: (context, data, child) {
+        final (savedCode, favorited) = data;
         final displayCode = temporaryCode ?? savedCode;
         final location = Global.location[displayCode];
 
@@ -56,27 +60,22 @@ class LocationButton extends StatelessWidget {
 
     showModalBottomSheet<String?>(
       context: context,
-      constraints: context.bottomSheetConstraints,
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => _LocationMenuSheet(
+      builder: (sheetContext) => _LocationMenuSheet(
         savedCode: savedCode,
         favorited: favorited,
         currentCode: currentCode,
         onLocationSelected: (code) {
-          Navigator.of(context).pop();
-          final model = context.read<HomeLocationModel>();
+          Navigator.of(sheetContext).pop();
           if (code == savedCode) {
-            model.setTemporaryCode(null);
+            onLocationChanged?.call(null);
           } else {
-            model.setTemporaryCode(code);
+            onLocationChanged?.call(code);
           }
         },
-        onAddLocationPressed: () {
-          Navigator.of(context).pop();
-          SettingsLocationSelectRoute().push(context);
-        },
         onSettingsPressed: () {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           SettingsLocationRoute().push(context);
         },
       ),
@@ -89,7 +88,6 @@ class _LocationMenuSheet extends StatefulWidget {
   final Set<String> favorited;
   final String? currentCode;
   final ValueChanged<String> onLocationSelected;
-  final VoidCallback onAddLocationPressed;
   final VoidCallback onSettingsPressed;
 
   const _LocationMenuSheet({
@@ -97,7 +95,6 @@ class _LocationMenuSheet extends StatefulWidget {
     required this.favorited,
     required this.currentCode,
     required this.onLocationSelected,
-    required this.onAddLocationPressed,
     required this.onSettingsPressed,
   });
 
@@ -125,32 +122,57 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: const .vertical(top: .circular(16)),
-      clipBehavior: .antiAlias,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: _selectedCity != null
-                ? () => setState(() => _selectedCity = null)
-                : null,
+    return Container(
+      margin: const EdgeInsets.all(16),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildHeader(context),
+          Flexible(
+            child: _selectedCity == null
+                ? _buildCityList(context)
+                : _buildTownList(context),
           ),
-          title: Text('切換區域'.i18n),
-          centerTitle: true,
-          actions: [
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: Row(
+        children: [
+          if (_selectedCity != null)
             IconButton(
-              icon: const Icon(Symbols.settings_rounded),
-              onPressed: widget.onSettingsPressed,
-              tooltip: '位置設定'.i18n,
+              onPressed: () => setState(() => _selectedCity = null),
+              icon: const Icon(Symbols.arrow_back_rounded, size: 20),
+              tooltip: '返回'.i18n,
+            )
+          else
+            const SizedBox(width: 48),
+          Expanded(
+            child: Text(
+              _selectedCity ?? '切換區域'.i18n,
+              style: context.theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: .only(bottom: context.padding.bottom + 16),
-          child: _selectedCity == null
-              ? _buildCityList(context)
-              : _buildTownList(context),
-        ),
+          ),
+          IconButton(
+            onPressed: widget.onSettingsPressed,
+            icon: const Icon(Symbols.settings_rounded, size: 20),
+            tooltip: '位置設定'.i18n,
+          ),
+        ],
       ),
     );
   }
@@ -188,72 +210,77 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
       }
     }
 
-    return Column(
-      crossAxisAlignment: .start,
+    return ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(bottom: 16),
       children: [
-        SegmentedList(
-          label: Text('快速切換'.i18n),
-          children: [
-            for (var i = 0; i < quickItems.length; i++)
-              SegmentedListTile(
-                isFirst: i == 0,
-                tileColor: quickItems[i].isSelected
-                    ? context.colors.secondaryContainer
-                    : null,
-                leading: Icon(
-                  quickItems[i].icon,
-                  fill: 1,
-                  color: quickItems[i].isSelected
-                      ? context.colors.primary
-                      : context.colors.onSurfaceVariant,
-                ),
-                title: Text(
-                  quickItems[i].name,
-                  style: TextStyle(
-                    color: quickItems[i].isSelected
-                        ? context.colors.primary
-                        : context.colors.onSurface,
-                    fontWeight: quickItems[i].isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-                trailing: quickItems[i].isSelected
-                    ? Icon(
-                        Symbols.check_rounded,
-                        color: context.colors.primary,
-                      )
-                    : null,
-                onTap: () => widget.onLocationSelected(quickItems[i].code),
+        if (quickItems.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Text(
+              '快速切換'.i18n,
+              style: context.theme.textTheme.labelMedium?.copyWith(
+                color: context.colors.onSurfaceVariant,
               ),
-            SegmentedListTile(
-              isFirst: quickItems.isEmpty,
-              isLast: true,
-              leading: const Icon(Symbols.add_circle_rounded),
-              title: Text('新增地點'.i18n),
-              onTap: widget.onAddLocationPressed,
             ),
-          ],
-        ),
-
-        SegmentedList.builder(
-          label: Text('選擇縣市'.i18n),
-          itemCount: cities.length,
-          itemBuilder: (context, index) {
-            final city = cities[index];
-
-            return SegmentedListTile(
-              isFirst: index == 0,
-              isLast: index == cities.length - 1,
-              title: Text(city.cityWithLevel),
-              subtitle: currentLocation?.cityWithLevel == city.cityWithLevel
-                  ? Text('目前選擇'.i18n)
+          ),
+          for (final item in quickItems)
+            ListTile(
+              dense: true,
+              leading: Icon(
+                item.icon,
+                size: 20,
+                color: item.isSelected
+                    ? context.colors.primary
+                    : context.colors.onSurfaceVariant,
+              ),
+              title: Text(
+                item.name,
+                style: TextStyle(
+                  color: item.isSelected
+                      ? context.colors.primary
+                      : context.colors.onSurface,
+                  fontWeight: item.isSelected
+                      ? FontWeight.w600
+                      : FontWeight.normal,
+                ),
+              ),
+              trailing: item.isSelected
+                  ? Icon(
+                      Symbols.check_rounded,
+                      size: 20,
+                      color: context.colors.primary,
+                    )
                   : null,
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => setState(() => _selectedCity = city.cityWithLevel),
-            );
-          },
+              onTap: () => widget.onLocationSelected(item.code),
+            ),
+          const Divider(height: 16),
+        ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          child: Text(
+            '選擇縣市'.i18n,
+            style: context.theme.textTheme.labelMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
         ),
+        for (final city in cities)
+          ListTile(
+            dense: true,
+            title: Text(city.cityWithLevel),
+            subtitle: currentLocation?.cityWithLevel == city.cityWithLevel
+                ? Text(
+                    '目前選擇'.i18n,
+                    style: TextStyle(
+                      color: context.colors.primary,
+                      fontSize: 12,
+                    ),
+                  )
+                : null,
+            trailing: const Icon(Symbols.chevron_right_rounded, size: 20),
+            onTap: () => setState(() => _selectedCity = city.cityWithLevel),
+          ),
       ],
     );
   }
@@ -261,19 +288,33 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
   Widget _buildTownList(BuildContext context) {
     final towns = _towns;
 
-    return SegmentedList.builder(
-      label: Text(_selectedCity!),
+    return ListView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(bottom: 16),
       itemCount: towns.length,
       itemBuilder: (context, index) {
         final entry = towns[index];
         final code = entry.key;
         final town = entry.value;
         final isSelected = widget.currentCode == code;
+        final isSaved = widget.savedCode == code;
+        final isFavorited = widget.favorited.contains(code);
 
-        return SegmentedListTile(
-          isFirst: index == 0,
-          isLast: index == towns.length - 1,
-          tileColor: isSelected ? context.colors.secondaryContainer : null,
+        return ListTile(
+          dense: true,
+          leading: isSaved
+              ? Icon(
+                  Symbols.home_rounded,
+                  size: 20,
+                  color: context.colors.onSurfaceVariant,
+                )
+              : isFavorited
+              ? Icon(
+                  Symbols.star_rounded,
+                  size: 20,
+                  color: context.colors.onSurfaceVariant,
+                )
+              : const SizedBox(width: 20),
           title: Text(
             town.townWithLevel,
             style: TextStyle(
@@ -286,6 +327,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
           trailing: isSelected
               ? Icon(
                   Symbols.check_rounded,
+                  size: 20,
                   color: context.colors.primary,
                 )
               : null,
