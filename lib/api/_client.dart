@@ -64,7 +64,8 @@ IOHttpClientAdapter _createInnerAdapter() => IOHttpClientAdapter(
   },
 );
 
-Dio _createDio() => Dio()..httpClientAdapter = _ZstdAdapter(_createInnerAdapter());
+Dio _createDio() =>
+    Dio()..httpClientAdapter = _ZstdAdapter(_createInnerAdapter());
 
 final _cacheOptions = CacheOptions(
   store: MemCacheStore(),

@@ -141,7 +141,7 @@ class ContainedIcon extends StatelessWidget {
             ? backgroundColor ?? color.withValues(alpha: .16)
             : null,
         gradient: backgroundGradient,
-        borderRadius: .circular(12),
+        borderRadius: .circular((size ?? 24) * 0.5),
       ),
       child: Icon(
         icon,
