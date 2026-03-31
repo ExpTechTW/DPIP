@@ -27,6 +27,9 @@ class WeatherStation {
   factory WeatherStation.fromJson(Map<String, dynamic> json) =>
       _$WeatherStationFromJson(json);
 
+  factory WeatherStation.fromMap(Map<String, dynamic> map) =>
+      WeatherStation.fromJson(map);
+
   Map<String, dynamic> toJson() => _$WeatherStationToJson(this);
 
   GeoJsonFeatureBuilder toFeatureBuilder() {

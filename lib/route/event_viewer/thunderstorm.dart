@@ -64,7 +64,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         radarList = list;
       });
     }
-    final String newTileUrl = Routes.radarTile(radarList.last);
+    final String newTileUrl = radarTile(radarList.last);
 
     await _mapController.addSource(
       'radarSource',

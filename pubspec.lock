@@ -299,13 +299,21 @@ packages:
     source: hosted
     version: "7.0.3"
   dio:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dio
       sha256: d90ee57923d1828ac14e492ca49440f65477f4bb1263575900be731a3dac66a9
       url: "https://pub.dev"
     source: hosted
     version: "5.9.0"
+  dio_cache_interceptor:
+    dependency: "direct main"
+    description:
+      name: dio_cache_interceptor
+      sha256: "1346705a2057c265014d7696e3e2318b560bfb00b484dac7f9b01e2ceaebb07d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.1"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -696,7 +704,7 @@ packages:
     source: hosted
     version: "2.0.0"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -987,10 +995,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
+      sha256: "1741988757a65eb6b36abe716829688cf01910bbf91c34354ff7ec1c3de2b349"
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.0"
+    version: "1.18.0"
   mime:
     dependency: transitive
     description:
@@ -1504,10 +1512,10 @@ packages:
     dependency: transitive
     description:
       name: talker
-      sha256: e5d4f7cce6a639037e551660ae1b93b451f107e78dabcc9f89fc52ffeb6d63d5
+      sha256: c364edc0fbd6c648e1a78e6edd89cccd64df2150ca96d899ecd486b76c185042
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.9"
+    version: "5.1.16"
   talker_flutter:
     dependency: "direct main"
     description:
@@ -1520,10 +1528,10 @@ packages:
     dependency: transitive
     description:
       name: talker_logger
-      sha256: "0c9f37cd17012e5f45986007340de95e9ebccb7a64c5375919cb27e2f0cc60ee"
+      sha256: cea1b8283a28c2118a0b197057fc5beb5b0672c75e40a48725e5e452c0278ff3
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.9"
+    version: "5.1.16"
   term_glyph:
     dependency: transitive
     description:

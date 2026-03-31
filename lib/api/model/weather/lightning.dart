@@ -14,6 +14,9 @@ class Lightning {
   factory Lightning.fromJson(Map<String, dynamic> json) =>
       _$LightningFromJson(json);
 
+  factory Lightning.fromMap(Map<String, dynamic> map) =>
+      Lightning.fromJson(map);
+
   Map<String, dynamic> toJson() => _$LightningToJson(this);
 
   GeoJsonFeatureBuilder<GeoJsonFeatureType> toFeatureBuilder(int currentTime) {

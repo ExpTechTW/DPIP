@@ -44,7 +44,7 @@ class _RadarMapCardState extends State<RadarMapCard>
 
     try {
       final time = (await radarListFuture).last;
-      final newTileUrl = Routes.radarTile(time);
+      final newTileUrl = radarTile(time);
 
       if (await controller.exists(sourceId, source: true)) {
         await controller.removeSource(sourceId);

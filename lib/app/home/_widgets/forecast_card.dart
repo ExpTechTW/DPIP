@@ -21,8 +21,9 @@ class ForecastCard extends StatelessWidget {
     final period = hour24 < 12 ? '上午'.i18n : '下午'.i18n;
     int hour12 = hour24 % 12;
     if (hour12 == 0) hour12 = 12;
-    return (period, '{hour12}時'.i18n.args({
-        'hour12': hour12}),
+    return (
+      period,
+      '{hour12}時'.i18n.args({'hour12': hour12}),
     );
   }
 

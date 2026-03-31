@@ -801,7 +801,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               border: Border.all(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.white.withValues(alpha: 0.25)
-                    : const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.25),
+                    : const Color.fromARGB(
+                        255,
+                        0,
+                        0,
+                        0,
+                      ).withValues(alpha: 0.25),
                 width: 0.5,
               ),
             ),

@@ -58,6 +58,10 @@ class GithubRelease {
 
   factory GithubRelease.fromJson(Map<String, dynamic> json) =>
       _$GithubReleaseFromJson(json);
+
+  factory GithubRelease.fromMap(Map<String, dynamic> map) =>
+      GithubRelease.fromJson(map);
+
   Map<String, dynamic> toJson() => _$GithubReleaseToJson(this);
 }
 

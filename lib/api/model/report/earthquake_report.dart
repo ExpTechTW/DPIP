@@ -50,6 +50,9 @@ class EarthquakeReport {
   factory EarthquakeReport.fromJson(Map<String, dynamic> json) =>
       _$EarthquakeReportFromJson(json);
 
+  factory EarthquakeReport.fromMap(Map<String, dynamic> map) =>
+      EarthquakeReport.fromJson(map);
+
   Map<String, dynamic> toJson() => _$EarthquakeReportToJson(this);
 
   String? get number {

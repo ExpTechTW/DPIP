@@ -72,6 +72,8 @@ class History {
     return isExpired;
   }
 
+  factory History.fromMap(Map<String, dynamic> map) => History.fromJson(map);
+
   factory History.fromJson(Map<String, dynamic> json) {
     HistoryType type;
     try {

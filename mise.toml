@@ -1,5 +1,0 @@
-[tools]
-android-sdk = "19"
-flutter = "3.38.1"
-java = "zulu-25"
-ruby = "3.4.7"

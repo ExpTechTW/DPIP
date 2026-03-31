@@ -99,5 +99,9 @@ class RealtimeWeather {
 
   factory RealtimeWeather.fromJson(Map<String, dynamic> json) =>
       _$RealtimeWeatherFromJson(json);
+
+  factory RealtimeWeather.fromMap(Map<String, dynamic> map) =>
+      RealtimeWeather.fromJson(map);
+
   Map<String, dynamic> toJson() => _$RealtimeWeatherToJson(this);
 }

@@ -34,7 +34,7 @@ class _MePageState extends State<MePage> {
         ListTile(
           leading: const Icon(Icons.visibility),
           title: const Text('歡迎頁面'),
-          onTap: () => WelcomeRoute().push(context)
+          onTap: () => WelcomeRoute().push(context),
         ),
       ],
     );

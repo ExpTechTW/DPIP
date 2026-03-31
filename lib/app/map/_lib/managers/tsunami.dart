@@ -496,7 +496,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                               '{id}號 第{serial}報'.i18n.args({
                                                 'id': tsunami!.id,
                                                 'serial': tsunami!.serial,
-                                                }),
+                                              }),
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500,

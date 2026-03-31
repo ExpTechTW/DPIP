@@ -41,6 +41,10 @@ class MeteorStation {
 
   factory MeteorStation.fromJson(Map<String, dynamic> json) =>
       _$MeteorStationFromJson(json);
+
+  factory MeteorStation.fromMap(Map<String, dynamic> map) =>
+      MeteorStation.fromJson(map);
+
   Map<String, dynamic> toJson() => _$MeteorStationToJson(this);
 }
 

@@ -38,5 +38,7 @@ class Eew {
 
   factory Eew.fromJson(Map<String, dynamic> json) => _$EewFromJson(json);
 
+  factory Eew.fromMap(Map<String, dynamic> map) => Eew.fromJson(map);
+
   Map<String, dynamic> toJson() => _$EewToJson(this);
 }

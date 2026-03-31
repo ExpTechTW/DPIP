@@ -14,6 +14,9 @@ class ServerStatus {
   factory ServerStatus.fromJson(Map<String, dynamic> json) =>
       _$ServerStatusFromJson(json);
 
+  factory ServerStatus.fromMap(Map<String, dynamic> map) =>
+      ServerStatus.fromJson(map);
+
   Map<String, dynamic> toJson() => _$ServerStatusToJson(this);
 
   String get formattedTime {

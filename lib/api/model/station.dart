@@ -19,5 +19,7 @@ class Station {
   factory Station.fromJson(Map<String, dynamic> json) =>
       _$StationFromJson(json);
 
+  factory Station.fromMap(Map<String, dynamic> map) => Station.fromJson(map);
+
   Map<String, dynamic> toJson() => _$StationToJson(this);
 }

@@ -21,5 +21,8 @@ class Announcement {
   factory Announcement.fromJson(Map<String, dynamic> json) =>
       _$AnnouncementFromJson(json);
 
+  factory Announcement.fromMap(Map<String, dynamic> map) =>
+      Announcement.fromJson(map);
+
   Map<String, dynamic> toJson() => _$AnnouncementToJson(this);
 }

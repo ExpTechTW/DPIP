@@ -8,7 +8,7 @@ import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -101,11 +101,14 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         return;
       }
 
-      final res = await get(Uri.parse(widget.imageUrl));
+      final res = await Dio().get<List<int>>(
+        widget.imageUrl,
+        options: Options(responseType: .bytes),
+      );
 
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${widget.imageName}');
-      await tempFile.writeAsBytes(res.bodyBytes);
+      await tempFile.writeAsBytes(res.data!);
 
       try {
         if (Platform.isAndroid) {

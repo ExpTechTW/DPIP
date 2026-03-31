@@ -97,8 +97,7 @@ enum Language {
     name: 'Vue',
     icon: SimpleIcons.vuedotjs,
     iconColor: SimpleIconColors.vuedotjs,
-  )
-  ;
+  );
 
   /// The display name of the language.
   final String name;

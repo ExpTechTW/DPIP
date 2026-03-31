@@ -19,5 +19,8 @@ class CrowdinLocalizationProgress {
   factory CrowdinLocalizationProgress.fromJson(Map<String, dynamic> json) =>
       _$CrowdinLocalizationProgressFromJson(json);
 
+  factory CrowdinLocalizationProgress.fromMap(Map<String, dynamic> map) =>
+      CrowdinLocalizationProgress.fromJson(map);
+
   Map<String, dynamic> toJson() => _$CrowdinLocalizationProgressToJson(this);
 }

@@ -31,6 +31,8 @@ class Rts {
 
   factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
+  factory Rts.fromMap(Map<String, dynamic> map) => Rts.fromJson(map);
+
   Map<String, dynamic> toJson() => _$RtsToJson(this);
 
   GeoJsonBuilder toGeoJsonBuilder() => GeoJsonBuilder().setFeatures(

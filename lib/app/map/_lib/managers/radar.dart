@@ -182,7 +182,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     if (!isSourceExists) {
       final properties = RasterSourceProperties(
-        tiles: [Routes.radarTile(time)],
+        tiles: [radarTile(time)],
         tileSize: 256,
       );
 
