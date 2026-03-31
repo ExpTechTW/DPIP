@@ -1,5 +1,6 @@
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
+import 'package:dpip/app/home/layout.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/map/page.dart';
@@ -110,7 +111,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const AppLayout(child: HomePage());
+    return const HomeLayout(child: HomePage());
   }
 }
 

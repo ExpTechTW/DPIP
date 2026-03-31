@@ -1,3 +1,4 @@
+import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/core/i18n.dart';
@@ -11,21 +12,15 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 class LocationButton extends StatelessWidget {
-  final String? temporaryCode;
-  final ValueChanged<String?>? onLocationChanged;
-
-  const LocationButton({
-    super.key,
-    this.temporaryCode,
-    this.onLocationChanged,
-  });
+  const LocationButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Selector<SettingsLocationModel, (String?, Set<String>)>(
-      selector: (context, model) => (model.code, model.favorited),
-      builder: (context, data, child) {
-        final (savedCode, favorited) = data;
+    return Consumer2<HomeLocationModel, SettingsLocationModel>(
+      builder: (context, homeLocation, settingsLocation, child) {
+        final savedCode = settingsLocation.code;
+        final favorited = settingsLocation.favorited;
+        final temporaryCode = homeLocation.temporaryCode;
         final displayCode = temporaryCode ?? savedCode;
         final location = Global.location[displayCode];
 
@@ -63,20 +58,25 @@ class LocationButton extends StatelessWidget {
       context: context,
       constraints: context.bottomSheetConstraints,
       isScrollControlled: true,
-      builder: (sheetContext) => _LocationMenuSheet(
+      builder: (context) => _LocationMenuSheet(
         savedCode: savedCode,
         favorited: favorited,
         currentCode: currentCode,
         onLocationSelected: (code) {
-          Navigator.of(sheetContext).pop();
+          Navigator.of(context).pop();
+          final model = context.read<HomeLocationModel>();
           if (code == savedCode) {
-            onLocationChanged?.call(null);
+            model.setTemporaryCode(null);
           } else {
-            onLocationChanged?.call(code);
+            model.setTemporaryCode(code);
           }
         },
+        onAddLocationPressed: () {
+          Navigator.of(context).pop();
+          SettingsLocationSelectRoute().push(context);
+        },
         onSettingsPressed: () {
-          Navigator.of(sheetContext).pop();
+          Navigator.of(context).pop();
           SettingsLocationRoute().push(context);
         },
       ),
@@ -89,6 +89,7 @@ class _LocationMenuSheet extends StatefulWidget {
   final Set<String> favorited;
   final String? currentCode;
   final ValueChanged<String> onLocationSelected;
+  final VoidCallback onAddLocationPressed;
   final VoidCallback onSettingsPressed;
 
   const _LocationMenuSheet({
@@ -96,6 +97,7 @@ class _LocationMenuSheet extends StatefulWidget {
     required this.favorited,
     required this.currentCode,
     required this.onLocationSelected,
+    required this.onAddLocationPressed,
     required this.onSettingsPressed,
   });
 
@@ -137,7 +139,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Symbols.settings_rounded, size: 20),
+              icon: const Icon(Symbols.settings_rounded),
               onPressed: widget.onSettingsPressed,
               tooltip: '位置設定'.i18n,
             ),
@@ -189,46 +191,49 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
     return Column(
       crossAxisAlignment: .start,
       children: [
-        SegmentedList.builder(
+        SegmentedList(
           label: Text('快速切換'.i18n),
-          itemCount: quickItems.length,
-          itemBuilder: (context, index) {
-            final item = quickItems[index];
-
-            return SegmentedListTile(
-              isFirst: index == 0,
-              isLast: index == quickItems.length - 1,
-              tileColor: item.isSelected
-                  ? context.colors.secondaryContainer
-                  : null,
-              leading: Icon(
-                item.icon,
-                size: 20,
-                color: item.isSelected
-                    ? context.colors.primary
-                    : context.colors.onSurfaceVariant,
-              ),
-              title: Text(
-                item.name,
-                style: TextStyle(
-                  color: item.isSelected
+          children: [
+            for (var i = 0; i < quickItems.length; i++)
+              SegmentedListTile(
+                isFirst: i == 0,
+                tileColor: quickItems[i].isSelected
+                    ? context.colors.secondaryContainer
+                    : null,
+                leading: Icon(
+                  quickItems[i].icon,
+                  fill: 1,
+                  color: quickItems[i].isSelected
                       ? context.colors.primary
-                      : context.colors.onSurface,
-                  fontWeight: item.isSelected
-                      ? FontWeight.w600
-                      : FontWeight.normal,
+                      : context.colors.onSurfaceVariant,
                 ),
+                title: Text(
+                  quickItems[i].name,
+                  style: TextStyle(
+                    color: quickItems[i].isSelected
+                        ? context.colors.primary
+                        : context.colors.onSurface,
+                    fontWeight: quickItems[i].isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
+                trailing: quickItems[i].isSelected
+                    ? Icon(
+                        Symbols.check_rounded,
+                        color: context.colors.primary,
+                      )
+                    : null,
+                onTap: () => widget.onLocationSelected(quickItems[i].code),
               ),
-              trailing: item.isSelected
-                  ? Icon(
-                      Symbols.check_rounded,
-                      size: 20,
-                      color: context.colors.primary,
-                    )
-                  : null,
-              onTap: () => widget.onLocationSelected(item.code),
-            );
-          },
+            SegmentedListTile(
+              isFirst: quickItems.isEmpty,
+              isLast: true,
+              leading: const Icon(Symbols.add_circle_rounded),
+              title: Text('新增地點'.i18n),
+              onTap: widget.onAddLocationPressed,
+            ),
+          ],
         ),
 
         SegmentedList.builder(
@@ -244,7 +249,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
               subtitle: currentLocation?.cityWithLevel == city.cityWithLevel
                   ? Text('目前選擇'.i18n)
                   : null,
-              trailing: const Icon(Symbols.chevron_right_rounded, size: 20),
+              trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => setState(() => _selectedCity = city.cityWithLevel),
             );
           },
@@ -264,8 +269,6 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
         final code = entry.key;
         final town = entry.value;
         final isSelected = widget.currentCode == code;
-        final isSaved = widget.savedCode == code;
-        final isFavorited = widget.favorited.contains(code);
 
         return SegmentedListTile(
           isFirst: index == 0,
@@ -283,7 +286,6 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
           trailing: isSelected
               ? Icon(
                   Symbols.check_rounded,
-                  size: 20,
                   color: context.colors.primary,
                 )
               : null,

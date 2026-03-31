@@ -9,6 +9,7 @@ import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/forecast_card.dart';
 import 'package:dpip/app/home/_widgets/hero_weather.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
+import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
@@ -80,7 +81,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   String? _lastRefreshCode;
   bool _isFirstRefresh = true;
-  String? _temporaryLocationCode;
+
+  HomeLocationModel? _homeLocationModel;
 
   History? get _thunderstorm => _realtimeRegion
       ?.where((e) => e.type == HistoryType.thunderstorm)
@@ -157,7 +159,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final model = context.read<HomeLocationModel>();
+    if (_homeLocationModel != model) {
+      _homeLocationModel?.removeListener(_refresh);
+      _homeLocationModel = model;
+      model.addListener(_refresh);
+    }
+  }
+
+  @override
   void dispose() {
+    _homeLocationModel?.removeListener(_refresh);
     _sheetController.removeListener(_onSheetChanged);
     _blurNotifier.dispose();
     _isFullyExpandedNotifier.dispose();
@@ -194,12 +208,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   String? get _effectiveLocationCode =>
-      _temporaryLocationCode ?? GlobalProviders.location.code;
+      _homeLocationModel?.temporaryCode ?? GlobalProviders.location.code;
 
   Future<void> _refresh() async {
     if (_isLoading) return;
 
-    if (_temporaryLocationCode == null) {
+    if (_homeLocationModel?.temporaryCode == null) {
       await _reloadLocationData();
     }
 
@@ -238,13 +252,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void _onTemporaryLocationChanged(String? code) {
-    setState(() {
-      _temporaryLocationCode = code;
-    });
-    _refresh();
-  }
-
   Future<void> _reloadLocationData() async {
     if (GlobalProviders.location.auto) {
       await updateLocationFromGPS();
@@ -265,7 +272,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _checkIfOutOfService(String? code) {
     if (code == null) return true;
 
-    if (_temporaryLocationCode != null) return false;
+    if (_homeLocationModel?.temporaryCode != null) return false;
 
     final auto = GlobalProviders.location.auto;
     final location = Global.location[code];
@@ -286,8 +293,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     try {
       LatLng? coords;
 
-      if (_temporaryLocationCode != null) {
-        final location = Global.location[_temporaryLocationCode];
+      final temporaryCode = _homeLocationModel?.temporaryCode;
+      if (temporaryCode != null) {
+        final location = Global.location[temporaryCode];
         if (location != null) {
           coords = LatLng(location.lat, location.lng);
         }
@@ -502,10 +510,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: RepaintBoundary(
               child: Align(
                 alignment: Alignment.topCenter,
-                child: LocationButton(
-                  temporaryCode: _temporaryLocationCode,
-                  onLocationChanged: _onTemporaryLocationChanged,
-                ),
+                child: const LocationButton(),
               ),
             ),
           ),
