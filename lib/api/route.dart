@@ -34,8 +34,9 @@ const api = _BaseUrlGenerator(prefix: 'api', count: 2);
 /// server, or `'${lb(1)}/path'` to pin to a specific server index.
 const lb = _BaseUrlGenerator(prefix: 'lb', count: 4);
 
-/// Base host for NTP requests (no `/api` suffix).
+/// Base host for NTP requests.
 String get ntpBase => 'https://lb-${Random().nextInt(4) + 1}.exptech.dev';
 
+/// Base host for radar tile requests.
 String radarTile(String timestamp) =>
     'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';

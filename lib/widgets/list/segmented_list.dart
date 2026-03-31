@@ -30,15 +30,31 @@ class SegmentedList extends StatelessWidget {
   /// The optional label displayed at the top of the section.
   final Widget? label;
 
-  /// The list of widgets to display in the section.
-  final List<Widget> children;
+  final List<Widget>? _children;
+  final int? _itemCount;
+  final IndexedWidgetBuilder? _itemBuilder;
 
   /// Creates a section with an optional [label] and required [children].
   const SegmentedList({
     super.key,
     this.label,
-    required this.children,
-  });
+    required List<Widget> children,
+  }) : _children = children,
+       _itemCount = null,
+       _itemBuilder = null;
+
+  /// Creates a section with an optional [label] using a builder callback.
+  ///
+  /// Equivalent to [SegmentedList] but lazily builds items on demand, which is
+  /// more efficient for long lists.
+  const SegmentedList.builder({
+    super.key,
+    this.label,
+    required int itemCount,
+    required IndexedWidgetBuilder itemBuilder,
+  }) : _children = null,
+       _itemCount = itemCount,
+       _itemBuilder = itemBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +77,10 @@ class SegmentedList extends StatelessWidget {
           padding: .symmetric(horizontal: 16),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: children.length,
-          itemBuilder: (context, index) => children[index],
+          itemCount: _children?.length ?? _itemCount!,
+          itemBuilder: _children != null
+              ? (context, index) => _children[index]
+              : _itemBuilder!,
         ),
       ],
     );

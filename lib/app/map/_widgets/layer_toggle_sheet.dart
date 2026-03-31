@@ -81,8 +81,8 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
   Widget build(BuildContext context) {
     return SheetContainer(
       icon: Symbols.layers_rounded,
-      title: '地圖圖層'.i18n,
-      description: '選擇要顯示的地圖圖層'.i18n,
+      title: Text('地圖圖層'.i18n),
+      description: Text('選擇要顯示的地圖圖層'.i18n),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
