@@ -11,7 +11,7 @@ class HomeLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ChangeNotifierProvider<HomeLocationModel>(
-        create: (_) => HomeLocationModel(),
+        create: (context) => HomeLocationModel(),
         child: child,
       ),
     );

@@ -13,6 +13,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,6 +41,8 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   bool _hasHandledInitialShortcut = false;
 
   Future<void> _checkUpdate() async {
+    if (kDebugMode) return;
+
     try {
       if (Platform.isAndroid) {
         final info = await InAppUpdate.checkForUpdate();

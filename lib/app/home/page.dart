@@ -36,6 +36,7 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/shader_selector.dart';
 import 'package:dpip/utils/wallpaper_selector.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -49,15 +50,12 @@ import 'package:url_launcher/url_launcher.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  static const route = '/home';
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  DraggableScrollableController _sheetController =
-      DraggableScrollableController();
+  DraggableScrollableController _sheetController = .new();
 
   Key _mapKey = UniqueKey();
   bool _isLoading = false;
@@ -85,7 +83,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   HomeLocationModel? _homeLocationModel;
 
   History? get _thunderstorm => _realtimeRegion
-      ?.where((e) => e.type == HistoryType.thunderstorm)
+      ?.where((e) => e.type == .thunderstorm)
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
       .firstOrNull;
 
@@ -145,7 +143,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onSheetChanged() {
     final size = _sheetController.size;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.dimension.height;
     final baseSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final progress = ((size - baseSize) / (1.0 - baseSize)).clamp(0.0, 1.0);
     final newBlur = (progress * 15.0 / 5.0).round() * 5.0;
@@ -183,7 +181,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _refresh();
+    if (state == .resumed) _refresh();
   }
 
   void _checkVersion() {
@@ -222,9 +220,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final isOutOfService = _checkIfOutOfService(code);
 
     if (isOutOfService && !_currentMode.isNational) {
-      _currentMode = _currentMode.isActive
-          ? HomeMode.nationalActive
-          : HomeMode.nationalHistory;
+      _currentMode = _currentMode.isActive ? .nationalActive : .nationalHistory;
     }
 
     setState(() {

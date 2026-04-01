@@ -53,18 +53,18 @@ class LocationButton extends StatelessWidget {
     required Set<String> favorited,
   }) {
     final currentCode = temporaryCode ?? savedCode;
+    final model = context.read<HomeLocationModel>();
 
     showModalBottomSheet<String?>(
       context: context,
       constraints: context.bottomSheetConstraints,
       isScrollControlled: true,
-      builder: (context) => _LocationMenuSheet(
+      builder: (sheetContext) => _LocationMenuSheet(
         savedCode: savedCode,
         favorited: favorited,
         currentCode: currentCode,
         onLocationSelected: (code) {
-          Navigator.of(context).pop();
-          final model = context.read<HomeLocationModel>();
+          Navigator.of(sheetContext).pop();
           if (code == savedCode) {
             model.setTemporaryCode(null);
           } else {
@@ -72,11 +72,11 @@ class LocationButton extends StatelessWidget {
           }
         },
         onAddLocationPressed: () {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           SettingsLocationSelectRoute().push(context);
         },
         onSettingsPressed: () {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           SettingsLocationRoute().push(context);
         },
       ),
