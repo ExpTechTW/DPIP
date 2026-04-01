@@ -2,7 +2,6 @@ import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/layout.dart';
 import 'package:dpip/app/home/page.dart';
-import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout.dart';
