@@ -9,8 +9,6 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     outputs:
       ios: ${{ steps.filter.outputs.ios }}
     steps:
@@ -29,8 +27,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.ios == 'true' }}
     runs-on: macos-latest
-    permissions:
-      contents: read
 
     steps:
     - uses: actions/checkout@v4
