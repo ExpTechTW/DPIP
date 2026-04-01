@@ -31,13 +31,13 @@ import 'package:option_result/result.dart';
 import 'package:zstandard/zstandard.dart';
 
 part '_client.dart';
-part 'endpoints/app.dart';
-part 'endpoints/device.dart';
 part 'endpoints/earthquake.dart';
+part 'endpoints/weather.dart';
+part 'endpoints/tsunami.dart';
 part 'endpoints/history.dart';
 part 'endpoints/station.dart';
-part 'endpoints/tsunami.dart';
-part 'endpoints/weather.dart';
+part 'endpoints/device.dart';
+part 'endpoints/app.dart';
 
 /// Client for the ExpTech API.
 class ExpTech

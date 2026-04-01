@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
-import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
