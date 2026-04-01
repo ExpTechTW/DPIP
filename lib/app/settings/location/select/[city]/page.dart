@@ -1,11 +1,11 @@
 import 'dart:collection';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/toast.dart';
@@ -20,9 +20,6 @@ class SettingsLocationSelectCityPage extends StatefulWidget {
   final String city;
 
   const SettingsLocationSelectCityPage({super.key, required this.city});
-
-  static String route([String city = ':city']) =>
-      '/settings/location/select/$city';
 
   @override
   State<SettingsLocationSelectCityPage> createState() =>
@@ -83,7 +80,9 @@ class _SettingsLocationSelectCityPageState
                               context.location.setCode(code);
                               if (!context.mounted) return;
 
-                              context.popUntil(SettingsLocationPage.route);
+                              context.popUntil(
+                                SettingsLocationRoute().location,
+                              );
                             } catch (e, s) {
                               if (!context.mounted) return;
                               TalkerManager.instance.error(

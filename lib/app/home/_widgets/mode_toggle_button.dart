@@ -54,7 +54,7 @@ class ModeToggleButton extends StatelessWidget {
   void _showModeMenu(BuildContext context) {
     final RenderBox? button = context.findRenderObject() as RenderBox?;
     final RenderBox? overlay =
-        Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+        context.navigator.overlay?.context.findRenderObject() as RenderBox?;
 
     if (button == null || overlay == null) return;
 

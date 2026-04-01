@@ -16,55 +16,38 @@ import 'package:simple_icons/simple_icons.dart';
 class SettingsIndexPage extends StatelessWidget {
   const SettingsIndexPage({super.key});
 
-  Widget _buildIconContainer({
-    required Widget icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: IconTheme(
-        data: IconThemeData(color: color, size: 20),
-        child: icon,
-      ),
-    );
-  }
-
   Widget _buildHeader(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      padding: const EdgeInsets.all(20),
+      margin: const .fromLTRB(16, 0, 16, 8),
+      padding: const .all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             context.colors.primaryContainer.withValues(alpha: 0.6),
             context.colors.tertiaryContainer.withValues(alpha: 0.4),
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: .topLeft,
+          end: .bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
+        borderRadius: .circular(20),
+        border: .all(
           color: context.colors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const .all(12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
                   context.colors.primary,
                   context.colors.tertiary,
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: .topLeft,
+                end: .bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: .circular(16),
               boxShadow: [
                 BoxShadow(
                   color: context.colors.primary.withValues(alpha: 0.3),
@@ -102,7 +85,7 @@ class SettingsIndexPage extends StatelessWidget {
         '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     return ListView(
-      padding: EdgeInsets.only(top: 16, bottom: 16 + context.padding.bottom),
+      padding: .only(top: 16, bottom: 16 + context.padding.bottom),
       children: [
         _buildHeader(context),
 
@@ -113,8 +96,8 @@ class SettingsIndexPage extends StatelessWidget {
             SegmentedListTile(
               isFirst: true,
               isLast: true,
-              leading: _buildIconContainer(
-                icon: const Icon(Symbols.pin_drop_rounded),
+              leading: ContainedIcon(
+                Symbols.pin_drop_rounded,
                 color: Colors.deepOrangeAccent,
               ),
               title: Text('所在地'.i18n),
@@ -132,17 +115,17 @@ class SettingsIndexPage extends StatelessWidget {
             SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
-                Symbols.grid_view_rounded,
+                Symbols.dashboard_rounded,
                 color: Colors.lightBlueAccent,
               ),
               title: Text('版面'.i18n),
-              subtitle: Text('調整 DPIP 的版面樣式'.i18n),
+              subtitle: Text('調整首頁的版面樣式'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsLayoutRoute().push(context),
             ),
             SegmentedListTile(
               leading: ContainedIcon(
-                Symbols.brush_rounded,
+                Symbols.palette_rounded,
                 color: Colors.indigoAccent,
               ),
               title: Text('主題'.i18n),
@@ -177,7 +160,7 @@ class SettingsIndexPage extends StatelessWidget {
                 color: Colors.greenAccent,
               ),
               title: Text('地圖'.i18n),
-              subtitle: Text('調整 DPIP 地圖的設定'.i18n),
+              subtitle: Text('調整地圖的顯示樣式'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsMapRoute().push(context),
             ),
@@ -215,11 +198,7 @@ class SettingsIndexPage extends StatelessWidget {
                 color: Colors.blueGrey,
               ),
               title: Text('HTTP 代理'.i18n),
-              subtitle: Text(
-                Preference.proxyEnabled == true
-                    ? '${Preference.proxyHost ?? ''}:${Preference.proxyPort ?? ''}'
-                    : '未啟用'.i18n,
-              ),
+              subtitle: Text('調整 HTTP 代理伺服器設定'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsProxyRoute().push(context),
             ),

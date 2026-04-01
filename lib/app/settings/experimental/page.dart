@@ -5,6 +5,7 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class SettingsExperimentalPage extends StatefulWidget {
@@ -322,11 +323,11 @@ class _ExperimentalWarningDialogState
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => context.pop(false),
           child: Text('取消'.i18n),
         ),
         FilledButton(
-          onPressed: canConfirm ? () => Navigator.of(context).pop(true) : null,
+          onPressed: canConfirm ? () => context.pop(true) : null,
           child: Text(
             canConfirm ? '啟用'.i18n : '${_countdown}s',
           ),

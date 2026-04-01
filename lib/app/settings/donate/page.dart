@@ -183,7 +183,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
 
           return ListView(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).padding.bottom + 16,
+              bottom: context.padding.bottom + 16,
             ),
             children: [
               _buildHeader(),
@@ -622,7 +622,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                     final storeName = Platform.isIOS
                         ? 'App Store'
                         : 'Google Play';
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    context.scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
                           '無法連線至 {store}，請稍後再試。'.i18n.args({
@@ -635,7 +635,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                   }
                   InAppPurchase.instance.restorePurchases();
 
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  context.scaffoldMessenger.showSnackBar(
                     SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)),
                   );
                 },

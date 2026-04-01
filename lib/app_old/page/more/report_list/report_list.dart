@@ -3,6 +3,7 @@ import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/report/list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
@@ -318,7 +319,7 @@ class _ReportListPageState extends State<ReportListPage> {
                 TextButton(
                   child: const Text('套用'),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    context.pop();
                     this.setState(() {
                       _currentPage = 1;
                       _loadedPage = 0;

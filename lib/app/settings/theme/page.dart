@@ -1,3 +1,4 @@
+import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
@@ -19,7 +20,11 @@ class SettingsThemePage extends StatelessWidget {
       builder: (context, model, child) {
         return ListView(
           children: [
-            _buildHeader(context),
+            SettingsHeader(
+              icon: Symbols.palette_rounded,
+              title: Text('主題'.i18n),
+              subtitle: Text('調整 DPIP 整體的外觀與顏色'.i18n),
+            ),
             const SizedBox(height: 16),
             SegmentedList(
               children: [
@@ -70,48 +75,6 @@ class SettingsThemePage extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: context.colors.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Symbols.palette_rounded,
-              color: context.colors.onPrimaryContainer,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '主題設定'.i18n,
-                  style: context.texts.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '自訂應用程式的外觀'.i18n,
-                  style: context.texts.bodySmall?.copyWith(
-                    color: context.colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

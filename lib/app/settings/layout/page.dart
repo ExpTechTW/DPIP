@@ -1,3 +1,4 @@
+import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -41,9 +42,10 @@ class SettingsLayoutPage extends StatelessWidget {
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: _buildHeader(context),
+              child: SettingsHeader(
+                icon: Symbols.dashboard_rounded,
+                title: Text('版面'.i18n),
+                subtitle: Text('調整首頁的版面樣式'.i18n),
               ),
             ),
             if (sections.isNotEmpty) ...[
@@ -62,7 +64,7 @@ class SettingsLayoutPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverReorderableList(
                   itemCount: sections.length,
-                  onReorder: (oldIndex, newIndex) {
+                  onReorderItem: (oldIndex, newIndex) {
                     context.userInterface.reorderSection(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {
@@ -139,60 +141,13 @@ class SettingsLayoutPage extends StatelessWidget {
               ),
             ],
             SliverPadding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom + 16,
+              padding: .only(
+                bottom: context.padding.bottom + 16,
               ),
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: context.colors.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Symbols.dashboard_customize_rounded,
-                  color: context.colors.onPrimaryContainer,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '首頁樣式'.i18n,
-                      style: context.texts.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '自訂首頁顯示的區塊'.i18n,
-                      style: context.texts.bodySmall?.copyWith(
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 

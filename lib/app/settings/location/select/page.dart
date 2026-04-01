@@ -11,8 +11,6 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 class SettingsLocationSelectPage extends StatelessWidget {
   const SettingsLocationSelectPage({super.key});
 
-  static const route = '/settings/location/select';
-
   @override
   Widget build(BuildContext context) {
     final entries = Global.location.entries;

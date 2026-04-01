@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
             if (isFirstMeasure && mounted) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                final screenHeight = MediaQuery.of(context).size.height;
+                final screenHeight = context.dimension.height;
                 final targetSize = (height / screenHeight).clamp(0.25, 0.6);
                 _sheetController.animateTo(
                   targetSize,
@@ -394,7 +394,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       imagePath: wallpaperPath,
     );
 
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.dimension.height;
     final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final handleHeight = 28.0 / screenHeight;
     final minSize = handleHeight.clamp(0.03, 0.05);
@@ -543,7 +543,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildDraggableSheet(List<HomeDisplaySection> homeSections) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.dimension.height;
     final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final handleHeight = 28.0 / screenHeight;
     final minSize = handleHeight.clamp(0.03, 0.05);
@@ -601,7 +601,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _buildHeroSection() {
     final code = GlobalProviders.location.code;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.dimension.height;
 
     if (code == null) {
       return SizedBox(
@@ -700,7 +700,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Column(
       children: [
         ...allCards,
-        SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+        SizedBox(height: context.padding.bottom + 16),
       ],
     );
   }
@@ -714,9 +714,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
       (
         icon: SimpleIcons.threads,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : Colors.black,
+        color: context.theme.brightness == .dark ? Colors.white : Colors.black,
         url: 'https://www.threads.net/@dpip.tw',
       ),
       (
@@ -726,7 +724,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
       (
         icon: Symbols.favorite_rounded,
-        color: Theme.of(context).colorScheme.primary,
+        color: context.colors.primary,
         url: SettingsDonatePage.route,
       ),
     ];
@@ -800,7 +798,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: context.theme.brightness == .dark
                     ? Colors.white.withValues(alpha: 0.25)
                     : const Color.fromARGB(
                         255,
@@ -817,7 +815,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text(
                   label,
                   style: context.texts.labelSmall?.copyWith(
-                    color: Theme.of(context).brightness == Brightness.dark
+                    color: context.theme.brightness == Brightness.dark
                         ? Colors.white
                         : const Color.fromARGB(255, 90, 90, 90),
                     fontWeight: FontWeight.w700,
@@ -827,7 +825,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Text(
                   value,
                   style: context.texts.bodySmall?.copyWith(
-                    color: Theme.of(context).brightness == Brightness.dark
+                    color: context.theme.brightness == Brightness.dark
                         ? Colors.white
                         : const Color.fromARGB(255, 60, 60, 60),
                     fontWeight: FontWeight.w600,

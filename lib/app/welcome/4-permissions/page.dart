@@ -9,6 +9,7 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -353,13 +354,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
         actions: [
           TextButton(
             child: Text('取消'.i18n),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
           ),
           TextButton(
             child: Text('確定'.i18n),
             onPressed: () {
               openAppSettings();
-              Navigator.of(context).pop();
+              context.pop();
             },
           ),
         ],
@@ -381,11 +382,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
         actions: [
           TextButton(
             child: Text('稍後'.i18n),
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => context.pop(false),
           ),
           FilledButton(
             child: Text('前往設定'.i18n),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => context.pop(true),
           ),
         ],
       ),

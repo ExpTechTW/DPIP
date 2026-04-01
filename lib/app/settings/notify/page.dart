@@ -1,4 +1,5 @@
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -16,9 +17,6 @@ import 'package:provider/provider.dart';
 
 class SettingsNotifyPage extends StatefulWidget {
   const SettingsNotifyPage({super.key});
-
-  static const name = 'notify';
-  static const route = '/settings/$name';
 
   @override
   State<SettingsNotifyPage> createState() => _SettingsNotifyPageState();
@@ -79,10 +77,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)));
+          context.scaffoldMessenger.clearSnackBars();
+          context.scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('伺服器排隊中，請稍候…'.i18n)),
+          );
         }
       });
       ExpTech()
@@ -131,48 +129,6 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: context.colors.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Symbols.notifications_rounded,
-              color: context.colors.onPrimaryContainer,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '通知設定'.i18n,
-                  style: context.texts.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '自訂各類通知的接收方式'.i18n,
-                  style: context.texts.bodySmall?.copyWith(
-                    color: context.colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsLocationModel, String?>(
@@ -198,7 +154,11 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                 bottom: 16 + context.padding.bottom,
               ),
               children: [
-                _buildHeader(context),
+                SettingsHeader(
+                  icon: Symbols.notifications_rounded,
+                  title: Text('通知'.i18n),
+                  subtitle: Text('推播通知設定與通知音效測試'.i18n),
+                ),
                 if (!enabled)
                   Container(
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),

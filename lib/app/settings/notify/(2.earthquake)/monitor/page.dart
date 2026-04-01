@@ -1,6 +1,5 @@
 import 'package:dpip/app/settings/notify/_widgets/earthquake_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
-import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/segmented_list.dart';
@@ -9,9 +8,6 @@ import 'package:provider/provider.dart';
 
 class SettingsNotifyMonitorPage extends StatelessWidget {
   const SettingsNotifyMonitorPage({super.key});
-
-  static const name = 'monitor';
-  static const route = '/settings/${SettingsNotifyPage.name}/$name';
 
   @override
   Widget build(BuildContext context) {

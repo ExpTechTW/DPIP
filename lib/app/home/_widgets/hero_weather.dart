@@ -19,8 +19,8 @@ class HeroWeather extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final screenHeight = context.dimension.height;
+    final statusBarHeight = context.padding.top;
 
     return SizedBox(
       height: screenHeight * 0.5,

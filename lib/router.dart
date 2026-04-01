@@ -33,11 +33,8 @@ import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
-import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -180,48 +177,9 @@ class SettingsShellRoute extends ShellRouteData {
 
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    final title = _getSettingsTitle(state.fullPath);
     return ShellWrapper(
-      SettingsLayout(
-        title: title,
-        child: Theme(
-          data: context.theme.copyWith(
-            pageTransitionsTheme: kFadeForwardPageTransitionsTheme,
-          ),
-          child: navigator,
-        ),
-      ),
+      SettingsLayout(child: navigator),
     );
-  }
-
-  static String _getSettingsTitle(String? path) {
-    return switch (path) {
-      '/settings/location' => '所在地'.i18n,
-      '/settings/location/select' => '新增地點'.i18n,
-      final p when p?.startsWith('/settings/location/select/') == true =>
-        '新增地點'.i18n,
-      '/settings/layout' => '版面'.i18n,
-      '/settings/theme' => '主題'.i18n,
-      '/settings/theme/select' => '主題'.i18n,
-      '/settings/locale' => '語言'.i18n,
-      '/settings/locale/select' => '語言'.i18n,
-      '/settings/unit' => '單位'.i18n,
-      '/settings/map' => '地圖'.i18n,
-      '/settings/proxy' => 'HTTP 代理'.i18n,
-      '/settings/experimental' => '實驗性功能'.i18n,
-      '/settings/notify' => '通知'.i18n,
-      '/settings/notify/eew' => '緊急地震速報'.i18n,
-      '/settings/notify/monitor' => '強震監視器'.i18n,
-      '/settings/notify/report' => '地震報告'.i18n,
-      '/settings/notify/intensity' => '震度速報'.i18n,
-      '/settings/notify/thunderstorm' => '雷雨即時訊息'.i18n,
-      '/settings/notify/advisory' => '天氣警特報'.i18n,
-      '/settings/notify/evacuation' => '防災資訊'.i18n,
-      '/settings/notify/tsunami' => '海嘯資訊'.i18n,
-      '/settings/notify/announcement' => '公告'.i18n,
-      '/settings/donate' => '贊助我們'.i18n,
-      _ => '設定'.i18n,
-    };
   }
 }
 

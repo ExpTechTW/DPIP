@@ -5,89 +5,90 @@ import 'package:dpip/api/model/notify/notify_settings.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-/// 通知類型
+/// Notification channel identifiers used when updating server-side settings.
 enum NotifyChannel {
-  /// 緊急地震速報
+  /// Earthquake early warning.
   eew,
 
-  /// 強震監視器
+  /// Seismic intensity monitor.
   monitor,
 
-  /// 地震報告
+  /// Earthquake report.
   report,
 
-  /// 震度速報
+  /// Intensity report.
   intensity,
 
-  /// 雷雨即時訊息
+  /// Real-time thunderstorm alerts.
   thunderstorm,
 
-  /// 天氣景警特報
+  /// Weather advisory alerts.
   weatherAdvisory,
 
-  /// 防災避難
+  /// Disaster evacuation alerts.
   evacuation,
 
-  /// 海嘯
+  /// Tsunami alerts.
   tsunami,
 
-  /// 公告
+  /// General announcements.
   announcement,
 }
 
-/// 緊急地震速報通知設定
+/// Notification filter for earthquake early warning alerts.
 enum EewNotifyType {
-  /// 所在地震度4以上
+  /// Local intensity 4 or above.
   localIntensityAbove4,
 
-  /// 所在地震度1以上
+  /// Local intensity 1 or above.
   localIntensityAbove1,
 
-  /// 接收全部
+  /// All warnings.
   all,
 }
 
-/// 地震通知設定
+/// Notification filter for earthquake events.
 enum EarthquakeNotifyType {
-  /// 不接收
+  /// Disabled.
   off,
 
-  /// 所在地震度1以上
+  /// Local intensity 1 or above.
   localIntensityAbove1,
 
-  /// 接收全部
+  /// All events.
   all,
 }
 
-/// 天氣通知設定
+/// Notification filter for weather events.
 enum WeatherNotifyType {
-  /// 不接收
+  /// Disabled.
   off,
 
-  /// 接收所在地
+  /// Local area only.
   local,
 }
 
-/// 海嘯通知設定
+/// Notification filter for tsunami alerts.
 enum TsunamiNotifyType {
-  /// 海嘯警報
+  /// Tsunami warnings only.
   warningOnly,
 
-  /// 海嘯警報、海嘯警報
+  /// All tsunami alerts.
   all,
 }
 
-/// 基本通知設定
+/// Notification filter for general announcements.
 enum BasicNotifyType {
-  /// 不接收
+  /// Disabled.
   off,
 
-  /// 接收全部
+  /// All announcements.
   all,
 }
 
-class SettingsNotificationModel extends ChangeNotifier {
+class _SettingsNotificationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsNotificationModel');
 
   String get _eew =>
@@ -118,6 +119,10 @@ class SettingsNotificationModel extends ChangeNotifier {
   String get _announcement =>
       Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
+  /// Applies notification settings received from the server.
+  ///
+  /// Overwrites all channel preferences with the values in [settings] and
+  /// notifies all attached listeners.
   void apply(NotifySettings settings) {
     Preference.notifyEew = settings.eew.name;
     Preference.notifyMonitor = settings.monitor.name;
@@ -133,11 +138,16 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 地震速報通知設定
+  /// The current earthquake early warning notification filter.
   ///
-  /// 預設：所在地震度1以上
+  /// Returns an [EewNotifyType] from preferences. Defaults to
+  /// [EewNotifyType.localIntensityAbove1] if no value has been set.
   EewNotifyType get eew => EewNotifyType.values.byName(_eew);
 
+  /// Sets the earthquake early warning notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setEew(EewNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -151,12 +161,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 強震監視器通知設定
+  /// The current seismic intensity monitor notification filter.
   ///
-  /// 預設：所在地震度1以上
+  /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
+  /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
   EarthquakeNotifyType get monitor =>
       EarthquakeNotifyType.values.byName(_monitor);
 
+  /// Sets the seismic intensity monitor notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setMonitor(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -172,12 +187,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 地震報告通知設定
+  /// The current earthquake report notification filter.
   ///
-  /// 預設：所在地震度1以上
+  /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
+  /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
   EarthquakeNotifyType get report =>
       EarthquakeNotifyType.values.byName(_report);
 
+  /// Sets the earthquake report notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setReport(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -193,12 +213,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 震度速報通知設定
+  /// The current intensity report notification filter.
   ///
-  /// 預設：所在地震度1以上
+  /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
+  /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
   EarthquakeNotifyType get intensity =>
       EarthquakeNotifyType.values.byName(_intensity);
 
+  /// Sets the intensity report notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setIntensity(EarthquakeNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -214,12 +239,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 雷雨即時訊息通知設定
+  /// The current thunderstorm alert notification filter.
   ///
-  /// 預設：接收所在地
+  /// Returns a [WeatherNotifyType] from preferences. Defaults to
+  /// [WeatherNotifyType.local] if no value has been set.
   WeatherNotifyType get thunderstorm =>
       WeatherNotifyType.values.byName(_thunderstorm);
 
+  /// Sets the thunderstorm alert notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setThunderstorm(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -235,12 +265,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 天氣景警特報通知設定
+  /// The current weather advisory notification filter.
   ///
-  /// 預設：接收所在地
+  /// Returns a [WeatherNotifyType] from preferences. Defaults to
+  /// [WeatherNotifyType.local] if no value has been set.
   WeatherNotifyType get weatherAdvisory =>
       WeatherNotifyType.values.byName(_weatherAdvisory);
 
+  /// Sets the weather advisory notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setWeatherAdvisory(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -256,12 +291,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 防災避難通知設定
+  /// The current disaster evacuation notification filter.
   ///
-  /// 預設：接收全部
+  /// Returns a [WeatherNotifyType] from preferences. Defaults to
+  /// [WeatherNotifyType.local] if no value has been set.
   WeatherNotifyType get evacuation =>
       WeatherNotifyType.values.byName(_evacuation);
 
+  /// Sets the disaster evacuation notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setEvacuation(WeatherNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -277,11 +317,16 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 海嘯通知設定
+  /// The current tsunami alert notification filter.
   ///
-  /// 預設：海嘯警報、海嘯警報
+  /// Returns a [TsunamiNotifyType] from preferences. Defaults to
+  /// [TsunamiNotifyType.all] if no value has been set.
   TsunamiNotifyType get tsunami => TsunamiNotifyType.values.byName(_tsunami);
 
+  /// Sets the tsunami alert notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setTsunami(TsunamiNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -297,12 +342,17 @@ class SettingsNotificationModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 公告通知設定
+  /// The current announcement notification filter.
   ///
-  /// 預設：接收全部
+  /// Returns a [BasicNotifyType] from preferences. Defaults to
+  /// [BasicNotifyType.all] if no value has been set.
   BasicNotifyType get announcement =>
       BasicNotifyType.values.byName(_announcement);
 
+  /// Sets the announcement notification filter.
+  ///
+  /// Sends [value] to the server, applies the returned settings, persists the
+  /// value to preferences, and notifies all attached listeners.
   Future<void> setAnnouncement(BasicNotifyType value) async {
     final result = await ExpTech().setNotify(
       token: Preference.notifyToken,
@@ -317,4 +367,14 @@ class SettingsNotificationModel extends ChangeNotifier {
     );
     notifyListeners();
   }
+}
+
+class SettingsNotificationModel extends _SettingsNotificationModel {}
+
+extension SettingsNotificationModelExtension on BuildContext {
+  /// Watches [SettingsNotificationModel] and rebuilds when it notifies listeners.
+  SettingsNotificationModel get useMap => watch<SettingsNotificationModel>();
+
+  /// Reads [SettingsNotificationModel] without subscribing to updates.
+  SettingsNotificationModel get map => read<SettingsNotificationModel>();
 }

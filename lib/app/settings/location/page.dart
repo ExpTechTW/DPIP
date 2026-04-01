@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -27,8 +28,6 @@ final stateSettingsLocationView = _SettingsLocationPageState();
 typedef PositionUpdateCallback = void Function();
 
 class SettingsLocationPage extends StatefulWidget {
-  static const route = '/settings/location';
-
   const SettingsLocationPage({super.key});
 
   @override
@@ -236,6 +235,12 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
+        SettingsHeader(
+          icon: Symbols.pin_drop_rounded,
+          title: Text('所在地'.i18n),
+          subtitle: Text('設定你的所在地來接收當地的即時資訊'.i18n),
+        ),
+        const SizedBox(height: 16),
         SegmentedList(
           children: [
             Selector<SettingsLocationModel, bool>(

@@ -58,7 +58,7 @@ class _TimeSelectorState extends State<TimeSelector>
     final index = widget.timeList.indexOf(_selectedTimestamp);
     if (index != -1) {
       final selectedItemOffset = index * _itemWidth;
-      final screenWidth = MediaQuery.of(context).size.width;
+      final screenWidth = context.dimension.width;
       final scrollOffset =
           selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
 

@@ -95,7 +95,7 @@ class DpipMap extends StatefulWidget {
   State<DpipMap> createState() => DpipMapState();
 
   static double adjustedZoom(BuildContext context, double zoom) {
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     const double baseZoomAdjustment = 1.0;
     const double mediumZoomAdjustment = 0.3;
 

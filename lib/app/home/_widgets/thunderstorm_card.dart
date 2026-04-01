@@ -105,7 +105,7 @@ class ThunderstormCard extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => Navigator.of(context).push(
+                onTap: () => context.navigator.push(
                   MaterialPageRoute(
                     builder: (context) => ThunderstormPage(item: history),
                   ),
