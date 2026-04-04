@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-01 07:16\n"
+"PO-Revision-Date: 2026-04-04 17:35\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -90,7 +90,7 @@ msgstr "Please set your current location to enable notifications"
 
 #: ./lib/app/settings/notify/page.dart:211
 msgid "設定所在地"
-msgstr ""
+msgstr "Set Location"
 
 #: ./lib/app/settings/experimental/page.dart:209
 msgid "地震速報"
@@ -297,7 +297,7 @@ msgstr "The location (township) issues instant thunderstorm information"
 
 #: ./lib/app/settings/experimental/page.dart:197
 msgid "啟動時進入強震監視器"
-msgstr ""
+msgstr "Launch the earthquake monitor on start"
 
 #: ./lib/app/settings/experimental/page.dart:57
 msgid "地震速報不限制非 CWA 來源"
