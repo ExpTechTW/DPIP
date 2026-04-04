@@ -1,3 +1,6 @@
+/// Weather advisory notification settings page.
+library;
+
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/weather_notify_section.dart';
 import 'package:dpip/core/i18n.dart';
@@ -6,7 +9,10 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A page for configuring weather advisory notification settings and testing
+/// advisory sounds.
 class SettingsNotifyAdvisoryPage extends StatelessWidget {
+  /// Creates a [SettingsNotifyAdvisoryPage].
   const SettingsNotifyAdvisoryPage({super.key});
 
   @override

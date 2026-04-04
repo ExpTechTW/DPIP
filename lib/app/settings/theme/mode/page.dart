@@ -1,3 +1,6 @@
+/// Theme mode settings page.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -7,13 +10,18 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// A page for selecting the app theme mode (light, dark, or system).
+///
+/// Selecting a mode immediately applies it and pops the page. Requires
+/// [SettingsUserInterfaceModel] in the widget tree.
 class SettingsThemeModePage extends StatelessWidget {
+  /// Creates a [SettingsThemeModePage].
   const SettingsThemeModePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+      padding: .only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SegmentedList(
           label: Text('主題模式'.i18n),
@@ -25,11 +33,11 @@ class SettingsThemeModePage extends StatelessWidget {
                 leading: Icon(Symbols.light_mode_rounded),
                 title: Text('淺色'.i18n),
                 trailing: Icon(
-                  themeMode == ThemeMode.light ? Symbols.check : null,
+                  themeMode == .light ? Symbols.check_rounded : null,
                 ),
                 onTap: () {
                   context.read<SettingsUserInterfaceModel>().setThemeMode(
-                    ThemeMode.light,
+                    .light,
                   );
                   context.pop();
                 },
@@ -41,11 +49,11 @@ class SettingsThemeModePage extends StatelessWidget {
                 leading: Icon(Symbols.dark_mode_rounded),
                 title: Text('深色'.i18n),
                 trailing: Icon(
-                  themeMode == ThemeMode.dark ? Symbols.check : null,
+                  themeMode == .dark ? Symbols.check_rounded : null,
                 ),
                 onTap: () {
                   context.read<SettingsUserInterfaceModel>().setThemeMode(
-                    ThemeMode.dark,
+                    .dark,
                   );
                   context.pop();
                 },
@@ -57,18 +65,16 @@ class SettingsThemeModePage extends StatelessWidget {
                 isLast: true,
                 leading: Icon(Symbols.devices_rounded),
                 title: Text('跟隨系統主題'.i18n),
-                subtitle: Text(switch (MediaQuery.of(
-                  context,
-                ).platformBrightness) {
-                  Brightness.light => '淺色'.i18n,
-                  Brightness.dark => '深色'.i18n,
+                subtitle: Text(switch (context.brightness) {
+                  .light => '淺色'.i18n,
+                  .dark => '深色'.i18n,
                 }),
                 trailing: Icon(
-                  themeMode == ThemeMode.system ? Symbols.check : null,
+                  themeMode == .system ? Symbols.check_rounded : null,
                 ),
                 onTap: () {
                   context.read<SettingsUserInterfaceModel>().setThemeMode(
-                    ThemeMode.system,
+                    .system,
                   );
                   context.pop();
                 },

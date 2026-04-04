@@ -1,3 +1,6 @@
+/// HTTP proxy settings page.
+library;
+
 import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -6,7 +9,12 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// A settings page for configuring an HTTP proxy server.
+///
+/// Changes are saved immediately; a restart is required for them to take
+/// effect.
 class SettingsProxyPage extends StatefulWidget {
+  /// Creates a [SettingsProxyPage].
   const SettingsProxyPage({super.key});
 
   @override
@@ -17,25 +25,6 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
   late final TextEditingController _hostController;
   late final TextEditingController _portController;
   late bool _enabled;
-
-  @override
-  void initState() {
-    super.initState();
-    _enabled = Preference.proxyEnabled ?? false;
-    _hostController = TextEditingController(
-      text: Preference.proxyHost ?? 'localhost',
-    );
-    _portController = TextEditingController(
-      text: Preference.proxyPort?.toString() ?? '9090',
-    );
-  }
-
-  @override
-  void dispose() {
-    _hostController.dispose();
-    _portController.dispose();
-    super.dispose();
-  }
 
   void _saveSettings() {
     Preference.proxyEnabled = _enabled;
@@ -53,6 +42,18 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
         ),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _enabled = Preference.proxyEnabled ?? false;
+    _hostController = TextEditingController(
+      text: Preference.proxyHost ?? 'localhost',
+    );
+    _portController = TextEditingController(
+      text: Preference.proxyPort?.toString() ?? '9090',
+    );
   }
 
   @override
@@ -117,5 +118,12 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
         if (_enabled) SectionText(child: Text('設定儲存後，需要重新啟動應用程式才能生效'.i18n)),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _hostController.dispose();
+    _portController.dispose();
+    super.dispose();
   }
 }

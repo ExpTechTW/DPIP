@@ -5,6 +5,7 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/route/event_viewer/intensity.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
+import 'package:dpip/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,14 +44,10 @@ void handleEventList(BuildContext context, History history) {
       page = ThunderstormPage(item: history);
 
     case HistoryType.earthquake:
-      context.push(
-        MapPage.route(
-          options: MapPageOptions(
-            initialLayers: {MapLayer.report},
-            reportId: (history as ReportHistory).addition.id,
-          ),
-        ),
-      );
+      MapRoute(
+        layers: MapLayer.report.name,
+        report: (history as ReportHistory).addition.id,
+      ).push(context);
 
     case HistoryType.intensity:
       page = IntensityPage(item: history as IntensityHistory);

@@ -1,3 +1,7 @@
+/// Detailed weather header widget showing temperature, conditions, and
+/// station metadata.
+library;
+
 import 'dart:math';
 
 import 'package:dpip/api/model/weather_schema.dart';
@@ -12,11 +16,19 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+/// Renders a full weather summary for the given [weather] observation,
+/// including temperature, feels-like, condition chips, and station info.
+///
+/// Call [WeatherHeader.skeleton] to show a loading placeholder while data
+/// is being fetched.
 class WeatherHeader extends StatelessWidget {
+  /// The current realtime weather observation to display.
   final RealtimeWeather weather;
 
+  /// Creates a [WeatherHeader] for the given [weather].
   const WeatherHeader(this.weather, {super.key});
 
+  /// Returns a skeleton placeholder that mirrors the layout of [WeatherHeader].
   static Widget skeleton(BuildContext context) {
     return Skeletonizer.zone(
       child: Center(
@@ -24,31 +36,43 @@ class WeatherHeader extends StatelessWidget {
           spacing: 12,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: .min,
               spacing: 4,
               children: [
                 const Bone.icon(size: 32),
-                Bone.text(words: 1, style: context.theme.textTheme.titleLarge),
+                Bone.text(
+                  words: 1,
+                  style: context.texts.titleLarge,
+                ),
               ],
             ),
-            Bone.text(width: 140, style: context.theme.textTheme.displayLarge),
+            Bone.text(
+              width: 140,
+              style: context.texts.displayLarge,
+            ),
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: .min,
               spacing: 12,
               children: [
-                Bone.text(width: 60, style: context.theme.textTheme.bodyLarge),
-                Bone.text(width: 60, style: context.theme.textTheme.bodyLarge),
+                Bone.text(
+                  width: 60,
+                  style: context.texts.bodyLarge,
+                ),
+                Bone.text(
+                  width: 60,
+                  style: context.texts.bodyLarge,
+                ),
               ],
             ),
             Wrap(
               spacing: 12,
               runSpacing: 8,
-              alignment: WrapAlignment.center,
+              alignment: .center,
               children: List.generate(
                 9,
                 (_) => Bone.text(
                   width: 50,
-                  style: context.theme.textTheme.bodySmall,
+                  style: context.texts.bodySmall,
                 ),
               ),
             ),
@@ -65,7 +89,9 @@ class WeatherHeader extends StatelessWidget {
         100 *
         6.105 *
         exp(
-          17.27 * weather.data.temperature / (weather.data.temperature + 237.3),
+          17.27 *
+              weather.data.temperature /
+              (weather.data.temperature + 237.3),
         );
     final feelsLike =
         weather.data.temperature +
@@ -75,24 +101,27 @@ class WeatherHeader extends StatelessWidget {
 
     return ResponsiveContainer(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const .symmetric(horizontal: 12),
         child: Column(
           spacing: 12,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: .min,
               spacing: 6,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const .all(8),
                   decoration: BoxDecoration(
                     color: context.colors.secondaryContainer.withValues(
                       alpha: 0.3,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: .circular(12),
                   ),
                   child: Icon(
-                    WeatherIcons.getWeatherIcon(weather.data.weatherCode, true),
+                    WeatherIcons.getWeatherIcon(
+                      weather.data.weatherCode,
+                      true,
+                    ),
                     size: 32,
                     color: context.colors.secondary,
                   ),
@@ -102,9 +131,9 @@ class WeatherHeader extends StatelessWidget {
                     context,
                     weather.data.weatherCode,
                   ),
-                  style: context.theme.textTheme.titleLarge!.copyWith(
+                  style: context.texts.titleLarge!.copyWith(
                     color: context.colors.secondary,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: .bold,
                   ),
                 ),
               ],
@@ -113,8 +142,8 @@ class WeatherHeader extends StatelessWidget {
               selector: (context, model) => model.useFahrenheit,
               builder: (context, useFahrenheit, child) {
                 final value = weather.data.temperature;
-                final displayTemp = (useFahrenheit ? value.asFahrenheit : value)
-                    .round();
+                final displayTemp =
+                    (useFahrenheit ? value.asFahrenheit : value).round();
                 final displayFeelsLike =
                     (useFahrenheit ? feelsLike.asFahrenheit : feelsLike)
                         .round();
@@ -124,29 +153,29 @@ class WeatherHeader extends StatelessWidget {
                   children: [
                     Text(
                       '$displayTemp°',
-                      style: context.theme.textTheme.displayLarge!.copyWith(
+                      style: context.texts.displayLarge!.copyWith(
                         fontSize: 64,
                         color: context.colors.onSurface,
-                        fontWeight: FontWeight.w200,
+                        fontWeight: .w200,
                         height: 1.0,
                         letterSpacing: -2,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: const .symmetric(
                         horizontal: 12,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: context.colors.surfaceContainerHighest
                             .withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: .circular(20),
                       ),
                       child: Text(
                         '體感 $displayFeelsLike°'.i18n,
-                        style: context.theme.textTheme.bodyLarge!.copyWith(
+                        style: context.texts.bodyLarge!.copyWith(
                           color: context.colors.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: .w500,
                         ),
                       ),
                     ),
@@ -157,7 +186,7 @@ class WeatherHeader extends StatelessWidget {
             Wrap(
               spacing: 10,
               runSpacing: 8,
-              alignment: WrapAlignment.center,
+              alignment: .center,
               children: [
                 _buildInfoChip(
                   context,
@@ -245,16 +274,16 @@ class WeatherHeader extends StatelessWidget {
               ],
             ),
             Container(
-              margin: const EdgeInsets.only(top: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              margin: const .only(top: 4),
+              padding: const .symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: context.colors.surfaceContainerHighest.withValues(
                   alpha: 0.4,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: .min,
                 spacing: 6,
                 children: [
                   Icon(
@@ -264,28 +293,28 @@ class WeatherHeader extends StatelessWidget {
                   ),
                   Text(
                     '${weather.station.name}氣象站'.i18n,
-                    style: context.theme.textTheme.bodySmall!.copyWith(
+                    style: context.texts.bodySmall!.copyWith(
                       color: context.colors.onSurfaceVariant,
                     ),
                   ),
                   Container(
                     width: 1,
                     height: 12,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    margin: const .symmetric(horizontal: 4),
                     color: context.colors.onSurfaceVariant.withValues(
                       alpha: 0.3,
                     ),
                   ),
                   Text(
                     '${weather.station.distance.toStringAsFixed(1)}km',
-                    style: context.theme.textTheme.bodySmall!.copyWith(
+                    style: context.texts.bodySmall!.copyWith(
                       color: context.colors.onSurfaceVariant,
                     ),
                   ),
                   Container(
                     width: 1,
                     height: 12,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    margin: const .symmetric(horizontal: 4),
                     color: context.colors.onSurfaceVariant.withValues(
                       alpha: 0.3,
                     ),
@@ -297,7 +326,7 @@ class WeatherHeader extends StatelessWidget {
                   ),
                   Text(
                     weather.time.toLocaleTimeString(context).substring(0, 5),
-                    style: context.theme.textTheme.bodySmall!.copyWith(
+                    style: context.texts.bodySmall!.copyWith(
                       color: context.colors.onSurfaceVariant,
                     ),
                   ),
@@ -318,24 +347,24 @@ class WeatherHeader extends StatelessWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const .symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: .circular(12),
         border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         spacing: 5,
         children: [
           Icon(icon, size: 14, color: color, weight: 600),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: .start,
+            mainAxisSize: .min,
             children: [
               Text(
                 label,
-                style: context.theme.textTheme.bodySmall!.copyWith(
+                style: context.texts.bodySmall!.copyWith(
                   color: context.colors.onSurfaceVariant,
                   fontSize: 9,
                   height: 1.0,
@@ -343,9 +372,9 @@ class WeatherHeader extends StatelessWidget {
               ),
               Text(
                 text,
-                style: context.theme.textTheme.bodySmall!.copyWith(
+                style: context.texts.bodySmall!.copyWith(
                   color: context.colors.onSurface,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: .w600,
                   fontSize: 11,
                   height: 1.2,
                 ),

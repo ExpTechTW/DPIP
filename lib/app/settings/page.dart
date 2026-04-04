@@ -1,3 +1,6 @@
+/// Settings index page listing all top-level settings categories.
+library;
+
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
@@ -13,7 +16,12 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
 
+/// The root settings page.
+///
+/// Displays a scrollable list of setting categories (location, UI, notifications,
+/// network, info, links, and debug). Tap any row to navigate to that section.
 class SettingsIndexPage extends StatelessWidget {
+  /// Creates a [SettingsIndexPage].
   const SettingsIndexPage({super.key});
 
   Widget _buildHeader(BuildContext context) {

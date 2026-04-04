@@ -1,3 +1,6 @@
+/// The fourth welcome step, requesting runtime permissions.
+library;
+
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -13,10 +16,14 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Guides the user through granting the permissions required by DPIP.
+///
+/// Displays a list of [PermissionItem] cards for each required permission.
+/// Tapping "next" requests notification permission and navigates to the home
+/// screen, marking the first-launch flag as complete.
 class WelcomePermissionPage extends StatefulWidget {
+  /// Creates a [WelcomePermissionPage].
   const WelcomePermissionPage({super.key});
-
-  static const route = '/welcome/permissions';
 
   @override
   State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
@@ -30,47 +37,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
-  Future<void> getNotify() async {
-    if (!_isNotificationPermission) {
-      await Permission.notification.request();
-      if (Platform.isIOS) {
-        final NotificationSettings iosrp = await FirebaseMessaging.instance
-            .requestPermission(
-              announcement: true,
-              carPlay: true,
-              criticalAlert: true,
-              provisional: true,
-            );
-        if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-          _isNotificationPermission = true;
-        }
-      }
-    }
-    if (mounted) {
-      Preference.isFirstLaunch = false;
-      HomeRoute().go(context);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _permissionsFuture = _initializePermissions();
-    // if (Platform.isAndroid) {
-    //   _autoStartStatusCheck();
-    // }
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _checkNotificationPermission();
-      setState(() {});
-    });
-  }
-
-  // Future<void> _autoStartStatusCheck() async {
-  //   _autoStartStatus = await Autostarter.checkAutoStartState() ?? true;
-  //   _autoStartPermission = Future.value(_autoStartStatus);
-  // }
-
   Future<void> _checkNotificationPermission() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.status;
@@ -78,25 +44,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
     } else if (Platform.isIOS) {
       _isNotificationPermission = await AwesomeNotifications()
           .isNotificationAllowed();
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      setState(() {
-        _permissionsFuture = _initializePermissions();
-        // if (Platform.isAndroid) {
-        //   _autoStartStatus = (await Autostarter.checkAutoStartState())!;
-        //   _autoStartPermission = Future.value(_autoStartStatus);
-        // }
-      });
     }
   }
 
@@ -208,11 +155,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
 
   Widget _buildPermissionCard(PermissionItem item) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const .symmetric(horizontal: 16, vertical: 8),
       child: Container(
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           border: item.isHighlighted
               ? Border.all(color: Colors.red, width: 2)
               : null,
@@ -234,7 +181,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
     return FutureBuilder<PermissionStatus>(
       future: item.permission.status,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == .waiting) {
           return const SizedBox(
             width: 24,
             height: 24,
@@ -268,9 +215,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
       setState(() {});
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('權限請求失敗: ${item.text}')));
+        context.scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('權限請求失敗: ${item.text}')),
+        );
       }
     } finally {
       setState(() {
@@ -394,26 +341,66 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
     return result ?? false;
   }
 
+  /// Requests notification permission and navigates to the home screen.
+  ///
+  /// On iOS, also requests critical-alert permission via Firebase Messaging.
+  /// Sets [Preference.isFirstLaunch] to `false` before navigating.
+  Future<void> getNotify() async {
+    if (!_isNotificationPermission) {
+      await Permission.notification.request();
+      if (Platform.isIOS) {
+        final NotificationSettings iosrp = await FirebaseMessaging.instance
+            .requestPermission(
+              announcement: true,
+              carPlay: true,
+              criticalAlert: true,
+              provisional: true,
+            );
+        if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+          _isNotificationPermission = true;
+        }
+      }
+    }
+    if (mounted) {
+      Preference.isFirstLaunch = false;
+      HomeRoute().go(context);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _permissionsFuture = _initializePermissions();
+    // if (Platform.isAndroid) {
+    //   _autoStartStatusCheck();
+    // }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _checkNotificationPermission();
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const .symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(onPressed: getNotify, child: Text('下一步'.i18n)),
         ),
       ),
       body: SingleChildScrollView(
         padding: context.padding,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: .stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),
+              padding: const .fromLTRB(0, 32, 0, 16),
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const .all(16),
                     child: Icon(
                       Symbols.security_rounded,
                       size: 80,
@@ -421,28 +408,28 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const .all(16),
                     child: Text(
                       '權限'.i18n,
-                      style: context.theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                      style: context.texts.headlineMedium?.copyWith(
+                        fontWeight: .bold,
                         color: context.colors.primary,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: .center,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const .all(8),
                     child: Column(
                       children: [
                         Text(
                           '我們一直和使用者站在一起，為使用者的隱私而不斷努力。'.i18n,
-                          style: context.theme.textTheme.titleMedium?.copyWith(
+                          style: context.texts.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(
                               alpha: 0.7,
                             ),
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: .center,
                         ),
                       ],
                     ),
@@ -453,7 +440,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
             FutureBuilder<List<Permission>>(
               future: _permissionsFuture,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                if (snapshot.connectionState == .waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
@@ -470,74 +457,54 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
                 );
               },
             ),
-            // if (Platform.isAndroid)
-            //   Column(children: [
-            //     Padding(
-            //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //       child: Container(
-            //         decoration: BoxDecoration(
-            //           color: context.colors.surfaceContainer,
-            //           borderRadius: BorderRadius.circular(16),
-            //           border: null,
-            //         ),
-            //         child: ListTile(
-            //           leading: CircleAvatar(
-            //             backgroundColor: Colors.orange.withValues(alpha: 0.1),
-            //             child: const Icon(Icons.start, color: Colors.orange),
-            //           ),
-            //           title: const Text('自動化啟動'),
-            //           subtitle: const Text('允許 DPIP 在裝置重新啟動或關閉後自動啟動，以持續提供防災通知服務。'),
-            //           trailing: FutureBuilder<bool>(
-            //             future: _autoStartPermission,
-            //             builder: (context, snapshot) {
-            //               if (snapshot.connectionState == ConnectionState.waiting) {
-            //                 return const SizedBox(
-            //                   width: 24,
-            //                   height: 24,
-            //                   child: CircularProgressIndicator(strokeWidth: 2),
-            //                 );
-            //               }
-            //               _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data ?? false;
-            //               return Switch(
-            //                 value: _autoStartStatus,
-            //                 onChanged: (value) async {
-            //                   setState(() {
-            //                     _autoStartStatus = value;
-            //                   });
-            //                   final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-            //                   if (isAvailable!) {
-            //                     await Autostarter.getAutoStartPermission(newTask: true);
-            //                     final newStatus = await Autostarter.checkAutoStartState();
-            //                     _autoStartStatus = newStatus!;
-            //                   }
-
-            //                   _autoStartPermission = Future.value(_autoStartStatus);
-
-            //                   setState(() {});
-            //                 },
-            //               );
-            //             },
-            //           ),
-            //         ),
-            //       ),
-            //     )
-            //   ]),
           ],
         ),
       ),
     );
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == .resumed) {
+      setState(() {
+        _permissionsFuture = _initializePermissions();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 }
 
+/// A data class describing a single permission entry in the welcome flow.
+///
+/// Used by [_WelcomePermissionPageState] to build the permission list UI.
 class PermissionItem {
+  /// The icon representing the permission category.
   final IconData icon;
+
+  /// The display name of the permission.
   final String text;
+
+  /// A user-facing explanation of why the permission is needed.
   final String description;
+
+  /// The accent color used for the permission's icon avatar.
   final Color color;
+
+  /// The underlying [Permission] object used to query and request status.
   Permission permission;
+
+  /// Whether this permission has been granted by the user.
   bool isGranted;
+
+  /// Whether this permission should be visually highlighted as important.
   bool isHighlighted;
 
+  /// Creates a [PermissionItem] with the given properties.
   PermissionItem({
     required this.icon,
     required this.text,

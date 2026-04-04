@@ -1,3 +1,6 @@
+/// Theme settings page for adjusting the app's visual appearance.
+library;
+
 import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
@@ -11,7 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// A settings page for choosing the theme mode and accent color.
+///
+/// Requires [SettingsUserInterfaceModel] in the widget tree.
 class SettingsThemePage extends StatelessWidget {
+  /// Creates a [SettingsThemePage].
   const SettingsThemePage({super.key});
 
   @override
@@ -46,7 +53,8 @@ class SettingsThemePage extends StatelessWidget {
                       title: Text('主題模式'.i18n),
                       subtitle: Text(themeMode.label.i18n),
                       trailing: const Icon(Symbols.chevron_right_rounded),
-                      onTap: () => const SettingsThemeModeRoute().push(context),
+                      onTap: () =>
+                          const SettingsThemeModeRoute().push(context),
                     );
                   },
                 ),

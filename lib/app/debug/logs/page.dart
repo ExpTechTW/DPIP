@@ -1,13 +1,19 @@
+/// The debug logs page, displaying in-app Talker log output.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
+/// Renders the full Talker log screen for in-app debugging.
+///
+/// Theming is derived from the current [BuildContext] color scheme so the
+/// screen respects light/dark mode automatically.
 class AppDebugLogsPage extends StatelessWidget {
+  /// Creates an [AppDebugLogsPage].
   const AppDebugLogsPage({super.key});
-
-  static const route = '/debug/logs';
 
   @override
   Widget build(BuildContext context) {

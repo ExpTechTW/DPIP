@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for wind direction and speed data.
+library;
+
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
@@ -20,13 +23,24 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// Intermediate data object for a single weather-station wind observation.
 class WindData {
+  /// The station's latitude in decimal degrees.
   final double latitude;
+
+  /// The station's longitude in decimal degrees.
   final double longitude;
+
+  /// Wind direction in degrees clockwise from north.
   final int direction;
+
+  /// Wind speed in metres per second.
   final double speed;
+
+  /// The station's unique identifier.
   final String id;
 
+  /// Creates a [WindData] with all required fields.
   WindData({
     required this.latitude,
     required this.longitude,
@@ -36,21 +50,33 @@ class WindData {
   });
 }
 
+/// Manages the wind direction and speed overlay layer on the DPIP map.
 class WindMapLayerManager extends MapLayerManager {
+  /// Creates a [WindMapLayerManager] bound to [context] and [controller].
   WindMapLayerManager(super.context, super.controller);
 
-  // Label layout constants for wind labels
+  /// Vertical offset of the first text label line above the station arrow.
   static const double kLabelBaseOffset = 2.0;
+
+  /// Vertical spacing between consecutive text label lines.
   static const double kLabelLineHeight = 1.1;
+
+  /// The currently displayed wind observation time string.
   final currentWindTime = ValueNotifier<String?>(
     GlobalProviders.data.wind.firstOrNull,
   );
+
+  /// Whether a time-change operation is currently in progress.
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
 
+  /// Called with the new time string whenever the displayed time changes.
   Function(String)? onTimeChanged;
 
+  /// Switches the displayed wind data to [time].
+  ///
+  /// Does nothing if [time] is already current or a load is in progress.
   Future<void> setWindTime(String time) async {
     if (currentWindTime.value == time || isLoading.value) return;
 
@@ -276,9 +302,12 @@ class WindMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => WindMapLayerSheet(manager: this);
 }
 
+/// The bottom sheet and legend overlay for the wind layer.
 class WindMapLayerSheet extends StatelessWidget {
+  /// The [WindMapLayerManager] whose state drives this sheet.
   final WindMapLayerManager manager;
 
+  /// Creates a [WindMapLayerSheet] for the given [manager].
   const WindMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -287,11 +316,11 @@ class WindMapLayerSheet extends StatelessWidget {
       children: [
         MorphingSheet(
           title: '風向/風速'.i18n,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           elevation: 4,
           partialBuilder: (context, controller, sheetController) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const .symmetric(vertical: 8),
               child: Selector<DpipDataModel, UnmodifiableListView<String>>(
                 selector: (context, model) => model.wind,
                 builder: (context, wind, child) {
@@ -305,10 +334,10 @@ class WindMapLayerSheet extends StatelessWidget {
                       .toList();
 
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: .min,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: const .symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
@@ -329,10 +358,10 @@ class WindMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentWindTime,
                           builder: (context, currentWindTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(
+                              padding: const .symmetric(
                                 horizontal: 16,
                               ),
-                              scrollDirection: Axis.horizontal,
+                              scrollDirection: .horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
@@ -377,7 +406,7 @@ class WindMapLayerSheet extends StatelessWidget {
 
                                 children.add(
                                   const Padding(
-                                    padding: EdgeInsets.only(right: 8),
+                                    padding: .only(right: 8),
                                     child: VerticalDivider(
                                       width: 16,
                                       indent: 8,
@@ -387,7 +416,7 @@ class WindMapLayerSheet extends StatelessWidget {
                                 );
 
                                 return Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize: .min,
                                   spacing: 8,
                                   children: children,
                                 );

@@ -1,3 +1,7 @@
+/// Locale selection page showing all supported languages with translation
+/// progress.
+library;
+
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -17,7 +21,13 @@ import 'package:m3e_collection/m3e_collection.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:option_result/result.dart';
 
+/// A page for selecting the app display language from the list of supported
+/// locales.
+///
+/// Each locale row shows its Crowdin translation and approval percentage.
+/// Pull to refresh reloads the progress data.
 class SettingsLocaleSelectPage extends StatefulWidget {
+  /// Creates a [SettingsLocaleSelectPage].
   const SettingsLocaleSelectPage({super.key});
 
   @override
@@ -157,7 +167,10 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage>
       onRefresh: _refresh,
       backgroundColor: context.colors.primaryContainer,
       child: ListView(
-        padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+        padding: .only(
+          top: 8,
+          bottom: 16 + context.padding.bottom,
+        ),
         children: [
           SegmentedList(
             label: Text('選擇語言'.i18n),

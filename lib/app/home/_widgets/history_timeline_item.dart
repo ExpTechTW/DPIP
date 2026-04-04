@@ -1,3 +1,6 @@
+/// Timeline item widget for a single history event entry.
+library;
+
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/list_icon.dart';
@@ -6,12 +9,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// Renders a single [History] event as a card within the home timeline.
+///
+/// Tapping the card opens the detail view when the event supports it.
+/// Expired events are rendered with reduced opacity to indicate they have
+/// ended.
 class HistoryTimelineItem extends StatelessWidget {
+  /// The history event to display.
   final History history;
+
+  /// Whether this is the first item in the timeline group.
   final bool first;
+
+  /// Whether this is the last item in the timeline group.
   final bool last;
+
+  /// Whether the event has already expired.
   final bool expired;
 
+  /// Creates a [HistoryTimelineItem] for the given [history] event.
   const HistoryTimelineItem({
     super.key,
     required this.history,
@@ -25,9 +41,9 @@ class HistoryTimelineItem extends StatelessWidget {
     final hasDetail = shouldShowArrow(history);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      margin: const .fromLTRB(16, 4, 16, 4),
       child: Stack(
-        clipBehavior: Clip.none,
+        clipBehavior: .none,
         children: [
           Positioned(
             left: 20.5,
@@ -42,7 +58,7 @@ class HistoryTimelineItem extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: context.colors.surfaceContainer,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: .circular(12),
             ),
             child: Material(
               color: Colors.transparent,
@@ -50,17 +66,17 @@ class HistoryTimelineItem extends StatelessWidget {
                 onTap: hasDetail
                     ? () => handleEventList(context, history)
                     : null,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: .circular(12),
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const .all(12),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       Container(
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                          shape: .circle,
                           color: expired
                               ? context.colors.surfaceContainerHighest
                               : context.colors.primaryContainer,
@@ -76,50 +92,49 @@ class HistoryTimelineItem extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: .start,
                           children: [
                             Text(
-                              DateFormat('HH:mm:ss').format(history.time.send),
-                              style: context.theme.textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: context.colors.onSurfaceVariant
-                                        .withValues(
-                                          alpha: expired ? 0.6 : 1,
-                                        ),
-                                  ),
+                              DateFormat('HH:mm:ss').format(
+                                history.time.send,
+                              ),
+                              style: context.texts.labelSmall?.copyWith(
+                                color: context.colors.onSurfaceVariant
+                                    .withValues(
+                                      alpha: expired ? 0.6 : 1,
+                                    ),
+                              ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               history.text.content['all']!.subtitle,
-                              style: context.theme.textTheme.titleSmall
-                                  ?.copyWith(
-                                    color: context.colors.onSurface.withValues(
-                                      alpha: expired ? 0.6 : 1,
-                                    ),
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: context.texts.titleSmall?.copyWith(
+                                color: context.colors.onSurface.withValues(
+                                  alpha: expired ? 0.6 : 1,
+                                ),
+                                fontWeight: .w600,
+                              ),
                               maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              overflow: .ellipsis,
                             ),
                             const SizedBox(height: 2),
                             Text(
                               history.text.description['all']!,
-                              style: context.theme.textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: context.colors.onSurfaceVariant
-                                        .withValues(
-                                          alpha: expired ? 0.6 : 1,
-                                        ),
-                                  ),
+                              style: context.texts.bodySmall?.copyWith(
+                                color: context.colors.onSurfaceVariant
+                                    .withValues(
+                                      alpha: expired ? 0.6 : 1,
+                                    ),
+                              ),
                               maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              overflow: .ellipsis,
                             ),
                           ],
                         ),
                       ),
                       if (hasDetail)
                         Padding(
-                          padding: const EdgeInsets.only(left: 8),
+                          padding: const .only(left: 8),
                           child: Icon(
                             Symbols.chevron_right_rounded,
                             size: 20,

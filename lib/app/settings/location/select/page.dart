@@ -1,3 +1,6 @@
+/// Location selection page listing all available cities.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
@@ -5,10 +8,15 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:dpip/router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// A page that lists all cities for location selection.
+///
+/// Tap a city to navigate to the district selection page for that city.
+/// The currently active location city is highlighted with a subtitle.
 class SettingsLocationSelectPage extends StatelessWidget {
+  /// Creates a [SettingsLocationSelectPage].
   const SettingsLocationSelectPage({super.key});
 
   @override
@@ -44,9 +52,9 @@ class SettingsLocationSelectPage extends StatelessWidget {
                     ? Text('目前所在地'.i18n)
                     : null,
                 trailing: const Icon(Symbols.chevron_right_rounded),
-                onTap: () => context.push(
-                  '/settings/location/select/${location.cityWithLevel}',
-                ),
+                onTap: () => SettingsLocationSelectCityRoute(
+                  city: location.cityWithLevel,
+                ).push(context),
               ),
           ],
         ),

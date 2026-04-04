@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for temperature data.
+library;
+
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
@@ -24,15 +27,30 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// Intermediate data object for a single weather-station temperature reading.
 class TemperatureData {
+  /// The station's latitude in decimal degrees.
   final double latitude;
+
+  /// The station's longitude in decimal degrees.
   final double longitude;
+
+  /// The measured air temperature in degrees Celsius.
   final double temperature;
+
+  /// The human-readable name of the weather station.
   final String stationName;
+
+  /// The county in which the station is located.
   final String county;
+
+  /// The town in which the station is located.
   final String town;
+
+  /// The station's unique identifier.
   final String id;
 
+  /// Creates a [TemperatureData] with all required fields.
   TemperatureData({
     required this.latitude,
     required this.longitude,
@@ -44,21 +62,34 @@ class TemperatureData {
   });
 }
 
+/// Manages the temperature overlay layer on the DPIP map.
 class TemperatureMapLayerManager extends MapLayerManager {
+  /// Creates a [TemperatureMapLayerManager] bound to [context] and
+  /// [controller].
   TemperatureMapLayerManager(super.context, super.controller);
 
-  // Label layout constants for temperature labels
+  /// Vertical offset of the first text label line above the station circle.
   static const double kLabelBaseOffset = 1.0;
+
+  /// Vertical spacing between consecutive text label lines.
   static const double kLabelLineHeight = 1.1;
+
+  /// The currently displayed temperature observation time string.
   final currentTemperatureTime = ValueNotifier<String?>(
     GlobalProviders.data.temperature.firstOrNull,
   );
+
+  /// Whether a time-change operation is currently in progress.
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
 
+  /// Called with the new time string whenever the displayed time changes.
   Function(String)? onTimeChanged;
 
+  /// Switches the displayed temperature data to [time].
+  ///
+  /// Does nothing if [time] is already current or a load is in progress.
   Future<void> setTemperatureTime(String time) async {
     if (currentTemperatureTime.value == time || isLoading.value) return;
 
@@ -333,9 +364,12 @@ class TemperatureMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => TemperatureMapLayerSheet(manager: this);
 }
 
+/// The bottom sheet and legend overlay for the temperature layer.
 class TemperatureMapLayerSheet extends StatelessWidget {
+  /// The [TemperatureMapLayerManager] whose state drives this sheet.
   final TemperatureMapLayerManager manager;
 
+  /// Creates a [TemperatureMapLayerSheet] for the given [manager].
   const TemperatureMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -344,11 +378,11 @@ class TemperatureMapLayerSheet extends StatelessWidget {
       children: [
         MorphingSheet(
           title: '氣溫'.i18n,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           elevation: 4,
           partialBuilder: (context, controller, sheetController) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const .symmetric(vertical: 8),
               child: Selector<DpipDataModel, UnmodifiableListView<String>>(
                 selector: (context, model) => model.temperature,
                 builder: (context, temperature, header) {
@@ -362,7 +396,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                       .toList();
 
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: .min,
                     children: [
                       header!,
                       SizedBox(
@@ -371,10 +405,10 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentTemperatureTime,
                           builder: (context, currentTemperatureTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(
+                              padding: const .symmetric(
                                 horizontal: 16,
                               ),
-                              scrollDirection: Axis.horizontal,
+                              scrollDirection: .horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
@@ -419,7 +453,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
 
                                 children.add(
                                   const Padding(
-                                    padding: EdgeInsets.only(right: 8),
+                                    padding: .only(right: 8),
                                     child: VerticalDivider(
                                       width: 16,
                                       indent: 8,
@@ -429,7 +463,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                                 );
 
                                 return Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize: .min,
                                   spacing: 8,
                                   children: children,
                                 );
@@ -442,7 +476,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: const .symmetric(
                     horizontal: 16,
                     vertical: 8,
                   ),

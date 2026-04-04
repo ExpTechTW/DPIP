@@ -1,3 +1,6 @@
+/// Announcement notification settings page.
+library;
+
 import 'package:dpip/app/settings/notify/_widgets/basic_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/core/i18n.dart';
@@ -6,7 +9,10 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A page for configuring announcement notification settings and testing the
+/// announcement sound.
 class SettingsNotifyAnnouncementPage extends StatelessWidget {
+  /// Creates a [SettingsNotifyAnnouncementPage].
   const SettingsNotifyAnnouncementPage({super.key});
 
   @override

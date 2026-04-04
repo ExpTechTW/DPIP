@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for radar echo data.
+library;
+
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -22,27 +25,48 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// Manages the radar-echo overlay layer and its auto-play functionality.
 class RadarMapLayerManager extends MapLayerManager {
+  /// Creates a [RadarMapLayerManager].
+  ///
+  /// [getActiveLayerCount] is queried to determine whether this manager is in
+  /// multi-layer mode, which disables auto-play.
   RadarMapLayerManager(
     super.context,
     super.controller, {
     this.getActiveLayerCount,
   });
 
+  /// The currently displayed radar observation time string.
   final currentRadarTime = ValueNotifier<String?>(
     GlobalProviders.data.radar.firstOrNull,
   );
+
+  /// Whether a time-change operation is currently in progress.
   final isLoading = ValueNotifier<bool>(false);
+
+  /// Whether the auto-play animation is currently running.
   final isPlaying = ValueNotifier<bool>(false);
+
+  /// The start time of the auto-play range, or `null` when not set.
   final playStartTime = ValueNotifier<String?>(null);
+
+  /// The end time of the auto-play range, or `null` when not set.
   final playEndTime = ValueNotifier<String?>(null);
 
   DateTime? _lastFetchTime;
 
   Timer? _playTimer;
   final Set<String> _preloadedLayers = {};
+
+  /// Returns the number of currently active map layers.
+  ///
+  /// Used to detect multi-layer mode and suppress auto-play.
   final int Function()? getActiveLayerCount;
 
+  /// Moves the displayed radar frame to [time], stopping auto-play if active.
+  ///
+  /// Also adjusts [playStartTime] if necessary and preloads adjacent frames.
   Future<void> updateRadarTime(String time) async {
     if (isPlaying.value) {
       stopAutoPlay();
@@ -84,6 +108,10 @@ class RadarMapLayerManager extends MapLayerManager {
     await _preloadAdjacentLayers(time);
   }
 
+  /// Sets [playStartTime] to [time] and adjusts [currentRadarTime] if needed.
+  ///
+  /// The current time is moved to the left of the new start time to keep the
+  /// playback range valid.
   void setPlayStartTime(String time) {
     if (time == currentRadarTime.value) {
       TalkerManager.instance.info('Cannot set current time as play start time');
@@ -126,6 +154,10 @@ class RadarMapLayerManager extends MapLayerManager {
     TalkerManager.instance.info('Set play start time to: $time');
   }
 
+  /// Whether the auto-play start conditions are satisfied.
+  ///
+  /// Returns `true` when no start time is set (play from the list end), or
+  /// when the start time is to the right of the current time.
   bool get canPlay {
     if (playStartTime.value == null) return true;
 
@@ -138,6 +170,9 @@ class RadarMapLayerManager extends MapLayerManager {
     return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
   }
 
+  /// Whether more than one map layer is currently active.
+  ///
+  /// Auto-play is stopped automatically when this returns `true`.
   bool get isMultiLayerMode {
     final count = getActiveLayerCount?.call() ?? 1;
     final isMulti = count > 1;
@@ -251,6 +286,7 @@ class RadarMapLayerManager extends MapLayerManager {
     }
   }
 
+  /// Starts auto-play if stopped, or stops it if currently running.
   void toggleAutoPlay() {
     if (isPlaying.value) {
       stopAutoPlay();
@@ -259,6 +295,8 @@ class RadarMapLayerManager extends MapLayerManager {
     }
   }
 
+  /// Begins animating through radar frames from [playStartTime] to
+  /// [playEndTime], looping continuously.
   void startAutoPlay() {
     if (isPlaying.value) return;
 
@@ -300,6 +338,7 @@ class RadarMapLayerManager extends MapLayerManager {
     );
   }
 
+  /// Stops the auto-play animation and clears the play range.
   void stopAutoPlay() {
     if (!isPlaying.value) return;
 
@@ -512,7 +551,7 @@ class _LegendItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       spacing: 4,
       children: [
         Container(
@@ -520,7 +559,7 @@ class _LegendItem extends StatelessWidget {
           height: 14,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: .circular(4),
             border: Border.all(color: borderColor),
           ),
         ),
@@ -536,9 +575,12 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
+/// The bottom sheet and legend overlay for the radar echo layer.
 class RadarMapLayerSheet extends StatelessWidget {
+  /// The [RadarMapLayerManager] whose state drives this sheet.
   final RadarMapLayerManager manager;
 
+  /// Creates a [RadarMapLayerSheet] for the given [manager].
   const RadarMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -547,11 +589,11 @@ class RadarMapLayerSheet extends StatelessWidget {
       children: [
         MorphingSheet(
           title: '雷達回波'.i18n,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           elevation: 4,
           partialBuilder: (context, controller, sheetController) {
             return Padding(
-              padding: const EdgeInsets.only(top: 4, bottom: 8),
+              padding: const .only(top: 4, bottom: 8),
               child: Selector<DpipDataModel, UnmodifiableListView<String>>(
                 selector: (context, model) => model.radar,
                 builder: (context, radar, child) {
@@ -565,15 +607,15 @@ class RadarMapLayerSheet extends StatelessWidget {
                       .toList();
 
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 4),
+                        padding: const .only(left: 16, right: 4),
                         child: SizedBox(
                           height: 48,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: .spaceBetween,
                             children: [
                               Row(
                                 spacing: 8,
@@ -616,7 +658,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                             : timeData[0];
 
                                         return Container(
-                                          padding: const EdgeInsets.symmetric(
+                                          padding: const .symmetric(
                                             horizontal: 8,
                                             vertical: 5,
                                           ),
@@ -625,7 +667,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                                 .colors
                                                 .surfaceContainer
                                                 .withValues(alpha: 0.6),
-                                            borderRadius: BorderRadius.circular(
+                                            borderRadius: .circular(
                                               8,
                                             ),
                                             border: Border.all(
@@ -633,7 +675,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                             ),
                                           ),
                                           child: Row(
-                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisSize: .min,
                                             spacing: 4,
                                             children: [
                                               Icon(
@@ -739,7 +781,7 @@ class RadarMapLayerSheet extends StatelessWidget {
 
                           if (startTime == null && !isPlaying) {
                             return Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                              padding: const .fromLTRB(16, 4, 16, 8),
                               child: Text(
                                 '長按設定播放起點'.i18n,
                                 style: context.texts.bodySmall?.copyWith(
@@ -750,7 +792,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                           }
 
                           return Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                            padding: const .fromLTRB(16, 4, 16, 8),
                             child: Column(
                               children: [
                                 Row(
@@ -779,7 +821,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                           if (isPlaying) {
                             return Container(
                               height: 32,
-                              padding: const EdgeInsets.symmetric(
+                              padding: const .symmetric(
                                 horizontal: 16,
                                 vertical: 4,
                               ),
@@ -970,8 +1012,8 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
   Widget build(BuildContext context) {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      scrollDirection: Axis.horizontal,
+      padding: const .symmetric(horizontal: 16),
+      scrollDirection: .horizontal,
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: widget.grouped.length,
       itemBuilder: (context, index) {
@@ -1036,13 +1078,13 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
 
         children.add(
           const Padding(
-            padding: EdgeInsets.only(right: 8),
+            padding: .only(right: 8),
             child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
           ),
         );
 
         return Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           spacing: 8,
           children: children,
         );

@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for earthquake report data.
+library;
+
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
@@ -35,29 +38,49 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Manages the earthquake report overlay layer on the DPIP map.
 class ReportMapLayerManager extends MapLayerManager {
+  /// The report ID to select immediately when the layer is first shown.
   String? initialReportId;
 
+  /// Creates a [ReportMapLayerManager], optionally with an [initialReportId].
   ReportMapLayerManager(
     super.context,
     super.controller, {
     this.initialReportId,
   });
 
+  /// The currently selected partial report, or `null` when viewing the list.
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
+
+  /// Whether a report load operation is currently in progress.
   final isLoading = ValueNotifier<bool>(false);
+
+  /// Incremented each time the report list is updated; drives UI rebuilds.
   final dataNotifier = ValueNotifier<int>(0);
+
+  /// Whether the sheet should expand when the user returns from a detail view.
   final shouldExpandOnReturn = ValueNotifier<bool>(false);
+
+  /// The scroll offset saved before navigating to a report detail view.
   double savedScrollOffset = 0.0;
   String? _lastPartialContentKey;
   bool _shouldResetScroll = false;
 
   DateTime? _lastFetchTime;
   int _currentPage = 1;
+
+  /// Whether more pages of report data are available to load.
   final hasMore = ValueNotifier<bool>(true);
+
+  /// Whether a pagination load is currently in progress.
   final isLoadingMore = ValueNotifier<bool>(false);
   static const int _pageSize = 50;
 
+  /// Selects the report with [reportId], or clears the selection if `null`.
+  ///
+  /// Optionally animates the camera to the report bounds when [focus] is
+  /// `true`.
   Future<void> setReport(String? reportId, {bool focus = true}) async {
     if (isLoading.value) return;
 
@@ -174,6 +197,8 @@ class ReportMapLayerManager extends MapLayerManager {
     }
   }
 
+  /// Loads the next page of reports if not already loading and more are
+  /// available.
   Future<void> loadMore() async {
     if (!isLoadingMore.value && hasMore.value) {
       await _fetchData();
@@ -444,18 +469,25 @@ class ReportMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => ReportMapLayerSheet(manager: this);
 }
 
+/// The bottom sheet that lists earthquake reports and shows report details.
 class ReportMapLayerSheet extends StatefulWidget {
+  /// The [ReportMapLayerManager] whose state drives this sheet.
   final ReportMapLayerManager manager;
 
+  /// Creates a [ReportMapLayerSheet] for the given [manager].
   const ReportMapLayerSheet({super.key, required this.manager});
 
   @override
   State<ReportMapLayerSheet> createState() => _ReportMapLayerSheetState();
 }
 
+/// A widget that renders [builder] and hides itself when [builder] reports an
+/// error via the provided [VoidCallback].
 class SafeImageSection extends StatefulWidget {
+  /// Builds the child widget; call the supplied callback to signal an error.
   final Widget Function(VoidCallback onError) builder;
 
+  /// Creates a [SafeImageSection] with the given [builder].
   const SafeImageSection({
     super.key,
     required this.builder,
@@ -1024,7 +1056,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             ActionChip(
                               avatar: Icon(
-                                Symbols.open_in_new,
+                                Symbols.open_in_new_rounded,
                                 color: context.colors.onPrimary,
                               ),
                               label: Text('報告頁面'.i18n),
@@ -1038,7 +1070,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               },
                             ),
                             ActionChip(
-                              avatar: const Icon(Symbols.replay),
+                              avatar: const Icon(Symbols.replay_rounded),
                               label: Text('重播'.i18n),
                               onPressed: () {
                                 Navigator.push(

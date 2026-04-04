@@ -1,3 +1,6 @@
+/// EEW notification type selection section widget.
+library;
+
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
@@ -5,10 +8,26 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// A list section for selecting the [EewNotifyType].
+///
+/// Shows each available EEW threshold as a selectable tile with a loading
+/// indicator while the change is being saved. Pass the current [value] and an
+/// [onChanged] callback:
+///
+/// ```dart
+/// EewNotifySection(
+///   value: EewNotifyType.all,
+///   onChanged: (v) => model.setEew(v),
+/// )
+/// ```
 class EewNotifySection extends StatefulWidget {
+  /// The currently active EEW notification type.
   final EewNotifyType value;
+
+  /// Called with the new type when the user selects a different option.
   final Future Function(EewNotifyType value) onChanged;
 
+  /// Creates an [EewNotifySection].
   const EewNotifySection({
     super.key,
     required this.value,

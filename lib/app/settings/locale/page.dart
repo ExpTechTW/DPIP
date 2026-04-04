@@ -1,3 +1,6 @@
+/// Locale settings page for adjusting the app display language.
+library;
+
 import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
@@ -11,7 +14,12 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// A settings page for selecting the app display language.
+///
+/// Shows the current locale and a link to open the locale selection page.
+/// Requires [SettingsUserInterfaceModel] in the widget tree.
 class SettingsLocalePage extends StatelessWidget {
+  /// Creates a [SettingsLocalePage].
   const SettingsLocalePage({super.key});
 
   @override
@@ -19,7 +27,7 @@ class SettingsLocalePage extends StatelessWidget {
     return Consumer<SettingsUserInterfaceModel>(
       builder: (context, model, child) {
         return ListView(
-          padding: EdgeInsets.only(
+          padding: .only(
             top: 16,
             bottom: 16 + context.padding.bottom,
           ),
@@ -53,7 +61,8 @@ class SettingsLocalePage extends StatelessWidget {
                   subtitle: Text('點擊這裡來幫助我們改進 DPIP 的翻譯'.i18n),
                   trailing: Icon(Symbols.arrow_outward_rounded),
                   onTap: () => 'https://crowdin.com/project/dpip'.launch(),
-                  onLongPress: () => 'https://crowdin.com/project/dpip'.copy(),
+                  onLongPress: () =>
+                      'https://crowdin.com/project/dpip'.copy(),
                 ),
               ],
             ),

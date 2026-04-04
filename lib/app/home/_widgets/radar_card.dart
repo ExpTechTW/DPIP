@@ -1,9 +1,11 @@
+/// Radar map card that shows the latest precipitation radar imagery.
+library;
+
 import 'dart:async';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/core/compass.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/router.dart';
@@ -15,11 +17,13 @@ import 'package:dpip/widgets/layout.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_compass/flutter_compass.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// An interactive card that embeds a read-only MapLibre radar overlay and
+/// navigates to the full radar map when tapped.
 class RadarMapCard extends StatefulWidget {
+  /// Creates a [RadarMapCard].
   const RadarMapCard({super.key});
 
   @override
@@ -29,11 +33,9 @@ class RadarMapCard extends StatefulWidget {
 class _RadarMapCardState extends State<RadarMapCard>
     with WidgetsBindingObserver, RouteAware {
   MapLibreMapController? _mapController;
-  late Future<List<String>> radarListFuture;
 
-  StreamSubscription<CompassEvent>? _compassSubscription;
-  double _deviceHeading = 0.0;
-  bool _mapReady = false;
+  /// Future that resolves to the list of available radar timestamps.
+  late Future<List<String>> radarListFuture;
 
   Future<void> _setupMapLayers() async {
     final controller = _mapController;
@@ -75,7 +77,6 @@ class _RadarMapCardState extends State<RadarMapCard>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     radarListFuture = ExpTech().getRadarList();
-    _initCompass();
   }
 
   @override
@@ -88,82 +89,12 @@ class _RadarMapCardState extends State<RadarMapCard>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _initCompass();
-      _updateMapBearing();
-    } else if (state == AppLifecycleState.paused) {
-      _compassSubscription?.cancel();
-      _compassSubscription = null;
-    }
-  }
-
-  @override
-  void didPopNext() {
-    _initCompass();
-    _updateMapBearing();
-  }
-
-  @override
-  void didPush() {
-    if (_compassSubscription == null) {
-      _initCompass();
-    }
-  }
-
-  @override
-  void didPushNext() {
-    _compassSubscription?.cancel();
-    _compassSubscription = null;
-  }
-
-  void _initCompass() {
-    if (_compassSubscription != null) return;
-
-    final compass = CompassService.instance;
-    if (!compass.hasCompass) return;
-
-    _deviceHeading = compass.lastHeading;
-
-    _compassSubscription = compass.events?.listen((event) {
-      if (event.heading != null && mounted) {
-        final newHeading = event.heading!;
-        if ((newHeading - _deviceHeading).abs() > 1) {
-          setState(() {
-            _deviceHeading = newHeading;
-          });
-          _updateMapBearing();
-        }
-      }
-    });
-  }
-
-  Future<void> _updateMapBearing() async {
-    if (!_mapReady || _mapController == null) return;
-    try {
-      await _mapController!.animateCamera(
-        CameraUpdate.bearingTo(_deviceHeading),
-        duration: const Duration(milliseconds: 150),
-      );
-    } catch (_) {}
-  }
-
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    WidgetsBinding.instance.removeObserver(this);
-    _compassSubscription?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final userLocation = GlobalProviders.location.coordinates;
     final targetLocation = userLocation ?? DpipMap.kTaiwanCenter;
     final targetZoom = userLocation != null
         ? DpipMap.kUserLocationZoom
         : DpipMap.kTaiwanZoom;
-    final bearing = CompassService.instance.lastHeading;
 
     return ResponsiveContainer(
       maxWidth: 720,
@@ -174,10 +105,10 @@ class _RadarMapCardState extends State<RadarMapCard>
               decoration: BoxDecoration(
                 color: context.colors.surfaceContainer,
                 border: Border.all(color: context.colors.outlineVariant),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
                 child: Layout.col.min(
                   children: [
                     SizedBox(
@@ -186,15 +117,10 @@ class _RadarMapCardState extends State<RadarMapCard>
                         initialCameraPosition: CameraPosition(
                           target: targetLocation,
                           zoom: targetZoom,
-                          bearing: bearing,
                         ),
                         onMapCreated: (controller) =>
                             _mapController = controller,
-                        onStyleLoadedCallback: () {
-                          _mapReady = true;
-                          _setupMapLayers();
-                          _deviceHeading = CompassService.instance.lastHeading;
-                        },
+                        onStyleLoadedCallback: () => _setupMapLayers(),
                         dragEnabled: false,
                         rotateGesturesEnabled: false,
                         zoomGesturesEnabled: false,
@@ -202,7 +128,7 @@ class _RadarMapCardState extends State<RadarMapCard>
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
+                      padding: const .symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
@@ -210,7 +136,7 @@ class _RadarMapCardState extends State<RadarMapCard>
                         children: [
                           Layout.row[8](
                             children: [
-                              const Icon(Symbols.radar, size: 24),
+                              const Icon(Symbols.radar_rounded, size: 24),
                               Text(
                                 '雷達回波'.i18n,
                                 style: context.texts.titleMedium,
@@ -230,7 +156,7 @@ class _RadarMapCardState extends State<RadarMapCard>
                                       );
 
                                   return Container(
-                                    padding: const EdgeInsets.symmetric(
+                                    padding: const .symmetric(
                                       horizontal: 8,
                                       vertical: 4,
                                     ),
@@ -239,13 +165,14 @@ class _RadarMapCardState extends State<RadarMapCard>
                                       border: Border.all(
                                         color: context.colors.outlineVariant,
                                       ),
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: .circular(16),
                                     ),
                                     child: Layout.row[4](
                                       children: [
                                         Icon(
                                           Symbols.schedule_rounded,
-                                          size: (style?.fontSize ?? 12) * 1.25,
+                                          size:
+                                              (style?.fontSize ?? 12) * 1.25,
                                           color:
                                               context.colors.onSurfaceVariant,
                                         ),
@@ -260,7 +187,10 @@ class _RadarMapCardState extends State<RadarMapCard>
                               ),
                             ],
                           ),
-                          const Icon(Symbols.chevron_right_rounded, size: 24),
+                          const Icon(
+                            Symbols.chevron_right_rounded,
+                            size: 24,
+                          ),
                         ],
                       ),
                     ),
@@ -274,12 +204,19 @@ class _RadarMapCardState extends State<RadarMapCard>
               type: MaterialType.transparency,
               child: InkWell(
                 onTap: () => MapRoute(layers: 'radar').push(context),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }

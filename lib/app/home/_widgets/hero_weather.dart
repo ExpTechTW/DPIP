@@ -1,3 +1,6 @@
+/// Full-screen hero weather section displayed at the top of the home page.
+library;
+
 import 'dart:math';
 
 import 'package:dpip/api/model/weather_schema.dart';
@@ -7,10 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// Displays the current temperature and weather condition as a large hero
+/// widget.
+///
+/// Shows a loading skeleton while [isLoading] is `true`, an empty state when
+/// [weather] is `null`, or the full weather content otherwise.
 class HeroWeather extends StatelessWidget {
+  /// The current weather data, or `null` when unavailable.
   final RealtimeWeather? weather;
+
+  /// When `true`, shows a loading placeholder instead of weather data.
   final bool isLoading;
 
+  /// Creates a [HeroWeather] widget.
   const HeroWeather({
     super.key,
     this.weather,
@@ -43,14 +55,14 @@ class HeroWeather extends StatelessWidget {
 
   Widget _buildLoadingState(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         Container(
           width: 100,
           height: 72,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: .circular(8),
           ),
         ),
         const SizedBox(height: 8),
@@ -59,7 +71,7 @@ class HeroWeather extends StatelessWidget {
           height: 24,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: .circular(4),
           ),
         ),
         const SizedBox(height: 4),
@@ -68,7 +80,7 @@ class HeroWeather extends StatelessWidget {
           height: 16,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: .circular(4),
           ),
         ),
       ],
@@ -82,16 +94,17 @@ class HeroWeather extends StatelessWidget {
         100 *
         6.105 *
         exp(17.27 * data.temperature / (data.temperature + 237.3));
-    final feelsLike = data.temperature + 0.33 * e - 0.7 * data.wind.speed - 4.0;
+    final feelsLike =
+        data.temperature + 0.33 * e - 0.7 * data.wind.speed - 4.0;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         Text(
           '${data.temperature.round()}°',
           style: context.texts.displayLarge?.copyWith(
             fontSize: 72,
-            fontWeight: FontWeight.w300,
+            fontWeight: .w300,
             color: Colors.white,
             height: 1,
             letterSpacing: -2,
@@ -106,7 +119,7 @@ class HeroWeather extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           children: [
             Icon(
               _getWeatherIcon(data.weatherCode),
@@ -125,7 +138,7 @@ class HeroWeather extends StatelessWidget {
               data.weather,
               style: context.texts.titleMedium?.copyWith(
                 color: Colors.white.withValues(alpha: 1),
-                fontWeight: FontWeight.w400,
+                fontWeight: .w400,
                 shadows: [
                   Shadow(
                     color: Colors.black.withValues(alpha: 0.3),
@@ -159,13 +172,13 @@ class HeroWeather extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         Text(
           '--°',
           style: context.texts.displayLarge?.copyWith(
             fontSize: 72,
-            fontWeight: FontWeight.w300,
+            fontWeight: .w300,
             color: Colors.white.withValues(alpha: 0.5),
             height: 1,
             letterSpacing: -2,
@@ -173,7 +186,7 @@ class HeroWeather extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           children: [
             Icon(
               Symbols.cloud_off_rounded,
@@ -193,6 +206,7 @@ class HeroWeather extends StatelessWidget {
     );
   }
 
+  /// Returns the appropriate [IconData] for the given CWA weather [code].
   IconData _getWeatherIcon(int code) {
     if (code >= 1 && code <= 3) return Symbols.clear_day_rounded;
     if (code >= 4 && code <= 7) return Symbols.partly_cloudy_day_rounded;

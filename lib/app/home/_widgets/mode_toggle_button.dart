@@ -1,3 +1,6 @@
+/// Mode toggle button and [HomeMode] enum for the home screen history filter.
+library;
+
 import 'dart:ui';
 
 import 'package:dpip/core/i18n.dart';
@@ -5,46 +8,70 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-enum HomeMode { nationalActive, nationalHistory, localActive, localHistory }
+/// Describes the four history display modes available on the home screen.
+enum HomeMode {
+  /// Nationwide view showing currently active events.
+  nationalActive,
 
+  /// Nationwide view showing historical events.
+  nationalHistory,
+
+  /// Local view showing currently active events near the user's location.
+  localActive,
+
+  /// Local view showing historical events near the user's location.
+  localHistory,
+}
+
+/// Convenience accessors for [HomeMode] display properties.
 extension HomeModeExtension on HomeMode {
+  /// The localised label shown in the UI for this mode.
   String get label {
     switch (this) {
-      case HomeMode.nationalActive:
+      case .nationalActive:
         return '全國 · 生效中'.i18n;
-      case HomeMode.nationalHistory:
+      case .nationalHistory:
         return '全國 · 歷史'.i18n;
-      case HomeMode.localActive:
+      case .localActive:
         return '所在地 · 生效中'.i18n;
-      case HomeMode.localHistory:
+      case .localHistory:
         return '所在地 · 歷史'.i18n;
     }
   }
 
+  /// The icon that represents this mode.
   IconData get icon {
     switch (this) {
-      case HomeMode.nationalActive:
-      case HomeMode.nationalHistory:
+      case .nationalActive:
+      case .nationalHistory:
         return Symbols.public_rounded;
-      case HomeMode.localActive:
-      case HomeMode.localHistory:
+      case .localActive:
+      case .localHistory:
         return Symbols.location_on_rounded;
     }
   }
 
+  /// Whether this mode shows nationwide data rather than local data.
   bool get isNational {
-    return this == HomeMode.nationalActive || this == HomeMode.nationalHistory;
+    return this == .nationalActive || this == .nationalHistory;
   }
 
+  /// Whether this mode shows currently active events rather than history.
   bool get isActive {
-    return this == HomeMode.nationalActive || this == HomeMode.localActive;
+    return this == .nationalActive || this == .localActive;
   }
 }
 
+/// A blurred glass-effect button that opens a popup menu to switch
+/// [HomeMode].
 class ModeToggleButton extends StatelessWidget {
+  /// The mode currently displayed by the button.
   final HomeMode currentMode;
+
+  /// Called with the newly selected [HomeMode] when the user makes a choice.
   final ValueChanged<HomeMode> onModeChanged;
 
+  /// Creates a [ModeToggleButton].
   const ModeToggleButton({
     super.key,
     required this.currentMode,
@@ -75,7 +102,7 @@ class ModeToggleButton extends StatelessWidget {
     showMenu<HomeMode>(
       context: context,
       position: position,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: .circular(16)),
       elevation: 8,
       items: HomeMode.values.map((mode) {
         return PopupMenuItem<HomeMode>(
@@ -92,13 +119,13 @@ class ModeToggleButton extends StatelessWidget {
               ),
               Text(
                 mode.label,
-                style: context.theme.textTheme.bodyMedium?.copyWith(
+                style: context.texts.bodyMedium?.copyWith(
                   color: currentMode == mode
                       ? context.colors.primary
                       : context.colors.onSurface,
                   fontWeight: currentMode == mode
-                      ? FontWeight.bold
-                      : FontWeight.normal,
+                      ? .bold
+                      : .normal,
                 ),
               ),
             ],
@@ -118,15 +145,15 @@ class ModeToggleButton extends StatelessWidget {
       color: Colors.transparent,
       shadowColor: context.colors.shadow.withValues(alpha: 0.4),
       elevation: 2,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: .circular(24),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: .circular(24),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: .circular(24),
               border: Border.all(
                 color: context.colors.outlineVariant.withValues(alpha: 0.4),
               ),
@@ -136,11 +163,11 @@ class ModeToggleButton extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () => _showModeMenu(context),
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: .circular(24),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const .symmetric(horizontal: 16),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: .min,
                   spacing: 8,
                   children: [
                     Icon(
@@ -150,7 +177,7 @@ class ModeToggleButton extends StatelessWidget {
                     ),
                     Text(
                       currentMode.label,
-                      style: context.theme.textTheme.bodyLarge?.copyWith(
+                      style: context.texts.bodyLarge?.copyWith(
                         color: context.colors.outline,
                       ),
                     ),

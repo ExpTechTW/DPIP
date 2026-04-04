@@ -1,15 +1,35 @@
+/// Timeline item widget that shows a date header with an optional mode selector.
+library;
+
 import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
+/// Renders a date-labelled row in the home history timeline.
+///
+/// When [mode] and [onModeChanged] are provided the label is tappable and
+/// opens a popup menu for switching [HomeMode]. Pass [isOutOfService] as
+/// `true` to restrict available modes to national-only options.
 class DateTimelineItem extends StatelessWidget {
+  /// The formatted date string displayed in the chip.
   final String date;
+
+  /// Whether this is the first item in the timeline.
   final bool first;
+
+  /// Whether this is the last item in the timeline.
   final bool last;
+
+  /// The currently active [HomeMode], or `null` to hide the mode indicator.
   final HomeMode? mode;
+
+  /// Called with the newly selected [HomeMode] when the user changes modes.
   final ValueChanged<HomeMode>? onModeChanged;
+
+  /// When `true`, limits the mode menu to national-only entries.
   final bool isOutOfService;
 
+  /// Creates a [DateTimelineItem] for the given [date].
   const DateTimelineItem(
     this.date, {
     super.key,
@@ -51,7 +71,7 @@ class DateTimelineItem extends StatelessWidget {
     showMenu<HomeMode>(
       context: context,
       position: position,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: .circular(16)),
       elevation: 8,
       items: availableModes.map((m) {
         return PopupMenuItem<HomeMode>(
@@ -68,11 +88,12 @@ class DateTimelineItem extends StatelessWidget {
               ),
               Text(
                 m.label,
-                style: context.theme.textTheme.bodyMedium?.copyWith(
+                style: context.texts.bodyMedium?.copyWith(
                   color: mode == m
                       ? context.colors.primary
                       : context.colors.onSurface,
-                  fontWeight: mode == m ? FontWeight.bold : FontWeight.normal,
+                  fontWeight:
+                      mode == m ? .bold : .normal,
                 ),
               ),
             ],
@@ -90,12 +111,12 @@ class DateTimelineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: .stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const .symmetric(horizontal: 16),
             child: Stack(
-              alignment: Alignment.centerLeft,
+              alignment: .centerLeft,
               children: [
                 Positioned(
                   left: 0,
@@ -103,13 +124,15 @@ class DateTimelineItem extends StatelessWidget {
                   bottom: last ? null : 0,
                   height: last ? 21 : null,
                   child: Stack(
-                    alignment: Alignment.center,
+                    alignment: .center,
                     children: [
                       Positioned(
                         top: 0,
                         bottom: 0,
                         width: 1,
-                        child: Container(color: context.colors.outlineVariant),
+                        child: Container(
+                          color: context.colors.outlineVariant,
+                        ),
                       ),
                       SizedBox(
                         width: 42,
@@ -117,7 +140,7 @@ class DateTimelineItem extends StatelessWidget {
                           height: 8,
                           width: 8,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            shape: .circle,
                             color: context.colors.outlineVariant,
                           ),
                         ),
@@ -126,20 +149,20 @@ class DateTimelineItem extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  padding: const .only(top: 16, bottom: 8),
                   child: InkWell(
                     onTap: mode != null && onModeChanged != null
                         ? () => _showModeMenu(context)
                         : null,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: .circular(8),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const .all(8),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: .circular(8),
                         color: context.colors.secondaryContainer,
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: .min,
                         spacing: 6,
                         children: [
                           if (mode != null) ...[
@@ -150,12 +173,11 @@ class DateTimelineItem extends StatelessWidget {
                             ),
                             Text(
                               mode!.label,
-                              style: context.theme.textTheme.labelMedium
-                                  ?.copyWith(
-                                    height: 1,
-                                    color: context.colors.onSecondaryContainer,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: context.texts.labelMedium?.copyWith(
+                                height: 1,
+                                color: context.colors.onSecondaryContainer,
+                                fontWeight: .bold,
+                              ),
                             ),
                             Container(
                               width: 1,
@@ -166,7 +188,7 @@ class DateTimelineItem extends StatelessWidget {
                           ],
                           Text(
                             date,
-                            style: context.theme.textTheme.labelLarge?.copyWith(
+                            style: context.texts.labelLarge?.copyWith(
                               height: 1,
                               color: context.colors.onSecondaryContainer,
                             ),

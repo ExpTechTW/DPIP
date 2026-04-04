@@ -1,3 +1,6 @@
+/// Basic notification type selection section widget.
+library;
+
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
@@ -5,10 +8,26 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// A list section for selecting the [BasicNotifyType].
+///
+/// Displays each available type as a selectable tile with a loading indicator
+/// while the change is being saved. Pass the current [value] and an
+/// [onChanged] callback that persists the new type:
+///
+/// ```dart
+/// BasicNotifySection(
+///   value: BasicNotifyType.all,
+///   onChanged: (v) => model.setAnnouncement(v),
+/// )
+/// ```
 class BasicNotifySection extends StatefulWidget {
+  /// The currently active notification type.
   final BasicNotifyType value;
+
+  /// Called with the new type when the user selects a different option.
   final Future Function(BasicNotifyType value) onChanged;
 
+  /// Creates a [BasicNotifySection].
   const BasicNotifySection({
     super.key,
     required this.value,

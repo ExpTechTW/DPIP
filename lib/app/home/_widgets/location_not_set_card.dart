@@ -1,10 +1,18 @@
+/// Card shown when no home location has been configured.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// Prompts the user to set a home location when none is configured.
+///
+/// Displays an icon, explanatory text, and a button that navigates to the
+/// location settings page.
 class LocationNotSetCard extends StatelessWidget {
+  /// Creates a [LocationNotSetCard].
   const LocationNotSetCard({super.key});
 
   @override
@@ -13,13 +21,13 @@ class LocationNotSetCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.secondaryContainer,
         border: Border.all(color: context.colors.secondary, width: 2),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: .circular(16),
       ),
-      padding: const EdgeInsets.only(left: 12, top: 4, right: 4, bottom: 4),
+      padding: const .only(left: 12, top: 4, right: 4, bottom: 4),
       clipBehavior: Clip.antiAlias,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: .min,
+        mainAxisAlignment: .spaceBetween,
         children: [
           Row(
             spacing: 8,

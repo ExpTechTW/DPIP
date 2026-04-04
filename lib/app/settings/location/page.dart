@@ -1,3 +1,7 @@
+/// Location settings page for managing the user's saved locations and
+/// automatic GPS tracking.
+library;
+
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -23,11 +27,19 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+/// A global reference to the location settings page state, used by external
+/// callers to trigger a permission status refresh.
 final stateSettingsLocationView = _SettingsLocationPageState();
 
+/// Callback type invoked when the user's position has been updated.
 typedef PositionUpdateCallback = void Function();
 
+/// Settings page for configuring the user's current location.
+///
+/// Allows toggling automatic GPS-based location updates and managing a list of
+/// favorited locations. Requires [SettingsLocationModel] in the widget tree.
 class SettingsLocationPage extends StatefulWidget {
+  /// Creates a [SettingsLocationPage].
   const SettingsLocationPage({super.key});
 
   @override
@@ -64,8 +76,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     });
   }
 
-  /// Shows a error dialog to the user with the given permission type. [type] can be either [Permission] or
-  /// `"auto-start"`
+  /// Shows an error dialog explaining why [type] permission is needed.
+  ///
+  /// [type] must be either a [Permission] or the string `'auto-start'` or
+  /// `'battery-optimization'`.
   Future<void> showPermissionDialog(dynamic type) async {
     if (!mounted) return;
     if (type is! Permission && type is! String) return;
@@ -90,10 +104,12 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                   .i18n
             : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'
                   .i18n,
-      'auto-start' => '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      'auto-start' =>
+        '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
       'battery-optimization' =>
         '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
-      _ => '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
+      _ =>
+        '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
     };
 
     await showDialog(
@@ -103,19 +119,19 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
           icon: const Icon(Symbols.error_rounded),
           title: Text(title),
           content: Text(content),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actionsAlignment: .spaceBetween,
           actions: [
             TextButton(
               child: Text('取消'.i18n),
               onPressed: () {
-                Navigator.pop(context);
+                context.navigator.pop();
               },
             ),
             FilledButton(
               child: Text('設定'.i18n),
               onPressed: () {
                 openAppSettings();
-                Navigator.pop(context);
+                context.navigator.pop();
               },
             ),
           ],
@@ -233,7 +249,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     final permissionType = Platform.isAndroid ? '一律允許'.i18n : '永遠'.i18n;
 
     return ListView(
-      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+      padding: .only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsHeader(
           icon: Symbols.pin_drop_rounded,
@@ -277,11 +293,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const .all(16),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const .all(8),
                           child: Icon(
                             Symbols.warning_rounded,
                             color: context.colors.error,
@@ -290,7 +306,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'.i18n,
+                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'
+                                .i18n,
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
@@ -314,15 +331,16 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                 maintainAnimation: true,
                 maintainState: true,
                 child: AnimatedOpacity(
-                  opacity: auto && !notificationPermission!.isGranted ? 1 : 0,
+                  opacity:
+                      auto && !notificationPermission!.isGranted ? 1 : 0,
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const .all(16),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const .all(8),
                           child: Icon(
                             Symbols.warning_rounded,
                             color: context.colors.error,
@@ -398,7 +416,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                         TextButton(
                           child: Text('設定'.i18n),
                           onPressed: () =>
-                              DisableBatteryOptimization.showDisableBatteryOptimizationSettings(),
+                              DisableBatteryOptimization
+                                  .showDisableBatteryOptimizationSettings(),
                         ),
                       ],
                     ),
@@ -481,7 +500,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                       leading: Icon(Symbols.add_circle_rounded),
                       title: Text('新增地點'.i18n),
                       enabled: loadingCode == null,
-                      onTap: () => SettingsLocationSelectRoute().push(context),
+                      onTap: () =>
+                          SettingsLocationSelectRoute().push(context),
                     ),
                   ],
                 );

@@ -1,3 +1,6 @@
+/// Earthquake Early Warning (EEW) alert card for the home screen.
+library;
+
 import 'dart:async';
 
 import 'package:dpip/api/model/eew.dart';
@@ -15,9 +18,15 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_text/styled_text.dart';
 
+/// Displays an EEW alert for the given [data], including magnitude, location,
+/// local intensity estimate, and a live countdown to S-wave arrival.
+///
+/// Tapping the card navigates to the monitor map view.
 class EewCard extends StatefulWidget {
+  /// The EEW event data to display.
   final Eew data;
 
+  /// Creates an [EewCard] for the provided [data].
   const EewCard(this.data, {super.key});
 
   @override
@@ -25,8 +34,13 @@ class EewCard extends StatefulWidget {
 }
 
 class _EewCardState extends State<EewCard> {
+  /// Estimated local seismic intensity, or `null` when location is unavailable.
   int? localIntensity;
+
+  /// Expected S-wave arrival timestamp in milliseconds, or `null`.
   int? localArrivalTime;
+
+  /// Current countdown in seconds until S-wave arrival.
   int countdown = 0;
 
   Timer? _timer;
@@ -35,7 +49,8 @@ class _EewCardState extends State<EewCard> {
     if (localArrivalTime == null) return;
 
     final remainingSeconds =
-        ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000).floor();
+        ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000)
+            .floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
@@ -80,16 +95,16 @@ class _EewCardState extends State<EewCard> {
               decoration: BoxDecoration(
                 color: context.colors.errorContainer,
                 border: Border.all(color: context.colors.error, width: 2),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
               ),
-              padding: const EdgeInsets.all(12),
+              padding: const .all(12),
               clipBehavior: Clip.antiAlias,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: .min,
+                crossAxisAlignment: .start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: .spaceBetween,
                     children: [
                       Row(
                         spacing: 8,
@@ -97,11 +112,11 @@ class _EewCardState extends State<EewCard> {
                           Container(
                             decoration: BoxDecoration(
                               color: context.colors.error,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: .circular(8),
                             ),
-                            padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+                            padding: const .fromLTRB(8, 6, 12, 6),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisSize: .min,
                               spacing: 4,
                               children: [
                                 Icon(
@@ -114,7 +129,7 @@ class _EewCardState extends State<EewCard> {
                                   'EEW'.i18n,
                                   style: context.texts.labelLarge!.copyWith(
                                     color: context.colors.onError,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: .bold,
                                   ),
                                 ),
                               ],
@@ -138,7 +153,7 @@ class _EewCardState extends State<EewCard> {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: const .only(top: 8),
                     child: StyledText(
                       text: localIntensity != null
                           ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
@@ -149,7 +164,8 @@ class _EewCardState extends State<EewCard> {
                                   'location': widget.data.info.location,
                                   'magnitude': widget.data.info.magnitude
                                       .toStringAsFixed(1),
-                                  'intensity': localIntensity!.asIntensityLabel,
+                                  'intensity':
+                                      localIntensity!.asIntensityLabel,
                                 })
                           : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
                                 .i18n
@@ -167,7 +183,7 @@ class _EewCardState extends State<EewCard> {
                       ),
                       tags: {
                         'bold': StyledTextTag(
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: .bold),
                         ),
                       },
                     ),
@@ -180,19 +196,18 @@ class _EewCardState extends State<EewCard> {
                       }
 
                       return Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 4),
+                        padding: const .only(top: 8, bottom: 4),
                         child: IntrinsicHeight(
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: .min,
+                            crossAxisAlignment: .start,
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(4),
+                                  padding: const .all(4),
                                   child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                    mainAxisSize: .min,
+                                    crossAxisAlignment: .stretch,
                                     children: [
                                       Text(
                                         '所在地預估'.i18n,
@@ -205,7 +220,7 @@ class _EewCardState extends State<EewCard> {
                                             ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
+                                        padding: const .only(
                                           top: 12,
                                           bottom: 8,
                                         ),
@@ -213,7 +228,7 @@ class _EewCardState extends State<EewCard> {
                                           localIntensity!.asIntensityLabel,
                                           style: context.texts.displayMedium!
                                               .copyWith(
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: .bold,
                                                 color: context
                                                     .colors
                                                     .onErrorContainer,
@@ -222,7 +237,7 @@ class _EewCardState extends State<EewCard> {
                                                     TextLeadingDistribution
                                                         .even,
                                               ),
-                                          textAlign: TextAlign.center,
+                                          textAlign: .center,
                                         ),
                                       ),
                                     ],
@@ -236,11 +251,10 @@ class _EewCardState extends State<EewCard> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(4),
+                                  padding: const .all(4),
                                   child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                    mainAxisSize: .min,
+                                    crossAxisAlignment: .stretch,
                                     children: [
                                       Text(
                                         '震波'.i18n,
@@ -253,7 +267,7 @@ class _EewCardState extends State<EewCard> {
                                             ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
+                                        padding: const .only(
                                           top: 12,
                                           bottom: 8,
                                         ),
@@ -287,8 +301,7 @@ class _EewCardState extends State<EewCard> {
                                                       .texts
                                                       .displayMedium!
                                                       .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        fontWeight: .bold,
                                                         color: context
                                                             .colors
                                                             .onErrorContainer,
@@ -298,7 +311,7 @@ class _EewCardState extends State<EewCard> {
                                                                 .even,
                                                       ),
                                                 ),
-                                                textAlign: TextAlign.center,
+                                                textAlign: .center,
                                               )
                                             : Text(
                                                 '抵達'.i18n,
@@ -312,8 +325,7 @@ class _EewCardState extends State<EewCard> {
                                                               .displayMedium!
                                                               .fontSize! *
                                                           0.92,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                      fontWeight: .bold,
                                                       color: context
                                                           .colors
                                                           .onErrorContainer,
@@ -322,7 +334,7 @@ class _EewCardState extends State<EewCard> {
                                                           TextLeadingDistribution
                                                               .even,
                                                     ),
-                                                textAlign: TextAlign.center,
+                                                textAlign: .center,
                                               ),
                                       ),
                                     ],
@@ -345,7 +357,7 @@ class _EewCardState extends State<EewCard> {
               child: InkWell(
                 onTap: () => MapRoute(layers: 'monitor').push(context),
                 splashColor: context.colors.error.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
               ),
             ),
           ),

@@ -1,3 +1,6 @@
+/// The changelog page, displaying a list of GitHub releases for the app.
+library;
+
 import 'dart:async';
 
 import 'package:dpip/api/exptech.dart';
@@ -14,7 +17,12 @@ import 'package:m3e_collection/m3e_collection.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:option_result/result.dart';
 
+/// Displays the full release changelog fetched from GitHub.
+///
+/// Renders each [GithubRelease] with a sticky header and Markdown body.
+/// Pull-to-refresh triggers a fresh network fetch.
 class ChangelogPage extends StatefulWidget {
+  /// Creates a [ChangelogPage].
   const ChangelogPage({super.key});
 
   @override
@@ -23,6 +31,8 @@ class ChangelogPage extends StatefulWidget {
 
 class _ChangelogPageState extends State<ChangelogPage> {
   final _refreshIndicatorKey = GlobalKey<ExpressiveRefreshIndicatorState>();
+
+  /// The most recently fetched releases result, or `null` while loading.
   Result<List<GithubRelease>, String>? releases;
 
   Future<void> _refresh() async {
@@ -130,12 +140,16 @@ class _ChangelogPageState extends State<ChangelogPage> {
   }
 }
 
+/// A [SliverPersistentHeaderDelegate] that renders a sticky release header.
+///
+/// Shows the release icon, name, publish date, and a "current version" badge
+/// when the release matches the installed app version.
 class _ReleaseHeaderDelegate extends SliverPersistentHeaderDelegate {
+  /// The release whose metadata is shown in this header.
   final GithubRelease release;
 
+  /// Creates a [_ReleaseHeaderDelegate] for the given [release].
   const _ReleaseHeaderDelegate(this.release);
-
-  static const height = kToolbarHeight + 32;
 
   @override
   double get minExtent => height;
@@ -209,4 +223,7 @@ class _ReleaseHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(covariant _ReleaseHeaderDelegate oldDelegate) => true;
+
+  /// Fixed height of the header in logical pixels.
+  static const height = kToolbarHeight + 32;
 }

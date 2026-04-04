@@ -1,3 +1,6 @@
+/// Notification settings index page.
+library;
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
@@ -15,7 +18,13 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+/// A page showing all notification category settings.
+///
+/// Fetches the current notification preferences from the server if they have
+/// not been loaded yet. Requires [SettingsNotificationModel] and
+/// [SettingsLocationModel] in the widget tree.
 class SettingsNotifyPage extends StatefulWidget {
+  /// Creates a [SettingsNotifyPage].
   const SettingsNotifyPage({super.key});
 
   @override
@@ -23,10 +32,16 @@ class SettingsNotifyPage extends StatefulWidget {
 }
 
 class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
-  String getEewNotifyTypeName(EewNotifyType value) => switch (value) {
-    EewNotifyType.localIntensityAbove4 => '所在地震度4以上'.i18n,
-    EewNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
-    EewNotifyType.all => '接收全部'.i18n,
+  bool isLoading = false;
+
+  bool get hasLocation =>
+      GlobalProviders.location.coordinates != null ||
+      GlobalProviders.location.code != null ||
+      (Preference.locationAuto ?? false);
+
+  String getBasicNotifyTypeName(BasicNotifyType value) => switch (value) {
+    BasicNotifyType.off => '關閉'.i18n,
+    BasicNotifyType.all => '接收全部'.i18n,
   };
 
   String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) =>
@@ -36,9 +51,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
         EarthquakeNotifyType.all => '接收全部'.i18n,
       };
 
-  String getWeatherNotifyTypeName(WeatherNotifyType value) => switch (value) {
-    WeatherNotifyType.off => '關閉'.i18n,
-    WeatherNotifyType.local => '接收所在地'.i18n,
+  String getEewNotifyTypeName(EewNotifyType value) => switch (value) {
+    EewNotifyType.localIntensityAbove4 => '所在地震度4以上'.i18n,
+    EewNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
+    EewNotifyType.all => '接收全部'.i18n,
   };
 
   String getTsunamiNotifyTypeName(TsunamiNotifyType value) => switch (value) {
@@ -46,17 +62,24 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     TsunamiNotifyType.all => '海嘯消息、海嘯警報'.i18n,
   };
 
-  String getBasicNotifyTypeName(BasicNotifyType value) => switch (value) {
-    BasicNotifyType.off => '關閉'.i18n,
-    BasicNotifyType.all => '接收全部'.i18n,
+  String getWeatherNotifyTypeName(WeatherNotifyType value) => switch (value) {
+    WeatherNotifyType.off => '關閉'.i18n,
+    WeatherNotifyType.local => '接收所在地'.i18n,
   };
 
-  bool get hasLocation =>
-      GlobalProviders.location.coordinates != null ||
-      GlobalProviders.location.code != null ||
-      (Preference.locationAuto ?? false);
-
-  bool isLoading = false;
+  Widget _buildIconContainer({
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const .all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: .circular(10),
+      ),
+      child: Icon(icon, color: color, size: 20),
+    );
+  }
 
   @override
   void initState() {
@@ -115,20 +138,6 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     }
   }
 
-  Widget _buildIconContainer({
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsLocationModel, String?>(
@@ -149,7 +158,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               ),
             ),
             ListView(
-              padding: EdgeInsets.only(
+              padding: .only(
                 top: 8,
                 bottom: 16 + context.padding.bottom,
               ),
@@ -161,22 +170,22 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                 ),
                 if (!enabled)
                   Container(
-                    margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    padding: const EdgeInsets.all(16),
+                    margin: const .fromLTRB(16, 16, 16, 0),
+                    padding: const .all(16),
                     decoration: BoxDecoration(
                       color: context.theme.extendedColors.amber.withValues(
                         alpha: 0.15,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: .circular(16),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const .all(10),
                           decoration: BoxDecoration(
                             color: context.theme.extendedColors.amber
                                 .withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: .circular(12),
                           ),
                           child: Icon(
                             Symbols.warning_rounded,
@@ -187,12 +196,12 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: .start,
                             children: [
                               Text(
                                 '尚未設定所在地'.i18n,
                                 style: context.texts.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: .w600,
                                   color: context.theme.extendedColors.amber,
                                 ),
                               ),
@@ -253,11 +262,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             color: Colors.orange,
                           ),
                           title: Text('強震監視器'.i18n),
-                          subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
+                          subtitle: Text(
+                            getEarthquakeNotifyTypeName(monitor),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyMonitorRoute().push(context),
+                          onTap: () => const SettingsNotifyMonitorRoute()
+                              .push(context),
                         );
                       },
                     ),
@@ -270,7 +281,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             color: Colors.blue,
                           ),
                           title: Text('地震報告'.i18n),
-                          subtitle: Text(getEarthquakeNotifyTypeName(report)),
+                          subtitle: Text(
+                            getEarthquakeNotifyTypeName(report),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
                           onTap: () =>
@@ -337,8 +350,8 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyAdvisoryRoute().push(context),
+                          onTap: () => const SettingsNotifyAdvisoryRoute()
+                              .push(context),
                         );
                       },
                     ),
@@ -352,7 +365,9 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             color: Colors.green,
                           ),
                           title: Text('防災資訊'.i18n),
-                          subtitle: Text(getWeatherNotifyTypeName(evacuation)),
+                          subtitle: Text(
+                            getWeatherNotifyTypeName(evacuation),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
                           onTap: () => const SettingsNotifyEvacuationRoute()
@@ -400,11 +415,14 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             color: Colors.indigo,
                           ),
                           title: Text('公告'.i18n),
-                          subtitle: Text(getBasicNotifyTypeName(announcement)),
+                          subtitle: Text(
+                            getBasicNotifyTypeName(announcement),
+                          ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAnnouncementRoute()
-                              .push(context),
+                          onTap: () =>
+                              const SettingsNotifyAnnouncementRoute()
+                                  .push(context),
                         );
                       },
                     ),

@@ -78,7 +78,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ctx = router.routerDelegate.navigatorKey.currentContext;
         if (ctx != null && mounted) {
-          ctx.go(WelcomePermissionPage.route);
+          WelcomePermissionsRoute().go(context);
         }
       });
     }
@@ -95,13 +95,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
 
     switch (widget.initialShortcut) {
       case 'monitor':
-        ctx.push(
-          MapPage.route(
-            options: MapPageOptions(
-              initialLayers: {MapLayer.monitor},
-            ),
-          ),
-        );
+        MapRoute(layers: MapLayer.monitor.name).push(context);
         break;
     }
   }

@@ -1,3 +1,6 @@
+/// City-level district selection page for location settings.
+library;
+
 import 'dart:collection';
 
 import 'package:dpip/api/exptech.dart';
@@ -16,9 +19,19 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// A page listing all districts within a given [city] for location selection.
+///
+/// Tap a district to save it as the user's location and navigate back to the
+/// location settings page:
+///
+/// ```dart
+/// SettingsLocationSelectCityPage(city: '台北市')
+/// ```
 class SettingsLocationSelectCityPage extends StatefulWidget {
+  /// The city name used to filter available districts.
   final String city;
 
+  /// Creates a [SettingsLocationSelectCityPage] for the given [city].
   const SettingsLocationSelectCityPage({super.key, required this.city});
 
   @override
@@ -95,7 +108,9 @@ class _SettingsLocationSelectCityPageState
 
                               showToast(
                                 context,
-                                ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n),
+                                ToastWidget.text(
+                                  '設定所在地時發生錯誤，請稍候再試一次。'.i18n,
+                                ),
                               );
                             }
                           },

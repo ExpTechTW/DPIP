@@ -1,13 +1,29 @@
+/// A toggleable layer-selection tile used inside the layer picker sheet.
+library;
+
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// A tappable tile representing a single map layer that can be toggled on or
+/// off.
+///
+/// Long-pressing triggers [onLongPress] when provided, which is used for
+/// overlay-mode activation.
 class LayerToggle extends StatelessWidget {
+  /// Whether this layer is currently active.
   final bool checked;
+
+  /// The human-readable name shown below the layer icon.
   final String label;
+
+  /// Called when the user taps the tile. Pass `null` to disable interaction.
   final void Function(bool)? onChanged;
+
+  /// Called when the user long-presses the tile for overlay mode.
   final void Function(bool)? onLongPress;
 
+  /// Creates a [LayerToggle] for the given [label].
   const LayerToggle({
     super.key,
     required this.checked,
@@ -21,7 +37,7 @@ class LayerToggle extends StatelessWidget {
     final bool isDisabled = onChanged == null;
     return Material(
       color: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: .circular(16)),
       child: Opacity(
         opacity: isDisabled ? 0.4 : 1.0,
         child: InkWell(
@@ -29,11 +45,11 @@ class LayerToggle extends StatelessWidget {
           onLongPress: onLongPress != null
               ? () => onLongPress!(!checked)
               : null,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: .circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(6),
+            padding: const .all(6),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: .min,
               spacing: 4,
               children: [
                 Container(
@@ -44,11 +60,11 @@ class LayerToggle extends StatelessWidget {
                           : Colors.transparent,
                       width: 2,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: .circular(12),
                   ),
-                  padding: const EdgeInsets.all(2),
+                  padding: const .all(2),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: .circular(8),
                     child: Container(
                       height: 64,
                       width: 64,
@@ -66,11 +82,11 @@ class LayerToggle extends StatelessWidget {
                 ),
                 Text(
                   label,
-                  style: context.theme.textTheme.labelMedium!.copyWith(
+                  style: context.texts.labelMedium!.copyWith(
                     color: checked
                         ? context.colors.primary
                         : context.colors.onSurfaceVariant,
-                    fontWeight: checked ? FontWeight.bold : null,
+                    fontWeight: checked ? .bold : null,
                   ),
                 ),
               ],

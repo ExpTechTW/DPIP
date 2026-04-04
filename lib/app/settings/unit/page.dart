@@ -34,7 +34,7 @@ class SettingsUnitPage extends StatelessWidget {
     return Consumer<SettingsUserInterfaceModel>(
       builder: (context, model, child) {
         return ListView(
-          padding: EdgeInsets.only(
+          padding: .only(
             top: 16,
             bottom: 16 + context.padding.bottom,
           ),

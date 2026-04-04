@@ -1,3 +1,6 @@
+/// Location selector button and bottom sheet for the home screen.
+library;
+
 import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
@@ -11,7 +14,13 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+/// A frosted-glass text button that shows the current location name and opens
+/// a location-picker sheet on tap.
+///
+/// Uses [HomeLocationModel] to manage a temporary override and
+/// [SettingsLocationModel] for the persisted location code and favourites.
 class LocationButton extends StatelessWidget {
+  /// Creates a [LocationButton].
   const LocationButton({super.key});
 
   @override
@@ -39,7 +48,7 @@ class LocationButton extends StatelessWidget {
             favorited: favorited,
           ),
           text: content,
-          textStyle: context.theme.textTheme.bodyLarge,
+          textStyle: context.texts.bodyLarge,
           elevation: 2,
         );
       },
@@ -64,7 +73,7 @@ class LocationButton extends StatelessWidget {
         favorited: favorited,
         currentCode: currentCode,
         onLocationSelected: (code) {
-          Navigator.of(sheetContext).pop();
+          sheetContext.navigator.pop();
           if (code == savedCode) {
             model.setTemporaryCode(null);
           } else {
@@ -72,11 +81,11 @@ class LocationButton extends StatelessWidget {
           }
         },
         onAddLocationPressed: () {
-          Navigator.of(sheetContext).pop();
+          sheetContext.navigator.pop();
           SettingsLocationSelectRoute().push(context);
         },
         onSettingsPressed: () {
-          Navigator.of(sheetContext).pop();
+          sheetContext.navigator.pop();
           SettingsLocationRoute().push(context);
         },
       ),
@@ -123,46 +132,15 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
         .toList();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      borderRadius: const .vertical(top: .circular(16)),
-      clipBehavior: .antiAlias,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: _selectedCity != null
-                ? () => setState(() => _selectedCity = null)
-                : null,
-          ),
-          title: Text('切換區域'.i18n),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Symbols.settings_rounded),
-              onPressed: widget.onSettingsPressed,
-              tooltip: '位置設定'.i18n,
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: .only(bottom: context.padding.bottom + 16),
-          child: _selectedCity == null
-              ? _buildCityList(context)
-              : _buildTownList(context),
-        ),
-      ),
-    );
-  }
-
   Widget _buildCityList(BuildContext context) {
     final cities = _cities;
-    final savedLocation = Global.location[widget.savedCode];
     final currentLocation = Global.location[widget.currentCode];
 
     final quickItems = <_QuickItem>[];
 
-    if (widget.savedCode != null && savedLocation != null) {
+    if (widget.savedCode != null &&
+        Global.location[widget.savedCode] != null) {
+      final savedLocation = Global.location[widget.savedCode]!;
       quickItems.add(
         _QuickItem(
           code: widget.savedCode!,
@@ -214,8 +192,8 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
                         ? context.colors.primary
                         : context.colors.onSurface,
                     fontWeight: quickItems[i].isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                        ? .w600
+                        : .normal,
                   ),
                 ),
                 trailing: quickItems[i].isSelected
@@ -250,7 +228,9 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
                   ? Text('目前選擇'.i18n)
                   : null,
               trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => setState(() => _selectedCity = city.cityWithLevel),
+              onTap: () => setState(
+                () => _selectedCity = city.cityWithLevel,
+              ),
             );
           },
         ),
@@ -280,7 +260,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
               color: isSelected
                   ? context.colors.primary
                   : context.colors.onSurface,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: isSelected ? .w600 : .normal,
             ),
           ),
           trailing: isSelected
@@ -292,6 +272,38 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
           onTap: () => widget.onLocationSelected(code),
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: const .vertical(top: .circular(16)),
+      clipBehavior: .antiAlias,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: _selectedCity != null
+                ? () => setState(() => _selectedCity = null)
+                : null,
+          ),
+          title: Text('切換區域'.i18n),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Symbols.settings_rounded),
+              onPressed: widget.onSettingsPressed,
+              tooltip: '位置設定'.i18n,
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: .only(bottom: context.padding.bottom + 16),
+          child: _selectedCity == null
+              ? _buildCityList(context)
+              : _buildTownList(context),
+        ),
+      ),
     );
   }
 }

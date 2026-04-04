@@ -1,3 +1,6 @@
+/// Main home page presenting weather, EEW alerts, and event history.
+library;
+
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
@@ -36,7 +39,6 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/shader_selector.dart';
 import 'package:dpip/utils/wallpaper_selector.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -47,7 +49,13 @@ import 'package:simple_icons/simple_icons.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// The main home screen widget.
+///
+/// Composes a full-screen shader background, a hero weather section, overlay
+/// buttons, and a draggable bottom sheet containing weather cards and the
+/// event timeline.
 class HomePage extends StatefulWidget {
+  /// Creates the [HomePage].
   const HomePage({super.key});
 
   @override
@@ -86,19 +94,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ?.where((e) => e.type == .thunderstorm)
       .sorted((a, b) => b.time.send.compareTo(a.time.send))
       .firstOrNull;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkVersion();
-      _measureFirstCard();
-    });
-    GlobalProviders.location.$code.addListener(_refresh);
-    _sheetController.addListener(_onSheetChanged);
-    _refresh();
-  }
 
   void _measureFirstCard() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -154,34 +149,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (_isFullyExpandedNotifier.value != isFullyExpanded) {
       _isFullyExpandedNotifier.value = isFullyExpanded;
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final model = context.read<HomeLocationModel>();
-    if (_homeLocationModel != model) {
-      _homeLocationModel?.removeListener(_refresh);
-      _homeLocationModel = model;
-      model.addListener(_refresh);
-    }
-  }
-
-  @override
-  void dispose() {
-    _homeLocationModel?.removeListener(_refresh);
-    _sheetController.removeListener(_onSheetChanged);
-    _blurNotifier.dispose();
-    _isFullyExpandedNotifier.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    GlobalProviders.location.$code.removeListener(_refresh);
-    _sheetController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == .resumed) _refresh();
   }
 
   void _checkVersion() {
@@ -337,7 +304,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (mounted) setState(() => _realtimeRegion = realtime);
     } catch (e, s) {
       if (!mounted) return;
-      TalkerManager.instance.error('_HomePageState._fetchRealtimeRegion', e, s);
+      TalkerManager.instance.error(
+        '_HomePageState._fetchRealtimeRegion',
+        e,
+        s,
+      );
       if (mounted) setState(() => _realtimeRegion = null);
     }
   }
@@ -370,6 +341,466 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onModeChanged(HomeMode mode) {
     setState(() => _currentMode = mode);
+    _refresh();
+  }
+
+  Widget _buildDraggableSheet(List<HomeDisplaySection> homeSections) {
+    final screenHeight = context.dimension.height;
+    final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
+    final handleHeight = 28.0 / screenHeight;
+    final minSize = handleHeight.clamp(0.03, 0.05);
+    final initialSize = _measuredFirstCardHeight == null
+        ? minSize
+        : baseSnapSize;
+    final snapSizes = [minSize, baseSnapSize, 1.0];
+
+    return DraggableScrollableSheet(
+      key: _sheetKey,
+      controller: _sheetController,
+      initialChildSize: initialSize,
+      minChildSize: minSize,
+      maxChildSize: 1.0,
+      snap: true,
+      snapSizes: snapSizes,
+      builder: (context, scrollController) {
+        return SingleChildScrollView(
+          controller: scrollController,
+          child: Column(
+            children: [
+              RepaintBoundary(
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _isFullyExpandedNotifier,
+                  builder: (context, isFullyExpanded, child) {
+                    return AnimatedOpacity(
+                      opacity: isFullyExpanded ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 150),
+                      child: Center(
+                        child: Container(
+                          margin: const .symmetric(vertical: 12),
+                          width: 32,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: context.colors.onSurfaceVariant.withValues(
+                              alpha: 0.4,
+                            ),
+                            borderRadius: .circular(2),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              RepaintBoundary(
+                child: _buildContentSection(homeSections),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeroSection() {
+    final code = GlobalProviders.location.code;
+    final screenHeight = context.dimension.height;
+
+    if (code == null) {
+      return SizedBox(
+        height: screenHeight * 0.5,
+        child: const Center(
+          child: Padding(
+            padding: .all(32),
+            child: LocationNotSetCard(),
+          ),
+        ),
+      );
+    }
+
+    if (_isOutOfService) {
+      return SizedBox(
+        height: screenHeight * 0.5,
+        child: const Center(
+          child: Padding(
+            padding: .all(32),
+            child: LocationOutOfServiceCard(),
+          ),
+        ),
+      );
+    }
+
+    return HeroWeather(
+      weather: _weather,
+      isLoading: _isLoading,
+    );
+  }
+
+  Widget _buildContentSection(List<HomeDisplaySection> homeSections) {
+    final List<Widget> allCards = [];
+    final List<Widget> firstCardChildren = [];
+
+    final stationInfo = _buildStationInfo();
+    firstCardChildren.add(stationInfo);
+
+    Widget? firstSectionWidget;
+    int? firstSectionIndex;
+
+    if (!_isLoading) {
+      final realtimeWidgets = _buildRealtimeInfo();
+      allCards.addAll(realtimeWidgets);
+    }
+    for (var i = 0; i < homeSections.length; i++) {
+      final section = homeSections[i];
+      switch (section) {
+        case HomeDisplaySection.radar:
+          firstSectionWidget = _buildRadarMap();
+          firstSectionIndex = i;
+        case HomeDisplaySection.forecast:
+          firstSectionWidget = _buildForecast();
+          firstSectionIndex = i;
+        case HomeDisplaySection.wind:
+          if (!_isLoading && _weather != null) {
+            firstSectionWidget = _buildWindCard();
+            firstSectionIndex = i;
+          }
+      }
+      if (firstSectionWidget != null) break;
+    }
+
+    if (firstSectionWidget != null) {
+      firstCardChildren.add(firstSectionWidget);
+    }
+
+    allCards.add(
+      KeyedSubtree(
+        key: _firstCardKey,
+        child: Column(
+          mainAxisSize: .min,
+          children: firstCardChildren,
+        ),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureFirstCard());
+    for (var i = 0; i < homeSections.length; i++) {
+      if (i == firstSectionIndex) continue;
+      final section = homeSections[i];
+      switch (section) {
+        case HomeDisplaySection.radar:
+          allCards.add(_buildRadarMap());
+        case HomeDisplaySection.forecast:
+          allCards.add(_buildForecast());
+        case HomeDisplaySection.wind:
+          if (_weather != null) {
+            allCards.add(_buildWindCard());
+          }
+      }
+    }
+
+    allCards.add(_buildHistoryTimeline());
+    allCards.add(_buildCommunityCards());
+
+    return Column(
+      children: [
+        ...allCards,
+        SizedBox(height: context.padding.bottom + 16),
+      ],
+    );
+  }
+
+  Widget _buildCommunityCards() {
+    final options = [
+      (
+        icon: SimpleIcons.discord,
+        color: const Color(0xFF5865F2),
+        url: 'https://exptech.com.tw/dc',
+      ),
+      (
+        icon: SimpleIcons.threads,
+        color: context.theme.brightness == .dark ? Colors.white : Colors.black,
+        url: 'https://www.threads.net/@dpip.tw',
+      ),
+      (
+        icon: SimpleIcons.youtube,
+        color: const Color(0xFFFF0000),
+        url: 'https://www.youtube.com/@exptechtw/live',
+      ),
+      (
+        icon: Symbols.favorite_rounded,
+        color: context.colors.primary,
+        url: SettingsDonateRoute().location,
+      ),
+    ];
+
+    return Padding(
+      padding: const .symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: .center,
+        children: options.map((item) {
+          return Padding(
+            padding: const .symmetric(horizontal: 4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  if (item.url.startsWith('/')) {
+                    context.push(item.url);
+                  } else {
+                    launchUrl(Uri.parse(item.url));
+                  }
+                },
+                borderRadius: .circular(20),
+                child: Ink(
+                  padding: const .all(8),
+                  decoration: BoxDecoration(
+                    color: context.colors.surfaceContainerLow.withValues(
+                      alpha: 0.6,
+                    ),
+                    shape: .circle,
+                  ),
+                  child: Icon(item.icon, size: 24, color: item.color),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildStationInfo() {
+    final weather = _weather;
+    final hasData = weather != null;
+
+    String timeStr = '--:--';
+    if (hasData) {
+      final dt = DateTime.fromMillisecondsSinceEpoch(weather.time);
+      final hour = dt.hour;
+      final hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+      final period = hour < 12 ? '上午'.i18n : '下午'.i18n;
+      timeStr =
+          '$period ${hour12.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    }
+
+    String stationLabel = '--';
+    if (hasData) {
+      stationLabel = weather.station.name;
+      if (weather.station.distance >= 0) {
+        stationLabel += '・${weather.station.distance.toStringAsFixed(1)}km';
+      }
+    }
+
+    return ResponsiveContainer(
+      child: Padding(
+        padding: const .fromLTRB(16, 0, 16, 8),
+        child: Container(
+          padding: const .all(10),
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainer,
+            borderRadius: .circular(12),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Symbols.pin_drop_rounded,
+                    size: 15,
+                    color: context.colors.primary,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      stationLabel,
+                      style: context.texts.labelSmall?.copyWith(
+                        fontSize: 12,
+                        fontWeight: .w600,
+                        color: context.colors.onSurface,
+                      ),
+                      overflow: .ellipsis,
+                    ),
+                  ),
+                  Text(
+                    timeStr,
+                    style: context.texts.labelSmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: .w600,
+                      color: context.colors.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  _StationChip(
+                    label: '濕度'.i18n,
+                    value: hasData && weather.data.humidity >= 0
+                        ? '${weather.data.humidity.round().toString().padLeft(3)}%'
+                        : '---',
+                    color: Colors.cyan,
+                  ),
+                  _StationChip(
+                    label: '氣壓'.i18n,
+                    value: hasData && weather.data.pressure >= 0
+                        ? '${weather.data.pressure.round().toString().padLeft(4)}hPa'
+                        : '----',
+                    color: Colors.purple,
+                  ),
+                  _StationChip(
+                    label: '降雨'.i18n,
+                    value: hasData && weather.data.rain >= 0
+                        ? '${weather.data.rain.toStringAsFixed(1).padLeft(5)}mm'
+                        : '----',
+                    color: Colors.blue,
+                  ),
+                  _StationChip(
+                    label: '能見度'.i18n,
+                    value: hasData && weather.data.visibility >= 0
+                        ? '${weather.data.visibility.round().toString().padLeft(2)}km'
+                        : '--',
+                    color: Colors.amber,
+                  ),
+                  _StationChip(
+                    label: '風速'.i18n,
+                    value: hasData && weather.data.wind.speed >= 0
+                        ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed.toStringAsFixed(1)}m/s'
+                        : '----',
+                    color: Colors.teal,
+                  ),
+                  _StationChip(
+                    label: '陣風'.i18n,
+                    value: hasData && weather.data.gust.speed >= 0
+                        ? '${weather.data.gust.speed.toStringAsFixed(1).padLeft(4)}m/s'
+                        : '----',
+                    color: Colors.orange,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildRealtimeInfo() {
+    return [
+      if (GlobalProviders.data.eew.isNotEmpty)
+        ListView.builder(
+          shrinkWrap: true,
+          padding: .zero,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: GlobalProviders.data.eew.length,
+          itemBuilder: (context, index) => Padding(
+            padding: const .all(16),
+            child: EewCard(GlobalProviders.data.eew[index]),
+          ),
+        ),
+      if (_thunderstorm != null)
+        Padding(
+          padding: const .all(16),
+          child: ThunderstormCard(_thunderstorm!),
+        ),
+    ];
+  }
+
+  Widget _buildWindCard() {
+    if (_weather == null) return const SizedBox.shrink();
+    return WindCard(_weather!);
+  }
+
+  Widget _buildRadarMap() {
+    return Padding(
+      padding: const .all(16),
+      child: RadarMapCard(key: _mapKey),
+    );
+  }
+
+  Widget _buildForecast() {
+    if (_forecast == null) return const SizedBox.shrink();
+    return ForecastCard(_forecast!);
+  }
+
+  Widget _buildHistoryTimeline() {
+    return ResponsiveContainer(
+      child: Builder(
+        builder: (context) {
+          final history = _history;
+
+          if (history == null || history.isEmpty) {
+            return Column(
+              children: [
+                DateTimelineItem(
+                  TZDateTime.now(UTC).toLocaleFullDateString(context),
+                  first: true,
+                  last: true,
+                  mode: _currentMode,
+                  onModeChanged: _onModeChanged,
+                  isOutOfService: _isOutOfService,
+                ),
+              ],
+            );
+          }
+
+          final grouped = groupBy(
+            history,
+            (e) => e.time.send.toLocaleFullDateString(context),
+          );
+
+          return Column(
+            children: grouped.entries
+                .sorted((a, b) => b.key.compareTo(a.key))
+                .mapIndexed(
+                  (index, entry) => _buildHistoryGroup(entry, index, history),
+                )
+                .toList(),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHistoryGroup(
+    MapEntry<String, List<History>> entry,
+    int index,
+    List<History> allHistory,
+  ) {
+    final historyGroup = entry.value.sorted(
+      (a, b) => b.time.send.compareTo(a.time.send),
+    );
+
+    return Column(
+      children: [
+        DateTimelineItem(
+          entry.key,
+          first: index == 0,
+          mode: index == 0 ? _currentMode : null,
+          onModeChanged: index == 0 ? _onModeChanged : null,
+          isOutOfService: _isOutOfService,
+        ),
+        ...historyGroup.map((item) {
+          return HistoryTimelineItem(
+            expired: item.isExpired,
+            history: item,
+            last: item == allHistory.last,
+          );
+        }),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkVersion();
+      _measureFirstCard();
+    });
+    GlobalProviders.location.$code.addListener(_refresh);
+    _sheetController.addListener(_onSheetChanged);
     _refresh();
   }
 
@@ -472,11 +903,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
                     tooltip: '地圖',
-                    onPressed: () => context.push(
-                      MapPage.route(
-                        options: MapPageOptions(initialLayers: layers),
-                      ),
-                    ),
+                    onPressed: () =>
+                        MapRoute(layers: layers.join(',')).push(context),
                     elevation: 2,
                   );
                 },
@@ -505,7 +933,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: SafeArea(
             child: RepaintBoundary(
               child: Align(
-                alignment: Alignment.topCenter,
+                alignment: .topCenter,
                 child: const LocationButton(),
               ),
             ),
@@ -528,7 +956,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       filter: filter,
                       blendMode: BlendMode.srcOver,
                       child: ColoredBox(
-                        color: Colors.black.withValues(alpha: blurAmount / 50),
+                        color: Colors.black.withValues(
+                          alpha: blurAmount / 50,
+                        ),
                       ),
                     ),
                   ),
@@ -542,502 +972,95 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildDraggableSheet(List<HomeDisplaySection> homeSections) {
-    final screenHeight = context.dimension.height;
-    final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
-    final handleHeight = 28.0 / screenHeight;
-    final minSize = handleHeight.clamp(0.03, 0.05);
-    final initialSize = _measuredFirstCardHeight == null
-        ? minSize
-        : baseSnapSize;
-    final snapSizes = [minSize, baseSnapSize, 1.0];
-
-    return DraggableScrollableSheet(
-      key: _sheetKey,
-      controller: _sheetController,
-      initialChildSize: initialSize,
-      minChildSize: minSize,
-      maxChildSize: 1.0,
-      snap: true,
-      snapSizes: snapSizes,
-      builder: (context, scrollController) {
-        return SingleChildScrollView(
-          controller: scrollController,
-          child: Column(
-            children: [
-              RepaintBoundary(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: _isFullyExpandedNotifier,
-                  builder: (context, isFullyExpanded, child) {
-                    return AnimatedOpacity(
-                      opacity: isFullyExpanded ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 150),
-                      child: Center(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          width: 32,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: context.colors.onSurfaceVariant.withValues(
-                              alpha: 0.4,
-                            ),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              RepaintBoundary(
-                child: _buildContentSection(homeSections),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final model = context.read<HomeLocationModel>();
+    if (_homeLocationModel != model) {
+      _homeLocationModel?.removeListener(_refresh);
+      _homeLocationModel = model;
+      model.addListener(_refresh);
+    }
   }
 
-  Widget _buildHeroSection() {
-    final code = GlobalProviders.location.code;
-    final screenHeight = context.dimension.height;
-
-    if (code == null) {
-      return SizedBox(
-        height: screenHeight * 0.5,
-        child: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(32),
-            child: LocationNotSetCard(),
-          ),
-        ),
-      );
-    }
-
-    if (_isOutOfService) {
-      return SizedBox(
-        height: screenHeight * 0.5,
-        child: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(32),
-            child: LocationOutOfServiceCard(),
-          ),
-        ),
-      );
-    }
-
-    return HeroWeather(
-      weather: _weather,
-      isLoading: _isLoading,
-    );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == .resumed) _refresh();
   }
 
-  Widget _buildContentSection(List<HomeDisplaySection> homeSections) {
-    final List<Widget> allCards = [];
-    final List<Widget> firstCardChildren = [];
-
-    final stationInfo = _buildStationInfo();
-    firstCardChildren.add(stationInfo);
-
-    Widget? firstSectionWidget;
-    int? firstSectionIndex;
-
-    if (!_isLoading) {
-      final realtimeWidgets = _buildRealtimeInfo();
-      allCards.addAll(realtimeWidgets);
-    }
-    for (var i = 0; i < homeSections.length; i++) {
-      final section = homeSections[i];
-      switch (section) {
-        case HomeDisplaySection.radar:
-          firstSectionWidget = _buildRadarMap();
-          firstSectionIndex = i;
-        case HomeDisplaySection.forecast:
-          firstSectionWidget = _buildForecast();
-          firstSectionIndex = i;
-        case HomeDisplaySection.wind:
-          if (!_isLoading && _weather != null) {
-            firstSectionWidget = _buildWindCard();
-            firstSectionIndex = i;
-          }
-      }
-      if (firstSectionWidget != null) break;
-    }
-
-    if (firstSectionWidget != null) {
-      firstCardChildren.add(firstSectionWidget);
-    }
-
-    allCards.add(
-      KeyedSubtree(
-        key: _firstCardKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: firstCardChildren,
-        ),
-      ),
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measureFirstCard());
-    for (var i = 0; i < homeSections.length; i++) {
-      if (i == firstSectionIndex) continue;
-      final section = homeSections[i];
-      switch (section) {
-        case HomeDisplaySection.radar:
-          allCards.add(_buildRadarMap());
-        case HomeDisplaySection.forecast:
-          allCards.add(_buildForecast());
-        case HomeDisplaySection.wind:
-          if (_weather != null) {
-            allCards.add(_buildWindCard());
-          }
-      }
-    }
-
-    allCards.add(_buildHistoryTimeline());
-    allCards.add(_buildCommunityCards());
-
-    return Column(
-      children: [
-        ...allCards,
-        SizedBox(height: context.padding.bottom + 16),
-      ],
-    );
+  @override
+  void dispose() {
+    _homeLocationModel?.removeListener(_refresh);
+    _sheetController.removeListener(_onSheetChanged);
+    _blurNotifier.dispose();
+    _isFullyExpandedNotifier.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    GlobalProviders.location.$code.removeListener(_refresh);
+    _sheetController.dispose();
+    super.dispose();
   }
+}
 
-  Widget _buildCommunityCards() {
-    final options = [
-      (
-        icon: SimpleIcons.discord,
-        color: const Color(0xFF5865F2),
-        url: 'https://exptech.com.tw/dc',
-      ),
-      (
-        icon: SimpleIcons.threads,
-        color: context.theme.brightness == .dark ? Colors.white : Colors.black,
-        url: 'https://www.threads.net/@dpip.tw',
-      ),
-      (
-        icon: SimpleIcons.youtube,
-        color: const Color(0xFFFF0000),
-        url: 'https://www.youtube.com/@exptechtw/live',
-      ),
-      (
-        icon: Symbols.favorite_rounded,
-        color: context.colors.primary,
-        url: SettingsDonatePage.route,
-      ),
-    ];
+/// A single info chip in the station summary row of the home page.
+///
+/// Renders a blurred glass container with a [label] above a [value], tinted
+/// with [color].
+class _StationChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: options.map((item) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  if (item.url.startsWith('/')) {
-                    context.push(item.url);
-                  } else {
-                    launchUrl(Uri.parse(item.url));
-                  }
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Ink(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: context.colors.surfaceContainerLow.withValues(
-                      alpha: 0.6,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(item.icon, size: 24, color: item.color),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  const _StationChip({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
-  Widget _buildStationInfo() {
-    final weather = _weather;
-    final hasData = weather != null;
-
-    String timeStr = '--:--';
-    if (hasData) {
-      final dt = DateTime.fromMillisecondsSinceEpoch(weather.time);
-      final hour = dt.hour;
-      final hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-      final period = hour < 12 ? '上午'.i18n : '下午'.i18n;
-      timeStr =
-          '$period ${hour12.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    }
-
-    String stationLabel = '--';
-    if (hasData) {
-      stationLabel = weather.station.name;
-      if (weather.station.distance >= 0) {
-        stationLabel += '・${weather.station.distance.toStringAsFixed(1)}km';
-      }
-    }
-
-    Widget buildChip(String label, String value, Color color) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: context.theme.brightness == .dark
-                    ? Colors.white.withValues(alpha: 0.25)
-                    : const Color.fromARGB(
-                        255,
-                        0,
-                        0,
-                        0,
-                      ).withValues(alpha: 0.25),
-                width: 0.5,
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: context.texts.labelSmall?.copyWith(
-                    color: context.theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : const Color.fromARGB(255, 90, 90, 90),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 9,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: context.texts.bodySmall?.copyWith(
-                    color: context.theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : const Color.fromARGB(255, 60, 60, 60),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return ResponsiveContainer(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: .circular(8),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const .symmetric(horizontal: 6, vertical: 4),
           decoration: BoxDecoration(
-            color: context.colors.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
+            color: color.withValues(alpha: 0.15),
+            borderRadius: .circular(8),
+            border: Border.all(
+              color: context.theme.brightness == .dark
+                  ? Colors.white.withValues(alpha: 0.25)
+                  : const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.25),
+              width: 0.5,
+            ),
           ),
           child: Column(
+            mainAxisSize: .min,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Symbols.pin_drop_rounded,
-                    size: 15,
-                    color: context.colors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      stationLabel,
-                      style: context.texts.labelSmall?.copyWith(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: context.colors.onSurface,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    timeStr,
-                    style: context.texts.labelSmall?.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: context.colors.onSurface,
-                    ),
-                  ),
-                ],
+              Text(
+                label,
+                style: context.texts.labelSmall?.copyWith(
+                  color: context.theme.brightness == .dark
+                      ? Colors.white
+                      : const Color.fromARGB(255, 90, 90, 90),
+                  fontWeight: .w700,
+                  fontSize: 9,
+                ),
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  buildChip(
-                    '濕度'.i18n,
-                    hasData && weather.data.humidity >= 0
-                        ? '${weather.data.humidity.round().toString().padLeft(3)}%'
-                        : '---',
-                    Colors.cyan,
-                  ),
-                  buildChip(
-                    '氣壓'.i18n,
-                    hasData && weather.data.pressure >= 0
-                        ? '${weather.data.pressure.round().toString().padLeft(4)}hPa'
-                        : '----',
-                    Colors.purple,
-                  ),
-                  buildChip(
-                    '降雨'.i18n,
-                    hasData && weather.data.rain >= 0
-                        ? '${weather.data.rain.toStringAsFixed(1).padLeft(5)}mm'
-                        : '----',
-                    Colors.blue,
-                  ),
-                  buildChip(
-                    '能見度'.i18n,
-                    hasData && weather.data.visibility >= 0
-                        ? '${weather.data.visibility.round().toString().padLeft(2)}km'
-                        : '--',
-                    Colors.amber,
-                  ),
-                  buildChip(
-                    '風速'.i18n,
-                    hasData && weather.data.wind.speed >= 0
-                        ? '${weather.data.wind.direction.isNotEmpty ? '${weather.data.wind.direction} ' : ''}${weather.data.wind.speed.toStringAsFixed(1)}m/s'
-                        : '----',
-                    Colors.teal,
-                  ),
-                  buildChip(
-                    '陣風'.i18n,
-                    hasData && weather.data.gust.speed >= 0
-                        ? '${weather.data.gust.speed.toStringAsFixed(1).padLeft(4)}m/s'
-                        : '----',
-                    Colors.orange,
-                  ),
-                ],
+              Text(
+                value,
+                style: context.texts.bodySmall?.copyWith(
+                  color: context.theme.brightness == .dark
+                      ? Colors.white
+                      : const Color.fromARGB(255, 60, 60, 60),
+                  fontWeight: .w600,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  List<Widget> _buildRealtimeInfo() {
-    return [
-      if (GlobalProviders.data.eew.isNotEmpty)
-        ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: GlobalProviders.data.eew.length,
-          itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.all(16),
-            child: EewCard(GlobalProviders.data.eew[index]),
-          ),
-        ),
-      if (_thunderstorm != null)
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: ThunderstormCard(_thunderstorm!),
-        ),
-    ];
-  }
-
-  Widget _buildWindCard() {
-    if (_weather == null) return const SizedBox.shrink();
-    return WindCard(_weather!);
-  }
-
-  Widget _buildRadarMap() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: RadarMapCard(key: _mapKey),
-    );
-  }
-
-  Widget _buildForecast() {
-    if (_forecast == null) return const SizedBox.shrink();
-    return ForecastCard(_forecast!);
-  }
-
-  Widget _buildHistoryTimeline() {
-    return ResponsiveContainer(
-      child: Builder(
-        builder: (context) {
-          final history = _history;
-
-          if (history == null || history.isEmpty) {
-            return Column(
-              children: [
-                DateTimelineItem(
-                  TZDateTime.now(UTC).toLocaleFullDateString(context),
-                  first: true,
-                  last: true,
-                  mode: _currentMode,
-                  onModeChanged: _onModeChanged,
-                  isOutOfService: _isOutOfService,
-                ),
-              ],
-            );
-          }
-
-          final grouped = groupBy(
-            history,
-            (e) => e.time.send.toLocaleFullDateString(context),
-          );
-
-          return Column(
-            children: grouped.entries
-                .sorted((a, b) => b.key.compareTo(a.key))
-                .mapIndexed(
-                  (index, entry) => _buildHistoryGroup(entry, index, history),
-                )
-                .toList(),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildHistoryGroup(
-    MapEntry<String, List<History>> entry,
-    int index,
-    List<History> allHistory,
-  ) {
-    final historyGroup = entry.value.sorted(
-      (a, b) => b.time.send.compareTo(a.time.send),
-    );
-
-    return Column(
-      children: [
-        DateTimelineItem(
-          entry.key,
-          first: index == 0,
-          mode: index == 0 ? _currentMode : null,
-          onModeChanged: index == 0 ? _onModeChanged : null,
-          isOutOfService: _isOutOfService,
-        ),
-        ...historyGroup.map((item) {
-          return HistoryTimelineItem(
-            expired: item.isExpired,
-            history: item,
-            last: item == allHistory.last,
-          );
-        }),
-      ],
     );
   }
 }

@@ -1,3 +1,6 @@
+/// The main map page and supporting options for the DPIP map view.
+library;
+
 import 'dart:async';
 
 import 'package:dpip/app/map/_lib/manager.dart';
@@ -21,13 +24,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+/// Configuration options passed to [MapPage] to control initial state.
 class MapPageOptions {
+  /// The set of [MapLayer]s to activate when the page first appears.
   final Set<MapLayer>? initialLayers;
+
+  /// The report ID to load and display immediately on open.
   final String? reportId;
+
+  /// A Unix timestamp (ms) used to replay monitor data at a fixed point in time.
   final int? replayTimestamp;
 
+  /// Creates options with optional initial layers, report ID, and replay
+  /// timestamp.
   MapPageOptions({this.initialLayers, this.reportId, this.replayTimestamp});
 
+  /// Constructs [MapPageOptions] by parsing URL query parameters.
+  ///
+  /// Reads `layers`, `report`, and `replay` keys from [queryParameters].
   factory MapPageOptions.fromQueryParameters(
     Map<String, String> queryParameters,
   ) {
@@ -45,11 +59,16 @@ class MapPageOptions {
   }
 }
 
+/// The full-screen map page with layer management and playback controls.
 class MapPage extends StatefulWidget {
+  /// Optional configuration controlling the initial layer and report state.
   final MapPageOptions? options;
 
+  /// Creates a [MapPage] with optional [options].
   const MapPage({super.key, this.options});
 
+  /// Returns the route path for this page, including any query parameters
+  /// derived from [options].
   static String route({MapPageOptions? options}) {
     if (options == null) return '/map';
 
@@ -96,8 +115,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
   }
 
+  /// The currently active set of map layers.
   Set<MapLayer> get activeLayers => _activeLayers;
 
+  /// Returns the highest-priority active weather layer, or the first active
+  /// layer if none of the priority layers are active.
   MapLayer? get primaryLayer {
     for (final layer in [
       MapLayer.temperature,
@@ -112,6 +134,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return _activeLayers.isNotEmpty ? _activeLayers.first : null;
   }
 
+  /// Synchronises the radar layer to the given weather observation [time].
+  ///
+  /// Has no effect if the radar layer is not currently active.
   Future<void> syncTimeToRadar(String time) async {
     if (!_activeLayers.contains(MapLayer.radar)) return;
 
@@ -188,11 +213,17 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
+  /// Returns the [MapLayerManager] for [layer] cast to [T], or `null` if the
+  /// manager does not exist or is not of type [T].
   T? getLayerManager<T extends MapLayerManager>(MapLayer layer) {
     final manager = _managers[layer];
     return manager is T ? manager : null;
   }
 
+  /// Toggles [layer] on or off, waiting for any prior toggle to complete first.
+  ///
+  /// Pass [show] as `true` to show the layer or `false` to hide it.
+  /// [activeLayers] is the full desired set of active layers after the change.
   Future<void> toggleLayer(
     MapLayer layer,
     bool show,
@@ -243,6 +274,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
+  /// Switches the base map style to [baseMapType] and updates state.
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
     if (!mounted) return;
 
@@ -251,6 +283,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _baseMapType = baseMapType);
   }
 
+  /// Sets up and shows each layer in [layers], replacing the active layer set.
   Future<void> setLayers(Set<MapLayer> layers) async {
     if (!mounted) return;
 
@@ -265,10 +298,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _activeLayers = layers);
   }
 
+  /// Called by [DpipMap] when the underlying MapLibre controller is ready.
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
   }
 
+  /// Called after the map style has finished loading.
+  ///
+  /// Rebuilds all [MapLayerManager] instances and restores any active layers.
   void onStyleLoaded() {
     final controller = _controller;
 
@@ -376,9 +413,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 }
 
+/// A convenience wrapper around [MapPage] that opens directly in monitor
+/// replay mode for the given [replayTimestamp].
 class MapMonitorPage extends StatelessWidget {
+  /// The Unix timestamp (ms) at which to replay monitor data.
   final int replayTimestamp;
 
+  /// Creates a [MapMonitorPage] with the required [replayTimestamp].
   const MapMonitorPage({super.key, required this.replayTimestamp});
 
   @override

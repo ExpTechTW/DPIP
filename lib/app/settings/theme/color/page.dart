@@ -1,3 +1,6 @@
+/// Theme color settings page.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -8,7 +11,12 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// A page for selecting the app accent color.
+///
+/// Offers a system dynamic color option and a custom color picker.
+/// Requires [SettingsUserInterfaceModel] via [BuildContext] extensions.
 class SettingsThemeColorPage extends StatelessWidget {
+  /// Creates a [SettingsThemeColorPage].
   const SettingsThemeColorPage({super.key});
 
   @override
@@ -24,8 +32,8 @@ class SettingsThemeColorPage extends StatelessWidget {
             DynamicColorBuilder(
               builder: (lightDynamic, darkDynamic) {
                 final seed = switch (context.theme.brightness) {
-                  .light => lightDynamic ?? ColorScheme.light(),
-                  .dark => darkDynamic ?? ColorScheme.dark(),
+                  .light => lightDynamic ?? .light(),
+                  .dark => darkDynamic ?? .dark(),
                 }.primary;
 
                 final colors = ColorScheme.fromSeed(

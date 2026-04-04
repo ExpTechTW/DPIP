@@ -1,3 +1,6 @@
+/// Wind and compass card displaying real-time wind data for the home screen.
+library;
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -13,12 +16,59 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// Compass accuracy threshold (degrees) for a warning indicator.
 const double _kCompassAccuracyWarning = 25.0;
+
+/// Compass accuracy threshold (degrees) for a danger indicator.
 const double _kCompassAccuracyDanger = 45.0;
 
+/// Maps Chinese cardinal/intercardinal direction names to bearing angles.
+const _kWindDirections = {
+  '北': 0.0,
+  '北北東': 22.5,
+  '東北': 45.0,
+  '東北東': 67.5,
+  '東': 90.0,
+  '東南東': 112.5,
+  '東南': 135.0,
+  '南南東': 157.5,
+  '南': 180.0,
+  '南南西': 202.5,
+  '西南': 225.0,
+  '西南西': 247.5,
+  '西': 270.0,
+  '西北西': 292.5,
+  '西北': 315.0,
+  '北北西': 337.5,
+};
+
+/// Beaufort scale descriptions indexed by Beaufort number (0–12).
+const _kBeaufortDescriptions = [
+  '無風',
+  '軟風',
+  '輕風',
+  '微風',
+  '和風',
+  '清風',
+  '強風',
+  '疾風',
+  '大風',
+  '烈風',
+  '狂風',
+  '暴風',
+  '颶風',
+];
+
+/// Shows a compact wind card with a live compass rose and magnetic accuracy
+/// indicator.
+///
+/// The compass rose rotates to reflect the device heading when a magnetometer
+/// is available. Tapping the accuracy indicator opens a diagnostic dialog.
 class WindCard extends StatefulWidget {
+  /// The current weather observation used to display wind data.
   final RealtimeWeather weather;
 
+  /// Creates a [WindCard] for the provided [weather].
   const WindCard(this.weather, {super.key});
 
   @override
@@ -54,9 +104,9 @@ class _WindCardState extends State<WindCard>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     TalkerManager.instance.debug('WindCard.didChangeAppLifecycleState: $state');
-    if (state == AppLifecycleState.resumed) {
+    if (state == .resumed) {
       _initCompass();
-    } else if (state == AppLifecycleState.paused) {
+    } else if (state == .paused) {
       _compassSubscription?.cancel();
       _compassSubscription = null;
     }
@@ -87,7 +137,8 @@ class _WindCardState extends State<WindCard>
 
   void _initCompass() {
     TalkerManager.instance.debug(
-      'WindCard._initCompass called, mounted=$mounted, hasSubscription=${_compassSubscription != null}',
+      'WindCard._initCompass called, mounted=$mounted, '
+      'hasSubscription=${_compassSubscription != null}',
     );
 
     if (_compassSubscription != null) {
@@ -124,106 +175,26 @@ class _WindCardState extends State<WindCard>
     TalkerManager.instance.debug('WindCard._initCompass: subscription created');
   }
 
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    WidgetsBinding.instance.removeObserver(this);
-    _compassSubscription?.cancel();
-    super.dispose();
-  }
+  double _getWindDirectionAngle(String direction) =>
+      _kWindDirections[direction.trim()] ?? 0.0;
 
-  double _getWindDirectionAngle(String direction) {
-    const directions = {
-      '北': 0.0,
-      '北北東': 22.5,
-      '東北': 45.0,
-      '東北東': 67.5,
-      '東': 90.0,
-      '東南東': 112.5,
-      '東南': 135.0,
-      '南南東': 157.5,
-      '南': 180.0,
-      '南南西': 202.5,
-      '西南': 225.0,
-      '西南西': 247.5,
-      '西': 270.0,
-      '西北西': 292.5,
-      '西北': 315.0,
-      '北北西': 337.5,
-    };
-    return directions[direction.trim()] ?? 0.0;
-  }
+  String _getBeaufortDescription(int beaufort) =>
+      ((beaufort >= 0 && beaufort < _kBeaufortDescriptions.length)
+              ? _kBeaufortDescriptions[beaufort]
+              : '未知')
+          .i18n;
 
-  String _getWindDirectionName(String direction) {
-    return direction.trim();
-  }
+  bool get _compassHasDanger =>
+      _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
 
-  String _getBeaufortDescription(int beaufort) {
-    const descriptions = [
-      '無風',
-      '軟風',
-      '輕風',
-      '微風',
-      '和風',
-      '清風',
-      '強風',
-      '疾風',
-      '大風',
-      '烈風',
-      '狂風',
-      '暴風',
-      '颶風',
-    ];
-    if (beaufort >= 0 && beaufort < descriptions.length) {
-      return descriptions[beaufort];
-    }
-    return '未知';
-  }
+  bool get _compassHasWarning =>
+      _compassAccuracy >= _kCompassAccuracyWarning &&
+      _compassAccuracy < _kCompassAccuracyDanger;
 
-  @override
-  Widget build(BuildContext context) {
-    final wind = widget.weather.data.wind;
-    final gust = widget.weather.data.gust;
-    final hasValidDirection =
-        wind.direction.isNotEmpty && wind.direction != '-';
-    final windAngle = hasValidDirection
-        ? _getWindDirectionAngle(wind.direction)
-        : 0.0;
-
-    return ResponsiveContainer(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: context.colors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: context.colors.outlineVariant.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 80,
-                height: 80,
-                child: _buildCompass(context, windAngle, hasValidDirection),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildCompactWindInfo(
-                  context,
-                  wind,
-                  gust,
-                  hasValidDirection,
-                ),
-              ),
-              if (_hasCompass) _buildMagneticInfo(context),
-            ],
-          ),
-        ),
-      ),
-    );
+  Color get _compassStatusColor {
+    if (_compassHasDanger) return Colors.red;
+    if (_compassHasWarning) return Colors.orange;
+    return Colors.green;
   }
 
   Widget _buildCompass(
@@ -234,11 +205,11 @@ class _WindCardState extends State<WindCard>
     final deviceRotation = -_deviceHeading * math.pi / 180;
 
     return Stack(
-      alignment: Alignment.center,
+      alignment: .center,
       children: [
         Container(
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
+            shape: .circle,
             color: context.colors.surfaceContainerHighest.withValues(
               alpha: 0.5,
             ),
@@ -251,7 +222,7 @@ class _WindCardState extends State<WindCard>
         Transform.rotate(
           angle: deviceRotation,
           child: Stack(
-            alignment: Alignment.center,
+            alignment: .center,
             children: [
               ...['N', 'E', 'S', 'W'].asMap().entries.map((entry) {
                 final index = entry.key;
@@ -272,8 +243,8 @@ class _WindCardState extends State<WindCard>
                               ? Colors.red
                               : context.colors.onSurfaceVariant,
                           fontWeight: isNorth
-                              ? FontWeight.bold
-                              : FontWeight.w500,
+                              ? .bold
+                              : .w500,
                           fontSize: isNorth ? 14 : 12,
                         ),
                       ),
@@ -292,9 +263,7 @@ class _WindCardState extends State<WindCard>
                   angle: windAngle * math.pi / 180,
                   child: CustomPaint(
                     size: const Size.square(80),
-                    painter: _WindArrowPainter(
-                      color: Colors.teal,
-                    ),
+                    painter: _WindArrowPainter(color: Colors.teal),
                   ),
                 ),
             ],
@@ -304,13 +273,14 @@ class _WindCardState extends State<WindCard>
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
+            shape: .circle,
             color: hasValidDirection ? Colors.teal : context.colors.outline,
             boxShadow: [
               BoxShadow(
-                color:
-                    (hasValidDirection ? Colors.teal : context.colors.outline)
-                        .withValues(alpha: 0.3),
+                color: (hasValidDirection
+                        ? Colors.teal
+                        : context.colors.outline)
+                    .withValues(alpha: 0.3),
                 blurRadius: 4,
                 spreadRadius: 1,
               ),
@@ -338,17 +308,17 @@ class _WindCardState extends State<WindCard>
     bool hasValidDirection,
   ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: .start,
+      mainAxisSize: .min,
       children: [
         Row(
           children: [
             Icon(Symbols.air_rounded, size: 16, color: Colors.teal),
             const SizedBox(width: 6),
             Text(
-              hasValidDirection ? _getWindDirectionName(wind.direction) : '-',
+              hasValidDirection ? wind.direction.trim() : '-',
               style: context.texts.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: .bold,
               ),
             ),
             const SizedBox(width: 8),
@@ -382,9 +352,7 @@ class _WindCardState extends State<WindCard>
                 ),
               ),
               Text(
-                '陣風 {speed} m/s'.i18n.args({
-                  'speed': gust.speed,
-                }),
+                '陣風 {speed} m/s'.i18n.args({'speed': gust.speed}),
                 style: context.texts.bodySmall?.copyWith(
                   color: Colors.purple,
                 ),
@@ -397,37 +365,26 @@ class _WindCardState extends State<WindCard>
   }
 
   Widget _buildMagneticInfo(BuildContext context) {
-    final hasDanger =
-        _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
-    final hasWarning =
-        _compassAccuracy >= _kCompassAccuracyWarning &&
-        _compassAccuracy < _kCompassAccuracyDanger;
+    final hasDanger = _compassHasDanger;
+    final hasWarning = _compassHasWarning;
     final statusText = _compassAccuracy < 0
         ? '–'
         : '±${_compassAccuracy.round()}°';
-
-    final Color statusColor;
-    if (hasDanger) {
-      statusColor = Colors.red;
-    } else if (hasWarning) {
-      statusColor = Colors.orange;
-    } else {
-      statusColor = Colors.green;
-    }
+    final statusColor = _compassStatusColor;
 
     return GestureDetector(
       onTap: () => _showMagneticFieldInfo(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const .symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: statusColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: .circular(8),
           border: (hasWarning || hasDanger)
               ? Border.all(color: statusColor.withValues(alpha: 0.5))
               : null,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           children: [
             Icon(
               hasDanger || hasWarning
@@ -441,7 +398,7 @@ class _WindCardState extends State<WindCard>
               '${_deviceHeading.round()}°',
               style: context.texts.labelSmall?.copyWith(
                 color: statusColor,
-                fontWeight: FontWeight.bold,
+                fontWeight: .bold,
               ),
             ),
             Text(
@@ -458,11 +415,8 @@ class _WindCardState extends State<WindCard>
   }
 
   void _showMagneticFieldInfo(BuildContext context) {
-    final hasDanger =
-        _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
-    final hasWarning =
-        _compassAccuracy >= _kCompassAccuracyWarning &&
-        _compassAccuracy < _kCompassAccuracyDanger;
+    final hasDanger = _compassHasDanger;
+    final hasWarning = _compassHasWarning;
     final valueText = _compassAccuracy < 0
         ? '無法測量'.i18n
         : '±${_compassAccuracy.toStringAsFixed(1)}°';
@@ -491,8 +445,8 @@ class _WindCardState extends State<WindCard>
               : '指北針正常'.i18n,
         ),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: .min,
+          crossAxisAlignment: .start,
           children: [
             Text(
               '方向精確度'.i18n,
@@ -504,7 +458,7 @@ class _WindCardState extends State<WindCard>
             Text(
               valueText,
               style: context.texts.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: .bold,
                 color: hasDanger
                     ? Colors.red
                     : hasWarning
@@ -522,16 +476,17 @@ class _WindCardState extends State<WindCard>
             if (hasWarning || hasDanger) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const .all(12),
                 decoration: BoxDecoration(
                   color: (hasDanger ? Colors.red : Colors.orange).withValues(
                     alpha: 0.1,
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: .circular(8),
                 ),
                 child: Text(
                   hasDanger
-                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。'.i18n
+                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。'
+                            .i18n
                       : '附近可能有磁場干擾，指北針方向可能有偏差。'.i18n,
                   style: context.texts.bodySmall,
                 ),
@@ -541,19 +496,76 @@ class _WindCardState extends State<WindCard>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.navigator.pop(),
             child: Text('確定'.i18n),
           ),
         ],
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final wind = widget.weather.data.wind;
+    final gust = widget.weather.data.gust;
+    final hasValidDirection =
+        wind.direction.isNotEmpty && wind.direction != '-';
+    final windAngle = hasValidDirection
+        ? _getWindDirectionAngle(wind.direction)
+        : 0.0;
+
+    return ResponsiveContainer(
+      child: Container(
+        margin: const .symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainerLow,
+          borderRadius: .circular(16),
+          border: Border.all(
+            color: context.colors.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Padding(
+          padding: const .all(12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: _buildCompass(context, windAngle, hasValidDirection),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildCompactWindInfo(
+                  context,
+                  wind,
+                  gust,
+                  hasValidDirection,
+                ),
+              ),
+              if (_hasCompass) _buildMagneticInfo(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
+    _compassSubscription?.cancel();
+    super.dispose();
+  }
 }
 
+/// Draws the compass tick marks around the perimeter of the rose.
 class _CompassTicksPainter extends CustomPainter {
+  /// The colour used to draw the tick marks.
   final Color color;
 
-  _CompassTicksPainter({required this.color});
+  /// Creates a [_CompassTicksPainter] with the given [color].
+  const _CompassTicksPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -584,13 +596,17 @@ class _CompassTicksPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CompassTicksPainter oldDelegate) =>
+      color != oldDelegate.color;
 }
 
+/// Draws a directional arrow indicating the current wind direction.
 class _WindArrowPainter extends CustomPainter {
+  /// The colour used to fill the arrow.
   final Color color;
 
-  _WindArrowPainter({required this.color});
+  /// Creates a [_WindArrowPainter] with the given [color].
+  const _WindArrowPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -645,5 +661,6 @@ class _WindArrowPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _WindArrowPainter oldDelegate) =>
+      color != oldDelegate.color;
 }

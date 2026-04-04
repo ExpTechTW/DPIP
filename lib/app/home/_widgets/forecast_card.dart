@@ -1,3 +1,6 @@
+/// 24-hour weather forecast card for the home screen.
+library;
+
 import 'dart:math';
 
 import 'package:dpip/core/i18n.dart';
@@ -10,9 +13,15 @@ import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// Renders a horizontal scrolling 24-hour forecast strip from raw [forecast]
+/// JSON data.
+///
+/// Returns [SizedBox.shrink] when the data is missing or malformed.
 class ForecastCard extends StatelessWidget {
+  /// The raw forecast JSON map returned by the ExpTech API.
   final Map<String, dynamic> forecast;
 
+  /// Creates a [ForecastCard] with the given raw [forecast] data.
   const ForecastCard(this.forecast, {super.key});
 
   @override
@@ -90,6 +99,7 @@ class ForecastCard extends StatelessWidget {
   }
 }
 
+/// A single column in the forecast strip representing one time slot.
 class _ForecastItem extends StatelessWidget {
   final Map<String, dynamic> item;
   final double minTemp;
@@ -115,14 +125,14 @@ class _ForecastItem extends StatelessWidget {
       Colors.blueGrey[300],
     ),
     final s when s.contains('雷') => (
-      Symbols.flash_on,
+      Symbols.flash_on_rounded,
       Colors.yellow,
     ),
     final s when s.contains('雪') => (
       Symbols.snowflake_rounded,
       Colors.white70,
     ),
-    _ => (Symbols.wb_cloudy, Colors.grey.withValues(alpha: 0.6)),
+    _ => (Symbols.wb_cloudy_rounded, Colors.grey.withValues(alpha: 0.6)),
   };
 
   @override
@@ -169,7 +179,7 @@ class _ForecastItem extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 10,
                   color: Colors.blueAccent,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: .w600,
                 ),
               ),
             ],

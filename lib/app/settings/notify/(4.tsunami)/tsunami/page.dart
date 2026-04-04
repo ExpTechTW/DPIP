@@ -1,3 +1,6 @@
+/// Tsunami notification settings page.
+library;
+
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/tsunami_notify_section.dart';
 import 'package:dpip/core/i18n.dart';
@@ -6,7 +9,10 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A page for configuring tsunami notification settings and testing tsunami
+/// notification sounds.
 class SettingsNotifyTsunamiPage extends StatelessWidget {
+  /// Creates a [SettingsNotifyTsunamiPage].
   const SettingsNotifyTsunamiPage({super.key});
 
   @override

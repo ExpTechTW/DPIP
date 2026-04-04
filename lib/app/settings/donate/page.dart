@@ -1,3 +1,6 @@
+/// Donate settings page for in-app purchase and donation options.
+library;
+
 import 'dart:async';
 import 'dart:io';
 
@@ -12,13 +15,17 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// A page that presents subscription and one-time donation options via
+/// in-app purchases.
+///
+/// Pull to refresh to reload the product list from the store.
 class SettingsDonatePage extends StatefulWidget {
+  /// Creates a [SettingsDonatePage].
   const SettingsDonatePage({super.key});
-
-  static const route = '/settings/donate';
 
   @override
   State<SettingsDonatePage> createState() => _SettingsDonatePageState();
+
 }
 
 class _SettingsDonatePageState extends State<SettingsDonatePage>
@@ -63,37 +70,6 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
     products.complete(response.productDetails);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _refreshIndicatorKey.currentState?.show();
-    });
-
-    subscription?.cancel();
-    subscription = InAppPurchase.instance.purchaseStream.listen(
-      onPurchaseUpdate,
-      onError: (error) {
-        if (!mounted) return;
-        setState(() => isPending = false);
-      },
-    );
-    refresh();
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    subscription?.cancel();
-    super.dispose();
-  }
-
   void onPurchaseUpdate(List<PurchaseDetails> list) {
     if (!mounted) return;
 
@@ -134,84 +110,20 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      key: _refreshIndicatorKey,
-      onRefresh: refresh,
-      child: FutureBuilder(
-        future: products.future,
-        builder: (context, snapshot) {
-          final data = snapshot.data;
-          final error = snapshot.error;
-
-          if (error != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 16,
-                children: [
-                  Text(error.toString()),
-                  FilledButton.tonal(
-                    onPressed: refresh,
-                    child: Text('重新載入'.i18n),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (data == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 16,
-                children: [
-                  const CircularProgressIndicator(),
-                  Text('正在載入商店物品中'.i18n),
-                ],
-              ),
-            );
-          }
-
-          final subscriptions = data
-              .where((item) => item.isSubscription)
-              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
-          final oneTime = data
-              .where((item) => !item.isSubscription)
-              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
-
-          return ListView(
-            padding: EdgeInsets.only(
-              bottom: context.padding.bottom + 16,
-            ),
-            children: [
-              _buildHeader(),
-              if (subscriptions.isNotEmpty)
-                _buildSubscriptionSection(subscriptions),
-              if (oneTime.isNotEmpty) _buildOneTimeSection(oneTime),
-              _buildFooter(),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildHeader() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const .all(16),
+      padding: const .all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             context.colors.primaryContainer.withOpacity(0.5),
             context.colors.tertiaryContainer.withOpacity(0.5),
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: .topLeft,
+          end: .bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: .circular(20),
       ),
       child: Column(
         children: [
@@ -224,7 +136,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
           Text(
             '支持 DPIP'.i18n,
             style: context.texts.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: .bold,
               color: context.colors.onSurface,
             ),
           ),
@@ -235,7 +147,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
             style: context.texts.bodyMedium?.copyWith(
               color: context.colors.onSurfaceVariant,
             ),
-            textAlign: TextAlign.center,
+            textAlign: .center,
           ),
         ],
       ),
@@ -244,10 +156,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
 
   Widget _buildSubscriptionSection(List<ProductDetails> subscriptions) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const .fromLTRB(16, 16, 16, 8),
           child: Row(
             children: [
               Icon(
@@ -259,24 +171,27 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               Text(
                 '訂閱制'.i18n,
                 style: context.texts.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: .bold,
                   color: context.colors.onSurface,
                 ),
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const .symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: .circular(12),
                 ),
                 child: Text(
                   '推薦'.i18n,
                   style: context.texts.labelSmall?.copyWith(
                     color: Colors.black87,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: .bold,
                   ),
                 ),
               ),
@@ -302,9 +217,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
       animation: _shimmerController,
       builder: (context, child) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          margin: const .symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: .circular(16),
             gradient: LinearGradient(
               colors: [
                 const Color(0xFFFFD700).withOpacity(isDisabled ? 0.3 : 0.15),
@@ -316,8 +231,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                 _shimmerController.value,
                 1.0,
               ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: .topLeft,
+              end: .bottomRight,
             ),
             boxShadow: isDisabled
                 ? null
@@ -332,7 +247,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: .circular(16),
               onTap: isPending || isPurchased
                   ? null
                   : () {
@@ -348,11 +263,11 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                       );
                     },
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const .all(16),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const .all(10),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -363,10 +278,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                               0xFFFFA500,
                             ).withOpacity(isDisabled ? 0.3 : 0.8),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                          begin: .topLeft,
+                          end: .bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: .circular(12),
                       ),
                       child: Icon(
                         Symbols.diamond_rounded,
@@ -377,12 +292,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: .start,
                         children: [
                           Text(
                             title,
                             style: context.texts.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: .bold,
                               color: isDisabled
                                   ? context.theme.disabledColor
                                   : context.colors.onSurface,
@@ -402,10 +317,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                     ),
                     if (isPurchased)
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const .all(8),
                         decoration: BoxDecoration(
                           color: context.colors.primary,
-                          shape: BoxShape.circle,
+                          shape: .circle,
                         ),
                         child: Icon(
                           Symbols.check_rounded,
@@ -421,7 +336,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                       )
                     else
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: const .symmetric(
                           horizontal: 12,
                           vertical: 6,
                         ),
@@ -437,13 +352,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                           color: isDisabled
                               ? context.theme.disabledColor
                               : null,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: .circular(20),
                         ),
                         child: Text(
                           '{price}/月'.i18n.args({'price': product.price}),
                           style: context.texts.labelLarge?.copyWith(
-                            color: isDisabled ? Colors.white54 : Colors.black87,
-                            fontWeight: FontWeight.bold,
+                            color:
+                                isDisabled ? Colors.white54 : Colors.black87,
+                            fontWeight: .bold,
                           ),
                         ),
                       ),
@@ -459,10 +375,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
 
   Widget _buildOneTimeSection(List<ProductDetails> oneTime) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+          padding: const .fromLTRB(16, 24, 16, 8),
           child: Row(
             children: [
               Icon(
@@ -474,7 +390,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               Text(
                 '單次支援'.i18n,
                 style: context.texts.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: .bold,
                   color: context.colors.onSurface,
                 ),
               ),
@@ -496,15 +412,15 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
         : product.title;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: const .symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: .circular(16),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           onTap: isPending
               ? null
               : () {
@@ -520,14 +436,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                   );
                 },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const .all(16),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const .all(10),
                   decoration: BoxDecoration(
                     color: context.colors.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: .circular(12),
                   ),
                   child: Icon(
                     Symbols.coffee_rounded,
@@ -540,12 +456,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       Text(
                         title,
                         style: context.texts.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: .bold,
                           color: isDisabled
                               ? context.theme.disabledColor
                               : context.colors.onSurface,
@@ -571,7 +487,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                   )
                 else
                   Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: const .symmetric(
                       horizontal: 12,
                       vertical: 6,
                     ),
@@ -579,7 +495,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                       color: isDisabled
                           ? context.theme.disabledColor
                           : context.colors.primary,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: .circular(20),
                     ),
                     child: Text(
                       product.price,
@@ -587,7 +503,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                         color: isDisabled
                             ? Colors.white54
                             : context.colors.onPrimary,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: .bold,
                       ),
                     ),
                   ),
@@ -601,7 +517,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
 
   Widget _buildFooter() {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const .all(24),
       child: Column(
         children: [
           Divider(color: context.colors.outlineVariant),
@@ -609,13 +525,13 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
           Wrap(
             spacing: 24,
             runSpacing: 8,
-            alignment: WrapAlignment.center,
+            alignment: .center,
             children: [
               _buildFooterLink(
                 '恢復購買'.i18n,
                 onTap: () async {
-                  final bool available = await InAppPurchase.instance
-                      .isAvailable();
+                  final bool available =
+                      await InAppPurchase.instance.isAvailable();
                   if (!context.mounted) return;
 
                   if (!available) {
@@ -659,9 +575,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
   Widget _buildFooterLink(String text, {required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: .circular(4),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const .symmetric(horizontal: 4, vertical: 2),
         child: Text(
           text,
           style: context.texts.bodySmall?.copyWith(
@@ -672,5 +588,100 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _refreshIndicatorKey.currentState?.show();
+    });
+
+    subscription?.cancel();
+    subscription = InAppPurchase.instance.purchaseStream.listen(
+      onPurchaseUpdate,
+      onError: (error) {
+        if (!mounted) return;
+        setState(() => isPending = false);
+      },
+    );
+    refresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: refresh,
+      child: FutureBuilder(
+        future: products.future,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
+
+          if (error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: .center,
+                spacing: 16,
+                children: [
+                  Text(error.toString()),
+                  FilledButton.tonal(
+                    onPressed: refresh,
+                    child: Text('重新載入'.i18n),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (data == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: .center,
+                spacing: 16,
+                children: [
+                  const CircularProgressIndicator(),
+                  Text('正在載入商店物品中'.i18n),
+                ],
+              ),
+            );
+          }
+
+          final subscriptions = data
+              .where((item) => item.isSubscription)
+              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
+          final oneTime = data
+              .where((item) => !item.isSubscription)
+              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
+
+          return ListView(
+            padding: .only(
+              bottom: context.padding.bottom + 16,
+            ),
+            children: [
+              _buildHeader(),
+              if (subscriptions.isNotEmpty)
+                _buildSubscriptionSection(subscriptions),
+              if (oneTime.isNotEmpty) _buildOneTimeSection(oneTime),
+              _buildFooter(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    subscription?.cancel();
+    super.dispose();
   }
 }

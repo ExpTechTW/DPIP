@@ -1,17 +1,36 @@
+/// Blurred glass-effect button widgets for the home screen overlay.
+library;
+
 import 'dart:ui';
 
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
+/// A full-width text button with a frosted-glass backdrop blur effect.
 class BlurredTextButton extends StatelessWidget {
+  /// The label displayed inside the button.
   final String text;
+
+  /// Called when the button is tapped, or `null` to disable the button.
   final void Function()? onPressed;
+
+  /// Background colour override; defaults to
+  /// [ColorScheme.surfaceContainerHighest] at 60% opacity.
   final Color? backgroundColor;
+
+  /// Horizontal blur sigma applied to the backdrop.
   final double sigmaX;
+
+  /// Vertical blur sigma applied to the backdrop.
   final double sigmaY;
+
+  /// Optional text style applied to the label.
   final TextStyle? textStyle;
+
+  /// Material elevation for the drop shadow.
   final double elevation;
 
+  /// Creates a [BlurredTextButton].
   const BlurredTextButton({
     super.key,
     required this.text,
@@ -29,15 +48,15 @@ class BlurredTextButton extends StatelessWidget {
       color: Colors.transparent,
       shadowColor: context.colors.shadow.withValues(alpha: 0.4),
       elevation: elevation,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: .circular(24),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: .circular(24),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: .circular(24),
               border: Border.all(
                 color: context.colors.outlineVariant.withValues(alpha: 0.4),
               ),
@@ -52,7 +71,7 @@ class BlurredTextButton extends StatelessWidget {
                     ? const Color.fromARGB(199, 250, 250, 250)
                     : const Color.fromARGB(255, 50, 50, 50),
                 textStyle: textStyle,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const .symmetric(horizontal: 16),
               ),
               onPressed: onPressed,
               child: Text(text),
@@ -64,15 +83,31 @@ class BlurredTextButton extends StatelessWidget {
   }
 }
 
+/// A circular icon button with a frosted-glass backdrop blur effect.
 class BlurredIconButton extends StatelessWidget {
+  /// The icon widget rendered inside the button.
   final Widget icon;
+
+  /// Called when the button is tapped, or `null` to disable the button.
   final void Function()? onPressed;
+
+  /// Background colour override; defaults to
+  /// [ColorScheme.surfaceContainerHighest] at 60% opacity.
   final Color? backgroundColor;
+
+  /// Material elevation for the drop shadow.
   final double elevation;
+
+  /// Horizontal blur sigma applied to the backdrop.
   final double sigmaX;
+
+  /// Vertical blur sigma applied to the backdrop.
   final double sigmaY;
+
+  /// Optional tooltip string shown on long-press.
   final String? tooltip;
 
+  /// Creates a [BlurredIconButton].
   const BlurredIconButton({
     super.key,
     required this.icon,

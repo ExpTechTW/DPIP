@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for lightning data.
+library;
+
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -23,18 +26,27 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+/// Manages the lightning overlay layer on the DPIP map.
 class LightningMapLayerManager extends MapLayerManager {
+  /// Creates a [LightningMapLayerManager] bound to [context] and [controller].
   LightningMapLayerManager(super.context, super.controller);
 
+  /// The currently displayed lightning observation time string.
   final currentLightningTime = ValueNotifier<String?>(
     GlobalProviders.data.lightning.firstOrNull,
   );
+
+  /// Whether a time-change operation is currently in progress.
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
 
+  /// Called with the new time string whenever the displayed time changes.
   Function(String)? onTimeChanged;
 
+  /// Switches the displayed lightning data to [time].
+  ///
+  /// Does nothing if [time] is already current or a load is in progress.
   Future<void> setLightningTime(String time) async {
     if (currentLightningTime.value == time || isLoading.value) return;
 
@@ -251,9 +263,12 @@ class LightningMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => LightningMapLayerSheet(manager: this);
 }
 
+/// The bottom sheet and legend overlay for the lightning layer.
 class LightningMapLayerSheet extends StatelessWidget {
+  /// The [LightningMapLayerManager] whose state drives this sheet.
   final LightningMapLayerManager manager;
 
+  /// Creates a [LightningMapLayerSheet] for the given [manager].
   const LightningMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -262,11 +277,11 @@ class LightningMapLayerSheet extends StatelessWidget {
       children: [
         MorphingSheet(
           title: '閃電'.i18n,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           elevation: 4,
           partialBuilder: (context, controller, sheetController) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const .symmetric(vertical: 8),
               child: Selector<DpipDataModel, UnmodifiableListView<String>>(
                 selector: (context, model) => model.lightning,
                 builder: (context, lightning, child) {
@@ -280,17 +295,17 @@ class LightningMapLayerSheet extends StatelessWidget {
                       .toList();
 
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: .min,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: const .symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
                         child: Row(
                           spacing: 8,
                           children: [
-                            const Icon(Symbols.bolt, size: 24),
+                            const Icon(Symbols.bolt_rounded, size: 24),
                             Text('閃電'.i18n, style: context.texts.titleMedium),
                           ],
                         ),
@@ -301,10 +316,10 @@ class LightningMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentLightningTime,
                           builder: (context, currentLightningTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(
+                              padding: const .symmetric(
                                 horizontal: 16,
                               ),
-                              scrollDirection: Axis.horizontal,
+                              scrollDirection: .horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
@@ -349,7 +364,7 @@ class LightningMapLayerSheet extends StatelessWidget {
 
                                 children.add(
                                   const Padding(
-                                    padding: EdgeInsets.only(right: 8),
+                                    padding: .only(right: 8),
                                     child: VerticalDivider(
                                       width: 16,
                                       indent: 8,
@@ -359,7 +374,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                                 );
 
                                 return Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize: .min,
                                   spacing: 8,
                                   children: children,
                                 );
@@ -386,7 +401,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                 items: [
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.health_cross,
+                      Symbols.health_cross_rounded,
                       fill: Color(0xffff0000),
                       size: 20,
                     ),
@@ -394,7 +409,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.health_cross,
+                      Symbols.health_cross_rounded,
                       fill: Color(0xffffff00),
                       size: 20,
                     ),
@@ -402,7 +417,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.health_cross,
+                      Symbols.health_cross_rounded,
                       fill: Color(0xff00ff00),
                       size: 20,
                     ),
@@ -410,7 +425,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.health_cross,
+                      Symbols.health_cross_rounded,
                       fill: Color(0xff0000ff),
                       size: 20,
                     ),
@@ -418,7 +433,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.circle,
+                      Symbols.circle_rounded,
                       fill: Color(0xffff0000),
                       size: 20,
                     ),
@@ -426,7 +441,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.circle,
+                      Symbols.circle_rounded,
                       fill: Color(0xffffff00),
                       size: 20,
                     ),
@@ -434,7 +449,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.circle,
+                      Symbols.circle_rounded,
                       fill: Color(0xff00ff00),
                       size: 20,
                     ),
@@ -442,7 +457,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                   ),
                   LegendItem(
                     icon: const OutlinedIcon(
-                      Symbols.circle,
+                      Symbols.circle_rounded,
                       fill: Color(0xff0000ff),
                       size: 20,
                     ),

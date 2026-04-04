@@ -1,11 +1,26 @@
+/// A card widget that highlights an available app update.
+library;
+
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
+/// Displays a summary card for an available update.
+///
+/// Shows [title], [description], and an optional [onViewDetails] callback.
+/// The card uses a gradient derived from the current theme's primary color.
 class UpdateCard extends StatelessWidget {
+  /// The update title (typically the version name).
   final String title;
+
+  /// A brief description of what changed in this update.
   final String description;
+
+  /// Called when the user taps to view full release details.
+  ///
+  /// When `null`, no interactive affordance is shown.
   final VoidCallback? onViewDetails;
 
+  /// Creates an [UpdateCard] with the given [title] and [description].
   const UpdateCard({
     super.key,
     required this.title,
@@ -17,13 +32,15 @@ class UpdateCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: .circular(20),
+      ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: .circular(20),
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: .topLeft,
+            end: .bottomRight,
             colors: [
               context.theme.primaryColor.withValues(alpha: 0.1),
               context.theme.primaryColor.withValues(alpha: 0.3),
@@ -31,13 +48,13 @@ class UpdateCard extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const .all(20),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
                     Row(
                       children: [
@@ -49,8 +66,8 @@ class UpdateCard extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text(
                           title,
-                          style: context.theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                          style: context.texts.titleLarge?.copyWith(
+                            fontWeight: .bold,
                             color: context.theme.primaryColor,
                           ),
                         ),
@@ -59,8 +76,8 @@ class UpdateCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       description,
-                      style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.textTheme.bodyMedium?.color
+                      style: context.texts.bodyMedium?.copyWith(
+                        color: context.texts.bodyMedium?.color
                             ?.withValues(alpha: 0.8),
                       ),
                     ),
@@ -73,9 +90,13 @@ class UpdateCard extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   color: Colors.amber.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  shape: .circle,
                 ),
-                child: const Icon(Icons.update, size: 48, color: Colors.amber),
+                child: const Icon(
+                  Icons.update,
+                  size: 48,
+                  color: Colors.amber,
+                ),
               ),
             ],
           ),

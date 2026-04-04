@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for precipitation data.
+library;
+
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
@@ -22,15 +25,30 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+/// Intermediate data object for a single rain-gauge station reading.
 class RainData {
+  /// The station's latitude in decimal degrees.
   final double latitude;
+
+  /// The station's longitude in decimal degrees.
   final double longitude;
+
+  /// The measured rainfall amount in millimetres.
   final double rainfall;
+
+  /// The human-readable name of the weather station.
   final String stationName;
+
+  /// The county in which the station is located.
   final String county;
+
+  /// The town in which the station is located.
   final String town;
+
+  /// The station's unique identifier.
   final String id;
 
+  /// Creates a [RainData] with all required fields.
   RainData({
     required this.latitude,
     required this.longitude,
@@ -42,9 +60,13 @@ class RainData {
   });
 }
 
+/// Manages the precipitation overlay layer on the DPIP map.
 class PrecipitationMapLayerManager extends MapLayerManager {
+  /// Creates a [PrecipitationMapLayerManager] bound to [context] and
+  /// [controller].
   PrecipitationMapLayerManager(super.context, super.controller);
 
+  /// The available accumulation intervals selectable by the user.
   static const precipitationIntervals = [
     'now',
     '10m',
@@ -57,20 +79,31 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     '3d',
   ];
 
-  // Label layout constants for precipitation labels
+  /// Vertical offset of the first text label line above the station circle.
   static const double kLabelBaseOffset = 1.0;
+
+  /// Vertical spacing between consecutive text label lines.
   static const double kLabelLineHeight = 1.1;
 
+  /// The currently displayed precipitation observation time string.
   final currentPrecipitationTime = ValueNotifier<String?>(
     GlobalProviders.data.precipitation.firstOrNull,
   );
+
+  /// The currently selected accumulation interval key.
   final currentPrecipitationInterval = ValueNotifier<String>('now');
+
+  /// Whether a time-change or interval-change operation is in progress.
   final isLoading = ValueNotifier<bool>(false);
 
   DateTime? _lastFetchTime;
 
+  /// Called with the new time string whenever the displayed time changes.
   Function(String)? onTimeChanged;
 
+  /// Switches the displayed precipitation data to [time].
+  ///
+  /// Does nothing if [time] is already current or a load is in progress.
   Future<void> setPrecipitationTime(String time) async {
     if (currentPrecipitationTime.value == time || isLoading.value) return;
 
@@ -93,6 +126,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     }
   }
 
+  /// Switches the visible accumulation interval to [interval].
+  ///
+  /// Toggles layer visibility without reloading source data.
   Future<void> setPrecipitationInterval(String interval) async {
     if (currentPrecipitationInterval.value == interval) return;
 
@@ -385,9 +421,12 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       PrecipitationMapLayerSheet(manager: this);
 }
 
+/// The bottom sheet and legend overlay for the precipitation layer.
 class PrecipitationMapLayerSheet extends StatelessWidget {
+  /// The [PrecipitationMapLayerManager] whose state drives this sheet.
   final PrecipitationMapLayerManager manager;
 
+  /// Creates a [PrecipitationMapLayerSheet] for the given [manager].
   const PrecipitationMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -409,11 +448,11 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
       children: [
         MorphingSheet(
           title: '降水'.i18n,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           elevation: 4,
           partialBuilder: (context, controller, sheetController) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const .symmetric(vertical: 8),
               child: Selector<DpipDataModel, UnmodifiableListView<String>>(
                 selector: (context, model) => model.precipitation,
                 builder: (context, precipitation, header) {
@@ -427,7 +466,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                       .toList();
 
                   return Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: .min,
                     children: [
                       header!,
                       SizedBox(
@@ -440,10 +479,10 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                     .precipitationIntervals;
 
                                 return ListView.separated(
-                                  padding: const EdgeInsets.symmetric(
+                                  padding: const .symmetric(
                                     horizontal: 16,
                                   ),
-                                  scrollDirection: Axis.horizontal,
+                                  scrollDirection: .horizontal,
                                   physics:
                                       const AlwaysScrollableScrollPhysics(),
                                   itemCount: intervals.length,
@@ -495,10 +534,10 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                           valueListenable: manager.currentPrecipitationTime,
                           builder: (context, currentPrecipitationTime, child) {
                             return ListView.builder(
-                              padding: const EdgeInsets.symmetric(
+                              padding: const .symmetric(
                                 horizontal: 16,
                               ),
-                              scrollDirection: Axis.horizontal,
+                              scrollDirection: .horizontal,
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
@@ -543,7 +582,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
 
                                 children.add(
                                   const Padding(
-                                    padding: EdgeInsets.only(right: 8),
+                                    padding: .only(right: 8),
                                     child: VerticalDivider(
                                       width: 16,
                                       indent: 8,
@@ -553,7 +592,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                 );
 
                                 return Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize: .min,
                                   spacing: 8,
                                   children: children,
                                 );
@@ -566,7 +605,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: const .symmetric(
                     horizontal: 16,
                     vertical: 8,
                   ),

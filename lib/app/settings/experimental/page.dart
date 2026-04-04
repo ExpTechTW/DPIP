@@ -1,3 +1,6 @@
+/// Experimental features settings page.
+library;
+
 import 'dart:async';
 
 import 'package:dpip/core/i18n.dart';
@@ -8,7 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// A page for toggling experimental (in-development) features.
+///
+/// Each feature shows a confirmation dialog with a countdown before it can be
+/// enabled. Disabled features can be turned off immediately.
 class SettingsExperimentalPage extends StatefulWidget {
+  /// Creates a [SettingsExperimentalPage].
   const SettingsExperimentalPage({super.key});
 
   @override
@@ -36,21 +44,6 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
     }
   }
 
-  void _toggleLaunchToMonitor(bool value) {
-    if (value) {
-      _showEnableWarningDialog(
-        featureName: '啟動時進入強震監視器'.i18n,
-        onConfirm: () {
-          setState(() => _launchToMonitor = true);
-          Preference.experimentalLaunchToMonitor = true;
-        },
-      );
-    } else {
-      setState(() => _launchToMonitor = false);
-      Preference.experimentalLaunchToMonitor = false;
-    }
-  }
-
   void _toggleEewAllSource(bool value) {
     if (value) {
       _showEnableWarningDialog(
@@ -66,30 +59,31 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
     }
   }
 
-  Widget _buildIconContainer({
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
+  void _toggleLaunchToMonitor(bool value) {
+    if (value) {
+      _showEnableWarningDialog(
+        featureName: '啟動時進入強震監視器'.i18n,
+        onConfirm: () {
+          setState(() => _launchToMonitor = true);
+          Preference.experimentalLaunchToMonitor = true;
+        },
+      );
+    } else {
+      setState(() => _launchToMonitor = false);
+      Preference.experimentalLaunchToMonitor = false;
+    }
   }
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const .fromLTRB(16, 8, 16, 0),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const .all(10),
             decoration: BoxDecoration(
               color: context.colors.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: .circular(12),
             ),
             child: Icon(
               Symbols.science_rounded,
@@ -100,12 +94,12 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
           const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Text(
                   '實驗性功能'.i18n,
                   style: context.texts.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: .bold,
                   ),
                 ),
                 Text(
@@ -122,22 +116,36 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
     );
   }
 
+  Widget _buildIconContainer({
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const .all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: .circular(10),
+      ),
+      child: Icon(icon, color: color, size: 20),
+    );
+  }
+
   Widget _buildWarningCard(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(16),
+      margin: const .fromLTRB(16, 16, 16, 0),
+      padding: const .all(16),
       decoration: BoxDecoration(
         color: Colors.amber.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: .circular(16),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const .all(10),
             decoration: BoxDecoration(
               color: Colors.amber.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: .circular(12),
             ),
             child: Icon(
               Symbols.warning_rounded,
@@ -148,12 +156,12 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
           const SizedBox(width: 16),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Text(
                   '注意'.i18n,
                   style: context.texts.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: .w600,
                     color: Colors.amber[700],
                   ),
                 ),
@@ -175,7 +183,7 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.only(
+      padding: .only(
         top: 8,
         bottom: 16 + context.padding.bottom,
       ),
@@ -230,7 +238,10 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
   }
 }
 
+/// A confirmation dialog with a countdown timer before the confirm button
+/// becomes enabled.
 class _ExperimentalWarningDialog extends StatefulWidget {
+  /// The display name of the experimental feature being enabled.
   final String featureName;
 
   const _ExperimentalWarningDialog({required this.featureName});
@@ -245,12 +256,6 @@ class _ExperimentalWarningDialogState
   int _countdown = 5;
   Timer? _timer;
 
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
-
   void _startCountdown() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdown > 0) {
@@ -262,9 +267,9 @@ class _ExperimentalWarningDialogState
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _startCountdown();
   }
 
   @override
@@ -279,8 +284,8 @@ class _ExperimentalWarningDialogState
       ),
       title: Text('啟用實驗性功能'.i18n),
       content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: .min,
+        crossAxisAlignment: .start,
         children: [
           Text(
             '你即將啟用：'.i18n,
@@ -288,10 +293,10 @@ class _ExperimentalWarningDialogState
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const .all(12),
             decoration: BoxDecoration(
               color: context.colors.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: .circular(8),
             ),
             child: Row(
               children: [
@@ -305,7 +310,7 @@ class _ExperimentalWarningDialogState
                   child: Text(
                     widget.featureName,
                     style: context.texts.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                     ),
                   ),
                 ),
@@ -334,5 +339,11 @@ class _ExperimentalWarningDialogState
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }

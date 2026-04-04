@@ -1,3 +1,6 @@
+/// Map layer manager and associated UI for the real-time seismic monitor.
+library;
+
 import 'dart:async';
 import 'dart:collection';
 
@@ -30,21 +33,35 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:styled_text/styled_text.dart';
 
+/// Manages the real-time seismic monitor overlay, EEW circles, and detection
+/// boxes on the DPIP map.
 class MonitorMapLayerManager extends MapLayerManager {
+  /// Whether this manager is replaying historical data rather than live data.
   final bool isReplayMode;
+
+  /// The Unix timestamp (ms) used when replaying historical data.
   final int? replayTimestamp;
+
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
   bool _isEpicenterVisible = true;
   Timer? _focusTimer;
   bool _isFocusing = false;
+
+  /// The padding in logical pixels applied to each side when fitting the camera
+  /// to detection bounds.
   static const double kCameraPadding = 80.0;
-  // Layout constants for stacked label lines. Adjust these to tune spacing.
-  // kLabelBaseOffset is the vertical offset of the first text line.
-  // kLabelLineHeight is the vertical spacing between subsequent lines.
+
+  /// Vertical offset of the first text label line above the station circle.
   static const double kLabelBaseOffset = 0.8;
+
+  /// Vertical spacing between consecutive text label lines.
   static const double kLabelLineHeight = 1.2;
+
+  /// Whether data has been received within the last 12 seconds.
   bool get dataStatus => _dataStatus();
+
+  /// The most recently measured round-trip latency in milliseconds.
   double get ping => _ping;
   double _ping = 0;
 
@@ -77,6 +94,10 @@ class MonitorMapLayerManager extends MapLayerManager {
   late final String _pWaveLayerId = MapLayerIds.eew('p');
   late final String _sWaveLayerId = MapLayerIds.eew('s');
 
+  /// Creates a [MonitorMapLayerManager].
+  ///
+  /// Set [isReplayMode] to `true` and supply a [replayTimestamp] to replay
+  /// historical data instead of the live feed.
   MonitorMapLayerManager(
     super.context,
     super.controller, {
@@ -92,12 +113,18 @@ class MonitorMapLayerManager extends MapLayerManager {
         12000;
   }
 
+  /// The timestamp of the most recently processed RTS data packet.
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.syncTime);
+
+  /// The human-readable time string shown in the monitor UI.
   final displayTimeNotifier = ValueNotifier<String>('N/A');
+
+  /// The round-trip latency value exposed for the monitor UI.
   final pingNotifier = ValueNotifier<double>(0);
   int? _lastDataReceivedTime;
   int _lastDisplayedSecond = 0;
 
+  /// MapLibre expression that maps instrumental intensity values to colours.
   static final kRtsCircleColor = [
     Expressions.interpolate,
     ['linear'],
@@ -126,6 +153,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     InstrumentalIntensityColor.intensity7.toHexStringRGB(),
   ];
 
+  /// MapLibre expression that scales RTS circles based on zoom level.
   static const kRtsCircleRadius = [
     Expressions.interpolate,
     ['linear'],
@@ -1197,9 +1225,12 @@ class MonitorMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => MonitorMapLayerSheet(manager: this);
 }
 
+/// The overlay sheet displayed while the seismic monitor layer is active.
 class MonitorMapLayerSheet extends StatefulWidget {
+  /// The [MonitorMapLayerManager] whose state drives this sheet.
   final MonitorMapLayerManager manager;
 
+  /// Creates a [MonitorMapLayerSheet] for the given [manager].
   const MonitorMapLayerSheet({super.key, required this.manager});
 
   @override
@@ -1238,13 +1269,13 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colors.error,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: .circular(8),
       ),
       padding: eewCount > 1 || showLabel
-          ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
-          : const EdgeInsets.fromLTRB(8, 6, 8, 6),
+          ? const .fromLTRB(8, 6, 12, 6)
+          : const .fromLTRB(8, 6, 8, 6),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         spacing: 4,
         children: [
           Icon(
@@ -1258,7 +1289,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               'EEW'.i18n,
               style: theme.labelLarge!.copyWith(
                 color: colors.onError,
-                fontWeight: FontWeight.bold,
+                fontWeight: .bold,
               ),
             )
           else if (eewCount > 1)
@@ -1269,14 +1300,14 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     text: '1',
                     style: theme.labelMedium!.copyWith(
                       color: colors.onError,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                     ),
                   ),
                   TextSpan(
                     text: '/$eewCount',
                     style: theme.labelMedium!.copyWith(
                       color: colors.onError.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                     ),
                   ),
                 ],
@@ -1295,10 +1326,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     if (_isCollapsed) {
       // Collapsed view - compact info
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: .spaceBetween,
             children: [
               Row(
                 spacing: 8,
@@ -1307,7 +1338,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   Text(
                     '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
                     style: theme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: .bold,
                       color: colors.onErrorContainer,
                     ),
                   ),
@@ -1321,10 +1352,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const .only(top: 8),
             child: hasLocation
                 ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: .spaceBetween,
                     children: [
                       StyledText(
                         text:
@@ -1340,7 +1371,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                         ),
                         tags: {
                           'bold': StyledTextTag(
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: .bold),
                           ),
                         },
                       ),
@@ -1351,7 +1382,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                               })
                             : '已抵達'.i18n,
                         style: theme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: .bold,
                           color: colors.onErrorContainer,
                           height: 1,
                           leadingDistribution: TextLeadingDistribution.even,
@@ -1374,7 +1405,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     ),
                     tags: {
                       'bold': StyledTextTag(
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: .bold),
                       ),
                     },
                   ),
@@ -1384,10 +1415,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     } else {
       // Expanded view - detailed info
       return Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: .spaceBetween,
             children: [
               Row(
                 spacing: 8,
@@ -1409,7 +1440,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const .only(top: 8),
             child: StyledText(
               text: hasLocation
                   ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
@@ -1431,7 +1462,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
               tags: {
                 'bold': StyledTextTag(
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: .bold),
                 ),
               },
             ),
@@ -1453,17 +1484,17 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
         final theme = context.texts;
 
         return Padding(
-          padding: const EdgeInsets.only(top: 8, bottom: 4),
+          padding: const .only(top: 8, bottom: 4),
           child: IntrinsicHeight(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(4),
+                    padding: const .all(4),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: .min,
+                      crossAxisAlignment: .stretch,
                       children: [
                         Text(
                           '所在地預估'.i18n,
@@ -1474,16 +1505,16 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          padding: const .only(top: 12, bottom: 8),
                           child: Text(
                             localIntensity.asIntensityLabel,
                             style: theme.displayMedium!.copyWith(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: .bold,
                               color: colors.onErrorContainer,
                               height: 1,
                               leadingDistribution: TextLeadingDistribution.even,
                             ),
-                            textAlign: TextAlign.center,
+                            textAlign: .center,
                           ),
                         ),
                       ],
@@ -1496,10 +1527,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(4),
+                    padding: const .all(4),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: .min,
+                      crossAxisAlignment: .stretch,
                       children: [
                         Text(
                           '震波'.i18n,
@@ -1510,7 +1541,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          padding: const .only(top: 12, bottom: 8),
                           child: countdown > 0
                               ? RichText(
                                   text: TextSpan(
@@ -1531,27 +1562,27 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                       ),
                                     ],
                                     style: theme.displayMedium!.copyWith(
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: .bold,
                                       color: colors.onErrorContainer,
                                       height: 1,
                                       leadingDistribution:
                                           TextLeadingDistribution.even,
                                     ),
                                   ),
-                                  textAlign: TextAlign.center,
+                                  textAlign: .center,
                                 )
                               : Text(
                                   '抵達'.i18n,
                                   style: theme.displayMedium!.copyWith(
                                     fontSize:
                                         theme.displayMedium!.fontSize! * 0.81,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: .bold,
                                     color: colors.onErrorContainer,
                                     height: 1,
                                     leadingDistribution:
                                         TextLeadingDistribution.even,
                                   ),
-                                  textAlign: TextAlign.center,
+                                  textAlign: .center,
                                 ),
                         ),
                       ],
@@ -1577,7 +1608,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               maxWidth: 720,
               child: MorphingSheet(
                 title: '強震監視器'.i18n,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: .circular(16),
                 elevation: 4,
                 borderWidth: activeEew.isNotEmpty ? 2 : null,
                 borderColor: activeEew.isNotEmpty ? context.colors.error : null,
@@ -1587,7 +1618,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 partialBuilder: (context, controller, sheetController) {
                   if (activeEew.isEmpty) {
                     return Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const .all(12),
                       child: Text('目前沒有生效中的地震速報'.i18n),
                     );
                   }
@@ -1625,7 +1656,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   return InkWell(
                     onTap: _toggleCollapse,
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const .all(12),
                       child: _buildEewContent(
                         data,
                         activeEew.length,
@@ -1659,7 +1690,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               right: 95,
               child: SafeArea(
                 child: Align(
-                  alignment: Alignment.topCenter,
+                  alignment: .topCenter,
                   child: ValueListenableBuilder<String>(
                     valueListenable: widget.manager.displayTimeNotifier,
                     builder: (context, displayTime, child) {
@@ -1684,20 +1715,20 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                               : Colors.green;
 
                           return Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const .all(8),
                             decoration: BoxDecoration(
                               color: context.colors.surface.withValues(
                                 alpha: 0.5,
                               ),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: .circular(16),
                             ),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: .min,
+                              mainAxisAlignment: .center,
                               children: [
                                 Text(
                                   timeText,
-                                  textAlign: TextAlign.center,
+                                  textAlign: .center,
                                   style: TextStyle(
                                     color: widget.manager.isReplayMode
                                         ? Colors.orange
@@ -1712,10 +1743,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   width: 55,
                                   child: Text(
                                     pingText,
-                                    textAlign: TextAlign.right,
+                                    textAlign: .right,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: .bold,
                                       color: pingColor,
                                     ),
                                   ),

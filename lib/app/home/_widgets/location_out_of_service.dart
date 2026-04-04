@@ -1,9 +1,15 @@
+/// Card shown when the user's GPS location is outside the service area.
+library;
+
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// Informs the user that their current location is outside the supported
+/// service area (Taiwan).
 class LocationOutOfServiceCard extends StatelessWidget {
+  /// Creates a [LocationOutOfServiceCard].
   const LocationOutOfServiceCard({super.key});
 
   @override
@@ -12,9 +18,9 @@ class LocationOutOfServiceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.secondaryContainer,
         border: Border.all(color: context.colors.secondary, width: 2),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: .circular(16),
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const .all(12),
       clipBehavior: Clip.antiAlias,
       child: Row(
         spacing: 8,

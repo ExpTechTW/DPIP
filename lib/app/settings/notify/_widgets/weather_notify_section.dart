@@ -1,3 +1,6 @@
+/// Weather notification type selection section widget.
+library;
+
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
@@ -5,10 +8,26 @@ import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// A list section for selecting the [WeatherNotifyType].
+///
+/// Shows each option as a selectable tile with a loading indicator while the
+/// change is being saved. Pass the current [value] and an [onChanged]
+/// callback:
+///
+/// ```dart
+/// WeatherNotifySection(
+///   value: WeatherNotifyType.local,
+///   onChanged: (v) => model.setThunderstorm(v),
+/// )
+/// ```
 class WeatherNotifySection extends StatefulWidget {
+  /// The currently active weather notification type.
   final WeatherNotifyType value;
+
+  /// Called with the new type when the user selects a different option.
   final Future Function(WeatherNotifyType value) onChanged;
 
+  /// Creates a [WeatherNotifySection].
   const WeatherNotifySection({
     super.key,
     required this.value,

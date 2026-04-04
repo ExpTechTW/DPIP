@@ -1,3 +1,6 @@
+/// The bottom sheet widget that lets users toggle map layers and base maps.
+library;
+
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
 import 'package:dpip/core/i18n.dart';
@@ -8,13 +11,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+/// A scrollable bottom sheet that exposes controls to toggle individual
+/// [MapLayer]s and choose among the available [BaseMapType]s.
 class LayerToggleSheet extends StatefulWidget {
+  /// The currently active set of map layers.
   final Set<MapLayer> activeLayers;
+
+  /// The currently selected base map style.
   final BaseMapType currentBaseMap;
+
+  /// Called whenever a layer is turned on or off.
   final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers)
   onLayerChanged;
+
+  /// Called whenever the user selects a different base map.
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
+  /// Creates a [LayerToggleSheet] with the given layer and base-map state.
   const LayerToggleSheet({
     super.key,
     required this.activeLayers,
@@ -84,8 +97,8 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
       title: Text('地圖圖層'.i18n),
       description: Text('選擇要顯示的地圖圖層'.i18n),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: .min,
+        crossAxisAlignment: .start,
         spacing: 8,
         children: [
           LabeledDivider(label: '底圖'.i18n),
@@ -95,18 +108,18 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             children: [
               LayerToggle(
                 label: '簡單'.i18n,
-                checked: _currentBaseMap == BaseMapType.exptech,
-                onChanged: (_) => _setBaseMap(BaseMapType.exptech),
+                checked: _currentBaseMap == .exptech,
+                onChanged: (_) => _setBaseMap(.exptech),
               ),
               LayerToggle(
                 label: 'OpenStreetMap',
-                checked: _currentBaseMap == BaseMapType.osm,
-                onChanged: (_) => _setBaseMap(BaseMapType.osm),
+                checked: _currentBaseMap == .osm,
+                onChanged: (_) => _setBaseMap(.osm),
               ),
               LayerToggle(
                 label: 'Google',
-                checked: _currentBaseMap == BaseMapType.google,
-                onChanged: (_) => _setBaseMap(BaseMapType.google),
+                checked: _currentBaseMap == .google,
+                onChanged: (_) => _setBaseMap(.google),
               ),
             ],
           ),
@@ -118,12 +131,12 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
               LayerToggle(
                 label: '監視器'.i18n,
                 checked: _activeLayers.contains(MapLayer.monitor),
-                onChanged: (_) => _toggleLayer(MapLayer.monitor),
+                onChanged: (_) => _toggleLayer(.monitor),
               ),
               LayerToggle(
                 label: '報告'.i18n,
                 checked: _activeLayers.contains(MapLayer.report),
-                onChanged: (_) => _toggleLayer(MapLayer.report),
+                onChanged: (_) => _toggleLayer(.report),
               ),
               LayerToggle(
                 label: '海嘯'.i18n,
@@ -140,35 +153,32 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
               LayerToggle(
                 label: '雷達回波'.i18n,
                 checked: _activeLayers.contains(MapLayer.radar),
-                onChanged: (_) => _toggleLayer(MapLayer.radar),
-                onLongPress: (_) => _toggleLayer(MapLayer.radar, overlay: true),
+                onChanged: (_) => _toggleLayer(.radar),
+                onLongPress: (_) => _toggleLayer(.radar, overlay: true),
               ),
               LayerToggle(
                 label: '氣溫'.i18n,
                 checked: _activeLayers.contains(MapLayer.temperature),
-                onChanged: (_) => _toggleLayer(MapLayer.temperature),
-                onLongPress: (_) =>
-                    _toggleLayer(MapLayer.temperature, overlay: true),
+                onChanged: (_) => _toggleLayer(.temperature),
+                onLongPress: (_) => _toggleLayer(.temperature, overlay: true),
               ),
               LayerToggle(
                 label: '降水'.i18n,
                 checked: _activeLayers.contains(MapLayer.precipitation),
-                onChanged: (_) => _toggleLayer(MapLayer.precipitation),
-                onLongPress: (_) =>
-                    _toggleLayer(MapLayer.precipitation, overlay: true),
+                onChanged: (_) => _toggleLayer(.precipitation),
+                onLongPress: (_) => _toggleLayer(.precipitation, overlay: true),
               ),
               LayerToggle(
                 label: '風向/風速'.i18n,
                 checked: _activeLayers.contains(MapLayer.wind),
-                onChanged: (_) => _toggleLayer(MapLayer.wind),
-                onLongPress: (_) => _toggleLayer(MapLayer.wind, overlay: true),
+                onChanged: (_) => _toggleLayer(.wind),
+                onLongPress: (_) => _toggleLayer(.wind, overlay: true),
               ),
               LayerToggle(
                 label: '閃電'.i18n,
                 checked: _activeLayers.contains(MapLayer.lightning),
-                onChanged: (_) => _toggleLayer(MapLayer.lightning),
-                onLongPress: (_) =>
-                    _toggleLayer(MapLayer.lightning, overlay: true),
+                onChanged: (_) => _toggleLayer(.lightning),
+                onLongPress: (_) => _toggleLayer(.lightning, overlay: true),
               ),
             ],
           ),

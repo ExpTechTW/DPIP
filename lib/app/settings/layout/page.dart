@@ -1,3 +1,6 @@
+/// Home layout settings page for reordering and toggling displayed sections.
+library;
+
 import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
@@ -6,7 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+/// A page that lets users reorder and enable or disable home screen sections.
+///
+/// Drag tiles to reorder enabled sections, or tap the add/remove buttons to
+/// toggle sections on and off. Requires [SettingsUserInterfaceModel] in the
+/// widget tree.
 class SettingsLayoutPage extends StatelessWidget {
+  /// Creates a [SettingsLayoutPage].
   const SettingsLayoutPage({super.key});
 
   static const _sectionInfo = {
@@ -30,6 +39,133 @@ class SettingsLayoutPage extends StatelessWidget {
     ),
   };
 
+  Widget _buildSectionTile(
+    BuildContext context, {
+    required HomeDisplaySection section,
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required bool isFirst,
+    required bool isLast,
+    required int index,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        margin: .only(bottom: isLast ? 0 : 2),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainerLow,
+          borderRadius: .vertical(
+            top: isFirst ? const Radius.circular(12) : Radius.zero,
+            bottom: isLast ? const Radius.circular(12) : Radius.zero,
+          ),
+        ),
+        child: ListTile(
+          contentPadding: const .symmetric(
+            horizontal: 16,
+            vertical: 4,
+          ),
+          leading: Container(
+            padding: const .all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: .circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          title: Text(title),
+          subtitle: Text(subtitle, style: context.texts.bodySmall),
+          trailing: Row(
+            mainAxisSize: .min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Symbols.remove_circle_outline_rounded,
+                  color: context.colors.error,
+                ),
+                onPressed: () {
+                  context.userInterface.toggleSection(section, false);
+                },
+                tooltip: '停用'.i18n,
+              ),
+              ReorderableDragStartListener(
+                index: index,
+                child: Padding(
+                  padding: const .all(8),
+                  child: Icon(
+                    Symbols.drag_handle_rounded,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDisabledTile(
+    BuildContext context, {
+    required HomeDisplaySection section,
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required bool isFirst,
+    required bool isLast,
+  }) {
+    return Container(
+      margin: .only(bottom: isLast ? 0 : 2),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow.withValues(alpha: 0.5),
+        borderRadius: .vertical(
+          top: isFirst ? const Radius.circular(12) : Radius.zero,
+          bottom: isLast ? const Radius.circular(12) : Radius.zero,
+        ),
+      ),
+      child: ListTile(
+        contentPadding: const .symmetric(
+          horizontal: 16,
+          vertical: 4,
+        ),
+        leading: Container(
+          padding: const .all(8),
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainerHighest,
+            borderRadius: .circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: context.colors.onSurfaceVariant.withValues(alpha: 0.5),
+            size: 20,
+          ),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(color: context.colors.onSurfaceVariant),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: context.texts.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            Symbols.add_circle_outline_rounded,
+            color: context.colors.primary,
+          ),
+          onPressed: () {
+            context.userInterface.toggleSection(section, true);
+          },
+          tooltip: '啟用'.i18n,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsUserInterfaceModel, List<HomeDisplaySection>>(
@@ -50,7 +186,7 @@ class SettingsLayoutPage extends StatelessWidget {
             ),
             if (sections.isNotEmpty) ...[
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const .fromLTRB(16, 16, 16, 8),
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     '拖曳調整順序'.i18n,
@@ -61,7 +197,7 @@ class SettingsLayoutPage extends StatelessWidget {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const .symmetric(horizontal: 16),
                 sliver: SliverReorderableList(
                   itemCount: sections.length,
                   onReorderItem: (oldIndex, newIndex) {
@@ -94,7 +230,7 @@ class SettingsLayoutPage extends StatelessWidget {
             ],
             if (disabledSections.isNotEmpty) ...[
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const .fromLTRB(16, 16, 16, 8),
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     '已停用'.i18n,
@@ -105,7 +241,7 @@ class SettingsLayoutPage extends StatelessWidget {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const .symmetric(horizontal: 16),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -129,7 +265,7 @@ class SettingsLayoutPage extends StatelessWidget {
               ),
             ] else ...[
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const .fromLTRB(16, 16, 16, 8),
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     '所有區塊皆已啟用'.i18n,
@@ -148,130 +284,6 @@ class SettingsLayoutPage extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildSectionTile(
-    BuildContext context, {
-    required HomeDisplaySection section,
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required bool isFirst,
-    required bool isLast,
-    required int index,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        margin: EdgeInsets.only(bottom: isLast ? 0 : 2),
-        decoration: BoxDecoration(
-          color: context.colors.surfaceContainerLow,
-          borderRadius: BorderRadius.vertical(
-            top: isFirst ? const Radius.circular(12) : Radius.zero,
-            bottom: isLast ? const Radius.circular(12) : Radius.zero,
-          ),
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 4,
-          ),
-          leading: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          title: Text(title),
-          subtitle: Text(subtitle, style: context.texts.bodySmall),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Symbols.remove_circle_outline_rounded,
-                  color: context.colors.error,
-                ),
-                onPressed: () {
-                  context.userInterface.toggleSection(section, false);
-                },
-                tooltip: '停用'.i18n,
-              ),
-              ReorderableDragStartListener(
-                index: index,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Symbols.drag_handle_rounded,
-                    color: context.colors.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDisabledTile(
-    BuildContext context, {
-    required HomeDisplaySection section,
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required bool isFirst,
-    required bool isLast,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: isLast ? 0 : 2),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.vertical(
-          top: isFirst ? const Radius.circular(12) : Radius.zero,
-          bottom: isLast ? const Radius.circular(12) : Radius.zero,
-        ),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: context.colors.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: context.colors.onSurfaceVariant.withValues(alpha: 0.5),
-            size: 20,
-          ),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(color: context.colors.onSurfaceVariant),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: context.texts.bodySmall?.copyWith(
-            color: context.colors.onSurfaceVariant.withValues(alpha: 0.7),
-          ),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            Symbols.add_circle_outline_rounded,
-            color: context.colors.primary,
-          ),
-          onPressed: () {
-            context.userInterface.toggleSection(section, true);
-          },
-          tooltip: '啟用'.i18n,
-        ),
-      ),
     );
   }
 }
