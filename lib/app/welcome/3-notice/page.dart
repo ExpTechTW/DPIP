@@ -84,8 +84,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   borderRadius: .circular(16),
                 ),
                 child: Text(
-                  '根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。'
-                      .i18n,
+                  '根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。'.i18n,
                   style: context.texts.bodyLarge,
                 ),
               ),

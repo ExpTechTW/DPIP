@@ -90,12 +90,8 @@ class HeroWeather extends StatelessWidget {
   Widget _buildWeatherContent(BuildContext context) {
     final data = weather!.data;
     final e =
-        data.humidity /
-        100 *
-        6.105 *
-        exp(17.27 * data.temperature / (data.temperature + 237.3));
-    final feelsLike =
-        data.temperature + 0.33 * e - 0.7 * data.wind.speed - 4.0;
+        data.humidity / 100 * 6.105 * exp(17.27 * data.temperature / (data.temperature + 237.3));
+    final feelsLike = data.temperature + 0.33 * e - 0.7 * data.wind.speed - 4.0;
 
     return Column(
       crossAxisAlignment: .start,

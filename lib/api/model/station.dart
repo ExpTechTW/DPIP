@@ -16,8 +16,7 @@ class Station {
 
   Station({required this.net, required this.info, required this.work});
 
-  factory Station.fromJson(Map<String, dynamic> json) =>
-      _$StationFromJson(json);
+  factory Station.fromJson(Map<String, dynamic> json) => _$StationFromJson(json);
 
   factory Station.fromMap(Map<String, dynamic> map) => Station.fromJson(map);
 

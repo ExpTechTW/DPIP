@@ -21,8 +21,7 @@ class LayerToggleSheet extends StatefulWidget {
   final BaseMapType currentBaseMap;
 
   /// Called whenever a layer is turned on or off.
-  final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers)
-  onLayerChanged;
+  final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers) onLayerChanged;
 
   /// Called whenever the user selects a different base map.
   final void Function(BaseMapType baseMap) onBaseMapChanged;

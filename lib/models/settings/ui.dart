@@ -42,9 +42,10 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     } else {
       final saved = savedList
           .map(
-            (s) => HomeDisplaySection.values
-                .cast<HomeDisplaySection?>()
-                .firstWhere((e) => e?.name == s, orElse: () => null),
+            (s) => HomeDisplaySection.values.cast<HomeDisplaySection?>().firstWhere(
+              (e) => e?.name == s,
+              orElse: () => null,
+            ),
           )
           .whereType<HomeDisplaySection>()
           .toList();
@@ -61,8 +62,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Color? get themeColor =>
-      _currentThemeColor == null ? null : Color(_currentThemeColor!);
+  Color? get themeColor => _currentThemeColor == null ? null : Color(_currentThemeColor!);
   void setThemeColor(Color? color) {
     final colorInt = color?.toARGB32();
     _currentThemeColor = colorInt;
@@ -119,8 +119,6 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
 }
 
 extension SettingsUserInterfaceModelExtension on BuildContext {
-  SettingsUserInterfaceModel get useUserInterface =>
-      watch<SettingsUserInterfaceModel>();
-  SettingsUserInterfaceModel get userInterface =>
-      read<SettingsUserInterfaceModel>();
+  SettingsUserInterfaceModel get useUserInterface => watch<SettingsUserInterfaceModel>();
+  SettingsUserInterfaceModel get userInterface => read<SettingsUserInterfaceModel>();
 }

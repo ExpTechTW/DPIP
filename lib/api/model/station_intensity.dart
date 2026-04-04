@@ -23,8 +23,7 @@ class StationIntensity {
     required this.intensity,
   });
 
-  factory StationIntensity.fromJson(Map<String, dynamic> json) =>
-      _$StationIntensityFromJson(json);
+  factory StationIntensity.fromJson(Map<String, dynamic> json) => _$StationIntensityFromJson(json);
 
   LatLng get latlng => LatLng(lat, lon);
 

@@ -81,9 +81,7 @@ const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
 /// - earthquakeLayers = layers ∩ _earthquakeLayers
 /// - weatherLayers = layers ∩ _weatherLayers
 bool isValidLayerCombination(Set<MapLayer> layers) {
-  final earthquakeLayerCount = layers
-      .where((l) => kEarthquakeLayers.contains(l))
-      .length;
+  final earthquakeLayerCount = layers.where((l) => kEarthquakeLayers.contains(l)).length;
   if (earthquakeLayerCount > 1) return false;
 
   final weatherLayers = layers.where((l) => kWeatherLayers.contains(l)).toSet();
@@ -112,12 +110,10 @@ class MapSourceIds {
 
   /// Returns the source ID for earthquake report data, optionally scoped to
   /// [time].
-  static String report([String? time]) =>
-      time == null ? 'report' : 'report-$time';
+  static String report([String? time]) => time == null ? 'report' : 'report-$time';
 
   /// Returns the source ID for tsunami data, optionally scoped to [code].
-  static String tsunami([String? code]) =>
-      code == null ? 'tsunami' : 'tsunami-$code';
+  static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
 
   /// Returns the source ID for real-time seismograph (RTS) data, optionally
   /// scoped to [time].
@@ -127,8 +123,7 @@ class MapSourceIds {
   static String eew([String? code]) => code == null ? 'eew' : 'eew-$code';
 
   /// Returns the source ID for temperature data, optionally scoped to [time].
-  static String temperature([String? time]) =>
-      time == null ? 'temperature' : 'temperature-$time';
+  static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
 
   /// Returns the source ID for precipitation data, optionally scoped to
   /// [time].
@@ -139,8 +134,7 @@ class MapSourceIds {
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
 
   /// Returns the source ID for lightning data, optionally scoped to [time].
-  static String lightning([String? time]) =>
-      time == null ? 'lightning' : 'lightning-$time';
+  static String lightning([String? time]) => time == null ? 'lightning' : 'lightning-$time';
 
   /// Returns the source ID for seismic intensity polygon data.
   static String intensity() => 'intensity';
@@ -164,12 +158,10 @@ class MapLayerIds {
 
   /// Returns the layer ID for earthquake report data, optionally scoped to
   /// [time].
-  static String report([String? time]) =>
-      time == null ? 'report' : 'report-$time';
+  static String report([String? time]) => time == null ? 'report' : 'report-$time';
 
   /// Returns the layer ID for tsunami data, optionally scoped to [code].
-  static String tsunami([String? code]) =>
-      code == null ? 'tsunami' : 'tsunami-$code';
+  static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
 
   /// Returns the layer ID for real-time seismograph (RTS) data, optionally
   /// scoped to [time].
@@ -179,8 +171,7 @@ class MapLayerIds {
   static String eew([String? code]) => code == null ? 'eew' : 'eew-$code';
 
   /// Returns the layer ID for temperature data, optionally scoped to [time].
-  static String temperature([String? time]) =>
-      time == null ? 'temperature' : 'temperature-$time';
+  static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
 
   /// Returns the layer ID for precipitation data, optionally scoped to [time].
   static String precipitation([String? time]) =>
@@ -190,8 +181,7 @@ class MapLayerIds {
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
 
   /// Returns the layer ID for lightning data, optionally scoped to [time].
-  static String lightning([String? time]) =>
-      time == null ? 'lightning' : 'lightning-$time';
+  static String lightning([String? time]) => time == null ? 'lightning' : 'lightning-$time';
 
   /// Returns the layer ID for seismic intensity polygon data.
   static String intensity() => 'intensity';
@@ -209,8 +199,7 @@ class MapLayerIds {
 Future<void> cleanupMap(MapLibreMapController controller) async {
   final layerIds = (await controller.getLayerIds()).cast<String>()
     ..removeWhere((v) => BaseMapLayerIds.values().contains(v));
-  final sourceIds = (await controller.getSourceIds())
-    ..removeWhere((v) => v == 'map');
+  final sourceIds = (await controller.getSourceIds())..removeWhere((v) => v == 'map');
 
   for (final layerId in layerIds) {
     await controller.removeLayer(layerId);

@@ -48,9 +48,7 @@ class ReportSheetContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      report.hasNumber
-                          ? '編號 ${report.number} 顯著有感地震'
-                          : '小區域有感地震',
+                      report.hasNumber ? '編號 ${report.number} 顯著有感地震' : '小區域有感地震',
                       style: TextStyle(
                         color: context.colors.onSurfaceVariant,
                         fontSize: 14,
@@ -93,8 +91,7 @@ class ReportSheetContent extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapMonitorPage(
-                      replayTimestamp:
-                          report.time.millisecondsSinceEpoch - 2000,
+                      replayTimestamp: report.time.millisecondsSinceEpoch - 2000,
                     ),
                   ),
                 );
@@ -177,8 +174,7 @@ class ReportSheetContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final MapEntry(key: areaName, value: area)
-                  in report.list.entries)
+              for (final MapEntry(key: areaName, value: area) in report.list.entries)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Column(
@@ -213,8 +209,7 @@ class ReportSheetContent extends StatelessWidget {
                                     backgroundColor: IntensityColor.intensity(
                                       town.intensity,
                                     ).withValues(alpha: 0.16),
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     avatar: AspectRatio(
                                       aspectRatio: 1,
                                       child: Container(
@@ -228,9 +223,7 @@ class ReportSheetContent extends StatelessWidget {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            town
-                                                .intensity
-                                                .asIntensityDisplayLabel,
+                                            town.intensity.asIntensityDisplayLabel,
                                             style: TextStyle(
                                               height: 1,
                                               fontSize: 15,
@@ -244,8 +237,7 @@ class ReportSheetContent extends StatelessWidget {
                                       ),
                                     ),
                                     label: Text(townName),
-                                    onPressed: () =>
-                                        focus(LatLng(town.lat, town.lon)),
+                                    onPressed: () => focus(LatLng(town.lat, town.lon)),
                                   ),
                               ],
                             ),

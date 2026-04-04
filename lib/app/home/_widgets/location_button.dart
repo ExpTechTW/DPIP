@@ -1,8 +1,8 @@
 /// Location selector button and bottom sheet for the home screen.
 library;
 
-import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/api/model/location/location.dart';
+import 'package:dpip/app/home/_models/home_location.dart';
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
@@ -127,9 +127,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
 
   List<MapEntry<String, Location>> get _towns {
     if (_selectedCity == null) return [];
-    return Global.location.entries
-        .where((e) => e.value.cityWithLevel == _selectedCity)
-        .toList();
+    return Global.location.entries.where((e) => e.value.cityWithLevel == _selectedCity).toList();
   }
 
   Widget _buildCityList(BuildContext context) {
@@ -138,8 +136,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
 
     final quickItems = <_QuickItem>[];
 
-    if (widget.savedCode != null &&
-        Global.location[widget.savedCode] != null) {
+    if (widget.savedCode != null && Global.location[widget.savedCode] != null) {
       final savedLocation = Global.location[widget.savedCode]!;
       quickItems.add(
         _QuickItem(
@@ -175,9 +172,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
             for (var i = 0; i < quickItems.length; i++)
               SegmentedListTile(
                 isFirst: i == 0,
-                tileColor: quickItems[i].isSelected
-                    ? context.colors.secondaryContainer
-                    : null,
+                tileColor: quickItems[i].isSelected ? context.colors.secondaryContainer : null,
                 leading: Icon(
                   quickItems[i].icon,
                   fill: 1,
@@ -191,9 +186,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
                     color: quickItems[i].isSelected
                         ? context.colors.primary
                         : context.colors.onSurface,
-                    fontWeight: quickItems[i].isSelected
-                        ? .w600
-                        : .normal,
+                    fontWeight: quickItems[i].isSelected ? .w600 : .normal,
                   ),
                 ),
                 trailing: quickItems[i].isSelected
@@ -257,9 +250,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
           title: Text(
             town.townWithLevel,
             style: TextStyle(
-              color: isSelected
-                  ? context.colors.primary
-                  : context.colors.onSurface,
+              color: isSelected ? context.colors.primary : context.colors.onSurface,
               fontWeight: isSelected ? .w600 : .normal,
             ),
           ),
@@ -283,9 +274,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(
-            onPressed: _selectedCity != null
-                ? () => setState(() => _selectedCity = null)
-                : null,
+            onPressed: _selectedCity != null ? () => setState(() => _selectedCity = null) : null,
           ),
           title: Text('切換區域'.i18n),
           centerTitle: true,
@@ -299,9 +288,7 @@ class _LocationMenuSheetState extends State<_LocationMenuSheet> {
         ),
         body: SingleChildScrollView(
           padding: .only(bottom: context.padding.bottom + 16),
-          child: _selectedCity == null
-              ? _buildCityList(context)
-              : _buildTownList(context),
+          child: _selectedCity == null ? _buildCityList(context) : _buildTownList(context),
         ),
       ),
     );

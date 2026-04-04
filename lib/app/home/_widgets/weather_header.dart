@@ -89,15 +89,9 @@ class WeatherHeader extends StatelessWidget {
         100 *
         6.105 *
         exp(
-          17.27 *
-              weather.data.temperature /
-              (weather.data.temperature + 237.3),
+          17.27 * weather.data.temperature / (weather.data.temperature + 237.3),
         );
-    final feelsLike =
-        weather.data.temperature +
-        0.33 * e -
-        0.7 * weather.data.wind.speed -
-        4.0;
+    final feelsLike = weather.data.temperature + 0.33 * e - 0.7 * weather.data.wind.speed - 4.0;
 
     return ResponsiveContainer(
       child: Padding(
@@ -142,11 +136,9 @@ class WeatherHeader extends StatelessWidget {
               selector: (context, model) => model.useFahrenheit,
               builder: (context, useFahrenheit, child) {
                 final value = weather.data.temperature;
-                final displayTemp =
-                    (useFahrenheit ? value.asFahrenheit : value).round();
-                final displayFeelsLike =
-                    (useFahrenheit ? feelsLike.asFahrenheit : feelsLike)
-                        .round();
+                final displayTemp = (useFahrenheit ? value.asFahrenheit : value).round();
+                final displayFeelsLike = (useFahrenheit ? feelsLike.asFahrenheit : feelsLike)
+                    .round();
 
                 return Column(
                   spacing: 8,
@@ -167,8 +159,7 @@ class WeatherHeader extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: context.colors.surfaceContainerHighest
-                            .withValues(alpha: 0.6),
+                        color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
                         borderRadius: .circular(20),
                       ),
                       child: Text(
@@ -199,36 +190,28 @@ class WeatherHeader extends StatelessWidget {
                   context,
                   Symbols.wind_power_rounded,
                   '風速'.i18n,
-                  weather.data.wind.speed >= 0
-                      ? '${weather.data.wind.speed}m/s'
-                      : '-',
+                  weather.data.wind.speed >= 0 ? '${weather.data.wind.speed}m/s' : '-',
                   Colors.teal,
                 ),
                 _buildInfoChip(
                   context,
                   Symbols.explore_rounded,
                   '風向'.i18n,
-                  weather.data.wind.direction.isNotEmpty
-                      ? weather.data.wind.direction
-                      : '-',
+                  weather.data.wind.direction.isNotEmpty ? weather.data.wind.direction : '-',
                   Colors.cyan,
                 ),
                 _buildInfoChip(
                   context,
                   Symbols.wind_power_rounded,
                   '風級'.i18n,
-                  weather.data.wind.beaufort > 0
-                      ? '${weather.data.wind.beaufort}級'.i18n
-                      : '-',
+                  weather.data.wind.beaufort > 0 ? '${weather.data.wind.beaufort}級'.i18n : '-',
                   Colors.teal,
                 ),
                 _buildInfoChip(
                   context,
                   Symbols.compress_rounded,
                   '氣壓'.i18n,
-                  weather.data.pressure >= 0
-                      ? '${weather.data.pressure.round()}hPa'
-                      : '-',
+                  weather.data.pressure >= 0 ? '${weather.data.pressure.round()}hPa' : '-',
                   Colors.orange,
                 ),
                 _buildInfoChip(
@@ -242,9 +225,7 @@ class WeatherHeader extends StatelessWidget {
                   context,
                   Symbols.visibility_rounded,
                   '能見度'.i18n,
-                  weather.data.visibility >= 0
-                      ? '${weather.data.visibility.round()}km'
-                      : '-',
+                  weather.data.visibility >= 0 ? '${weather.data.visibility.round()}km' : '-',
                   Colors.grey,
                 ),
                 if (weather.data.gust.speed > 0)

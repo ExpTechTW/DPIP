@@ -30,9 +30,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
 
     if (!mounted) return;
 
-    data = latestWeatherData
-        .where((station) => station.data.wind.speed != -99)
-        .toList();
+    data = latestWeatherData.where((station) => station.data.wind.speed != -99).toList();
     time = DateFormat(
       'yyyy/MM/dd HH:mm:ss',
     ).format(parseDateTime(weatherList.last));
@@ -43,9 +41,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
     final temp = (merge != MergeType.none)
         ? groupBy(
             data,
-            (e) => merge == MergeType.town
-                ? (e.station.county, e.station.town)
-                : e.station.county,
+            (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
           ).values.map(
             (v) => v.reduce(
               (acc, e) =>
@@ -203,9 +199,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
 
                 final leading = index < 3
                     ? Icon(
-                        index == 0
-                            ? Symbols.trophy_rounded
-                            : Symbols.workspace_premium_rounded,
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
                         color: iconColor,
                         size: iconSize,
                         fill: 1,
@@ -224,8 +218,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                 final maxWind = reversed
                     ? ranked.last.data.wind.speed
                     : ranked.first.data.wind.speed;
-                final percentage =
-                    (item.data.wind.speed - minWind) / (maxWind - minWind);
+                final percentage = (item.data.wind.speed - minWind) / (maxWind - minWind);
 
                 final location = merge != MergeType.none
                     ? [

@@ -77,12 +77,8 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage>
         (e) => e.id == item.toLanguageTag(),
       );
 
-      final translated = p != null
-          ? NumberFormat('#.#%').format(p.translation / 100)
-          : '...';
-      final approved = p != null
-          ? NumberFormat('#.#%').format(p.approval / 100)
-          : '...';
+      final translated = p != null ? NumberFormat('#.#%').format(p.translation / 100) : '...';
+      final approved = p != null ? NumberFormat('#.#%').format(p.approval / 100) : '...';
 
       final isSelected = item.toLanguageTag() == locale?.toLanguageTag();
 

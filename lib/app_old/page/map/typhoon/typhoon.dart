@@ -241,8 +241,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
     _mapController.addSource(
       'radarOverlaySource',
       ImageSourceProperties(
-        url:
-            'https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}',
+        url: 'https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}',
         coordinates: [
           [bounds.southwest.longitude, bounds.northeast.latitude],
           [bounds.northeast.longitude, bounds.northeast.latitude],

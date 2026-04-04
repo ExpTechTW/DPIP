@@ -30,9 +30,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
     if (!mounted) return;
 
-    data = latestWeatherData
-        .where((station) => station.data.air.temperature != -99)
-        .toList();
+    data = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
     time = DateFormat(
       'yyyy/MM/dd HH:mm:ss',
     ).format(parseDateTime(weatherList.last));
@@ -43,9 +41,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     final temp = (merge != MergeType.none)
         ? groupBy(
             data,
-            (e) => merge == MergeType.town
-                ? (e.station.county, e.station.town)
-                : e.station.county,
+            (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
           ).values.map(
             (v) => v.reduce(
               (acc, e) =>
@@ -60,8 +56,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
     final sorted = temp
         .sorted(
-          (a, b) =>
-              (b.data.air.temperature - a.data.air.temperature).sign.toInt(),
+          (a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt(),
         )
         .toList();
     setState(() {
@@ -204,9 +199,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
                 final leading = index < 3
                     ? Icon(
-                        index == 0
-                            ? Symbols.trophy_rounded
-                            : Symbols.workspace_premium_rounded,
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
                         color: iconColor,
                         size: iconSize,
                         fill: 1,
@@ -220,14 +213,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                       );
 
                 final percentage = reversed
-                    ? (ranked.first.data.air.temperature -
-                              item.data.air.temperature) /
-                          (ranked.first.data.air.temperature -
-                              ranked.last.data.air.temperature)
-                    : (item.data.air.temperature -
-                              ranked.last.data.air.temperature) /
-                          (ranked.first.data.air.temperature -
-                              ranked.last.data.air.temperature);
+                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
+                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
+                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
+                          (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
 
                 final location = merge != MergeType.none
                     ? [

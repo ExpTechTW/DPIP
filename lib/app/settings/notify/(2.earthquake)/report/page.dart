@@ -24,8 +24,7 @@ class SettingsNotifyReportPage extends StatelessWidget {
           builder: (context, value, child) {
             return EarthquakeNotifySection(
               value: value,
-              onChanged: (value) =>
-                  context.read<SettingsNotificationModel>().setReport(value),
+              onChanged: (value) => context.read<SettingsNotificationModel>().setReport(value),
             );
           },
         ),

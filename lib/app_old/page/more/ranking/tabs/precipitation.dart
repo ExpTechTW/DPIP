@@ -13,8 +13,7 @@ class RankingPrecipitationTab extends StatefulWidget {
   const RankingPrecipitationTab({super.key});
 
   @override
-  State<RankingPrecipitationTab> createState() =>
-      _RankingPrecipitationTabState();
+  State<RankingPrecipitationTab> createState() => _RankingPrecipitationTabState();
 }
 
 class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
@@ -129,8 +128,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   ChoiceChip(
                     label: const Text('24 小時'),
                     selected: interval == Intervals.twentyFourHours,
-                    onSelected: (value) =>
-                        setInterval(Intervals.twentyFourHours),
+                    onSelected: (value) => setInterval(Intervals.twentyFourHours),
                   ),
                   ChoiceChip(
                     label: const Text('2 天'),
@@ -208,9 +206,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
                 final leading = index < 3
                     ? Icon(
-                        index == 0
-                            ? Symbols.trophy_rounded
-                            : Symbols.workspace_premium_rounded,
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
                         color: iconColor,
                         size: iconSize,
                         fill: 1,

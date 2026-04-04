@@ -29,8 +29,7 @@ class RtsStation {
     this.alert,
   });
 
-  factory RtsStation.fromJson(Map<String, dynamic> json) =>
-      _$RtsStationFromJson(json);
+  factory RtsStation.fromJson(Map<String, dynamic> json) => _$RtsStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsStationToJson(this);
 }

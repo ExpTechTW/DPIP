@@ -137,9 +137,7 @@ class WindMapLayerManager extends MapLayerManager {
 
         final features = weatherData
             .where(
-              (station) =>
-                  station.data.wind.direction != -99 &&
-                  station.data.wind.speed != -99,
+              (station) => station.data.wind.direction != -99 && station.data.wind.speed != -99,
             )
             .map((station) => station.toFeatureBuilder())
             .toList();
@@ -271,8 +269,7 @@ class WindMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null ||
-          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
         await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.show', e, s);
@@ -328,10 +325,7 @@ class WindMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times
-                      .groupListsBy((time) => time.date)
-                      .entries
-                      .toList();
+                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
 
                   return Column(
                     mainAxisSize: .min,
@@ -365,14 +359,12 @@ class WindMapLayerSheet extends StatelessWidget {
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) =
-                                    grouped[index];
+                                final MapEntry(key: date, value: group) = grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected =
-                                      time.value == currentWindTime;
+                                  final isSelected = time.value == currentWindTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(

@@ -44,12 +44,11 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     BasicNotifyType.all => '接收全部'.i18n,
   };
 
-  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) =>
-      switch (value) {
-        EarthquakeNotifyType.off => '關閉'.i18n,
-        EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
-        EarthquakeNotifyType.all => '接收全部'.i18n,
-      };
+  String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) => switch (value) {
+    EarthquakeNotifyType.off => '關閉'.i18n,
+    EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上'.i18n,
+    EarthquakeNotifyType.all => '接收全部'.i18n,
+  };
 
   String getEewNotifyTypeName(EewNotifyType value) => switch (value) {
     EewNotifyType.localIntensityAbove4 => '所在地震度4以上'.i18n,
@@ -183,8 +182,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         Container(
                           padding: const .all(10),
                           decoration: BoxDecoration(
-                            color: context.theme.extendedColors.amber
-                                .withValues(alpha: 0.2),
+                            color: context.theme.extendedColors.amber.withValues(alpha: 0.2),
                             borderRadius: .circular(12),
                           ),
                           child: Icon(
@@ -214,8 +212,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                               ),
                               const SizedBox(height: 12),
                               FilledButton.icon(
-                                onPressed: () =>
-                                    const SettingsLocationRoute().push(context),
+                                onPressed: () => const SettingsLocationRoute().push(context),
                                 icon: const Icon(Symbols.location_on_rounded),
                                 label: Text('設定所在地'.i18n),
                               ),
@@ -242,8 +239,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           subtitle: Text(getEewNotifyTypeName(eew)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyEewRoute().push(context),
+                          onTap: () => const SettingsNotifyEewRoute().push(context),
                         );
                       },
                     ),
@@ -267,8 +263,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyMonitorRoute()
-                              .push(context),
+                          onTap: () => const SettingsNotifyMonitorRoute().push(context),
                         );
                       },
                     ),
@@ -286,8 +281,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyReportRoute().push(context),
+                          onTap: () => const SettingsNotifyReportRoute().push(context),
                         );
                       },
                     ),
@@ -306,8 +300,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyIntensityRoute()
-                              .push(context),
+                          onTap: () => const SettingsNotifyIntensityRoute().push(context),
                         );
                       },
                     ),
@@ -331,8 +324,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyThunderstormRoute()
-                              .push(context),
+                          onTap: () => const SettingsNotifyThunderstormRoute().push(context),
                         );
                       },
                     ),
@@ -350,8 +342,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyAdvisoryRoute()
-                              .push(context),
+                          onTap: () => const SettingsNotifyAdvisoryRoute().push(context),
                         );
                       },
                     ),
@@ -370,8 +361,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () => const SettingsNotifyEvacuationRoute()
-                              .push(context),
+                          onTap: () => const SettingsNotifyEvacuationRoute().push(context),
                         );
                       },
                     ),
@@ -394,8 +384,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyTsunamiRoute().push(context),
+                          onTap: () => const SettingsNotifyTsunamiRoute().push(context),
                         );
                       },
                     ),
@@ -420,9 +409,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           ),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           enabled: !isLoading && enabled,
-                          onTap: () =>
-                              const SettingsNotifyAnnouncementRoute()
-                                  .push(context),
+                          onTap: () => const SettingsNotifyAnnouncementRoute().push(context),
                         );
                       },
                     ),

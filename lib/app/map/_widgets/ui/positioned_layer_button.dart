@@ -24,8 +24,7 @@ class PositionedLayerButton extends StatelessWidget {
   final bool isReplayMode;
 
   /// Called when the user toggles a layer on or off.
-  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers)
-  onLayerChanged;
+  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers) onLayerChanged;
 
   /// Called when the user selects a different base map.
   final void Function(BaseMapType baseMap) onBaseMapChanged;

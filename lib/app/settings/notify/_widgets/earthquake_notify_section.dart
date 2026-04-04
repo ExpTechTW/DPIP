@@ -35,8 +35,7 @@ class EarthquakeNotifySection extends StatefulWidget {
   });
 
   @override
-  State<EarthquakeNotifySection> createState() =>
-      _EarthquakeNotifySectionState();
+  State<EarthquakeNotifySection> createState() => _EarthquakeNotifySectionState();
 }
 
 class _EarthquakeNotifySectionState extends State<EarthquakeNotifySection> {

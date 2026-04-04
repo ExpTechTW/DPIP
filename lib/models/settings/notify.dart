@@ -91,33 +91,24 @@ enum BasicNotifyType {
 class _SettingsNotificationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsNotificationModel');
 
-  String get _eew =>
-      Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
+  String get _eew => Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
 
-  String get _monitor =>
-      Preference.notifyMonitor ??
-      EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _monitor => Preference.notifyMonitor ?? EarthquakeNotifyType.localIntensityAbove1.name;
 
-  String get _report =>
-      Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _report => Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
 
   String get _intensity =>
-      Preference.notifyIntensity ??
-      EarthquakeNotifyType.localIntensityAbove1.name;
+      Preference.notifyIntensity ?? EarthquakeNotifyType.localIntensityAbove1.name;
 
-  String get _thunderstorm =>
-      Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
+  String get _thunderstorm => Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
 
-  String get _weatherAdvisory =>
-      Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
+  String get _weatherAdvisory => Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
 
-  String get _evacuation =>
-      Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
+  String get _evacuation => Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
 
   String get _tsunami => Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
 
-  String get _announcement =>
-      Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
+  String get _announcement => Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
   /// Applies notification settings received from the server.
   ///
@@ -165,8 +156,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
   /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
-  EarthquakeNotifyType get monitor =>
-      EarthquakeNotifyType.values.byName(_monitor);
+  EarthquakeNotifyType get monitor => EarthquakeNotifyType.values.byName(_monitor);
 
   /// Sets the seismic intensity monitor notification filter.
   ///
@@ -191,8 +181,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
   /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
-  EarthquakeNotifyType get report =>
-      EarthquakeNotifyType.values.byName(_report);
+  EarthquakeNotifyType get report => EarthquakeNotifyType.values.byName(_report);
 
   /// Sets the earthquake report notification filter.
   ///
@@ -217,8 +206,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns an [EarthquakeNotifyType] from preferences. Defaults to
   /// [EarthquakeNotifyType.localIntensityAbove1] if no value has been set.
-  EarthquakeNotifyType get intensity =>
-      EarthquakeNotifyType.values.byName(_intensity);
+  EarthquakeNotifyType get intensity => EarthquakeNotifyType.values.byName(_intensity);
 
   /// Sets the intensity report notification filter.
   ///
@@ -243,8 +231,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns a [WeatherNotifyType] from preferences. Defaults to
   /// [WeatherNotifyType.local] if no value has been set.
-  WeatherNotifyType get thunderstorm =>
-      WeatherNotifyType.values.byName(_thunderstorm);
+  WeatherNotifyType get thunderstorm => WeatherNotifyType.values.byName(_thunderstorm);
 
   /// Sets the thunderstorm alert notification filter.
   ///
@@ -269,8 +256,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns a [WeatherNotifyType] from preferences. Defaults to
   /// [WeatherNotifyType.local] if no value has been set.
-  WeatherNotifyType get weatherAdvisory =>
-      WeatherNotifyType.values.byName(_weatherAdvisory);
+  WeatherNotifyType get weatherAdvisory => WeatherNotifyType.values.byName(_weatherAdvisory);
 
   /// Sets the weather advisory notification filter.
   ///
@@ -295,8 +281,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns a [WeatherNotifyType] from preferences. Defaults to
   /// [WeatherNotifyType.local] if no value has been set.
-  WeatherNotifyType get evacuation =>
-      WeatherNotifyType.values.byName(_evacuation);
+  WeatherNotifyType get evacuation => WeatherNotifyType.values.byName(_evacuation);
 
   /// Sets the disaster evacuation notification filter.
   ///
@@ -346,8 +331,7 @@ class _SettingsNotificationModel extends ChangeNotifier {
   ///
   /// Returns a [BasicNotifyType] from preferences. Defaults to
   /// [BasicNotifyType.all] if no value has been set.
-  BasicNotifyType get announcement =>
-      BasicNotifyType.values.byName(_announcement);
+  BasicNotifyType get announcement => BasicNotifyType.values.byName(_announcement);
 
   /// Sets the announcement notification filter.
   ///

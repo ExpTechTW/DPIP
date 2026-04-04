@@ -61,8 +61,7 @@ class Global {
   static Future<Map<String, Location>> loadLocationData() async {
     final data = await _loadCompressedJson('assets/location.json.gz');
     return data.map(
-      (key, value) =>
-          MapEntry(key, Location.fromJson(value as Map<String, dynamic>)),
+      (key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)),
     );
   }
 

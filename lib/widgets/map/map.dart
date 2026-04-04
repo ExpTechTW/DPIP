@@ -137,9 +137,7 @@ class DpipMapState extends State<DpipMap> {
 
       if (!mounted) return;
 
-      if (_isMapReady &&
-          widget.focusUserLocationWhenUpdated &&
-          location != null) {
+      if (_isMapReady && widget.focusUserLocationWhenUpdated && location != null) {
         try {
           TalkerManager.instance.debug(
             'DpipMap: animating to user location $location, zoom=${DpipMap.kUserLocationZoom}',
@@ -255,8 +253,7 @@ class DpipMapState extends State<DpipMap> {
           color: context.colors.surface,
           child: MapLibreMap(
             minMaxZoomPreference:
-                widget.minMaxZoomPreference ??
-                const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
+                widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 11), // 不要動 雷達回波 會有問題
             trackCameraPosition: true,
             initialCameraPosition: CameraPosition(
               target: widget.initialCameraPosition.target,

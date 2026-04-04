@@ -18,8 +18,7 @@ class TimeSelector extends StatefulWidget {
   State<TimeSelector> createState() => _TimeSelectorState();
 }
 
-class _TimeSelectorState extends State<TimeSelector>
-    with SingleTickerProviderStateMixin {
+class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late ScrollController _scrollController;
   final double _itemWidth = 80.0;
@@ -59,8 +58,7 @@ class _TimeSelectorState extends State<TimeSelector>
     if (index != -1) {
       final selectedItemOffset = index * _itemWidth;
       final screenWidth = context.dimension.width;
-      final scrollOffset =
-          selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
+      final scrollOffset = selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
 
       _scrollController.animateTo(
         scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
@@ -150,9 +148,7 @@ class _TimeSelectorState extends State<TimeSelector>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? context.colors.secondary
-                                  : Colors.transparent,
+                              color: isSelected ? context.colors.secondary : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Column(

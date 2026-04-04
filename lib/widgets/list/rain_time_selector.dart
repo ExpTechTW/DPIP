@@ -18,8 +18,7 @@ class RainTimeSelector extends StatefulWidget {
   State<RainTimeSelector> createState() => _RainTimeSelectorState();
 }
 
-class _RainTimeSelectorState extends State<RainTimeSelector>
-    with SingleTickerProviderStateMixin {
+class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late String _selectedInterval;
   late ScrollController _timeScrollController;
@@ -94,8 +93,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector>
       final viewportWidth = _timeScrollController.position.viewportDimension;
       final maxScroll = _timeScrollController.position.maxScrollExtent;
 
-      double targetScroll =
-          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -116,12 +114,10 @@ class _RainTimeSelectorState extends State<RainTimeSelector>
     final index = _intervals.indexOf(_selectedInterval);
     if (index != -1) {
       final totalWidth = _itemWidth * _intervals.length;
-      final viewportWidth =
-          _intervalScrollController.position.viewportDimension;
+      final viewportWidth = _intervalScrollController.position.viewportDimension;
       final maxScroll = _intervalScrollController.position.maxScrollExtent;
 
-      double targetScroll =
-          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -188,9 +184,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colors.secondary
-                          : Colors.transparent,
+                      color: isSelected ? context.colors.secondary : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -269,17 +263,13 @@ class _RainTimeSelectorState extends State<RainTimeSelector>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colors.secondary
-                          : Colors.transparent,
+                      color: isSelected ? context.colors.secondary : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       translation,
                       style: TextStyle(
-                        color: isSelected
-                            ? context.colors.onSecondary
-                            : context.colors.onSurface,
+                        color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),

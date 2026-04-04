@@ -22,8 +22,7 @@ class _ZstdAdapter implements HttpClientAdapter {
     options.headers['Accept-Encoding'] = 'gzip, deflate, zstd';
     final response = await _inner.fetch(options, requestStream, cancelFuture);
 
-    final contentEncoding = response.headers['content-encoding']?.firstOrNull
-        ?.toLowerCase();
+    final contentEncoding = response.headers['content-encoding']?.firstOrNull?.toLowerCase();
     if (contentEncoding == 'zstd') {
       final builder = BytesBuilder(copy: false);
       await for (final chunk in response.stream) {
@@ -64,8 +63,7 @@ IOHttpClientAdapter _createInnerAdapter() => IOHttpClientAdapter(
   },
 );
 
-Dio _createDio() =>
-    Dio()..httpClientAdapter = _ZstdAdapter(_createInnerAdapter());
+Dio _createDio() => Dio()..httpClientAdapter = _ZstdAdapter(_createInnerAdapter());
 
 final _cacheOptions = CacheOptions(
   store: MemCacheStore(),
@@ -74,5 +72,4 @@ final _cacheOptions = CacheOptions(
 );
 
 final Dio _dio = _createDio();
-final Dio _cachedDio = _createDio()
-  ..interceptors.add(DioCacheInterceptor(options: _cacheOptions));
+final Dio _cachedDio = _createDio()..interceptors.add(DioCacheInterceptor(options: _cacheOptions));

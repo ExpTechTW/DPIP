@@ -42,9 +42,7 @@ class LayerToggle extends StatelessWidget {
         opacity: isDisabled ? 0.4 : 1.0,
         child: InkWell(
           onTap: onChanged != null ? () => onChanged!(!checked) : null,
-          onLongPress: onLongPress != null
-              ? () => onLongPress!(!checked)
-              : null,
+          onLongPress: onLongPress != null ? () => onLongPress!(!checked) : null,
           borderRadius: .circular(12),
           child: Padding(
             padding: const .all(6),
@@ -55,9 +53,7 @@ class LayerToggle extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: checked
-                          ? context.colors.primary
-                          : Colors.transparent,
+                      color: checked ? context.colors.primary : Colors.transparent,
                       width: 2,
                     ),
                     borderRadius: .circular(12),
@@ -83,9 +79,7 @@ class LayerToggle extends StatelessWidget {
                 Text(
                   label,
                   style: context.texts.labelMedium!.copyWith(
-                    color: checked
-                        ? context.colors.primary
-                        : context.colors.onSurfaceVariant,
+                    color: checked ? context.colors.primary : context.colors.onSurfaceVariant,
                     fontWeight: checked ? .bold : null,
                   ),
                 ),

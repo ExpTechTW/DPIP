@@ -130,9 +130,8 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}i.png';
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null
-      ? null
-      : '$traceBaseUrl/$intensityMapImageName';
+  String? get intensityMapImageUrl =>
+      intensityMapImageName == null ? null : '$traceBaseUrl/$intensityMapImageName';
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
@@ -140,8 +139,7 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}a.png';
   }
 
-  String? get pgaMapImageUrl =>
-      pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
+  String? get pgaMapImageUrl => pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
@@ -149,8 +147,7 @@ class PartialEarthquakeReport {
     return '${mapImageBaseName}v.png';
   }
 
-  String? get pgvMapImageUrl =>
-      pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
+  String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
   String extractLocation() {
     if (location.contains('(')) {

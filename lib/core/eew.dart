@@ -84,8 +84,7 @@ Map<String, dynamic> eewAreaPga(
   double eewMaxI = 0.0;
 
   region.forEach((String key, Location info) {
-    final double distSurface =
-        LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
+    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng)) / 1000;
     final double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
     final double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
     double i = pgaToFloat(pga);
@@ -114,16 +113,11 @@ double eewAreaPgv(
         pointLocation.asLatLng,
       ) /
       1000;
-  final double hypocenterDistance =
-      sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
+  final double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   final double x = max(hypocenterDistance, 3);
   final double gpv600 = pow(
     10,
-    0.58 * magW +
-        0.0038 * depth -
-        1.29 -
-        log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 -
-        0.002 * x,
+    0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x,
   ).toDouble();
   final double pgv400 = gpv600 * 1.31;
   final double pgv = pgv400 * 1.0;

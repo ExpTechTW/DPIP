@@ -24,9 +24,7 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
           builder: (context, value, child) {
             return WeatherNotifySection(
               value: value,
-              onChanged: (value) => context
-                  .read<SettingsNotificationModel>()
-                  .setEvacuation(value),
+              onChanged: (value) => context.read<SettingsNotificationModel>().setEvacuation(value),
             );
           },
         ),

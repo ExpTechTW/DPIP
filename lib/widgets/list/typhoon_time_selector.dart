@@ -76,8 +76,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
       final viewportWidth = _timeScrollController.position.viewportDimension;
       final maxScroll = _timeScrollController.position.maxScrollExtent;
 
-      double targetScroll =
-          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -101,8 +100,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
       final viewportWidth = _typhoonScrollController.position.viewportDimension;
       final maxScroll = _typhoonScrollController.position.maxScrollExtent;
 
-      double targetScroll =
-          (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
+      double targetScroll = (index * _itemWidth) - (viewportWidth / 2) + (_itemWidth / 2);
 
       targetScroll = targetScroll.clamp(0.0, maxScroll);
 
@@ -166,9 +164,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.colors.secondary
-                        : Colors.transparent,
+                    color: isSelected ? context.colors.secondary : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -177,9 +173,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
                       Text(
                         DateFormat('HH:mm').format(time),
                         style: TextStyle(
-                          color: isSelected
-                              ? context.colors.onSecondary
-                              : context.colors.onSurface,
+                          color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -239,17 +233,13 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector>
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.colors.secondary
-                        : Colors.transparent,
+                    color: isSelected ? context.colors.secondary : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     widget.typhoonList[index],
                     style: TextStyle(
-                      color: isSelected
-                          ? context.colors.onSecondary
-                          : context.colors.onSurface,
+                      color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),

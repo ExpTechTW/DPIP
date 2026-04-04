@@ -163,9 +163,7 @@ void main() async {
   locationFuture
       .whenComplete(() {
         final locationInitEnd = DateTime.now();
-        final locationDuration = locationInitEnd
-            .difference(locationInitStart)
-            .inMilliseconds;
+        final locationDuration = locationInitEnd.difference(locationInitStart).inMilliseconds;
         talker.log('✅ LocationServiceManager 完成。耗時: ${locationDuration}ms');
       })
       .catchError((e) {

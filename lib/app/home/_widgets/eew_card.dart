@@ -48,9 +48,8 @@ class _EewCardState extends State<EewCard> {
   void _updateCountdown() {
     if (localArrivalTime == null) return;
 
-    final remainingSeconds =
-        ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000)
-            .floor();
+    final remainingSeconds = ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000)
+        .floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
@@ -72,9 +71,7 @@ class _EewCardState extends State<EewCard> {
 
       localIntensity = intensityFloatToInt(info.i);
       localArrivalTime =
-          (widget.data.info.time +
-                  sWaveTimeByDistance(widget.data.info.depth, info.dist))
-              .floor();
+          (widget.data.info.time + sWaveTimeByDistance(widget.data.info.depth, info.dist)).floor();
     }
 
     _updateCountdown();
@@ -159,24 +156,18 @@ class _EewCardState extends State<EewCard> {
                           ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
                                 .i18n
                                 .args({
-                                  'time': widget.data.info.time
-                                      .toSimpleDateTimeString(),
+                                  'time': widget.data.info.time.toSimpleDateTimeString(),
                                   'location': widget.data.info.location,
-                                  'magnitude': widget.data.info.magnitude
-                                      .toStringAsFixed(1),
-                                  'intensity':
-                                      localIntensity!.asIntensityLabel,
+                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                  'intensity': localIntensity!.asIntensityLabel,
                                 })
                           : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
                                 .i18n
                                 .args({
-                                  'time': widget.data.info.time
-                                      .toSimpleDateTimeString(),
+                                  'time': widget.data.info.time.toSimpleDateTimeString(),
                                   'location': widget.data.info.location,
-                                  'magnitude': widget.data.info.magnitude
-                                      .toStringAsFixed(1),
-                                  'depth': widget.data.info.depth
-                                      .toStringAsFixed(1),
+                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                  'depth': widget.data.info.depth.toStringAsFixed(1),
                                 }),
                       style: context.texts.bodyLarge!.copyWith(
                         color: context.colors.onErrorContainer,
@@ -211,13 +202,11 @@ class _EewCardState extends State<EewCard> {
                                     children: [
                                       Text(
                                         '所在地預估'.i18n,
-                                        style: context.texts.labelLarge!
-                                            .copyWith(
-                                              color: context
-                                                  .colors
-                                                  .onErrorContainer
-                                                  .withValues(alpha: 0.6),
-                                            ),
+                                        style: context.texts.labelLarge!.copyWith(
+                                          color: context.colors.onErrorContainer.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                        ),
                                       ),
                                       Padding(
                                         padding: const .only(
@@ -226,17 +215,12 @@ class _EewCardState extends State<EewCard> {
                                         ),
                                         child: Text(
                                           localIntensity!.asIntensityLabel,
-                                          style: context.texts.displayMedium!
-                                              .copyWith(
-                                                fontWeight: .bold,
-                                                color: context
-                                                    .colors
-                                                    .onErrorContainer,
-                                                height: 1,
-                                                leadingDistribution:
-                                                    TextLeadingDistribution
-                                                        .even,
-                                              ),
+                                          style: context.texts.displayMedium!.copyWith(
+                                            fontWeight: .bold,
+                                            color: context.colors.onErrorContainer,
+                                            height: 1,
+                                            leadingDistribution: TextLeadingDistribution.even,
+                                          ),
                                           textAlign: .center,
                                         ),
                                       ),
@@ -245,8 +229,7 @@ class _EewCardState extends State<EewCard> {
                                 ),
                               ),
                               VerticalDivider(
-                                color: context.colors.onErrorContainer
-                                    .withValues(alpha: 0.4),
+                                color: context.colors.onErrorContainer.withValues(alpha: 0.4),
                                 width: 24,
                               ),
                               Expanded(
@@ -258,13 +241,11 @@ class _EewCardState extends State<EewCard> {
                                     children: [
                                       Text(
                                         '震波'.i18n,
-                                        style: context.texts.labelLarge!
-                                            .copyWith(
-                                              color: context
-                                                  .colors
-                                                  .onErrorContainer
-                                                  .withValues(alpha: 0.6),
-                                            ),
+                                        style: context.texts.labelLarge!.copyWith(
+                                          color: context.colors.onErrorContainer.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                        ),
                                       ),
                                       Padding(
                                         padding: const .only(
@@ -276,64 +257,41 @@ class _EewCardState extends State<EewCard> {
                                                 text: TextSpan(
                                                   children: [
                                                     TextSpan(
-                                                      text: countdown
-                                                          .toString(),
+                                                      text: countdown.toString(),
                                                       style: TextStyle(
                                                         fontSize:
-                                                            context
-                                                                .texts
-                                                                .displayMedium!
-                                                                .fontSize! *
+                                                            context.texts.displayMedium!.fontSize! *
                                                             1.15,
                                                       ),
                                                     ),
                                                     TextSpan(
                                                       text: ' 秒'.i18n,
                                                       style: TextStyle(
-                                                        fontSize: context
-                                                            .texts
-                                                            .labelLarge!
-                                                            .fontSize,
+                                                        fontSize:
+                                                            context.texts.labelLarge!.fontSize,
                                                       ),
                                                     ),
                                                   ],
-                                                  style: context
-                                                      .texts
-                                                      .displayMedium!
-                                                      .copyWith(
-                                                        fontWeight: .bold,
-                                                        color: context
-                                                            .colors
-                                                            .onErrorContainer,
-                                                        height: 1,
-                                                        leadingDistribution:
-                                                            TextLeadingDistribution
-                                                                .even,
-                                                      ),
+                                                  style: context.texts.displayMedium!.copyWith(
+                                                    fontWeight: .bold,
+                                                    color: context.colors.onErrorContainer,
+                                                    height: 1,
+                                                    leadingDistribution:
+                                                        TextLeadingDistribution.even,
+                                                  ),
                                                 ),
                                                 textAlign: .center,
                                               )
                                             : Text(
                                                 '抵達'.i18n,
-                                                style: context
-                                                    .texts
-                                                    .displayMedium!
-                                                    .copyWith(
-                                                      fontSize:
-                                                          context
-                                                              .texts
-                                                              .displayMedium!
-                                                              .fontSize! *
-                                                          0.92,
-                                                      fontWeight: .bold,
-                                                      color: context
-                                                          .colors
-                                                          .onErrorContainer,
-                                                      height: 1,
-                                                      leadingDistribution:
-                                                          TextLeadingDistribution
-                                                              .even,
-                                                    ),
+                                                style: context.texts.displayMedium!.copyWith(
+                                                  fontSize:
+                                                      context.texts.displayMedium!.fontSize! * 0.92,
+                                                  fontWeight: .bold,
+                                                  color: context.colors.onErrorContainer,
+                                                  height: 1,
+                                                  leadingDistribution: TextLeadingDistribution.even,
+                                                ),
                                                 textAlign: .center,
                                               ),
                                       ),

@@ -61,8 +61,7 @@ class SettingsLocalePage extends StatelessWidget {
                   subtitle: Text('點擊這裡來幫助我們改進 DPIP 的翻譯'.i18n),
                   trailing: Icon(Symbols.arrow_outward_rounded),
                   onTap: () => 'https://crowdin.com/project/dpip'.launch(),
-                  onLongPress: () =>
-                      'https://crowdin.com/project/dpip'.copy(),
+                  onLongPress: () => 'https://crowdin.com/project/dpip'.copy(),
                 ),
               ],
             ),

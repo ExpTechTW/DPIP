@@ -32,8 +32,7 @@ class _ReportListPageState extends State<ReportListPage> {
   });
 
   Future<void> refreshReportList() async {
-    if (lastFetchTime != null &&
-        DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
+    if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
       return;
     }
     if (isLoadingEnd) return;
@@ -114,14 +113,12 @@ class _ReportListPageState extends State<ReportListPage> {
         '最大震度: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
       );
     }
-    if (_magnitudeRange.start > 0 ||
-        (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
+    if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
       summaries.add(
         '規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}',
       );
     }
-    if (_depthRange.start > 0 ||
-        (_depthRange.end > 0 && _depthRange.end < 700)) {
+    if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
       summaries.add(
         '深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km',
       );
@@ -160,9 +157,7 @@ class _ReportListPageState extends State<ReportListPage> {
                   children: [
                     FilterChip(
                       label: Text(
-                        _getFilterSummary() == '全部'
-                            ? '篩選器'
-                            : _getFilterSummary(),
+                        _getFilterSummary() == '全部' ? '篩選器' : _getFilterSummary(),
                       ),
                       selected: _getFilterSummary() != '全部',
                       onSelected: (_) => _showFilterDialog(),

@@ -42,9 +42,7 @@ mixin WeatherEndpoints {
   /// Fetches rain station data for [time].
   Future<List<RainStation>> getRain(String time) async {
     final res = await _dio.get('${api(1)}/v2/meteor/rain/$time');
-    return (res.data as List)
-        .map((e) => RainStation.fromMap(e as Map<String, dynamic>))
-        .toList();
+    return (res.data as List).map((e) => RainStation.fromMap(e as Map<String, dynamic>)).toList();
   }
 
   /// Fetches the list of available typhoon satellite images.
@@ -68,8 +66,6 @@ mixin WeatherEndpoints {
   /// Fetches lightning strike data for [time].
   Future<List<Lightning>> getLightning(String time) async {
     final res = await _dio.get('${api(1)}/v2/meteor/lightning/$time');
-    return (res.data as List)
-        .map((e) => Lightning.fromMap(e as Map<String, dynamic>))
-        .toList();
+    return (res.data as List).map((e) => Lightning.fromMap(e as Map<String, dynamic>)).toList();
   }
 }

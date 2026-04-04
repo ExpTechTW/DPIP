@@ -17,8 +17,7 @@ Future<void> updateLocationFromGPS() async {
   }
 
   final now = DateTime.now();
-  if (_lastUpdateTime != null &&
-      now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
+  if (_lastUpdateTime != null && now.difference(_lastUpdateTime!) < _kMinUpdateInterval) {
     TalkerManager.instance.debug(
       '📍 [GPS] Skipping update (throttle: ${now.difference(_lastUpdateTime!).inSeconds}s)',
     );
@@ -36,8 +35,7 @@ Future<void> updateLocationFromGPS() async {
     }
 
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       TalkerManager.instance.debug('📍 [GPS] Location permission denied');
       _clearLocation();
       return;

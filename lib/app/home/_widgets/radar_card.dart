@@ -30,8 +30,7 @@ class RadarMapCard extends StatefulWidget {
   State<RadarMapCard> createState() => _RadarMapCardState();
 }
 
-class _RadarMapCardState extends State<RadarMapCard>
-    with WidgetsBindingObserver, RouteAware {
+class _RadarMapCardState extends State<RadarMapCard> with WidgetsBindingObserver, RouteAware {
   MapLibreMapController? _mapController;
 
   /// Future that resolves to the list of available radar timestamps.
@@ -92,9 +91,7 @@ class _RadarMapCardState extends State<RadarMapCard>
   Widget build(BuildContext context) {
     final userLocation = GlobalProviders.location.coordinates;
     final targetLocation = userLocation ?? DpipMap.kTaiwanCenter;
-    final targetZoom = userLocation != null
-        ? DpipMap.kUserLocationZoom
-        : DpipMap.kTaiwanZoom;
+    final targetZoom = userLocation != null ? DpipMap.kUserLocationZoom : DpipMap.kTaiwanZoom;
 
     return ResponsiveContainer(
       maxWidth: 720,
@@ -118,8 +115,7 @@ class _RadarMapCardState extends State<RadarMapCard>
                           target: targetLocation,
                           zoom: targetZoom,
                         ),
-                        onMapCreated: (controller) =>
-                            _mapController = controller,
+                        onMapCreated: (controller) => _mapController = controller,
                         onStyleLoadedCallback: () => _setupMapLayers(),
                         dragEnabled: false,
                         rotateGesturesEnabled: false,
@@ -150,10 +146,9 @@ class _RadarMapCardState extends State<RadarMapCard>
                                     return const SizedBox.shrink();
                                   }
 
-                                  final style = context.texts.labelSmall
-                                      ?.copyWith(
-                                        color: context.colors.onSurfaceVariant,
-                                      );
+                                  final style = context.texts.labelSmall?.copyWith(
+                                    color: context.colors.onSurfaceVariant,
+                                  );
 
                                   return Container(
                                     padding: const .symmetric(
@@ -171,10 +166,8 @@ class _RadarMapCardState extends State<RadarMapCard>
                                       children: [
                                         Icon(
                                           Symbols.schedule_rounded,
-                                          size:
-                                              (style?.fontSize ?? 12) * 1.25,
-                                          color:
-                                              context.colors.onSurfaceVariant,
+                                          size: (style?.fontSize ?? 12) * 1.25,
+                                          color: context.colors.onSurfaceVariant,
                                         ),
                                         Text(
                                           data.last.toSimpleDateTimeString(),

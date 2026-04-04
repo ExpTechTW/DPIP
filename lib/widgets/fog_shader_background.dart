@@ -35,8 +35,7 @@ class _FogShaderBackgroundState extends State<FogShaderBackground>
   late final AnimationController _controller;
   int _startTime = 0;
 
-  double get _elapsedTime =>
-      (DateTime.now().millisecondsSinceEpoch - _startTime) / 1000;
+  double get _elapsedTime => (DateTime.now().millisecondsSinceEpoch - _startTime) / 1000;
 
   @override
   void initState() {

@@ -24,9 +24,8 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
           builder: (context, value, child) {
             return BasicNotifySection(
               value: value,
-              onChanged: (value) => context
-                  .read<SettingsNotificationModel>()
-                  .setAnnouncement(value),
+              onChanged: (value) =>
+                  context.read<SettingsNotificationModel>().setAnnouncement(value),
             );
           },
         ),

@@ -83,10 +83,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         'precipitation': data!.precipitation.reversed.toList(),
         'humidity': data!.humidity.reversed.toList(),
         'pressure': data!.pressure.reversed.toList(),
-        'time': data!.time.reversed
-            .toList()
-            .map((item) => double.tryParse(item) ?? 0)
-            .toList(),
+        'time': data!.time.reversed.toList().map((item) => double.tryParse(item) ?? 0).toList(),
       };
       isLoading = false;
     });
@@ -220,8 +217,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 touchedIndex != -1 &&
                 weatherData[selectedDataType]![touchedIndex] != 0)
               Transform.rotate(
-                angle:
-                    (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
+                angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
                 child: Icon(
                   Icons.arrow_upward,
                   color: getDataTypeColor(selectedDataType!)[0],
@@ -253,9 +249,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             const SizedBox(height: 8),
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: selectedDataType == 'precipitation'
-                  ? _buildBarChart()
-                  : _buildLineChart(),
+              child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
             ),
             const SizedBox(height: 8),
             _buildLegend(),
@@ -271,8 +265,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
 
-    final bool invalid =
-        weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (invalid) {
       return const Center(child: Text('沒有有效資料可顯示'));
@@ -346,9 +339,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               reservedSize: 40,
               interval: interval,
               getTitlesWidget: (value, meta) {
-                if (value >= startY &&
-                    value <= endY &&
-                    (value % interval).abs() < 0.001) {
+                if (value >= startY && value <= endY && (value % interval).abs() < 0.001) {
                   return Text(
                     value.toInt().toString(),
                     style: const TextStyle(fontSize: 10),
@@ -388,42 +379,38 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           ),
         ],
         lineTouchData: LineTouchData(
-          touchCallback:
-              (FlTouchEvent event, LineTouchResponse? touchResponse) {
-                setState(() {
-                  if (event is FlPanEndEvent ||
-                      event is FlTapUpEvent ||
-                      event is FlLongPressEnd) {
-                    touchedIndex = -1;
-                  } else if (touchResponse?.lineBarSpots != null &&
-                      touchResponse!.lineBarSpots!.isNotEmpty) {
-                    touchedIndex = touchResponse.lineBarSpots![0].x.toInt();
-                  }
-                });
-              },
+          touchCallback: (FlTouchEvent event, LineTouchResponse? touchResponse) {
+            setState(() {
+              if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
+                touchedIndex = -1;
+              } else if (touchResponse?.lineBarSpots != null &&
+                  touchResponse!.lineBarSpots!.isNotEmpty) {
+                touchedIndex = touchResponse.lineBarSpots![0].x.toInt();
+              }
+            });
+          },
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
               return List.filled(touchedBarSpots.length, null);
             },
           ),
-          getTouchedSpotIndicator:
-              (LineChartBarData barData, List<int> spotIndexes) {
-                return spotIndexes.map((spotIndex) {
-                  return TouchedSpotIndicatorData(
-                    const FlLine(color: Colors.white, dashArray: [5, 5]),
-                    FlDotData(
-                      getDotPainter: (spot, percent, barData, index) {
-                        return FlDotCirclePainter(
-                          radius: 3,
-                          color: Colors.white,
-                          strokeWidth: 2,
-                          strokeColor: Colors.grey,
-                        );
-                      },
-                    ),
-                  );
-                }).toList();
-              },
+          getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+            return spotIndexes.map((spotIndex) {
+              return TouchedSpotIndicatorData(
+                const FlLine(color: Colors.white, dashArray: [5, 5]),
+                FlDotData(
+                  getDotPainter: (spot, percent, barData, index) {
+                    return FlDotCirclePainter(
+                      radius: 3,
+                      color: Colors.white,
+                      strokeWidth: 2,
+                      strokeColor: Colors.grey,
+                    );
+                  },
+                ),
+              );
+            }).toList();
+          },
         ),
         extraLinesData: ExtraLinesData(
           horizontalLines: [
@@ -443,8 +430,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     final Color barColor = getDataTypeColor(selectedDataType!)[0];
     final Color abnormalColor = Colors.red.withValues(alpha: 0.3);
 
-    final bool invalid =
-        weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (invalid) {
       return const Center(child: Text('沒有有效資料可顯示'));
@@ -474,13 +460,10 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     reservedSize: 30,
                     getTitlesWidget: (value, meta) {
                       final int index = value.toInt();
-                      if (index % 3 == 0 &&
-                          index >= 0 &&
-                          index < weatherData['time']!.length) {
-                        final DateTime dateTime =
-                            DateTime.fromMillisecondsSinceEpoch(
-                              weatherData['time']![index].toInt(),
-                            );
+                      if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
+                        final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                          weatherData['time']![index].toInt(),
+                        );
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
@@ -541,19 +524,17 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
                 ),
-                touchCallback:
-                    (FlTouchEvent event, BarTouchResponse? touchResponse) {
-                      setState(() {
-                        if (event is FlPanEndEvent ||
-                            event is FlTapUpEvent ||
-                            event is FlLongPressEnd) {
-                          touchedIndex = -1;
-                        } else if (touchResponse?.spot != null) {
-                          touchedIndex =
-                              touchResponse!.spot!.touchedBarGroupIndex;
-                        }
-                      });
-                    },
+                touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
+                  setState(() {
+                    if (event is FlPanEndEvent ||
+                        event is FlTapUpEvent ||
+                        event is FlLongPressEnd) {
+                      touchedIndex = -1;
+                    } else if (touchResponse?.spot != null) {
+                      touchedIndex = touchResponse!.spot!.touchedBarGroupIndex;
+                    }
+                  });
+                },
               ),
               maxY: (maxRainfall / interval).ceil() * interval,
               minY: 0,
@@ -691,8 +672,7 @@ class BackgroundPainter extends CustomPainter {
     const double rightPadding = 10;
 
     final double chartWidth = chartAreaSize.width - leftPadding - rightPadding;
-    final double chartHeight =
-        chartAreaSize.height - bottomPadding - topPadding;
+    final double chartHeight = chartAreaSize.height - bottomPadding - topPadding;
 
     final barWidth = chartWidth / data.length;
 

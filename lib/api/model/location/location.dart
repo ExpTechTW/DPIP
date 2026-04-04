@@ -81,13 +81,12 @@ class Location {
   /// Example: "臺北市 信義區" or "Taipei City Xinyi District"
   ///
   /// This is the most complete form of the location name including all administrative level indicators.
-  String get cityTownWithLevel =>
-      '{city}{cityLevel} {town}{townLevel}'.i18n.args({
-        'city': city.locationName,
-        'cityLevel': cityLevel.locationName,
-        'town': town.locationName,
-        'townLevel': townLevel.locationName,
-      });
+  String get cityTownWithLevel => '{city}{cityLevel} {town}{townLevel}'.i18n.args({
+    'city': city.locationName,
+    'cityLevel': cityLevel.locationName,
+    'town': town.locationName,
+    'townLevel': townLevel.locationName,
+  });
 
   /// Returns the localized location name without administrative levels.
   ///
@@ -183,8 +182,7 @@ class Location {
   /// };
   /// final location = Location.fromJson(json);
   /// ```
-  factory Location.fromJson(Map<String, dynamic> json) =>
-      _$LocationFromJson(json);
+  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
 
   /// Converts this [Location] instance to a JSON map.
   ///

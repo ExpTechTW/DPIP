@@ -110,8 +110,7 @@ class InfoTime {
     return expireTimestamp.asTZDateTime;
   }
 
-  factory InfoTime.fromJson(Map<String, dynamic> json) =>
-      _$InfoTimeFromJson(json);
+  factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$InfoTimeToJson(this);
 }
@@ -123,8 +122,7 @@ class InfoText {
 
   InfoText({required this.content, required this.description});
 
-  factory InfoText.fromJson(Map<String, dynamic> json) =>
-      _$InfoTextFromJson(json);
+  factory InfoText.fromJson(Map<String, dynamic> json) => _$InfoTextFromJson(json);
 
   Map<String, dynamic> toJson() => _$InfoTextToJson(this);
 }
@@ -136,8 +134,7 @@ class InfoTextValue {
 
   InfoTextValue({required this.title, required this.subtitle});
 
-  factory InfoTextValue.fromJson(Map<String, dynamic> json) =>
-      _$InfoTextValueFromJson(json);
+  factory InfoTextValue.fromJson(Map<String, dynamic> json) => _$InfoTextValueFromJson(json);
 
   Map<String, dynamic> toJson() => _$InfoTextValueToJson(this);
 }

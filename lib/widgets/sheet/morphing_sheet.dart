@@ -47,8 +47,7 @@ class MorphingSheet extends StatefulWidget {
   State<MorphingSheet> createState() => _MorphingSheetState();
 }
 
-class _MorphingSheetState extends State<MorphingSheet>
-    with SingleTickerProviderStateMixin {
+class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProviderStateMixin {
   late DraggableScrollableController _controller;
   late AnimationController _morphController;
   bool _isSnapping = false;
@@ -106,10 +105,8 @@ class _MorphingSheetState extends State<MorphingSheet>
   }
 
   void _measureSizes() {
-    final RenderBox? contentBox =
-        _contentKey.currentContext?.findRenderObject() as RenderBox?;
-    final RenderBox? partialBox =
-        _partialKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? contentBox = _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? partialBox = _partialKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (contentBox != null) {
       final screenHeight = context.dimension.height;
@@ -157,8 +154,7 @@ class _MorphingSheetState extends State<MorphingSheet>
     if (_isSnapping) return;
 
     final position = _controller.size;
-    final morphValue =
-        (position - _minChildSize) / (widget.maxChildSize - _minChildSize);
+    final morphValue = (position - _minChildSize) / (widget.maxChildSize - _minChildSize);
     _morphController.value = morphValue.clamp(0.0, 1.0);
   }
 
@@ -168,9 +164,7 @@ class _MorphingSheetState extends State<MorphingSheet>
 
     try {
       final isExpanding = targetPosition > _controller.size;
-      final curve = isExpanding
-          ? Easing.emphasizedDecelerate
-          : Easing.emphasizedAccelerate;
+      final curve = isExpanding ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate;
       final duration = isExpanding
           ? MorphingSheetController.enterDuration
           : MorphingSheetController.exitDuration;
@@ -220,9 +214,7 @@ class _MorphingSheetState extends State<MorphingSheet>
                   borderRadius: BorderRadius.circular(borderRadius),
                   border: Border.all(
                     width: widget.borderWidth ?? 1,
-                    color:
-                        widget.borderColor ??
-                        context.colors.outline.withValues(alpha: 0.2),
+                    color: widget.borderColor ?? context.colors.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: ClipRRect(
@@ -230,8 +222,9 @@ class _MorphingSheetState extends State<MorphingSheet>
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Material(
-                      color: (widget.backgroundColor ?? context.colors.surface)
-                          .withValues(alpha: 0.6),
+                      color: (widget.backgroundColor ?? context.colors.surface).withValues(
+                        alpha: 0.6,
+                      ),
                       borderRadius: BorderRadius.circular(borderRadius),
                       clipBehavior: Clip.antiAlias,
                       child: Stack(
@@ -266,8 +259,7 @@ class _MorphingSheetState extends State<MorphingSheet>
                                   child: widget.partialBuilder(
                                     context,
                                     ScrollController(),
-                                    widget.controller ??
-                                        MorphingSheetController(),
+                                    widget.controller ?? MorphingSheetController(),
                                   ),
                                 ),
                               );
@@ -316,15 +308,12 @@ class _MorphingSheetState extends State<MorphingSheet>
                   ).transform(_morphController.value);
 
                   final isFullScreen =
-                      _morphController.value == 1.0 &&
-                      _controller.size == widget.maxChildSize;
+                      _morphController.value == 1.0 && _controller.size == widget.maxChildSize;
 
                   final borderRadius = !isFullScreen
                       ? Tween<double>(
                           begin: widget.borderRadius?.topLeft.y ?? 16.0,
-                          end: _isOverflowing
-                              ? 0.0
-                              : (widget.borderRadius?.topLeft.y ?? 16.0),
+                          end: _isOverflowing ? 0.0 : (widget.borderRadius?.topLeft.y ?? 16.0),
                         ).transform(_morphController.value)
                       : 0.0;
 
@@ -383,15 +372,13 @@ class _MorphingSheetState extends State<MorphingSheet>
                                 ).transform(_morphController.value),
                               ),
                               child: Material(
-                                color:
-                                    (widget.backgroundColor ??
-                                            context.colors.surface)
-                                        .withValues(
-                                          alpha: Tween<double>(
-                                            begin: 0.6,
-                                            end: 1.0,
-                                          ).transform(_morphController.value),
-                                        ),
+                                color: (widget.backgroundColor ?? context.colors.surface)
+                                    .withValues(
+                                      alpha: Tween<double>(
+                                        begin: 0.6,
+                                        end: 1.0,
+                                      ).transform(_morphController.value),
+                                    ),
                                 borderRadius: BorderRadius.circular(
                                   borderRadius,
                                 ),
@@ -409,10 +396,12 @@ class _MorphingSheetState extends State<MorphingSheet>
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                                 colors: [
-                                                  context.colors.surfaceTint
-                                                      .withValues(alpha: 0.04),
-                                                  context.colors.surfaceTint
-                                                      .withValues(alpha: 0.12),
+                                                  context.colors.surfaceTint.withValues(
+                                                    alpha: 0.04,
+                                                  ),
+                                                  context.colors.surfaceTint.withValues(
+                                                    alpha: 0.12,
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -426,8 +415,7 @@ class _MorphingSheetState extends State<MorphingSheet>
                                           child: LayoutBuilder(
                                             builder: (context, constraints) {
                                               return SingleChildScrollView(
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
+                                                physics: const NeverScrollableScrollPhysics(),
                                                 padding: EdgeInsets.zero,
                                                 child: SizedBox(
                                                   key: _partialKey,
@@ -435,8 +423,7 @@ class _MorphingSheetState extends State<MorphingSheet>
                                                   child: widget.partialBuilder(
                                                     context,
                                                     scrollController,
-                                                    widget.controller ??
-                                                        MorphingSheetController(),
+                                                    widget.controller ?? MorphingSheetController(),
                                                   ),
                                                 ),
                                               );

@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class _SettingsMapModel extends ChangeNotifier {
-  void _log(String message) =>
-      TalkerManager.instance.info('[SettingsMapModel] $message');
+  void _log(String message) => TalkerManager.instance.info('[SettingsMapModel] $message');
 
   /// The underlying [ValueNotifier] for the map update interval in frames per second.
   ///
@@ -67,10 +66,7 @@ class _SettingsMapModel extends ChangeNotifier {
   /// Returns the stored [Set<MapLayer>] from preferences. Defaults to
   /// `{MapLayer.monitor}` if no value has been set.
   final layersNotifier = ValueNotifier(
-    Preference.mapLayers
-            ?.split(',')
-            .map((v) => MapLayer.values.byName(v))
-            .toSet() ??
+    Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ??
         {MapLayer.monitor},
   );
 
@@ -123,13 +119,9 @@ class _SettingsMapModel extends ChangeNotifier {
   void refresh() {
     updateIntervalNotifier.value = Preference.mapUpdateFps ?? 10;
     baseMapNotifier.value =
-        BaseMapType.values.asNameMap()[Preference.mapBase] ??
-        BaseMapType.exptech;
+        BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech;
     layersNotifier.value =
-        Preference.mapLayers
-            ?.split(',')
-            .map((v) => MapLayer.values.byName(v))
-            .toSet() ??
+        Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ??
         {MapLayer.monitor};
     autoZoomNotifier.value = Preference.mapAutoZoom ?? false;
   }

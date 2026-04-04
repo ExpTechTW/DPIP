@@ -28,9 +28,7 @@ class _SettingsProxyPageState extends State<SettingsProxyPage> {
 
   void _saveSettings() {
     Preference.proxyEnabled = _enabled;
-    Preference.proxyHost = _hostController.text.trim().isEmpty
-        ? null
-        : _hostController.text.trim();
+    Preference.proxyHost = _hostController.text.trim().isEmpty ? null : _hostController.text.trim();
     final portText = _portController.text.trim();
     Preference.proxyPort = portText.isEmpty ? null : int.tryParse(portText);
 

@@ -36,8 +36,7 @@ class TsunamiEstimate {
     required this.waveHeight,
   });
 
-  factory TsunamiEstimate.fromJson(Map<String, dynamic> json) =>
-      _$TsunamiEstimateFromJson(json);
+  factory TsunamiEstimate.fromJson(Map<String, dynamic> json) => _$TsunamiEstimateFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiEstimateToJson(this);
 }

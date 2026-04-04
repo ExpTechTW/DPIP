@@ -86,8 +86,7 @@ class _IntensityPageState extends State<IntensityPage> {
 
     if (!widget.item.addition.isFinal) {
       _update = Timer.periodic(const Duration(seconds: 1), (_) async {
-        data =
-            (await ExpTech().getEvent(widget.item.id))[0] as IntensityHistory;
+        data = (await ExpTech().getEvent(widget.item.id))[0] as IntensityHistory;
         getEventInfo();
         if (data.addition.isFinal == true) {
           _update?.cancel();
@@ -297,8 +296,7 @@ class _IntensityPageState extends State<IntensityPage> {
               ),
               const SizedBox(width: 8),
               LabelChip(
-                label:
-                    "第${data.addition.serial}報${(data.addition.isFinal) ? '(最終)' : ""}",
+                label: "第${data.addition.serial}報${(data.addition.isFinal) ? '(最終)' : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
@@ -415,8 +413,7 @@ class _IntensityPageState extends State<IntensityPage> {
                           padding: const EdgeInsets.all(4),
                           side: BorderSide(color: context.colors.outline),
                           backgroundColor: context.colors.surfaceContainerHigh,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           label: Text(e.townWithLevel),
                         );
                       }).toList(),

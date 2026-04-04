@@ -251,9 +251,7 @@ class _MarkdownPreWrapperState extends State<MarkdownPreWrapper> {
                   onPressed: copy,
                   tooltip: _isCopied ? '已複製' : '複製',
                   icon: Icon(
-                    _isCopied
-                        ? Symbols.check_rounded
-                        : Symbols.content_copy_rounded,
+                    _isCopied ? Symbols.check_rounded : Symbols.content_copy_rounded,
                     size: 16,
                   ),
                   visualDensity: .compact,
@@ -479,59 +477,57 @@ class Markdown extends StatelessWidget {
 
     return MarkdownBlock(
       data: MarkdownUtils.apply(text),
-      config:
-          (isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig)
-              .copy(
-                configs: [
-                  _H1Config(
-                    style: headlineSmall.copyWith(fontWeight: .bold),
-                    divierColor: context.colors.outlineVariant,
-                  ),
-                  _H2Config(
-                    style: titleLarge.copyWith(fontWeight: .bold),
-                    divierColor: context.colors.outlineVariant,
-                  ),
-                  _H3Config(
-                    style: titleMedium.copyWith(fontWeight: .bold),
-                  ),
-                  H4Config(
-                    style: titleSmall.copyWith(fontWeight: .bold),
-                  ),
-                  HrConfig(color: context.colors.outlineVariant),
-                  LinkConfig(
-                    style: TextStyle(
-                      color: context.colors.primary,
-                      decoration: .underline,
-                      decorationColor: context.colors.primary,
-                    ),
-                    onTap: (url) => url.launch(),
-                  ),
-                  ImgConfig(
-                    builder: (url, attributes) {
-                      return CachedNetworkImage(imageUrl: url);
-                    },
-                  ),
-                  BlockquoteConfig(
-                    sideColor: context.colors.outlineVariant,
-                    textColor: context.colors.outline,
-                  ),
-                  PConfig(textStyle: body),
-                  CodeConfig(style: applyFont(bodyMedium)),
-                  PreConfig(
-                    wrapper: MarkdownPreWrapper.new,
-                    margin: .zero,
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainerHigh,
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(8),
-                      ),
-                    ),
-                    language: 'text',
-                    theme: isDark ? _githubThemeDark : _githubTheme,
-                    styleNotMatched: applyFont(bodyMedium),
-                  ),
-                ],
+      config: (isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig).copy(
+        configs: [
+          _H1Config(
+            style: headlineSmall.copyWith(fontWeight: .bold),
+            divierColor: context.colors.outlineVariant,
+          ),
+          _H2Config(
+            style: titleLarge.copyWith(fontWeight: .bold),
+            divierColor: context.colors.outlineVariant,
+          ),
+          _H3Config(
+            style: titleMedium.copyWith(fontWeight: .bold),
+          ),
+          H4Config(
+            style: titleSmall.copyWith(fontWeight: .bold),
+          ),
+          HrConfig(color: context.colors.outlineVariant),
+          LinkConfig(
+            style: TextStyle(
+              color: context.colors.primary,
+              decoration: .underline,
+              decorationColor: context.colors.primary,
+            ),
+            onTap: (url) => url.launch(),
+          ),
+          ImgConfig(
+            builder: (url, attributes) {
+              return CachedNetworkImage(imageUrl: url);
+            },
+          ),
+          BlockquoteConfig(
+            sideColor: context.colors.outlineVariant,
+            textColor: context.colors.outline,
+          ),
+          PConfig(textStyle: body),
+          CodeConfig(style: applyFont(bodyMedium)),
+          PreConfig(
+            wrapper: MarkdownPreWrapper.new,
+            margin: .zero,
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(8),
               ),
+            ),
+            language: 'text',
+            theme: isDark ? _githubThemeDark : _githubTheme,
+            styleNotMatched: applyFont(bodyMedium),
+          ),
+        ],
+      ),
     );
   }
 }

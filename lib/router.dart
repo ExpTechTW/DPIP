@@ -4,6 +4,7 @@ import 'package:dpip/app/home/layout.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
+import 'package:dpip/app/settings/experimental/page.dart';
 import 'package:dpip/app/settings/layout.dart';
 import 'package:dpip/app/settings/layout/page.dart';
 import 'package:dpip/app/settings/locale/page.dart';
@@ -27,7 +28,6 @@ import 'package:dpip/app/settings/proxy/page.dart';
 import 'package:dpip/app/settings/theme/color/page.dart';
 import 'package:dpip/app/settings/theme/mode/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
-import 'package:dpip/app/settings/experimental/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
@@ -44,11 +44,9 @@ import 'package:talker_flutter/talker_flutter.dart';
 part 'router.g.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _settingsNavigatorKey =
-    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _settingsNavigatorKey = GlobalKey<NavigatorState>();
 
-final RouteObserver<ModalRoute<void>> routeObserver =
-    RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 /// Welcome route - displays the welcome/onboarding page.
 @TypedGoRoute<WelcomeRoute>(path: '/welcome')
@@ -88,8 +86,7 @@ class WelcomeNoticeRoute extends GoRouteData with $WelcomeNoticeRoute {
 
 /// Welcome Permissions route - displays permissions request page.
 @TypedGoRoute<WelcomePermissionsRoute>(path: '/welcome/permissions')
-class WelcomePermissionsRoute extends GoRouteData
-    with $WelcomePermissionsRoute {
+class WelcomePermissionsRoute extends GoRouteData with $WelcomePermissionsRoute {
   /// Creates a [WelcomePermissionsRoute].
   const WelcomePermissionsRoute();
 
@@ -206,8 +203,7 @@ class SettingsLocationRoute extends GoRouteData with $SettingsLocationRoute {
 }
 
 /// Settings location select route - displays location selection page.
-class SettingsLocationSelectRoute extends GoRouteData
-    with $SettingsLocationSelectRoute {
+class SettingsLocationSelectRoute extends GoRouteData with $SettingsLocationSelectRoute {
   /// Creates a [SettingsLocationSelectRoute].
   const SettingsLocationSelectRoute();
 
@@ -218,8 +214,7 @@ class SettingsLocationSelectRoute extends GoRouteData
 }
 
 /// Settings location select city route - displays city selection page.
-class SettingsLocationSelectCityRoute extends GoRouteData
-    with $SettingsLocationSelectCityRoute {
+class SettingsLocationSelectCityRoute extends GoRouteData with $SettingsLocationSelectCityRoute {
   /// Creates a [SettingsLocationSelectCityRoute].
   const SettingsLocationSelectCityRoute({required this.city});
 
@@ -265,8 +260,7 @@ class SettingsThemeModeRoute extends GoRouteData with $SettingsThemeModeRoute {
 }
 
 /// Settings theme color route - displays theme color page.
-class SettingsThemeColorRoute extends GoRouteData
-    with $SettingsThemeColorRoute {
+class SettingsThemeColorRoute extends GoRouteData with $SettingsThemeColorRoute {
   /// Creates a [SettingsThemeColorRoute].
   const SettingsThemeColorRoute();
 
@@ -288,8 +282,7 @@ class SettingsLocaleRoute extends GoRouteData with $SettingsLocaleRoute {
 }
 
 /// Settings locale select route - displays locale selection page.
-class SettingsLocaleSelectRoute extends GoRouteData
-    with $SettingsLocaleSelectRoute {
+class SettingsLocaleSelectRoute extends GoRouteData with $SettingsLocaleSelectRoute {
   /// Creates a [SettingsLocaleSelectRoute].
   const SettingsLocaleSelectRoute();
 
@@ -333,8 +326,7 @@ class SettingsProxyRoute extends GoRouteData with $SettingsProxyRoute {
 }
 
 /// Settings experimental route - displays experimental features settings.
-class SettingsExperimentalRoute extends GoRouteData
-    with $SettingsExperimentalRoute {
+class SettingsExperimentalRoute extends GoRouteData with $SettingsExperimentalRoute {
   /// Creates a [SettingsExperimentalRoute].
   const SettingsExperimentalRoute();
 
@@ -367,8 +359,7 @@ class SettingsNotifyEewRoute extends GoRouteData with $SettingsNotifyEewRoute {
 }
 
 /// Settings notify monitor route - displays seismic monitor notification settings.
-class SettingsNotifyMonitorRoute extends GoRouteData
-    with $SettingsNotifyMonitorRoute {
+class SettingsNotifyMonitorRoute extends GoRouteData with $SettingsNotifyMonitorRoute {
   /// Creates a [SettingsNotifyMonitorRoute].
   const SettingsNotifyMonitorRoute();
 
@@ -379,8 +370,7 @@ class SettingsNotifyMonitorRoute extends GoRouteData
 }
 
 /// Settings notify report route - displays earthquake report notification settings.
-class SettingsNotifyReportRoute extends GoRouteData
-    with $SettingsNotifyReportRoute {
+class SettingsNotifyReportRoute extends GoRouteData with $SettingsNotifyReportRoute {
   /// Creates a [SettingsNotifyReportRoute].
   const SettingsNotifyReportRoute();
 
@@ -391,8 +381,7 @@ class SettingsNotifyReportRoute extends GoRouteData
 }
 
 /// Settings notify intensity route - displays intensity notification settings.
-class SettingsNotifyIntensityRoute extends GoRouteData
-    with $SettingsNotifyIntensityRoute {
+class SettingsNotifyIntensityRoute extends GoRouteData with $SettingsNotifyIntensityRoute {
   /// Creates a [SettingsNotifyIntensityRoute].
   const SettingsNotifyIntensityRoute();
 
@@ -403,8 +392,7 @@ class SettingsNotifyIntensityRoute extends GoRouteData
 }
 
 /// Settings notify thunderstorm route - displays thunderstorm notification settings.
-class SettingsNotifyThunderstormRoute extends GoRouteData
-    with $SettingsNotifyThunderstormRoute {
+class SettingsNotifyThunderstormRoute extends GoRouteData with $SettingsNotifyThunderstormRoute {
   /// Creates a [SettingsNotifyThunderstormRoute].
   const SettingsNotifyThunderstormRoute();
 
@@ -415,8 +403,7 @@ class SettingsNotifyThunderstormRoute extends GoRouteData
 }
 
 /// Settings notify advisory route - displays weather advisory notification settings.
-class SettingsNotifyAdvisoryRoute extends GoRouteData
-    with $SettingsNotifyAdvisoryRoute {
+class SettingsNotifyAdvisoryRoute extends GoRouteData with $SettingsNotifyAdvisoryRoute {
   /// Creates a [SettingsNotifyAdvisoryRoute].
   const SettingsNotifyAdvisoryRoute();
 
@@ -427,8 +414,7 @@ class SettingsNotifyAdvisoryRoute extends GoRouteData
 }
 
 /// Settings notify evacuation route - displays evacuation notification settings.
-class SettingsNotifyEvacuationRoute extends GoRouteData
-    with $SettingsNotifyEvacuationRoute {
+class SettingsNotifyEvacuationRoute extends GoRouteData with $SettingsNotifyEvacuationRoute {
   /// Creates a [SettingsNotifyEvacuationRoute].
   const SettingsNotifyEvacuationRoute();
 
@@ -439,8 +425,7 @@ class SettingsNotifyEvacuationRoute extends GoRouteData
 }
 
 /// Settings notify tsunami route - displays tsunami notification settings.
-class SettingsNotifyTsunamiRoute extends GoRouteData
-    with $SettingsNotifyTsunamiRoute {
+class SettingsNotifyTsunamiRoute extends GoRouteData with $SettingsNotifyTsunamiRoute {
   /// Creates a [SettingsNotifyTsunamiRoute].
   const SettingsNotifyTsunamiRoute();
 
@@ -451,8 +436,7 @@ class SettingsNotifyTsunamiRoute extends GoRouteData
 }
 
 /// Settings notify announcement route - displays announcement notification settings.
-class SettingsNotifyAnnouncementRoute extends GoRouteData
-    with $SettingsNotifyAnnouncementRoute {
+class SettingsNotifyAnnouncementRoute extends GoRouteData with $SettingsNotifyAnnouncementRoute {
   /// Creates a [SettingsNotifyAnnouncementRoute].
   const SettingsNotifyAnnouncementRoute();
 

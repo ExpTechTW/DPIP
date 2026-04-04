@@ -46,8 +46,7 @@ class SettingsLocationPage extends StatefulWidget {
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
 }
 
-class _SettingsLocationPageState extends State<SettingsLocationPage>
-    with WidgetsBindingObserver {
+class _SettingsLocationPageState extends State<SettingsLocationPage> with WidgetsBindingObserver {
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
@@ -60,8 +59,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
       Permission.location.status,
       Permission.locationAlways.status,
       // if (Platform.isAndroid) Autostarter.checkAutoStartState(),
-      if (Platform.isAndroid)
-        DisableBatteryOptimization.isBatteryOptimizationDisabled,
+      if (Platform.isAndroid) DisableBatteryOptimization.isBatteryOptimizationDisabled,
     ]);
 
     if (!mounted) return;
@@ -71,8 +69,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
       locationPermission = values[1] as PermissionStatus?;
       locationAlwaysPermission = values[2] as PermissionStatus?;
       autoStartPermission = true;
-      batteryOptimizationPermission =
-          !Platform.isAndroid || (values[3] as bool? ?? true);
+      batteryOptimizationPermission = !Platform.isAndroid || (values[3] as bool? ?? true);
     });
   }
 
@@ -94,22 +91,15 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
     };
 
     final content = switch (type) {
-      Permission.notification =>
-        '自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。'.i18n,
-      Permission.location =>
-        '自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。'.i18n,
+      Permission.notification => '自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。'.i18n,
+      Permission.location => '自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。'.i18n,
       Permission.locationAlways =>
         Platform.isIOS
-            ? '自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。'
-                  .i18n
-            : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'
-                  .i18n,
-      'auto-start' =>
-        '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
-      'battery-optimization' =>
-        '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
-      _ =>
-        '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
+            ? '自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。'.i18n
+            : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'.i18n,
+      'auto-start' => '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      'battery-optimization' => '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      _ => '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
     };
 
     await showDialog(
@@ -194,8 +184,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
 
     batteryOptimization:
     {
-      final status =
-          await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+      final status = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
       if (status == null || status) {
         batteryOptimizationPermission = true;
         break batteryOptimization;
@@ -206,8 +195,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
 
     manufacturerBatteryOptimization:
     {
-      final status = await DisableBatteryOptimization
-          .isManufacturerBatteryOptimizationDisabled;
+      final status = await DisableBatteryOptimization.isManufacturerBatteryOptimizationDisabled;
       if (status == null || status) break manufacturerBatteryOptimization;
 
       await DisableBatteryOptimization.showEnableAutoStartSettings(
@@ -306,8 +294,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'
-                                .i18n,
+                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'.i18n,
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
@@ -331,8 +318,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                 maintainAnimation: true,
                 maintainState: true,
                 child: AnimatedOpacity(
-                  opacity:
-                      auto && !notificationPermission!.isGranted ? 1 : 0,
+                  opacity: auto && !notificationPermission!.isGranted ? 1 : 0,
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: Padding(
@@ -416,8 +402,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                         TextButton(
                           child: Text('設定'.i18n),
                           onPressed: () =>
-                              DisableBatteryOptimization
-                                  .showDisableBatteryOptimizationSettings(),
+                              DisableBatteryOptimization.showDisableBatteryOptimizationSettings(),
                         ),
                       ],
                     ),
@@ -456,9 +441,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
                           tooltip: '刪除',
-                          onPressed: isCurrentLoading
-                              ? null
-                              : () => model.unfavorite(code),
+                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
                         ),
                         enabled: !model.auto && loadingCode == null,
                         onTap: isSelected
@@ -500,8 +483,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage>
                       leading: Icon(Symbols.add_circle_rounded),
                       title: Text('新增地點'.i18n),
                       enabled: loadingCode == null,
-                      onTap: () =>
-                          SettingsLocationSelectRoute().push(context),
+                      onTap: () => SettingsLocationSelectRoute().push(context),
                     ),
                   ],
                 );

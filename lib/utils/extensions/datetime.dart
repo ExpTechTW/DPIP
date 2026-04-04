@@ -50,8 +50,7 @@ extension DateTimeExtension on DateTime {
   /// Formats this date and time as a full string.
   ///
   /// Returns a string in the format "yyyy/MM/dd HH:mm:ss" (e.g., "2024/12/25 14:30:45").
-  String toDateTimeString() =>
-      _getDateFormat('yyyy/MM/dd HH:mm:ss').format(this);
+  String toDateTimeString() => _getDateFormat('yyyy/MM/dd HH:mm:ss').format(this);
 
   /// Formats the time portion of this date as a string.
   ///
@@ -61,8 +60,7 @@ extension DateTimeExtension on DateTime {
   /// Formats this date and time as a full simple string.
   ///
   /// Returns a string in the format "MM/dd HH:mm:ss" (e.g., "12/25 14:30:45").
-  String toFullSimpleDateTimeString() =>
-      _getDateFormat('MM/dd HH:mm:ss').format(this);
+  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
 }
 
 /// Extension on [TZDateTime] that provides convenient utilities for formatting timezone-aware dates and times.
@@ -103,6 +101,5 @@ extension TZDateTimeExtension on TZDateTime {
   /// Formats this date and time as a full simple string.
   ///
   /// Returns a string in the format "MM/dd HH:mm:ss" (e.g., "12/25 14:30:45").
-  String toFullSimpleDateTimeString() =>
-      _getDateFormat('MM/dd HH:mm:ss').format(this);
+  String toFullSimpleDateTimeString() => _getDateFormat('MM/dd HH:mm:ss').format(this);
 }

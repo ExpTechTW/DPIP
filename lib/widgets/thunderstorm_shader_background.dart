@@ -20,20 +20,17 @@ class ThunderstormShaderBackground extends StatefulWidget {
   });
 
   @override
-  State<ThunderstormShaderBackground> createState() =>
-      _ThunderstormShaderBackgroundState();
+  State<ThunderstormShaderBackground> createState() => _ThunderstormShaderBackgroundState();
 }
 
-class _ThunderstormShaderBackgroundState
-    extends State<ThunderstormShaderBackground>
+class _ThunderstormShaderBackgroundState extends State<ThunderstormShaderBackground>
     with SingleTickerProviderStateMixin {
   ui.FragmentShader? _shader;
   ui.Image? _image;
   late final AnimationController _controller;
   int _startTime = 0;
 
-  double get _elapsedTime =>
-      (DateTime.now().millisecondsSinceEpoch - _startTime) / 1000.0;
+  double get _elapsedTime => (DateTime.now().millisecondsSinceEpoch - _startTime) / 1000.0;
 
   @override
   void initState() {

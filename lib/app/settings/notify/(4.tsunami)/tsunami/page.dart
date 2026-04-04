@@ -24,8 +24,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
           builder: (context, value, child) {
             return TsunamiNotifySection(
               value: value,
-              onChanged: (value) =>
-                  context.read<SettingsNotificationModel>().setTsunami(value),
+              onChanged: (value) => context.read<SettingsNotificationModel>().setTsunami(value),
             );
           },
         ),

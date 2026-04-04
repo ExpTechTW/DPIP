@@ -24,8 +24,7 @@ import 'package:geojson_vi/geojson_vi.dart';
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
 
-  UnmodifiableMapView<String, Station> get station =>
-      UnmodifiableMapView(_station);
+  UnmodifiableMapView<String, Station> get station => UnmodifiableMapView(_station);
 
   void setStation(Map<String, Station> station) {
     _station = station;
@@ -86,9 +85,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   void appendPartialReport(List<PartialEarthquakeReport> partialReport) {
     final existingIds = _partialReport.map((r) => r.id).toSet();
-    final newReports = partialReport
-        .where((r) => !existingIds.contains(r.id))
-        .toList();
+    final newReports = partialReport.where((r) => !existingIds.contains(r.id)).toList();
     if (newReports.isNotEmpty) {
       _partialReport = [..._partialReport, ...newReports];
       notifyListeners();
@@ -97,8 +94,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   Map<String, EarthquakeReport> _report = {};
 
-  UnmodifiableMapView<String, EarthquakeReport> get report =>
-      UnmodifiableMapView(_report);
+  UnmodifiableMapView<String, EarthquakeReport> get report => UnmodifiableMapView(_report);
 
   void setReport(String id, EarthquakeReport report) {
     _report[id] = report;
@@ -121,8 +117,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   List<String> _temperature = [];
 
-  UnmodifiableListView<String> get temperature =>
-      UnmodifiableListView(_temperature);
+  UnmodifiableListView<String> get temperature => UnmodifiableListView(_temperature);
 
   void setTemperature(List<String> temperature) {
     _temperature = temperature;
@@ -141,8 +136,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   List<String> _precipitation = [];
 
-  UnmodifiableListView<String> get precipitation =>
-      UnmodifiableListView(_precipitation);
+  UnmodifiableListView<String> get precipitation => UnmodifiableListView(_precipitation);
 
   void setPrecipitation(List<String> precipitation) {
     _precipitation = precipitation;
@@ -151,8 +145,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   final Map<String, List<RainStation>> _rainData = {};
 
-  UnmodifiableMapView<String, List<RainStation>> get rainData =>
-      UnmodifiableMapView(_rainData);
+  UnmodifiableMapView<String, List<RainStation>> get rainData => UnmodifiableMapView(_rainData);
 
   void setRainData(String time, List<RainStation> rain) {
     _rainData[time] = rain;
@@ -170,8 +163,7 @@ class _DpipDataModel extends ChangeNotifier {
 
   List<String> _lightning = [];
 
-  UnmodifiableListView<String> get lightning =>
-      UnmodifiableListView(_lightning);
+  UnmodifiableListView<String> get lightning => UnmodifiableListView(_lightning);
 
   void setLightning(List<String> lightning) {
     _lightning = lightning;
@@ -199,10 +191,8 @@ class _DpipDataModel extends ChangeNotifier {
 }
 
 class DpipDataModel extends _DpipDataModel {
-  static const int _eewActiveWindow =
-      4 * 60 * 1000; // 4 minutes in milliseconds
-  static const double _rtsCoordinateOffset =
-      0.00009; // ~5m displacement for privacy
+  static const int _eewActiveWindow = 4 * 60 * 1000; // 4 minutes in milliseconds
+  static const double _rtsCoordinateOffset = 0.00009; // ~5m displacement for privacy
 
   Timer? _secondTimer;
   Timer? _minuteTimer;
@@ -273,16 +263,12 @@ class DpipDataModel extends _DpipDataModel {
     List<Eew> eew = [];
 
     try {
-      rts = _isReplayMode
-          ? await ExpTech().getRts(currentTime)
-          : await ExpTech().getRts();
+      rts = _isReplayMode ? await ExpTech().getRts(currentTime) : await ExpTech().getRts();
     } on Rtsnodata {
       rts = null;
     }
     try {
-      eew = _isReplayMode
-          ? await ExpTech().getEew(currentTime)
-          : await ExpTech().getEew();
+      eew = _isReplayMode ? await ExpTech().getEew(currentTime) : await ExpTech().getEew();
     } catch (e) {
       eew = [];
     }
@@ -325,8 +311,7 @@ class DpipDataModel extends _DpipDataModel {
       if (shouldSync && _syncDistance != null) {
         _lastSyncTime = now;
 
-        final serverMs =
-            (currentTime % 1000 - _syncDistance! % 1000 + 1000) % 1000;
+        final serverMs = (currentTime % 1000 - _syncDistance! % 1000 + 1000) % 1000;
         final delayToNextSecond = serverMs == 0 ? 1000 : (1000 - serverMs);
 
         Timer(Duration(milliseconds: delayToNextSecond), () async {
@@ -461,15 +446,13 @@ class DpipDataModel extends _DpipDataModel {
 
       if (radius.p > 0) {
         builder.addFeature(
-          circleFeature(center: center, radius: radius.p)
-            ..setProperty('type', 'p'),
+          circleFeature(center: center, radius: radius.p)..setProperty('type', 'p'),
         );
       }
 
       if (radius.s > 0) {
         builder.addFeature(
-          circleFeature(center: center, radius: radius.s)
-            ..setProperty('type', 's'),
+          circleFeature(center: center, radius: radius.s)..setProperty('type', 's'),
         );
       }
 
@@ -529,8 +512,7 @@ class DpipDataModel extends _DpipDataModel {
     if (activeEew.isNotEmpty) {
       eewMap = {for (final e in activeEew) e.id: e};
       eewDistMap = {
-        for (final e in activeEew)
-          e.id: calcWaveRadius(e.info.depth, e.info.time, now).s * 1000,
+        for (final e in activeEew) e.id: calcWaveRadius(e.info.depth, e.info.time, now).s * 1000,
       };
     }
 
@@ -542,9 +524,7 @@ class DpipDataModel extends _DpipDataModel {
 
       final coordinates = (area.geometry! as GeoJSONPolygon).coordinates[0];
 
-      if (eewMap != null &&
-          eewDistMap != null &&
-          checkBoxSkip(eewMap, eewDistMap, coordinates)) {
+      if (eewMap != null && eewDistMap != null && checkBoxSkip(eewMap, eewDistMap, coordinates)) {
         continue;
       }
 

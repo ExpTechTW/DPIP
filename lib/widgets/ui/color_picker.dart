@@ -81,13 +81,12 @@ class _ColorPickerState extends State<ColorPicker> {
 
   HSVColor get hsv => widget.color;
 
-  Color _ColorFromAHSV(num alpha, num hue, num saturation, num value) =>
-      HSVColor.fromAHSV(
-        alpha.asDouble,
-        hue.asDouble,
-        saturation.asDouble,
-        value.asDouble,
-      ).toColor();
+  Color _ColorFromAHSV(num alpha, num hue, num saturation, num value) => HSVColor.fromAHSV(
+    alpha.asDouble,
+    hue.asDouble,
+    saturation.asDouble,
+    value.asDouble,
+  ).toColor();
 
   Offset _calculatePositionFromColor(HSVColor color, Size size) {
     final center = size.center(.zero);
@@ -219,8 +218,7 @@ class _ColorPickerState extends State<ColorPicker> {
                       children: [
                         GestureDetector(
                           behavior: .opaque,
-                          onPanDown: (details) =>
-                              _updateFromPosition(details.localPosition, size),
+                          onPanDown: (details) => _updateFromPosition(details.localPosition, size),
                           onPanUpdate: (details) =>
                               _updateFromPosition(details.localPosition, size),
                           child: CustomPaint(

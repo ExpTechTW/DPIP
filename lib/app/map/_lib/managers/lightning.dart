@@ -89,8 +89,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     try {
-      final lightningList = (await ExpTech().getLightningList()).reversed
-          .toList();
+      final lightningList = (await ExpTech().getLightningList()).reversed.toList();
       if (!context.mounted) return;
 
       GlobalProviders.data.setLightning(lightningList);
@@ -131,9 +130,7 @@ class LightningMapLayerManager extends MapLayerManager {
         }
 
         final currentTime = int.parse(time);
-        final features = lightningData
-            .map((data) => data.toFeatureBuilder(currentTime))
-            .toList();
+        final features = lightningData.map((data) => data.toFeatureBuilder(currentTime)).toList();
 
         final data = GeoJsonBuilder().setFeatures(features).build();
 
@@ -232,8 +229,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null ||
-          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
         await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('LightningMapLayerManager.show', e, s);
@@ -289,10 +285,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times
-                      .groupListsBy((time) => time.date)
-                      .entries
-                      .toList();
+                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
 
                   return Column(
                     mainAxisSize: .min,
@@ -323,14 +316,12 @@ class LightningMapLayerSheet extends StatelessWidget {
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) =
-                                    grouped[index];
+                                final MapEntry(key: date, value: group) = grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected =
-                                      time.value == currentLightningTime;
+                                  final isSelected = time.value == currentLightningTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(

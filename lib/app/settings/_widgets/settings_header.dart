@@ -55,9 +55,7 @@ class SettingsHeader extends StatelessWidget {
           ContainedIcon(
             icon,
             color: iconColor ?? context.colors.onPrimaryContainer,
-            backgroundColor: iconColor == null
-                ? context.colors.primaryContainer
-                : null,
+            backgroundColor: iconColor == null ? context.colors.primaryContainer : null,
             size: 28,
           ),
           Column(

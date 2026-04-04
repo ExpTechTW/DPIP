@@ -87,8 +87,7 @@ class SettingsIndexPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appInfo =
-        '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
+    final appInfo = '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
     final deviceInfo =
         '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
@@ -340,8 +339,7 @@ class SettingsIndexPage extends StatelessWidget {
               subtitle: const Text('@exptechtw'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
               onTap: () => 'https://www.youtube.com/@exptechtw/live'.launch(),
-              onLongPress: () =>
-                  'https://www.youtube.com/@exptechtw/live'.copy(),
+              onLongPress: () => 'https://www.youtube.com/@exptechtw/live'.copy(),
             ),
           ],
         ),
@@ -359,10 +357,8 @@ class SettingsIndexPage extends StatelessWidget {
               title: const Text('App Store'),
               subtitle: const Text('iOS'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () =>
-                  'https://apps.apple.com/tw/app/dpip/id6468026362'.launch(),
-              onLongPress: () =>
-                  'https://apps.apple.com/tw/app/dpip/id6468026362'.copy(),
+              onTap: () => 'https://apps.apple.com/tw/app/dpip/id6468026362'.launch(),
+              onLongPress: () => 'https://apps.apple.com/tw/app/dpip/id6468026362'.copy(),
             ),
             SegmentedListTile(
               isLast: true,
@@ -377,11 +373,9 @@ class SettingsIndexPage extends StatelessWidget {
               subtitle: const Text('Android'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
               onTap: () =>
-                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'
-                      .launch(),
+                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'.launch(),
               onLongPress: () =>
-                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'
-                      .copy(),
+                  'https://play.google.com/store/apps/details?id=com.exptech.dpip'.copy(),
             ),
           ],
         ),

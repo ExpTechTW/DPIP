@@ -70,8 +70,7 @@ class SettingsThemeColorPage extends StatelessWidget {
               title: Text('自訂'.i18n),
               subtitle: color != null ? Text('#${color.toHexString()}') : null,
               trailing: color != null ? Icon(Symbols.check_rounded) : null,
-              onTap: () =>
-                  context.userInterface.setThemeColor(context.colors.primary),
+              onTap: () => context.userInterface.setThemeColor(context.colors.primary),
             ),
           ],
         ),

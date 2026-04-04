@@ -11,8 +11,7 @@ class RankingPage extends StatefulWidget {
   State<RankingPage> createState() => _RankingPageState();
 }
 
-class _RankingPageState extends State<RankingPage>
-    with TickerProviderStateMixin {
+class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin {
   late final controller = TabController(length: 3, vsync: this);
   final scroll = GlobalKey<NestedScrollViewState>();
   bool showFAB = false;
@@ -27,8 +26,7 @@ class _RankingPageState extends State<RankingPage>
       innerController.addListener(() {
         if (controller.indexIsChanging) return;
 
-        if (innerController.offset ==
-            innerController.position.minScrollExtent) {
+        if (innerController.offset == innerController.position.minScrollExtent) {
           if (showFAB) setState(() => showFAB = false);
         } else {
           if (!showFAB) setState(() => showFAB = true);

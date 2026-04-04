@@ -63,9 +63,7 @@ class HistoryTimelineItem extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: hasDetail
-                    ? () => handleEventList(context, history)
-                    : null,
+                onTap: hasDetail ? () => handleEventList(context, history) : null,
                 borderRadius: .circular(12),
                 child: Padding(
                   padding: const .all(12),
@@ -99,10 +97,9 @@ class HistoryTimelineItem extends StatelessWidget {
                                 history.time.send,
                               ),
                               style: context.texts.labelSmall?.copyWith(
-                                color: context.colors.onSurfaceVariant
-                                    .withValues(
-                                      alpha: expired ? 0.6 : 1,
-                                    ),
+                                color: context.colors.onSurfaceVariant.withValues(
+                                  alpha: expired ? 0.6 : 1,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -121,10 +118,9 @@ class HistoryTimelineItem extends StatelessWidget {
                             Text(
                               history.text.description['all']!,
                               style: context.texts.bodySmall?.copyWith(
-                                color: context.colors.onSurfaceVariant
-                                    .withValues(
-                                      alpha: expired ? 0.6 : 1,
-                                    ),
+                                color: context.colors.onSurfaceVariant.withValues(
+                                  alpha: expired ? 0.6 : 1,
+                                ),
                               ),
                               maxLines: 2,
                               overflow: .ellipsis,

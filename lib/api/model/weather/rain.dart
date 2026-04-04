@@ -20,31 +20,28 @@ class RainStation {
     required this.data,
   });
 
-  factory RainStation.fromJson(Map<String, dynamic> json) =>
-      _$RainStationFromJson(json);
+  factory RainStation.fromJson(Map<String, dynamic> json) => _$RainStationFromJson(json);
 
-  factory RainStation.fromMap(Map<String, dynamic> map) =>
-      RainStation.fromJson(map);
+  factory RainStation.fromMap(Map<String, dynamic> map) => RainStation.fromJson(map);
 
   Map<String, dynamic> toJson() => _$RainStationToJson(this);
 
-  GeoJsonFeatureBuilder toFeatureBuilder() =>
-      GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        ..setGeometry(station.latlng.asGeoJsonCooridnate)
-        ..setProperty('id', id)
-        ..setProperty('name', station.name)
-        ..setProperty('county', station.county)
-        ..setProperty('town', station.town)
-        ..setProperty('altitude', station.altitude)
-        ..setProperty('now', data.now)
-        ..setProperty('10m', data.tenMinutes)
-        ..setProperty('1h', data.oneHour)
-        ..setProperty('3h', data.threeHours)
-        ..setProperty('6h', data.sixHours)
-        ..setProperty('12h', data.twelveHours)
-        ..setProperty('24h', data.twentyFourHours)
-        ..setProperty('2d', data.twoDays)
-        ..setProperty('3d', data.threeDays);
+  GeoJsonFeatureBuilder toFeatureBuilder() => GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+    ..setGeometry(station.latlng.asGeoJsonCooridnate)
+    ..setProperty('id', id)
+    ..setProperty('name', station.name)
+    ..setProperty('county', station.county)
+    ..setProperty('town', station.town)
+    ..setProperty('altitude', station.altitude)
+    ..setProperty('now', data.now)
+    ..setProperty('10m', data.tenMinutes)
+    ..setProperty('1h', data.oneHour)
+    ..setProperty('3h', data.threeHours)
+    ..setProperty('6h', data.sixHours)
+    ..setProperty('12h', data.twelveHours)
+    ..setProperty('24h', data.twentyFourHours)
+    ..setProperty('2d', data.twoDays)
+    ..setProperty('3d', data.threeDays);
 }
 
 @JsonSerializable()
@@ -65,8 +62,7 @@ class StationInfo {
     required this.lng,
   });
 
-  factory StationInfo.fromJson(Map<String, dynamic> json) =>
-      _$StationInfoFromJson(json);
+  factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
 
@@ -107,8 +103,7 @@ class RainData {
     required this.threeDays,
   });
 
-  factory RainData.fromJson(Map<String, dynamic> json) =>
-      _$RainDataFromJson(json);
+  factory RainData.fromJson(Map<String, dynamic> json) => _$RainDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$RainDataToJson(this);
 }

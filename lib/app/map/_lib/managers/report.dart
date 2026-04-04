@@ -263,15 +263,9 @@ class ReportMapLayerManager extends MapLayerManager {
             Expressions.interpolate,
             ['linear'],
             [Expressions.get, 'time'],
-            DateTime.now().millisecondsSinceEpoch -
-                const Duration(days: 14).inMilliseconds,
+            DateTime.now().millisecondsSinceEpoch - const Duration(days: 14).inMilliseconds,
             0.2,
-            GlobalProviders
-                .data
-                .partialReport
-                .first
-                .time
-                .millisecondsSinceEpoch,
+            GlobalProviders.data.partialReport.first.time.millisecondsSinceEpoch,
             1.0,
           ],
           iconAllowOverlap: true,
@@ -331,8 +325,7 @@ class ReportMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null ||
-          DateTime.now().difference(_lastFetchTime!).inMinutes > 5) {
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) {
         await _fetchData(reset: true);
       }
     } catch (e, s) {
@@ -598,9 +591,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
       morphingSheetController.expand().then((_) {
         if (!mounted) return;
         final offset = widget.manager.savedScrollOffset;
-        if (_listScrollController != null &&
-            _listScrollController!.hasClients &&
-            offset > 0) {
+        if (_listScrollController != null && _listScrollController!.hasClients && offset > 0) {
           _listScrollController!.jumpTo(offset);
         }
       });
@@ -613,8 +604,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
       valueListenable: widget.manager.dataNotifier,
       builder: (context, value, child) {
         final partialKey = widget.manager._getPartialContentKey();
-        final shouldUpdateKey =
-            partialKey != widget.manager._lastPartialContentKey;
+        final shouldUpdateKey = partialKey != widget.manager._lastPartialContentKey;
         if (shouldUpdateKey) {
           widget.manager._lastPartialContentKey = partialKey;
         }
@@ -641,8 +631,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
                     final locationString = report.extractLocation();
                     final location =
-                        Location.tryParse(locationString)?.dynamicName ??
-                        locationString;
+                        Location.tryParse(locationString)?.dynamicName ?? locationString;
 
                     return Padding(
                       padding: const .symmetric(vertical: 8),
@@ -669,10 +658,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     Expanded(
                                       child: Text(
                                         '近期的地震報告'.i18n,
-                                        style: context.texts.titleMedium
-                                            ?.copyWith(
-                                              color: context.colors.onSurface,
-                                            ),
+                                        style: context.texts.titleMedium?.copyWith(
+                                          color: context.colors.onSurface,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -705,15 +693,13 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     Expanded(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             report.hasNumber
-                                                ? '編號 {number} 顯著有感地震'.i18n
-                                                      .args({
-                                                        'number': report.number,
-                                                      })
+                                                ? '編號 {number} 顯著有感地震'.i18n.args({
+                                                    'number': report.number,
+                                                  })
                                                 : location,
                                             style: context.texts.titleMedium,
                                           ),
@@ -721,12 +707,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                             report.time.toLocaleDateTimeString(
                                               context,
                                             ),
-                                            style: context.texts.bodyMedium
-                                                ?.copyWith(
-                                                  color: context
-                                                      .colors
-                                                      .onSurfaceVariant,
-                                                ),
+                                            style: context.texts.bodyMedium?.copyWith(
+                                              color: context.colors.onSurfaceVariant,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -748,9 +731,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   // Show the current report with details
 
                   final locationString = currentReport.extractLocation();
-                  final location =
-                      Location.tryParse(locationString)?.dynamicName ??
-                      locationString;
+                  final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
 
                   return Padding(
                     padding: const EdgeInsets.all(12),
@@ -808,8 +789,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Expanded(
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '地震規模'.i18n,
@@ -828,8 +808,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                             ),
                             Expanded(
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '震源深度'.i18n,
@@ -867,8 +846,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
 
                     final grouped = GlobalProviders.data.partialReport
                         .groupListsBy(
-                          (report) =>
-                              report.time.toLocaleFullDateString(context),
+                          (report) => report.time.toLocaleFullDateString(context),
                         )
                         .entries
                         .toList();
@@ -907,21 +885,15 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       valueListenable: widget.manager.hasMore,
                                       builder: (context, hasMoreValue, child) {
                                         if (!hasMoreValue &&
-                                            GlobalProviders
-                                                .data
-                                                .partialReport
-                                                .isNotEmpty) {
+                                            GlobalProviders.data.partialReport.isNotEmpty) {
                                           return Padding(
                                             padding: const EdgeInsets.all(16),
                                             child: Center(
                                               child: Text(
                                                 '沒有更多資料'.i18n,
-                                                style: context.texts.bodyMedium
-                                                    ?.copyWith(
-                                                      color: context
-                                                          .colors
-                                                          .onSurfaceVariant,
-                                                    ),
+                                                style: context.texts.bodyMedium?.copyWith(
+                                                  color: context.colors.onSurfaceVariant,
+                                                ),
                                               ),
                                             ),
                                           );
@@ -931,8 +903,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                           return const Padding(
                                             padding: EdgeInsets.all(16),
                                             child: Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                              child: CircularProgressIndicator(),
                                             ),
                                           );
                                         }
@@ -944,16 +915,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 );
                               }
 
-                              final MapEntry(key: date, value: reports) =
-                                  grouped[index];
+                              final MapEntry(key: date, value: reports) = grouped[index];
 
                               final length = reports.length;
 
                               return SegmentedList(
                                 label: Text(date),
                                 children: reports.mapIndexed((index, report) {
-                                  final locationString = report
-                                      .extractLocation();
+                                  final locationString = report.extractLocation();
                                   final location =
                                       Location.tryParse(
                                         locationString,
@@ -979,8 +948,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     ),
                                     onTap: () {
                                       if (controller.hasClients) {
-                                        widget.manager.savedScrollOffset =
-                                            controller.offset;
+                                        widget.manager.savedScrollOffset = controller.offset;
                                       }
                                       widget.manager.setReport(report.id);
                                       sheetController.collapse();
@@ -1005,8 +973,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   } else {
                     final locationString = report.getLocation();
                     final location =
-                        Location.tryParse(locationString)?.dynamicName ??
-                        locationString;
+                        Location.tryParse(locationString)?.dynamicName ?? locationString;
 
                     content = [
                       Padding(
@@ -1077,9 +1044,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => MapMonitorPage(
-                                      replayTimestamp:
-                                          report.time.millisecondsSinceEpoch -
-                                          2000,
+                                      replayTimestamp: report.time.millisecondsSinceEpoch - 2000,
                                     ),
                                   ),
                                 );
@@ -1193,8 +1158,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                       backgroundColor: IntensityColor.intensity(
                                         town.intensity,
                                       ).withValues(alpha: 0.16),
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
+                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       avatar: AspectRatio(
                                         aspectRatio: 1,
                                         child: Container(
@@ -1206,17 +1170,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                           ),
                                           child: Center(
                                             child: Text(
-                                              town
-                                                  .intensity
-                                                  .asIntensityDisplayLabel,
+                                              town.intensity.asIntensityDisplayLabel,
                                               style: TextStyle(
                                                 height: 1,
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold,
-                                                color:
-                                                    IntensityColor.onIntensity(
-                                                      town.intensity,
-                                                    ),
+                                                color: IntensityColor.onIntensity(
+                                                  town.intensity,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1254,8 +1215,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           ),
                         ],
                       ),
-                      if (report.hasNumber &&
-                          report.intensityMapImageUrl != null)
+                      if (report.hasNumber && report.intensityMapImageUrl != null)
                         SegmentedList(
                           label: Text('震度圖'.i18n),
                           children: [

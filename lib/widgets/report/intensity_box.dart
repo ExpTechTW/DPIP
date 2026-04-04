@@ -38,9 +38,7 @@ class IntensityBox extends StatelessWidget {
         child: Text(
           intensity.asIntensityDisplayLabel,
           style: TextStyle(
-            color: border
-                ? context.colors.onSurface
-                : IntensityColor.onIntensity(intensity),
+            color: border ? context.colors.onSurface : IntensityColor.onIntensity(intensity),
             fontSize: size / 2,
             fontWeight: FontWeight.bold,
           ),

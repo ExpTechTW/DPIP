@@ -21,8 +21,7 @@ class NotificationRecord {
   factory NotificationRecord.fromJson(Map<String, dynamic> json) =>
       _$NotificationRecordFromJson(json);
 
-  factory NotificationRecord.fromMap(Map<String, dynamic> map) =>
-      NotificationRecord.fromJson(map);
+  factory NotificationRecord.fromMap(Map<String, dynamic> map) => NotificationRecord.fromJson(map);
 
   Map<String, dynamic> toJson() => _$NotificationRecordToJson(this);
 }

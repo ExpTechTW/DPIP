@@ -24,8 +24,7 @@ class SettingsNotifyEewPage extends StatelessWidget {
           builder: (context, value, child) {
             return EewNotifySection(
               value: value,
-              onChanged: (value) =>
-                  context.read<SettingsNotificationModel>().setEew(value),
+              onChanged: (value) => context.read<SettingsNotificationModel>().setEew(value),
             );
           },
         ),

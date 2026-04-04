@@ -5,8 +5,7 @@ StationInfo findAppropriateItem(List<StationInfo> infos, int date) {
   final DateTime targetDate = (date == 0)
       ? DateTime.now()
       : DateTime.fromMillisecondsSinceEpoch(date);
-  final List<StationInfo> sortedItems = infos.toList()
-    ..sort((a, b) => a.time.compareTo(b.time));
+  final List<StationInfo> sortedItems = infos.toList()..sort((a, b) => a.time.compareTo(b.time));
 
   for (var i = 0; i < sortedItems.length; i++) {
     if (DateFormat(

@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
-import 'package:dio/dio.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -182,8 +182,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                   }
                 },
                 onInteractionEnd: (details) {
-                  if (details.pointerCount == 0 &&
-                      Velocity.zero == details.velocity) {
+                  if (details.pointerCount == 0 && Velocity.zero == details.velocity) {
                     if (isUiHidden) {
                       setState(() => isUiHidden = false);
                     } else {

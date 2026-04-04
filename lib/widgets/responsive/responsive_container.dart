@@ -41,9 +41,7 @@ class ResponsiveContainer extends StatelessWidget {
 
           case ResponsiveMode.content:
           default:
-            contentMaxWidth = width >= 600
-                ? min(width * 0.9, maxWidth ?? 750)
-                : width;
+            contentMaxWidth = width >= 600 ? min(width * 0.9, maxWidth ?? 750) : width;
             alignment = Alignment.center;
         }
 

@@ -26,8 +26,7 @@ class ReportRoute extends StatefulWidget {
   State<ReportRoute> createState() => _ReportRouteState();
 }
 
-class _ReportRouteState extends State<ReportRoute>
-    with TickerProviderStateMixin {
+class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin {
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
 
@@ -55,8 +54,7 @@ class _ReportRouteState extends State<ReportRoute>
     end: 1.0,
   ).chain(CurveTween(curve: Curves.linear));
 
-  late final sheetInitialSize =
-      context.padding.bottom / context.dimension.height + 0.2;
+  late final sheetInitialSize = context.padding.bottom / context.dimension.height + 0.2;
   final sheetController = DraggableScrollableController();
   late final animController = AnimationController(
     vsync: this,
@@ -86,8 +84,7 @@ class _ReportRouteState extends State<ReportRoute>
 
       for (final MapEntry(key: areaName, value: area) in data.list.entries) {
         for (final MapEntry(key: _, value: town) in area.town.entries) {
-          if (cityMaxIntensity[areaName] == null ||
-              cityMaxIntensity[areaName]! < town.intensity) {
+          if (cityMaxIntensity[areaName] == null || cityMaxIntensity[areaName]! < town.intensity) {
             cityMaxIntensity[areaName] = town.intensity;
           }
 
@@ -276,11 +273,10 @@ class _ReportRouteState extends State<ReportRoute>
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      final double scrollPosition =
-          ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(
-            0.0,
-            1.0,
-          );
+      final double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(
+        0.0,
+        1.0,
+      );
 
       if (scrollPosition > 1e-5) {
         if (!isAppBarVisible) {

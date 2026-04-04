@@ -218,8 +218,7 @@ class _HumidityMapState extends State<HumidityMap> {
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null)
-          AdvancedWeatherChart.updateStationId(stationId);
+        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });
@@ -291,9 +290,7 @@ class _HumidityMapState extends State<HumidityMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels
-            .map((label) => Text(label, style: const TextStyle(fontSize: 12)))
-            .toList(),
+        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 12))).toList(),
       ),
     );
   }
@@ -351,8 +348,7 @@ class _HumidityMapState extends State<HumidityMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                final List<WeatherStation> weatherData = await ExpTech()
-                    .getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
                 humidityDataList = [];
 

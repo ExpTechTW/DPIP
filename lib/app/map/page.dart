@@ -50,9 +50,7 @@ class MapPageOptions {
     final replay = queryParameters['replay'];
 
     return MapPageOptions(
-      initialLayers: layers
-          ?.map((layer) => MapLayer.values.byName(layer))
-          .toSet(),
+      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
       reportId: report,
       replayTimestamp: replay == null ? null : int.tryParse(replay),
     );
@@ -79,8 +77,7 @@ class MapPage extends StatefulWidget {
         'layers=${options.initialLayers!.map((e) => e.name).join(',')}',
       );
     if (options.reportId != null) parameters.add('report=${options.reportId}');
-    if (options.replayTimestamp != null)
-      parameters.add('replay=${options.replayTimestamp}');
+    if (options.replayTimestamp != null) parameters.add('replay=${options.replayTimestamp}');
 
     return "/map?${parameters.join('&')}";
   }

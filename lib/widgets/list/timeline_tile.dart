@@ -72,18 +72,14 @@ class TimeLineTile extends StatelessWidget {
                     child: Container(
                       width: 2,
                       height: first ? height / 2 : height,
-                      color: context
-                          .colors
-                          .outlineVariant, // Color of the vertical line
+                      color: context.colors.outlineVariant, // Color of the vertical line
                     ),
                   )
                 else
                   Container(
                     width: 2,
                     height: first ? height / 2 : height,
-                    color: context
-                        .colors
-                        .outlineVariant, // Color of the vertical line
+                    color: context.colors.outlineVariant, // Color of the vertical line
                   ),
                 Container(
                   height: 42,

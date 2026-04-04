@@ -31,8 +31,7 @@ class ReportHistory extends History {
     required this.addition,
   });
 
-  factory ReportHistory.fromJson(Map<String, dynamic> json) =>
-      _$ReportHistoryFromJson(json);
+  factory ReportHistory.fromJson(Map<String, dynamic> json) => _$ReportHistoryFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ReportHistoryToJson(this);

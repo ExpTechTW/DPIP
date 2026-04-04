@@ -44,8 +44,7 @@ class IntensityHistory extends History {
     required this.addition,
   });
 
-  factory IntensityHistory.fromJson(Map<String, dynamic> json) =>
-      _$IntensityHistoryFromJson(json);
+  factory IntensityHistory.fromJson(Map<String, dynamic> json) => _$IntensityHistoryFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$IntensityHistoryToJson(this);

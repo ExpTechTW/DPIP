@@ -47,11 +47,9 @@ class EarthquakeReport {
     required this.trem,
   });
 
-  factory EarthquakeReport.fromJson(Map<String, dynamic> json) =>
-      _$EarthquakeReportFromJson(json);
+  factory EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
 
-  factory EarthquakeReport.fromMap(Map<String, dynamic> map) =>
-      EarthquakeReport.fromJson(map);
+  factory EarthquakeReport.fromMap(Map<String, dynamic> map) => EarthquakeReport.fromJson(map);
 
   Map<String, dynamic> toJson() => _$EarthquakeReportToJson(this);
 
@@ -129,9 +127,8 @@ class EarthquakeReport {
     return '${mapImageBaseName}i.png';
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null
-      ? null
-      : '$traceBaseUrl/$intensityMapImageName';
+  String? get intensityMapImageUrl =>
+      intensityMapImageName == null ? null : '$traceBaseUrl/$intensityMapImageName';
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
@@ -139,8 +136,7 @@ class EarthquakeReport {
     return '${mapImageBaseName}a.png';
   }
 
-  String? get pgaMapImageUrl =>
-      pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
+  String? get pgaMapImageUrl => pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
@@ -148,8 +144,7 @@ class EarthquakeReport {
     return '${mapImageBaseName}v.png';
   }
 
-  String? get pgvMapImageUrl =>
-      pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
+  String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
   LatLngBounds get bounds {
     final bounds = [latitude, longitude, latitude, longitude];

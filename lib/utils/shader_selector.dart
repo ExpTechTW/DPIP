@@ -113,8 +113,7 @@ class ShaderSelector {
     final visibility = parseVisibility(weather.data.visibility);
 
     final showThunderstorm = _isThunderstormCode(weatherCode);
-    final showRain =
-        (_isRainCode(weatherCode) || rain > 0) && !showThunderstorm;
+    final showRain = (_isRainCode(weatherCode) || rain > 0) && !showThunderstorm;
     final showFog = visibility < 5.0 || _isFogCode(weatherCode);
     final fogIntensity = showFog ? calculateFogIntensity(visibility) : 0.0;
 

@@ -15,8 +15,7 @@ extension IntExtension on int {
   /// Returns a string representation of the intensity level (0-7). Note that intensity levels 5 and 6 each map to two
   /// values (5→'5', 6→'5', 7→'6', 8→'6', 9→'7') to account for the 5弱/5強 and 6弱/6強 subdivisions in the Japanese
   /// intensity scale.
-  String get asIntensityNumber =>
-      ['0', '1', '2', '3', '4', '5', '5', '6', '6', '7'][this];
+  String get asIntensityNumber => ['0', '1', '2', '3', '4', '5', '5', '6', '6', '7'][this];
 
   /// Converts this earthquake intensity value to its localized label.
   ///
@@ -59,8 +58,7 @@ extension IntExtension on int {
   /// Formats this timestamp as a full simple date-time string.
   ///
   /// Returns a string in the format "MM/dd HH:mm:ss" (e.g., "12/25 14:30:45").
-  String toFullSimpleDateTimeString() =>
-      asTZDateTime.toFullSimpleDateTimeString();
+  String toFullSimpleDateTimeString() => asTZDateTime.toFullSimpleDateTimeString();
 
   /// Formats this timestamp as a locale-aware full date string.
   ///
@@ -80,8 +78,7 @@ extension IntExtension on int {
   ///
   /// Returns a string in the format "HH:mm:ss" (e.g., "14:30:45"). The format is localized according to [context]'s
   /// locale.
-  String toLocaleTimeString(BuildContext context) =>
-      asTZDateTime.toLocaleTimeString(context);
+  String toLocaleTimeString(BuildContext context) => asTZDateTime.toLocaleTimeString(context);
 }
 
 RegExp _trailingRegex = RegExp(r'([.]*0)(?!.*\d)');

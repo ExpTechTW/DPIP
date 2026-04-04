@@ -6,8 +6,7 @@ mixin StationEndpoints {
   Future<Map<String, Station>> getStations() async {
     final res = await _cachedDio.get('${api}/v1/trem/station');
     return (res.data as Map<String, dynamic>).map(
-      (key, value) =>
-          MapEntry(key, Station.fromMap(value as Map<String, dynamic>)),
+      (key, value) => MapEntry(key, Station.fromMap(value as Map<String, dynamic>)),
     );
   }
 

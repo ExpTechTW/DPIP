@@ -8,8 +8,7 @@ class NotificationHistoryPage extends StatefulWidget {
   const NotificationHistoryPage({super.key});
 
   @override
-  _NotificationHistoryPageState createState() =>
-      _NotificationHistoryPageState();
+  _NotificationHistoryPageState createState() => _NotificationHistoryPageState();
 }
 
 class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
@@ -111,8 +110,9 @@ class NotificationCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             record.title,
-                            style: context.theme.textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                            style: context.theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

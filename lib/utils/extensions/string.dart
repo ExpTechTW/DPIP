@@ -49,15 +49,13 @@ extension StringExtension on String {
   ///
   /// This method first converts the string to an integer (milliseconds since epoch), then formats it as a locale-aware
   /// time string in the format "HH:mm:ss" (e.g., "14:30:45"). The format is localized according to [context]'s locale.
-  String toLocaleTimeString(BuildContext context) =>
-      asInt.asTZDateTime.toLocaleTimeString(context);
+  String toLocaleTimeString(BuildContext context) => asInt.asTZDateTime.toLocaleTimeString(context);
 
   /// Formats this string as a timestamp and converts it to a simple date-time string.
   ///
   /// This method first converts the string to an integer (milliseconds since epoch), then formats it as a simple
   /// date-time string in the format "MM/dd HH:mm" (e.g., "12/25 14:30").
-  String toSimpleDateTimeString() =>
-      asInt.asTZDateTime.toSimpleDateTimeString();
+  String toSimpleDateTimeString() => asInt.asTZDateTime.toSimpleDateTimeString();
 
   /// Converts this string to a [Text] widget.
   ///

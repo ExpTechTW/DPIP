@@ -12,8 +12,7 @@ Future<void> updateInfoToServer() async {
   try {
     if (latitude == null || longitude == null) return;
     if (Preference.notifyToken != '' &&
-        DateTime.now().millisecondsSinceEpoch -
-                (Preference.lastUpdateToServerTime ?? 0) >
+        DateTime.now().millisecondsSinceEpoch - (Preference.lastUpdateToServerTime ?? 0) >
             86400 * 1 * 1000) {
       final random = Random();
       final int rand = random.nextInt(2);

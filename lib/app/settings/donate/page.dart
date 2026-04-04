@@ -25,7 +25,6 @@ class SettingsDonatePage extends StatefulWidget {
 
   @override
   State<SettingsDonatePage> createState() => _SettingsDonatePageState();
-
 }
 
 class _SettingsDonatePageState extends State<SettingsDonatePage>
@@ -60,8 +59,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
       return;
     }
 
-    final ProductDetailsResponse response = await InAppPurchase.instance
-        .queryProductDetails(_kIds);
+    final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
       products.completeError('找不到商品，請稍候再試'.i18n);
       return;
@@ -142,8 +140,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
           ),
           const SizedBox(height: 8),
           Text(
-            'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。'
-                .i18n,
+            'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。'.i18n,
             style: context.texts.bodyMedium?.copyWith(
               color: context.colors.onSurfaceVariant,
             ),
@@ -204,8 +201,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
   }
 
   Widget _buildSubscriptionCard(ProductDetails product) {
-    final isDisabled =
-        processingProductId != null && processingProductId != product.id;
+    final isDisabled = processingProductId != null && processingProductId != product.id;
     final isProcessing = processingProductId == product.id;
     final isPurchased = purchasedProductIds.contains(product.id);
 
@@ -349,16 +345,13 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                                     Color(0xFFFFA500),
                                   ],
                                 ),
-                          color: isDisabled
-                              ? context.theme.disabledColor
-                              : null,
+                          color: isDisabled ? context.theme.disabledColor : null,
                           borderRadius: .circular(20),
                         ),
                         child: Text(
                           '{price}/月'.i18n.args({'price': product.price}),
                           style: context.texts.labelLarge?.copyWith(
-                            color:
-                                isDisabled ? Colors.white54 : Colors.black87,
+                            color: isDisabled ? Colors.white54 : Colors.black87,
                             fontWeight: .bold,
                           ),
                         ),
@@ -403,8 +396,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
   }
 
   Widget _buildOneTimeCard(ProductDetails product) {
-    final isDisabled =
-        processingProductId != null && processingProductId != product.id;
+    final isDisabled = processingProductId != null && processingProductId != product.id;
     final isProcessing = processingProductId == product.id;
 
     final title = product.title.contains('(')
@@ -492,17 +484,13 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isDisabled
-                          ? context.theme.disabledColor
-                          : context.colors.primary,
+                      color: isDisabled ? context.theme.disabledColor : context.colors.primary,
                       borderRadius: .circular(20),
                     ),
                     child: Text(
                       product.price,
                       style: context.texts.labelLarge?.copyWith(
-                        color: isDisabled
-                            ? Colors.white54
-                            : context.colors.onPrimary,
+                        color: isDisabled ? Colors.white54 : context.colors.onPrimary,
                         fontWeight: .bold,
                       ),
                     ),
@@ -530,14 +518,11 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               _buildFooterLink(
                 '恢復購買'.i18n,
                 onTap: () async {
-                  final bool available =
-                      await InAppPurchase.instance.isAvailable();
+                  final bool available = await InAppPurchase.instance.isAvailable();
                   if (!context.mounted) return;
 
                   if (!available) {
-                    final storeName = Platform.isIOS
-                        ? 'App Store'
-                        : 'Google Play';
+                    final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
                     context.scaffoldMessenger.showSnackBar(
                       SnackBar(
                         content: Text(
@@ -562,8 +547,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
               ),
               _buildFooterLink(
                 '隱私權政策'.i18n,
-                onTap: () =>
-                    launchUrl(Uri.parse('https://exptech.dev/privacy')),
+                onTap: () => launchUrl(Uri.parse('https://exptech.dev/privacy')),
               ),
             ],
           ),
@@ -667,8 +651,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
             ),
             children: [
               _buildHeader(),
-              if (subscriptions.isNotEmpty)
-                _buildSubscriptionSection(subscriptions),
+              if (subscriptions.isNotEmpty) _buildSubscriptionSection(subscriptions),
               if (oneTime.isNotEmpty) _buildOneTimeSection(oneTime),
               _buildFooter(),
             ],

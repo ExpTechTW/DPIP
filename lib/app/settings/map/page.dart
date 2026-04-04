@@ -125,8 +125,7 @@ class SettingsMapPage extends StatelessWidget {
                             max: maxFpsAllowed,
                             divisions: maxFpsAllowed.floor() ~/ 5,
                             label: '$updateInterval FPS',
-                            onChanged: (value) =>
-                                context.map.setUpdateInterval(value.floor()),
+                            onChanged: (value) => context.map.setUpdateInterval(value.floor()),
                           ),
                         ),
                         LabelText.small('${maxFpsAllowed.floor()}'),

@@ -137,9 +137,7 @@ class ContainedIcon extends StatelessWidget {
       padding: padding ?? const .all(8),
       margin: margin,
       decoration: BoxDecoration(
-        color: backgroundGradient == null
-            ? backgroundColor ?? color.withValues(alpha: .16)
-            : null,
+        color: backgroundGradient == null ? backgroundColor ?? color.withValues(alpha: .16) : null,
         gradient: backgroundGradient,
         borderRadius: .circular((size ?? 24) * 0.5),
       ),

@@ -53,8 +53,7 @@ class SettingsThemePage extends StatelessWidget {
                       title: Text('主題模式'.i18n),
                       subtitle: Text(themeMode.label.i18n),
                       trailing: const Icon(Symbols.chevron_right_rounded),
-                      onTap: () =>
-                          const SettingsThemeModeRoute().push(context),
+                      onTap: () => const SettingsThemeModeRoute().push(context),
                     );
                   },
                 ),
@@ -73,8 +72,7 @@ class SettingsThemePage extends StatelessWidget {
                         final v => ColorTools.nameThatColor(v),
                       }),
                       trailing: const Icon(Symbols.chevron_right_rounded),
-                      onTap: () =>
-                          const SettingsThemeColorRoute().push(context),
+                      onTap: () => const SettingsThemeColorRoute().push(context),
                     );
                   },
                 ),

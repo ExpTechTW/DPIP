@@ -35,12 +35,10 @@ class SettingsLocationSelectCityPage extends StatefulWidget {
   const SettingsLocationSelectCityPage({super.key, required this.city});
 
   @override
-  State<SettingsLocationSelectCityPage> createState() =>
-      _SettingsLocationSelectCityPageState();
+  State<SettingsLocationSelectCityPage> createState() => _SettingsLocationSelectCityPageState();
 }
 
-class _SettingsLocationSelectCityPageState
-    extends State<SettingsLocationSelectCityPage> {
+class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectCityPage> {
   String? _loadingCode;
 
   @override
@@ -56,8 +54,7 @@ class _SettingsLocationSelectCityPageState
         SliverSegmentedList(
           label: Text(widget.city),
           children: [
-            for (final (index, MapEntry(key: code, value: town))
-                in towns.indexed)
+            for (final (index, MapEntry(key: code, value: town)) in towns.indexed)
               Selector<SettingsLocationModel, bool>(
                 selector: (context, model) => model.isFavorited(code),
                 builder: (context, isFavorited, child) {

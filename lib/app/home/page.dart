@@ -7,29 +7,27 @@ import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/app/home/_models/home_location.dart';
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/home/_widgets/date_timeline_item.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/forecast_card.dart';
 import 'package:dpip/app/home/_widgets/hero_weather.dart';
 import 'package:dpip/app/home/_widgets/history_timeline_item.dart';
-import 'package:dpip/app/home/_models/home_location.dart';
-import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
-import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
 import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
 import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
 import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/wind_card.dart';
-import 'package:dpip/app/settings/donate/page.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/gps_location.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/constants.dart';
@@ -103,8 +101,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (box != null && box.hasSize) {
           final height = box.size.height + 28;
           final isFirstMeasure = _measuredFirstCardHeight == null;
-          if (isFirstMeasure ||
-              ((_measuredFirstCardHeight! - height).abs() > 1)) {
+          if (isFirstMeasure || ((_measuredFirstCardHeight! - height).abs() > 1)) {
             _sheetController.removeListener(_onSheetChanged);
             _sheetController.dispose();
 
@@ -133,8 +130,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  double get _firstCardHeight =>
-      _measuredFirstCardHeight ?? _defaultFirstCardHeight;
+  double get _firstCardHeight => _measuredFirstCardHeight ?? _defaultFirstCardHeight;
 
   void _onSheetChanged() {
     final size = _sheetController.size;
@@ -262,8 +258,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         if (location != null) {
           coords = LatLng(location.lat, location.lng);
         }
-      } else if (Preference.locationLatitude != null &&
-          Preference.locationLongitude != null) {
+      } else if (Preference.locationLatitude != null && Preference.locationLongitude != null) {
         coords = LatLng(
           Preference.locationLatitude!,
           Preference.locationLongitude!,
@@ -315,8 +310,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<void> _fetchHistory(String? code, bool isOutOfService) async {
     try {
-      final shouldUseNational =
-          _currentMode.isNational || isOutOfService || code == null;
+      final shouldUseNational = _currentMode.isNational || isOutOfService || code == null;
       final List<History> history;
 
       if (shouldUseNational) {
@@ -349,9 +343,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final baseSnapSize = (_firstCardHeight / screenHeight).clamp(0.25, 0.6);
     final handleHeight = 28.0 / screenHeight;
     final minSize = handleHeight.clamp(0.03, 0.05);
-    final initialSize = _measuredFirstCardHeight == null
-        ? minSize
-        : baseSnapSize;
+    final initialSize = _measuredFirstCardHeight == null ? minSize : baseSnapSize;
     final snapSizes = [minSize, baseSnapSize, 1.0];
 
     return DraggableScrollableSheet(
@@ -812,10 +804,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     _wasVisible = isVisible;
 
-    final homeSections = context
-        .select<SettingsUserInterfaceModel, List<HomeDisplaySection>>(
-          (model) => model.homeSections,
-        );
+    final homeSections = context.select<SettingsUserInterfaceModel, List<HomeDisplaySection>>(
+      (model) => model.homeSections,
+    );
 
     final utc8Time = WallpaperSelector.getUtc8Time();
     final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
@@ -854,12 +845,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               if (velocity.abs() > 500) {
                 if (velocity > 0) {
                   targetSnap =
-                      snapSizes.where((s) => s < currentSize).lastOrNull ??
-                      snapSizes.first;
+                      snapSizes.where((s) => s < currentSize).lastOrNull ?? snapSizes.first;
                 } else {
                   targetSnap =
-                      snapSizes.where((s) => s > currentSize).firstOrNull ??
-                      snapSizes.last;
+                      snapSizes.where((s) => s > currentSize).firstOrNull ?? snapSizes.last;
                 }
               } else {
                 targetSnap = snapSizes.first;
@@ -903,8 +892,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
                     tooltip: '地圖',
-                    onPressed: () =>
-                        MapRoute(layers: layers.join(',')).push(context),
+                    onPressed: () => MapRoute(layers: layers.join(',')).push(context),
                     elevation: 2,
                   );
                 },

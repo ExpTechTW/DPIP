@@ -13,12 +13,8 @@ mixin DeviceEndpoints {
 
     final t2Header = res.headers.value('x-ntp-t2');
     final t3Header = res.headers.value('x-ntp-t3');
-    final t2 = t2Header != null
-        ? (double.parse(t2Header) * 1000).toInt()
-        : null;
-    final t3 = t3Header != null
-        ? (double.parse(t3Header) * 1000).toInt()
-        : null;
+    final t2 = t2Header != null ? (double.parse(t2Header) * 1000).toInt() : null;
+    final t3 = t3Header != null ? (double.parse(t3Header) * 1000).toInt() : null;
 
     if (t2 != null && t3 != null) {
       final offset = ((t2 - t1) + (t3 - t4)) / 2;
@@ -33,8 +29,7 @@ mixin DeviceEndpoints {
     required String token,
     required LatLng coordinates,
   }) async {
-    if (token.isEmpty)
-      throw ArgumentError.value(token, 'token', 'Token is empty');
+    if (token.isEmpty) throw ArgumentError.value(token, 'token', 'Token is empty');
 
     final platform = Platform.isIOS ? 1 : 0;
     final version = Global.packageInfo.version;
@@ -66,8 +61,7 @@ mixin DeviceEndpoints {
     required NotifyChannel channel,
     required Enum status,
   }) async {
-    if (token.isEmpty)
-      throw ArgumentError.value(token, 'token', 'Token is empty');
+    if (token.isEmpty) throw ArgumentError.value(token, 'token', 'Token is empty');
 
     if (status is! EewNotifyType &&
         status is! EarthquakeNotifyType &&

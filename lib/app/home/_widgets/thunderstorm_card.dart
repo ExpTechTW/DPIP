@@ -64,16 +64,14 @@ class ThunderstormCard extends StatelessWidget {
                               children: [
                                 Icon(
                                   Symbols.thunderstorm_rounded,
-                                  color:
-                                      context.theme.extendedColors.onBlue,
+                                  color: context.theme.extendedColors.onBlue,
                                   weight: 700,
                                   size: 22,
                                 ),
                                 Text(
                                   '雷雨即時訊息'.i18n,
                                   style: context.texts.labelLarge!.copyWith(
-                                    color:
-                                        context.theme.extendedColors.onBlue,
+                                    color: context.theme.extendedColors.onBlue,
                                     fontWeight: .bold,
                                   ),
                                 ),
@@ -92,16 +90,11 @@ class ThunderstormCard extends StatelessWidget {
                   Padding(
                     padding: const .only(top: 8),
                     child: StyledText(
-                      text:
-                          '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。'
-                              .i18n
-                              .args({
-                                'time': history.time.expiresAt
-                                    .toSimpleDateTimeString(),
-                              }),
+                      text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。'.i18n.args({
+                        'time': history.time.expiresAt.toSimpleDateTimeString(),
+                      }),
                       style: context.texts.bodyLarge!.copyWith(
-                        color:
-                            context.theme.extendedColors.onBlueContainer,
+                        color: context.theme.extendedColors.onBlueContainer,
                       ),
                       tags: {
                         'bold': StyledTextTag(

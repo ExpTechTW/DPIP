@@ -24,8 +24,7 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
           builder: (context, value, child) {
             return EarthquakeNotifySection(
               value: value,
-              onChanged: (value) =>
-                  context.read<SettingsNotificationModel>().setIntensity(value),
+              onChanged: (value) => context.read<SettingsNotificationModel>().setIntensity(value),
             );
           },
         ),

@@ -43,8 +43,7 @@ class LocationServiceManager {
     if (Preference.locationAuto != true) return;
 
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever)
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever)
       return;
 
     try {
@@ -63,9 +62,7 @@ class LocationServiceManager {
 
   static Duration _getUpdateInterval() {
     final minutes = Preference.instance.getInt(_kPrefKeyUpdateInterval);
-    return minutes != null
-        ? Duration(minutes: minutes)
-        : kDefaultUpdateInterval;
+    return minutes != null ? Duration(minutes: minutes) : kDefaultUpdateInterval;
   }
 
   static Future<void> _setUpdateInterval(Duration interval) async {
@@ -78,8 +75,7 @@ class LocationServiceManager {
   static Duration _calculateNextInterval(double? distanceInMeters) {
     if (distanceInMeters == null) return kDefaultUpdateInterval;
     if (distanceInMeters >= kHighMovementThreshold) return kMinUpdateInterval;
-    if (distanceInMeters >= kLowMovementThreshold)
-      return kDefaultUpdateInterval;
+    if (distanceInMeters >= kLowMovementThreshold) return kDefaultUpdateInterval;
 
     final currentInterval = _getUpdateInterval();
     final newInterval = Duration(minutes: currentInterval.inMinutes + 5);
@@ -230,9 +226,7 @@ class LocationService {
       }
 
       final previousLocation = _$location;
-      final distanceInMeters = previousLocation != null
-          ? coordinates.to(previousLocation)
-          : null;
+      final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
       final nextInterval = LocationServiceManager._calculateNextInterval(
         distanceInMeters,
       );
@@ -329,16 +323,14 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       TalkerManager.instance.warning(
         '⚙️::BackgroundLocationService location permission not granted',
       );
       return null;
     }
 
-    final isLocationServiceEnabled =
-        await Geolocator.isLocationServiceEnabled();
+    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!isLocationServiceEnabled) {
       TalkerManager.instance.warning(
         '⚙️::BackgroundLocationService location service is not available',
@@ -429,8 +421,7 @@ class LocationService {
           final double yj = polygon[j][1];
           final bool intersect =
               ((yi > target.latitude) != (yj > target.latitude)) &&
-              (target.longitude <
-                  (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
           if (intersect) isInside = !isInside;
           j = i;
         }
@@ -450,8 +441,7 @@ class LocationService {
             final double yj = polygon[j][1];
             final bool intersect =
                 ((yi > target.latitude) != (yj > target.latitude)) &&
-                (target.longitude <
-                    (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+                (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
             if (intersect) isInside = !isInside;
             j = i;
           }
@@ -477,9 +467,7 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$updatePosition(LatLng? position) async {
     _$location = position;
-    final result = position != null
-        ? _$getLocationFromCoordinates(position)
-        : null;
+    final result = position != null ? _$getLocationFromCoordinates(position) : null;
     Preference.locationCode = result?.code;
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;

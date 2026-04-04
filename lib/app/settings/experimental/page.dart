@@ -20,8 +20,7 @@ class SettingsExperimentalPage extends StatefulWidget {
   const SettingsExperimentalPage({super.key});
 
   @override
-  State<SettingsExperimentalPage> createState() =>
-      _SettingsExperimentalPageState();
+  State<SettingsExperimentalPage> createState() => _SettingsExperimentalPageState();
 }
 
 class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
@@ -35,8 +34,7 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) =>
-          _ExperimentalWarningDialog(featureName: featureName),
+      builder: (context) => _ExperimentalWarningDialog(featureName: featureName),
     );
 
     if (confirmed == true) {
@@ -247,12 +245,10 @@ class _ExperimentalWarningDialog extends StatefulWidget {
   const _ExperimentalWarningDialog({required this.featureName});
 
   @override
-  State<_ExperimentalWarningDialog> createState() =>
-      _ExperimentalWarningDialogState();
+  State<_ExperimentalWarningDialog> createState() => _ExperimentalWarningDialogState();
 }
 
-class _ExperimentalWarningDialogState
-    extends State<_ExperimentalWarningDialog> {
+class _ExperimentalWarningDialogState extends State<_ExperimentalWarningDialog> {
   int _countdown = 5;
   Timer? _timer;
 

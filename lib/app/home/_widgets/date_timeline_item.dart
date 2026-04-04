@@ -44,8 +44,7 @@ class DateTimelineItem extends StatelessWidget {
     if (mode == null || onModeChanged == null) return;
 
     final RenderBox? button = context.findRenderObject() as RenderBox?;
-    final RenderBox? overlay =
-        context.navigator.overlay?.context.findRenderObject() as RenderBox?;
+    final RenderBox? overlay = context.navigator.overlay?.context.findRenderObject() as RenderBox?;
 
     if (button == null || overlay == null) return;
 
@@ -82,18 +81,13 @@ class DateTimelineItem extends StatelessWidget {
               Icon(
                 m.icon,
                 size: 20,
-                color: mode == m
-                    ? context.colors.primary
-                    : context.colors.onSurfaceVariant,
+                color: mode == m ? context.colors.primary : context.colors.onSurfaceVariant,
               ),
               Text(
                 m.label,
                 style: context.texts.bodyMedium?.copyWith(
-                  color: mode == m
-                      ? context.colors.primary
-                      : context.colors.onSurface,
-                  fontWeight:
-                      mode == m ? .bold : .normal,
+                  color: mode == m ? context.colors.primary : context.colors.onSurface,
+                  fontWeight: mode == m ? .bold : .normal,
                 ),
               ),
             ],
@@ -182,8 +176,7 @@ class DateTimelineItem extends StatelessWidget {
                             Container(
                               width: 1,
                               height: 12,
-                              color: context.colors.onSecondaryContainer
-                                  .withValues(alpha: 0.3),
+                              color: context.colors.onSecondaryContainer.withValues(alpha: 0.3),
                             ),
                           ],
                           Text(

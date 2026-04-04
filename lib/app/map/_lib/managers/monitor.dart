@@ -109,8 +109,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   bool _dataStatus() {
-    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) <
-        12000;
+    return (GlobalProviders.data.currentTime - (_lastDataReceivedTime ?? 0)) < 12000;
   }
 
   /// The timestamp of the most recently processed RTS data packet.
@@ -171,8 +170,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       try {
         // Cache blink conditions at the start of each blink cycle to ensure consistency
-        final hasBoxData =
-            (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+        final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
         final hasBoxFlag = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
         final shouldBlinkBoxes = hasBoxData && hasBoxFlag;
 
@@ -214,18 +212,14 @@ class MonitorMapLayerManager extends MapLayerManager {
   /// RTS data hasn't changed. Returns empty list if no detection areas exist.
   List<LatLng> _getFocusBounds() {
     final rts = GlobalProviders.data.rts;
-    if (_cachedBounds != null && _lastRtsTime == rts?.time)
-      return _cachedBounds!;
+    if (_cachedBounds != null && _lastRtsTime == rts?.time) return _cachedBounds!;
 
     final coords = (rts?.box.isEmpty ?? true)
         ? <LatLng>[]
         : [
             for (final area in Global.boxGeojson.features)
-              if (area?.properties?['ID'] case final id
-                  when rts!.box.containsKey(id.toString()))
-                for (final coord
-                    in (area!.geometry! as GeoJSONPolygon).coordinates[0]
-                        as List)
+              if (area?.properties?['ID'] case final id when rts!.box.containsKey(id.toString()))
+                for (final coord in (area!.geometry! as GeoJSONPolygon).coordinates[0] as List)
                   LatLng(
                     (coord[1] as num).toDouble(),
                     (coord[0] as num).toDouble(),
@@ -252,8 +246,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs(),
     );
 
-    const minBoundSize =
-        0.0001; // ~11 meters - safety check for division by zero
+    const minBoundSize = 0.0001; // ~11 meters - safety check for division by zero
     if (lastLatDiff < minBoundSize || lastLngDiff < minBoundSize) return true;
 
     return (latDiff - lastLatDiff).abs() / lastLatDiff > 0.1 ||
@@ -854,14 +847,11 @@ class MonitorMapLayerManager extends MapLayerManager {
     _lastDisplayedSecond = currentSecond;
 
     final lastDataReceivedTime = _lastDataReceivedTime;
-    final isStale =
-        lastDataReceivedTime != null &&
-        (currentTime - lastDataReceivedTime) > 3000;
+    final isStale = lastDataReceivedTime != null && (currentTime - lastDataReceivedTime) > 3000;
 
     if (lastDataReceivedTime != null) {
       if (isStale) {
-        displayTimeNotifier.value =
-            '${lastDataReceivedTime.toFullSimpleDateTimeString()}|STALE';
+        displayTimeNotifier.value = '${lastDataReceivedTime.toFullSimpleDateTimeString()}|STALE';
       } else {
         displayTimeNotifier.value = currentTime.toFullSimpleDateTimeString();
       }
@@ -899,12 +889,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final existingSources = (await controller.getSourceIds()).toSet();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-      final hasRtsData =
-          (_cachedRtsGeoJson?['features'] as List?)?.isNotEmpty ?? false;
-      final hasIntensityData =
-          (_cachedIntensityGeoJson?['features'] as List?)?.isNotEmpty ?? false;
-      final hasBoxData =
-          (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasRtsData = (_cachedRtsGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasIntensityData = (_cachedIntensityGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
 
       await Future.wait([
         if (hasRtsData && existingSources.contains(_rtsSourceId))
@@ -977,8 +964,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       final activeEew = GlobalProviders.data.activeEew;
       if (activeEew.isNotEmpty) {
         final eew = activeEew.first;
-        final needsIntensityUpdate =
-            _lastEewId != eew.id || _lastEewSerial != eew.serial;
+        final needsIntensityUpdate = _lastEewId != eew.id || _lastEewSerial != eew.serial;
 
         if (needsIntensityUpdate) {
           _lastEewId = eew.id;
@@ -1250,8 +1236,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   }
 
   void _updateCountdown() {
-    final remainingSeconds =
-        ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
+    final remainingSeconds = ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
@@ -1358,14 +1343,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     mainAxisAlignment: .spaceBetween,
                     children: [
                       StyledText(
-                        text:
-                            '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'
-                                .i18n
-                                .args({
-                                  'magnitude': data.info.magnitude
-                                      .toStringAsFixed(1),
-                                  'intensity': localIntensity.asIntensityLabel,
-                                }),
+                        text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n
+                            .args({
+                              'magnitude': data.info.magnitude.toStringAsFixed(1),
+                              'intensity': localIntensity.asIntensityLabel,
+                            }),
                         style: theme.bodyMedium!.copyWith(
                           color: colors.onErrorContainer,
                         ),
@@ -1391,15 +1373,12 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     ],
                   )
                 : StyledText(
-                    text:
-                        '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'
-                            .i18n
-                            .args({
-                              'magnitude': data.info.magnitude.toStringAsFixed(
-                                1,
-                              ),
-                              'depth': data.info.depth.toStringAsFixed(1),
-                            }),
+                    text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
+                      'magnitude': data.info.magnitude.toStringAsFixed(
+                        1,
+                      ),
+                      'depth': data.info.depth.toStringAsFixed(1),
+                    }),
                     style: theme.bodyMedium!.copyWith(
                       color: colors.onErrorContainer,
                     ),
@@ -1549,9 +1528,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                       TextSpan(
                                         text: countdown.toString(),
                                         style: TextStyle(
-                                          fontSize:
-                                              theme.displayMedium!.fontSize! *
-                                              1.15,
+                                          fontSize: theme.displayMedium!.fontSize! * 1.15,
                                         ),
                                       ),
                                       TextSpan(
@@ -1565,8 +1542,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                       fontWeight: .bold,
                                       color: colors.onErrorContainer,
                                       height: 1,
-                                      leadingDistribution:
-                                          TextLeadingDistribution.even,
+                                      leadingDistribution: TextLeadingDistribution.even,
                                     ),
                                   ),
                                   textAlign: .center,
@@ -1574,13 +1550,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                               : Text(
                                   '抵達'.i18n,
                                   style: theme.displayMedium!.copyWith(
-                                    fontSize:
-                                        theme.displayMedium!.fontSize! * 0.81,
+                                    fontSize: theme.displayMedium!.fontSize! * 0.81,
                                     fontWeight: .bold,
                                     color: colors.onErrorContainer,
                                     height: 1,
-                                    leadingDistribution:
-                                        TextLeadingDistribution.even,
+                                    leadingDistribution: TextLeadingDistribution.even,
                                   ),
                                   textAlign: .center,
                                 ),
@@ -1612,9 +1586,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                 elevation: 4,
                 borderWidth: activeEew.isNotEmpty ? 2 : null,
                 borderColor: activeEew.isNotEmpty ? context.colors.error : null,
-                backgroundColor: activeEew.isNotEmpty
-                    ? context.colors.errorContainer
-                    : null,
+                backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
                 partialBuilder: (context, controller, sheetController) {
                   if (activeEew.isEmpty) {
                     return Padding(
@@ -1624,8 +1596,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   }
 
                   final data = activeEew.first;
-                  final hasLocation =
-                      GlobalProviders.location.coordinates != null;
+                  final hasLocation = GlobalProviders.location.coordinates != null;
 
                   // Calculate location-specific info if available
                   if (hasLocation) {
@@ -1640,9 +1611,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
 
                     localIntensity = intensityFloatToInt(info.i);
                     localArrivalTime =
-                        (data.info.time +
-                                sWaveTimeByDistance(data.info.depth, info.dist))
-                            .floor();
+                        (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
                     WidgetsBinding.instance.addPostFrameCallback(
                       (_) => _updateCountdown(),
@@ -1677,9 +1646,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                   elevation: 4,
                   shadowColor: context.colors.shadow.withValues(alpha: 0.4),
                   child: IntensityLegend(
-                    mode: activeEew.isNotEmpty
-                        ? IntensityLegendMode.eew
-                        : IntensityLegendMode.rts,
+                    mode: activeEew.isNotEmpty ? IntensityLegendMode.eew : IntensityLegendMode.rts,
                   ),
                 ),
               ),
@@ -1695,17 +1662,13 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     valueListenable: widget.manager.displayTimeNotifier,
                     builder: (context, displayTime, child) {
                       final isStale = displayTime.endsWith('|STALE');
-                      final timeText = isStale
-                          ? displayTime.replaceAll('|STALE', '')
-                          : displayTime;
+                      final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
 
                       return ValueListenableBuilder<double>(
                         valueListenable: widget.manager.pingNotifier,
                         builder: (context, ping, child) {
                           final isDataOk = widget.manager.dataStatus;
-                          final pingText = (!isDataOk)
-                              ? 'N/A'
-                              : '${ping.toStringAsFixed(0)}ms';
+                          final pingText = (!isDataOk) ? 'N/A' : '${ping.toStringAsFixed(0)}ms';
                           final pingColor = (!isDataOk)
                               ? Colors.red
                               : (ping > 5000)
@@ -1732,9 +1695,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   style: TextStyle(
                                     color: widget.manager.isReplayMode
                                         ? Colors.orange
-                                        : (isStale
-                                              ? Colors.red
-                                              : context.colors.onSurface),
+                                        : (isStale ? Colors.red : context.colors.onSurface),
                                     fontSize: 16,
                                   ),
                                 ),

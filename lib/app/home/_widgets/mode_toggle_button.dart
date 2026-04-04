@@ -80,8 +80,7 @@ class ModeToggleButton extends StatelessWidget {
 
   void _showModeMenu(BuildContext context) {
     final RenderBox? button = context.findRenderObject() as RenderBox?;
-    final RenderBox? overlay =
-        context.navigator.overlay?.context.findRenderObject() as RenderBox?;
+    final RenderBox? overlay = context.navigator.overlay?.context.findRenderObject() as RenderBox?;
 
     if (button == null || overlay == null) return;
 
@@ -120,12 +119,8 @@ class ModeToggleButton extends StatelessWidget {
               Text(
                 mode.label,
                 style: context.texts.bodyMedium?.copyWith(
-                  color: currentMode == mode
-                      ? context.colors.primary
-                      : context.colors.onSurface,
-                  fontWeight: currentMode == mode
-                      ? .bold
-                      : .normal,
+                  color: currentMode == mode ? context.colors.primary : context.colors.onSurface,
+                  fontWeight: currentMode == mode ? .bold : .normal,
                 ),
               ),
             ],

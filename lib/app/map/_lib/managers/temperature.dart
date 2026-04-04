@@ -132,8 +132,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     try {
-      final temperatureList = (await ExpTech().getWeatherList()).reversed
-          .toList();
+      final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
       if (!context.mounted) return;
 
       GlobalProviders.data.setTemperature(temperatureList);
@@ -333,8 +332,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
       visible = true;
 
-      if (_lastFetchTime == null ||
-          DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5)
         await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.show', e, s);
@@ -390,10 +388,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                     final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
-                  final grouped = times
-                      .groupListsBy((time) => time.date)
-                      .entries
-                      .toList();
+                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
 
                   return Column(
                     mainAxisSize: .min,
@@ -412,14 +407,12 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: grouped.length,
                               itemBuilder: (context, index) {
-                                final MapEntry(key: date, value: group) =
-                                    grouped[index];
+                                final MapEntry(key: date, value: group) = grouped[index];
 
                                 final children = <Widget>[Text(date)];
 
                                 for (final time in group) {
-                                  final isSelected =
-                                      time.value == currentTemperatureTime;
+                                  final isSelected = time.value == currentTemperatureTime;
 
                                   children.add(
                                     ValueListenableBuilder<bool>(

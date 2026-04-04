@@ -111,9 +111,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode
-                ? Colors.black26
-                : Colors.grey.withValues(alpha: 0.3),
+            color: isDarkMode ? Colors.black26 : Colors.grey.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -225,9 +223,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                       ),
                       const SizedBox(width: 8),
                       Icon(
-                        isExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
+                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         color: isDarkMode ? Colors.white70 : Colors.grey,
                       ),
                     ],

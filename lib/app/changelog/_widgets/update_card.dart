@@ -77,8 +77,7 @@ class UpdateCard extends StatelessWidget {
                     Text(
                       description,
                       style: context.texts.bodyMedium?.copyWith(
-                        color: context.texts.bodyMedium?.color
-                            ?.withValues(alpha: 0.8),
+                        color: context.texts.bodyMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                   ],

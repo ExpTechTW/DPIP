@@ -56,11 +56,9 @@ class GithubRelease {
     this.reactions,
   });
 
-  factory GithubRelease.fromJson(Map<String, dynamic> json) =>
-      _$GithubReleaseFromJson(json);
+  factory GithubRelease.fromJson(Map<String, dynamic> json) => _$GithubReleaseFromJson(json);
 
-  factory GithubRelease.fromMap(Map<String, dynamic> map) =>
-      GithubRelease.fromJson(map);
+  factory GithubRelease.fromMap(Map<String, dynamic> map) => GithubRelease.fromJson(map);
 
   Map<String, dynamic> toJson() => _$GithubReleaseToJson(this);
 }
@@ -167,8 +165,7 @@ class GithubUser {
     required this.siteAdmin,
   });
 
-  factory GithubUser.fromJson(Map<String, dynamic> json) =>
-      _$GithubUserFromJson(json);
+  factory GithubUser.fromJson(Map<String, dynamic> json) => _$GithubUserFromJson(json);
   Map<String, dynamic> toJson() => _$GithubUserToJson(this);
 }
 

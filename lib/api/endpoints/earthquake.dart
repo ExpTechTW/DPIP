@@ -41,8 +41,7 @@ mixin EarthquakeEndpoints {
       final res = await _dio.get(url);
       return Rts.fromMap(res.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      if (time != null && e.response?.statusCode == 404)
-        throw const Rtsnodata();
+      if (time != null && e.response?.statusCode == 404) throw const Rtsnodata();
       rethrow;
     }
   }

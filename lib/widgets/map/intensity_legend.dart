@@ -33,9 +33,7 @@ class IntensityLegend extends StatelessWidget {
   }
 
   List<Widget> _buildLegendItems() {
-    final colors = mode == IntensityLegendMode.eew
-        ? _colors.reversed.toList()
-        : _colors;
+    final colors = mode == IntensityLegendMode.eew ? _colors.reversed.toList() : _colors;
     final labels = _labels.reversed.toList();
 
     if (mode == IntensityLegendMode.eew) {

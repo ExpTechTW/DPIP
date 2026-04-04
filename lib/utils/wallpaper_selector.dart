@@ -38,9 +38,7 @@ class WallpaperSelector {
 
     final hour = utc8Time.hour;
     final dateHash = _hashDate(utc8Time);
-    final periodHash = hour >= 6 && hour < 18
-        ? 0
-        : (hour >= 18 && hour < 20 ? 1 : 2);
+    final periodHash = hour >= 6 && hour < 18 ? 0 : (hour >= 18 && hour < 20 ? 1 : 2);
     final combinedHash = (dateHash * 3 + periodHash) % 2147483647;
 
     if (hour >= 6 && hour < 18) {

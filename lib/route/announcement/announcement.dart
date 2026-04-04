@@ -61,8 +61,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   Future<void> _fetchAnnouncements() async {
     try {
-      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed
-          .toList();
+      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed.toList();
       setState(() {
         announcements = fetchedAnnouncements;
         isLoading = false;
@@ -264,24 +263,22 @@ class AnnouncementDetailPage extends StatelessWidget {
                 runSpacing: 8,
                 children: announcement.tags
                     .map(
-                      (tagId) =>
-                          _buildGlassyTag(context, _getTagTypeById(tagId)),
+                      (tagId) => _buildGlassyTag(context, _getTagTypeById(tagId)),
                     )
                     .toList(),
               ),
               const SizedBox(height: 24),
               MarkdownBody(
                 data: announcement.content,
-                styleSheet: MarkdownStyleSheet.fromTheme(context.theme)
-                    .copyWith(
-                      h1: context.theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      h2: context.theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      p: context.theme.textTheme.bodyLarge,
-                    ),
+                styleSheet: MarkdownStyleSheet.fromTheme(context.theme).copyWith(
+                  h1: context.theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  h2: context.theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  p: context.theme.textTheme.bodyLarge,
+                ),
               ),
             ],
           ),

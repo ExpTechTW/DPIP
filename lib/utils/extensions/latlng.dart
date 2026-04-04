@@ -23,8 +23,7 @@ extension GeoJsonLatLng on LatLng {
   /// Returns a [GeoJsonFeatureBuilder] configured as a Point feature with this coordinate's geometry.
   /// The builder can be further customized with properties before building the final GeoJSON feature.
   GeoJsonFeatureBuilder toGeoJsonFeatureBuilder() {
-    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-      ..setGeometry(asGeoJsonCooridnate);
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(asGeoJsonCooridnate);
   }
 
   /// Converts this coordinate to a GeoJSON builder.

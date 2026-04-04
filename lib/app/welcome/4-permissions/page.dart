@@ -29,8 +29,7 @@ class WelcomePermissionPage extends StatefulWidget {
   State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
 }
 
-class _WelcomePermissionPageState extends State<WelcomePermissionPage>
-    with WidgetsBindingObserver {
+class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   late Future<bool> _autoStartPermission;
   bool _autoStartStatus = false;
@@ -42,8 +41,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
       final status = await Permission.notification.status;
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
-      _isNotificationPermission = await AwesomeNotifications()
-          .isNotificationAllowed();
+      _isNotificationPermission = await AwesomeNotifications().isNotificationAllowed();
     }
   }
 
@@ -160,9 +158,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
           borderRadius: .circular(16),
-          border: item.isHighlighted
-              ? Border.all(color: Colors.red, width: 2)
-              : null,
+          border: item.isHighlighted ? Border.all(color: Colors.red, width: 2) : null,
         ),
         child: ListTile(
           leading: CircleAvatar(
@@ -240,8 +236,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
           _showPermanentlyDeniedDialog(item);
         } else if (status.isGranted) {
           if (Platform.isAndroid) {
-            final shouldContinue =
-                await _showBackgroundLocationExplanationDialog();
+            final shouldContinue = await _showBackgroundLocationExplanationDialog();
 
             if (shouldContinue && mounted) {
               await Permission.locationAlways.request();
@@ -279,13 +274,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
         await openAppSettings();
       }
     } else if (Platform.isIOS) {
-      final NotificationSettings iosSettings = await FirebaseMessaging.instance
-          .requestPermission(
-            announcement: true,
-            carPlay: true,
-            criticalAlert: true,
-            provisional: false,
-          );
+      final NotificationSettings iosSettings = await FirebaseMessaging.instance.requestPermission(
+        announcement: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: false,
+      );
       if (iosSettings.criticalAlert == AppleNotificationSetting.enabled) {
         _isNotificationPermission = true;
       }
@@ -349,13 +343,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage>
     if (!_isNotificationPermission) {
       await Permission.notification.request();
       if (Platform.isIOS) {
-        final NotificationSettings iosrp = await FirebaseMessaging.instance
-            .requestPermission(
-              announcement: true,
-              carPlay: true,
-              criticalAlert: true,
-              provisional: true,
-            );
+        final NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+          announcement: true,
+          carPlay: true,
+          criticalAlert: true,
+          provisional: true,
+        );
         if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
           _isNotificationPermission = true;
         }

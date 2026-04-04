@@ -390,9 +390,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     bool isExpired,
   ) {
     final Duration duration = expireTime.difference(sendTime);
-    final Duration elapsed = isExpired
-        ? duration
-        : DateTime.now().difference(sendTime);
+    final Duration elapsed = isExpired ? duration : DateTime.now().difference(sendTime);
     final double progress = elapsed.inSeconds / duration.inSeconds;
 
     return Container(
@@ -414,9 +412,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               LinearProgressIndicator(
                 value: progress.clamp(0.0, 1.0),
                 borderRadius: BorderRadius.circular(8),
-                color: isExpired
-                    ? context.colors.outline
-                    : context.colors.primary,
+                color: isExpired ? context.colors.outline : context.colors.primary,
                 backgroundColor: context.colors.outlineVariant,
               ),
             ],
@@ -502,8 +498,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                           padding: const EdgeInsets.all(4),
                           side: BorderSide(color: context.colors.outline),
                           backgroundColor: context.colors.surfaceContainerHigh,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           label: Text(e.townWithLevel),
                         );
                       }).toList(),

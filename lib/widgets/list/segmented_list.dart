@@ -78,9 +78,7 @@ class SegmentedList extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _children?.length ?? _itemCount!,
-          itemBuilder: _children != null
-              ? (context, index) => _children[index]
-              : _itemBuilder!,
+          itemBuilder: _children != null ? (context, index) => _children[index] : _itemBuilder!,
         ),
       ],
     );
@@ -350,9 +348,7 @@ class SegmentedListTile extends StatelessWidget {
                     ),
                   if (content != null)
                     Padding(
-                      padding:
-                          contentPadding ??
-                          (leading != null ? .only(left: 32) : .zero),
+                      padding: contentPadding ?? (leading != null ? .only(left: 32) : .zero),
                       child: DefaultTextStyle(
                         style: context.texts.bodyMedium!,
                         child: content,

@@ -75,8 +75,7 @@ class WindCard extends StatefulWidget {
   State<WindCard> createState() => _WindCardState();
 }
 
-class _WindCardState extends State<WindCard>
-    with WidgetsBindingObserver, RouteAware {
+class _WindCardState extends State<WindCard> with WidgetsBindingObserver, RouteAware {
   StreamSubscription<CompassEvent>? _compassSubscription;
   double _deviceHeading = 0.0;
   double _compassAccuracy = 0.0;
@@ -175,8 +174,7 @@ class _WindCardState extends State<WindCard>
     TalkerManager.instance.debug('WindCard._initCompass: subscription created');
   }
 
-  double _getWindDirectionAngle(String direction) =>
-      _kWindDirections[direction.trim()] ?? 0.0;
+  double _getWindDirectionAngle(String direction) => _kWindDirections[direction.trim()] ?? 0.0;
 
   String _getBeaufortDescription(int beaufort) =>
       ((beaufort >= 0 && beaufort < _kBeaufortDescriptions.length)
@@ -184,12 +182,10 @@ class _WindCardState extends State<WindCard>
               : '未知')
           .i18n;
 
-  bool get _compassHasDanger =>
-      _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
+  bool get _compassHasDanger => _compassAccuracy < 0 || _compassAccuracy >= _kCompassAccuracyDanger;
 
   bool get _compassHasWarning =>
-      _compassAccuracy >= _kCompassAccuracyWarning &&
-      _compassAccuracy < _kCompassAccuracyDanger;
+      _compassAccuracy >= _kCompassAccuracyWarning && _compassAccuracy < _kCompassAccuracyDanger;
 
   Color get _compassStatusColor {
     if (_compassHasDanger) return Colors.red;
@@ -239,12 +235,8 @@ class _WindCardState extends State<WindCard>
                       child: Text(
                         label,
                         style: context.texts.labelMedium?.copyWith(
-                          color: isNorth
-                              ? Colors.red
-                              : context.colors.onSurfaceVariant,
-                          fontWeight: isNorth
-                              ? .bold
-                              : .w500,
+                          color: isNorth ? Colors.red : context.colors.onSurfaceVariant,
+                          fontWeight: isNorth ? .bold : .w500,
                           fontSize: isNorth ? 14 : 12,
                         ),
                       ),
@@ -277,10 +269,9 @@ class _WindCardState extends State<WindCard>
             color: hasValidDirection ? Colors.teal : context.colors.outline,
             boxShadow: [
               BoxShadow(
-                color: (hasValidDirection
-                        ? Colors.teal
-                        : context.colors.outline)
-                    .withValues(alpha: 0.3),
+                color: (hasValidDirection ? Colors.teal : context.colors.outline).withValues(
+                  alpha: 0.3,
+                ),
                 blurRadius: 4,
                 spreadRadius: 1,
               ),
@@ -367,9 +358,7 @@ class _WindCardState extends State<WindCard>
   Widget _buildMagneticInfo(BuildContext context) {
     final hasDanger = _compassHasDanger;
     final hasWarning = _compassHasWarning;
-    final statusText = _compassAccuracy < 0
-        ? '–'
-        : '±${_compassAccuracy.round()}°';
+    final statusText = _compassAccuracy < 0 ? '–' : '±${_compassAccuracy.round()}°';
     final statusColor = _compassStatusColor;
 
     return GestureDetector(
@@ -387,9 +376,7 @@ class _WindCardState extends State<WindCard>
           mainAxisSize: .min,
           children: [
             Icon(
-              hasDanger || hasWarning
-                  ? Symbols.warning_rounded
-                  : Symbols.explore_rounded,
+              hasDanger || hasWarning ? Symbols.warning_rounded : Symbols.explore_rounded,
               size: 16,
               color: statusColor,
             ),
@@ -485,8 +472,7 @@ class _WindCardState extends State<WindCard>
                 ),
                 child: Text(
                   hasDanger
-                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。'
-                            .i18n
+                      ? '附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。'.i18n
                       : '附近可能有磁場干擾，指北針方向可能有偏差。'.i18n,
                   style: context.texts.bodySmall,
                 ),
@@ -508,11 +494,8 @@ class _WindCardState extends State<WindCard>
   Widget build(BuildContext context) {
     final wind = widget.weather.data.wind;
     final gust = widget.weather.data.gust;
-    final hasValidDirection =
-        wind.direction.isNotEmpty && wind.direction != '-';
-    final windAngle = hasValidDirection
-        ? _getWindDirectionAngle(wind.direction)
-        : 0.0;
+    final hasValidDirection = wind.direction.isNotEmpty && wind.direction != '-';
+    final windAngle = hasValidDirection ? _getWindDirectionAngle(wind.direction) : 0.0;
 
     return ResponsiveContainer(
       child: Container(
@@ -596,8 +579,7 @@ class _CompassTicksPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _CompassTicksPainter oldDelegate) =>
-      color != oldDelegate.color;
+  bool shouldRepaint(covariant _CompassTicksPainter oldDelegate) => color != oldDelegate.color;
 }
 
 /// Draws a directional arrow indicating the current wind direction.
@@ -661,6 +643,5 @@ class _WindArrowPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WindArrowPainter oldDelegate) =>
-      color != oldDelegate.color;
+  bool shouldRepaint(covariant _WindArrowPainter oldDelegate) => color != oldDelegate.color;
 }

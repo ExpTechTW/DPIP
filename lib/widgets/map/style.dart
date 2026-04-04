@@ -26,8 +26,7 @@ class MapStyle {
         'Noto Sans TC Bold':
             'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Bold.otf',
       },
-      'glyphs':
-          'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
+      'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
       'sprite': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/sprites',
       'sources': {
         ...osmSource(),

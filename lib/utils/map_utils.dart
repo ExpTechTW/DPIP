@@ -104,8 +104,7 @@ LatLng destination(
 
   // Main
   final latitude2 = asin(
-    sin(latitude1) * cos(radians) +
-        cos(latitude1) * sin(radians) * cos(bearingRad),
+    sin(latitude1) * cos(radians) + cos(latitude1) * sin(radians) * cos(bearingRad),
   );
   final longitude2 =
       longitude1 +
@@ -271,8 +270,7 @@ String? getTownCodeFromCoordinates(LatLng target) {
 
         final bool intersect =
             ((yi > target.latitude) != (yj > target.latitude)) &&
-            (target.longitude <
-                (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+            (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
         if (intersect) isInside = !isInside;
 
         j = i;
@@ -296,8 +294,7 @@ String? getTownCodeFromCoordinates(LatLng target) {
 
           final bool intersect =
               ((yi > target.latitude) != (yj > target.latitude)) &&
-              (target.longitude <
-                  (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
           if (intersect) isInside = !isInside;
 
           j = i;

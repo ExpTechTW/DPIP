@@ -61,8 +61,7 @@ class BlurredTextButton extends StatelessWidget {
                 color: context.colors.outlineVariant.withValues(alpha: 0.4),
               ),
               color:
-                  backgroundColor ??
-                  context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                  backgroundColor ?? context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
             ),
             child: TextButton(
               style: TextButton.styleFrom(
@@ -139,8 +138,7 @@ class BlurredIconButton extends StatelessWidget {
           child: IconButton(
             style: IconButton.styleFrom(
               backgroundColor:
-                  backgroundColor ??
-                  context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                  backgroundColor ?? context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
               foregroundColor: context.colors.outline,
             ),
             onPressed: onPressed,

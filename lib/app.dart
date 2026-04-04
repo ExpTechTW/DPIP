@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -15,7 +13,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -47,8 +44,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       if (Platform.isAndroid) {
         final info = await InAppUpdate.checkForUpdate();
 
-        if (info.updateAvailability != UpdateAvailability.updateAvailable)
-          return;
+        if (info.updateAvailability != UpdateAvailability.updateAvailable) return;
 
         if (info.immediateUpdateAllowed) {
           InAppUpdate.performImmediateUpdate();
@@ -71,8 +67,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     bool notificationAllowed = false;
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
     notificationAllowed =
-        settings.authorizationStatus == .authorized ||
-        settings.authorizationStatus == .provisional;
+        settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional;
 
     if (!Preference.isFirstLaunch && !notificationAllowed) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -130,9 +125,8 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
           builder: (context, model, child) {
             final switchTheme = SwitchThemeData(
               thumbIcon: .resolveWith(
-                (states) => states.contains(WidgetState.selected)
-                    ? Icon(Symbols.check_rounded)
-                    : null,
+                (states) =>
+                    states.contains(WidgetState.selected) ? Icon(Symbols.check_rounded) : null,
               ),
             );
 
