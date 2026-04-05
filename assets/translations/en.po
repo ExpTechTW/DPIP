@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-05 06:07\n"
+"PO-Revision-Date: 2026-04-05 07:57\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -313,7 +313,7 @@ msgstr "Get an early look at new features currently in development"
 
 #: ./lib/app/settings/experimental/page.dart:154
 msgid "注意"
-msgstr ""
+msgstr "Attention"
 
 #: ./lib/app/settings/experimental/page.dart:162
 msgid "這些功能仍在開發中，可能會不穩定或在未來的版本中變更。"
@@ -337,7 +337,7 @@ msgstr ""
 
 #: ./lib/app/settings/experimental/page.dart:280
 msgid "啟用實驗性功能"
-msgstr ""
+msgstr "Enable experimental features"
 
 #: ./lib/app/settings/experimental/page.dart:286
 msgid "你即將啟用："
@@ -713,7 +713,7 @@ msgstr "Current Location"
 
 #: ./lib/app/settings/layout/page.dart:56
 msgid "拖曳調整順序"
-msgstr ""
+msgstr "Drag to reorder"
 
 #: ./lib/app/settings/layout/page.dart:100
 msgid "已停用"
