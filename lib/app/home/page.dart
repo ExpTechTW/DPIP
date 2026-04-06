@@ -394,7 +394,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildHeroSection() {
-    final code = GlobalProviders.location.code;
+    final code = _effectiveLocationCode;
     final screenHeight = context.dimension.height;
 
     if (code == null) {
