@@ -58,18 +58,20 @@ class SettingsHeader extends StatelessWidget {
             backgroundColor: iconColor == null ? context.colors.primaryContainer : null,
             size: 28,
           ),
-          Column(
-            crossAxisAlignment: .start,
-            children: [
-              DefaultTextStyle(
-                style: context.texts.titleLarge!.copyWith(fontWeight: .bold),
-                child: title,
-              ),
-              DefaultTextStyle(
-                style: context.texts.bodyLarge!,
-                child: subtitle,
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: .start,
+              children: [
+                DefaultTextStyle(
+                  style: context.texts.titleLarge!.copyWith(fontWeight: .bold),
+                  child: title,
+                ),
+                DefaultTextStyle(
+                  style: context.texts.bodyLarge!,
+                  child: subtitle,
+                ),
+              ],
+            ),
           ),
         ],
       ),
