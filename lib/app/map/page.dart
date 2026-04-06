@@ -50,7 +50,7 @@ class MapPageOptions {
     final replay = queryParameters['replay'];
 
     return MapPageOptions(
-      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
+      initialLayers: layers?.map((layer) => MapLayer.values.asNameMap()[layer]).whereType<MapLayer>().toSet(),
       reportId: report,
       replayTimestamp: replay == null ? null : int.tryParse(replay),
     );
