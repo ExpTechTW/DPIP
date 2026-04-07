@@ -39,7 +39,18 @@ mixin EarthquakeEndpoints {
         : '${lb}/v2/trem/rts';
     try {
       final res = await _dio.get(url);
-      return Rts.fromMap(res.data as Map<String, dynamic>);
+      final data = res.data;
+
+      if (data is Map<String, dynamic>) {
+        return Rts.fromMap(data);
+      }
+      if (data is String) {
+        final decoded = jsonDecode(data);
+        if (decoded is Map<String, dynamic>) {
+          return Rts.fromMap(decoded);
+        }
+      }
+      throw FormatException('Unexpected RTS format: ${data.runtimeType}');
     } on DioException catch (e) {
       if (time != null && e.response?.statusCode == 404) throw const Rtsnodata();
       rethrow;
