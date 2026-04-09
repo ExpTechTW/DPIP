@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-09 16:36\n"
+"PO-Revision-Date: 2026-04-09 17:59\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -581,7 +581,7 @@ msgstr "Help us maintain the stability and long-term development of the server"
 
 #: ./lib/app/settings/page.dart:343
 msgid "下載"
-msgstr ""
+msgstr "Download"
 
 #: ./lib/app/settings/page.dart:383
 msgid "除錯"
