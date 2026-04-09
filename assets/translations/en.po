@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-05 07:57\n"
+"PO-Revision-Date: 2026-04-09 16:36\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -1187,7 +1187,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:607
 msgid "預估海嘯到達時間及波高"
-msgstr ""
+msgstr "Estimated arrival time and wave height of the tsunami"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:626
 msgid "各地觀測到的海嘯"
