@@ -139,7 +139,9 @@ class BlurredIconButton extends StatelessWidget {
             style: IconButton.styleFrom(
               backgroundColor:
                   backgroundColor ?? context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
-              foregroundColor: context.colors.outline,
+              foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 200, 200, 200)
+                  : const Color.fromARGB(255, 70, 70, 70),
             ),
             onPressed: onPressed,
             icon: icon,
