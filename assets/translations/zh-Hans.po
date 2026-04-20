@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-04-01 07:16\n"
+"PO-Revision-Date: 2026-04-01 09:40\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -42,7 +42,7 @@ msgstr "海啸信息、海啸警报"
 
 #: ./lib/app/settings/notify/page.dart:45
 msgid "只接收海嘯警報"
-msgstr "只接收海啸警报"
+msgstr "仅接收海啸警报"
 
 #: ./lib/app/settings/notify/page.dart:41
 msgid "接收所在地"
@@ -62,7 +62,7 @@ msgstr "公告"
 
 #: ./lib/app/settings/notify/(5.basic)/announcement/page.dart:32
 msgid "發送公告時"
-msgstr "发送公告时"
+msgstr "推送公告时"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:46
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"

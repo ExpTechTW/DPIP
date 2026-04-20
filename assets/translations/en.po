@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-01 07:16\n"
+"PO-Revision-Date: 2026-04-20 08:51\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -90,7 +90,7 @@ msgstr "Please set your current location to enable notifications"
 
 #: ./lib/app/settings/notify/page.dart:211
 msgid "設定所在地"
-msgstr ""
+msgstr "Set Location"
 
 #: ./lib/app/settings/experimental/page.dart:209
 msgid "地震速報"
@@ -297,27 +297,27 @@ msgstr "The location (township) issues instant thunderstorm information"
 
 #: ./lib/app/settings/experimental/page.dart:197
 msgid "啟動時進入強震監視器"
-msgstr ""
+msgstr "Launch the earthquake monitor on start"
 
 #: ./lib/app/settings/experimental/page.dart:57
 msgid "地震速報不限制非 CWA 來源"
-msgstr ""
+msgstr "Earthquake alerts not restricted to non-CWA sources"
 
 #: ./lib/app/settings/page.dart:428
 msgid "實驗性功能"
-msgstr ""
+msgstr "Experimental features"
 
 #: ./lib/app/settings/page.dart:429
 msgid "搶先體驗開發中的新功能"
-msgstr ""
+msgstr "Get an early look at new features currently in development"
 
 #: ./lib/app/settings/experimental/page.dart:154
 msgid "注意"
-msgstr ""
+msgstr "Attention"
 
 #: ./lib/app/settings/experimental/page.dart:162
 msgid "這些功能仍在開發中，可能會不穩定或在未來的版本中變更。"
-msgstr ""
+msgstr "These features are still under development and may be unstable or change in future versions."
 
 #: ./lib/app/settings/experimental/page.dart:188
 msgid "啟動行為"
@@ -337,7 +337,7 @@ msgstr ""
 
 #: ./lib/app/settings/experimental/page.dart:280
 msgid "啟用實驗性功能"
-msgstr ""
+msgstr "Enable experimental features"
 
 #: ./lib/app/settings/experimental/page.dart:286
 msgid "你即將啟用："
@@ -345,7 +345,7 @@ msgstr ""
 
 #: ./lib/app/settings/experimental/page.dart:317
 msgid "此功能為實驗性質，可能會造成應用程式不穩定或行為異常。如遇問題，請至設定中關閉此功能。"
-msgstr ""
+msgstr "This feature is experimental and may cause the app to become unstable or behave abnormally. If you encounter any issues, please disable this feature in Settings."
 
 #: ./lib/route/image_viewer/image_viewer.dart:78
 msgid "取消"
@@ -369,7 +369,7 @@ msgstr "Use Fahrenheit"
 
 #: ./lib/app/settings/unit/page.dart:61
 msgid "切換溫度顯示單位為華氏度 (℉)"
-msgstr ""
+msgstr "Switch the temperature display unit to Fahrenheit (℉)."
 
 #: ./lib/app/settings/page.dart:141
 msgid "語言"
@@ -425,11 +425,11 @@ msgstr "Loading store items"
 
 #: ./lib/app/settings/donate/page.dart:225
 msgid "支持 DPIP"
-msgstr ""
+msgstr "Support DPIP"
 
 #: ./lib/app/settings/donate/page.dart:233
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。"
-msgstr ""
+msgstr "DPIP, an app dedicated to providing real-time earthquake information, currently has no advertising or other monetization models. Your support will help us maintain server operation and continue development."
 
 #: ./lib/app/settings/donate/page.dart:260
 msgid "訂閱制"
@@ -473,11 +473,11 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:200
 msgid "HTTP 代理"
-msgstr ""
+msgstr "HTTP Proxy"
 
 #: ./lib/app/settings/page.dart:201
 msgid "調整 HTTP 代理伺服器設定"
-msgstr ""
+msgstr "Adjust HTTP proxy server settings"
 
 #: ./lib/app/settings/proxy/page.dart:75
 msgid "啟用代理"
@@ -505,7 +505,7 @@ msgstr "Settings"
 
 #: ./lib/app/settings/page.dart:71
 msgid "自訂你的 DPIP 使用體驗"
-msgstr ""
+msgstr "Customize your DPIP experience"
 
 #: ./lib/app/welcome/4-permissions/page.dart:174
 msgid "位置"
@@ -525,11 +525,11 @@ msgstr "Interface"
 
 #: ./lib/app/settings/layout/page.dart:47
 msgid "版面"
-msgstr ""
+msgstr "Layout"
 
 #: ./lib/app/settings/layout/page.dart:48
 msgid "調整首頁的版面樣式"
-msgstr ""
+msgstr "Adjust the layout of the homepage"
 
 #: ./lib/app/settings/theme/page.dart:25
 msgid "主題"
@@ -545,7 +545,7 @@ msgstr "Map"
 
 #: ./lib/app/settings/map/page.dart:50
 msgid "調整地圖的顯示樣式"
-msgstr ""
+msgstr "Adjust the map display style"
 
 #: ./lib/app/settings/page.dart:191
 msgid "網路"
@@ -569,7 +569,7 @@ msgstr "Third Party Libraries"
 
 #: ./lib/app/settings/page.dart:241
 msgid "DPIP 的實現歸功於開放原始碼"
-msgstr ""
+msgstr "The implementation of DPIP is made possible by open source"
 
 #: ./lib/app/settings/page.dart:264
 msgid "贊助我們"
@@ -581,7 +581,7 @@ msgstr "Help us maintain the stability and long-term development of the server"
 
 #: ./lib/app/settings/page.dart:343
 msgid "下載"
-msgstr ""
+msgstr "Download"
 
 #: ./lib/app/settings/page.dart:383
 msgid "除錯"
@@ -605,7 +605,7 @@ msgstr "App Logs"
 
 #: ./lib/app/settings/page.dart:463
 msgid "任何資訊應以中央氣象署發布之內容為準"
-msgstr ""
+msgstr "All information is subject to the official announcements issued by the Central Weather Administration."
 
 #: ./lib/app/settings/location/page.dart:74
 msgid "無法取得通知權限"
@@ -713,7 +713,7 @@ msgstr "Current Location"
 
 #: ./lib/app/settings/layout/page.dart:56
 msgid "拖曳調整順序"
-msgstr ""
+msgstr "Drag to reorder"
 
 #: ./lib/app/settings/layout/page.dart:100
 msgid "已停用"
@@ -753,7 +753,7 @@ msgstr ""
 
 #: ./lib/app/settings/map/page.dart:136
 msgid "過高的動畫幀率可能會造成卡頓或裝置發熱"
-msgstr ""
+msgstr "Excessively high the animation frame rate may cause lag or overheating"
 
 #: ./lib/app/settings/theme/page.dart:46
 msgid "主題模式"
@@ -817,35 +817,35 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/wind_card.dart:471
 msgid "無法測量"
-msgstr ""
+msgstr "Cannot be measured"
 
 #: ./lib/app/home/_widgets/wind_card.dart:492
 msgid "指北針不可靠"
-msgstr ""
+msgstr "The compass the unreliable"
 
 #: ./lib/app/home/_widgets/wind_card.dart:494
 msgid "指北針準確度下降"
-msgstr ""
+msgstr "Decrease in compass accuracy"
 
 #: ./lib/app/home/_widgets/wind_card.dart:495
 msgid "指北針正常"
-msgstr ""
+msgstr "The compass is working properly"
 
 #: ./lib/app/home/_widgets/wind_card.dart:502
 msgid "方向精確度"
-msgstr ""
+msgstr "Directional accuracy"
 
 #: ./lib/app/home/_widgets/wind_card.dart:521
 msgid "正常範圍：±0-15°"
-msgstr ""
+msgstr "Normal range: ±0–15°"
 
 #: ./lib/app/home/_widgets/wind_card.dart:538
 msgid "附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。"
-msgstr ""
+msgstr "There is strong magnetic interference in the vicinity, which may cause the compass to be completely inaccurate. Please stay away from magnets, electronic devices, or metal objects."
 
 #: ./lib/app/home/_widgets/wind_card.dart:539
 msgid "附近可能有磁場干擾，指北針方向可能有偏差。"
-msgstr ""
+msgstr "There may be magnetic interference in the vicinity, which could cause the compass to deviate from true north."
 
 #: ./lib/route/image_viewer/image_viewer.dart:145
 msgid "確定"
@@ -861,7 +861,7 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/location_button.dart:144
 msgid "位置設定"
-msgstr ""
+msgstr "Location Settings"
 
 #: ./lib/app/home/_widgets/location_button.dart:195
 msgid "快速切換"
@@ -869,7 +869,7 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/location_button.dart:240
 msgid "選擇縣市"
-msgstr ""
+msgstr "Select County/City"
 
 #: ./lib/app/home/_widgets/location_button.dart:250
 msgid "目前選擇"
@@ -917,11 +917,11 @@ msgstr "Sun UVI"
 
 #: ./lib/app/home/_widgets/hero_weather.dart:142
 msgid "體感 {feelsLike}°"
-msgstr ""
+msgstr "Feels Like {feelsLike}°"
 
 #: ./lib/app/home/_widgets/hero_weather.dart:185
 msgid "無天氣資料"
-msgstr ""
+msgstr "No weather data available"
 
 #: ./lib/app/home/_widgets/mode_toggle_button.dart:14
 msgid "全國 · 生效中"
@@ -1187,7 +1187,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:607
 msgid "預估海嘯到達時間及波高"
-msgstr ""
+msgstr "Estimated arrival time and wave height of the tsunami"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:626
 msgid "各地觀測到的海嘯"
