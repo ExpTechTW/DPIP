@@ -200,7 +200,7 @@ class SettingsLayoutPage extends StatelessWidget {
                 padding: const .symmetric(horizontal: 16),
                 sliver: SliverReorderableList(
                   itemCount: sections.length,
-                  onReorderItem: (oldIndex, newIndex) {
+                  onReorder: (oldIndex, newIndex) {
                     context.userInterface.reorderSection(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {

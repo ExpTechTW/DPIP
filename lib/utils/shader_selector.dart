@@ -137,16 +137,15 @@ class ShaderSelector {
 
   static Widget buildShaderBackground({
     required ShaderConfig config,
-    required String imagePath,
+    required Color backgroundColor,
     Widget? child,
   }) {
     if (config.showThunderstorm) {
       if (config.showFog) {
         return Stack(
           children: [
-            Positioned.fill(
+            const Positioned.fill(
               child: ThunderstormShaderBackground(
-                imagePath: imagePath,
                 animated: true,
                 lightningIntensity: 1.0,
                 rainAmount: 0.5,
@@ -155,8 +154,7 @@ class ShaderSelector {
             Positioned.fill(
               child: Opacity(
                 opacity: config.fogIntensity * 0.7,
-                child: FogShaderBackground(
-                  imagePath: imagePath,
+                child: const FogShaderBackground(
                   animated: true,
                   intensity: 1.0,
                   speed: 1.0,
@@ -168,7 +166,6 @@ class ShaderSelector {
         );
       }
       return ThunderstormShaderBackground(
-        imagePath: imagePath,
         animated: true,
         lightningIntensity: 1.0,
         rainAmount: 0.3,
@@ -180,9 +177,8 @@ class ShaderSelector {
       final fogIntensity = config.fogIntensity * 0.5;
       return Stack(
         children: [
-          Positioned.fill(
+          const Positioned.fill(
             child: ThunderstormShaderBackground(
-              imagePath: imagePath,
               animated: true,
               lightningIntensity: 0.0,
               rainAmount: 0.3,
@@ -190,7 +186,6 @@ class ShaderSelector {
           ),
           Positioned.fill(
             child: FogShaderBackground(
-              imagePath: imagePath,
               animated: true,
               intensity: fogIntensity,
               speed: 1.0,
@@ -203,7 +198,6 @@ class ShaderSelector {
 
     if (config.showRain) {
       return ThunderstormShaderBackground(
-        imagePath: imagePath,
         animated: true,
         lightningIntensity: 0.0,
         rainAmount: 0.3,
@@ -213,7 +207,6 @@ class ShaderSelector {
 
     if (config.showFog) {
       return FogShaderBackground(
-        imagePath: imagePath,
         animated: true,
         intensity: config.fogIntensity,
         speed: 1.0,
@@ -222,12 +215,7 @@ class ShaderSelector {
     }
 
     return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(imagePath),
-          fit: BoxFit.cover,
-        ),
-      ),
+      color: backgroundColor,
       child: child,
     );
   }

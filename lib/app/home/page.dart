@@ -35,7 +35,6 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/shader_selector.dart';
-import 'package:dpip/utils/wallpaper_selector.dart';
 import 'package:dpip/widgets/responsive/responsive_container.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -808,12 +807,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       (model) => model.homeSections,
     );
 
-    final utc8Time = WallpaperSelector.getUtc8Time();
-    final wallpaperPath = WallpaperSelector.selectWallpaper(utc8Time);
     final shaderConfig = ShaderSelector.selectShaderConfig(_weather);
     final shaderBackground = ShaderSelector.buildShaderBackground(
       config: shaderConfig,
-      imagePath: wallpaperPath,
+      backgroundColor: context.colors.surface,
     );
 
     final screenHeight = context.dimension.height;
@@ -892,7 +889,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
                     tooltip: '地圖',
-                    onPressed: () => MapRoute(layers: layers.map((l) => l.name).join(',')).push(context),
+                    onPressed: () =>
+                        MapRoute(layers: layers.map((l) => l.name).join(',')).push(context),
                     elevation: 2,
                   );
                 },

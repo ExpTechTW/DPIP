@@ -3,10 +3,14 @@ library;
 
 import 'dart:ui';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
 /// A full-width text button with a frosted-glass backdrop blur effect.
+///
+/// ios 26 以上使用 native liquid-glass button
+/// 其他平台使用 backdrop
 class BlurredTextButton extends StatelessWidget {
   /// The label displayed inside the button.
   final String text;
@@ -44,6 +48,31 @@ class BlurredTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PlatformInfo.isIOS26OrHigher()) {
+      final effectiveStyle = textStyle ?? context.texts.bodyLarge ?? const TextStyle();
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: effectiveStyle),
+        textDirection: TextDirection.ltr,
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+
+      return SizedBox(
+        width: painter.size.width + 40,
+        height: 44,
+        child: AdaptiveButton(
+          useSmoothRectangleBorder: false,
+          borderRadius: .circular(1000),
+          style: AdaptiveButtonStyle.glass,
+          padding: const .symmetric(horizontal: 20, vertical: 10),
+          label: text,
+          textColor: context.theme.brightness == .dark
+              ? const Color.fromARGB(199, 250, 250, 250)
+              : const Color.fromARGB(255, 50, 50, 50),
+          onPressed: onPressed,
+        ),
+      );
+    }
+
     return Material(
       color: Colors.transparent,
       shadowColor: context.colors.shadow.withValues(alpha: 0.4),
@@ -83,6 +112,9 @@ class BlurredTextButton extends StatelessWidget {
 }
 
 /// A circular icon button with a frosted-glass backdrop blur effect.
+///
+/// ios 26 以上使用 native liquid-glass button
+/// 其他平台使用 backdrop
 class BlurredIconButton extends StatelessWidget {
   /// The icon widget rendered inside the button.
   final Widget icon;
@@ -120,6 +152,26 @@ class BlurredIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (PlatformInfo.isIOS26OrHigher()) {
+      final button = SizedBox(
+        width: 48,
+        height: 48,
+        child: AdaptiveButton.child(
+          useSmoothRectangleBorder: false,
+          borderRadius: .circular(1000),
+          style: AdaptiveButtonStyle.glass,
+          padding: const .all(12),
+          onPressed: onPressed,
+          child: icon,
+        ),
+      );
+
+      if (tooltip != null) {
+        return Tooltip(message: tooltip!, child: button);
+      }
+      return button;
+    }
+
     return SizedBox(
       width: 48,
       height: 48,
