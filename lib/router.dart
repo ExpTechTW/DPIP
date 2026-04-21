@@ -1,8 +1,11 @@
+import 'package:dpip/app/_shell/main_shell.dart';
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/layout.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/map/page.dart';
+import 'package:dpip/app/time/layout.dart';
+import 'package:dpip/app/time/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/experimental/page.dart';
 import 'package:dpip/app/settings/layout.dart';
@@ -96,8 +99,48 @@ class WelcomePermissionsRoute extends GoRouteData with $WelcomePermissionsRoute 
   }
 }
 
+/// Main shell - wraps the bottom-navigation tabs (首頁 / 時間).
+@TypedStatefulShellRoute<MainShellRoute>(
+  branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
+    TypedStatefulShellBranch<HomeBranchData>(
+      routes: <TypedGoRoute<GoRouteData>>[
+        TypedGoRoute<HomeRoute>(path: '/home'),
+      ],
+    ),
+    TypedStatefulShellBranch<TimeBranchData>(
+      routes: <TypedGoRoute<GoRouteData>>[
+        TypedGoRoute<TimeRoute>(path: '/time'),
+      ],
+    ),
+  ],
+)
+class MainShellRoute extends StatefulShellRouteData {
+  /// Creates a [MainShellRoute].
+  const MainShellRoute();
+
+  @override
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return MainShell(navigationShell: navigationShell);
+  }
+}
+
+/// Home branch of the main shell.
+class HomeBranchData extends StatefulShellBranchData {
+  /// Creates a [HomeBranchData].
+  const HomeBranchData();
+}
+
+/// Time branch of the main shell.
+class TimeBranchData extends StatefulShellBranchData {
+  /// Creates a [TimeBranchData].
+  const TimeBranchData();
+}
+
 /// Home route - displays the main application home page.
-@TypedGoRoute<HomeRoute>(path: '/home')
 class HomeRoute extends GoRouteData with $HomeRoute {
   /// Creates a [HomeRoute].
   const HomeRoute();
@@ -105,6 +148,17 @@ class HomeRoute extends GoRouteData with $HomeRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const HomeLayout(child: HomePage());
+  }
+}
+
+/// Time route - displays the event timeline.
+class TimeRoute extends GoRouteData with $TimeRoute {
+  /// Creates a [TimeRoute].
+  const TimeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TimeLayout(child: TimePage());
   }
 }
 

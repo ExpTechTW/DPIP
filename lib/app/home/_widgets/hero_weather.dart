@@ -1,4 +1,4 @@
-/// Full-screen hero weather section displayed at the top of the home page.
+/// 首頁上方天氣卡片
 library;
 
 import 'dart:math';
@@ -10,11 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Displays the current temperature and weather condition as a large hero
-/// widget.
-///
-/// Shows a loading skeleton while [isLoading] is `true`, an empty state when
-/// [weather] is `null`, or the full weather content otherwise.
 class HeroWeather extends StatelessWidget {
   /// The current weather data, or `null` when unavailable.
   final RealtimeWeather? weather;
@@ -22,11 +17,15 @@ class HeroWeather extends StatelessWidget {
   /// When `true`, shows a loading placeholder instead of weather data.
   final bool isLoading;
 
+  /// When `true`, renders a shorter banner form.
+  final bool compact;
+
   /// Creates a [HeroWeather] widget.
   const HeroWeather({
     super.key,
     this.weather,
     this.isLoading = false,
+    this.compact = false,
   });
 
   @override
@@ -35,34 +34,36 @@ class HeroWeather extends StatelessWidget {
     final statusBarHeight = context.padding.top;
 
     return SizedBox(
-      height: screenHeight * 0.5,
-      child: Stack(
-        children: [
-          Positioned(
-            top: statusBarHeight + 80,
-            left: 32,
-            right: 32,
-            child: isLoading
-                ? _buildLoadingState(context)
-                : weather != null
-                ? _buildWeatherContent(context)
-                : _buildEmptyState(context),
-          ),
-        ],
+      height: compact ? statusBarHeight + 160 : screenHeight * 0.5,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: statusBarHeight + 80,
+          left: 32,
+          right: 32,
+        ),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: isLoading
+              ? _buildLoadingState(context)
+              : weather != null
+              ? _buildWeatherContent(context)
+              : _buildEmptyState(context),
+        ),
       ),
     );
   }
 
   Widget _buildLoadingState(BuildContext context) {
+    final double tempHeight = compact ? 40 : 72;
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 100,
-          height: 72,
+          height: tempHeight,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: .circular(8),
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
         const SizedBox(height: 8),
@@ -71,7 +72,7 @@ class HeroWeather extends StatelessWidget {
           height: 24,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: .circular(4),
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
         const SizedBox(height: 4),
@@ -80,7 +81,7 @@ class HeroWeather extends StatelessWidget {
           height: 16,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: .circular(4),
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
       ],
@@ -93,106 +94,110 @@ class HeroWeather extends StatelessWidget {
         data.humidity / 100 * 6.105 * exp(17.27 * data.temperature / (data.temperature + 237.3));
     final feelsLike = data.temperature + 0.33 * e - 0.7 * data.wind.speed - 4.0;
 
-    return Column(
-      crossAxisAlignment: .start,
+    final tempText = Text(
+      '${data.temperature.round()}°',
+      style: context.texts.displayLarge?.copyWith(
+        fontSize: compact ? 40 : 72,
+        fontWeight: FontWeight.w300,
+        color: Colors.white,
+        height: 1,
+        letterSpacing: compact ? -1 : -2,
+        shadows: _textShadows(),
+      ),
+    );
+
+    final conditionRow = Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          '${data.temperature.round()}°',
-          style: context.texts.displayLarge?.copyWith(
-            fontSize: 72,
-            fontWeight: .w300,
-            color: Colors.white,
-            height: 1,
-            letterSpacing: -2,
-            shadows: [
-              Shadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        Icon(
+          _getWeatherIcon(data.weatherCode),
+          size: compact ? 18 : 24,
+          color: Colors.white,
+          shadows: _textShadows(small: true),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            data.weather,
+            style: (compact ? context.texts.bodyMedium : context.texts.titleMedium)?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+              shadows: _textShadows(small: true),
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisSize: .min,
-          children: [
-            Icon(
-              _getWeatherIcon(data.weatherCode),
-              size: 24,
-              color: Colors.white.withValues(alpha: 1),
-              shadows: [
-                Shadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
+      ],
+    );
+
+    final feelsLikeText = Text(
+      '體感 {feelsLike}°'.i18n.args({'feelsLike': feelsLike.round()}),
+      style: context.texts.bodyMedium?.copyWith(
+        color: Colors.white,
+        shadows: _textShadows(small: true),
+      ),
+    );
+
+    if (compact) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          tempText,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                conditionRow,
+                const SizedBox(height: 4),
+                feelsLikeText,
               ],
             ),
-            const SizedBox(width: 8),
-            Text(
-              data.weather,
-              style: context.texts.titleMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 1),
-                fontWeight: .w400,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '體感 {feelsLike}°'.i18n.args({
-            'feelsLike': feelsLike.round(),
-          }),
-          style: context.texts.bodyMedium?.copyWith(
-            color: Colors.white.withValues(alpha: 1),
-            shadows: [
-              Shadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
           ),
-        ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        tempText,
+        const SizedBox(height: 8),
+        conditionRow,
+        const SizedBox(height: 4),
+        feelsLikeText,
       ],
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '--°',
           style: context.texts.displayLarge?.copyWith(
-            fontSize: 72,
-            fontWeight: .w300,
+            fontSize: compact ? 40 : 72,
+            fontWeight: FontWeight.w300,
             color: Colors.white.withValues(alpha: 0.5),
             height: 1,
-            letterSpacing: -2,
+            letterSpacing: compact ? -1 : -2,
           ),
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisSize: .min,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Symbols.cloud_off_rounded,
-              size: 24,
+              size: compact ? 18 : 24,
               color: Colors.white.withValues(alpha: 0.5),
             ),
             const SizedBox(width: 8),
             Text(
               '無天氣資料'.i18n,
-              style: context.texts.titleMedium?.copyWith(
+              style: (compact ? context.texts.bodyMedium : context.texts.titleMedium)?.copyWith(
                 color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
@@ -200,6 +205,16 @@ class HeroWeather extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  List<Shadow> _textShadows({bool small = false}) {
+    return [
+      Shadow(
+        color: Colors.black.withValues(alpha: small ? 0.3 : 0.4),
+        blurRadius: small ? 4 : 8,
+        offset: Offset(0, small ? 1 : 2),
+      ),
+    ];
   }
 
   /// Returns the appropriate [IconData] for the given CWA weather [code].
