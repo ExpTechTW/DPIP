@@ -34,7 +34,7 @@ const kFadeForwardPageTransitionsTheme = PageTransitionsTheme(
 const kEmphasizedAnimationStyle = AnimationStyle(
   curve: Easing.emphasizedDecelerate,
   duration: Durations.medium4,
-  reverseCurve: Easing.emphasizedDecelerate,
+  reverseCurve: Easing.standardDecelerate,
   reverseDuration: Durations.short4,
 );
 

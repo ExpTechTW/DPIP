@@ -101,3 +101,7 @@ flutter:
     - assets/location.json.gz
     - assets/notify_test.json
     - assets/time.json.gz
+  fonts:
+    - family: Google Sans Flex
+      fonts:
+        - asset: assets/fonts/GoogleSansFlex.ttf

@@ -130,11 +130,16 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               ),
             );
 
+            final cardTheme = CardThemeData(
+              shape: RoundedRectangleBorder(borderRadius: .circular(16)),
+            );
+
             ThemeData lightTheme = .new(
               colorSchemeSeed: model.themeColor ?? lightDynamic?.primary,
               brightness: .light,
               snackBarTheme: const .new(behavior: .floating),
               pageTransitionsTheme: kZoomPageTransitionsTheme,
+              cardTheme: cardTheme,
               switchTheme: switchTheme,
               // TODO(kamiya4047): Opt-in to new Material 3 update, remove this after it becomes the default option
               sliderTheme: const .new(year2023: false),
@@ -145,31 +150,49 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               brightness: .dark,
               snackBarTheme: const .new(behavior: .floating),
               pageTransitionsTheme: kZoomPageTransitionsTheme,
+              cardTheme: cardTheme,
               switchTheme: switchTheme,
               // TODO(kamiya4047): Opt-in to new Material 3 update, remove this after it becomes the default option
               sliderTheme: const .new(year2023: false),
               progressIndicatorTheme: const .new(year2023: false),
             );
 
-            final fontTextTheme = switch (I18n.locale.toLanguageTag()) {
-              'zh-Hans' => GoogleFonts.notoSansScTextTheme,
-              'ja' => GoogleFonts.notoSansJpTextTheme,
-              'ko' => GoogleFonts.notoSansKrTextTheme,
-              'vi' => GoogleFonts.notoSansTextTheme,
-              'ru' => GoogleFonts.notoSansTextTheme,
-              _ => GoogleFonts.notoSansTcTextTheme,
+            final notoFallback = switch (I18n.locale.toLanguageTag()) {
+              'zh-Hans' => GoogleFonts.notoSansSc().fontFamily!,
+              'ja' => GoogleFonts.notoSansJp().fontFamily!,
+              'ko' => GoogleFonts.notoSansKr().fontFamily!,
+              'vi' => GoogleFonts.notoSans().fontFamily!,
+              'ru' => GoogleFonts.notoSans().fontFamily!,
+              _ => GoogleFonts.notoSansTc().fontFamily!,
             };
 
-            lightTheme = lightTheme.copyWith(
-              textTheme: GoogleFonts.latoTextTheme(
-                fontTextTheme(lightTheme.textTheme),
-              ),
+            TextStyle applyFlex(TextStyle? base) {
+              final style = GoogleFonts.googleSansFlex(textStyle: base);
+              return style.copyWith(
+                fontFamilyFallback: [...?style.fontFamilyFallback, notoFallback],
+              );
+            }
+
+            TextTheme buildTextTheme(TextTheme base) => base.copyWith(
+              displayLarge: applyFlex(base.displayLarge),
+              displayMedium: applyFlex(base.displayMedium),
+              displaySmall: applyFlex(base.displaySmall),
+              headlineLarge: applyFlex(base.headlineLarge),
+              headlineMedium: applyFlex(base.headlineMedium),
+              headlineSmall: applyFlex(base.headlineSmall),
+              titleLarge: applyFlex(base.titleLarge),
+              titleMedium: applyFlex(base.titleMedium),
+              titleSmall: applyFlex(base.titleSmall),
+              bodyLarge: applyFlex(base.bodyLarge),
+              bodyMedium: applyFlex(base.bodyMedium),
+              bodySmall: applyFlex(base.bodySmall),
+              labelLarge: applyFlex(base.labelLarge),
+              labelMedium: applyFlex(base.labelMedium),
+              labelSmall: applyFlex(base.labelSmall),
             );
-            darkTheme = darkTheme.copyWith(
-              textTheme: GoogleFonts.latoTextTheme(
-                fontTextTheme(darkTheme.textTheme),
-              ),
-            );
+
+            lightTheme = lightTheme.copyWith(textTheme: buildTextTheme(lightTheme.textTheme));
+            darkTheme = darkTheme.copyWith(textTheme: buildTextTheme(darkTheme.textTheme));
 
             return MaterialApp.router(
               builder: (context, child) {

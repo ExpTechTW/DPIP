@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
+
   if (Platform.isAndroid) {
     await AwesomeNotificationsFcm().initialize(
       onFcmTokenHandle: onTokenHandle,

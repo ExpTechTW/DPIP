@@ -104,7 +104,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const HomeLayout(child: HomePage());
+    return const Material(child: NewHomeLayout(child: NewHomePage()));
   }
 }
 
