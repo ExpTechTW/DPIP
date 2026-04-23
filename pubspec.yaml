@@ -83,6 +83,8 @@ dev_dependencies:
   lint: ^2.8.0
 
 flutter:
+  config:
+    enable-swift-package-manager: false
   uses-material-design: true
   shaders:
     - shaders/fog.frag
