@@ -59,7 +59,7 @@ class WeatherParameters extends StatelessWidget {
             ),
             _ParameterCard(
               icon: const Icon(Symbols.umbrella_rounded, fill: 1, color: Colors.indigoAccent),
-              label: '降雨量',
+              label: '降水量',
               value: params != null ? '${params.rain.toStringAsFixed(1)} mm' : '--',
             ),
           ],
