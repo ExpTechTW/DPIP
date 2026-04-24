@@ -1760,26 +1760,26 @@ packages:
     dependency: "direct main"
     description:
       name: zstandard
-      sha256: "0332045357644eaf66ff0b92619edefc5f8d2e1ef385403d2cb46c150db5db89"
+      sha256: d2cae71d34dfdd014525259be2f84ebc2a738c94cc4232515df44a1415dde9d3
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.3.29"
   zstandard_android:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: zstandard_android
-      sha256: b8dc9860d2ae834744bd82d6b648fc15bdf11dd85d61e01ac563c9e1d51f4bcf
+      sha256: "7d85d814f147faa7a33d5cd5b5610dea451a57f95b34f98c93723bb2f2efbf98"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.3.29"
   zstandard_ios:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: zstandard_ios
-      sha256: a992ee46aef915029abce6acd54f03a4bf7076e92d9148000fc56e9e6068f6d9
+      sha256: "50e6b3d05ad6ecf8def65c9fae46d4b786edd89150fd2bb207cdcef918946f0d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.3.29"
   zstandard_linux:
     dependency: transitive
     description:
