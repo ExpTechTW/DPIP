@@ -1362,11 +1362,12 @@ packages:
   simple_icons:
     dependency: "direct main"
     description:
-      name: simple_icons
-      sha256: "2ca3cd79c9f12e97a8588cae0f342609f19fd2e82315356cb09b5c4987ad0808"
-      url: "https://pub.dev"
-    source: hosted
-    version: "14.6.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "38c01c5d9a9dbe1a8b46e0804345798291d7d1da"
+      url: "https://github.com/PiscesXD/simple_icons"
+    source: git
+    version: "16.16.0"
   skeletonizer:
     dependency: "direct main"
     description:
