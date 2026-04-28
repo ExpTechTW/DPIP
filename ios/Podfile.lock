@@ -9,6 +9,8 @@ PODS:
     - Flutter
     - IosAwnCore (~> 0.10.0)
     - IosAwnFcmCore (~> 0.10.1)
+  - clipboard (3.0.9):
+    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/CoreOnly (11.15.0):
@@ -166,6 +168,7 @@ PODS:
 DEPENDENCIES:
   - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - awesome_notifications_fcm (from `.symlinks/plugins/awesome_notifications_fcm/ios`)
+  - clipboard (from `.symlinks/plugins/clipboard/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
@@ -210,6 +213,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/awesome_notifications/ios"
   awesome_notifications_fcm:
     :path: ".symlinks/plugins/awesome_notifications_fcm/ios"
+  clipboard:
+    :path: ".symlinks/plugins/clipboard/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_core:
@@ -250,6 +255,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   awesome_notifications: 0f432b28098d193920b11a44cfa9d2d9313a3888
   awesome_notifications_fcm: ad14f584c81e2488ae4310ab96331327dcbb5368
+  clipboard: 85f02e190f24debf05943aff98c26644b2a90245
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_core: 995454a784ff288be5689b796deb9e9fa3601818
@@ -284,7 +290,7 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
-  zstandard_ios: 09cab18e0ee494020cc24d82a95c5bf4252d240c
+  zstandard_ios: b20c54862b56c31c7a47074b79fcf181780268b0
 
 PODFILE CHECKSUM: 3d88bce62bfe048ac33ca00d3fb1bc02caeda4d3
 
