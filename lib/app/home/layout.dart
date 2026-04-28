@@ -57,12 +57,18 @@ class _NewHomeLayoutState extends State<NewHomeLayout> with TickerProviderStateM
                     Symbols.notifications_rounded,
                     fill: 1,
                   ),
+                  style: IconButton.styleFrom(
+                    elevation: 4,
+                  ),
                 ),
                 IconButton.filledTonal(
                   onPressed: () => const SettingsIndexRoute().push(context),
                   icon: const Icon(
                     Symbols.settings_rounded,
                     fill: 1,
+                  ),
+                  style: IconButton.styleFrom(
+                    elevation: 4,
                   ),
                 ),
               ],

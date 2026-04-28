@@ -151,7 +151,7 @@ void main() {
         col += vec3(1.0, 0.86, 0.42) * exp(-dSun * 18.0) * 0.55 * sunVis;
         // Disc with internal gradient: golden rim → bright yellow core,
         // gradient sampled from a point slightly above-left of the sun center
-        float discR = 0.050;
+        float discR = 0.040;
         vec2 gradC = sunC - vec2(0.003, 0.003);
         float dGrad = length(puv - gradC);
         vec3 rim = vec3(1.0, 0.78, 0.32);
