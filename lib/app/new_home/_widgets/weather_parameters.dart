@@ -2,7 +2,7 @@
 library;
 
 import 'package:dpip/api/model/weather_schema.dart';
-import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/app/new_home/_models/home_model.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/typography.dart';

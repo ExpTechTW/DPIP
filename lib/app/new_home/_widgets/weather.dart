@@ -1,7 +1,7 @@
 /// Weather condition icon and label for the home page.
 library;
 
-import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/app/new_home/_models/home_model.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';

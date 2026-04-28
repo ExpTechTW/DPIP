@@ -1,7 +1,7 @@
 /// Timeline item widget that shows a date header with an optional mode selector.
 library;
 
-import 'package:dpip/app/home_old/_widgets/mode_toggle_button.dart';
+import 'package:dpip/app/home/_widgets/mode_toggle_button.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 

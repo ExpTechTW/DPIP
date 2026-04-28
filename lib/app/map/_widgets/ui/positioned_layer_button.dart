@@ -1,7 +1,7 @@
 /// A layer-picker button positioned in the top-right corner of the map.
 library;
 
-import 'package:dpip/app/home_old/_widgets/blurred_button.dart';
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle_sheet.dart';
 import 'package:dpip/utils/extensions/build_context.dart';

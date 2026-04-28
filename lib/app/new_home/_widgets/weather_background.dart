@@ -3,8 +3,8 @@ library;
 
 import 'dart:ui';
 
-import 'package:dpip/app/home/_models/home_model.dart';
-import 'package:dpip/app/home/_models/weather_params.dart';
+import 'package:dpip/app/new_home/_models/home_model.dart';
+import 'package:dpip/app/new_home/_models/weather_params.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

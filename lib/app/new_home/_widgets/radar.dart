@@ -3,7 +3,7 @@ library;
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/route.dart';
-import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/app/new_home/_models/home_model.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';

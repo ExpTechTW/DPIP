@@ -1,4 +1,5 @@
 import 'package:dpip/models/data.dart';
+import 'package:dpip/models/settings/experimental.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/models/settings/notify.dart';
@@ -8,6 +9,7 @@ class GlobalProviders {
   GlobalProviders._();
 
   static late DpipDataModel data;
+  static late SettingsExperimentalModel experimental;
   static late SettingsLocationModel location;
   static late SettingsMapModel map;
   static late SettingsNotificationModel notification;
@@ -15,6 +17,7 @@ class GlobalProviders {
 
   static void init() {
     data = DpipDataModel();
+    experimental = SettingsExperimentalModel();
     location = SettingsLocationModel();
     map = SettingsMapModel();
     notification = SettingsNotificationModel();

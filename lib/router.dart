@@ -2,6 +2,8 @@ import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/layout.dart';
 import 'package:dpip/app/home/page.dart';
+import 'package:dpip/app/new_home/layout.dart';
+import 'package:dpip/app/new_home/page.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/experimental/page.dart';
@@ -34,6 +36,7 @@ import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/preference.dart';
+import 'package:dpip/models/settings/experimental.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
@@ -104,7 +107,11 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const Material(child: NewHomeLayout(child: NewHomePage()));
+    if (context.experimental.experimental__newHomeScreen) {
+      return const Material(child: NewHomeLayout(child: NewHomePage()));
+    }
+
+    return const Material(child: HomeLayout(child: HomePage()));
   }
 }
 
@@ -538,9 +545,10 @@ final router = GoRouter(
         return const WelcomeRoute().location;
       }
       // Experimental: Launch to monitor if enabled
-      if (Preference.experimentalLaunchToMonitor == true) {
+      if (Preference.experimental__launchToMonitor == true) {
         return const MapRoute(layers: 'monitor').location;
       }
+
       return const HomeRoute().location;
     }
     return null;

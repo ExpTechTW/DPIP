@@ -1,7 +1,7 @@
 /// A back-navigation button positioned in the top-left corner of the map.
 library;
 
-import 'package:dpip/app/home_old/_widgets/blurred_button.dart';
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 

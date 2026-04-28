@@ -1,7 +1,7 @@
 /// Large temperature display for the home page.
 library;
 
-import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/app/new_home/_models/home_model.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
