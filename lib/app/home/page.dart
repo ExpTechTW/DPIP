@@ -892,7 +892,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
                     tooltip: '地圖',
-                    onPressed: () => MapRoute(layers: layers.map((l) => l.name).join(',')).push(context),
+                    onPressed: () =>
+                        MapRoute(layers: layers.map((l) => l.name).join(',')).push(context),
                     elevation: 2,
                   );
                 },

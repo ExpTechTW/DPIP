@@ -66,8 +66,9 @@ class PreferenceKeys {
   // #endregion
 
   // #region Experimental
-  static const experimentalLaunchToMonitor = 'experimental:launchToMonitor';
-  static const experimentalEewAllSource = 'experimental:eewAllSource';
+  static const experimental__launchToMonitor = 'experimental:launchToMonitor';
+  static const experimental__eewAllSource = 'experimental:eewAllSource';
+  static const experimental__newHomeScreen = 'experimental:newHomeScreen';
   // #endregion
 }
 
@@ -210,14 +211,19 @@ class Preference {
   // #endregion
 
   // #region Experimental
-  static bool? get experimentalLaunchToMonitor =>
-      instance.getBool(PreferenceKeys.experimentalLaunchToMonitor);
-  static set experimentalLaunchToMonitor(bool? value) =>
-      instance.set(PreferenceKeys.experimentalLaunchToMonitor, value);
+  static bool? get experimental__launchToMonitor =>
+      instance.getBool(PreferenceKeys.experimental__launchToMonitor);
+  static set experimental__launchToMonitor(bool? value) =>
+      instance.set(PreferenceKeys.experimental__launchToMonitor, value);
 
-  static bool? get experimentalEewAllSource =>
-      instance.getBool(PreferenceKeys.experimentalEewAllSource);
-  static set experimentalEewAllSource(bool? value) =>
-      instance.set(PreferenceKeys.experimentalEewAllSource, value);
+  static bool? get experimental__eewAllSource =>
+      instance.getBool(PreferenceKeys.experimental__eewAllSource);
+  static set experimental__eewAllSource(bool? value) =>
+      instance.set(PreferenceKeys.experimental__eewAllSource, value);
+
+  static bool? get experimental__newHomeScreen =>
+      instance.getBool(PreferenceKeys.experimental__newHomeScreen);
+  static set experimental__newHomeScreen(bool? value) =>
+      instance.set(PreferenceKeys.experimental__newHomeScreen, value);
   // #endregion
 }

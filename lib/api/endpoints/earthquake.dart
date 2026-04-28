@@ -66,7 +66,7 @@ mixin EarthquakeEndpoints {
     final eewList = (res.data as List).map(
       (e) => Eew.fromMap(e as Map<String, dynamic>),
     );
-    if (Preference.experimentalEewAllSource == true) return eewList.toList();
+    if (Preference.experimental__eewAllSource == true) return eewList.toList();
     return eewList.where((e) => e.agency == 'cwa').toList();
   }
 }

@@ -1,132 +1,23 @@
 /// Experimental features settings page.
 library;
 
-import 'dart:async';
-
+import 'package:dpip/app/settings/_widgets/settings_header.dart';
 import 'package:dpip/core/i18n.dart';
-import 'package:dpip/core/preference.dart';
+import 'package:dpip/models/settings/experimental.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/segmented_list.dart';
+import 'package:dpip/widgets/ui/icon_container.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 /// A page for toggling experimental (in-development) features.
 ///
 /// Each feature shows a confirmation dialog with a countdown before it can be
 /// enabled. Disabled features can be turned off immediately.
-class SettingsExperimentalPage extends StatefulWidget {
+class SettingsExperimentalPage extends StatelessWidget {
   /// Creates a [SettingsExperimentalPage].
   const SettingsExperimentalPage({super.key});
-
-  @override
-  State<SettingsExperimentalPage> createState() => _SettingsExperimentalPageState();
-}
-
-class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
-  bool _launchToMonitor = Preference.experimentalLaunchToMonitor ?? false;
-  bool _eewAllSource = Preference.experimentalEewAllSource ?? false;
-
-  Future<void> _showEnableWarningDialog({
-    required String featureName,
-    required VoidCallback onConfirm,
-  }) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _ExperimentalWarningDialog(featureName: featureName),
-    );
-
-    if (confirmed == true) {
-      onConfirm();
-    }
-  }
-
-  void _toggleEewAllSource(bool value) {
-    if (value) {
-      _showEnableWarningDialog(
-        featureName: '地震速報不限制非 CWA 來源'.i18n,
-        onConfirm: () {
-          setState(() => _eewAllSource = true);
-          Preference.experimentalEewAllSource = true;
-        },
-      );
-    } else {
-      setState(() => _eewAllSource = false);
-      Preference.experimentalEewAllSource = false;
-    }
-  }
-
-  void _toggleLaunchToMonitor(bool value) {
-    if (value) {
-      _showEnableWarningDialog(
-        featureName: '啟動時進入強震監視器'.i18n,
-        onConfirm: () {
-          setState(() => _launchToMonitor = true);
-          Preference.experimentalLaunchToMonitor = true;
-        },
-      );
-    } else {
-      setState(() => _launchToMonitor = false);
-      Preference.experimentalLaunchToMonitor = false;
-    }
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const .fromLTRB(16, 8, 16, 0),
-      child: Row(
-        children: [
-          Container(
-            padding: const .all(10),
-            decoration: BoxDecoration(
-              color: context.colors.primaryContainer,
-              borderRadius: .circular(12),
-            ),
-            child: Icon(
-              Symbols.science_rounded,
-              color: context.colors.onPrimaryContainer,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text(
-                  '實驗性功能'.i18n,
-                  style: context.texts.titleLarge?.copyWith(
-                    fontWeight: .bold,
-                  ),
-                ),
-                Text(
-                  '搶先體驗開發中的新功能'.i18n,
-                  style: context.texts.bodySmall?.copyWith(
-                    color: context.colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconContainer({
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const .all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: .circular(10),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
 
   Widget _buildWarningCard(BuildContext context) {
     return Container(
@@ -139,17 +30,9 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
       child: Row(
         crossAxisAlignment: .start,
         children: [
-          Container(
-            padding: const .all(10),
-            decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.2),
-              borderRadius: .circular(12),
-            ),
-            child: Icon(
-              Symbols.warning_rounded,
-              color: Colors.amber[700],
-              size: 24,
-            ),
+          const ContainedIcon(
+            Symbols.warning_rounded,
+            color: Colors.amberAccent,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -181,165 +64,72 @@ class _SettingsExperimentalPageState extends State<SettingsExperimentalPage> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: .only(
-        top: 8,
-        bottom: 16 + context.padding.bottom,
-      ),
       children: [
-        _buildHeader(context),
+        SettingsHeader(
+          icon: Symbols.science_rounded,
+          title: Text('實驗性功能'.i18n),
+          subtitle: Text('搶先體驗開發中的新功能'.i18n),
+        ),
         _buildWarningCard(context),
-
-        // 啟動行為
+        const SizedBox(height: 16),
         SegmentedList(
-          label: Text('啟動行為'.i18n),
           children: [
-            SegmentedListTile(
-              isFirst: true,
-              isLast: true,
-              leading: _buildIconContainer(
-                icon: Symbols.monitor_heart_rounded,
-                color: Colors.red,
-              ),
-              title: Text('啟動時進入強震監視器'.i18n),
-              subtitle: Text('開啟 App 時直接進入強震監視器地圖'.i18n),
-              trailing: Switch(
-                value: _launchToMonitor,
-                onChanged: _toggleLaunchToMonitor,
-              ),
-              onTap: () => _toggleLaunchToMonitor(!_launchToMonitor),
-            ),
-          ],
-        ),
-
-        SegmentedList(
-          label: Text('地震速報'.i18n),
-          children: [
-            SegmentedListTile(
-              isFirst: true,
-              isLast: true,
-              leading: _buildIconContainer(
-                icon: Symbols.earthquake_rounded,
-                color: Colors.orange,
-              ),
-              title: Text('不限制非 CWA 來源'.i18n),
-              subtitle: Text('顯示所有來源的地震速報資料'.i18n),
-              trailing: Switch(
-                value: _eewAllSource,
-                onChanged: _toggleEewAllSource,
-              ),
-              onTap: () => _toggleEewAllSource(!_eewAllSource),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// A confirmation dialog with a countdown timer before the confirm button
-/// becomes enabled.
-class _ExperimentalWarningDialog extends StatefulWidget {
-  /// The display name of the experimental feature being enabled.
-  final String featureName;
-
-  const _ExperimentalWarningDialog({required this.featureName});
-
-  @override
-  State<_ExperimentalWarningDialog> createState() => _ExperimentalWarningDialogState();
-}
-
-class _ExperimentalWarningDialogState extends State<_ExperimentalWarningDialog> {
-  int _countdown = 5;
-  Timer? _timer;
-
-  void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdown > 0) {
-        setState(() => _countdown--);
-      } else {
-        timer.cancel();
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final canConfirm = _countdown == 0;
-
-    return AlertDialog(
-      icon: Icon(
-        Symbols.warning_rounded,
-        color: Colors.amber[700],
-        size: 48,
-      ),
-      title: Text('啟用實驗性功能'.i18n),
-      content: Column(
-        mainAxisSize: .min,
-        crossAxisAlignment: .start,
-        children: [
-          Text(
-            '你即將啟用：'.i18n,
-            style: context.texts.bodyMedium,
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const .all(12),
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainerHighest,
-              borderRadius: .circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Symbols.science_rounded,
-                  color: context.colors.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.featureName,
-                    style: context.texts.bodyMedium?.copyWith(
-                      fontWeight: .bold,
-                    ),
+            Selector<SettingsExperimentalModel, bool>(
+              selector: (_, model) => model.experimental__launchToMonitor,
+              builder: (context, experimental__launchToMonitor, child) {
+                return SegmentedListTile(
+                  isFirst: true,
+                  leading: const ContainedIcon(
+                    Symbols.monitor_heart_rounded,
+                    color: Colors.red,
                   ),
-                ),
-              ],
+                  title: Text('啟動時進入強震監視器'.i18n),
+                  subtitle: Text('開啟 App 時直接進入強震監視器地圖'.i18n),
+                  trailing: Switch(
+                    value: experimental__launchToMonitor,
+                    onChanged: context.experimental.set_experimental__launchToMonitor,
+                  ),
+                );
+              },
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '此功能為實驗性質，可能會造成應用程式不穩定或行為異常。如遇問題，請至設定中關閉此功能。'.i18n,
-            style: context.texts.bodySmall?.copyWith(
-              color: context.colors.onSurfaceVariant,
+            Selector<SettingsExperimentalModel, bool>(
+              selector: (_, model) => model.experimental__eewAllSource,
+              builder: (context, experimental__eewAllSource, child) {
+                return SegmentedListTile(
+                  leading: const ContainedIcon(
+                    Symbols.earthquake_rounded,
+                    color: Colors.orange,
+                  ),
+                  title: Text('不限制非 CWA 來源'.i18n),
+                  subtitle: Text('顯示所有來源的地震速報資料'.i18n),
+                  trailing: Switch(
+                    value: experimental__eewAllSource,
+                    onChanged: context.experimental.set_experimental__eewAllSource,
+                  ),
+                );
+              },
             ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => context.pop(false),
-          child: Text('取消'.i18n),
-        ),
-        FilledButton(
-          onPressed: canConfirm ? () => context.pop(true) : null,
-          child: Text(
-            canConfirm ? '啟用'.i18n : '${_countdown}s',
-          ),
+            Selector<SettingsExperimentalModel, bool>(
+              selector: (_, model) => model.experimental__newHomeScreen,
+              builder: (context, experimental__newHomeScreen, child) {
+                return SegmentedListTile(
+                  isLast: true,
+                  leading: const ContainedIcon(
+                    Symbols.home_rounded,
+                    color: Colors.blueAccent,
+                  ),
+                  title: Text('新首頁樣式'.i18n),
+                  subtitle: Text('使用新的首頁，目前還在開發中\n需要重新啟動 DPIP 來套用設定'.i18n),
+                  trailing: Switch(
+                    value: experimental__newHomeScreen,
+                    onChanged: context.experimental.set_experimental__newHomeScreen,
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 }

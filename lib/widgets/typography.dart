@@ -31,9 +31,20 @@ class DisplayText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.displaySmall);
 
   /// Creates a medium display text widget.
@@ -45,9 +56,20 @@ class DisplayText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.displayMedium);
 
   /// Creates a large display text widget.
@@ -59,9 +81,20 @@ class DisplayText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.displayLarge);
 
   @override
@@ -103,9 +136,20 @@ class HeadLineText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.headlineSmall);
 
   /// Creates a medium headline text widget.
@@ -117,9 +161,20 @@ class HeadLineText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.headlineMedium);
 
   /// Creates a large headline text widget.
@@ -131,9 +186,20 @@ class HeadLineText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
-  }) : style = TextStyle(color: color, fontWeight: weight).merge(style),
+  }) : style = TextStyle(
+         color: color,
+         fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
+         shadows: shadows,
+       ).merge(style),
        _textStyleGetter = ((context) => context.texts.headlineLarge);
 
   @override
@@ -176,13 +242,21 @@ class TitleText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleSmall);
 
@@ -195,13 +269,21 @@ class TitleText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleMedium);
 
@@ -214,13 +296,21 @@ class TitleText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.titleLarge);
 
@@ -264,13 +354,21 @@ class BodyText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodySmall);
 
@@ -283,13 +381,21 @@ class BodyText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodyMedium);
 
@@ -302,13 +408,21 @@ class BodyText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.bodyLarge);
 
@@ -352,13 +466,21 @@ class LabelText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelSmall);
 
@@ -371,13 +493,21 @@ class LabelText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelMedium);
 
@@ -390,13 +520,21 @@ class LabelText extends StatelessWidget {
     super.key,
     Color? color,
     FontWeight? weight,
+    String? fontFamily,
+    double? fontSize,
+    List<FontVariation>? fontVariations,
     double? leading,
+    List<Shadow>? shadows,
     TextStyle? style,
     this.align,
   }) : style = TextStyle(
          color: color,
          fontWeight: weight,
+         fontFamily: fontFamily,
+         fontSize: fontSize,
+         fontVariations: fontVariations,
          height: leading,
+         shadows: shadows,
        ).merge(style),
        _textStyleGetter = ((context) => context.texts.labelLarge);
 
@@ -408,4 +546,8 @@ class LabelText extends StatelessWidget {
       textAlign: align,
     );
   }
+}
+
+extension FontVariationExtension on FontVariation {
+  static roundness(double round) => FontVariation('ROND', round);
 }

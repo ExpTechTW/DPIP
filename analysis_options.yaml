@@ -12,7 +12,9 @@ linter:
     flutter_style_todos: error
     prefer_single_quotes: warning
     avoid_annotating_with_dynamic: error
-    public_member_api_docs: warning
+    prefer_const_constructors: info
+    prefer_const_constructors_in_immutables: info
+    prefer_const_declarations: info
 
 formatter:
   page_width: 100

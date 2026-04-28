@@ -24,12 +24,14 @@ import 'package:timezone/data/latest.dart';
 
 final fcmReadyCompleter = Completer<void>();
 final talker = TalkerManager.instance;
+
 void main() async {
   final overallStartTime = DateTime.now();
   talker.log('--- 冷啟動偵測開始 ---');
   talker.log('🔥 1. (main) 啟動時間: ${overallStartTime.toIso8601String()}');
   WidgetsFlutterBinding.ensureInitialized();
   String? initialShortcut;
+
   if (Platform.isIOS) {
     // iOS 14 以下改回用 StoreKit1
     InAppPurchaseStoreKitPlatform.enableStoreKit1();
@@ -45,9 +47,6 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     talker.handle(details.exception, details.stack);
-    if (Platform.isAndroid) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
-    }
   };
 
   final globalInitStart = DateTime.now();
@@ -132,6 +131,7 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: GlobalProviders.data),
+          ChangeNotifierProvider.value(value: GlobalProviders.experimental),
           ChangeNotifierProvider.value(value: GlobalProviders.location),
           ChangeNotifierProvider.value(value: GlobalProviders.map),
           ChangeNotifierProvider.value(value: GlobalProviders.notification),

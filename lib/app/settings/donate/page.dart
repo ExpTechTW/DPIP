@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
 import 'package:flutter/material.dart';
@@ -115,8 +116,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            context.colors.primaryContainer.withOpacity(0.5),
-            context.colors.tertiaryContainer.withOpacity(0.5),
+            context.colors.primaryContainer / 0.5,
+            context.colors.tertiaryContainer / 0.5,
           ],
           begin: .topLeft,
           end: .bottomRight,
