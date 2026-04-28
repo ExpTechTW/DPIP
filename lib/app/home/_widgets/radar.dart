@@ -135,7 +135,11 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
                 Row(
                   spacing: 4,
                   children: [
-                    Icon(Symbols.radar_rounded, fill: 1, color: Colors.lightBlue),
+                    const Icon(
+                      Symbols.radar_rounded,
+                      fill: 1,
+                      color: Colors.lightBlue,
+                    ),
                     BodyText.large('雷達回波'.i18n, weight: .bold),
                     FutureBuilder(
                       future: _radarListFuture,
@@ -144,7 +148,7 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
                         if (data == null) return const SizedBox.shrink();
 
                         return Container(
-                          padding: .fromLTRB(6, 4, 8, 4),
+                          padding: const .fromLTRB(6, 4, 8, 4),
                           decoration: BoxDecoration(
                             borderRadius: .circular(64),
                             color: context.colors.surfaceContainerHighest,
@@ -168,7 +172,7 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
                       },
                     ),
                     const Spacer(),
-                    Icon(
+                    const Icon(
                       Symbols.chevron_right_rounded,
                       size: 16,
                     ),

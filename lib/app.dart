@@ -28,6 +28,7 @@ import 'main.dart';
 class DpipApp extends StatefulWidget {
   /// Creates a new [DpipApp] instance.
   final String? initialShortcut;
+
   const DpipApp({super.key, this.initialShortcut});
 
   @override
@@ -167,8 +168,9 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
             };
 
             TextStyle applyFlex(TextStyle? base) {
-              final style = GoogleFonts.googleSansFlex(textStyle: base);
+              final style = base ?? const TextStyle();
               return style.copyWith(
+                fontFamily: 'Google Sans Flex',
                 fontFamilyFallback: [...?style.fontFamilyFallback, notoFallback],
               );
             }

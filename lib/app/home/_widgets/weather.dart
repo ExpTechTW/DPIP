@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -27,12 +28,22 @@ class Weather extends StatelessWidget {
         final label = data?.$1 ?? '--';
 
         return Padding(
-          padding: .symmetric(horizontal: 16),
+          padding: const .symmetric(horizontal: 16),
           child: Row(
             spacing: 8,
             children: [
-              Icon(icon, fill: 1, color: color),
-              Text(label, style: const TextStyle(height: 0, fontSize: 20)),
+              Icon(
+                icon,
+                fill: 1,
+                color: color,
+                shadows: kElevationToShadow[2],
+              ),
+              BodyText.large(
+                label,
+                fontSize: 20,
+                color: Colors.white,
+                shadows: kElevationToShadow[2],
+              ),
             ],
           ),
         );

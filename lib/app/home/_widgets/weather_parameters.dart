@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
@@ -37,29 +38,29 @@ class WeatherParameters extends StatelessWidget {
           childAspectRatio: 7 / 5,
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
-          padding: .symmetric(horizontal: 12, vertical: 4),
+          padding: const .symmetric(horizontal: 12, vertical: 4),
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           children: [
             _ParameterCard(
               icon: const Icon(Symbols.water_drop_rounded, fill: 1, color: Colors.blueAccent),
-              label: '相對溼度',
+              label: '相對溼度'.i18n,
               value: params != null ? '${params.humidity.round()}%' : '--',
             ),
             _ParameterCard(
               icon: Icon(Symbols.mist_rounded, fill: 1, color: Colors.grey),
-              label: '空氣品質',
+              label: '空氣品質'.i18n,
               value: '--',
             ),
             _ParameterCard(
               icon: const Icon(Symbols.air_rounded, fill: 1, color: Colors.lightBlue),
-              label: '風向/風速',
+              label: '風向/風速'.i18n,
               value: params != null && params.windDir.isNotEmpty ? params.windDir : '--',
               footer: params != null ? '${params.windSpeed.toStringAsFixed(1)} m/s' : null,
             ),
             _ParameterCard(
               icon: const Icon(Symbols.umbrella_rounded, fill: 1, color: Colors.indigoAccent),
-              label: '降水量',
+              label: '降水量'.i18n,
               value: params != null ? '${params.rain.toStringAsFixed(1)} mm' : '--',
             ),
           ],

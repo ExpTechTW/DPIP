@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/app/home/_models/home_model.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,13 +22,28 @@ class Temperature extends StatelessWidget {
       builder: (context, temp, _) {
         final tempStr = temp != null ? temp.toStringAsFixed(1) : '--';
         return Padding(
-          padding: .symmetric(horizontal: 16),
+          padding: const .symmetric(horizontal: 16),
           child: Row(
             mainAxisAlignment: .start,
             crossAxisAlignment: .start,
             children: [
-              DisplayText.large(tempStr, fontSize: 80, fontVariations: [.weight(200)]),
-              DisplayText.large('°', weight: .w200),
+              DisplayText.large(
+                tempStr,
+                color: context.colors.secondaryFixed,
+                fontFamily: 'Google Sans Flex',
+                fontSize: 96,
+                fontVariations: [const .new('ROND', 100)],
+                shadows: kElevationToShadow[4],
+              ),
+              DisplayText.large(
+                '°',
+                color: context.colors.secondaryFixed,
+                fontFamily: 'Google Sans Flex',
+                weight: .w300,
+                fontSize: 96,
+                fontVariations: [const .new('ROND', 100)],
+                shadows: kElevationToShadow[4],
+              ),
             ],
           ),
         );

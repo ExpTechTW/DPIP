@@ -89,6 +89,7 @@ flutter:
   shaders:
     - shaders/fog.frag
     - shaders/thunderstorm.frag
+    - shaders/weather_sky.frag
   assets:
     # localizations
     - assets/translations/

@@ -60,26 +60,21 @@ class AssistantHint extends StatelessWidget {
 
 String _buildHintText(double temperature, String weather) {
   final hour = DateTime.now().hour;
-  final greeting = hour < 6
-      ? '夜深了'
-      : hour < 12
-      ? '早安'
-      : hour < 18
-      ? '午安'
-      : '晚安';
 
-  final String tempComment;
-  if (temperature < 10) {
-    tempComment = '天氣寒冷，注意保暖。';
-  } else if (temperature < 20) {
-    tempComment = '氣溫涼爽，適合外出。';
-  } else if (temperature < 28) {
-    tempComment = '氣溫舒適，天氣宜人。';
-  } else if (temperature < 33) {
-    tempComment = '氣溫偏高，多補充水分。';
-  } else {
-    tempComment = '高溫注意，避免長時間戶外活動。';
-  }
+  final greeting = switch (hour) {
+    < 6 => '夜深了',
+    < 12 => '早安',
+    < 18 => '午安',
+    _ => '晚安',
+  };
 
-  return '$greeting，現在$weather，氣溫 ${temperature.toStringAsFixed(1)}°C。$tempComment';
+  final tempComment = switch (temperature) {
+    < 10 => '天氣寒冷，注意保暖。',
+    < 20 => '氣溫涼爽，適合外出。',
+    < 26 => '氣溫舒適，天氣宜人。',
+    < 30 => '氣溫偏高，多補充水分。',
+    _ => '高溫注意，避免長時間戶外活動。',
+  };
+
+  return '$greeting，目前$weather，氣溫 ${temperature.toStringAsFixed(1)}°C。$tempComment';
 }

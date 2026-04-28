@@ -1,5 +1,7 @@
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color.dart';
 import 'package:flutter/material.dart';
 import 'package:m3e_collection/m3e_collection.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -35,9 +37,8 @@ class _NewHomeLayoutState extends State<NewHomeLayout> with TickerProviderStateM
                   begin: .topCenter,
                   end: .bottomCenter,
                   colors: [
-                    context.colors.surface,
-                    context.colors.surface.withValues(alpha: .75),
-                    context.colors.surface.withValues(alpha: 0),
+                    context.colors.surface / 40,
+                    context.colors.surface / 0,
                   ],
                 ),
               ),
@@ -52,14 +53,14 @@ class _NewHomeLayoutState extends State<NewHomeLayout> with TickerProviderStateM
               children: [
                 IconButton.filledTonal(
                   onPressed: () {},
-                  icon: Icon(
+                  icon: const Icon(
                     Symbols.notifications_rounded,
                     fill: 1,
                   ),
                 ),
                 IconButton.filledTonal(
-                  onPressed: () => SettingsIndexRoute().push(context),
-                  icon: Icon(
+                  onPressed: () => const SettingsIndexRoute().push(context),
+                  icon: const Icon(
                     Symbols.settings_rounded,
                     fill: 1,
                   ),
@@ -70,20 +71,27 @@ class _NewHomeLayoutState extends State<NewHomeLayout> with TickerProviderStateM
         ],
       ),
       extendBody: true,
-      bottomNavigationBar: Padding(
-        padding: const .symmetric(horizontal: 96, vertical: 8),
-        child: NavigationBarM3E(
-          destinations: [
-            NavigationDestinationM3E(
-              icon: Icon(Symbols.home_rounded),
-              label: '主頁',
-            ),
-            NavigationDestinationM3E(
-              icon: Icon(Symbols.category_rounded),
-              label: '小工具',
-            ),
-          ],
-        ),
+      bottomNavigationBar: NavigationBarM3E(
+        elevation: 2,
+        padding: const .symmetric(horizontal: 72, vertical: 8),
+        density: .compact,
+        destinations: [
+          NavigationDestinationM3E(
+            icon: const Icon(Symbols.home_rounded),
+            selectedIcon: const Icon(Symbols.home_rounded, fill: 1),
+            label: '首頁'.i18n,
+          ),
+          NavigationDestinationM3E(
+            icon: const Icon(Symbols.map_rounded),
+            selectedIcon: const Icon(Symbols.map_rounded, fill: 1),
+            label: '地圖'.i18n,
+          ),
+          NavigationDestinationM3E(
+            icon: const Icon(Symbols.category_rounded),
+            selectedIcon: const Icon(Symbols.category_rounded, fill: 1),
+            label: '小工具'.i18n,
+          ),
+        ],
       ),
     );
   }

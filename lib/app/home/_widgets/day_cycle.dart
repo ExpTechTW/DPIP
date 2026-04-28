@@ -19,10 +19,10 @@ class DayCycle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: .symmetric(horizontal: 12, vertical: 4),
+      padding: const .symmetric(horizontal: 12, vertical: 4),
       child: Card(
         child: Padding(
-          padding: .all(16),
+          padding: const .all(16),
           child: Column(
             crossAxisAlignment: .start,
             spacing: 8,
@@ -30,7 +30,11 @@ class DayCycle extends StatelessWidget {
               Row(
                 spacing: 4,
                 children: [
-                  Icon(Symbols.wb_twilight_rounded, fill: 1, color: Colors.orangeAccent),
+                  const Icon(
+                    Symbols.wb_twilight_rounded,
+                    fill: 1,
+                    color: Colors.orangeAccent,
+                  ),
                   BodyText.large('日出日落', weight: .bold),
                 ],
               ),
@@ -90,7 +94,7 @@ class _SunCycleGraph extends StatelessWidget {
                 Row(
                   spacing: 4,
                   children: [
-                    Icon(
+                    const Icon(
                       Symbols.sunny_rounded,
                       fill: 1,
                       size: 20,
@@ -114,7 +118,7 @@ class _SunCycleGraph extends StatelessWidget {
                 Row(
                   spacing: 4,
                   children: [
-                    Icon(
+                    const Icon(
                       Symbols.wb_twilight_rounded,
                       fill: 1,
                       size: 20,

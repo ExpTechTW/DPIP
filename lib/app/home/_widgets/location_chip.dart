@@ -10,6 +10,7 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color.dart';
 import 'package:dpip/widgets/list/segmented_list.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -56,7 +57,7 @@ class LocationChip extends StatelessWidget {
         };
 
         return Padding(
-          padding: .symmetric(horizontal: 12, vertical: 4),
+          padding: const .symmetric(horizontal: 12, vertical: 4),
           child: Row(
             children: [
               FilledButton.icon(
@@ -64,9 +65,10 @@ class LocationChip extends StatelessWidget {
                 icon: const Icon(Symbols.location_on_rounded, fill: 1),
                 label: Text(displayName),
                 style: FilledButton.styleFrom(
+                  elevation: hasOverride ? 4 : 0,
                   backgroundColor: hasOverride
                       ? context.colors.primaryContainer
-                      : context.colors.surfaceContainerLow,
+                      : context.colors.surfaceContainerLow / 80,
                   foregroundColor: hasOverride
                       ? context.colors.onPrimaryContainer
                       : context.colors.onSurface,
@@ -75,8 +77,14 @@ class LocationChip extends StatelessWidget {
               if (hasOverride)
                 IconButton(
                   onPressed: () => context.home.setTemporaryCode(null),
-                  icon: const Icon(Symbols.close_rounded),
-                  tooltip: '清除暫時位置',
+                  icon: Icon(
+                    Symbols.close_rounded,
+                    shadows: kElevationToShadow[4],
+                  ),
+                  tooltip: '清除暫時位置'.i18n,
+                  style: IconButton.styleFrom(
+                    foregroundColor: Colors.white,
+                  ),
                 ),
             ],
           ),
@@ -96,6 +104,7 @@ class _LocationPickerSheet extends StatefulWidget {
 }
 
 class _LocationPickerSheetState extends State<_LocationPickerSheet> {
+  final _scrollController = ScrollController();
   String? _selectedCity;
 
   List<(String cityWithLevel, Location location)> get _cities {
@@ -125,8 +134,15 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
     dismissSheet();
   }
 
+  void selectCity(String name) {
+    setState(() => _selectedCity = name);
+    _scrollController.jumpTo(0);
+  }
+
   Widget _buildCityList() {
     final cities = _cities;
+    final resolvedCode = widget.homeModel.temporaryCode ?? context.location.code;
+    final resolvedLocation = Global.location[resolvedCode];
 
     return SegmentedList.builder(
       label: Text('縣市'.i18n),
@@ -134,12 +150,15 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       itemBuilder: (context, index) {
         final (cityName, _) = cities[index];
 
+        final isSelected = resolvedLocation?.cityWithLevel == cityName;
+
         return SegmentedListTile(
           isFirst: index == 0,
           isLast: index == cities.length - 1,
           title: Text(cityName),
+          subtitle: isSelected ? Text('目前選擇地區'.i18n) : null,
           trailing: const Icon(Symbols.chevron_right_rounded),
-          onTap: () => setState(() => _selectedCity = cityName),
+          onTap: () => selectCity(cityName),
         );
       },
     );
@@ -148,6 +167,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
   Widget _buildTownList() {
     final towns = _towns;
     final temporaryCode = widget.homeModel.temporaryCode;
+    final currentCode = context.location.code;
 
     return SegmentedList.builder(
       label: Text(towns.first.$2.cityWithLevel),
@@ -155,7 +175,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
       itemBuilder: (context, index) {
         final (code, location) = towns[index];
 
-        final isCurrentCode = code == context.location.code;
+        final isCurrentCode = code == currentCode;
         final isSelected = (temporaryCode == null && isCurrentCode) || code == temporaryCode;
         final isOverride = temporaryCode != null && !isCurrentCode;
 
@@ -235,10 +255,11 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
           children: [
             ...quickLocations,
             SegmentedListTile(
+              isFirst: quickLocations.isEmpty,
               isLast: true,
-              leading: Icon(Symbols.add_circle_rounded),
+              leading: const Icon(Symbols.add_circle_rounded),
               title: Text('新增地點'.i18n),
-              onTap: () => SettingsLocationSelectRoute().push(context),
+              onTap: () => const SettingsLocationSelectRoute().push(context),
             ),
           ],
         );
@@ -258,6 +279,7 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
           onPressed: () {
             if (_selectedCity != null) {
               setState(() => _selectedCity = null);
+              _scrollController.jumpTo(0);
             } else {
               dismissSheet();
             }
@@ -269,20 +291,19 @@ class _LocationPickerSheetState extends State<_LocationPickerSheet> {
           IconButton(
             onPressed: () {
               dismissSheet();
-              SettingsLocationRoute().push(context);
+              const SettingsLocationRoute().push(context);
             },
-            icon: Icon(Symbols.settings_rounded, fill: 1),
+            icon: const Icon(Symbols.settings_rounded, fill: 1),
             tooltip: '所在地設定',
           ),
         ],
-        actionsPadding: .only(right: 4),
+        actionsPadding: const .only(right: 4),
       ),
       body: ListView(
-        children: (_selectedCity == null)
-            ? ([
-                _buildQuickLocations(),
-                _buildCityList(),
-              ])
+        controller: _scrollController,
+        padding: .only(bottom: context.padding.bottom + 16),
+        children: _selectedCity == null
+            ? [_buildQuickLocations(), _buildCityList()]
             : [_buildTownList()],
       ),
     );

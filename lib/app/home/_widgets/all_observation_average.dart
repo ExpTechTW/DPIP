@@ -26,19 +26,24 @@ class AllObservationAverage extends StatelessWidget {
       },
       builder: (context, data, _) {
         final tremLabel = '--° / --%';
+
         final cwaLabel = data != null
             ? '${data.$1.toStringAsFixed(1)}° / ${data.$2.round()}%'
             : '--° / --%';
 
         return Padding(
-          padding: .symmetric(horizontal: 12, vertical: 8),
+          padding: const .symmetric(horizontal: 12, vertical: 8),
           child: Column(
             crossAxisAlignment: .start,
             spacing: 4,
             children: [
               Padding(
                 padding: const .symmetric(horizontal: 8),
-                child: LabelText.large('所有測站平均', color: context.colors.onSurfaceVariant),
+                child: LabelText.large(
+                  '所有測站平均',
+                  color: Colors.white,
+                  shadows: kElevationToShadow[1],
+                ),
               ),
               Card(
                 child: Padding(
