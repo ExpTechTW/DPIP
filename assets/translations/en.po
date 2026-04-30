@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-20 08:51\n"
+"PO-Revision-Date: 2026-04-30 14:53\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -341,7 +341,7 @@ msgstr "Enable experimental features"
 
 #: ./lib/app/settings/experimental/page.dart:286
 msgid "你即將啟用："
-msgstr ""
+msgstr "You are able to enable"
 
 #: ./lib/app/settings/experimental/page.dart:317
 msgid "此功能為實驗性質，可能會造成應用程式不穩定或行為異常。如遇問題，請至設定中關閉此功能。"
@@ -353,7 +353,7 @@ msgstr "Cancel"
 
 #: ./lib/app/settings/layout/page.dart:272
 msgid "啟用"
-msgstr ""
+msgstr "Enable"
 
 #: ./lib/app/settings/page.dart:151
 msgid "單位"
@@ -437,7 +437,7 @@ msgstr "Subscription"
 
 #: ./lib/app/settings/donate/page.dart:276
 msgid "推薦"
-msgstr ""
+msgstr "Recommend"
 
 #: ./lib/app/settings/donate/page.dart:443
 msgid "{price}/月"
@@ -469,7 +469,7 @@ msgstr "Privacy policy"
 
 #: ./lib/app/settings/proxy/page.dart:51
 msgid "設定已儲存"
-msgstr ""
+msgstr "Settings saved"
 
 #: ./lib/app/settings/page.dart:200
 msgid "HTTP 代理"
@@ -549,7 +549,7 @@ msgstr "Adjust the map display style"
 
 #: ./lib/app/settings/page.dart:191
 msgid "網路"
-msgstr ""
+msgstr "Network"
 
 #: ./lib/app/settings/page.dart:210
 msgid "資訊"
@@ -717,7 +717,7 @@ msgstr "Drag to reorder"
 
 #: ./lib/app/settings/layout/page.dart:100
 msgid "已停用"
-msgstr ""
+msgstr "Disabled"
 
 #: ./lib/app/settings/layout/page.dart:135
 msgid "所有區塊皆已啟用"
@@ -773,19 +773,19 @@ msgstr "System"
 
 #: ./lib/app/settings/theme/color/page.dart:22
 msgid "主題色彩"
-msgstr ""
+msgstr "Theme color"
 
 #: ./lib/app/settings/theme/color/page.dart:43
 msgid "使用系統配色"
-msgstr ""
+msgstr "Use system theme"
 
 #: ./lib/app/settings/theme/color/page.dart:62
 msgid "自訂"
-msgstr ""
+msgstr "Customize"
 
 #: ./lib/app/settings/theme/color/page.dart:72
 msgid "自訂色彩"
-msgstr ""
+msgstr "Custom theme"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:84
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
@@ -857,7 +857,7 @@ msgstr "Not Set"
 
 #: ./lib/app/home/_widgets/location_button.dart:138
 msgid "切換區域"
-msgstr ""
+msgstr "Change region"
 
 #: ./lib/app/home/_widgets/location_button.dart:144
 msgid "位置設定"
@@ -865,7 +865,7 @@ msgstr "Location Settings"
 
 #: ./lib/app/home/_widgets/location_button.dart:195
 msgid "快速切換"
-msgstr ""
+msgstr "Quick switch"
 
 #: ./lib/app/home/_widgets/location_button.dart:240
 msgid "選擇縣市"
@@ -873,7 +873,7 @@ msgstr "Select County/City"
 
 #: ./lib/app/home/_widgets/location_button.dart:250
 msgid "目前選擇"
-msgstr ""
+msgstr "Current selection"
 
 #: ./lib/app/home/page.dart:888
 msgid "濕度"
@@ -985,15 +985,15 @@ msgstr "Error retrieving history."
 
 #: ./lib/app/home/page.dart:777
 msgid "上午"
-msgstr ""
+msgstr "Morning"
 
 #: ./lib/app/home/page.dart:777
 msgid "下午"
-msgstr ""
+msgstr "Afternoon"
 
 #: ./lib/app/changelog/page.dart:76
 msgid "發生錯誤"
-msgstr ""
+msgstr "Something went wrong"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "再試一次"
@@ -1001,7 +1001,7 @@ msgstr "Try again"
 
 #: ./lib/app/changelog/page.dart:203
 msgid "目前版本"
-msgstr ""
+msgstr "Current version"
 
 #: ./lib/app/welcome/4-permissions/page.dart:403
 msgid "下一步"
@@ -1163,11 +1163,11 @@ msgstr "Units: {unit}"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:485
 msgid "近期無海嘯資訊"
-msgstr ""
+msgstr "No current tsunami information"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:486
 msgid "海嘯警報"
-msgstr ""
+msgstr "Tsunami warning"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:496
 msgid "{id}號 第{serial}報"
@@ -1175,15 +1175,15 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:551
 msgid "發布"
-msgstr ""
+msgstr "Post"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:553
 msgid "更新"
-msgstr ""
+msgstr "Update"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:554
 msgid "解除"
-msgstr ""
+msgstr "Cancel"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:607
 msgid "預估海嘯到達時間及波高"
@@ -1191,15 +1191,15 @@ msgstr "Estimated arrival time and wave height of the tsunami"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:626
 msgid "各地觀測到的海嘯"
-msgstr ""
+msgstr "Tsunami observed in multiple areas"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:641
 msgid "地震資訊"
-msgstr ""
+msgstr "Earthquake Information"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:654
 msgid "發生時間"
-msgstr ""
+msgstr "Event time"
 
 #: ./lib/app/map/_lib/managers/report.dart:1072
 msgid "位於"
@@ -1207,11 +1207,11 @@ msgstr "Location"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:736
 msgid "規模"
-msgstr ""
+msgstr "Magnitude"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:765
 msgid "深度"
-msgstr ""
+msgstr "Depth"
 
 #: ./lib/app/map/_lib/managers/radar.dart:744
 msgid "長按設定播放起點"
@@ -1335,7 +1335,7 @@ msgstr "There are currently no active earthquake early warnings"
 
 #: ./lib/app/map/_lib/managers/report.dart:516
 msgid "CWA 正在製圖中"
-msgstr ""
+msgstr "CWA is loading maps"
 
 #: ./lib/app/map/_lib/managers/report.dart:639
 msgid "近期的地震報告"
@@ -1363,7 +1363,7 @@ msgstr "Depth"
 
 #: ./lib/app/map/_lib/managers/report.dart:886
 msgid "沒有更多資料"
-msgstr ""
+msgstr "No more data"
 
 #: ./lib/app/map/_lib/managers/report.dart:1030
 msgid "報告頁面"
@@ -1371,7 +1371,7 @@ msgstr "Web"
 
 #: ./lib/route/report/report_sheet_content.dart:90
 msgid "重播"
-msgstr ""
+msgstr "Replay"
 
 #: ./lib/app/map/_lib/managers/report.dart:1064
 msgid "發震時間"
@@ -1751,11 +1751,11 @@ msgstr "{town} {townLevel}"
 
 #: ./lib/widgets/ui/color_picker.dart:363
 msgid "色相"
-msgstr ""
+msgstr "Hue"
 
 #: ./lib/widgets/ui/color_picker.dart:379
 msgid "彩度"
-msgstr ""
+msgstr "Saturation"
 
 #: ./lib/widgets/ui/color_picker.dart:395
 msgid "明度"
