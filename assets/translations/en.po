@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-04-30 14:53\n"
+"PO-Revision-Date: 2026-05-01 12:53\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -325,7 +325,7 @@ msgstr ""
 
 #: ./lib/app/settings/experimental/page.dart:198
 msgid "開啟 App 時直接進入強震監視器地圖"
-msgstr ""
+msgstr "Open directly to earthquake monitor map on app start"
 
 #: ./lib/app/settings/experimental/page.dart:218
 msgid "不限制非 CWA 來源"
@@ -481,7 +481,7 @@ msgstr "Adjust HTTP proxy server settings"
 
 #: ./lib/app/settings/proxy/page.dart:75
 msgid "啟用代理"
-msgstr ""
+msgstr "Enable proxy"
 
 #: ./lib/app/settings/proxy/page.dart:76
 msgid "透過代理伺服器發送所有網路請求"
@@ -489,11 +489,11 @@ msgstr ""
 
 #: ./lib/app/settings/proxy/page.dart:88
 msgid "代理主機"
-msgstr ""
+msgstr "Proxy host"
 
 #: ./lib/app/settings/proxy/page.dart:102
 msgid "代理端口"
-msgstr ""
+msgstr "Proxy port"
 
 #: ./lib/app/settings/proxy/page.dart:117
 msgid "設定儲存後，需要重新啟動應用程式才能生效"
@@ -725,7 +725,7 @@ msgstr ""
 
 #: ./lib/app/settings/layout/page.dart:202
 msgid "停用"
-msgstr ""
+msgstr "Disable"
 
 #: ./lib/app/settings/map/page.dart:61
 msgid "初始圖層"
@@ -813,7 +813,7 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/wind_card.dart:389
 msgid "陣風 {speed} m/s"
-msgstr ""
+msgstr "Wind speed {speed} m/s"
 
 #: ./lib/app/home/_widgets/wind_card.dart:471
 msgid "無法測量"
@@ -1171,7 +1171,7 @@ msgstr "Tsunami warning"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:496
 msgid "{id}號 第{serial}報"
-msgstr ""
+msgstr "No. {id}, Update # {serial}"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:551
 msgid "發布"
