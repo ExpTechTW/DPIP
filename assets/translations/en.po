@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-05-01 12:53\n"
+"PO-Revision-Date: 2026-05-01 14:36\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -321,7 +321,7 @@ msgstr "These features are still under development and may be unstable or change
 
 #: ./lib/app/settings/experimental/page.dart:188
 msgid "啟動行為"
-msgstr ""
+msgstr "Enable Behaviors"
 
 #: ./lib/app/settings/experimental/page.dart:198
 msgid "開啟 App 時直接進入強震監視器地圖"
@@ -329,11 +329,11 @@ msgstr "Open directly to earthquake monitor map on app start"
 
 #: ./lib/app/settings/experimental/page.dart:218
 msgid "不限制非 CWA 來源"
-msgstr ""
+msgstr "Allow non-CWA sources"
 
 #: ./lib/app/settings/experimental/page.dart:219
 msgid "顯示所有來源的地震速報資料"
-msgstr ""
+msgstr "Show earthquake alerts from all sources"
 
 #: ./lib/app/settings/experimental/page.dart:280
 msgid "啟用實驗性功能"
@@ -497,7 +497,7 @@ msgstr "Proxy port"
 
 #: ./lib/app/settings/proxy/page.dart:117
 msgid "設定儲存後，需要重新啟動應用程式才能生效"
-msgstr ""
+msgstr "After saving settings, restart the app for settings to take effect"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "設定"
@@ -721,7 +721,7 @@ msgstr "Disabled"
 
 #: ./lib/app/settings/layout/page.dart:135
 msgid "所有區塊皆已啟用"
-msgstr ""
+msgstr "All blocks are saved"
 
 #: ./lib/app/settings/layout/page.dart:202
 msgid "停用"
@@ -809,7 +809,7 @@ msgstr "No data"
 
 #: ./lib/app/home/_widgets/wind_card.dart:372
 msgid "{wind}級 {Desc}"
-msgstr ""
+msgstr "Wind speed grade {wind} {Desc}"
 
 #: ./lib/app/home/_widgets/wind_card.dart:389
 msgid "陣風 {speed} m/s"
