@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-05-07 09:56\n"
+"PO-Revision-Date: 2026-05-07 11:47\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -654,7 +654,7 @@ msgstr "より良い自動位置設定体験を得るために、DPIP がバッ�
 
 #: ./lib/app/settings/location/page.dart:96
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
-msgstr ""
+msgstr "自動位置取得機能を使用するには、DPIP に位置情報へのアクセス権限を許可する必要があります。アプリの設定から「権限」を開き、許可した後にもう一度お試しください。"
 
 #: ./lib/app/settings/location/page.dart:174
 msgid "自動啟動"
@@ -662,11 +662,11 @@ msgstr "自動起動"
 
 #: ./lib/app/settings/location/page.dart:175
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
-msgstr ""
+msgstr "より快適にDPIPをご利用いただくため、手順に従って自動起動機能を有効にしてください。DPIPがバックグラウンドで正常に情報を受信し、現在地を更新できるようになります。"
 
 #: ./lib/app/settings/location/page.dart:199
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
-msgstr ""
+msgstr "より快適にDPIPをご利用いただくため、手順に従って省電力設定をオフにしてください。DPIPがバックグラウンドで正常に情報を受信し、現在地を更新できるようになります。"
 
 #: ./lib/app/settings/location/page.dart:233
 msgid "一律允許"
@@ -674,7 +674,7 @@ msgstr "常に許可"
 
 #: ./lib/app/settings/location/page.dart:233
 msgid "永遠"
-msgstr ""
+msgstr "無期限"
 
 #: ./lib/app/settings/location/page.dart:253
 msgid "自動更新"
@@ -690,15 +690,15 @@ msgstr "この機能には、デバイスのGPSを利用して、地理的な位
 
 #: ./lib/app/settings/location/page.dart:334
 msgid "通知功能已被拒絕，請移至設定允許權限。"
-msgstr ""
+msgstr "通知機能が拒否されました。設定に移動して通知の権限を許可してください。"
 
 #: ./lib/app/settings/location/page.dart:395
 msgid "省電策略已被拒絕，請移至設定允許權限。"
-msgstr ""
+msgstr "省電力設定が拒否されました。設定画面で権限を許可してください。"
 
 #: ./lib/app/settings/location/select/[city]/page.dart:98
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
-msgstr ""
+msgstr "現在地の設定中にエラーが発生しました。もう一度お試しください。"
 
 #: ./lib/app/home/_widgets/location_button.dart:233
 msgid "新增地點"
@@ -714,19 +714,19 @@ msgstr "現在地"
 
 #: ./lib/app/settings/layout/page.dart:56
 msgid "拖曳調整順序"
-msgstr ""
+msgstr "ドラッグして順序を調整"
 
 #: ./lib/app/settings/layout/page.dart:100
 msgid "已停用"
-msgstr ""
+msgstr "無効"
 
 #: ./lib/app/settings/layout/page.dart:135
 msgid "所有區塊皆已啟用"
-msgstr ""
+msgstr "すべての項目が有効になっています"
 
 #: ./lib/app/settings/layout/page.dart:202
 msgid "停用"
-msgstr ""
+msgstr "無効"
 
 #: ./lib/app/settings/map/page.dart:61
 msgid "初始圖層"
@@ -734,7 +734,7 @@ msgstr "初期レイヤー"
 
 #: ./lib/app/settings/map/page.dart:62
 msgid "調整地圖的底圖以及初始顯示的圖層"
-msgstr ""
+msgstr "ベースマップおよび初期レイヤーの設定"
 
 #: ./lib/app/settings/map/page.dart:74
 msgid "自動縮放"
@@ -742,7 +742,7 @@ msgstr "自動ズーム"
 
 #: ./lib/app/settings/map/page.dart:75
 msgid "接收到檢知時自動縮放地圖"
-msgstr ""
+msgstr "揺れ検知があった際に自動的に地図をズームする"
 
 #: ./lib/app/settings/map/page.dart:101
 msgid "動畫幀率"
@@ -750,11 +750,11 @@ msgstr "動画のフレームレート"
 
 #: ./lib/app/settings/map/page.dart:102
 msgid "調整強震監視器震波模擬動畫的流暢度"
-msgstr ""
+msgstr "強震モニターの地震波アニメーションの滑らかさを調整します"
 
 #: ./lib/app/settings/map/page.dart:136
 msgid "過高的動畫幀率可能會造成卡頓或裝置發熱"
-msgstr ""
+msgstr "高いフレームレートは、カクつきや端末の発熱を引き起こす可能性があります"
 
 #: ./lib/app/settings/theme/page.dart:46
 msgid "主題模式"
@@ -1163,43 +1163,43 @@ msgstr "単位：{unit}"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:485
 msgid "近期無海嘯資訊"
-msgstr ""
+msgstr "最近の津波情報なし"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:486
 msgid "海嘯警報"
-msgstr ""
+msgstr "津波警報"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:496
 msgid "{id}號 第{serial}報"
-msgstr ""
+msgstr "ID #{id} 第{serial}報"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:551
 msgid "發布"
-msgstr ""
+msgstr "発表"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:553
 msgid "更新"
-msgstr ""
+msgstr "更新"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:554
 msgid "解除"
-msgstr ""
+msgstr "解除"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:607
 msgid "預估海嘯到達時間及波高"
-msgstr ""
+msgstr "津波到達予想時刻と予想高さ"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:626
 msgid "各地觀測到的海嘯"
-msgstr ""
+msgstr "各地で観測された津波"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:641
 msgid "地震資訊"
-msgstr ""
+msgstr "地震情報"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:654
 msgid "發生時間"
-msgstr ""
+msgstr "発生日時"
 
 #: ./lib/app/map/_lib/managers/report.dart:1072
 msgid "位於"
@@ -1207,11 +1207,11 @@ msgstr "震源地"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:736
 msgid "規模"
-msgstr ""
+msgstr "マグニチュード"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:765
 msgid "深度"
-msgstr ""
+msgstr "深さ"
 
 #: ./lib/app/map/_lib/managers/radar.dart:744
 msgid "長按設定播放起點"
@@ -1303,15 +1303,15 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:494
 msgid "即時震度："
-msgstr ""
+msgstr "現在の震度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:517
 msgid "地動加速度："
-msgstr ""
+msgstr "地動加速度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:541
 msgid "地動速度："
-msgstr ""
+msgstr "地動速度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1331
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
@@ -1363,7 +1363,7 @@ msgstr "震源の深さ"
 
 #: ./lib/app/map/_lib/managers/report.dart:886
 msgid "沒有更多資料"
-msgstr ""
+msgstr "これ以上の情報はありません"
 
 #: ./lib/app/map/_lib/managers/report.dart:1030
 msgid "報告頁面"
@@ -1371,7 +1371,7 @@ msgstr "Webで見る"
 
 #: ./lib/route/report/report_sheet_content.dart:90
 msgid "重播"
-msgstr ""
+msgstr "リプレイ"
 
 #: ./lib/app/map/_lib/managers/report.dart:1064
 msgid "發震時間"
@@ -1587,7 +1587,7 @@ msgstr "多雲"
 
 #: ./lib/utils/weather_icon.dart:306
 msgid "多雲有霾"
-msgstr ""
+msgstr "多雲もやあり"
 
 #: ./lib/utils/weather_icon.dart:307
 msgid "多雲有靄"
@@ -1751,17 +1751,17 @@ msgstr "{town}{townLevel}"
 
 #: ./lib/widgets/ui/color_picker.dart:363
 msgid "色相"
-msgstr ""
+msgstr "色相"
 
 #: ./lib/widgets/ui/color_picker.dart:379
 msgid "彩度"
-msgstr ""
+msgstr "彩度"
 
 #: ./lib/widgets/ui/color_picker.dart:395
 msgid "明度"
-msgstr ""
+msgstr "明るさ"
 
 #: ./lib/widgets/ui/color_picker.dart:415
 msgid "十六進位值"
-msgstr ""
+msgstr "Hex値"
 
