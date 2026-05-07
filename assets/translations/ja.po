@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-04-01 07:16\n"
+"PO-Revision-Date: 2026-05-07 09:56\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -298,7 +298,7 @@ msgstr "所在地（町）が雷雨のリアルタイム情報を発令した場
 
 #: ./lib/app/settings/experimental/page.dart:197
 msgid "啟動時進入強震監視器"
-msgstr ""
+msgstr "起動時に強震モニターを表示する"
 
 #: ./lib/app/settings/experimental/page.dart:57
 msgid "地震速報不限制非 CWA 來源"
@@ -306,47 +306,47 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:428
 msgid "實驗性功能"
-msgstr ""
+msgstr "実験的な機能"
 
 #: ./lib/app/settings/page.dart:429
 msgid "搶先體驗開發中的新功能"
-msgstr ""
+msgstr "開発中の新機能をいち早く体験"
 
 #: ./lib/app/settings/experimental/page.dart:154
 msgid "注意"
-msgstr ""
+msgstr "注意"
 
 #: ./lib/app/settings/experimental/page.dart:162
 msgid "這些功能仍在開發中，可能會不穩定或在未來的版本中變更。"
-msgstr ""
+msgstr "これらの機能は現在開発中であり、不安定な場合や、今後のバージョンで変更される可能性があります。"
 
 #: ./lib/app/settings/experimental/page.dart:188
 msgid "啟動行為"
-msgstr ""
+msgstr "スタートアップ設定"
 
 #: ./lib/app/settings/experimental/page.dart:198
 msgid "開啟 App 時直接進入強震監視器地圖"
-msgstr ""
+msgstr "アプリ起動時に、直接強震モニターマップが表示されます"
 
 #: ./lib/app/settings/experimental/page.dart:218
 msgid "不限制非 CWA 來源"
-msgstr ""
+msgstr "CWA以外のソースを許可"
 
 #: ./lib/app/settings/experimental/page.dart:219
 msgid "顯示所有來源的地震速報資料"
-msgstr ""
+msgstr "すべてのソースの地震速報データを表示します"
 
 #: ./lib/app/settings/experimental/page.dart:280
 msgid "啟用實驗性功能"
-msgstr ""
+msgstr "実験的機能の有効化"
 
 #: ./lib/app/settings/experimental/page.dart:286
 msgid "你即將啟用："
-msgstr ""
+msgstr "次を有効にします："
 
 #: ./lib/app/settings/experimental/page.dart:317
 msgid "此功能為實驗性質，可能會造成應用程式不穩定或行為異常。如遇問題，請至設定中關閉此功能。"
-msgstr ""
+msgstr "この機能は実験的なものであり、アプリの不安定化やバグを引き起こす可能性があります。問題が発生した場合は、設定からこの機能をオフにしてください。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:78
 msgid "取消"
@@ -354,7 +354,7 @@ msgstr "キャンセル"
 
 #: ./lib/app/settings/layout/page.dart:272
 msgid "啟用"
-msgstr ""
+msgstr "有効"
 
 #: ./lib/app/settings/page.dart:151
 msgid "單位"
@@ -370,7 +370,7 @@ msgstr "華氏度を使う"
 
 #: ./lib/app/settings/unit/page.dart:61
 msgid "切換溫度顯示單位為華氏度 (℉)"
-msgstr ""
+msgstr "温度の表示単位を華氏（℉）に変更する"
 
 #: ./lib/app/settings/page.dart:141
 msgid "語言"
@@ -426,11 +426,11 @@ msgstr "ストアの商品を読み込み中"
 
 #: ./lib/app/settings/donate/page.dart:225
 msgid "支持 DPIP"
-msgstr ""
+msgstr "DPIPを支援する"
 
 #: ./lib/app/settings/donate/page.dart:233
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。"
-msgstr ""
+msgstr "DPIPはリアルタイムの地震情報を提供することに特化したアプリであり、現在、広告の掲載やその他の収益化は行っておりません。皆様からのご支援は、サーバーの維持管理および継続的な開発に役立てられます。"
 
 #: ./lib/app/settings/donate/page.dart:260
 msgid "訂閱制"
@@ -438,7 +438,7 @@ msgstr "サブスクリプション"
 
 #: ./lib/app/settings/donate/page.dart:276
 msgid "推薦"
-msgstr ""
+msgstr "おすすめ"
 
 #: ./lib/app/settings/donate/page.dart:443
 msgid "{price}/月"
@@ -470,35 +470,35 @@ msgstr "プライバシーポリシー"
 
 #: ./lib/app/settings/proxy/page.dart:51
 msgid "設定已儲存"
-msgstr ""
+msgstr "設定を保存しました"
 
 #: ./lib/app/settings/page.dart:200
 msgid "HTTP 代理"
-msgstr ""
+msgstr "HTTP プロキシ"
 
 #: ./lib/app/settings/page.dart:201
 msgid "調整 HTTP 代理伺服器設定"
-msgstr ""
+msgstr "HTTP プロキシサーバーの設定を変更する"
 
 #: ./lib/app/settings/proxy/page.dart:75
 msgid "啟用代理"
-msgstr ""
+msgstr "プロキシを有効化"
 
 #: ./lib/app/settings/proxy/page.dart:76
 msgid "透過代理伺服器發送所有網路請求"
-msgstr ""
+msgstr "すべてのリクエストをプロキシ経由で送信します"
 
 #: ./lib/app/settings/proxy/page.dart:88
 msgid "代理主機"
-msgstr ""
+msgstr "プロキシホスト"
 
 #: ./lib/app/settings/proxy/page.dart:102
 msgid "代理端口"
-msgstr ""
+msgstr "プロキシポート"
 
 #: ./lib/app/settings/proxy/page.dart:117
 msgid "設定儲存後，需要重新啟動應用程式才能生效"
-msgstr ""
+msgstr "変更を反映させるには設定を保存し、アプリを再起動する必要があります"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "設定"
@@ -506,7 +506,7 @@ msgstr "設定"
 
 #: ./lib/app/settings/page.dart:71
 msgid "自訂你的 DPIP 使用體驗"
-msgstr ""
+msgstr "DPIPのUIをカスタマイズする"
 
 #: ./lib/app/welcome/4-permissions/page.dart:174
 msgid "位置"
@@ -526,11 +526,11 @@ msgstr "画面"
 
 #: ./lib/app/settings/layout/page.dart:47
 msgid "版面"
-msgstr ""
+msgstr "レイアウト"
 
 #: ./lib/app/settings/layout/page.dart:48
 msgid "調整首頁的版面樣式"
-msgstr ""
+msgstr "トップページのレイアウトを調整する"
 
 #: ./lib/app/settings/theme/page.dart:25
 msgid "主題"
@@ -546,11 +546,11 @@ msgstr "地図"
 
 #: ./lib/app/settings/map/page.dart:50
 msgid "調整地圖的顯示樣式"
-msgstr ""
+msgstr "地図の表示スタイルを調整する"
 
 #: ./lib/app/settings/page.dart:191
 msgid "網路"
-msgstr ""
+msgstr "ネットワーク"
 
 #: ./lib/app/settings/page.dart:210
 msgid "資訊"
@@ -570,7 +570,7 @@ msgstr "外部ライブラリの使用許諾"
 
 #: ./lib/app/settings/page.dart:241
 msgid "DPIP 的實現歸功於開放原始碼"
-msgstr ""
+msgstr "DPIPはオープンソースによって実現されています"
 
 #: ./lib/app/settings/page.dart:264
 msgid "贊助我們"
@@ -582,7 +582,7 @@ msgstr "サーバーの安定性と長期的な運営の維持の為にご協力
 
 #: ./lib/app/settings/page.dart:343
 msgid "下載"
-msgstr ""
+msgstr "ダウンロード"
 
 #: ./lib/app/settings/page.dart:383
 msgid "除錯"
@@ -606,7 +606,7 @@ msgstr "アプリログ"
 
 #: ./lib/app/settings/page.dart:463
 msgid "任何資訊應以中央氣象署發布之內容為準"
-msgstr ""
+msgstr "情報は中央気象署が発表する内容を基準としてください"
 
 #: ./lib/app/settings/location/page.dart:74
 msgid "無法取得通知權限"
