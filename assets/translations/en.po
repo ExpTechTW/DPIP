@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-05-01 14:36\n"
+"PO-Revision-Date: 2026-05-10 04:32\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -485,7 +485,7 @@ msgstr "Enable proxy"
 
 #: ./lib/app/settings/proxy/page.dart:76
 msgid "透過代理伺服器發送所有網路請求"
-msgstr ""
+msgstr "Send all request via proxy server."
 
 #: ./lib/app/settings/proxy/page.dart:88
 msgid "代理主機"
@@ -741,7 +741,7 @@ msgstr "Auto Zoom"
 
 #: ./lib/app/settings/map/page.dart:75
 msgid "接收到檢知時自動縮放地圖"
-msgstr ""
+msgstr "Auto resize map when receive the message"
 
 #: ./lib/app/settings/map/page.dart:101
 msgid "動畫幀率"
@@ -1759,9 +1759,9 @@ msgstr "Saturation"
 
 #: ./lib/widgets/ui/color_picker.dart:395
 msgid "明度"
-msgstr ""
+msgstr "Bright"
 
 #: ./lib/widgets/ui/color_picker.dart:415
 msgid "十六進位值"
-msgstr ""
+msgstr "Hex"
 
