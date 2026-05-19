@@ -70,7 +70,7 @@ jobs:
 
       - name: Run AI Code Review
         id: review
-        uses: zxcloli666/AI-Code-Review@v1
+        uses: zxcloli666/AI-Code-Review@v1.3.0
         env:
           PR_NUMBER: ${{ fromJSON(steps.pr.outputs.result).number }}
         with:
