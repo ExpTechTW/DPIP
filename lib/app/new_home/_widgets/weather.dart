@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/app/new_home/_models/home_model.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/typography.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -32,17 +33,11 @@ class Weather extends StatelessWidget {
           child: Row(
             spacing: 8,
             children: [
-              Icon(
-                icon,
-                fill: 1,
-                color: color,
-                shadows: kElevationToShadow[2],
-              ),
+              Icon(icon, fill: 1, color: color),
               BodyText.large(
                 label,
                 fontSize: 20,
-                color: Colors.white,
-                shadows: kElevationToShadow[2],
+                color: context.colors.onSurface,
               ),
             ],
           ),

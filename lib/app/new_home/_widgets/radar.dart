@@ -34,7 +34,7 @@ class Radar extends StatefulWidget {
 
 class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
   MapLibreMapController? _mapController;
-  bool _homeListenerAdded = false;
+  HomeModel? _homeModel;
 
   /// Resolves to the list of available radar timestamps once fetched.
   late Future<List<String>> _radarListFuture;
@@ -109,9 +109,11 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
     final route = ModalRoute.of(context);
     if (route != null) routeObserver.subscribe(this, route);
 
-    if (!_homeListenerAdded) {
-      context.home.addListener(_onHomeModelChanged);
-      _homeListenerAdded = true;
+    final model = context.home;
+    if (_homeModel != model) {
+      _homeModel?.removeListener(_onHomeModelChanged);
+      _homeModel = model;
+      model.addListener(_onHomeModelChanged);
     }
   }
 
@@ -121,14 +123,22 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
     final targetLocation = userLocation ?? DpipMap.kTaiwanCenter;
     final targetZoom = userLocation != null ? DpipMap.kUserLocationZoom : DpipMap.kTaiwanZoom;
 
-    return Padding(
-      padding: .symmetric(horizontal: 12, vertical: 4),
-      child: Card(
-        clipBehavior: .antiAlias,
+    return Container(
+      margin: const .symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
+        borderRadius: .circular(16),
+        border: Border.all(
+          color: context.colors.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      clipBehavior: .antiAlias,
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
-          onTap: () => MapRoute(layers: 'radar').push(context),
+          onTap: () => const MapRoute(layers: 'radar').push(context),
           child: Padding(
-            padding: .all(12),
+            padding: const .all(12),
             child: Column(
               crossAxisAlignment: .start,
               spacing: 12,
@@ -209,7 +219,7 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
 
   @override
   void dispose() {
-    context.home.removeListener(_onHomeModelChanged);
+    _homeModel?.removeListener(_onHomeModelChanged);
     routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();

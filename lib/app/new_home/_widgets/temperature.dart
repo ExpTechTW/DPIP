@@ -29,20 +29,18 @@ class Temperature extends StatelessWidget {
             children: [
               DisplayText.large(
                 tempStr,
-                color: context.colors.secondaryFixed,
+                color: context.colors.onSurface,
                 fontFamily: 'Google Sans Flex',
                 fontSize: 96,
                 fontVariations: [const .new('ROND', 100)],
-                shadows: kElevationToShadow[4],
               ),
               DisplayText.large(
                 '°',
-                color: context.colors.secondaryFixed,
+                color: context.colors.onSurface,
                 fontFamily: 'Google Sans Flex',
                 weight: .w300,
                 fontSize: 96,
                 fontVariations: [const .new('ROND', 100)],
-                shadows: kElevationToShadow[4],
               ),
             ],
           ),

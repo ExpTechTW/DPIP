@@ -18,34 +18,39 @@ class DayCycle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const .symmetric(horizontal: 12, vertical: 4),
-      child: Card(
-        child: Padding(
-          padding: const .all(16),
-          child: Column(
-            crossAxisAlignment: .start,
-            spacing: 8,
-            children: [
-              Row(
-                spacing: 4,
-                children: [
-                  const Icon(
-                    Symbols.wb_twilight_rounded,
-                    fill: 1,
-                    color: Colors.orangeAccent,
-                  ),
-                  BodyText.large('日出日落', weight: .bold),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _SunCycleGraph(
-                sunrise: const TimeOfDay(hour: 5, minute: 30),
-                sunset: const TimeOfDay(hour: 18, minute: 30),
-                now: TimeOfDay.now(),
-              ),
-            ],
-          ),
+    return Container(
+      margin: const .symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
+        borderRadius: .circular(16),
+        border: Border.all(
+          color: context.colors.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Padding(
+        padding: const .all(16),
+        child: Column(
+          crossAxisAlignment: .start,
+          spacing: 8,
+          children: [
+            Row(
+              spacing: 4,
+              children: [
+                const Icon(
+                  Symbols.wb_twilight_rounded,
+                  fill: 1,
+                  color: Colors.orangeAccent,
+                ),
+                BodyText.large('日出日落', weight: .bold),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _SunCycleGraph(
+              sunrise: const TimeOfDay(hour: 5, minute: 30),
+              sunset: const TimeOfDay(hour: 18, minute: 30),
+              now: TimeOfDay.now(),
+            ),
+          ],
         ),
       ),
     );

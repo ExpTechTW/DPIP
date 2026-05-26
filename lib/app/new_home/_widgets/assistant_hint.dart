@@ -27,30 +27,35 @@ class AssistantHint extends StatelessWidget {
       builder: (context, data, _) {
         final text = data != null ? _buildHintText(data.$1, data.$2) : '載入天氣資料中…';
 
-        return Padding(
-          padding: const .symmetric(horizontal: 12, vertical: 8),
-          child: Card(
-            child: Padding(
-              padding: const .all(12),
-              child: Row(
-                spacing: 8,
-                crossAxisAlignment: .start,
-                children: [
-                  Icon(
-                    Symbols.auto_awesome_rounded,
-                    fill: 1,
-                    color: context.colors.onSurfaceVariant,
+        return Container(
+          margin: const .symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainerLow,
+            borderRadius: .circular(16),
+            border: Border.all(
+              color: context.colors.outlineVariant.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Padding(
+            padding: const .all(12),
+            child: Row(
+              spacing: 8,
+              crossAxisAlignment: .start,
+              children: [
+                Icon(
+                  Symbols.auto_awesome_rounded,
+                  fill: 1,
+                  color: context.colors.onSurfaceVariant,
+                ),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: TextStyle(fontSize: 16, color: context.colors.onSurfaceVariant),
+                    maxLines: 2,
+                    overflow: .ellipsis,
                   ),
-                  Expanded(
-                    child: Text(
-                      text,
-                      style: TextStyle(fontSize: 16, color: context.colors.onSurfaceVariant),
-                      maxLines: 2,
-                      overflow: .ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
