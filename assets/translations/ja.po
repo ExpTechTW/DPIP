@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-05-25 16:18\n"
+"PO-Revision-Date: 2026-06-14 12:34\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -302,7 +302,7 @@ msgstr "起動時に強震モニターを表示する"
 
 #: ./lib/app/settings/experimental/page.dart:57
 msgid "地震速報不限制非 CWA 來源"
-msgstr ""
+msgstr "緊急地震速報（CWA以外の情報源も含める）"
 
 #: ./lib/app/settings/page.dart:428
 msgid "實驗性功能"
@@ -774,15 +774,15 @@ msgstr "システムに従う"
 
 #: ./lib/app/settings/theme/color/page.dart:22
 msgid "主題色彩"
-msgstr ""
+msgstr "テーマカラー"
 
 #: ./lib/app/settings/theme/color/page.dart:43
 msgid "使用系統配色"
-msgstr ""
+msgstr "システムの配色を使用"
 
 #: ./lib/app/settings/theme/color/page.dart:62
 msgid "自訂"
-msgstr ""
+msgstr "カスタム"
 
 #: ./lib/app/settings/theme/color/page.dart:72
 msgid "自訂色彩"
