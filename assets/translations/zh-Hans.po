@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-04-01 09:40\n"
+"PO-Revision-Date: 2026-06-14 12:34\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -300,11 +300,11 @@ msgstr "所在地(乡镇)发布雷雨即时信息时"
 
 #: ./lib/app/settings/experimental/page.dart:197
 msgid "啟動時進入強震監視器"
-msgstr ""
+msgstr "启动时进入强震监视器"
 
 #: ./lib/app/settings/experimental/page.dart:57
 msgid "地震速報不限制非 CWA 來源"
-msgstr ""
+msgstr "地震速报不限制非 CWA 来源"
 
 #: ./lib/app/settings/page.dart:428
 msgid "實驗性功能"
@@ -312,43 +312,43 @@ msgstr "实验性功能"
 
 #: ./lib/app/settings/page.dart:429
 msgid "搶先體驗開發中的新功能"
-msgstr ""
+msgstr "抢先体验开发中的新功能"
 
 #: ./lib/app/settings/experimental/page.dart:154
 msgid "注意"
-msgstr ""
+msgstr "注意"
 
 #: ./lib/app/settings/experimental/page.dart:162
 msgid "這些功能仍在開發中，可能會不穩定或在未來的版本中變更。"
-msgstr ""
+msgstr "这些功能仍在开发中，可能会不稳定或在未来的版本中变更。"
 
 #: ./lib/app/settings/experimental/page.dart:188
 msgid "啟動行為"
-msgstr ""
+msgstr "启动行为"
 
 #: ./lib/app/settings/experimental/page.dart:198
 msgid "開啟 App 時直接進入強震監視器地圖"
-msgstr ""
+msgstr "开启软件时直接进入强震监控地图"
 
 #: ./lib/app/settings/experimental/page.dart:218
 msgid "不限制非 CWA 來源"
-msgstr ""
+msgstr "不限制非 CWA 来源"
 
 #: ./lib/app/settings/experimental/page.dart:219
 msgid "顯示所有來源的地震速報資料"
-msgstr ""
+msgstr "显示所有来源的地震预警资料"
 
 #: ./lib/app/settings/experimental/page.dart:280
 msgid "啟用實驗性功能"
-msgstr ""
+msgstr "启用实验性功能"
 
 #: ./lib/app/settings/experimental/page.dart:286
 msgid "你即將啟用："
-msgstr ""
+msgstr "你即将启用："
 
 #: ./lib/app/settings/experimental/page.dart:317
 msgid "此功能為實驗性質，可能會造成應用程式不穩定或行為異常。如遇問題，請至設定中關閉此功能。"
-msgstr ""
+msgstr "此功能为实验性质，可能会造成应用软件不稳定或行为异常。如遇问题，请至设定中关闭此功能。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:78
 msgid "取消"
@@ -356,7 +356,7 @@ msgstr "取消"
 
 #: ./lib/app/settings/layout/page.dart:272
 msgid "啟用"
-msgstr ""
+msgstr "启用"
 
 #: ./lib/app/settings/page.dart:151
 msgid "單位"
@@ -372,7 +372,7 @@ msgstr "使用华氏度"
 
 #: ./lib/app/settings/unit/page.dart:61
 msgid "切換溫度顯示單位為華氏度 (℉)"
-msgstr ""
+msgstr "切换温度显示单位为华氏度 (℉)"
 
 #: ./lib/app/settings/page.dart:141
 msgid "語言"
@@ -428,11 +428,11 @@ msgstr "正在加载商店商品中"
 
 #: ./lib/app/settings/donate/page.dart:225
 msgid "支持 DPIP"
-msgstr ""
+msgstr "支持DPIP"
 
 #: ./lib/app/settings/donate/page.dart:233
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。您的支持將幫助我們維持伺服器運行與持續開發。"
-msgstr ""
+msgstr "DPIP 作为一款致力于提供即时地震资讯的软件，目前并无广告或其他盈利模式。您的支持将帮助我们维持服务器运行与持续开发。"
 
 #: ./lib/app/settings/donate/page.dart:260
 msgid "訂閱制"
@@ -440,7 +440,7 @@ msgstr "订阅制"
 
 #: ./lib/app/settings/donate/page.dart:276
 msgid "推薦"
-msgstr ""
+msgstr "推荐"
 
 #: ./lib/app/settings/donate/page.dart:443
 msgid "{price}/月"
@@ -472,7 +472,7 @@ msgstr "隐私政策"
 
 #: ./lib/app/settings/proxy/page.dart:51
 msgid "設定已儲存"
-msgstr ""
+msgstr "设定已储存"
 
 #: ./lib/app/settings/page.dart:200
 msgid "HTTP 代理"
@@ -480,19 +480,19 @@ msgstr "HTTP 代理"
 
 #: ./lib/app/settings/page.dart:201
 msgid "調整 HTTP 代理伺服器設定"
-msgstr ""
+msgstr "调整 HTTP 代理服务器设置"
 
 #: ./lib/app/settings/proxy/page.dart:75
 msgid "啟用代理"
-msgstr ""
+msgstr "启用代理"
 
 #: ./lib/app/settings/proxy/page.dart:76
 msgid "透過代理伺服器發送所有網路請求"
-msgstr ""
+msgstr "透过代理服务器发送所有网络请求"
 
 #: ./lib/app/settings/proxy/page.dart:88
 msgid "代理主機"
-msgstr ""
+msgstr "代理主机"
 
 #: ./lib/app/settings/proxy/page.dart:102
 msgid "代理端口"
