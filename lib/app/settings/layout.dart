@@ -37,7 +37,7 @@ class _SettingsLayoutState extends State<SettingsLayout> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('設定'.i18n),
+          title: Text('進階設定'.i18n),
           leading: BackButton(onPressed: () => context.pop()),
           centerTitle: true,
         ),

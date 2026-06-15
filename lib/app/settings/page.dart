@@ -95,25 +95,6 @@ class SettingsIndexPage extends StatelessWidget {
       children: [
         _buildHeader(context),
 
-        // 位置
-        SegmentedList(
-          label: Text('位置'.i18n),
-          children: [
-            SegmentedListTile(
-              isFirst: true,
-              isLast: true,
-              leading: ContainedIcon(
-                Symbols.pin_drop_rounded,
-                color: Colors.deepOrangeAccent,
-              ),
-              title: Text('所在地'.i18n),
-              subtitle: Text('設定你的所在地來接收當地的即時資訊'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => SettingsLocationRoute().push(context),
-            ),
-          ],
-        ),
-
         // 介面
         SegmentedList(
           label: Text('介面'.i18n),
@@ -130,36 +111,6 @@ class SettingsIndexPage extends StatelessWidget {
               onTap: () => SettingsLayoutRoute().push(context),
             ),
             SegmentedListTile(
-              leading: ContainedIcon(
-                Symbols.palette_rounded,
-                color: Colors.indigoAccent,
-              ),
-              title: Text('主題'.i18n),
-              subtitle: Text('調整 DPIP 整體的外觀與顏色'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => SettingsThemeRoute().push(context),
-            ),
-            SegmentedListTile(
-              leading: ContainedIcon(
-                Symbols.translate_rounded,
-                color: Colors.tealAccent,
-              ),
-              title: Text('語言'.i18n),
-              subtitle: Text('調整 DPIP 的顯示語言'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => SettingsLocaleRoute().push(context),
-            ),
-            SegmentedListTile(
-              leading: ContainedIcon(
-                Symbols.percent_rounded,
-                color: Colors.orangeAccent,
-              ),
-              title: Text('單位'.i18n),
-              subtitle: Text('調整 DPIP 顯示數值時使用的單位'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => SettingsUnitRoute().push(context),
-            ),
-            SegmentedListTile(
               isLast: true,
               leading: ContainedIcon(
                 Symbols.map_rounded,
@@ -169,25 +120,6 @@ class SettingsIndexPage extends StatelessWidget {
               subtitle: Text('調整地圖的顯示樣式'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => SettingsMapRoute().push(context),
-            ),
-          ],
-        ),
-
-        // 通知
-        SegmentedList(
-          label: Text('通知'.i18n),
-          children: [
-            SegmentedListTile(
-              isFirst: true,
-              isLast: true,
-              leading: ContainedIcon(
-                Symbols.notifications_rounded,
-                color: Colors.amberAccent,
-              ),
-              title: Text('通知'.i18n),
-              subtitle: Text('推播通知設定與通知音效測試'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => SettingsNotifyRoute().push(context),
             ),
           ],
         ),
@@ -212,10 +144,10 @@ class SettingsIndexPage extends StatelessWidget {
         ),
 
         // 資訊
-        SegmentedList(
+        /*SegmentedList(
           label: Text('資訊'.i18n),
           children: [
-            /*SegmentedListTile(
+            SegmentedListTile(
               isFirst: true,
               leading: ContainedIcon(
                 Symbols.newspaper_rounded,
@@ -225,123 +157,9 @@ class SettingsIndexPage extends StatelessWidget {
               subtitle: Text('掌握 ExpTech Studio 的最新公告與資訊'.i18n),
               trailing: const Icon(Symbols.chevron_right_rounded),
               onTap: () => AnnouncementRoute().push(context),
-            ),*/
-            SegmentedListTile(
-              isFirst: true, //公告回歸時，要拿掉
-              leading: ContainedIcon(
-                Symbols.update_rounded,
-                color: Colors.cyanAccent,
-              ),
-              title: Text('更新日誌'.i18n),
-              subtitle: Text('瀏覽 DPIP 的歷次更新紀錄'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => ChangelogRoute().push(context),
-            ),
-            SegmentedListTile(
-              isLast: true,
-              leading: ContainedIcon(
-                Symbols.book_rounded,
-                color: Colors.brown,
-              ),
-              title: Text('第三方套件授權'.i18n),
-              subtitle: Text('DPIP 的實現歸功於開放原始碼'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              onTap: () => LicenseRoute().push(context),
             ),
           ],
-        ),
-
-        const SizedBox(height: 24),
-
-        // 贊助
-        SegmentedList(
-          children: [
-            SegmentedListTile(
-              leading: ContainedIcon(
-                Symbols.volunteer_activism_rounded,
-                color: Colors.black,
-                backgroundGradient: const LinearGradient(
-                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                  begin: .topLeft,
-                  end: .bottomRight,
-                ),
-              ),
-              title: Text(
-                '贊助我們'.i18n,
-                style: .new(color: Colors.amber[600]),
-              ),
-              subtitle: Text('幫助我們維護伺服器的穩定和長久發展'.i18n),
-              trailing: const Icon(Symbols.chevron_right_rounded),
-              tileColor: Colors.amber.withValues(alpha: 0.16),
-              shape: RoundedRectangleBorder(
-                borderRadius: .circular(20),
-                side: BorderSide(color: Colors.amber.withValues(alpha: 0.6)),
-              ),
-              onTap: () => SettingsDonateRoute().push(context),
-            ),
-          ],
-        ),
-
-        // ExpTech Studio 連結
-        SegmentedList(
-          label: Text('ExpTech Studio'),
-          children: [
-            SegmentedListTile(
-              isFirst: true,
-              leading: ContainedIcon(
-                SimpleIcons.github,
-                color: switch (context.theme.brightness) {
-                  .light => SimpleIconColors.github,
-                  .dark => SimpleIconColors.github.inverted,
-                },
-              ),
-              title: const Text('Github'),
-              subtitle: const Text('ExpTechTW'),
-              trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => 'https://github.com/ExpTechTW/DPIP-Pocket'.launch(),
-            ),
-            SegmentedListTile(
-              leading: ContainedIcon(
-                SimpleIcons.discord,
-                color: switch (context.theme.brightness) {
-                  .light => .new(0xff454FBF),
-                  .dark => .new(0xff5865F2),
-                },
-              ),
-              title: const Text('Discord'),
-              subtitle: const Text('.gg/exptech-studio'),
-              trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => 'https://discord.gg/exptech-studio'.launch(),
-              onLongPress: () => 'https://discord.gg/exptech-studio'.copy(),
-            ),
-            SegmentedListTile(
-              leading: ContainedIcon(
-                SimpleIcons.threads,
-                color: switch (context.theme.brightness) {
-                  .light => SimpleIconColors.threads,
-                  .dark => SimpleIconColors.threads.inverted,
-                },
-              ),
-              title: const Text('Threads'),
-              subtitle: const Text('@dpip.tw'),
-              trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => 'https://www.threads.net/@dpip.tw'.launch(),
-              onLongPress: () => 'https://www.threads.net/@dpip.tw'.copy(),
-            ),
-            SegmentedListTile(
-              isLast: true,
-              leading: ContainedIcon(
-                SimpleIcons.youtube,
-                color: SimpleIconColors.youtube,
-              ),
-              title: const Text('Youtube'),
-              subtitle: const Text('@exptechtw'),
-              trailing: const Icon(Symbols.arrow_outward_rounded),
-              onTap: () => 'https://www.youtube.com/@exptechtw/live'.launch(),
-              onLongPress: () => 'https://www.youtube.com/@exptechtw/live'.copy(),
-            ),
-          ],
-        ),
+        ),*/
 
         // 下載
         SegmentedList(
