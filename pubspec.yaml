@@ -53,7 +53,6 @@ dependencies:
   in_app_purchase: ^3.2.3
   in_app_update: ^4.2.5
   intl: ^0.20.2
-  ip_country_lookup: ^1.0.3
   json_annotation: ^4.9.0
   m3e_collection: ^0.3.7
   maplibre_gl: ^0.25.0

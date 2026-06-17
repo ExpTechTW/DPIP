@@ -823,14 +823,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  ip_country_lookup:
-    dependency: "direct main"
-    description:
-      name: ip_country_lookup
-      sha256: "7bf9a3ce23d7f89de868b621fe480e85fc13d0bb6450637a0e1e2b1b738a9c58"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   json_annotation:
     dependency: "direct main"
     description:
