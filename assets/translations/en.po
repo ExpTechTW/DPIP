@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2026-05-10 04:32\n"
+"PO-Revision-Date: 2026-06-18 10:43\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -733,7 +733,7 @@ msgstr "Initial Layer"
 
 #: ./lib/app/settings/map/page.dart:62
 msgid "調整地圖的底圖以及初始顯示的圖層"
-msgstr ""
+msgstr "Select base map and default map layer."
 
 #: ./lib/app/settings/map/page.dart:74
 msgid "自動縮放"
@@ -749,7 +749,7 @@ msgstr "Animation frame rate"
 
 #: ./lib/app/settings/map/page.dart:102
 msgid "調整強震監視器震波模擬動畫的流暢度"
-msgstr ""
+msgstr "Adjust the smoothness of the seismic wave simulation in the Earthquake Monitor."
 
 #: ./lib/app/settings/map/page.dart:136
 msgid "過高的動畫幀率可能會造成卡頓或裝置發熱"
@@ -1077,7 +1077,7 @@ msgstr "Save"
 
 #: ./lib/app/welcome/4-permissions/page.dart:188
 msgid "用於儲存中央氣象署或 ExpTech 提供之資料視覺化圖片"
-msgstr ""
+msgstr "Used to store resources from the Central Weather Administration or ExpTech visualization."
 
 #: ./lib/app/welcome/4-permissions/page.dart:352
 msgid "權限請求"
