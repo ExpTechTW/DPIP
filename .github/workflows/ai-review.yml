@@ -1,0 +1,87 @@
+name: ExpTechAI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  ai-review:
+    if: |
+      github.event_name == 'pull_request' ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        (
+          contains(github.event.comment.body, '/review') ||
+          contains(github.event.comment.body, '@ExpTechAI')
+        ) &&
+        (
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'COLLABORATOR'
+        )
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Get PR ref
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            if (context.eventName === 'pull_request') {
+              return {
+                sha: context.payload.pull_request.head.sha,
+                number: context.payload.pull_request.number
+              };
+            }
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.issue.number
+            });
+            return { sha: pr.head.sha, number: pr.number };
+
+      - name: React to comment
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
+      - name: Run AI Code Review
+        id: review
+        uses: zxcloli666/AI-Code-Review@v1.3.0
+        env:
+          PR_NUMBER: ${{ fromJSON(steps.pr.outputs.result).number }}
+        with:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.VLLM_API_KEY }}
+          OPENAI_API_BASE_URL: ${{ secrets.VLLM_BASE_URL }}
+          OPENAI_API_MODEL: "auto"
+          REVIEW_LANGUAGE: "zh"
+          MAX_CHUNK_SIZE: "3500"
+          SEVERITY_THRESHOLD: "error"
+          SILENT_MODE: "false"
+          ENABLE_LINTERS: "true"
+          ENABLE_AST: "false"
+          ENABLE_DEPENDENCY_ANALYSIS: "false"
