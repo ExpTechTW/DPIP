@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-06-14 12:34\n"
+"PO-Revision-Date: 2026-06-27 02:34\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -500,7 +500,7 @@ msgstr ""
 
 #: ./lib/app/settings/proxy/page.dart:117
 msgid "設定儲存後，需要重新啟動應用程式才能生效"
-msgstr ""
+msgstr "储存设定后，需要重新启动应用才能生效"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "設定"
@@ -508,7 +508,7 @@ msgstr "设置"
 
 #: ./lib/app/settings/page.dart:71
 msgid "自訂你的 DPIP 使用體驗"
-msgstr ""
+msgstr "自订你的DPIP使用体验"
 
 #: ./lib/app/welcome/4-permissions/page.dart:174
 msgid "位置"
@@ -584,7 +584,7 @@ msgstr "帮助我们维护服务器的稳定和长久发展"
 
 #: ./lib/app/settings/page.dart:343
 msgid "下載"
-msgstr ""
+msgstr "下载"
 
 #: ./lib/app/settings/page.dart:383
 msgid "除錯"
@@ -996,7 +996,7 @@ msgstr ""
 
 #: ./lib/app/changelog/page.dart:76
 msgid "發生錯誤"
-msgstr ""
+msgstr "发生错误"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "再試一次"
@@ -1004,7 +1004,7 @@ msgstr "再试一次"
 
 #: ./lib/app/changelog/page.dart:203
 msgid "目前版本"
-msgstr ""
+msgstr "当前版本"
 
 #: ./lib/app/welcome/4-permissions/page.dart:403
 msgid "下一步"
@@ -1170,7 +1170,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:486
 msgid "海嘯警報"
-msgstr ""
+msgstr "海啸警报"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:496
 msgid "{id}號 第{serial}報"
@@ -1182,7 +1182,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:553
 msgid "更新"
-msgstr ""
+msgstr "更新"
 
 #: ./lib/app/map/_lib/managers/tsunami.dart:554
 msgid "解除"
