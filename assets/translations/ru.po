@@ -10,11 +10,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2026-04-01 07:16\n"
+"PO-Revision-Date: 2026-06-27 02:34\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
-msgstr ""
+msgstr "Обновление местоположения"
 
 #: ./lib/core/service.dart:292
 msgid "取得 GPS 位置中..."
