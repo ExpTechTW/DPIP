@@ -120,7 +120,7 @@ double eewAreaPgv(
     0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x,
   ).toDouble();
   final double pgv400 = gpv600 * 1.31;
-  final double pgv = pgv400 * 1.0;
+  final double pgv = pgv400;
   return 2.68 + 1.72 * log(pgv) / ln10;
 }
 
@@ -231,7 +231,7 @@ String intensityToNumberString(int level) {
 }
 
 WaveTime calculateWaveTime(double depth, double distance) {
-  final double za = 1 * depth;
+  final double za = depth;
   double g0;
   double G;
   final double xb = distance;
@@ -242,25 +242,25 @@ WaveTime calculateWaveTime(double depth, double distance) {
     g0 = 7.804799;
     G = 0.004573;
   }
-  final double zc = -1 * (g0 / G);
+  final double zc = -(g0 / G);
   final double xc = (pow(xb, 2) - 2 * (g0 / G) * za - pow(za, 2)) / (2 * xb);
   double thetaA = atan((za - zc) / xc);
   if (thetaA < 0) {
     thetaA = thetaA + pi;
   }
   thetaA = pi - thetaA;
-  final double thetaB = atan(-1 * zc / (xb - xc));
+  final double thetaB = atan(-zc / (xb - xc));
   double ptime = (1 / G) * log(tan(thetaA / 2) / tan(thetaB / 2));
   final double g0_ = g0 / sqrt(3);
   final double g_ = G / sqrt(3);
-  final double zc_ = -1 * (g0_ / g_);
+  final double zc_ = -(g0_ / g_);
   final double xc_ = (pow(xb, 2) - 2 * (g0_ / g_) * za - pow(za, 2)) / (2 * xb);
   double thetaA_ = atan((za - zc_) / xc_);
   if (thetaA_ < 0) {
     thetaA_ = thetaA_ + pi;
   }
   thetaA_ = pi - thetaA_;
-  final double thetaB_ = atan(-1 * zc_ / (xb - xc_));
+  final double thetaB_ = atan(-zc_ / (xb - xc_));
   double stime = (1 / g_) * log(tan(thetaA_ / 2) / tan(thetaB_ / 2));
   if (distance / ptime > 7) {
     ptime = distance / 7;

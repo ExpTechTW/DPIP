@@ -53,7 +53,6 @@ dependencies:
   in_app_purchase: ^3.2.3
   in_app_update: ^4.2.5
   intl: ^0.20.2
-  ip_country_lookup: ^1.0.3
   json_annotation: ^4.9.0
   m3e_collection: ^0.3.7
   maplibre_gl: ^0.25.0
@@ -66,7 +65,6 @@ dependencies:
   provider: ^6.1.5
   shared_preferences: ^2.5.4
   simple_icons: ^14.6.1
-  skeletonizer: ^2.1.2
   styled_text: ^9.0.0
   talker_flutter: ^5.1.9
   timezone: ^0.11.0
