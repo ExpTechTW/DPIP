@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-06-15 06:09\n"
+"PO-Revision-Date: 2026-07-07 14:57\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -326,7 +326,7 @@ msgstr "スタートアップ設定"
 
 #: ./lib/app/settings/experimental/page.dart:198
 msgid "開啟 App 時直接進入強震監視器地圖"
-msgstr "アプリ起動時に、直接強震モニターマップが表示されます"
+msgstr "開啟 App 時直接進入強震監視器地圖"
 
 #: ./lib/app/settings/experimental/page.dart:218
 msgid "不限制非 CWA 來源"
