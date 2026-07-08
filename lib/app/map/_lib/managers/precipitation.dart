@@ -177,7 +177,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   Future<void> _fetchData() async {
     try {
       final precipitationList = (await ExpTech().getRainList()).reversed.toList();
-      if (!context.mounted) return;
+      if (isDisposed || !context.mounted) return;
 
       GlobalProviders.data.setPrecipitation(precipitationList);
       currentPrecipitationTime.value ??= precipitationList.first;
@@ -201,6 +201,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       if (GlobalProviders.data.precipitation.isEmpty) {
         await _fetchData();
       }
+      if (isDisposed) return;
 
       final time = currentPrecipitationTime.value;
 
@@ -210,6 +211,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.precipitation(time);
 
       final ids = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
+      if (isDisposed) return;
       final isSourceExists = ids[0].contains(sourceId);
       final isLayerExists = ids[1].contains(layerId);
 
@@ -220,6 +222,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           rainData = GlobalProviders.data.rainData[time]!;
         } else {
           rainData = await ExpTech().getRain(time);
+          if (isDisposed) return;
           GlobalProviders.data.setRainData(time, rainData);
         }
 
@@ -231,7 +234,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
         await controller.addSource(sourceId, properties);
 
-        if (!context.mounted) return;
+        if (isDisposed || !context.mounted) return;
       }
 
       if (!isLayerExists) {
@@ -307,6 +310,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
             }),
         };
 
+        if (isDisposed) return;
+
         await Future.wait(
           properties.entries.map((entry) {
             // Detect label entries more precisely using '-label-' marker
@@ -339,7 +344,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> hide() async {
-    if (!visible) return;
+    if (isDisposed || !visible) return;
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final base = '$layerId-${currentPrecipitationInterval.value}';
@@ -359,7 +364,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> show() async {
-    if (visible) return;
+    if (isDisposed || visible) return;
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final base = '$layerId-${currentPrecipitationInterval.value}';
@@ -370,8 +375,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
         controller.setLayerVisibility('$base-label-name', true),
         controller.setLayerVisibility('$base-label-value', true),
       ]);
+      if (isDisposed) return;
 
       await _focus();
+      if (isDisposed) return;
 
       visible = true;
 
@@ -384,6 +391,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> remove() async {
+    if (isDisposed) return;
+
     try {
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
       final sourceId = MapSourceIds.precipitation(

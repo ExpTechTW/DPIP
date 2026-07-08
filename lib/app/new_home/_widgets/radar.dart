@@ -10,6 +10,7 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
@@ -57,7 +58,19 @@ class _RadarState extends State<Radar> with WidgetsBindingObserver, RouteAware {
       zoom = DpipMap.kTaiwanZoom;
     }
 
-    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(target, zoom));
+    final controller = _mapController;
+    if (controller == null) return;
+
+    // Skip invalid coordinates: passing a NaN/out-of-range LatLng to the
+    // camera makes mbgl throw std::domain_error (an uncatchable native crash).
+    if (!target.isFiniteCoordinate) {
+      TalkerManager.instance.warning(
+        'Radar._onHomeModelChanged: skipping invalid camera target=$target',
+      );
+      return;
+    }
+
+    controller.animateCamera(CameraUpdate.newLatLngZoom(target, zoom));
   }
 
   Future<void> _setupMapLayers() async {

@@ -98,8 +98,7 @@ class WelcomePermissionsRoute extends GoRouteData with $WelcomePermissionsRoute 
 /// Home route - displays the main shell with all bottom-nav tabs.
 ///
 /// Use the optional `tab` query parameter for deep-linking into a specific
-/// tab: `/home?tab=events`, `/home?tab=weather`, `/home?tab=map`, or
-/// `/home?tab=menu`. Defaults to the home tab.
+/// tab: `/home?tab=events` or `/home?tab=menu`. Defaults to the home tab.
 @TypedGoRoute<HomeRoute>(path: '/home')
 class HomeRoute extends GoRouteData with $HomeRoute {
   /// Optional tab name for deep-linking.
@@ -110,8 +109,6 @@ class HomeRoute extends GoRouteData with $HomeRoute {
 
   static int _tabIndex(String? tab) => switch (tab) {
         'events' => tabEvents,
-        'map' => tabMap,
-        'weather' => tabWeather,
         'menu' => tabMenu,
         _ => tabHome,
       };

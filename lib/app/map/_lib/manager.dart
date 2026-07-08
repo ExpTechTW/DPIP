@@ -19,6 +19,17 @@ abstract class MapLayerManager {
   /// Whether [setup] has been called and completed successfully.
   bool didSetup = false;
 
+  bool _disposed = false;
+
+  /// Whether [dispose] has been called.
+  ///
+  /// Once disposed, the underlying platform map view may already be torn down.
+  /// Calling `controller` methods (e.g. `addSource`, `addLayer`) after this
+  /// point throws an uncaught native exception on iOS and crashes the app, so
+  /// every `await controller.…` in an async method must re-check this flag
+  /// after the await and bail out early if `true`.
+  bool get isDisposed => _disposed;
+
   /// Whether this layer is currently visible on the map.
   bool visible = false;
 
@@ -46,7 +57,13 @@ abstract class MapLayerManager {
   Future<void> remove();
 
   /// Releases any resources held by this manager.
-  void dispose() {}
+  ///
+  /// Subclasses overriding this **must** call `super.dispose()` so that
+  /// [isDisposed] is set and in-flight controller calls short-circuit.
+  @mustCallSuper
+  void dispose() {
+    _disposed = true;
+  }
 
   /// Called when the user triggers a back-navigation and [shouldPop] is
   /// `false`. Override to handle custom pop behaviour (e.g. deselecting an

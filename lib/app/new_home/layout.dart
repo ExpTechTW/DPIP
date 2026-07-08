@@ -6,11 +6,9 @@
 /// tabs programmatically.
 library;
 
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/new_home/events/page.dart';
 import 'package:dpip/app/new_home/menu/page.dart';
 import 'package:dpip/app/new_home/page.dart';
-import 'package:dpip/app/new_home/weather/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
@@ -22,14 +20,8 @@ const int tabHome = 0;
 /// Events timeline tab index.
 const int tabEvents = 1;
 
-/// Map tab index.
-const int tabMap = 2;
-
-/// Weather detail tab index.
-const int tabWeather = 3;
-
 /// Menu tab index.
-const int tabMenu = 4;
+const int tabMenu = 2;
 
 /// Single-instance stateful shell that hosts every tab.
 class NewHomeShell extends StatefulWidget {
@@ -70,14 +62,6 @@ class NewHomeShellState extends State<NewHomeShell> {
         children: [
           _LazyTab(visited: _visited.contains(tabHome), child: const NewHomePage()),
           _LazyTab(visited: _visited.contains(tabEvents), child: const EventsPage()),
-          _LazyTab(
-            visited: _visited.contains(tabMap),
-            child: const MapPage(showBackButton: false),
-          ),
-          _LazyTab(
-            visited: _visited.contains(tabWeather),
-            child: const WeatherDetailPage(),
-          ),
           _LazyTab(visited: _visited.contains(tabMenu), child: const MenuPage()),
         ],
       ),
@@ -154,16 +138,6 @@ class _BottomNav extends StatelessWidget {
             icon: const Icon(Symbols.history_rounded),
             selectedIcon: const Icon(Symbols.history_rounded, fill: 1),
             label: '事件'.i18n,
-          ),
-          NavigationDestination(
-            icon: const Icon(Symbols.map_rounded),
-            selectedIcon: const Icon(Symbols.map_rounded, fill: 1),
-            label: '地圖'.i18n,
-          ),
-          NavigationDestination(
-            icon: const Icon(Symbols.partly_cloudy_day_rounded),
-            selectedIcon: const Icon(Symbols.partly_cloudy_day_rounded, fill: 1),
-            label: '天氣'.i18n,
           ),
           NavigationDestination(
             icon: const Icon(Symbols.menu_rounded),

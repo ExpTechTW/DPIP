@@ -97,7 +97,7 @@ class WindMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     final windList = (await ExpTech().getWeatherList()).reversed.toList();
-    if (!context.mounted) return;
+    if (isDisposed || !context.mounted) return;
 
     GlobalProviders.data.setWind(windList);
     currentWindTime.value ??= windList.first;
@@ -112,6 +112,7 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.wind.isEmpty) await _fetchData();
+      if (isDisposed) return;
 
       final time = currentWindTime.value;
 
@@ -121,6 +122,7 @@ class WindMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.wind(time);
 
       final ids = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
+      if (isDisposed) return;
       final isSourceExists = ids[0].contains(sourceId);
       final isLayerExists = ids[1].contains(layerId);
 
@@ -131,6 +133,7 @@ class WindMapLayerManager extends MapLayerManager {
           weatherData = GlobalProviders.data.weatherData[time]!;
         } else {
           weatherData = await ExpTech().getWeather(time);
+          if (isDisposed) return;
           GlobalProviders.data.setWeatherData(time, weatherData);
         }
 
@@ -147,7 +150,7 @@ class WindMapLayerManager extends MapLayerManager {
 
         await controller.addSource(sourceId, properties);
 
-        if (!context.mounted) return;
+        if (isDisposed || !context.mounted) return;
       }
 
       if (!isLayerExists) {
@@ -202,6 +205,8 @@ class WindMapLayerManager extends MapLayerManager {
           visibility: visible ? 'visible' : 'none',
         );
 
+        if (isDisposed) return;
+
         await controller.addLayer(
           sourceId,
           layerId,
@@ -234,7 +239,7 @@ class WindMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> hide() async {
-    if (!visible) return;
+    if (isDisposed || !visible) return;
 
     final layerId = MapLayerIds.wind(currentWindTime.value);
 
@@ -253,7 +258,7 @@ class WindMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> show() async {
-    if (visible) return;
+    if (isDisposed || visible) return;
 
     final layerId = MapLayerIds.wind(currentWindTime.value);
 
@@ -263,6 +268,7 @@ class WindMapLayerManager extends MapLayerManager {
         controller.setLayerVisibility('$layerId-label-name', true),
         controller.setLayerVisibility('$layerId-label-value', true),
       ]);
+      if (isDisposed) return;
 
       visible = true;
 
@@ -275,6 +281,8 @@ class WindMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> remove() async {
+    if (isDisposed) return;
+
     try {
       final layerId = MapLayerIds.wind(currentWindTime.value);
       final sourceId = MapSourceIds.wind(currentWindTime.value);

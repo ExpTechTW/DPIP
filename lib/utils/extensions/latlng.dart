@@ -13,6 +13,19 @@ extension GeoJsonLatLng on LatLng {
   /// This is useful for filtering out invalid or uninitialized coordinates.
   bool get isValid => latitude != 0 && longitude != 0;
 
+  /// Whether this coordinate is finite and within valid geographic ranges
+  /// (latitude −90..90, longitude −180..180).
+  ///
+  /// Use this before passing a coordinate to MapLibre camera APIs
+  /// (`animateCamera`/`moveCamera`): mbgl's native `LatLng` throws
+  /// `std::domain_error` for NaN/out-of-range values, which is an uncatchable
+  /// native crash (SIGABRT), not a Dart exception.
+  bool get isFiniteCoordinate =>
+      latitude.isFinite &&
+      longitude.isFinite &&
+      latitude.abs() <= 90 &&
+      longitude.abs() <= 180;
+
   /// Converts this coordinate to a GeoJSON coordinate array.
   ///
   /// Returns a list in the format `[longitude, latitude]` as required by the GeoJSON specification.

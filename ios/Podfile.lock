@@ -265,7 +265,7 @@ SPEC CHECKSUMS:
   FirebaseSessions: b9a92c1c51bbb81e78fc3142cda6d925d700f8e7
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_compass: b236ab69b61545cce89fd58527f401a7587d5cc1
-  fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
+  fluttertoast: fe6790210fdba20801685be946e3a2124b72eef5
   gal: baecd024ebfd13c441269ca7404792a7152fde89
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7

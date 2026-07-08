@@ -90,7 +90,7 @@ class LightningMapLayerManager extends MapLayerManager {
   Future<void> _fetchData() async {
     try {
       final lightningList = (await ExpTech().getLightningList()).reversed.toList();
-      if (!context.mounted) return;
+      if (isDisposed || !context.mounted) return;
 
       GlobalProviders.data.setLightning(lightningList);
       currentLightningTime.value ??= lightningList.first;
@@ -106,6 +106,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.lightning.isEmpty) await _fetchData();
+      if (isDisposed) return;
 
       final time = currentLightningTime.value;
 
@@ -115,6 +116,7 @@ class LightningMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.lightning(time);
 
       final ids = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
+      if (isDisposed) return;
       final isSourceExists = ids[0].contains(sourceId);
       final isLayerExists = ids[1].contains(layerId);
 
@@ -125,6 +127,7 @@ class LightningMapLayerManager extends MapLayerManager {
           lightningData = GlobalProviders.data.lightningData[time]!;
         } else {
           lightningData = await ExpTech().getLightning(time);
+          if (isDisposed) return;
           GlobalProviders.data.setLightningData(time, lightningData);
         }
 
@@ -137,7 +140,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
         await controller.addSource(sourceId, properties);
 
-        if (!context.mounted) return;
+        if (isDisposed || !context.mounted) return;
       }
 
       if (!isLayerExists) {
@@ -196,7 +199,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> hide() async {
-    if (!visible) return;
+    if (isDisposed || !visible) return;
 
     final time = currentLightningTime.value;
     if (time == null) return;
@@ -214,7 +217,7 @@ class LightningMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> show() async {
-    if (visible) return;
+    if (isDisposed || visible) return;
 
     final time = currentLightningTime.value;
     if (time == null) return;
@@ -223,8 +226,10 @@ class LightningMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
+      if (isDisposed) return;
 
       await _focus();
+      if (isDisposed) return;
 
       visible = true;
 
@@ -237,6 +242,8 @@ class LightningMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> remove() async {
+    if (isDisposed) return;
+
     try {
       final time = currentLightningTime.value;
       if (time == null) return;
@@ -245,6 +252,7 @@ class LightningMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.lightning(time);
 
       await controller.removeLayer(layerId);
+      if (isDisposed) return;
 
       await controller.removeSource(sourceId);
     } catch (e, s) {

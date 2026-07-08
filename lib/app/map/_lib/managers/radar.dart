@@ -183,7 +183,7 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _updateRadarTileUrl(String time) async {
-    if (currentRadarTime.value == time || isLoading.value) return;
+    if (isDisposed || currentRadarTime.value == time || isLoading.value) return;
 
     isLoading.value = true;
 
@@ -191,6 +191,7 @@ class RadarMapLayerManager extends MapLayerManager {
       if (currentRadarTime.value != null) {
         await _hideLayer(currentRadarTime.value!);
       }
+      if (isDisposed) return;
 
       currentRadarTime.value = time;
 
@@ -207,10 +208,13 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _setupAndShowLayer(String time) async {
+    if (isDisposed) return;
+
     final sourceId = MapSourceIds.radar(time);
     final layerId = MapLayerIds.radar(time);
 
     final ids = await Future.wait([controller.getSourceIds(), controller.getLayerIds()]);
+    if (isDisposed) return;
     final isSourceExists = ids[0].contains(sourceId);
     final isLayerExists = ids[1].contains(layerId);
 
@@ -221,6 +225,7 @@ class RadarMapLayerManager extends MapLayerManager {
       );
 
       await controller.addSource(sourceId, properties);
+      if (isDisposed) return;
     }
 
     if (!isLayerExists) {
@@ -237,11 +242,14 @@ class RadarMapLayerManager extends MapLayerManager {
     } else if (visible) {
       await controller.setLayerVisibility(layerId, true);
     }
+    if (isDisposed) return;
 
     _preloadedLayers.add(time);
   }
 
   Future<void> _hideLayer(String time) async {
+    if (isDisposed) return;
+
     final layerId = MapLayerIds.radar(time);
 
     try {
@@ -252,6 +260,8 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _preloadAdjacentLayers(String currentTime) async {
+    if (isDisposed) return;
+
     final radarList = GlobalProviders.data.radar;
     if (radarList.isEmpty) return;
 
@@ -393,9 +403,24 @@ class RadarMapLayerManager extends MapLayerManager {
 
   Future<void> _focus() async {
     try {
+      // Wait until the native map view has been laid out before animating.
+      //
+      // `animateCamera`/`newLatLngZoom` converts the target zoom to a camera
+      // altitude using the map view's frame size. When this runs before the
+      // view has a non-zero size (e.g. immediately after the style loads on a
+      // fast repeat navigation, while the main thread is still busy setting up
+      // layers), the altitude becomes NaN, mbgl then builds a camera with a
+      // NaN latitude and throws std::domain_error ("latitude must not be
+      // NaN") — an uncatchable native crash (SIGABRT). Yielding a frame lets
+      // UIKit lay the map view out first.
+      await WidgetsBinding.instance.endOfFrame;
+      if (isDisposed) return;
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (isDisposed) return;
+
       final location = GlobalProviders.location.coordinates;
 
-      if (location != null && location.isValid) {
+      if (location != null && location.isFiniteCoordinate) {
         await controller.animateCamera(
           CameraUpdate.newLatLngZoom(location, 7.4),
         );
@@ -412,7 +437,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
   Future<void> _fetchData() async {
     final radarList = (await ExpTech().getRadarList()).reversed.toList();
-    if (!context.mounted) return;
+    if (isDisposed || !context.mounted) return;
 
     GlobalProviders.data.setRadar(radarList);
     currentRadarTime.value ??= radarList.first;
@@ -425,6 +450,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.radar.isEmpty) await _fetchData();
+      if (isDisposed) return;
 
       final time = currentRadarTime.value;
       if (time == null) throw Exception('Time is null');
@@ -440,7 +466,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> hide() async {
-    if (!visible) return;
+    if (isDisposed || !visible) return;
 
     stopAutoPlay();
 
@@ -457,15 +483,17 @@ class RadarMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> show() async {
-    if (visible) return;
+    if (isDisposed || visible) return;
 
     try {
       if (currentRadarTime.value != null) {
         final layerId = MapLayerIds.radar(currentRadarTime.value);
         await controller.setLayerVisibility(layerId, true);
+        if (isDisposed) return;
       }
 
       await _focus();
+      if (isDisposed) return;
 
       visible = true;
 
@@ -482,6 +510,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     try {
       for (final time in _preloadedLayers.toList()) {
+        if (isDisposed) break;
         final layerId = MapLayerIds.radar(time);
         final sourceId = MapSourceIds.radar(time);
 
