@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:dpip/core/constants/app_constants.dart';
 
-/// Builds the shared [Dio] instance used for all HTTP access.
+/// Builds the shared [Dio] instance for the region-aware `ApiClient`.
 ///
-/// Cross-cutting interceptors (logging, auth, caching) are registered here as
-/// the app grows, keeping transport concerns out of individual repositories.
-Dio createDioClient() {
+/// No base URL is set: every request targets an absolute, region-pinned host
+/// resolved from the current region selection. gzip is negotiated by the
+/// platform HTTP stack, so no manual decompression adapter is required.
+/// Cross-cutting interceptors (logging, auth) are registered here as the app
+/// grows.
+Dio createDio() {
   return Dio(
     BaseOptions(
-      baseUrl: AppConstants.apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
+      headers: const {'Accept-Encoding': 'gzip'},
     ),
   );
 }
