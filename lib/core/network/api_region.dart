@@ -56,13 +56,18 @@ enum ApiTier {
   /// Core static assets — multi-active across [CoreRegion]s.
   coreStatic,
 
-  /// API served in **every** region — multi-active across all LB and Core
-  /// regions (used by EEW, which is replicated everywhere).
-  globalApi,
-
   /// Core API available **only** in [CoreRegion.tnn1]. No failover.
-  coreExclusiveApi;
+  coreExclusiveApi,
+
+  /// Legacy single host `api-1.exptech.dev`. No region, no failover — used by
+  /// endpoints not yet migrated to the region topology. As the backend
+  /// migrates them, move each to [coreExclusiveApi] (or a redundant tier).
+  legacyApi;
 
   /// Whether this tier has multi-active redundancy (failover across regions).
-  bool get isRedundant => this != coreExclusiveApi;
+  bool get isRedundant =>
+      this == lbApi ||
+      this == lbStatic ||
+      this == coreApi ||
+      this == coreStatic;
 }

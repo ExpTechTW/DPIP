@@ -3,204 +3,191 @@ import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 
-/// Endpoints **without** multi-active redundancy — served only from
-/// `core-tnn1`. There is no failover: if `tnn1` is unavailable, these fail.
+/// Endpoints **without** multi-active redundancy — each targets a single host
+/// with no failover.
 ///
-/// This is every service except the five multi-active ones in [RedundantApi].
-/// All URLs are `https://api.core-tnn1.exptech.dev/api/...`. Methods return raw
-/// decoded JSON; feature data layers map it to domain models.
+/// Two current hosts (see the full URL on each method):
+/// - `api.core-tnn1.exptech.dev` — already migrated to the region topology.
+/// - `api-1.exptech.dev` (legacy) — not yet migrated; move to `core-tnn1` as
+///   the backend deploys them.
+///
+/// Methods return raw decoded JSON; feature data layers map it to domain models.
 class ExclusiveApi {
   const ExclusiveApi(this._client);
 
   final ApiClient _client;
 
-  // ── Seismic history ──────────────────────────────────────────────────────
+  // ── Seismic history (legacy api-1) ───────────────────────────────────────
 
   /// RTS data at [timeMs] (ms since epoch).
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/trem/rts/{sec}`
-  Future<dynamic> getRtsAt(int timeMs) => _client.get(
-    ApiTier.coreExclusiveApi,
-    '/api/v2/trem/rts/${timeMs ~/ 1000}',
-  );
+  /// `https://api-1.exptech.dev/api/v2/trem/rts/{sec}`
+  Future<dynamic> getRtsAt(int timeMs) =>
+      _client.get(ApiTier.legacyApi, '/api/v2/trem/rts/${timeMs ~/ 1000}');
 
   /// EEW list at [timeMs] (ms since epoch).
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/eq/eew/{sec}`
+  /// `https://api-1.exptech.dev/api/v2/eq/eew/{sec}`
   Future<List<dynamic>> getEewAt(int timeMs) async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v2/eq/eew/${timeMs ~/ 1000}',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v2/eq/eew/${timeMs ~/ 1000}'))
           as List<dynamic>;
 
-  // ── Meteor stations / radar ──────────────────────────────────────────────
+  // ── Stations / radar ─────────────────────────────────────────────────────
+
+  /// TREM station map, keyed by station ID. (Legacy host — not yet migrated.)
+  ///
+  /// `https://api-1.exptech.dev/api/v1/trem/station`
+  Future<dynamic> getStations() =>
+      _client.get(ApiTier.legacyApi, '/api/v1/trem/station');
 
   /// Meteor station data for [id].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/station/{id}`
+  /// `https://api-1.exptech.dev/api/v2/meteor/station/{id}`
   Future<dynamic> getMeteorStation(String id) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/station/$id');
+      _client.get(ApiTier.legacyApi, '/api/v2/meteor/station/$id');
 
-  /// Available radar tile timestamps.
+  /// Available radar tile timestamps. (Migrated to core-tnn1.)
   ///
   /// `https://api.core-tnn1.exptech.dev/api/v1/tiles/radar/list`
   Future<List<dynamic>> getRadarList() async =>
       (await _client.get(ApiTier.coreExclusiveApi, '/api/v1/tiles/radar/list'))
           as List<dynamic>;
 
-  // ── Weather / rain / lightning / typhoon ─────────────────────────────────
+  // ── Weather / rain / lightning / typhoon (legacy api-1) ──────────────────
 
   /// Available weather timestamps.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/weather/list`
+  /// `https://api-1.exptech.dev/api/v2/meteor/weather/list`
   Future<List<dynamic>> getWeatherList() async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v2/meteor/weather/list',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v2/meteor/weather/list'))
           as List<dynamic>;
 
   /// Weather station data at [time].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/weather/{time}`
+  /// `https://api-1.exptech.dev/api/v2/meteor/weather/{time}`
   Future<dynamic> getWeather(String time) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/weather/$time');
+      _client.get(ApiTier.legacyApi, '/api/v2/meteor/weather/$time');
 
   /// Realtime weather at the given coordinates (2-decimal precision).
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v3/weather/realtime/{lat},{lon}`
+  /// `https://api-1.exptech.dev/api/v3/weather/realtime/{lat},{lon}`
   Future<dynamic> getWeatherRealtime(double lat, double lon) => _client.get(
-    ApiTier.coreExclusiveApi,
+    ApiTier.legacyApi,
     '/api/v3/weather/realtime/${lat.toStringAsFixed(2)},${lon.toStringAsFixed(2)}',
   );
 
   /// Weather forecast for [region].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v3/weather/forecast/{region}`
+  /// `https://api-1.exptech.dev/api/v3/weather/forecast/{region}`
   Future<dynamic> getWeatherForecast(String region) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v3/weather/forecast/$region');
+      _client.get(ApiTier.legacyApi, '/api/v3/weather/forecast/$region');
 
   /// Available rain timestamps.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/rain/list`
+  /// `https://api-1.exptech.dev/api/v2/meteor/rain/list`
   Future<List<dynamic>> getRainList() async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/rain/list'))
+      (await _client.get(ApiTier.legacyApi, '/api/v2/meteor/rain/list'))
           as List<dynamic>;
 
   /// Rain station data at [time].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/rain/{time}`
+  /// `https://api-1.exptech.dev/api/v2/meteor/rain/{time}`
   Future<dynamic> getRain(String time) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/rain/$time');
+      _client.get(ApiTier.legacyApi, '/api/v2/meteor/rain/$time');
 
   /// Available lightning timestamps.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/lightning/list`
+  /// `https://api-1.exptech.dev/api/v2/meteor/lightning/list`
   Future<List<dynamic>> getLightningList() async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v2/meteor/lightning/list',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v2/meteor/lightning/list'))
           as List<dynamic>;
 
   /// Lightning data at [time].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/lightning/{time}`
+  /// `https://api-1.exptech.dev/api/v2/meteor/lightning/{time}`
   Future<dynamic> getLightning(String time) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/lightning/$time');
+      _client.get(ApiTier.legacyApi, '/api/v2/meteor/lightning/$time');
 
   /// Available typhoon image timestamps.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/typhoon/images/list`
+  /// `https://api-1.exptech.dev/api/v2/meteor/typhoon/images/list`
   Future<List<dynamic>> getTyphoonImagesList() async =>
       (await _client.get(
-            ApiTier.coreExclusiveApi,
+            ApiTier.legacyApi,
             '/api/v2/meteor/typhoon/images/list',
           ))
           as List<dynamic>;
 
   /// Typhoon track GeoJSON.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/meteor/typhoon/geojson`
+  /// `https://api-1.exptech.dev/api/v2/meteor/typhoon/geojson`
   Future<dynamic> getTyphoonGeojson() =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v2/meteor/typhoon/geojson');
+      _client.get(ApiTier.legacyApi, '/api/v2/meteor/typhoon/geojson');
 
-  // ── Tsunami ──────────────────────────────────────────────────────────────
+  // ── Tsunami (legacy api-1) ───────────────────────────────────────────────
 
   /// Tsunami detail by [id].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/tsunami/{id}`
+  /// `https://api-1.exptech.dev/api/v1/tsunami/{id}`
   Future<dynamic> getTsunami(String id) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v1/tsunami/$id');
+      _client.get(ApiTier.legacyApi, '/api/v1/tsunami/$id');
 
-  /// Tsunami event id list.
-  ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/tsunami/list`
-  Future<List<dynamic>> getTsunamiList() async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v1/tsunami/list'))
-          as List<dynamic>;
+  /// Tsunami event id list — **temporarily unavailable** (no backend endpoint).
+  Future<List<dynamic>> getTsunamiList() => throw UnsupportedError(
+    'tsunami list endpoint is temporarily unavailable',
+  );
 
-  // ── DPIP realtime / history ──────────────────────────────────────────────
+  // ── DPIP realtime / history (legacy api-1) ───────────────────────────────
 
   /// Realtime event list.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/realtime/list`
+  /// `https://api-1.exptech.dev/api/v1/dpip/realtime/list`
   Future<List<dynamic>> getRealtimeList() async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v1/dpip/realtime/list',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/dpip/realtime/list'))
           as List<dynamic>;
 
   /// Historical event list.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/history/list`
+  /// `https://api-1.exptech.dev/api/v1/dpip/history/list`
   Future<List<dynamic>> getHistoryList() async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v1/dpip/history/list'))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/dpip/history/list'))
           as List<dynamic>;
 
   /// Realtime events for [region].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/realtime/{region}`
+  /// `https://api-1.exptech.dev/api/v1/dpip/realtime/{region}`
   Future<List<dynamic>> getRealtimeRegion(String region) async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v1/dpip/realtime/$region',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/dpip/realtime/$region'))
           as List<dynamic>;
 
   /// Historical events for [region].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/history/{region}`
+  /// `https://api-1.exptech.dev/api/v1/dpip/history/{region}`
   Future<List<dynamic>> getHistoryRegion(String region) async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '/api/v1/dpip/history/$region',
-          ))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/dpip/history/$region'))
           as List<dynamic>;
 
   /// Event detail by [id].
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/event/{id}`
+  /// `https://api-1.exptech.dev/api/v1/dpip/event/{id}`
   Future<dynamic> getEvent(String id) =>
-      _client.get(ApiTier.coreExclusiveApi, '/api/v1/dpip/event/$id');
+      _client.get(ApiTier.legacyApi, '/api/v1/dpip/event/$id');
 
-  // ── Announcements ────────────────────────────────────────────────────────
+  // ── Announcements (legacy api-1) ─────────────────────────────────────────
 
   /// Current announcements.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/dpip/announcement`
+  /// `https://api-1.exptech.dev/api/v1/dpip/announcement`
   Future<List<dynamic>> getAnnouncements() async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v1/dpip/announcement'))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/dpip/announcement'))
           as List<dynamic>;
 
-  // ── Device / notification settings (stateful) ────────────────────────────
+  // ── Device / notification settings (legacy api-1, stateful) ──────────────
 
   /// Registers/updates this device's location for push targeting.
   /// [platform] is 1 for iOS, 0 for Android; [version] is the app version.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/location/{platform}/{token}/{version}/{lat},{lng}`
+  /// `https://api-1.exptech.dev/api/v2/location/{platform}/{token}/{version}/{lat},{lng}`
   Future<dynamic> updateDeviceLocation({
     required String token,
     required int platform,
@@ -211,7 +198,7 @@ class ExclusiveApi {
       throw ArgumentError.value(token, 'token', 'Token is empty');
     }
     return _client.get(
-      ApiTier.coreExclusiveApi,
+      ApiTier.legacyApi,
       '/api/v2/location/$platform/$token/$version/'
       '${coordinates.latitude},${coordinates.longitude}',
     );
@@ -219,14 +206,14 @@ class ExclusiveApi {
 
   /// Reads this device's notification settings (a list of per-channel ints).
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/notify/{token}`
+  /// `https://api-1.exptech.dev/api/v2/notify/{token}`
   Future<List<dynamic>> getNotify({required String token}) async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v2/notify/$token'))
+      (await _client.get(ApiTier.legacyApi, '/api/v2/notify/$token'))
           as List<dynamic>;
 
   /// Updates a single notification [channel] to [status]; returns new settings.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/notify/{token}/{channel}/{status}`
+  /// `https://api-1.exptech.dev/api/v2/notify/{token}/{channel}/{status}`
   Future<List<dynamic>> setNotify({
     required String token,
     required int channel,
@@ -236,7 +223,7 @@ class ExclusiveApi {
       throw ArgumentError.value(token, 'token', 'Token is empty');
     }
     return (await _client.get(
-          ApiTier.coreExclusiveApi,
+          ApiTier.legacyApi,
           '/api/v2/notify/$token/$channel/$status',
         ))
         as List<dynamic>;
@@ -244,20 +231,20 @@ class ExclusiveApi {
 
   /// Notification delivery history for this device.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v1/notify/history`
+  /// `https://api-1.exptech.dev/api/v1/notify/history`
   Future<List<dynamic>> getNotificationHistory() async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v1/notify/history'))
+      (await _client.get(ApiTier.legacyApi, '/api/v1/notify/history'))
           as List<dynamic>;
 
-  // ── Time sync / diagnostics ──────────────────────────────────────────────
+  // ── Time sync / diagnostics (legacy api-1) ───────────────────────────────
 
   /// Server time (ms since epoch) with NTP-style round-trip offset correction.
   ///
-  /// `https://api.core-tnn1.exptech.dev/ntp`
+  /// `https://api-1.exptech.dev/ntp`
   Future<int> getNtp() async {
     final t1 = DateTime.now().microsecondsSinceEpoch;
     final res = await _client.request(
-      ApiTier.coreExclusiveApi,
+      ApiTier.legacyApi,
       '/ntp',
       options: Options(responseType: ResponseType.plain),
     );
@@ -274,7 +261,7 @@ class ExclusiveApi {
 
   /// Reports network diagnostics to the server.
   ///
-  /// `POST https://api.core-tnn1.exptech.dev/api/v1/dpip/networkInfo`
+  /// `POST https://api-1.exptech.dev/api/v1/dpip/networkInfo`
   Future<void> sendNetworkInfo({
     required String? ip,
     required String? isp,
@@ -282,7 +269,7 @@ class ExclusiveApi {
     required List<int?> statusDev,
   }) async {
     await _client.post(
-      ApiTier.coreExclusiveApi,
+      ApiTier.legacyApi,
       '/api/v1/dpip/networkInfo',
       data: {'ip': ip, 'isp': isp, 'status': status, 'status_dev': statusDev},
     );
