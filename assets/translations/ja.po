@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-07-07 14:57\n"
+"PO-Revision-Date: 2026-07-11 03:42\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -878,7 +878,7 @@ msgstr ""
 
 #: ./lib/app/home/page.dart:888
 msgid "濕度"
-msgstr ""
+msgstr "湿度"
 
 #: ./lib/app/home/page.dart:916
 msgid "風速"
