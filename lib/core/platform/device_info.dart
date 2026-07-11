@@ -7,14 +7,21 @@ class DeviceDetails {
   const DeviceDetails({
     required this.model,
     required this.osVersion,
+    this.sdkInt,
     this.identifier,
   });
 
   /// Marketing model name (iOS) or `Build.MODEL` (Android).
   final String model;
 
-  /// OS version string (iOS `systemVersion`, Android SDK int as string).
+  /// OS release string (iOS `systemVersion`, Android `Build.VERSION.RELEASE`).
   final String osVersion;
+
+  /// Android API level (`Build.VERSION.SDK_INT`); null on iOS.
+  ///
+  /// Used to gate SDK-specific behaviour such as the legacy-storage permission
+  /// (`sdkInt <= 28`).
+  final int? sdkInt;
 
   /// Vendor identifier (iOS `identifierForVendor`) or Android ID; may be null.
   final String? identifier;
@@ -38,11 +45,13 @@ abstract final class DeviceInfoService {
         const <String, dynamic>{};
     final model = (raw['model'] as String?) ?? 'Unknown';
     final osVersion = (raw['osVersion'] as String?) ?? '';
+    final sdkInt = (raw['sdkInt'] as num?)?.toInt();
     final identifier = raw['identifier'] as String?;
 
     return DeviceDetails(
       model: Platform.isIOS ? (_iPhoneNames[model] ?? model) : model,
       osVersion: osVersion,
+      sdkInt: sdkInt,
       identifier: identifier,
     );
   }

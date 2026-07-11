@@ -11,6 +11,14 @@ import UIKit
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
-    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    let registry = engineBridge.pluginRegistry
+    // Firebase and other pub plugins.
+    GeneratedPluginRegistrant.register(with: registry)
+
+    // App-owned native channels. Registered as real FlutterPlugins through the
+    // same registry so their handlers are retained under the implicit-engine
+    // lifecycle (registering a bare channel here can silently stop firing).
+    DeviceInfoPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlugin")!)
+    CompassPlugin.register(with: registry.registrar(forPlugin: "CompassPlugin")!)
   }
 }

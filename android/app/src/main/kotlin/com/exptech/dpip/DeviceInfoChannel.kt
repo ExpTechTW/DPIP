@@ -21,7 +21,8 @@ class DeviceInfoChannel(private val context: Context) :
             "getDeviceInfo" -> result.success(
                 mapOf(
                     "model" to Build.MODEL,
-                    "osVersion" to Build.VERSION.SDK_INT.toString(),
+                    "osVersion" to Build.VERSION.RELEASE,
+                    "sdkInt" to Build.VERSION.SDK_INT,
                     "identifier" to Settings.Secure.getString(
                         context.contentResolver,
                         Settings.Secure.ANDROID_ID,
