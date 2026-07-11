@@ -44,17 +44,21 @@ enum CoreRegion {
 /// hosts (`api.lb.exptech.dev`, `api.core.exptech.dev`) are deliberately never
 /// requested so region selection and failover stay under app control.
 enum ApiTier {
-  /// LB API — multi-active across [LbRegion]s.
+  /// LB API — multi-active across [LbRegion]s (`api.lb-{tpe1,khh1}`).
   lbApi,
 
   /// LB static assets — multi-active across [LbRegion]s.
   lbStatic,
 
-  /// Core API — multi-active across [CoreRegion]s.
+  /// Core API — multi-active across [CoreRegion]s (`api.core-{tyo1,tnn1}`).
   coreApi,
 
   /// Core static assets — multi-active across [CoreRegion]s.
   coreStatic,
+
+  /// API served in **every** region — multi-active across all LB and Core
+  /// regions (used by EEW, which is replicated everywhere).
+  globalApi,
 
   /// Core API available **only** in [CoreRegion.tnn1]. No failover.
   coreExclusiveApi;

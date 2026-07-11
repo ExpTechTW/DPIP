@@ -11,12 +11,16 @@ class ExternalApi {
   final Dio _dio;
 
   /// Crowdin localization progress (via the ExpTech proxy).
+  ///
+  /// `https://exptech.dev/api/v1/dpip/locale`
   Future<dynamic> getLocalizationProgress() async {
     final res = await _dio.get('https://exptech.dev/api/v1/dpip/locale');
     return res.data['data'];
   }
 
   /// GitHub release notes for DPIP Pocket.
+  ///
+  /// `https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases`
   Future<List<dynamic>> getReleases() async {
     final res = await _dio.get(
       'https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases',
@@ -25,6 +29,8 @@ class ExternalApi {
   }
 
   /// Service status for the past day.
+  ///
+  /// `https://status.exptech.dev/api/v1/status/data?duration=1d`
   Future<List<dynamic>> getStatus() async {
     final res = await _dio.get(
       'https://status.exptech.dev/api/v1/status/data',

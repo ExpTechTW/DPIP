@@ -93,6 +93,13 @@ class ApiClient {
           for (final r in _regions.coreOrder)
             'https://static.core-${r.code}.exptech.dev',
         ];
+      case ApiTier.globalApi:
+        return [
+          for (final r in _regions.lbOrder)
+            'https://api.lb-${r.code}.exptech.dev',
+          for (final r in _regions.coreOrder)
+            'https://api.core-${r.code}.exptech.dev',
+        ];
       case ApiTier.coreExclusiveApi:
         return const ['https://api.core-tnn1.exptech.dev'];
     }
