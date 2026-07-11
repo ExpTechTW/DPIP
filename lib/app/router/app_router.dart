@@ -2,6 +2,7 @@ import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +28,12 @@ final GoRouter appRouter = GoRouter(
         ),
         _branch(MorePage.path, MorePage.name, (_, _) => const MorePage()),
       ],
+    ),
+    // Full-screen routes pushed over the shell.
+    GoRoute(
+      path: LogPage.path,
+      name: LogPage.name,
+      builder: (_, _) => const LogPage(),
     ),
   ],
 );

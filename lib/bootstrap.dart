@@ -2,6 +2,7 @@ import 'package:dpip/api/exclusive_api.dart';
 import 'package:dpip/api/external_api.dart';
 import 'package:dpip/api/redundant_api.dart';
 import 'package:dpip/app/app.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -16,6 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// options file is required here.
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Log.installErrorHandlers();
+  Log.info('DPIP starting up');
 
   await Firebase.initializeApp();
 

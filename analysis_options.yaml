@@ -4,3 +4,10 @@ analyzer:
   exclude:
     # Read-only snapshot of the pre-rewrite app, kept for reference only.
     - legacy/**
+  errors:
+    # Logging must go through core/logging Log — never print/debugPrint.
+    avoid_print: error
+
+linter:
+  rules:
+    avoid_print: true
