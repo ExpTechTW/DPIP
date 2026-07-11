@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// Landing page shown on launch.
+/// Home tab — the landing surface shown on launch.
 ///
-/// Placeholder for the home feature; replaced as the rewrite progresses.
+/// Starting scaffold: a large app bar over a scrollable body that will hold the
+/// status / weather / earthquake sections as those features land.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  /// Route path for this page.
-  static const String path = '/';
+  /// Route path.
+  static const String path = '/home';
 
-  /// Route name for this page.
+  /// Route name.
   static const String name = 'home';
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.public, size: 72, color: theme.colorScheme.primary),
-            const SizedBox(height: 16),
-            Text('DPIP', style: theme.textTheme.headlineMedium),
-            const SizedBox(height: 8),
-            Text(
-              'Disaster Prevention Information Platform',
-              style: theme.textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+    return const Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(title: Text('首頁')),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: Text('首頁')),
+          ),
+        ],
       ),
     );
   }
