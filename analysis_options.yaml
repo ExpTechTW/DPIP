@@ -1,1 +1,6 @@
 include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    # Read-only snapshot of the pre-rewrite app, kept for reference only.
+    - legacy/**

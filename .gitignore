@@ -48,3 +48,6 @@ app.*.map.json
 android/key.properties
 **/*.jks
 **/*.keystore
+
+# Local read-only reference copy of the pre-rewrite app (see history @ 789f5f18)
+/legacy/
