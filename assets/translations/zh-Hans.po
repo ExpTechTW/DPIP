@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-06-27 02:34\n"
+"PO-Revision-Date: 2026-07-11 03:42\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -860,7 +860,7 @@ msgstr "尚未设置"
 
 #: ./lib/app/home/_widgets/location_button.dart:138
 msgid "切換區域"
-msgstr ""
+msgstr "切换区域"
 
 #: ./lib/app/home/_widgets/location_button.dart:144
 msgid "位置設定"
