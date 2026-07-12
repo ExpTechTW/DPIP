@@ -17,18 +17,25 @@ abstract final class NotificationTaps {
 
   static String? _pending;
 
-  /// awesome_notifications tap entry point (must be a top-level static method).
-  @pragma('vm:entry-point')
-  static Future<void> onActionReceived(ReceivedAction action) async {
-    final channelKey = action.channelKey;
-    Log.debug('Notification tapped: channelKey=$channelKey');
-    if (channelKey == null) return;
+  /// Routes a tapped [channelKey] now via [onTap], or stashes it for
+  /// [drainPending] if the app/router isn't ready yet (cold start). Shared by
+  /// awesome-displayed taps ([onActionReceived]) and FCM-delivered taps
+  /// (firebase's `onMessageOpenedApp` / `getInitialMessage`).
+  static void route(String channelKey) {
     final handler = onTap;
     if (handler != null) {
       handler(channelKey);
     } else {
       _pending = channelKey;
     }
+  }
+
+  /// awesome_notifications tap entry point (must be a top-level static method).
+  @pragma('vm:entry-point')
+  static Future<void> onActionReceived(ReceivedAction action) async {
+    final channelKey = action.channelKey;
+    Log.debug('Notification tapped: channelKey=$channelKey');
+    if (channelKey != null) route(channelKey);
   }
 
   /// Replays a tap that arrived before [onTap] was registered (cold start).

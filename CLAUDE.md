@@ -99,20 +99,23 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   a freshness banner so aged safety data is never shown as current. Building
   blocks: `LoadingView` / `ErrorView` / `EmptyView`. Template consumer:
   `features/earthquake/presentation/pages/earthquake_page.dart`.
-- **Push notifications:** a legacy-faithful platform split (`core/notifications/`)
-  that keeps the two FCM plugins from contending: **Android** uses
-  `awesome_notifications_fcm` (FCM token + data messages), **iOS** uses
-  `firebase_messaging` only for the APNs token (APNs delivers the alert directly),
-  and `awesome_notifications` renders channels/display/tap routing on both. 0.12+
-  needs no license key; keep Firebase pinned (a newer major raises the min iOS
-  target). Alert categories live in `notification_channels.dart` — bump `version`
-  when a channel changes so Android re-creates it. Taps route via
-  `NotificationTaps` (core carries the channel key; `app/` maps it to an
-  `AppRoutes` tab). **External, not code:** upload an APNs auth key to the
-  Firebase console for iOS; push only works on a physical device; permission is
-  requested after the first frame for now (move to onboarding); backend token
-  registration (`/v2/location`) needs the not-yet-ported location feature — the
-  token is acquired and stored (`NotificationService.token`) meanwhile.
+- **Push notifications** (`core/notifications/`): `firebase_messaging` owns the
+  FCM/APNs transport (token + message receipt) on both platforms; `awesome_
+  notifications` renders the rich per-channel notification and routes taps.
+  (Legacy used `awesome_notifications_fcm`, but that plugin's iOS pod breaks the
+  rewrite's newer Flutter/scene build — one FCM plugin is simpler and builds
+  clean.) Keep Firebase pinned (a newer major raises the min iOS target). Backend
+  sends **data** messages (`channel`/`id`/`title`/`body`); foreground + data-only
+  background messages display via awesome so each honours its channel; a
+  `notification`-payload message is shown by the OS. Alert categories live in
+  `notification_channels.dart` — bump `version` when one changes so Android
+  re-creates it. Taps funnel through `NotificationTaps` (core carries the channel
+  key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
+  APNs auth key to the Firebase console for iOS; push only works on a physical
+  device; permission is requested after the first frame for now (move to
+  onboarding); backend token registration (`/v2/location`) needs the not-yet-
+  ported location feature — the token is stored (`NotificationService.token`)
+  meanwhile.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
