@@ -15,7 +15,8 @@ class MapSnapshot {
   );
 
   /// Renders [style] centred on ([latitude], [longitude]) at [zoom] into a
-  /// [width]×[height] (logical px) PNG. Returns the encoded bytes.
+  /// [width]×[height] (logical px) PNG at [pixelRatio] density. Returns the
+  /// encoded bytes.
   Future<Uint8List?> capture({
     required String style,
     required double latitude,
@@ -23,6 +24,7 @@ class MapSnapshot {
     required double zoom,
     required double width,
     required double height,
+    double pixelRatio = 1.0,
   }) async {
     try {
       return await _channel.invokeMethod<Uint8List>('capture', {
@@ -32,6 +34,7 @@ class MapSnapshot {
         'zoom': zoom,
         'width': width,
         'height': height,
+        'pixelRatio': pixelRatio,
       });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'Map snapshot failed');

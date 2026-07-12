@@ -17,6 +17,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, DeviceInfoChannel.NAME)
             .setMethodCallHandler(DeviceInfoChannel(applicationContext))
 
+        MethodChannel(messenger, MapSnapshotChannel.NAME)
+            .setMethodCallHandler(MapSnapshotChannel(applicationContext))
+
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
     }

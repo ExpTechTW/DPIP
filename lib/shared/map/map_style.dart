@@ -16,10 +16,18 @@ const double taiwanZoom = 6.4;
 /// Builds the home backdrop style — the ExpTech vector base map plus an optional
 /// [radarTileUrl] radar echo overlay — as a MapLibre style JSON string.
 ///
-/// Rendered off-screen to a static image (see `MapSnapshot`), so it never fights
-/// the home sheet for gestures. Label-free for a clean backdrop; radar sits
-/// under the county outlines so borders stay legible.
-String homeSnapshotStyle({String? radarTileUrl}) {
+/// Colours mirror the legacy map (theme-driven, so it adapts to light/dark):
+/// [sea] behind, [land] for the global fill, [countyTown] for county/town fills,
+/// and [outline] for the county borders. Rendered off-screen to a static image
+/// (see `MapSnapshot`); label-free, with radar under the outlines so borders
+/// stay legible.
+String homeSnapshotStyle({
+  required String sea,
+  required String land,
+  required String countyTown,
+  required String outline,
+  String? radarTileUrl,
+}) {
   final radarSource = radarTileUrl == null
       ? ''
       : ',"radar":{"type":"raster","tiles":["$radarTileUrl"],"tileSize":256}';
@@ -33,11 +41,11 @@ String homeSnapshotStyle({String? radarTileUrl}) {
     "exptech": { "type": "vector", "tiles": ["https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf"], "maxzoom": 12 }$radarSource
   },
   "layers": [
-    { "id": "bg", "type": "background", "paint": { "background-color": "#aed3e8" } },
-    { "id": "land", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "#eae7df" } },
-    { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "#f1eee6" } },
-    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "#f1eee6" } },
-    $radarLayer{ "id": "county-outline", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "#c2bdb2", "line-width": 0.6 } }
+    { "id": "bg", "type": "background", "paint": { "background-color": "$sea" } },
+    { "id": "land", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "$land" } },
+    { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$countyTown" } },
+    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$countyTown" } },
+    $radarLayer{ "id": "county-outline", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 0.6 } }
   ]
 }''';
 }

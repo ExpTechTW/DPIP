@@ -60,6 +60,9 @@ public class MapSnapshotPlugin: NSObject, FlutterPlugin {
       camera: camera,
       size: CGSize(width: width, height: height))
     options.zoomLevel = zoom
+    if let pixelRatio = args["pixelRatio"] as? Double, pixelRatio > 0 {
+      options.scale = CGFloat(pixelRatio)
+    }
 
     let snapshotter = MLNMapSnapshotter(options: options)
     pending.append(snapshotter)

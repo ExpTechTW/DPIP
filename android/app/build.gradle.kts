@@ -67,3 +67,10 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Lets MapSnapshotChannel use MapLibre's off-screen MapSnapshotter directly:
+    // the maplibre_gl plugin's SDK dependency isn't on the app's compile
+    // classpath. Keep the version in sync with maplibre_gl (android-sdk).
+    implementation("org.maplibre.gl:android-sdk:12.3.1")
+}

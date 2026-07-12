@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/data/radar_api.dart';
+import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/map_snapshot.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
   }
 
   Future<void> _load() async {
-    final size = MediaQuery.sizeOf(context);
+    final media = MediaQuery.of(context);
+    final colors = Theme.of(context).colorScheme;
     final radar = context.read<RadarApi>();
 
     String? radarUrl;
@@ -46,7 +48,13 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
       Log.handle(error, stackTrace, 'Radar frames for home backdrop');
     }
 
-    final style = homeSnapshotStyle(radarTileUrl: radarUrl);
+    final style = homeSnapshotStyle(
+      sea: colors.surface.toHexRgb(),
+      land: colors.surfaceContainer.toHexRgb(),
+      countyTown: colors.surfaceContainerHigh.toHexRgb(),
+      outline: colors.outline.toHexRgb(),
+      radarTileUrl: radarUrl,
+    );
     Uint8List? bytes;
     for (var attempt = 0; attempt < 2 && bytes == null && mounted; attempt++) {
       if (attempt > 0) await Future.delayed(const Duration(seconds: 2));
@@ -55,8 +63,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
         latitude: taiwanLat,
         longitude: taiwanLng,
         zoom: taiwanZoom,
-        width: size.width,
-        height: size.height,
+        width: media.size.width,
+        height: media.size.height,
+        pixelRatio: media.devicePixelRatio,
       );
     }
     if (mounted) setState(() => _image = bytes);
