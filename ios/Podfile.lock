@@ -1,4 +1,7 @@
 PODS:
+  - awesome_notifications (0.12.0):
+    - Flutter
+    - IosAwnCore (~> 0.12.0)
   - Firebase/CoreOnly (12.15.0):
     - FirebaseCore (~> 12.15.0)
   - Firebase/Messaging (12.15.0):
@@ -59,6 +62,7 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.2):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
+  - IosAwnCore (0.12.1)
   - MapLibre (6.19.1)
   - maplibre_gl (0.25.0):
     - Flutter
@@ -76,6 +80,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
@@ -93,10 +98,13 @@ SPEC REPOS:
     - FirebaseMessaging
     - GoogleDataTransport
     - GoogleUtilities
+    - IosAwnCore
     - nanopb
     - PromisesObjC
 
 EXTERNAL SOURCES:
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -113,6 +121,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
+  awesome_notifications: e52a8e6a8cdaca4edbd31f38f345305a377445c5
   Firebase: a8539b633d474fbeb654c7043f9c1649e274045b
   firebase_core: fc23178af8ea070194d09031ae4198a9608a3d22
   firebase_messaging: 870b2939a7f7cc52bc38ca0250127c45b42f4bad
@@ -123,6 +132,7 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 766ace00c6b10d8148408f329d10c4f051931850
+  IosAwnCore: ea91b2d2ee2fd3236748e1b9cdc16194f9558327
   MapLibre: 8dc92bf2c6a6e2d9b8a2364204ab2027e3e2c8f4
   maplibre_gl: a2114567cbd1065866614fbd34dfb75ab782aaa2
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
@@ -130,6 +140,6 @@ SPEC CHECKSUMS:
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
 
-PODFILE CHECKSUM: b69ec470d99b899dff022f213417e1e5fddcebb0
+PODFILE CHECKSUM: 4a241cc0e6b313c4155af194e04b2d0d6e17cdbd
 
 COCOAPODS: 1.16.2
