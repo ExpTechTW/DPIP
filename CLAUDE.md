@@ -62,7 +62,12 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   `app/app.dart`; feature state lives in the feature's `presentation`.
 - **Networking:** never call hosts directly — use the region-aware API surface
   (`api/redundant_api.dart`, `api/exclusive_api.dart`, `api/external_api.dart`).
-  No DNS-balanced bare hosts. See `api.md`.
+  No DNS-balanced bare hosts. See `api.md`. `ApiClient` fails over to the next
+  region **only** on transient/server faults (connection drop, timeout, 5xx) and
+  logs each failover; a 4xx or a cancellation throws immediately (it would recur
+  on every region). Pass a `CancelToken` to abort a superseded request. Fatal and
+  handled errors forward to an optional `CrashSink` set on `Log` (Crashlytics
+  wire-up point).
 - **Data & errors (contract):** models are `@freezed` value types with generated
   `fromJson`/`toJson` (`@JsonKey` for wire names; `boolishInt`/`intFromBool` for
   0/1 bools) — template: `features/earthquake/domain/eew.dart`. A feature exposes

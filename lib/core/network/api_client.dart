@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
 
@@ -22,7 +23,9 @@ class ApiClient {
     ApiTier tier,
     String path, {
     Map<String, dynamic>? query,
-  }) async => (await request(tier, path, query: query)).data;
+    CancelToken? cancelToken,
+  }) async =>
+      (await request(tier, path, query: query, cancelToken: cancelToken)).data;
 
   /// POST [data] to [path] on [tier] with failover; returns the decoded body.
   Future<dynamic> post(
@@ -30,17 +33,24 @@ class ApiClient {
     String path, {
     Object? data,
     Map<String, dynamic>? query,
+    CancelToken? cancelToken,
   }) async => (await request(
     tier,
     path,
     method: 'POST',
     data: data,
     query: query,
+    cancelToken: cancelToken,
   )).data;
 
   /// Low-level request against [tier], trying each region host in failover
-  /// order until one succeeds. Exposes the full [Response] for callers that
-  /// need headers (e.g. NTP).
+  /// order. Exposes the full [Response] for callers that need headers (e.g. NTP).
+  ///
+  /// Failover is **only** for transient/server faults (connection drops,
+  /// timeouts, 5xx): a 4xx is a client error that would repeat on every region,
+  /// and a cancellation is deliberate, so both throw immediately without trying
+  /// the next host. Every failover is logged so a silent region switch is
+  /// visible. Pass a [cancelToken] to abort a superseded request.
   Future<Response<dynamic>> request(
     ApiTier tier,
     String path, {
@@ -48,26 +58,55 @@ class ApiClient {
     Object? data,
     Map<String, dynamic>? query,
     Options? options,
+    CancelToken? cancelToken,
   }) async {
-    Object error = StateError('No hosts for $tier');
-    StackTrace stack = StackTrace.current;
-    for (final host in hostsFor(tier)) {
+    final hosts = hostsFor(tier);
+    for (var i = 0; i < hosts.length; i++) {
       try {
         return await _dio.request(
-          '$host$path',
+          '${hosts[i]}$path',
           data: data,
           queryParameters: query,
+          cancelToken: cancelToken,
           options: (options ?? Options()).copyWith(method: method),
         );
-      } catch (e, s) {
-        error = e;
-        stack = s;
-        // Multi-active tiers retry the next region; the exclusive tier yields a
-        // single host, so this is naturally a no-failover request.
+      } on DioException catch (e) {
+        final isLastHost = i == hosts.length - 1;
+        if (isLastHost || !_isRetryable(e)) rethrow;
+        Log.warning(
+          'ApiClient: ${tier.name} ${hosts[i]} failed (${_describe(e)}); '
+          'failing over to ${hosts[i + 1]}',
+        );
       }
     }
-    Error.throwWithStackTrace(error, stack);
+    // Every tier yields at least one host, so this is unreachable in practice.
+    throw StateError('No hosts configured for $tier');
   }
+
+  /// Whether [e] is worth retrying against the next region. Transient transport
+  /// faults and server (5xx) errors are; client (4xx) errors, cancellations, and
+  /// certificate failures are not — they would recur identically.
+  static bool _isRetryable(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+      case DioExceptionType.transformTimeout:
+      case DioExceptionType.connectionError:
+      case DioExceptionType.unknown:
+        return true;
+      case DioExceptionType.badResponse:
+        return (e.response?.statusCode ?? 0) >= 500;
+      case DioExceptionType.cancel:
+      case DioExceptionType.badCertificate:
+        return false;
+    }
+  }
+
+  static String _describe(DioException e) =>
+      e.type == DioExceptionType.badResponse
+      ? 'HTTP ${e.response?.statusCode}'
+      : e.type.name;
 
   /// The ordered base hosts for [tier], honouring the current region selection
   /// and failover order.
