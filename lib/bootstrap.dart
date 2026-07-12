@@ -6,6 +6,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
@@ -28,10 +29,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Initializes platform services and launches the app.
 ///
 /// Firebase reads its configuration from the native `google-services.json` /
-/// `GoogleService-Info.plist` bundled with each platform. Those files are not
-/// yet in place on the rewrite branch, so initialization is best-effort: a
-/// missing/invalid config is logged and the app still launches (push
-/// notifications are simply unavailable until the config is added).
+/// `GoogleService-Info.plist` bundled with each platform. Firebase init and
+/// notification setup are best-effort: a failure is logged and the app still
+/// launches (push is simply unavailable until the environment is complete —
+/// e.g. an APNs key uploaded to the Firebase console for iOS).
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -76,6 +77,16 @@ Future<void> bootstrap() async {
   realtimeService.register(eewChannel);
   final eewController = EewRealtimeController(eewChannel);
 
+  // Push notifications: channels + FCM/APNs transport. Best-effort so a missing
+  // push environment never blocks launch. Permission is requested from the UI,
+  // not here.
+  final notificationService = NotificationService(prefs);
+  try {
+    await notificationService.init();
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'Notification init skipped');
+  }
+
   runApp(
     DpipApp(
       regions: regions,
@@ -87,6 +98,7 @@ Future<void> bootstrap() async {
       eewRepository: eewRepository,
       realtimeService: realtimeService,
       eewController: eewController,
+      notificationService: notificationService,
     ),
   );
 }

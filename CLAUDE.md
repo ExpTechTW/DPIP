@@ -99,6 +99,20 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   a freshness banner so aged safety data is never shown as current. Building
   blocks: `LoadingView` / `ErrorView` / `EmptyView`. Template consumer:
   `features/earthquake/presentation/pages/earthquake_page.dart`.
+- **Push notifications:** a legacy-faithful platform split (`core/notifications/`)
+  that keeps the two FCM plugins from contending: **Android** uses
+  `awesome_notifications_fcm` (FCM token + data messages), **iOS** uses
+  `firebase_messaging` only for the APNs token (APNs delivers the alert directly),
+  and `awesome_notifications` renders channels/display/tap routing on both. 0.12+
+  needs no license key; keep Firebase pinned (a newer major raises the min iOS
+  target). Alert categories live in `notification_channels.dart` — bump `version`
+  when a channel changes so Android re-creates it. Taps route via
+  `NotificationTaps` (core carries the channel key; `app/` maps it to an
+  `AppRoutes` tab). **External, not code:** upload an APNs auth key to the
+  Firebase console for iOS; push only works on a physical device; permission is
+  requested after the first frame for now (move to onboarding); backend token
+  registration (`/v2/location`) needs the not-yet-ported location feature — the
+  token is acquired and stored (`NotificationService.token`) meanwhile.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon

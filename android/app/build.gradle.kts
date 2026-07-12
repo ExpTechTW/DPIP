@@ -23,6 +23,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Required by awesome_notifications (uses desugared java.time/etc.).
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -73,4 +75,6 @@ dependencies {
     // the maplibre_gl plugin's SDK dependency isn't on the app's compile
     // classpath. Keep the version in sync with maplibre_gl (android-sdk).
     implementation("org.maplibre.gl:android-sdk:12.3.1")
+    // Backports java.time/etc. for awesome_notifications (see compileOptions).
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

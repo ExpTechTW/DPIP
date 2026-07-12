@@ -7,7 +7,11 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
+  awesome_notifications: ^0.12.1
+  awesome_notifications_fcm: ^0.12.0
   dio: ^5.10.0
+  # Firebase pinned deliberately — a newer major bumps the min iOS target and
+  # breaks older-device compatibility. Do not upgrade without checking that.
   firebase_core: ^4.11.0
   firebase_messaging: ^16.4.1
   flutter:
