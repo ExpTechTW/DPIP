@@ -5,24 +5,64 @@ import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
+import 'package:dpip/shared/widgets/region_pager.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-/// Home tab — a full-bleed map with a draggable [HomeSheet] over it.
-///
-/// This host owns only the drag mechanics: the sheet rests at [HomeSheet.restExtent]
-/// and springs back there when released, or expands to [HomeSheet.maxExtent].
-/// The sheet's look and content live in [HomeSheet] / `HomeContent`.
-class HomePage extends StatefulWidget {
+/// Home tab — the region bar pinned at the top over a shared map backdrop, with
+/// a per-area draggable sheet. A horizontal swipe anywhere pages the whole body
+/// (map tap still opens the full map tab); each area keeps its own sheet.
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: RegionSwipeArea(
+        child: Column(
+          children: [
+            const SafeArea(bottom: false, child: RegionBar()),
+            Expanded(
+              child: Stack(
+                children: [
+                  // Shared map backdrop; a tap opens the full map tab.
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => context.goNamed(AppRoutes.map),
+                      child: const HomeMapBackdrop(),
+                    ),
+                  ),
+                  // Per-area draggable sheet, slid by the pager on a switch;
+                  // each area keeps its own sheet state (keyed by index).
+                  Positioned.fill(
+                    child: RegionPager(
+                      itemBuilder: (context, index) =>
+                          _HomeSheetPage(key: ValueKey(index)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+/// One area's draggable sheet over the shared backdrop. Owns the drag mechanics:
+/// the sheet rests at [HomeSheet.restExtent] and springs there when released, or
+/// expands to [HomeSheet.maxExtent].
+class _HomeSheetPage extends StatefulWidget {
+  const _HomeSheetPage({super.key});
+
+  @override
+  State<_HomeSheetPage> createState() => _HomeSheetPageState();
+}
+
+class _HomeSheetPageState extends State<_HomeSheetPage> {
   final DraggableScrollableController _sheet = DraggableScrollableController();
   final ValueNotifier<double> _extent = ValueNotifier<double>(
     HomeSheet.restExtent,
@@ -47,14 +87,6 @@ class _HomePageState extends State<HomePage> {
     _extent.value = HomeSheet.restExtent;
   }
 
-  @override
-  void dispose() {
-    _resetSignal?.removeListener(_resetSheet);
-    _sheet.dispose();
-    _extent.dispose();
-    super.dispose();
-  }
-
   bool _onExtentChanged(DraggableScrollableNotification notification) {
     _extent.value = notification.extent;
     return false;
@@ -73,48 +105,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _resetSignal?.removeListener(_resetSheet);
+    _sheet.dispose();
+    _extent.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final weatherMode = context.watch<ExperimentalSettings>().weatherMode;
-    return Scaffold(
-      // A horizontal fling anywhere — map or sheet — switches the area.
-      body: RegionSwipeArea(
-        child: Stack(
-          children: [
-            // Full-bleed map backdrop; a tap opens the full map tab.
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => context.goNamed(AppRoutes.map),
-                child: const HomeMapBackdrop(),
-              ),
-            ),
-            // Draggable sheet — expands full-screen *behind* the region bar so
-            // its weather backdrop blends up into the bar.
-            Listener(
-              onPointerUp: (_) => _settle(),
-              child: NotificationListener<DraggableScrollableNotification>(
-                onNotification: _onExtentChanged,
-                child: DraggableScrollableSheet(
-                  controller: _sheet,
-                  initialChildSize: HomeSheet.restExtent,
-                  minChildSize: HomeSheet.minExtent,
-                  maxChildSize: HomeSheet.maxExtent,
-                  builder: (context, scrollController) => HomeSheet(
-                    scrollController: scrollController,
-                    extent: _extent,
-                    weatherMode: weatherMode,
-                  ),
-                ),
-              ),
-            ),
-            // Area indicator, pinned at the top below the status bar, over
-            // everything so it stays visible as the sheet rises behind it.
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SafeArea(bottom: false, child: const RegionBar()),
-            ),
-          ],
+    return Listener(
+      onPointerUp: (_) => _settle(),
+      child: NotificationListener<DraggableScrollableNotification>(
+        onNotification: _onExtentChanged,
+        child: DraggableScrollableSheet(
+          controller: _sheet,
+          initialChildSize: HomeSheet.restExtent,
+          minChildSize: HomeSheet.minExtent,
+          maxChildSize: HomeSheet.maxExtent,
+          builder: (context, scrollController) => HomeSheet(
+            scrollController: scrollController,
+            extent: _extent,
+            weatherMode: weatherMode,
+          ),
         ),
       ),
     );

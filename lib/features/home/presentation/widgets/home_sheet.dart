@@ -37,13 +37,10 @@ class HomeSheet extends StatelessWidget {
   /// Extent at which the weather backdrop starts to appear (and animate).
   static const double _weatherFrom = 0.85;
 
-  /// Extent past which the sheet flattens against the region-bar overlay (square
-  /// top, no shadow) and insets its content to clear it — so the sheet blends
-  /// into the bar instead of butting a rounded, shadowed edge against it.
+  /// Extent past which the sheet flattens against the region bar — its top
+  /// corners square off and its shadow fades — so it meets the bar flush
+  /// instead of butting a rounded, shadowed edge against it.
   static const double _flushFrom = 0.9;
-
-  /// The region-bar overlay's height (matches `RegionBar`).
-  static const double _regionBarHeight = 44;
 
   /// The draggable sheet's scroll controller.
   final ScrollController scrollController;
@@ -69,7 +66,6 @@ class HomeSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final regionBarInset = MediaQuery.paddingOf(context).top + _regionBarHeight;
     return ValueListenableBuilder<double>(
       valueListenable: extent,
       builder: (context, e, _) {
@@ -121,10 +117,7 @@ class HomeSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                HomeContent(
-                  scrollController: scrollController,
-                  topInset: lerpDouble(0, regionBarInset, flush)!,
-                ),
+                HomeContent(scrollController: scrollController),
               ],
             ),
           ),
