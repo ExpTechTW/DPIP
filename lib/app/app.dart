@@ -4,6 +4,7 @@ import 'package:dpip/api/redundant_api.dart';
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/map/data/radar_api.dart';
 import 'package:dpip/features/settings/presentation/experimental_settings.dart';
@@ -24,6 +25,7 @@ class DpipApp extends StatelessWidget {
     required this.exclusiveApi,
     required this.externalApi,
     required this.radarApi,
+    required this.eewRepository,
   });
 
   /// Region selection state (also the endpoint-selection "state management").
@@ -44,6 +46,10 @@ class DpipApp extends StatelessWidget {
   /// Radar echo tile endpoints (map overlay).
   final RadarApi radarApi;
 
+  /// Earthquake Early Warning data (repository seam — presentation depends on
+  /// this abstraction, not the API).
+  final EewRepository eewRepository;
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -55,6 +61,7 @@ class DpipApp extends StatelessWidget {
         Provider.value(value: exclusiveApi),
         Provider.value(value: externalApi),
         Provider.value(value: radarApi),
+        Provider<EewRepository>.value(value: eewRepository),
       ],
       child: MaterialApp.router(
         title: 'DPIP',

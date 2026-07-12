@@ -1,0 +1,9 @@
+# Code-generation config for json_serializable / freezed.
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Nested models serialize via their own toJson (so round-trips and
+          # local caching produce plain JSON, not embedded objects).
+          explicit_to_json: true

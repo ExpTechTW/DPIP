@@ -6,6 +6,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:dpip/features/map/data/radar_api.dart';
 import 'package:dpip/features/settings/presentation/experimental_settings.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,15 +38,17 @@ Future<void> bootstrap() async {
   final experimental = ExperimentalSettings(prefs);
   final dio = createDio();
   final apiClient = ApiClient(dio, regions);
+  final redundantApi = RedundantApi(apiClient);
 
   runApp(
     DpipApp(
       regions: regions,
       experimental: experimental,
-      redundantApi: RedundantApi(apiClient),
+      redundantApi: redundantApi,
       exclusiveApi: ExclusiveApi(apiClient),
       externalApi: ExternalApi(dio),
       radarApi: RadarApi(apiClient),
+      eewRepository: EewRepositoryImpl(redundantApi),
     ),
   );
 }

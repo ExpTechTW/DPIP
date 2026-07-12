@@ -1,11 +1,21 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  # Tighten typing so the API-parsing surface can't quietly use `dynamic`:
+  # a raw `data['mag']` or unchecked cast becomes an analysis error, not a
+  # runtime surprise on a renamed field.
+  language:
+    strict-casts: true
+    strict-raw-types: true
   exclude:
     # Read-only snapshot of the pre-rewrite app, kept for reference only.
     - legacy/**
     # Build output, incl. SPM-checked-out dependency sources.
     - build/**
+    # Generated code (freezed / json_serializable / l10n).
+    - "**/*.freezed.dart"
+    - "**/*.g.dart"
+    - lib/l10n/gen/**
   errors:
     # Logging must go through core/logging Log — never print/debugPrint.
     avoid_print: error

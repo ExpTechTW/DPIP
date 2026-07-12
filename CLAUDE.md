@@ -55,6 +55,16 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 - **Networking:** never call hosts directly — use the region-aware API surface
   (`api/redundant_api.dart`, `api/exclusive_api.dart`, `api/external_api.dart`).
   No DNS-balanced bare hosts. See `api.md`.
+- **Data & errors (contract):** models are `@freezed` value types with generated
+  `fromJson`/`toJson` (`@JsonKey` for wire names; `boolishInt`/`intFromBool` for
+  0/1 bools) — template: `features/earthquake/domain/eew.dart`. A feature exposes
+  a `Repository` **interface in `domain/`** returning `Result<T>`
+  (`core/error/result.dart`); the impl lives in `data/`, owns JSON→model mapping,
+  and converts transport/decode errors to a typed `Failure`
+  (`core/error/failure.dart`) via `mapException` — never leak raw JSON or a
+  `DioException` above the data layer, and never `try/catch`-swallow into a blank
+  UI. `strict-casts`/`strict-raw-types` are on. Run `build_runner` after model
+  changes; add a `fromJson` round-trip test.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
