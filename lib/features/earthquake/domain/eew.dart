@@ -41,7 +41,8 @@ abstract class EewInfo with _$EewInfo {
     required int max,
   }) = _EewInfo;
 
-  factory EewInfo.fromJson(Map<String, dynamic> json) => _$EewInfoFromJson(json);
+  factory EewInfo.fromJson(Map<String, dynamic> json) =>
+      _$EewInfoFromJson(json);
 
   /// The epicentre as a dependency-free coordinate for the EEW math.
   LatLng get latlng => LatLng(latitude, longitude);

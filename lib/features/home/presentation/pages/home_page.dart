@@ -1,8 +1,8 @@
 import 'package:dpip/app/theme/app_motion.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
-import 'package:dpip/features/settings/presentation/experimental_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,12 +13,6 @@ import 'package:provider/provider.dart';
 /// The sheet's look and content live in [HomeSheet] / `HomeContent`.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-  /// Route path.
-  static const String path = '/home';
-
-  /// Route name.
-  static const String name = 'home';
 
   @override
   State<HomePage> createState() => _HomePageState();

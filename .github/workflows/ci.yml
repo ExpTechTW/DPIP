@@ -1,0 +1,51 @@
+name: CI
+
+# Foundation gates for the rewrite branch: the checks below must stay green so
+# the architecture, codegen, and safety-critical EEW math can't silently rot.
+on:
+  push:
+    branches: [rewrite, main]
+  pull_request:
+
+# One in-flight run per ref; a new push cancels the previous run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Architecture gate first — pure grep, no toolchain, fails fast.
+      - name: Layering gate
+        run: bash tool/check_layering.sh
+
+      # Flutter/Dart come from mise.toml, so CI uses the exact pinned version
+      # (3.44.3) developers run locally — one source of truth.
+      - name: Install toolchain (mise)
+        uses: jdx/mise-action@v2
+
+      - name: Install dependencies
+        run: mise exec -- flutter pub get
+
+      - name: Format
+        run: mise exec -- dart format --set-exit-if-changed lib test
+
+      # Committed *.freezed.dart / *.g.dart must match a fresh build — a stale
+      # generated file (e.g. after editing a model without regenerating) fails
+      # here instead of shipping.
+      - name: Codegen is up to date
+        run: |
+          mise exec -- dart run build_runner build --delete-conflicting-outputs
+          git diff --exit-code || {
+            echo "::error::Generated code is stale. Run: dart run build_runner build --delete-conflicting-outputs"
+            exit 1
+          }
+
+      - name: Analyze
+        run: mise exec -- flutter analyze
+
+      - name: Test
+        run: mise exec -- flutter test

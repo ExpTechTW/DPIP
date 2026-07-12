@@ -1,9 +1,9 @@
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:dpip/app/theme/app_radius.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
-import 'package:dpip/features/settings/domain/weather_mode.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 

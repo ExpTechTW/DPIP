@@ -1,4 +1,4 @@
-import 'package:dpip/features/settings/domain/weather_mode.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

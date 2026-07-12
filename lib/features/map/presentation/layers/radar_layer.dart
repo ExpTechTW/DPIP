@@ -1,4 +1,4 @@
-import 'package:dpip/features/map/data/radar_api.dart';
+import 'package:dpip/shared/map/radar_repository.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The radar echo (雷達回波) raster layer on the base map.
@@ -8,25 +8,30 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// map-layer pattern. v1 shows the single latest frame; timeline animation can
 /// build on this later.
 class RadarLayer {
-  RadarLayer(this._controller, this._api);
+  RadarLayer(this._controller, this._repository);
 
   static const String _sourceId = 'radar';
   static const String _layerId = 'radar';
 
   final MapLibreMapController _controller;
-  final RadarApi _api;
+  final RadarRepository _repository;
   bool _added = false;
 
-  /// Adds the latest radar frame to the map. No-op if already shown or if no
-  /// frames are available. Anchor the raster above [belowLayerId] when the base
-  /// style has labels/outlines that should stay on top.
+  /// Adds the latest radar frame to the map. No-op if already shown, if the
+  /// frame fetch fails, or if no frames are available — radar is a decorative
+  /// overlay, so its absence degrades gracefully rather than blocking the map.
+  /// Anchor the raster above [belowLayerId] when the base style has labels/
+  /// outlines that should stay on top.
   Future<void> showLatest({String? belowLayerId}) async {
     if (_added) return;
-    final frames = await _api.getFrames();
-    if (frames.isEmpty) return;
+    final frames = (await _repository.frames()).valueOrNull;
+    if (frames == null || frames.isEmpty) return;
     await _controller.addSource(
       _sourceId,
-      RasterSourceProperties(tiles: [_api.tileUrl(frames.first)], tileSize: 256),
+      RasterSourceProperties(
+        tiles: [_repository.tileUrl(frames.first)],
+        tileSize: 256,
+      ),
     );
     await _controller.addRasterLayer(
       _sourceId,

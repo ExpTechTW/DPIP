@@ -43,9 +43,17 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 ## Conventions
 
 - **Architecture:** feature-first + layered — `app/` (shell, router, theme),
-  `core/` (logging, network, storage, models, geo, platform), `features/<f>/
-  {data,domain,presentation}`, `shared/`. `core`/`shared` must not import
-  `features`; `presentation` depends on `domain`, not `data`.
+  `core/` (logging, network, storage, models, geo, platform, settings),
+  `features/<f>/{data,domain,presentation}`, `shared/`. Rules (enforced by
+  `tool/check_layering.sh`): `core`/`shared` must not import `features`;
+  `presentation` depends on `domain`, not `data`; a feature must not import
+  another feature's `data`/`presentation` — share via `shared/` or a `domain`
+  interface. App-wide state that several features consume lives outside any one
+  feature (e.g. `core/settings/` for `ExperimentalSettings`).
+- **Navigation:** route names/paths live in `shared/navigation/app_routes.dart`
+  (`AppRoutes`). The router (`app/router/`) is the only place that imports page
+  widgets; navigate by name — `context.pushNamed(AppRoutes.log)` — never import
+  another feature's page to reach its route. Pages don't declare their own path.
 - **Design system:** build UI from the tokens in `app/theme/`
   (`AppSpacing` / `AppRadius` / `AppMotion`), `ColorScheme` roles, and shared
   components (`shared/widgets/`). Never hardcode spacing, radius, duration, or
@@ -80,6 +88,17 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   `l10n.yaml`.
 - Every file starts with a doc comment; one public declaration = one clear
   responsibility.
+
+## CI & gates
+
+`.github/workflows/ci.yml` runs on every push/PR and must stay green. It uses
+the mise-pinned toolchain and runs, in order: the layering gate
+(`tool/check_layering.sh`), `dart format --set-exit-if-changed`, a codegen-drift
+check (`build_runner` + `git diff --exit-code` — committed `*.g.dart` /
+`*.freezed.dart` must match a fresh build), `flutter analyze`, and
+`flutter test`. Run these locally before pushing. Safety-critical seismic math
+is pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
+if you change the EEW estimator, update those goldens deliberately.
 
 ## Commits
 

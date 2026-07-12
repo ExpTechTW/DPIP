@@ -1,12 +1,12 @@
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 
-/// Radar echo (雷達回波) tile endpoints.
+/// Low-level radar echo (雷達回波) tile endpoints.
 ///
-/// Frames are server-rendered XYZ raster PNG tiles, one set per timestamp; the
-/// frame list returns the available timestamps. Served from the legacy host
-/// (`api-1.exptech.dev`) until migrated to the region topology. The tiles are
-/// fetched directly by MapLibre, so [tileUrl] hands out a concrete host URL.
+/// Frames are server-rendered XYZ raster tiles, one set per timestamp. Served
+/// from the legacy host (`api-1.exptech.dev`) until migrated to the region
+/// topology. Wrapped by `RadarRepository`; the tiles are fetched directly by
+/// MapLibre, so [tileUrl] hands out a concrete host URL.
 class RadarApi {
   const RadarApi(this._client);
 

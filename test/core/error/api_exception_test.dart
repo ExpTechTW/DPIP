@@ -29,16 +29,22 @@ void main() {
       expect(failure.message, contains('503'));
     });
 
-    test('a decode/shape error becomes a DecodeFailure, not a network error', () {
-      expect(mapException(const FormatException('bad')), isA<DecodeFailure>());
-      try {
-        // A renamed field would make a cast like this throw a TypeError.
-        (<String, dynamic>{'mag': 'x'})['mag']! as double;
-        fail('expected a cast error');
-      } catch (error) {
-        expect(mapException(error), isA<DecodeFailure>());
-      }
-    });
+    test(
+      'a decode/shape error becomes a DecodeFailure, not a network error',
+      () {
+        expect(
+          mapException(const FormatException('bad')),
+          isA<DecodeFailure>(),
+        );
+        try {
+          // A renamed field would make a cast like this throw a TypeError.
+          (<String, dynamic>{'mag': 'x'})['mag']! as double;
+          fail('expected a cast error');
+        } catch (error) {
+          expect(mapException(error), isA<DecodeFailure>());
+        }
+      },
+    );
 
     test('anything else becomes an UnexpectedFailure', () {
       expect(mapException(StateError('boom')), isA<UnexpectedFailure>());

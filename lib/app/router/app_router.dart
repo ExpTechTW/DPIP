@@ -6,39 +6,46 @@ import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
 
 /// The application's route table.
 ///
 /// A [StatefulShellRoute] hosts the five bottom-navigation branches, in the
 /// same order as `MainShell`'s destinations; each branch keeps its own state.
+/// Route names/paths come from [AppRoutes] so features never import each other's
+/// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
-  initialLocation: HomePage.path,
+  initialLocation: AppRoutes.homePath,
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
           MainShell(navigationShell: navigationShell),
       branches: [
-        _branch(HomePage.path, HomePage.name, (_, _) => const HomePage()),
-        _branch(EventsPage.path, EventsPage.name, (_, _) => const EventsPage()),
-        _branch(MapPage.path, MapPage.name, (_, _) => const MapPage()),
+        _branch(AppRoutes.homePath, AppRoutes.home, (_, _) => const HomePage()),
         _branch(
-          EarthquakePage.path,
-          EarthquakePage.name,
+          AppRoutes.eventsPath,
+          AppRoutes.events,
+          (_, _) => const EventsPage(),
+        ),
+        _branch(AppRoutes.mapPath, AppRoutes.map, (_, _) => const MapPage()),
+        _branch(
+          AppRoutes.earthquakePath,
+          AppRoutes.earthquake,
           (_, _) => const EarthquakePage(),
         ),
-        _branch(MorePage.path, MorePage.name, (_, _) => const MorePage()),
+        _branch(AppRoutes.morePath, AppRoutes.more, (_, _) => const MorePage()),
       ],
     ),
     // Full-screen routes pushed over the shell.
     GoRoute(
-      path: ExperimentalPage.path,
-      name: ExperimentalPage.name,
+      path: AppRoutes.experimentalPath,
+      name: AppRoutes.experimental,
       builder: (_, _) => const ExperimentalPage(),
     ),
     GoRoute(
-      path: LogPage.path,
-      name: LogPage.name,
+      path: AppRoutes.logPath,
+      name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
     ),
   ],

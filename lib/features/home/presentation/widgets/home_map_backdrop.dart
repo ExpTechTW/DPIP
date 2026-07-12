@@ -1,8 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/features/map/data/radar_api.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/radar_repository.dart';
 import 'package:dpip/shared/map/map_snapshot.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
@@ -37,16 +36,13 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
   Future<void> _load() async {
     final media = MediaQuery.of(context);
     final colors = Theme.of(context).colorScheme;
-    final radar = context.read<RadarApi>();
+    final radar = context.read<RadarRepository>();
 
-    String? radarUrl;
-    try {
-      final frames = await radar.getFrames();
-      if (frames.isNotEmpty) radarUrl = radar.tileUrl(frames.first);
-    } catch (error, stackTrace) {
-      // Radar is optional; still snapshot the base map without it.
-      Log.handle(error, stackTrace, 'Radar frames for home backdrop');
-    }
+    // Radar is optional; on failure still snapshot the base map without it.
+    final frames = (await radar.frames()).valueOrNull;
+    final radarUrl = (frames != null && frames.isNotEmpty)
+        ? radar.tileUrl(frames.first)
+        : null;
 
     final style = homeSnapshotStyle(
       sea: colors.surface.toHexRgb(),

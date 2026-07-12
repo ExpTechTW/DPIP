@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/features/settings/domain/weather_mode.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/material.dart';
 
 /// GPU-accelerated procedural sky backdrop.

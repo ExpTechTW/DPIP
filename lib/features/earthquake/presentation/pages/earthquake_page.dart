@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 class EarthquakePage extends StatelessWidget {
   const EarthquakePage({super.key});
 
-  /// Route path.
-  static const String path = '/earthquake';
-
-  /// Route name.
-  static const String name = 'earthquake';
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

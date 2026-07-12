@@ -8,12 +8,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 class LogPage extends StatelessWidget {
   const LogPage({super.key});
 
-  /// Route path.
-  static const String path = '/log';
-
-  /// Route name.
-  static const String name = 'log';
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;

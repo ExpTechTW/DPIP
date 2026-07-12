@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 class EventsPage extends StatelessWidget {
   const EventsPage({super.key});
 
-  /// Route path.
-  static const String path = '/events';
-
-  /// Route name.
-  static const String name = 'events';
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

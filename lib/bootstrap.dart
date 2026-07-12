@@ -6,9 +6,10 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
-import 'package:dpip/features/map/data/radar_api.dart';
-import 'package:dpip/features/settings/presentation/experimental_settings.dart';
+import 'package:dpip/shared/map/radar_api.dart';
+import 'package:dpip/shared/map/radar_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,7 +48,7 @@ Future<void> bootstrap() async {
       redundantApi: redundantApi,
       exclusiveApi: ExclusiveApi(apiClient),
       externalApi: ExternalApi(dio),
-      radarApi: RadarApi(apiClient),
+      radarRepository: RadarRepositoryImpl(RadarApi(apiClient)),
       eewRepository: EewRepositoryImpl(redundantApi),
     ),
   );

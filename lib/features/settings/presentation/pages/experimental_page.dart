@@ -1,5 +1,5 @@
-import 'package:dpip/features/settings/domain/weather_mode.dart';
-import 'package:dpip/features/settings/presentation/experimental_settings.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +11,6 @@ import 'package:provider/provider.dart';
 /// backdrop.
 class ExperimentalPage extends StatelessWidget {
   const ExperimentalPage({super.key});
-
-  /// Route path.
-  static const String path = '/experimental';
-
-  /// Route name.
-  static const String name = 'experimental';
 
   @override
   Widget build(BuildContext context) {
