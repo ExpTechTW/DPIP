@@ -107,5 +107,12 @@
       "magnitude": { "type": "String" },
       "depth": { "type": "String" }
     }
+  },
+  "areaPlaceholder": "Area {number}",
+  "@areaPlaceholder": {
+    "description": "Placeholder name for a swipeable region in the region bar, until real saved locations exist",
+    "placeholders": {
+      "number": { "type": "int" }
+    }
   }
 }

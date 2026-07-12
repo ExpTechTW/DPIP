@@ -87,4 +87,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String eewSummary(String magnitude, String depth) {
     return '規模 $magnitude・深度 $depth 公里';
   }
+
+  @override
+  String areaPlaceholder(int number) {
+    return '地區$number';
+  }
 }

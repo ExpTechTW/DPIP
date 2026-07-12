@@ -88,4 +88,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String eewSummary(String magnitude, String depth) {
     return 'M$magnitude · depth $depth km';
   }
+
+  @override
+  String areaPlaceholder(int number) {
+    return 'Area $number';
+  }
 }

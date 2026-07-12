@@ -1,6 +1,7 @@
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/radar_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -24,7 +25,7 @@ class _MapPageState extends State<MapPage> {
       await RadarLayer(
         controller,
         context.read<RadarRepository>(),
-      ).showLatest();
+      ).showLatest(belowLayerId: outlineLayerId);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'Failed to add radar layer');
     }

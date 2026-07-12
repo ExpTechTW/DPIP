@@ -44,7 +44,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
         ? radar.tileUrl(frames.first)
         : null;
 
-    final style = homeSnapshotStyle(
+    final style = exptechVectorStyle(
       sea: colors.surface.toHexRgb(),
       land: colors.surfaceContainer.toHexRgb(),
       countyTown: colors.surfaceContainerHigh.toHexRgb(),

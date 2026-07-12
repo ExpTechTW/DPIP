@@ -25,5 +25,6 @@
   "feedOffline": "連線中斷",
   "eewTitle": "地震速報",
   "eewNone": "目前沒有地震速報",
-  "eewSummary": "規模 {magnitude}・深度 {depth} 公里"
+  "eewSummary": "規模 {magnitude}・深度 {depth} 公里",
+  "areaPlaceholder": "地區{number}"
 }

@@ -253,6 +253,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'M{magnitude} · depth {depth} km'**
   String eewSummary(String magnitude, String depth);
+
+  /// Placeholder name for a swipeable region in the region bar, until real saved locations exist
+  ///
+  /// In en, this message translates to:
+  /// **'Area {number}'**
+  String areaPlaceholder(int number);
 }
 
 class _AppLocalizationsDelegate
