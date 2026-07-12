@@ -12,10 +12,11 @@ import 'package:flutter/material.dart';
 /// The draggable home sheet: a frosted panel over the map that reveals an
 /// animated weather backdrop as it expands to full.
 ///
-/// Owns the sheet's detent metrics ([restExtent] / [minExtent] / [maxExtent])
-/// and maps the live [extent] onto surface opacity, backdrop blur, and the
-/// weather backdrop's visibility. The scrollable content lives in [HomeContent];
-/// the drag mechanics live in the host `HomePage`.
+/// Owns the sheet's detent metrics ([restExtent] / [maxExtent]) and maps the
+/// live [extent] onto surface opacity, backdrop blur, and the weather
+/// backdrop's visibility. [restExtent] is also the sheet's floor — it can't be
+/// dragged smaller. The scrollable content lives in [HomeContent]; the drag
+/// mechanics live in the host `HomePage`.
 class HomeSheet extends StatelessWidget {
   const HomeSheet({
     super.key,
@@ -25,9 +26,9 @@ class HomeSheet extends StatelessWidget {
   });
 
   /// The sheet's detents, sourced from [HomeSheetExtent] so the value notifier's
-  /// seed and this widget's opacity/blur ramps share one definition.
+  /// seed and this widget's opacity/blur ramps share one definition. [restExtent]
+  /// doubles as the floor (min = rest), so the sheet never shrinks below it.
   static const double restExtent = HomeSheetExtent.rest;
-  static const double minExtent = HomeSheetExtent.min;
   static const double maxExtent = HomeSheetExtent.max;
 
   /// Surface opacity at rest — translucent so the map shows through.
@@ -51,13 +52,11 @@ class HomeSheet extends StatelessWidget {
   /// Which weather look the backdrop renders.
   final WeatherMode weatherMode;
 
+  // The sheet floors at [restExtent], so surface opacity only ever ramps from
+  // its resting translucency up to fully opaque as it climbs to full.
   double _surfaceAlpha(double e) {
-    if (e >= restExtent) {
-      final t = ((e - restExtent) / (maxExtent - restExtent)).clamp(0.0, 1.0);
-      return lerpDouble(_restAlpha, 1, t)!;
-    }
-    final t = ((e - minExtent) / (restExtent - minExtent)).clamp(0.0, 1.0);
-    return lerpDouble(0, _restAlpha, t)!;
+    final t = ((e - restExtent) / (maxExtent - restExtent)).clamp(0.0, 1.0);
+    return lerpDouble(_restAlpha, 1, t)!;
   }
 
   @override

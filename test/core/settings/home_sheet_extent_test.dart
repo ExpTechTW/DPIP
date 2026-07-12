@@ -8,8 +8,8 @@ void main() {
     expect(HomeSheetExtent().value, HomeSheetExtent.rest);
   });
 
-  test('detents are ordered min < rest < max', () {
-    expect(HomeSheetExtent.min, lessThan(HomeSheetExtent.rest));
+  test('rest is the floor, below the full detent', () {
+    expect(HomeSheetExtent.rest, greaterThan(0));
     expect(HomeSheetExtent.rest, lessThan(HomeSheetExtent.max));
   });
 }

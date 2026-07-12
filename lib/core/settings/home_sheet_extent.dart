@@ -19,11 +19,9 @@ import 'package:flutter/foundation.dart';
 class HomeSheetExtent extends ValueNotifier<double> {
   HomeSheetExtent() : super(rest);
 
-  /// Resting detent — the sheet covers the bottom third of the screen.
+  /// Resting detent — the sheet covers the bottom third of the screen. Also its
+  /// floor: the sheet can't be dragged any smaller.
   static const double rest = 1 / 3;
-
-  /// Lowest the sheet can be dragged before it springs back to [rest].
-  static const double min = 0.08;
 
   /// Fully expanded — the sheet covers the whole screen.
   static const double max = 1.0;

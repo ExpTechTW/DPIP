@@ -101,8 +101,9 @@ class _HomePageState extends State<HomePage> {
                   onNotification: _onExtentChanged,
                   child: DraggableScrollableSheet(
                     controller: _sheet,
+                    // Floor = rest: the sheet is never smaller than its default.
                     initialChildSize: HomeSheet.restExtent,
-                    minChildSize: HomeSheet.minExtent,
+                    minChildSize: HomeSheet.restExtent,
                     maxChildSize: HomeSheet.maxExtent,
                     builder: (context, scrollController) => HomeSheet(
                       scrollController: scrollController,
