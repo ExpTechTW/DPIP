@@ -1,0 +1,19 @@
+{
+  "@@locale": "zh",
+  "navHome": "首頁",
+  "navEvents": "事件",
+  "navMap": "地圖",
+  "navEarthquake": "地震",
+  "navMore": "更多",
+  "appLogs": "App 日誌",
+  "mapPlaceholderDisabled": "地圖(暫時停用)",
+  "moreSectionAdvanced": "進階",
+  "experimentalFeatures": "實驗性功能",
+  "weatherDynamicState": "天氣動態狀態",
+  "weatherDynamicStateSubtitle": "覆寫首頁背景天氣",
+  "weatherModeAuto": "自動",
+  "weatherModeClear": "晴天",
+  "weatherModeRain": "雨天",
+  "weatherModeFog": "大霧",
+  "weatherModeThunderstorm": "雷雨"
+}

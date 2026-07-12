@@ -1,0 +1,67 @@
+{
+  "@@locale": "en",
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom-nav label and page title for the Home tab"
+  },
+  "navEvents": "Events",
+  "@navEvents": {
+    "description": "Bottom-nav label and page title for the Events tab"
+  },
+  "navMap": "Map",
+  "@navMap": {
+    "description": "Bottom-nav label and page title for the Map tab"
+  },
+  "navEarthquake": "Earthquake",
+  "@navEarthquake": {
+    "description": "Bottom-nav label and page title for the Earthquake tab (the swappable slot)"
+  },
+  "navMore": "More",
+  "@navMore": {
+    "description": "Bottom-nav label and page title for the More tab"
+  },
+  "appLogs": "App logs",
+  "@appLogs": {
+    "description": "Title of the in-app log viewer and its entry in the More menu"
+  },
+  "mapPlaceholderDisabled": "Map (temporarily disabled)",
+  "@mapPlaceholderDisabled": {
+    "description": "Placeholder shown in place of the map while MapLibre is disabled"
+  },
+  "moreSectionAdvanced": "Advanced",
+  "@moreSectionAdvanced": {
+    "description": "Section header on the More page grouping advanced/developer entries"
+  },
+  "experimentalFeatures": "Experimental features",
+  "@experimentalFeatures": {
+    "description": "Title of the experimental-features settings page and its More-menu entry"
+  },
+  "weatherDynamicState": "Weather animation",
+  "@weatherDynamicState": {
+    "description": "Setting that forces the home weather backdrop to a fixed state"
+  },
+  "weatherDynamicStateSubtitle": "Override the home backdrop weather",
+  "@weatherDynamicStateSubtitle": {
+    "description": "Subtitle explaining the weather animation setting"
+  },
+  "weatherModeAuto": "Auto",
+  "@weatherModeAuto": {
+    "description": "Weather animation follows real conditions"
+  },
+  "weatherModeClear": "Clear",
+  "@weatherModeClear": {
+    "description": "Weather animation forced to a clear sky"
+  },
+  "weatherModeRain": "Rain",
+  "@weatherModeRain": {
+    "description": "Weather animation forced to rain"
+  },
+  "weatherModeFog": "Fog",
+  "@weatherModeFog": {
+    "description": "Weather animation forced to heavy fog"
+  },
+  "weatherModeThunderstorm": "Thunderstorm",
+  "@weatherModeThunderstorm": {
+    "description": "Weather animation forced to a thunderstorm"
+  }
+}

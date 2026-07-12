@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+
+/// The scrollable home dashboard shown inside the draggable sheet — the surface
+/// that fills the screen when the sheet is pulled up.
+///
+/// This is where weather / alert / event sections land as they are built, so
+/// [HomePage] stays a thin host and this file grows independently. It must be
+/// driven by the sheet's [scrollController] so scrolling past the top expands
+/// the sheet.
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key, required this.scrollController});
+
+  /// The draggable sheet's scroll controller.
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return ListView(
+      controller: scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        const HomeSheetHandle(),
+        // Placeholder cards until the real sections land.
+        for (var i = 0; i < 8; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Container(
+              height: 96,
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The grab handle shown at the top of the home sheet.
+class HomeSheetHandle extends StatelessWidget {
+  const HomeSheetHandle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(
+      context,
+    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 12),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+}

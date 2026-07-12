@@ -1,3 +1,4 @@
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// Disaster-event feed. Placeholder pending the events feature.
@@ -12,9 +13,10 @@ class EventsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('事件')),
-      body: const Center(child: Text('事件')),
+      appBar: AppBar(title: Text(l10n.navEvents)),
+      body: Center(child: Text(l10n.navEvents)),
     );
   }
 }

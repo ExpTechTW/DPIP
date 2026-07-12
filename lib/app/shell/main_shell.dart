@@ -1,3 +1,4 @@
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,49 +9,50 @@ import 'package:go_router/go_router.dart';
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.navigationShell});
 
-  /// The go_router shell that owns the five branches, in the same order as
-  /// [_destinations].
+  /// The go_router shell that owns the five branches, in the same order as the
+  /// destinations built in [build].
   final StatefulNavigationShell navigationShell;
-
-  /// Bottom-navigation destinations, in branch order.
-  ///
-  /// The 4th slot (地震) is intentionally swappable — replace this one entry
-  /// (and its branch in the router) to surface a different feature there.
-  static const List<NavigationDestination> _destinations = [
-    NavigationDestination(
-      icon: Icon(Icons.home_outlined),
-      selectedIcon: Icon(Icons.home),
-      label: '首頁',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.warning_amber_rounded),
-      selectedIcon: Icon(Icons.warning),
-      label: '事件',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.map_outlined),
-      selectedIcon: Icon(Icons.map),
-      label: '地圖',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.monitor_heart_outlined),
-      selectedIcon: Icon(Icons.monitor_heart),
-      label: '地震',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.menu),
-      selectedIcon: Icon(Icons.menu),
-      label: '更多',
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    // Bottom-navigation destinations, in branch order. The 4th slot
+    // (navEarthquake) is intentionally swappable — replace this one entry (and
+    // its branch in the router) to surface a different feature there.
+    final destinations = <NavigationDestination>[
+      NavigationDestination(
+        icon: const Icon(Icons.home_outlined),
+        selectedIcon: const Icon(Icons.home),
+        label: l10n.navHome,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.warning_amber_rounded),
+        selectedIcon: const Icon(Icons.warning),
+        label: l10n.navEvents,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.map_outlined),
+        selectedIcon: const Icon(Icons.map),
+        label: l10n.navMap,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.monitor_heart_outlined),
+        selectedIcon: const Icon(Icons.monitor_heart),
+        label: l10n.navEarthquake,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.menu),
+        selectedIcon: const Icon(Icons.menu),
+        label: l10n.navMore,
+      ),
+    ];
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
-        destinations: _destinations,
+        destinations: destinations,
         onDestinationSelected: (index) => navigationShell.goBranch(
           index,
           // Tapping the active tab returns it to its initial route.

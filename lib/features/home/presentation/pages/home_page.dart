@@ -1,10 +1,15 @@
+import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/features/settings/presentation/experimental_settings.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-/// Home tab — the landing surface shown on launch.
+/// Home tab — a full-bleed map with a draggable [HomeSheet] over it.
 ///
-/// Starting scaffold: a large app bar over a scrollable body that will hold the
-/// status / weather / earthquake sections as those features land.
-class HomePage extends StatelessWidget {
+/// This host owns only the drag mechanics: the sheet rests at [HomeSheet.restExtent]
+/// and springs back there when released, or expands to [HomeSheet.maxExtent].
+/// The sheet's look and content live in [HomeSheet] / `HomeContent`.
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   /// Route path.
@@ -14,14 +19,66 @@ class HomePage extends StatelessWidget {
   static const String name = 'home';
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final DraggableScrollableController _sheet = DraggableScrollableController();
+  final ValueNotifier<double> _extent = ValueNotifier<double>(
+    HomeSheet.restExtent,
+  );
+
+  @override
+  void dispose() {
+    _sheet.dispose();
+    _extent.dispose();
+    super.dispose();
+  }
+
+  bool _onExtentChanged(DraggableScrollableNotification notification) {
+    _extent.value = notification.extent;
+    return false;
+  }
+
+  /// Snaps the sheet to the nearest detent when a drag ends: down to
+  /// [HomeSheet.restExtent] (spring-back) or up to [HomeSheet.maxExtent].
+  void _settle() {
+    if (!_sheet.isAttached) return;
+    final size = _sheet.size;
+    final target = size < (HomeSheet.restExtent + HomeSheet.maxExtent) / 2
+        ? HomeSheet.restExtent
+        : HomeSheet.maxExtent;
+    if ((size - target).abs() < 0.001) return;
+    _sheet.animateTo(
+      target,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(title: Text('首頁')),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(child: Text('首頁')),
+    final weatherMode = context.watch<ExperimentalSettings>().weatherMode;
+    return Scaffold(
+      body: Stack(
+        children: [
+          const Positioned.fill(child: BaseMap()),
+          Listener(
+            onPointerUp: (_) => _settle(),
+            child: NotificationListener<DraggableScrollableNotification>(
+              onNotification: _onExtentChanged,
+              child: DraggableScrollableSheet(
+                controller: _sheet,
+                initialChildSize: HomeSheet.restExtent,
+                minChildSize: HomeSheet.minExtent,
+                maxChildSize: HomeSheet.maxExtent,
+                builder: (context, scrollController) => HomeSheet(
+                  scrollController: scrollController,
+                  extent: _extent,
+                  weatherMode: weatherMode,
+                ),
+              ),
+            ),
           ),
         ],
       ),

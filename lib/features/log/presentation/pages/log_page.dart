@@ -1,4 +1,5 @@
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -18,7 +19,7 @@ class LogPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return TalkerScreen(
       talker: Log.talker,
-      appBarTitle: 'App 日誌',
+      appBarTitle: AppLocalizations.of(context).appLogs,
       theme: TalkerScreenTheme(
         backgroundColor: colors.surface,
         textColor: colors.onSurface,

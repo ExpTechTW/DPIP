@@ -4,6 +4,8 @@ analyzer:
   exclude:
     # Read-only snapshot of the pre-rewrite app, kept for reference only.
     - legacy/**
+    # Build output, incl. SPM-checked-out dependency sources.
+    - build/**
   errors:
     # Logging must go through core/logging Log — never print/debugPrint.
     avoid_print: error

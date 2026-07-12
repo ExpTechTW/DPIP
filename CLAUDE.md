@@ -12,7 +12,21 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   (e.g. `mise exec -- flutter analyze`).
 - After changing `@freezed` / `@JsonSerializable` models:
   `mise exec -- dart run build_runner build --delete-conflicting-outputs`.
+- After editing ARB files, localizations regenerate on the next build
+  (`generate: true`); regenerate manually with `mise exec -- flutter gen-l10n`.
 - Format with `mise exec -- dart format lib`.
+
+## Running
+
+- iOS simulator: `mise exec -- flutter run -d "iPhone 17 Pro"`. Select the
+  device with `-d <name|id>` — a bare `flutter run ios` treats `ios` as a
+  target Dart file and fails with `Target file "ios" not found`.
+- If `flutter run` / `pub get` stalls at **Downloading packages**, resolve from
+  the local cache first: `mise exec -- flutter pub get --offline`, then re-run.
+- The visible simulator window in Xcode 26+ is **DeviceHub.app** (it replaced
+  `Simulator.app`): `open "$(xcode-select -p)/../Applications/DeviceHub.app"`.
+  `open -a Simulator` no longer works. `flutter run` boots the sim headless, so
+  open DeviceHub separately to see/interact with it.
 
 ## Logging — required
 
@@ -38,6 +52,17 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   No DNS-balanced bare hosts. See `api.md`.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
+- **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
+  packages. Default to the **outlined** variant (`Icons.foo_outlined`) for list
+  rows, actions, and inactive states; use the **filled** variant (`Icons.foo`)
+  for the selected/active state (e.g. the bottom-nav `selectedIcon`). Every
+  list row in a menu carries a leading icon.
+- **Localization (i18n):** every user-facing string goes through
+  `AppLocalizations` (`AppLocalizations.of(context).<key>`) — never hardcode
+  display text. ARB sources live in `lib/l10n/` (`app_en.arb` is the template,
+  `app_zh.arb` is Traditional Chinese, the Taiwan default); generated code is in
+  `lib/l10n/gen/`. Add a language by dropping in `app_<locale>.arb`. Config in
+  `l10n.yaml`.
 - Every file starts with a doc comment; one public declaration = one clear
   responsibility.
 

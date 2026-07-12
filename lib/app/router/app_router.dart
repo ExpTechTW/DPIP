@@ -5,6 +5,7 @@ import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
+import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:go_router/go_router.dart';
 
 /// The application's route table.
@@ -30,6 +31,11 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
     // Full-screen routes pushed over the shell.
+    GoRoute(
+      path: ExperimentalPage.path,
+      name: ExperimentalPage.name,
+      builder: (_, _) => const ExperimentalPage(),
+    ),
     GoRoute(
       path: LogPage.path,
       name: LogPage.name,
