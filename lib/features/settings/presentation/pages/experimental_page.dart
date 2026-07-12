@@ -1,6 +1,7 @@
 import 'package:dpip/features/settings/domain/weather_mode.dart';
 import 'package:dpip/features/settings/presentation/experimental_settings.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +28,7 @@ class ExperimentalPage extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.experimentalFeatures)),
       body: ListView(
         children: [
-          _SectionHeader(l10n.weatherDynamicState),
+          SectionHeader(l10n.weatherDynamicState),
           for (final mode in WeatherMode.values)
             ListTile(
               leading: Icon(_iconFor(mode)),
@@ -58,26 +59,4 @@ class ExperimentalPage extends StatelessWidget {
     WeatherMode.fog => l10n.weatherModeFog,
     WeatherMode.thunderstorm => l10n.weatherModeThunderstorm,
   };
-}
-
-/// A Material-style settings section header.
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
 }

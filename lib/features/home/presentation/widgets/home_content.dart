@@ -1,3 +1,5 @@
+import 'package:dpip/app/theme/app_radius.dart';
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// The scrollable home dashboard shown inside the draggable sheet — the surface
@@ -18,18 +20,23 @@ class HomeContent extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return ListView(
       controller: scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
       children: [
         const HomeSheetHandle(),
         // Placeholder cards until the real sections land.
         for (var i = 0; i < 8; i++)
           Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
             child: Container(
               height: 96,
               decoration: BoxDecoration(
                 color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppRadius.medium,
               ),
             ),
           ),
@@ -49,7 +56,7 @@ class HomeSheetHandle extends StatelessWidget {
     ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
     return Center(
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 12),
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         width: 40,
         height: 4,
         decoration: BoxDecoration(

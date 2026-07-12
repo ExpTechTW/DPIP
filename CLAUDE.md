@@ -1,7 +1,8 @@
 # CLAUDE.md
 
 Guidance for working in this repository. See `ARCHITECTURE.md` for the folder
-structure and `api.md` for the API/region map.
+structure, `api.md` for the API/region map, and `DESIGN.md` for the design
+system (colours, spacing, radius, motion, typography, shared components).
 
 DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 (clean Flutter 3.44 baseline, feature-first architecture).
@@ -45,6 +46,10 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   `core/` (logging, network, storage, models, geo, platform), `features/<f>/
   {data,domain,presentation}`, `shared/`. `core`/`shared` must not import
   `features`; `presentation` depends on `domain`, not `data`.
+- **Design system:** build UI from the tokens in `app/theme/`
+  (`AppSpacing` / `AppRadius` / `AppMotion`), `ColorScheme` roles, and shared
+  components (`shared/widgets/`). Never hardcode spacing, radius, duration, or
+  colour where a token/role exists. Full reference: `DESIGN.md`.
 - **State management:** `provider`. App-wide services are provided in
   `app/app.dart`; feature state lives in the feature's `presentation`.
 - **Networking:** never call hosts directly — use the region-aware API surface

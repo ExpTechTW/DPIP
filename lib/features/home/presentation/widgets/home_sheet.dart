@@ -1,5 +1,6 @@
 import 'dart:ui' show ImageFilter, lerpDouble;
 
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
 import 'package:dpip/features/settings/domain/weather_mode.dart';
@@ -62,7 +63,7 @@ class HomeSheet extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return DecoratedBox(
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.topSheet,
         boxShadow: [
           BoxShadow(
             color: Color(0x26000000),
@@ -72,7 +73,7 @@ class HomeSheet extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.topSheet,
         child: ValueListenableBuilder<double>(
           valueListenable: extent,
           child: HomeContent(scrollController: scrollController),

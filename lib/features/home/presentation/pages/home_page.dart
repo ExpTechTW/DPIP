@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
@@ -70,11 +71,7 @@ class _HomePageState extends State<HomePage> {
         ? HomeSheet.restExtent
         : HomeSheet.maxExtent;
     if ((size - target).abs() < 0.001) return;
-    _sheet.animateTo(
-      target,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOut,
-    );
+    _sheet.animateTo(target, duration: AppMotion.medium, curve: Curves.easeOut);
   }
 
   @override

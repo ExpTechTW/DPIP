@@ -1,6 +1,7 @@
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,7 +22,7 @@ class MorePage extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
         children: [
-          _SectionHeader(l10n.moreSectionAdvanced),
+          SectionHeader(l10n.moreSectionAdvanced),
           _MoreTile(
             icon: Icons.science_outlined,
             title: l10n.experimentalFeatures,
@@ -57,28 +58,6 @@ class _MoreTile extends StatelessWidget {
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
-    );
-  }
-}
-
-/// A Material-style settings section header.
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 }
