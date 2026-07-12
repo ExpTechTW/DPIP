@@ -73,6 +73,19 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   `DioException` above the data layer, and never `try/catch`-swallow into a blank
   UI. `strict-casts`/`strict-raw-types` are on. Run `build_runner` after model
   changes; add a `fromJson` round-trip test.
+- **Realtime (streaming feeds):** live feeds (EEW now, RTS later) flow through
+  the polling spine in `core/realtime/`. A `RealtimeChannel<T>` polls a
+  `RealtimeSource<T>` (returns `Result<T>`) on a fixed cadence and exposes
+  `Stream<RealtimeState<T>>` with a `connecting`/`live`/`stale`/`offline`
+  status. Freshness is a pure, golden-pinned function (`staleness.dart`) measured
+  against a corrected `ServerClock` — a feed ages to stale/offline on its own
+  when polls stop, and a failed poll keeps the last data (never blanks). Add a
+  feed by implementing `RealtimeSource` (in `data/`) and subclassing
+  `RealtimeNotifier` (in `presentation/`) — no engine change; transport stays
+  HTTP polling behind the source seam. `RealtimeService` + `AppLifecycleListener`
+  pause polling on background and resume (recompute status → resync clock →
+  refetch) on foreground; background alerting is push's job. A safety-critical
+  feed that is `stale`/`offline` must never be presented as current.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
