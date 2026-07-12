@@ -1,6 +1,8 @@
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:dpip/app/theme/app_radius.dart';
+import 'package:dpip/core/settings/home_chrome.dart';
+import 'package:dpip/core/settings/home_sheet_extent.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
@@ -22,20 +24,14 @@ class HomeSheet extends StatelessWidget {
     required this.weatherMode,
   });
 
-  /// Resting detent — bottom 1/3 of the screen.
-  static const double restExtent = 1 / 3;
-
-  /// Lowest the sheet can be dragged before it springs back to [restExtent].
-  static const double minExtent = 0.08;
-
-  /// Fully expanded — covers the whole map.
-  static const double maxExtent = 1.0;
+  /// The sheet's detents, sourced from [HomeSheetExtent] so the value notifier's
+  /// seed and this widget's opacity/blur ramps share one definition.
+  static const double restExtent = HomeSheetExtent.rest;
+  static const double minExtent = HomeSheetExtent.min;
+  static const double maxExtent = HomeSheetExtent.max;
 
   /// Surface opacity at rest — translucent so the map shows through.
   static const double _restAlpha = 0.85;
-
-  /// Extent at which the weather backdrop starts to appear (and animate).
-  static const double _weatherFrom = 0.85;
 
   /// Extent past which the sheet flattens against the region bar — its top
   /// corners square off and its shadow fades — so it meets the bar flush
@@ -64,11 +60,6 @@ class HomeSheet extends StatelessWidget {
     return lerpDouble(0, _restAlpha, t)!;
   }
 
-  /// How much the weather backdrop is revealed at [extent] (0 until it starts
-  /// appearing, 1 at full) — also the "immersive" factor for the chrome.
-  static double weatherReveal(double extent) =>
-      ((extent - _weatherFrom) / (maxExtent - _weatherFrom)).clamp(0.0, 1.0);
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -82,7 +73,7 @@ class HomeSheet extends StatelessWidget {
           1.0,
         );
         final surfaceAlpha = _surfaceAlpha(e);
-        final weatherOpacity = weatherReveal(e);
+        final weatherOpacity = HomeChrome.weatherReveal(e);
         final blur =
             24.0 *
             (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
@@ -120,7 +111,7 @@ class HomeSheet extends StatelessWidget {
                     opacity: weatherOpacity,
                     child: WeatherSkyBackground(
                       mode: weatherMode,
-                      active: e >= _weatherFrom,
+                      active: HomeChrome.weatherActive(e),
                     ),
                   ),
                 ),

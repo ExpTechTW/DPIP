@@ -2,6 +2,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/area_selection.dart';
+import 'package:dpip/core/settings/home_chrome.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
@@ -13,16 +14,17 @@ import 'package:provider/provider.dart';
 ///
 /// It only *displays* [AreaSelection]; switching is a horizontal swipe anywhere
 /// (see `RegionSwipeArea`) and the carousel slides to re-centre. When placed over
-/// a backdrop (the home weather), pass [reveal] (0→1): the bar fades its own
-/// background to transparent and flips its badges to light so it blends into the
-/// backdrop instead of leaving an opaque strip. It carries its own top safe area
-/// so that fade covers the status-bar row too.
+/// the home weather backdrop, pass [sheetExtent]: as the sheet climbs the bar
+/// first *blends* into the weather (its background fades transparent and its
+/// badges flip to light), then *dismisses* — sliding up and fading out — once the
+/// rising sheet invades it, leaving the weather unobstructed. It carries its own
+/// top safe area so both effects cover the status-bar row too.
 class RegionBar extends StatefulWidget {
-  const RegionBar({super.key, this.reveal});
+  const RegionBar({super.key, this.sheetExtent});
 
-  /// How much the backdrop behind the bar is revealed; null (Events) keeps it an
-  /// opaque surface bar.
-  final ValueListenable<double>? reveal;
+  /// The active Home sheet's extent (0→1) driving the bar's blend and dismissal;
+  /// null (Events) keeps it an opaque surface bar.
+  final ValueListenable<double>? sheetExtent;
 
   @override
   State<RegionBar> createState() => _RegionBarState();
@@ -90,32 +92,55 @@ class _RegionBarState extends State<RegionBar> {
         _controller.jumpToPage(areas.selectedIndex);
       }
     });
-    final reveal = widget.reveal;
-    if (reveal == null) return _build(context, 0, areas.count);
+    final sheetExtent = widget.sheetExtent;
+    if (sheetExtent == null) {
+      return _build(context, blend: 0, dismiss: 0, count: areas.count);
+    }
     return ValueListenableBuilder<double>(
-      valueListenable: reveal,
-      builder: (context, value, _) => _build(context, value, areas.count),
+      valueListenable: sheetExtent,
+      builder: (context, extent, _) => _build(
+        context,
+        blend: HomeChrome.regionBlend(extent),
+        dismiss: HomeChrome.regionDismiss(extent),
+        count: areas.count,
+      ),
     );
   }
 
-  Widget _build(BuildContext context, double reveal, int count) {
+  Widget _build(
+    BuildContext context, {
+    required double blend,
+    required double dismiss,
+    required int count,
+  }) {
     final colors = Theme.of(context).colorScheme;
-    return ColoredBox(
-      color: Color.lerp(colors.surface, Colors.transparent, reveal)!,
-      child: SafeArea(
-        bottom: false,
-        child: SizedBox(
-          height: 44,
-          child: PageView.builder(
-            controller: _controller,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: count,
-            itemBuilder: (context, index) => AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) => _RegionBadge(
-                index: index,
-                distance: (_page - index).abs(),
-                reveal: reveal,
+    // Slide up by the bar's own height and fade out once the sheet invades it;
+    // release taps to the sheet behind as soon as it is mostly gone.
+    return IgnorePointer(
+      ignoring: dismiss > 0.5,
+      child: Opacity(
+        opacity: 1 - dismiss,
+        child: FractionalTranslation(
+          translation: Offset(0, -dismiss),
+          child: ColoredBox(
+            color: Color.lerp(colors.surface, Colors.transparent, blend)!,
+            child: SafeArea(
+              bottom: false,
+              child: SizedBox(
+                height: 44,
+                child: PageView.builder(
+                  controller: _controller,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: count,
+                  itemBuilder: (context, index) => AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, _) => _RegionBadge(
+                      index: index,
+                      distance: (_page - index).abs(),
+                      reveal: blend,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
