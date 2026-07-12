@@ -56,4 +56,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weatherModeThunderstorm => 'Thunderstorm';
+
+  @override
+  String get commonLoading => 'Loading…';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get commonError => 'Something went wrong';
+
+  @override
+  String get commonEmpty => 'Nothing to show';
+
+  @override
+  String get feedConnecting => 'Connecting…';
+
+  @override
+  String get feedStale => 'Data may be out of date';
+
+  @override
+  String get feedOffline => 'Connection lost';
+
+  @override
+  String get eewTitle => 'Earthquake early warning';
+
+  @override
+  String get eewNone => 'No active earthquake early warning';
+
+  @override
+  String eewSummary(String magnitude, String depth) {
+    return 'M$magnitude · depth $depth km';
+  }
 }

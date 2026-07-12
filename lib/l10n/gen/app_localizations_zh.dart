@@ -55,4 +55,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get weatherModeThunderstorm => '雷雨';
+
+  @override
+  String get commonLoading => '載入中…';
+
+  @override
+  String get commonRetry => '重試';
+
+  @override
+  String get commonError => '發生錯誤';
+
+  @override
+  String get commonEmpty => '沒有資料';
+
+  @override
+  String get feedConnecting => '連線中…';
+
+  @override
+  String get feedStale => '資料可能已過期';
+
+  @override
+  String get feedOffline => '連線中斷';
+
+  @override
+  String get eewTitle => '地震速報';
+
+  @override
+  String get eewNone => '目前沒有地震速報';
+
+  @override
+  String eewSummary(String magnitude, String depth) {
+    return '規模 $magnitude・深度 $depth 公里';
+  }
 }

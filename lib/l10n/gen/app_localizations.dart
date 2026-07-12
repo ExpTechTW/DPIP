@@ -193,6 +193,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thunderstorm'**
   String get weatherModeThunderstorm;
+
+  /// Generic loading label for an async view
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get commonLoading;
+
+  /// Button that re-runs a failed request
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get commonRetry;
+
+  /// Generic headline when an async request fails
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get commonError;
+
+  /// Generic message when a loaded list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show'**
+  String get commonEmpty;
+
+  /// A realtime feed is establishing its first data
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting…'**
+  String get feedConnecting;
+
+  /// Banner over a realtime feed whose data has aged past the freshness threshold
+  ///
+  /// In en, this message translates to:
+  /// **'Data may be out of date'**
+  String get feedStale;
+
+  /// Banner/headline when a realtime feed has gone offline
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lost'**
+  String get feedOffline;
+
+  /// Header of the earthquake monitor when one or more alerts are active
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake early warning'**
+  String get eewTitle;
+
+  /// Calm state of the earthquake monitor when the live feed reports no alert
+  ///
+  /// In en, this message translates to:
+  /// **'No active earthquake early warning'**
+  String get eewNone;
+
+  /// One-line summary of an EEW alert's magnitude and depth
+  ///
+  /// In en, this message translates to:
+  /// **'M{magnitude} · depth {depth} km'**
+  String eewSummary(String magnitude, String depth);
 }
 
 class _AppLocalizationsDelegate

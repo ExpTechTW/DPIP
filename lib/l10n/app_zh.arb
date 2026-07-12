@@ -15,5 +15,15 @@
   "weatherModeClear": "晴天",
   "weatherModeRain": "雨天",
   "weatherModeFog": "大霧",
-  "weatherModeThunderstorm": "雷雨"
+  "weatherModeThunderstorm": "雷雨",
+  "commonLoading": "載入中…",
+  "commonRetry": "重試",
+  "commonError": "發生錯誤",
+  "commonEmpty": "沒有資料",
+  "feedConnecting": "連線中…",
+  "feedStale": "資料可能已過期",
+  "feedOffline": "連線中斷",
+  "eewTitle": "地震速報",
+  "eewNone": "目前沒有地震速報",
+  "eewSummary": "規模 {magnitude}・深度 {depth} 公里"
 }

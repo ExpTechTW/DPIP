@@ -86,6 +86,14 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   pause polling on background and resume (recompute status → resync clock →
   refetch) on foreground; background alerting is push's job. A safety-critical
   feed that is `stale`/`offline` must never be presented as current.
+- **Async-state UI (contract):** render async/realtime state through the shared
+  views in `shared/widgets/`, never a hand-rolled `FutureBuilder`/`Consumer` that
+  drops the error or stale case into a blank screen. `AsyncView<T>` maps a
+  one-shot `Future<Result<T>>` to loading/data/empty/error (with retry);
+  `RealtimeView<T>` maps a `RealtimeState<T>`, adding connecting/stale/offline and
+  a freshness banner so aged safety data is never shown as current. Building
+  blocks: `LoadingView` / `ErrorView` / `EmptyView`. Template consumer:
+  `features/earthquake/presentation/pages/earthquake_page.dart`.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon

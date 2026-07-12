@@ -63,5 +63,49 @@
   "weatherModeThunderstorm": "Thunderstorm",
   "@weatherModeThunderstorm": {
     "description": "Weather animation forced to a thunderstorm"
+  },
+  "commonLoading": "Loading…",
+  "@commonLoading": {
+    "description": "Generic loading label for an async view"
+  },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Button that re-runs a failed request"
+  },
+  "commonError": "Something went wrong",
+  "@commonError": {
+    "description": "Generic headline when an async request fails"
+  },
+  "commonEmpty": "Nothing to show",
+  "@commonEmpty": {
+    "description": "Generic message when a loaded list is empty"
+  },
+  "feedConnecting": "Connecting…",
+  "@feedConnecting": {
+    "description": "A realtime feed is establishing its first data"
+  },
+  "feedStale": "Data may be out of date",
+  "@feedStale": {
+    "description": "Banner over a realtime feed whose data has aged past the freshness threshold"
+  },
+  "feedOffline": "Connection lost",
+  "@feedOffline": {
+    "description": "Banner/headline when a realtime feed has gone offline"
+  },
+  "eewTitle": "Earthquake early warning",
+  "@eewTitle": {
+    "description": "Header of the earthquake monitor when one or more alerts are active"
+  },
+  "eewNone": "No active earthquake early warning",
+  "@eewNone": {
+    "description": "Calm state of the earthquake monitor when the live feed reports no alert"
+  },
+  "eewSummary": "M{magnitude} · depth {depth} km",
+  "@eewSummary": {
+    "description": "One-line summary of an EEW alert's magnitude and depth",
+    "placeholders": {
+      "magnitude": { "type": "String" },
+      "depth": { "type": "String" }
+    }
   }
 }
