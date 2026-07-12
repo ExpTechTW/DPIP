@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/home_backdrop_reveal.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,10 @@ import 'package:provider/provider.dart';
 /// The app's persistent bottom-navigation shell.
 ///
 /// Wraps the five top-level branches in an [IndexedStack] (via
-/// [StatefulNavigationShell]) so each tab keeps its own navigation state.
+/// [StatefulNavigationShell]) so each tab keeps its own navigation state. The
+/// body extends behind the bar so, on Home, the weather backdrop shows through
+/// it; the bar then fades transparent and flips its icons/labels to light as the
+/// weather reveals ([HomeBackdropReveal]) instead of leaving an opaque strip.
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.navigationShell});
 
@@ -51,8 +55,69 @@ class MainShell extends StatelessWidget {
     ];
 
     return Scaffold(
+      // Let the Home weather backdrop show through behind the bar.
+      extendBody: true,
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
+      // Only Home immerses; every other tab keeps the opaque bar (reveal 0).
+      bottomNavigationBar: ValueListenableBuilder<double>(
+        valueListenable: context.read<HomeBackdropReveal>(),
+        builder: (context, homeReveal, _) => _navBar(
+          context,
+          destinations,
+          navigationShell.currentIndex == 0 ? homeReveal : 0,
+        ),
+      ),
+    );
+  }
+
+  Widget _navBar(
+    BuildContext context,
+    List<NavigationDestination> destinations,
+    double reveal,
+  ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final iconColor = Color.lerp(
+      colors.onSurfaceVariant,
+      Colors.white,
+      reveal,
+    )!;
+    final selectedIconColor = Color.lerp(
+      colors.onSecondaryContainer,
+      Colors.white,
+      reveal,
+    )!;
+    final labelColor = Color.lerp(
+      colors.onSurfaceVariant,
+      Colors.white,
+      reveal,
+    )!;
+    return NavigationBarTheme(
+      data: NavigationBarThemeData(
+        backgroundColor: Color.lerp(
+          colors.surfaceContainer,
+          Colors.transparent,
+          reveal,
+        ),
+        elevation: reveal > 0 ? 0 : null,
+        shadowColor: reveal > 0 ? Colors.transparent : null,
+        indicatorColor: Color.lerp(
+          colors.secondaryContainer,
+          Colors.white.withValues(alpha: 0.22),
+          reveal,
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? selectedIconColor
+                : iconColor,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.all(
+          theme.textTheme.labelMedium?.copyWith(color: labelColor),
+        ),
+      ),
+      child: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         destinations: destinations,
         onDestinationSelected: (index) {

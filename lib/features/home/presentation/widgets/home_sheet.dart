@@ -42,6 +42,10 @@ class HomeSheet extends StatelessWidget {
   /// instead of butting a rounded, shadowed edge against it.
   static const double _flushFrom = 0.9;
 
+  /// The region-bar overlay's height (matches `RegionBar`), added to the safe
+  /// area for the content inset as the sheet reaches the top.
+  static const double _regionBarHeight = 44;
+
   /// The draggable sheet's scroll controller.
   final ScrollController scrollController;
 
@@ -60,12 +64,15 @@ class HomeSheet extends StatelessWidget {
     return lerpDouble(0, _restAlpha, t)!;
   }
 
-  double _weatherOpacity(double e) =>
-      ((e - _weatherFrom) / (maxExtent - _weatherFrom)).clamp(0.0, 1.0);
+  /// How much the weather backdrop is revealed at [extent] (0 until it starts
+  /// appearing, 1 at full) — also the "immersive" factor for the chrome.
+  static double weatherReveal(double extent) =>
+      ((extent - _weatherFrom) / (maxExtent - _weatherFrom)).clamp(0.0, 1.0);
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final regionBarInset = MediaQuery.paddingOf(context).top + _regionBarHeight;
     return ValueListenableBuilder<double>(
       valueListenable: extent,
       builder: (context, e, _) {
@@ -75,7 +82,7 @@ class HomeSheet extends StatelessWidget {
           1.0,
         );
         final surfaceAlpha = _surfaceAlpha(e);
-        final weatherOpacity = _weatherOpacity(e);
+        final weatherOpacity = weatherReveal(e);
         final blur =
             24.0 *
             (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
@@ -120,6 +127,8 @@ class HomeSheet extends StatelessWidget {
                 HomeContent(
                   scrollController: scrollController,
                   handleOpacity: 1 - weatherOpacity,
+                  reveal: weatherOpacity,
+                  topInset: lerpDouble(0, regionBarInset, flush)!,
                 ),
               ],
             ),

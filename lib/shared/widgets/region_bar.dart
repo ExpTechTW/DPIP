@@ -3,19 +3,26 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/area_selection.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 /// The area (地區) indicator at the top of Home and Events — a centered carousel
-/// of badges. The selected area sits in the middle with a filled badge; its
-/// neighbours flank it and areas two or more away fade out ("+2 太遠").
+/// of badges over page dots. The selected area sits in the middle with a filled
+/// badge; neighbours flank it and areas two or more away fade out.
 ///
-/// It only *displays* [AreaSelection] (the pager is non-interactive); switching
-/// is a horizontal swipe anywhere on the page (see `RegionSwipeArea`). On a
-/// selection change the carousel slides to re-centre — the recommended
-/// `PageController`-driven transition — so both screens' bars stay in sync.
+/// It only *displays* [AreaSelection]; switching is a horizontal swipe anywhere
+/// (see `RegionSwipeArea`) and the carousel slides to re-centre. When placed over
+/// a backdrop (the home weather), pass [reveal] (0→1): the bar fades its own
+/// background to transparent and flips its badges to light so it blends into the
+/// backdrop instead of leaving an opaque strip. It carries its own top safe area
+/// so that fade covers the status-bar row too.
 class RegionBar extends StatefulWidget {
-  const RegionBar({super.key});
+  const RegionBar({super.key, this.reveal});
+
+  /// How much the backdrop behind the bar is revealed; null (Events) keeps it an
+  /// opaque surface bar.
+  final ValueListenable<double>? reveal;
 
   @override
   State<RegionBar> createState() => _RegionBarState();
@@ -45,7 +52,10 @@ class _RegionBarState extends State<RegionBar> {
     }
   }
 
-  /// Slides the carousel to re-centre the selected area — the transition.
+  double get _page => !_controller.hasClients
+      ? _controller.initialPage.toDouble()
+      : (_controller.page ?? _controller.initialPage.toDouble());
+
   void _animateToSelected() {
     if (!_controller.hasClients) return;
     final index = _areas!.selectedIndex;
@@ -69,10 +79,6 @@ class _RegionBarState extends State<RegionBar> {
     super.dispose();
   }
 
-  double get _page => !_controller.hasClients
-      ? _controller.initialPage.toDouble()
-      : (_controller.page ?? _controller.initialPage.toDouble());
-
   @override
   Widget build(BuildContext context) {
     final areas = context.watch<AreaSelection>();
@@ -84,29 +90,53 @@ class _RegionBarState extends State<RegionBar> {
         _controller.jumpToPage(areas.selectedIndex);
       }
     });
-    return SizedBox(
-      height: 44,
-      child: PageView.builder(
-        controller: _controller,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: areas.count,
-        itemBuilder: (context, index) => AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) =>
-              _RegionBadge(index: index, distance: (_page - index).abs()),
+    final reveal = widget.reveal;
+    if (reveal == null) return _build(context, 0, areas.count);
+    return ValueListenableBuilder<double>(
+      valueListenable: reveal,
+      builder: (context, value, _) => _build(context, value, areas.count),
+    );
+  }
+
+  Widget _build(BuildContext context, double reveal, int count) {
+    final colors = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: Color.lerp(colors.surface, Colors.transparent, reveal)!,
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: 44,
+          child: PageView.builder(
+            controller: _controller,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: count,
+            itemBuilder: (context, index) => AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) => _RegionBadge(
+                index: index,
+                distance: (_page - index).abs(),
+                reveal: reveal,
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-/// A single area badge, styled by its [distance] from the carousel centre:
-/// filled and opaque at the centre, plain alongside, faded two or more away.
+/// A single area badge, styled by its [distance] from the carousel centre and
+/// shifted to light as [reveal] rises so it stays legible over the backdrop.
 class _RegionBadge extends StatelessWidget {
-  const _RegionBadge({required this.index, required this.distance});
+  const _RegionBadge({
+    required this.index,
+    required this.distance,
+    required this.reveal,
+  });
 
   final int index;
   final double distance;
+  final double reveal;
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +144,25 @@ class _RegionBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    // 1 at the centre → 0 by one step away: the badge fill and text emphasis.
+    // 1 at the centre → 0 one step away: badge fill and text emphasis.
     final fill = (1 - distance).clamp(0.0, 1.0);
     // Full within one step, then fades out toward two steps away.
     final opacity = distance <= 1
         ? 1.0
         : (1 - (distance - 1) * 0.85).clamp(0.15, 1.0);
+
+    // Palette shifts to light as the backdrop takes over.
+    final badgeBase = Color.lerp(
+      colors.primaryContainer,
+      Colors.white.withValues(alpha: 0.22),
+      reveal,
+    )!;
+    final restText = Color.lerp(colors.onSurface, Colors.white, reveal)!;
+    final centreText = Color.lerp(
+      colors.onPrimaryContainer,
+      Colors.white,
+      reveal,
+    )!;
 
     return GestureDetector(
       // Tapping a badge selects it — the other switch mode besides swiping.
@@ -134,7 +177,7 @@ class _RegionBadge extends StatelessWidget {
               vertical: 6,
             ),
             decoration: BoxDecoration(
-              color: colors.primaryContainer.withValues(alpha: fill),
+              color: badgeBase.withValues(alpha: badgeBase.a * fill),
               borderRadius: AppRadius.large,
             ),
             child: Text(
@@ -144,11 +187,7 @@ class _RegionBadge extends StatelessWidget {
               overflow: TextOverflow.fade,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Color.lerp(
-                  colors.onSurface,
-                  colors.onPrimaryContainer,
-                  fill,
-                ),
+                color: Color.lerp(restText, centreText, fill),
               ),
             ),
           ),

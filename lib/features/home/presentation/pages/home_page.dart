@@ -1,6 +1,7 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/area_selection.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/home_backdrop_reveal.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
@@ -12,10 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-/// Home tab — the region bar pinned at the top over a shared map backdrop, with
-/// a per-area draggable sheet. A horizontal swipe anywhere pages the whole body
-/// (a map tap still opens the full map tab); the sheet's height is **shared**
-/// across areas, so switching slides the content without collapsing the sheet.
+/// Home tab — the region bar pinned over a shared map backdrop, with a per-area
+/// draggable sheet that expands full-screen *behind* the bar so its weather
+/// backdrop fills the screen. A swipe anywhere pages the whole body (a map tap
+/// opens the full map tab); the sheet height is shared across areas so switching
+/// never collapses it.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -24,8 +26,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  /// The sheet extent shared by every area's sheet, so a switch keeps the sheet
-  /// at the same height instead of springing back to rest.
+  /// Shared by every area's sheet so a switch keeps it at the same height.
   final ValueNotifier<double> _sharedExtent = ValueNotifier<double>(
     HomeSheet.restExtent,
   );
@@ -40,32 +41,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RegionSwipeArea(
-        child: Column(
+        child: Stack(
           children: [
-            const SafeArea(bottom: false, child: RegionBar()),
-            Expanded(
-              child: Stack(
-                children: [
-                  // Shared map backdrop; a tap opens the full map tab.
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => context.goNamed(AppRoutes.map),
-                      child: const HomeMapBackdrop(),
-                    ),
-                  ),
-                  // Per-area sheet the pager slides on a switch; each keeps its
-                  // own state but adopts the shared height.
-                  Positioned.fill(
-                    child: RegionPager(
-                      itemBuilder: (context, index) => _HomeSheetPage(
-                        key: ValueKey(index),
-                        index: index,
-                        sharedExtent: _sharedExtent,
-                      ),
-                    ),
-                  ),
-                ],
+            // Shared map backdrop; a tap opens the full map tab.
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => context.goNamed(AppRoutes.map),
+                child: const HomeMapBackdrop(),
               ),
+            ),
+            // Per-area sheet the pager slides on a switch — full-screen behind
+            // the region bar, so its weather fills up into the bar.
+            Positioned.fill(
+              child: RegionPager(
+                itemBuilder: (context, index) => _HomeSheetPage(
+                  key: ValueKey(index),
+                  index: index,
+                  sharedExtent: _sharedExtent,
+                ),
+              ),
+            ),
+            // Region bar overlay, fading transparent as the weather reveals.
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: RegionBar(reveal: context.read<HomeBackdropReveal>()),
             ),
           ],
         ),
@@ -74,10 +75,9 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-/// One area's draggable sheet over the shared backdrop. Owns the drag mechanics
-/// and mirrors [sharedExtent]: while active it publishes its extent there, and
-/// on becoming active it adopts it — so switching areas never collapses the
-/// sheet.
+/// One area's draggable sheet over the shared backdrop. Owns the drag mechanics,
+/// mirrors [sharedExtent] so switching never collapses the sheet, and publishes
+/// its weather reveal to [HomeBackdropReveal] while it is the active area.
 class _HomeSheetPage extends StatefulWidget {
   const _HomeSheetPage({
     super.key,
@@ -99,6 +99,13 @@ class _HomeSheetPageState extends State<_HomeSheetPage> {
   );
   AreaSelection? _areas;
   HomeResetSignal? _resetSignal;
+  HomeBackdropReveal? _reveal;
+
+  @override
+  void initState() {
+    super.initState();
+    _extent.addListener(_publishReveal);
+  }
 
   @override
   void didChangeDependencies() {
@@ -113,13 +120,21 @@ class _HomeSheetPageState extends State<_HomeSheetPage> {
       _areas?.removeListener(_onSelectionChanged);
       _areas = areas..addListener(_onSelectionChanged);
     }
+    _reveal = context.read<HomeBackdropReveal>();
   }
 
   bool get _isActive => _areas?.selectedIndex == widget.index;
 
-  /// On becoming the visible area, adopt the shared height (freshly-built pages
-  /// already start there via `initialChildSize`).
-  void _onSelectionChanged() => _jumpTo(widget.sharedExtent.value);
+  /// Keeps [HomeBackdropReveal] in step with the active area's sheet.
+  void _publishReveal() {
+    if (_isActive) _reveal?.value = HomeSheet.weatherReveal(_extent.value);
+  }
+
+  /// On becoming visible, adopt the shared height and re-publish the reveal.
+  void _onSelectionChanged() {
+    _jumpTo(widget.sharedExtent.value);
+    _publishReveal();
+  }
 
   void _resetSheet() {
     widget.sharedExtent.value = HomeSheet.restExtent;
@@ -158,6 +173,7 @@ class _HomeSheetPageState extends State<_HomeSheetPage> {
   void dispose() {
     _resetSignal?.removeListener(_resetSheet);
     _areas?.removeListener(_onSelectionChanged);
+    _extent.removeListener(_publishReveal);
     _sheet.dispose();
     _extent.dispose();
     super.dispose();

@@ -16,7 +16,7 @@ class EventsPage extends StatelessWidget {
       body: RegionSwipeArea(
         child: Column(
           children: [
-            const SafeArea(bottom: false, child: RegionBar()),
+            const RegionBar(),
             Expanded(
               child: RegionPager(
                 itemBuilder: (context, index) => const EventTimeline(),

@@ -15,6 +15,8 @@ class HomeContent extends StatelessWidget {
     super.key,
     required this.scrollController,
     this.handleOpacity = 1,
+    this.reveal = 0,
+    this.topInset = 0,
   });
 
   /// The draggable sheet's scroll controller.
@@ -24,20 +26,34 @@ class HomeContent extends StatelessWidget {
   /// the pull-up affordance is no longer needed.
   final double handleOpacity;
 
+  /// How much the weather backdrop is revealed (0→1) — content shifts to light
+  /// glass so it stays legible over the weather.
+  final double reveal;
+
+  /// Extra top padding that clears the region-bar overlay as the sheet reaches
+  /// full, so the content isn't hidden behind it.
+  final double topInset;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final cardColor = Color.lerp(
+      colors.surfaceContainerHighest.withValues(alpha: 0.55),
+      Colors.white.withValues(alpha: 0.16),
+      reveal,
+    )!;
     return ListView(
       controller: scrollController,
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        0,
+        topInset,
         AppSpacing.lg,
-        AppSpacing.lg,
+        // Clear the bottom nav (the body extends behind it — extendBody).
+        AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
         Opacity(opacity: handleOpacity, child: const HomeSheetHandle()),
-        const HomeSheetHeader(),
+        HomeSheetHeader(reveal: reveal),
         const SizedBox(height: AppSpacing.lg),
         // Placeholder cards until the real sections land.
         for (var i = 0; i < 6; i++)
@@ -46,7 +62,7 @@ class HomeContent extends StatelessWidget {
             child: Container(
               height: 96,
               decoration: BoxDecoration(
-                color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
+                color: cardColor,
                 borderRadius: AppRadius.medium,
               ),
             ),

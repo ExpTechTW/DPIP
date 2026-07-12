@@ -7,18 +7,32 @@ import 'package:flutter/material.dart';
 /// warning, and the current weather — condition icon + temperature on the left
 /// (2/3), precipitation + humidity stacked on the right (1/3).
 ///
-/// Values are placeholders until the weather/area API is wired.
+/// [reveal] (0→1) shifts the text to light as the weather backdrop takes over,
+/// so it stays legible. Values are placeholders until the weather/area API is
+/// wired.
 class HomeSheetHeader extends StatelessWidget {
-  const HomeSheetHeader({super.key});
+  const HomeSheetHeader({super.key, this.reveal = 0});
+
+  final double reveal;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final foreground = Color.lerp(colors.onSurface, Colors.white, reveal)!;
+    final secondary = Color.lerp(
+      colors.onSurfaceVariant,
+      Colors.white.withValues(alpha: 0.75),
+      reveal,
+    )!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('臺南市 歸仁區', style: theme.textTheme.headlineSmall),
+        Text(
+          '臺南市 歸仁區',
+          style: theme.textTheme.headlineSmall?.copyWith(color: foreground),
+        ),
         const SizedBox(height: AppSpacing.sm),
         const _WarningBadge(label: '大豪雨特報'),
         const SizedBox(height: AppSpacing.lg),
@@ -30,23 +44,21 @@ class HomeSheetHeader extends StatelessWidget {
               flex: 2,
               child: Row(
                 children: [
-                  Icon(
-                    Icons.cloud_outlined,
-                    size: 48,
-                    color: colors.onSurfaceVariant,
-                  ),
+                  Icon(Icons.cloud_outlined, size: 48, color: secondary),
                   const SizedBox(width: AppSpacing.md),
                   Text.rich(
                     TextSpan(
                       children: [
                         TextSpan(
                           text: '26.6',
-                          style: theme.textTheme.displaySmall,
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            color: foreground,
+                          ),
                         ),
                         TextSpan(
                           text: '°C',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: colors.onSurfaceVariant,
+                            color: secondary,
                           ),
                         ),
                       ],
@@ -65,11 +77,15 @@ class HomeSheetHeader extends StatelessWidget {
                   _Metric(
                     label: AppLocalizations.of(context).weatherPrecipitation,
                     value: '0.0 mm',
+                    foreground: foreground,
+                    secondary: secondary,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   _Metric(
                     label: AppLocalizations.of(context).weatherHumidity,
                     value: '90%',
+                    foreground: foreground,
+                    secondary: secondary,
                   ),
                 ],
               ),
@@ -124,10 +140,17 @@ class _WarningBadge extends StatelessWidget {
 
 /// A small label over a prominent value (e.g. "Precipitation" / "0.0 mm").
 class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value});
+  const _Metric({
+    required this.label,
+    required this.value,
+    required this.foreground,
+    required this.secondary,
+  });
 
   final String label;
   final String value;
+  final Color foreground;
+  final Color secondary;
 
   @override
   Widget build(BuildContext context) {
@@ -137,11 +160,12 @@ class _Metric extends StatelessWidget {
       children: [
         Text(
           label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          style: theme.textTheme.labelMedium?.copyWith(color: secondary),
         ),
-        Text(value, style: theme.textTheme.titleMedium),
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(color: foreground),
+        ),
       ],
     );
   }

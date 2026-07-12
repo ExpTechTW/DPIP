@@ -6,6 +6,7 @@ import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/settings/area_selection.dart';
+import 'package:dpip/core/settings/home_backdrop_reveal.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -76,6 +77,7 @@ class DpipApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: regions),
         ChangeNotifierProvider.value(value: experimental),
         ChangeNotifierProvider(create: (_) => AreaSelection()),
+        ChangeNotifierProvider(create: (_) => HomeBackdropReveal()),
         ChangeNotifierProvider(create: (_) => HomeResetSignal()),
         Provider.value(value: redundantApi),
         Provider.value(value: exclusiveApi),

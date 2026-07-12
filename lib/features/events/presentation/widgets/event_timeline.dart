@@ -14,11 +14,12 @@ class EventTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.md,
         AppSpacing.lg,
-        AppSpacing.lg,
+        // Clear the bottom nav (the shell body extends behind it).
+        AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
       ),
       itemCount: _placeholderEvents.length,
       itemBuilder: (context, index) => _EventTile(
