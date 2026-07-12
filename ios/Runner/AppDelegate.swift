@@ -20,5 +20,6 @@ import UIKit
     // lifecycle (registering a bare channel here can silently stop firing).
     DeviceInfoPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlugin")!)
     CompassPlugin.register(with: registry.registrar(forPlugin: "CompassPlugin")!)
+    MapSnapshotPlugin.register(with: registry.registrar(forPlugin: "MapSnapshotPlugin")!)
   }
 }

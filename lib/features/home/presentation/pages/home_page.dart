@@ -1,6 +1,7 @@
+import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/features/settings/presentation/experimental_settings.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,9 +28,29 @@ class _HomePageState extends State<HomePage> {
   final ValueNotifier<double> _extent = ValueNotifier<double>(
     HomeSheet.restExtent,
   );
+  HomeResetSignal? _resetSignal;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final signal = context.read<HomeResetSignal>();
+    if (signal != _resetSignal) {
+      _resetSignal?.removeListener(_resetSheet);
+      _resetSignal = signal..addListener(_resetSheet);
+    }
+  }
+
+  /// Snaps the sheet back to rest (used when the Home tab is re-entered).
+  void _resetSheet() {
+    if (!_sheet.isAttached) return;
+    if ((_sheet.size - HomeSheet.restExtent).abs() < 0.001) return;
+    _sheet.jumpTo(HomeSheet.restExtent);
+    _extent.value = HomeSheet.restExtent;
+  }
 
   @override
   void dispose() {
+    _resetSignal?.removeListener(_resetSheet);
     _sheet.dispose();
     _extent.dispose();
     super.dispose();
@@ -62,7 +83,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: BaseMap()),
+          const Positioned.fill(child: HomeMapBackdrop()),
           Listener(
             onPointerUp: (_) => _settle(),
             child: NotificationListener<DraggableScrollableNotification>(

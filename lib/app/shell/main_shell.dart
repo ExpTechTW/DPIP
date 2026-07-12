@@ -1,6 +1,8 @@
+import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 /// The app's persistent bottom-navigation shell.
 ///
@@ -53,11 +55,15 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         destinations: destinations,
-        onDestinationSelected: (index) => navigationShell.goBranch(
-          index,
-          // Tapping the active tab returns it to its initial route.
-          initialLocation: index == navigationShell.currentIndex,
-        ),
+        onDestinationSelected: (index) {
+          // Re-entering Home snaps its sheet back to rest.
+          if (index == 0) context.read<HomeResetSignal>().fire();
+          navigationShell.goBranch(
+            index,
+            // Tapping the active tab returns it to its initial route.
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
       ),
     );
   }
