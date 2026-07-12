@@ -10,10 +10,18 @@ import 'package:flutter/material.dart';
 /// driven by the sheet's [scrollController] so scrolling past the top expands
 /// the sheet.
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key, required this.scrollController});
+  const HomeContent({
+    super.key,
+    required this.scrollController,
+    this.handleOpacity = 1,
+  });
 
   /// The draggable sheet's scroll controller.
   final ScrollController scrollController;
+
+  /// Opacity of the grab handle — faded to 0 as the sheet reaches full, where
+  /// the pull-up affordance is no longer needed.
+  final double handleOpacity;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +35,7 @@ class HomeContent extends StatelessWidget {
         AppSpacing.lg,
       ),
       children: [
-        const HomeSheetHandle(),
+        Opacity(opacity: handleOpacity, child: const HomeSheetHandle()),
         // Placeholder cards until the real sections land.
         for (var i = 0; i < 8; i++)
           Padding(

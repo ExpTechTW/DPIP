@@ -117,7 +117,10 @@ class HomeSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                HomeContent(scrollController: scrollController),
+                HomeContent(
+                  scrollController: scrollController,
+                  handleOpacity: 1 - weatherOpacity,
+                ),
               ],
             ),
           ),
