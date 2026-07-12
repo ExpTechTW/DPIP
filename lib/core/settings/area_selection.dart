@@ -24,4 +24,10 @@ class AreaSelection extends ChangeNotifier {
     _selectedIndex = index;
     notifyListeners();
   }
+
+  /// Moves to the next area (no-op at the end) — swipe left.
+  void next() => select(_selectedIndex + 1);
+
+  /// Moves to the previous area (no-op at the start) — swipe right.
+  void previous() => select(_selectedIndex - 1);
 }

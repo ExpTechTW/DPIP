@@ -5,58 +5,12 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// A swipeable bar of the user's geographic areas (地區), shown at the top of
-/// Home (inside the sheet) and Events. Swiping left/right switches the active
-/// area via [AreaSelection]; page dots show the position. Both screens' bars
-/// stay in sync through the shared selection.
-class RegionBar extends StatefulWidget {
+/// The area (地區) indicator shown at the top of Home and Events — the current
+/// area name over page dots. It only *displays* [AreaSelection]; switching is a
+/// horizontal swipe anywhere on the page (see `RegionSwipeArea`), so both
+/// screens' bars stay in sync through the shared selection.
+class RegionBar extends StatelessWidget {
   const RegionBar({super.key});
-
-  @override
-  State<RegionBar> createState() => _RegionBarState();
-}
-
-class _RegionBarState extends State<RegionBar> {
-  late final PageController _controller;
-  AreaSelection? _areas;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = PageController(
-      initialPage: context.read<AreaSelection>().selectedIndex,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final areas = context.read<AreaSelection>();
-    if (areas != _areas) {
-      _areas?.removeListener(_syncPage);
-      _areas = areas..addListener(_syncPage);
-    }
-  }
-
-  /// Animates the pager when the selection changes elsewhere (the other
-  /// screen's bar).
-  void _syncPage() {
-    if (!_controller.hasClients) return;
-    final index = _areas!.selectedIndex;
-    if (_controller.page?.round() == index) return;
-    _controller.animateToPage(
-      index,
-      duration: AppMotion.medium,
-      curve: Curves.easeOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _areas?.removeListener(_syncPage);
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,22 +18,17 @@ class _RegionBarState extends State<RegionBar> {
     final theme = Theme.of(context);
     final areas = context.watch<AreaSelection>();
     return SizedBox(
-      height: 52,
+      height: 48,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _controller,
-              onPageChanged: areas.select,
-              itemCount: areas.count,
-              itemBuilder: (context, index) => Center(
-                child: Text(
-                  l10n.areaPlaceholder(index + 1),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+          AnimatedSwitcher(
+            duration: AppMotion.medium,
+            child: Text(
+              l10n.areaPlaceholder(areas.selectedIndex + 1),
+              key: ValueKey(areas.selectedIndex),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -91,7 +40,7 @@ class _RegionBarState extends State<RegionBar> {
   }
 }
 
-/// The row of dots under the region pager marking the active area.
+/// The row of dots under the area name marking the active area.
 class _PageDots extends StatelessWidget {
   const _PageDots({required this.count, required this.active});
 

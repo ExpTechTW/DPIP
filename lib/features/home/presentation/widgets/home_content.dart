@@ -1,6 +1,5 @@
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:flutter/material.dart';
 
 /// The scrollable home dashboard shown inside the draggable sheet — the surface
@@ -29,9 +28,6 @@ class HomeContent extends StatelessWidget {
       ),
       children: [
         const HomeSheetHandle(),
-        // Region switcher — its own bar at the top of the sheet.
-        const RegionBar(),
-        const SizedBox(height: AppSpacing.md),
         // Placeholder cards until the real sections land.
         for (var i = 0; i < 8; i++)
           Padding(

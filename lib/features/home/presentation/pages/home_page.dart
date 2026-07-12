@@ -4,6 +4,8 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/widgets/region_bar.dart';
+import 'package:dpip/shared/widgets/region_swipe_area.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -74,33 +76,45 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final weatherMode = context.watch<ExperimentalSettings>().weatherMode;
     return Scaffold(
-      body: Stack(
-        children: [
-          // Tapping the exposed map backdrop opens the full map tab.
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () => context.goNamed(AppRoutes.map),
-              child: const HomeMapBackdrop(),
-            ),
-          ),
-          Listener(
-            onPointerUp: (_) => _settle(),
-            child: NotificationListener<DraggableScrollableNotification>(
-              onNotification: _onExtentChanged,
-              child: DraggableScrollableSheet(
-                controller: _sheet,
-                initialChildSize: HomeSheet.restExtent,
-                minChildSize: HomeSheet.minExtent,
-                maxChildSize: HomeSheet.maxExtent,
-                builder: (context, scrollController) => HomeSheet(
-                  scrollController: scrollController,
-                  extent: _extent,
-                  weatherMode: weatherMode,
-                ),
+      // A horizontal fling anywhere — map or sheet — switches the area.
+      body: RegionSwipeArea(
+        child: Column(
+          children: [
+            // Area indicator, pinned at the top below the status bar.
+            const SafeArea(bottom: false, child: RegionBar()),
+            Expanded(
+              child: Stack(
+                children: [
+                  // Tapping the exposed map backdrop opens the full map tab.
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => context.goNamed(AppRoutes.map),
+                      child: const HomeMapBackdrop(),
+                    ),
+                  ),
+                  Listener(
+                    onPointerUp: (_) => _settle(),
+                    child:
+                        NotificationListener<DraggableScrollableNotification>(
+                          onNotification: _onExtentChanged,
+                          child: DraggableScrollableSheet(
+                            controller: _sheet,
+                            initialChildSize: HomeSheet.restExtent,
+                            minChildSize: HomeSheet.minExtent,
+                            maxChildSize: HomeSheet.maxExtent,
+                            builder: (context, scrollController) => HomeSheet(
+                              scrollController: scrollController,
+                              extent: _extent,
+                              weatherMode: weatherMode,
+                            ),
+                          ),
+                        ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
