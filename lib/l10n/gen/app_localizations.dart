@@ -259,6 +259,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Area {number}'**
   String areaPlaceholder(int number);
+
+  /// Label for the precipitation metric in the home weather header
+  ///
+  /// In en, this message translates to:
+  /// **'Precipitation'**
+  String get weatherPrecipitation;
+
+  /// Label for the humidity metric in the home weather header
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get weatherHumidity;
 }
 
 class _AppLocalizationsDelegate

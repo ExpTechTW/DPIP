@@ -20,6 +20,7 @@ class RegionPager extends StatefulWidget {
 class _RegionPagerState extends State<RegionPager> {
   late final PageController _controller;
   AreaSelection? _areas;
+  bool _animating = false;
 
   @override
   void initState() {
@@ -39,18 +40,26 @@ class _RegionPagerState extends State<RegionPager> {
     }
   }
 
+  int get _pageRounded =>
+      (_controller.hasClients
+              ? (_controller.page ?? _controller.initialPage.toDouble())
+              : _controller.initialPage.toDouble())
+          .round();
+
   void _animateToSelected() {
     if (!_controller.hasClients) return;
     final index = _areas!.selectedIndex;
-    if ((_controller.page ?? _controller.initialPage.toDouble()).round() ==
-        index) {
-      return;
-    }
-    _controller.animateToPage(
-      index,
-      duration: AppMotion.medium,
-      curve: Curves.easeInOutCubicEmphasized,
-    );
+    if (_pageRounded == index) return;
+    _animating = true;
+    _controller
+        .animateToPage(
+          index,
+          duration: AppMotion.medium,
+          curve: Curves.easeInOutCubicEmphasized,
+        )
+        .whenComplete(() {
+          if (mounted) _animating = false;
+        });
   }
 
   @override
@@ -62,11 +71,20 @@ class _RegionPagerState extends State<RegionPager> {
 
   @override
   Widget build(BuildContext context) {
-    final count = context.watch<AreaSelection>().count;
+    final areas = context.watch<AreaSelection>();
+    // Safety net: if this pager missed a change while off-screen (another tab),
+    // snap it to the shared selection once it's laid out — keeps Home and Events
+    // in sync.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _animating || !_controller.hasClients) return;
+      if (_pageRounded != areas.selectedIndex) {
+        _controller.jumpToPage(areas.selectedIndex);
+      }
+    });
     return PageView.builder(
       controller: _controller,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: count,
+      itemCount: areas.count,
       itemBuilder: widget.itemBuilder,
     );
   }

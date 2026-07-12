@@ -1,17 +1,17 @@
-import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/features/events/presentation/widgets/event_timeline.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_pager.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
 import 'package:flutter/material.dart';
 
-/// Disaster-event feed. Placeholder pending the events feature; the region bar
-/// switches the area the feed is scoped to and a swipe pages the whole body.
+/// Disaster-event feed — a per-area timeline of events. The region bar switches
+/// the area (a swipe pages the whole timeline); content is placeholder until the
+/// history API is wired.
 class EventsPage extends StatelessWidget {
   const EventsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: RegionSwipeArea(
         child: Column(
@@ -19,8 +19,7 @@ class EventsPage extends StatelessWidget {
             const SafeArea(bottom: false, child: RegionBar()),
             Expanded(
               child: RegionPager(
-                itemBuilder: (context, index) =>
-                    Center(child: Text(l10n.navEvents)),
+                itemBuilder: (context, index) => const EventTimeline(),
               ),
             ),
           ],

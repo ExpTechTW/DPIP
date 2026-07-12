@@ -1,5 +1,6 @@
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:flutter/material.dart';
 
 /// The scrollable home dashboard shown inside the draggable sheet — the surface
@@ -36,8 +37,10 @@ class HomeContent extends StatelessWidget {
       ),
       children: [
         Opacity(opacity: handleOpacity, child: const HomeSheetHandle()),
+        const HomeSheetHeader(),
+        const SizedBox(height: AppSpacing.lg),
         // Placeholder cards until the real sections land.
-        for (var i = 0; i < 8; i++)
+        for (var i = 0; i < 6; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
             child: Container(

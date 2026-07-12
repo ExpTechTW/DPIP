@@ -114,5 +114,13 @@
     "placeholders": {
       "number": { "type": "int" }
     }
+  },
+  "weatherPrecipitation": "Precipitation",
+  "@weatherPrecipitation": {
+    "description": "Label for the precipitation metric in the home weather header"
+  },
+  "weatherHumidity": "Humidity",
+  "@weatherHumidity": {
+    "description": "Label for the humidity metric in the home weather header"
   }
 }

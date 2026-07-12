@@ -24,6 +24,7 @@ class RegionBar extends StatefulWidget {
 class _RegionBarState extends State<RegionBar> {
   late final PageController _controller;
   AreaSelection? _areas;
+  bool _animating = false;
 
   @override
   void initState() {
@@ -48,15 +49,17 @@ class _RegionBarState extends State<RegionBar> {
   void _animateToSelected() {
     if (!_controller.hasClients) return;
     final index = _areas!.selectedIndex;
-    if ((_controller.page ?? _controller.initialPage.toDouble()).round() ==
-        index) {
-      return;
-    }
-    _controller.animateToPage(
-      index,
-      duration: AppMotion.medium,
-      curve: Curves.easeInOutCubicEmphasized,
-    );
+    if (_page.round() == index) return;
+    _animating = true;
+    _controller
+        .animateToPage(
+          index,
+          duration: AppMotion.medium,
+          curve: Curves.easeInOutCubicEmphasized,
+        )
+        .whenComplete(() {
+          if (mounted) _animating = false;
+        });
   }
 
   @override
@@ -72,13 +75,21 @@ class _RegionBarState extends State<RegionBar> {
 
   @override
   Widget build(BuildContext context) {
-    final count = context.watch<AreaSelection>().count;
+    final areas = context.watch<AreaSelection>();
+    // Safety net: snap to the shared selection if this bar missed a change while
+    // off-screen — keeps Home and Events in sync.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _animating || !_controller.hasClients) return;
+      if (_page.round() != areas.selectedIndex) {
+        _controller.jumpToPage(areas.selectedIndex);
+      }
+    });
     return SizedBox(
       height: 44,
       child: PageView.builder(
         controller: _controller,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: count,
+        itemCount: areas.count,
         itemBuilder: (context, index) => AnimatedBuilder(
           animation: _controller,
           builder: (context, _) =>

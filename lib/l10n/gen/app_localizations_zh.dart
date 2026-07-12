@@ -92,4 +92,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String areaPlaceholder(int number) {
     return '地區$number';
   }
+
+  @override
+  String get weatherPrecipitation => '降水量';
+
+  @override
+  String get weatherHumidity => '濕度';
 }

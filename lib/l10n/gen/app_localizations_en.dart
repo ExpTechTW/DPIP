@@ -93,4 +93,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String areaPlaceholder(int number) {
     return 'Area $number';
   }
+
+  @override
+  String get weatherPrecipitation => 'Precipitation';
+
+  @override
+  String get weatherHumidity => 'Humidity';
 }
