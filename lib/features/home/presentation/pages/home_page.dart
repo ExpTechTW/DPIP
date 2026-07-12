@@ -3,7 +3,9 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 /// Home tab — a full-bleed map with a draggable [HomeSheet] over it.
@@ -74,7 +76,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned.fill(child: HomeMapBackdrop()),
+          // Tapping the exposed map backdrop opens the full map tab.
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => context.goNamed(AppRoutes.map),
+              child: const HomeMapBackdrop(),
+            ),
+          ),
           Listener(
             onPointerUp: (_) => _settle(),
             child: NotificationListener<DraggableScrollableNotification>(
