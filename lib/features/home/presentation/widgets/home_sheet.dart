@@ -37,6 +37,14 @@ class HomeSheet extends StatelessWidget {
   /// Extent at which the weather backdrop starts to appear (and animate).
   static const double _weatherFrom = 0.85;
 
+  /// Extent past which the sheet flattens against the region-bar overlay (square
+  /// top, no shadow) and insets its content to clear it — so the sheet blends
+  /// into the bar instead of butting a rounded, shadowed edge against it.
+  static const double _flushFrom = 0.9;
+
+  /// The region-bar overlay's height (matches `RegionBar`).
+  static const double _regionBarHeight = 44;
+
   /// The draggable sheet's scroll controller.
   final ScrollController scrollController;
 
@@ -61,30 +69,38 @@ class HomeSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        borderRadius: AppRadius.topSheet,
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 16,
-            offset: Offset(0, -2),
+    final regionBarInset = MediaQuery.paddingOf(context).top + _regionBarHeight;
+    return ValueListenableBuilder<double>(
+      valueListenable: extent,
+      builder: (context, e, _) {
+        // 0 until [_flushFrom], then 1 at full — drives the flatten + inset.
+        final flush = ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(
+          0.0,
+          1.0,
+        );
+        final surfaceAlpha = _surfaceAlpha(e);
+        final weatherOpacity = _weatherOpacity(e);
+        final blur =
+            24.0 *
+            (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
+            (1 - weatherOpacity);
+        final borderRadius = BorderRadius.vertical(
+          top: Radius.circular(lerpDouble(AppRadius.lg, 0, flush)!),
+        );
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15 * (1 - flush)),
+                blurRadius: 16,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: AppRadius.topSheet,
-        child: ValueListenableBuilder<double>(
-          valueListenable: extent,
-          child: HomeContent(scrollController: scrollController),
-          builder: (context, e, content) {
-            final surfaceAlpha = _surfaceAlpha(e);
-            final weatherOpacity = _weatherOpacity(e);
-            final blur =
-                24.0 *
-                (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
-                (1 - weatherOpacity);
-            return Stack(
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: Stack(
               fit: StackFit.expand,
               children: [
                 // Frosted map-through backdrop, dominant while collapsed.
@@ -94,7 +110,8 @@ class HomeSheet extends StatelessWidget {
                     color: colors.surface.withValues(alpha: surfaceAlpha),
                   ),
                 ),
-                // Animated weather backdrop, revealed and played near full.
+                // Animated weather backdrop, revealed and played near full —
+                // it fills behind the region-bar overlay so the bar blends in.
                 IgnorePointer(
                   child: Opacity(
                     opacity: weatherOpacity,
@@ -104,12 +121,15 @@ class HomeSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                content!,
+                HomeContent(
+                  scrollController: scrollController,
+                  topInset: lerpDouble(0, regionBarInset, flush)!,
+                ),
               ],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

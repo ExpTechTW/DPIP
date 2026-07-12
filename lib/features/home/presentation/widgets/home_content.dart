@@ -10,19 +10,27 @@ import 'package:flutter/material.dart';
 /// driven by the sheet's [scrollController] so scrolling past the top expands
 /// the sheet.
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key, required this.scrollController});
+  const HomeContent({
+    super.key,
+    required this.scrollController,
+    this.topInset = 0,
+  });
 
   /// The draggable sheet's scroll controller.
   final ScrollController scrollController;
+
+  /// Extra top padding that clears the region-bar overlay as the sheet nears
+  /// full, so the content isn't hidden behind it.
+  final double topInset;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return ListView(
       controller: scrollController,
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        0,
+        topInset,
         AppSpacing.lg,
         AppSpacing.lg,
       ),

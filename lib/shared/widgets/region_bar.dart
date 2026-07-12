@@ -110,29 +110,34 @@ class _RegionBadge extends StatelessWidget {
         ? 1.0
         : (1 - (distance - 1) * 0.85).clamp(0.15, 1.0);
 
-    return Opacity(
-      opacity: opacity,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: colors.primaryContainer.withValues(alpha: fill),
-            borderRadius: AppRadius.large,
-          ),
-          child: Text(
-            l10n.areaPlaceholder(index + 1),
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.fade,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Color.lerp(
-                colors.onSurface,
-                colors.onPrimaryContainer,
-                fill,
+    return GestureDetector(
+      // Tapping a badge selects it — the other switch mode besides swiping.
+      behavior: HitTestBehavior.opaque,
+      onTap: () => context.read<AreaSelection>().select(index),
+      child: Opacity(
+        opacity: opacity,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 6,
+            ),
+            decoration: BoxDecoration(
+              color: colors.primaryContainer.withValues(alpha: fill),
+              borderRadius: AppRadius.large,
+            ),
+            child: Text(
+              l10n.areaPlaceholder(index + 1),
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Color.lerp(
+                  colors.onSurface,
+                  colors.onPrimaryContainer,
+                  fill,
+                ),
               ),
             ),
           ),

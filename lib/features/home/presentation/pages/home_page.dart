@@ -78,40 +78,41 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       // A horizontal fling anywhere — map or sheet — switches the area.
       body: RegionSwipeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Area indicator, pinned at the top below the status bar.
-            const SafeArea(bottom: false, child: RegionBar()),
-            Expanded(
-              child: Stack(
-                children: [
-                  // Tapping the exposed map backdrop opens the full map tab.
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () => context.goNamed(AppRoutes.map),
-                      child: const HomeMapBackdrop(),
-                    ),
-                  ),
-                  Listener(
-                    onPointerUp: (_) => _settle(),
-                    child:
-                        NotificationListener<DraggableScrollableNotification>(
-                          onNotification: _onExtentChanged,
-                          child: DraggableScrollableSheet(
-                            controller: _sheet,
-                            initialChildSize: HomeSheet.restExtent,
-                            minChildSize: HomeSheet.minExtent,
-                            maxChildSize: HomeSheet.maxExtent,
-                            builder: (context, scrollController) => HomeSheet(
-                              scrollController: scrollController,
-                              extent: _extent,
-                              weatherMode: weatherMode,
-                            ),
-                          ),
-                        ),
-                  ),
-                ],
+            // Full-bleed map backdrop; a tap opens the full map tab.
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => context.goNamed(AppRoutes.map),
+                child: const HomeMapBackdrop(),
               ),
+            ),
+            // Draggable sheet — expands full-screen *behind* the region bar so
+            // its weather backdrop blends up into the bar.
+            Listener(
+              onPointerUp: (_) => _settle(),
+              child: NotificationListener<DraggableScrollableNotification>(
+                onNotification: _onExtentChanged,
+                child: DraggableScrollableSheet(
+                  controller: _sheet,
+                  initialChildSize: HomeSheet.restExtent,
+                  minChildSize: HomeSheet.minExtent,
+                  maxChildSize: HomeSheet.maxExtent,
+                  builder: (context, scrollController) => HomeSheet(
+                    scrollController: scrollController,
+                    extent: _extent,
+                    weatherMode: weatherMode,
+                  ),
+                ),
+              ),
+            ),
+            // Area indicator, pinned at the top below the status bar, over
+            // everything so it stays visible as the sheet rises behind it.
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(bottom: false, child: const RegionBar()),
             ),
           ],
         ),
