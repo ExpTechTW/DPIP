@@ -38,12 +38,25 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
     final colors = Theme.of(context).colorScheme;
     final radar = context.read<RadarRepository>();
 
-    // Radar is optional; on failure still snapshot the base map without it.
     final frames = (await radar.frames()).valueOrNull;
     final radarUrl = (frames != null && frames.isNotEmpty)
         ? radar.tileUrl(frames.first)
         : null;
 
+    // Try with the radar overlay; if that snapshot fails, retry without it so a
+    // flaky radar tile can never blank the base-map backdrop.
+    var bytes = await _capture(colors, media, radarUrl);
+    if (bytes == null && radarUrl != null && mounted) {
+      bytes = await _capture(colors, media, null);
+    }
+    if (mounted) setState(() => _image = bytes);
+  }
+
+  Future<Uint8List?> _capture(
+    ColorScheme colors,
+    MediaQueryData media,
+    String? radarUrl,
+  ) async {
     final style = exptechVectorStyle(
       sea: colors.surface.toHexRgb(),
       land: colors.surfaceContainer.toHexRgb(),
@@ -64,7 +77,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
         pixelRatio: media.devicePixelRatio,
       );
     }
-    if (mounted) setState(() => _image = bytes);
+    return bytes;
   }
 
   @override
