@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* rain.aiff */; };
 		071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */; };
-		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		1093A80918096649F26C9612 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79AD9E28C39ABB2543ED3140 /* Pods_Runner.framework */; };
 		10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* tsunami.aiff */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
@@ -29,6 +28,7 @@
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		AE92AD9862B7A721B0924557 /* eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* eew.aiff */; };
 		B930B80CD920DE98ECF3E23F /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F7778619923A421CDD3202 /* Pods_RunnerTests.framework */; };
+		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* report.aiff */; };
 		E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* weather.aiff */; };
 		F56D5186166227E46D96919D /* info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* info.aiff */; };
@@ -75,7 +75,6 @@
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapSnapshotPlugin.swift; sourceTree = "<group>"; };
-		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		79AD9E28C39ABB2543ED3140 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A6E88CB92902C0CACB07792 /* eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = eew.aiff; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
@@ -93,6 +92,7 @@
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		B49B9B0F3A5A3685FFAFB100 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		B916667D1B2356583B174E80 /* normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = normal.aiff; sourceTree = "<group>"; };
+		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		CCF0E2286072A9283A916C69 /* tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = tsunami.aiff; sourceTree = "<group>"; };
 		D9F1D69E3B0409C874D92222 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = info.aiff; sourceTree = "<group>"; };
