@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dpip/core/network/sse_client.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -79,6 +80,21 @@ void main() {
         ).toList();
         expect(events, hasLength(1));
         expect(events.single.data, 'y');
+      },
+    );
+
+    test(
+      'accepts a Stream<Uint8List> (Dio response.stream runtime type)',
+      () async {
+        // Dio delivers the response body as Stream<Uint8List>; `Stream.transform`
+        // reifies its input type from the receiver, so decoding must use
+        // `utf8.decoder.bind` — this is the type the live feed actually passes,
+        // and it must not throw a Utf8Decoder/StreamTransformer subtype error.
+        final stream = Stream<Uint8List>.fromIterable([
+          Uint8List.fromList(utf8.encode('data: []\n\n')),
+        ]);
+        final events = await HttpSseClient.parse(stream).toList();
+        expect(events.single.data, '[]');
       },
     );
   });

@@ -61,14 +61,21 @@ class HttpSseClient implements SseClient {
   /// delimiter; `:`-prefixed comment lines (SSE heartbeats) are skipped;
   /// multiple `data:` lines are joined with `\n` per the spec (trailing newline
   /// stripped). Exposed for unit testing the parser directly.
+  ///
+  /// Uses `utf8.decoder.bind` rather than `bytes.transform(utf8.decoder)`: Dio's
+  /// response stream is a `Stream<Uint8List>` at runtime, and `Stream.transform`
+  /// reifies its input type from the receiver — so it would demand a
+  /// `StreamTransformer<Uint8List, String>` and reject the decoder (a
+  /// `StreamTransformer<List<int>, String>`). `bind` takes the stream as a
+  /// parameter, so `Stream<Uint8List>` is accepted covariantly.
   static Stream<SseEvent> parse(Stream<List<int>> bytes) async* {
     String? name;
     final data = StringBuffer();
     Duration? retry;
     var dirty = false;
 
-    await for (final line
-        in bytes.transform(utf8.decoder).transform(const LineSplitter())) {
+    final lines = const LineSplitter().bind(utf8.decoder.bind(bytes));
+    await for (final line in lines) {
       if (line.isEmpty) {
         if (dirty) {
           yield SseEvent(
