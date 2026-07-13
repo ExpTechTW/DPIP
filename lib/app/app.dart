@@ -7,6 +7,7 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -40,6 +41,7 @@ class DpipApp extends StatelessWidget {
         locationService: deps.locationService,
         regionStore: deps.regionStore,
         deviceLocationReporter: deps.deviceLocationReporter,
+        backgroundLocation: deps.backgroundLocation,
         child: MaterialApp.router(
           title: 'DPIP',
           debugShowCheckedModeBanner: false,
@@ -68,6 +70,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.locationService,
     required this.regionStore,
     required this.deviceLocationReporter,
+    required this.backgroundLocation,
     required this.child,
   });
 
@@ -76,6 +79,7 @@ class _AppServicesHost extends StatefulWidget {
   final LocationService locationService;
   final RegionStore regionStore;
   final DeviceLocationReporter deviceLocationReporter;
+  final BackgroundLocationService backgroundLocation;
   final Widget child;
 
   @override
@@ -99,16 +103,20 @@ class _AppServicesHostState extends State<_AppServicesHost> {
   }
 
   /// Requests GPS permission, resolves the current township into the region
-  /// store, and — once permission is granted — starts the distance-triggered
-  /// device-location reporter. On denial/error the current code stays null, so
-  /// 所在地 renders its "can't get current location" state rather than a wrong
-  /// region, and no reporting starts.
+  /// store, and — once permission is granted — starts both the foreground
+  /// device-location reporter and its native background counterpart (the latter
+  /// only when a push token exists to target). On denial/error the current code
+  /// stays null, so 所在地 renders its "can't get current location" state rather
+  /// than a wrong region, and no reporting starts.
   Future<void> _resolveCurrentLocation() async {
     final granted = await widget.locationService.requestPermission();
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
-    if (granted) widget.deviceLocationReporter.start();
+    if (!granted) return;
+    widget.deviceLocationReporter.start();
+    final token = widget.notificationService.token;
+    if (token != null) widget.backgroundLocation.start(token);
   }
 
   @override

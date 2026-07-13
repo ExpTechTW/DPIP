@@ -29,6 +29,7 @@
 		AE92AD9862B7A721B0924557 /* eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* eew.aiff */; };
 		B930B80CD920DE98ECF3E23F /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53F7778619923A421CDD3202 /* Pods_RunnerTests.framework */; };
 		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
+		CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* report.aiff */; };
 		E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* weather.aiff */; };
 		F56D5186166227E46D96919D /* info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* info.aiff */; };
@@ -93,6 +94,7 @@
 		B49B9B0F3A5A3685FFAFB100 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		B916667D1B2356583B174E80 /* normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = normal.aiff; sourceTree = "<group>"; };
 		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
+		CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundLocationPlugin.swift; sourceTree = "<group>"; };
 		CCF0E2286072A9283A916C69 /* tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = tsunami.aiff; sourceTree = "<group>"; };
 		D9F1D69E3B0409C874D92222 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = info.aiff; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */,
 				CAC4EF00000000000000B002 /* MapCachePlugin.swift */,
+				CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */,
 				7A6E88CB92902C0CACB07792 /* eew.aiff */,
 				4D00D2962CF4598B61D0C722 /* eew_alert.aiff */,
 				682D0165E2FF3895C5B252C5 /* eq.aiff */,
@@ -467,6 +470,7 @@
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */,
 				CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */,
+				CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

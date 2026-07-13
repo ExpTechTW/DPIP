@@ -7,6 +7,7 @@ import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -110,6 +111,11 @@ Future<void> bootstrap() async {
       );
     },
   );
+  // Terminated/background counterpart: native reports on significant moves.
+  final backgroundLocation = BackgroundLocationService(
+    platform: reportPlatform,
+    version: appVersion,
+  );
 
   final deps = SharedDeps(
     prefs: prefs,
@@ -123,6 +129,7 @@ Future<void> bootstrap() async {
     regionStore: regionStore,
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
+    backgroundLocation: backgroundLocation,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime

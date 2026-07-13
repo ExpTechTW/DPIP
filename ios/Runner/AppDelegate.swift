@@ -22,5 +22,7 @@ import UIKit
     CompassPlugin.register(with: registry.registrar(forPlugin: "CompassPlugin")!)
     MapSnapshotPlugin.register(with: registry.registrar(forPlugin: "MapSnapshotPlugin")!)
     MapCachePlugin.register(with: registry.registrar(forPlugin: "MapCachePlugin")!)
+    BackgroundLocationPlugin.register(
+      with: registry.registrar(forPlugin: "BackgroundLocationPlugin")!)
   }
 }

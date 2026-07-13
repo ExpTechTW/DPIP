@@ -23,6 +23,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, MapCacheChannel.NAME)
             .setMethodCallHandler(MapCacheChannel(applicationContext))
 
+        MethodChannel(messenger, BackgroundLocationChannel.NAME)
+            .setMethodCallHandler(BackgroundLocationChannel(applicationContext))
+
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
     }

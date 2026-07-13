@@ -4,6 +4,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
@@ -30,6 +31,7 @@ class SharedDeps {
     required this.regionStore,
     required this.locationService,
     required this.deviceLocationReporter,
+    required this.backgroundLocation,
   });
 
   /// Persistence for feature-local settings.
@@ -66,4 +68,8 @@ class SharedDeps {
   /// Distance-triggered device-location reporter (foreground). Started by the
   /// service host after GPS permission is granted.
   final DeviceLocationReporter deviceLocationReporter;
+
+  /// Native background device-location reporting (terminated/background). The
+  /// terminated-state counterpart to [deviceLocationReporter].
+  final BackgroundLocationService backgroundLocation;
 }
