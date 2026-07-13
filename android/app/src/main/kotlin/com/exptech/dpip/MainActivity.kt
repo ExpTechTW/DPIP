@@ -20,6 +20,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, MapSnapshotChannel.NAME)
             .setMethodCallHandler(MapSnapshotChannel(applicationContext))
 
+        MethodChannel(messenger, MapCacheChannel.NAME)
+            .setMethodCallHandler(MapCacheChannel(applicationContext))
+
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
     }

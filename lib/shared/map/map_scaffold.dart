@@ -4,11 +4,17 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+/// Ambient tile-cache ceiling for the live map — well above MapLibre's ~50 MB
+/// native default so a week of small WebP radar frames (plus base tiles) stays
+/// cached and scrubbing the timeline re-fetches far less.
+const int _ambientCacheBytes = 128 * 1024 * 1024;
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
@@ -80,8 +86,14 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     }
   }
 
-  void _onMapCreated(MapLibreMapController controller) =>
-      _controller = controller;
+  void _onMapCreated(MapLibreMapController controller) {
+    _controller = controller;
+    // Raise the shared ambient-cache ceiling (MapLibre's default is only ~50 MB)
+    // now that the map exists so MapLibre is initialised on both platforms. The
+    // cache stays bounded (LRU) and is still cleared on background so the home
+    // snapshot starts clean.
+    const MapCache().setMaximumSize(_ambientCacheBytes);
+  }
 
   void _onStyleLoaded() {
     _styleLoaded = true;

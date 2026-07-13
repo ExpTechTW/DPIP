@@ -21,5 +21,6 @@ import UIKit
     DeviceInfoPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlugin")!)
     CompassPlugin.register(with: registry.registrar(forPlugin: "CompassPlugin")!)
     MapSnapshotPlugin.register(with: registry.registrar(forPlugin: "MapSnapshotPlugin")!)
+    MapCachePlugin.register(with: registry.registrar(forPlugin: "MapCachePlugin")!)
   }
 }
