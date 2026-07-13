@@ -125,4 +125,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapTimelineNow => '現在';
+
+  @override
+  String get mapTimelineObserved => '觀測';
 }

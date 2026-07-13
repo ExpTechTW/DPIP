@@ -45,7 +45,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Now'), findsOneWidget); // newest under the scrubber
-      expect(find.text('2026/7/13'), findsOneWidget); // date of the selection
+      expect(find.text('Observed'), findsOneWidget); // the date's label
+      expect(find.text('2026/07/13'), findsOneWidget); // date of the selection
       expect(
         find.text('08:30'),
         findsWidgets,

@@ -39,7 +39,7 @@ class MapTimeline extends StatefulWidget {
 class _MapTimelineState extends State<MapTimeline> {
   final DateFormat _time = DateFormat('HH:mm');
   // Numeric so no locale symbol data is needed (as with [_time]).
-  final DateFormat _date = DateFormat('yyyy/M/d');
+  final DateFormat _date = DateFormat('yyyy/MM/dd');
 
   /// Slot width per frame — the scroll offset that centres frame `i` is
   /// `i * _slotWidth` (the leading/trailing pads are symmetric).
@@ -127,41 +127,60 @@ class _MapTimelineState extends State<MapTimeline> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Selected date over the big time; "now" when the newest is under it.
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _date.format(widget.frames[_liveIndex].time),
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                if (isNow) ...[
+        // Left: 觀測 (label) over the selected date; right: the big time
+        // ("now" when the newest frame is under the scrubber). FittedBox keeps
+        // the row on one line on narrow screens instead of overflowing.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    l10n.mapTimelineNow,
+                    l10n.mapTimelineObserved,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: colors.primary,
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                ],
-                Text(
-                  _time.format(widget.frames[_liveIndex].time),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colors.primary,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                  Text(
+                    _date.format(widget.frames[_liveIndex].time),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  if (isNow) ...[
+                    Text(
+                      l10n.mapTimelineNow,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                  ],
+                  Text(
+                    _time.format(widget.frames[_liveIndex].time),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: colors.primary,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         SizedBox(

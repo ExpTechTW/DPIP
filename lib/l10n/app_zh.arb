@@ -37,5 +37,6 @@
   "weatherHumidity": "濕度",
   "mapLayers": "圖層",
   "mapLayerRadar": "雷達回波",
-  "mapTimelineNow": "現在"
+  "mapTimelineNow": "現在",
+  "mapTimelineObserved": "觀測"
 }

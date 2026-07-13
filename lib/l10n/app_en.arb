@@ -158,5 +158,9 @@
   "mapTimelineNow": "Now",
   "@mapTimelineNow": {
     "description": "Label on the map timeline when the newest (latest) frame is selected"
+  },
+  "mapTimelineObserved": "Observed",
+  "@mapTimelineObserved": {
+    "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"
   }
 }

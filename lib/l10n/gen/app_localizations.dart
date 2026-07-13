@@ -325,6 +325,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Now'**
   String get mapTimelineNow;
+
+  /// Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14
+  ///
+  /// In en, this message translates to:
+  /// **'Observed'**
+  String get mapTimelineObserved;
 }
 
 class _AppLocalizationsDelegate
