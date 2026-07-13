@@ -177,7 +177,7 @@ class _MapTimelineState extends State<MapTimeline> {
                     child: SingleChildScrollView(
                       controller: _scroll,
                       scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
+                      physics: const _ScrubPhysics(),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: pad),
                         child: Row(
@@ -269,5 +269,35 @@ class _Tick extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Scroll physics for the timeline ruler: caps a hard fling's speed and damps
+/// it, so a fast swipe eases through the loop and slows to a stop instead of
+/// blurring past. (The finger-drag itself is 1:1; this only shapes the fling.)
+class _ScrubPhysics extends ClampingScrollPhysics {
+  const _ScrubPhysics({super.parent});
+
+  /// Peak fling speed (px/s) — a hard swipe is clamped to this.
+  static const double _maxFlingVelocity = 2000;
+
+  /// Fraction of the (capped) fling velocity actually used, so a fling sheds
+  /// speed sooner and settles quickly.
+  static const double _damping = 0.6;
+
+  @override
+  _ScrubPhysics applyTo(ScrollPhysics? ancestor) =>
+      _ScrubPhysics(parent: buildParent(ancestor));
+
+  @override
+  double get maxFlingVelocity => _maxFlingVelocity;
+
+  @override
+  Simulation? createBallisticSimulation(
+    ScrollMetrics position,
+    double velocity,
+  ) {
+    final capped = velocity.clamp(-_maxFlingVelocity, _maxFlingVelocity);
+    return super.createBallisticSimulation(position, capped * _damping);
   }
 }

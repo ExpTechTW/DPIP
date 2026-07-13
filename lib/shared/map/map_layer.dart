@@ -52,9 +52,9 @@ abstract interface class MapLayer {
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();
 
-  /// Preloads every [frames] entry onto [controller] up front — hidden, so their
-  /// tiles fetch and cache in the background — making later [show] calls an
-  /// instant swap rather than a fetch. Idempotent; called once per frame set.
+  /// Registers the [frames] set (typically without touching [controller] — a
+  /// layer adds tiles lazily in [show], so opening the map doesn't pay for every
+  /// frame). Idempotent; called once per frame set.
   Future<void> prepare(MapLibreMapController controller, List<MapFrame> frames);
 
   /// Instantly reveals the already-[prepare]d [frame] (hiding the previous one).
