@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
+import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -18,6 +21,7 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Initializes platform services and launches the app.
@@ -46,7 +50,7 @@ Future<void> bootstrap() async {
   final prefs = await SharedPreferences.getInstance();
   final regions = RegionSelection(prefs);
   final experimental = ExperimentalSettings(prefs);
-  final dio = createDio();
+  final dio = createDio(etagCache: await _openEtagCache());
   final apiClient = ApiClient(dio, regions);
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
@@ -93,4 +97,17 @@ Future<void> bootstrap() async {
       ],
     ),
   );
+}
+
+/// Opens the on-disk ETag cache under the platform cache directory. Best-effort:
+/// if the directory can't be resolved the app runs without HTTP caching rather
+/// than failing to launch.
+Future<EtagCacheStore?> _openEtagCache() async {
+  try {
+    final base = await getApplicationCacheDirectory();
+    return EtagCacheStore(Directory('${base.path}/http_etag'));
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'ETag cache unavailable');
+    return null;
+  }
 }
