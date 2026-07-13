@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* rain.aiff */; };
 		071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */; };
+		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		1093A80918096649F26C9612 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79AD9E28C39ABB2543ED3140 /* Pods_Runner.framework */; };
 		10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* tsunami.aiff */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
@@ -74,6 +75,7 @@
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapSnapshotPlugin.swift; sourceTree = "<group>"; };
+		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		79AD9E28C39ABB2543ED3140 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A6E88CB92902C0CACB07792 /* eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = eew.aiff; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */,
+				CAC4EF00000000000000B002 /* MapCachePlugin.swift */,
 				7A6E88CB92902C0CACB07792 /* eew.aiff */,
 				4D00D2962CF4598B61D0C722 /* eew_alert.aiff */,
 				682D0165E2FF3895C5B252C5 /* eq.aiff */,
@@ -463,6 +466,7 @@
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */,
+				CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
