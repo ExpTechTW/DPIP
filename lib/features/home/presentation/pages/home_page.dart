@@ -1,6 +1,7 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
-import 'package:dpip/core/settings/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/home_chrome.dart';
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
@@ -115,12 +116,19 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             // Region bar overlay — blends into the weather, then dismisses as
-            // the rising sheet invades it.
+            // the rising sheet invades it (Home derives the dials from extent;
+            // the bar itself stays feature-agnostic).
             Positioned(
               top: 0,
               left: 0,
               right: 0,
-              child: RegionBar(sheetExtent: extent),
+              child: ValueListenableBuilder<double>(
+                valueListenable: extent,
+                builder: (context, e, _) => RegionBar(
+                  blend: HomeChrome.regionBlend(e),
+                  dismiss: HomeChrome.regionDismiss(e),
+                ),
+              ),
             ),
           ],
         ),

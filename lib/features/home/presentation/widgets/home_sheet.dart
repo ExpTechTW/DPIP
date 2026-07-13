@@ -1,8 +1,8 @@
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:dpip/app/theme/app_radius.dart';
-import 'package:dpip/core/settings/home_chrome.dart';
-import 'package:dpip/core/settings/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/home_chrome.dart';
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';

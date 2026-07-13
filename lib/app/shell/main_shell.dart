@@ -1,5 +1,5 @@
-import 'package:dpip/core/settings/home_chrome.dart';
-import 'package:dpip/core/settings/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/home_chrome.dart';
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';

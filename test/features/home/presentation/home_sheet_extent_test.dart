@@ -1,4 +1,4 @@
-import 'package:dpip/core/settings/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

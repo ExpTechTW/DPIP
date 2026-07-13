@@ -2,9 +2,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/area_selection.dart';
-import 'package:dpip/core/settings/home_chrome.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,18 +11,21 @@ import 'package:provider/provider.dart';
 /// badge; neighbours flank it and areas two or more away fade out.
 ///
 /// It only *displays* [AreaSelection]; switching is a horizontal swipe anywhere
-/// (see `RegionSwipeArea`) and the carousel slides to re-centre. When placed over
-/// the home weather backdrop, pass [sheetExtent]: as the sheet climbs the bar
-/// first *blends* into the weather (its background fades transparent and its
-/// badges flip to light), then *dismisses* — sliding up and fading out — once the
-/// rising sheet invades it, leaving the weather unobstructed. It carries its own
+/// (see `RegionSwipeArea`) and the carousel slides to re-centre. Two `0→1`
+/// dials drive its look over a backdrop, so the widget stays feature-agnostic:
+/// [blend] fades the background transparent and flips the badges to light;
+/// [dismiss] slides the whole bar up and fades it out. Home feeds these from its
+/// sheet extent; Events leaves them at 0 for an opaque bar. It carries its own
 /// top safe area so both effects cover the status-bar row too.
 class RegionBar extends StatefulWidget {
-  const RegionBar({super.key, this.sheetExtent});
+  const RegionBar({super.key, this.blend = 0, this.dismiss = 0});
 
-  /// The active Home sheet's extent (0→1) driving the bar's blend and dismissal;
-  /// null (Events) keeps it an opaque surface bar.
-  final ValueListenable<double>? sheetExtent;
+  /// How much the bar blends into the backdrop (0 opaque → 1 transparent, light
+  /// badges).
+  final double blend;
+
+  /// How far the bar has slid up and faded out (0 shown → 1 gone).
+  final double dismiss;
 
   @override
   State<RegionBar> createState() => _RegionBarState();
@@ -92,18 +93,11 @@ class _RegionBarState extends State<RegionBar> {
         _controller.jumpToPage(areas.selectedIndex);
       }
     });
-    final sheetExtent = widget.sheetExtent;
-    if (sheetExtent == null) {
-      return _build(context, blend: 0, dismiss: 0, count: areas.count);
-    }
-    return ValueListenableBuilder<double>(
-      valueListenable: sheetExtent,
-      builder: (context, extent, _) => _build(
-        context,
-        blend: HomeChrome.regionBlend(extent),
-        dismiss: HomeChrome.regionDismiss(extent),
-        count: areas.count,
-      ),
+    return _build(
+      context,
+      blend: widget.blend,
+      dismiss: widget.dismiss,
+      count: areas.count,
     );
   }
 
