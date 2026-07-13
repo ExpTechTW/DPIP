@@ -15,14 +15,8 @@ class EewRepositoryImpl implements EewRepository {
   final RedundantApi _api;
 
   @override
-  Future<Result<List<Eew>>> activeEews() async {
-    try {
-      final raw = await _api.getEewRealtime();
-      return Ok([
-        for (final item in raw) Eew.fromJson(item as Map<String, dynamic>),
-      ]);
-    } catch (error) {
-      return Err(mapException(error));
-    }
-  }
+  Future<Result<List<Eew>>> activeEews() => guardResult(() async {
+    final raw = await _api.getEewRealtime();
+    return [for (final item in raw) Eew.fromJson(item as Map<String, dynamic>)];
+  });
 }

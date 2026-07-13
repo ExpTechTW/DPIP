@@ -19,11 +19,5 @@ class NtpServerTimeSource implements ServerTimeSource {
   final Future<int> Function() _fetchServerTimeMs;
 
   @override
-  Future<Result<int>> serverTimeMs() async {
-    try {
-      return Ok(await _fetchServerTimeMs());
-    } catch (error) {
-      return Err(mapException(error));
-    }
-  }
+  Future<Result<int>> serverTimeMs() => guardResult(_fetchServerTimeMs);
 }

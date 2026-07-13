@@ -22,13 +22,7 @@ class RadarRepositoryImpl implements RadarRepository {
   final RadarApi _api;
 
   @override
-  Future<Result<List<String>>> frames() async {
-    try {
-      return Ok(await _api.getFrames());
-    } catch (error) {
-      return Err(mapException(error));
-    }
-  }
+  Future<Result<List<String>>> frames() => guardResult(_api.getFrames);
 
   @override
   String tileUrl(String frame) => _api.tileUrl(frame);

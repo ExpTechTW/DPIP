@@ -1,5 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
+
+/// Runs [body] and folds it into a [Result]: its value on success, a typed
+/// [Failure] (via [mapException]) on any throw.
+///
+/// The one place the data layer turns a throwing fetch/decode into `Result`, so
+/// every repository method is a one-liner and none can accidentally forget the
+/// `try` or return `Ok` on failure — which for a safety feed would turn a dead
+/// source into a false all-clear.
+Future<Result<T>> guardResult<T>(Future<T> Function() body) async {
+  try {
+    return Ok(await body());
+  } catch (error) {
+    return Err(mapException(error));
+  }
+}
 
 /// Maps a caught transport / decode error into a typed [Failure].
 ///
