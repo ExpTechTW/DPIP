@@ -24,6 +24,21 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl,
         ),
         children: [
+          SectionHeader(l10n.moreSectionAdvanced),
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.science_outlined,
+                title: l10n.experimentalFeatures,
+                onTap: () => context.pushNamed(AppRoutes.experimental),
+              ),
+              _MoreTile(
+                icon: Icons.article_outlined,
+                title: l10n.appLogs,
+                onTap: () => context.pushNamed(AppRoutes.log),
+              ),
+            ],
+          ),
           SectionHeader(l10n.moreSectionLinks),
           _MoreGroup(
             children: [
@@ -50,21 +65,6 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreAnnouncements,
                 host: 'announcement.exptech.com.tw',
                 url: 'https://announcement.exptech.com.tw/',
-              ),
-            ],
-          ),
-          SectionHeader(l10n.moreSectionAdvanced),
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.science_outlined,
-                title: l10n.experimentalFeatures,
-                onTap: () => context.pushNamed(AppRoutes.experimental),
-              ),
-              _MoreTile(
-                icon: Icons.article_outlined,
-                title: l10n.appLogs,
-                onTap: () => context.pushNamed(AppRoutes.log),
               ),
             ],
           ),
