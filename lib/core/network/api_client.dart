@@ -193,6 +193,8 @@ class ApiClient {
         ];
       case ApiTier.coreExclusiveApi:
         return const ['https://api.core-tnn1.exptech.dev'];
+      case ApiTier.coreStaticExclusive:
+        return const ['https://static.core-tnn1.exptech.dev'];
       case ApiTier.legacyApi:
         return const ['https://api-1.exptech.dev'];
     }
