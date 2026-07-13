@@ -65,10 +65,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Drag the ruler right → older frames move under the centre scrubber.
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(3 * 14.0, 0),
-    );
+    await tester.drag(find.byType(ListView), const Offset(3 * 14.0, 0));
     await tester.pumpAndSettle();
 
     expect(selected, lessThan(9));

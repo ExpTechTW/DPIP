@@ -172,28 +172,26 @@ class _MapTimelineState extends State<MapTimeline> {
               LayoutBuilder(
                 builder: (context, constraints) {
                   final pad = (constraints.maxWidth - _slotWidth) / 2;
+                  // ListView.builder (not a Row) so a week of frames only ever
+                  // builds the ~dozens of ticks on screen. itemExtent keeps the
+                  // centring math: offset `i * _slotWidth` centres frame `i`.
                   return NotificationListener<ScrollNotification>(
                     onNotification: _onScroll,
-                    child: SingleChildScrollView(
+                    child: ListView.builder(
                       controller: _scroll,
                       scrollDirection: Axis.horizontal,
                       physics: const _ScrubPhysics(),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: pad),
-                        child: Row(
-                          children: [
-                            for (var i = 0; i < widget.frames.length; i++)
-                              _Tick(
-                                width: _slotWidth,
-                                label: i % labelStep == 0
-                                    ? _time.format(widget.frames[i].time)
-                                    : null,
-                                emphasised: i == _liveIndex,
-                                colors: colors,
-                                textStyle: theme.textTheme.labelSmall,
-                              ),
-                          ],
-                        ),
+                      padding: EdgeInsets.symmetric(horizontal: pad),
+                      itemExtent: _slotWidth,
+                      itemCount: widget.frames.length,
+                      itemBuilder: (context, i) => _Tick(
+                        width: _slotWidth,
+                        label: i % labelStep == 0
+                            ? _time.format(widget.frames[i].time)
+                            : null,
+                        emphasised: i == _liveIndex,
+                        colors: colors,
+                        textStyle: theme.textTheme.labelSmall,
                       ),
                     ),
                   );

@@ -9,13 +9,13 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// The radar echo (雷達回波) raster [MapLayer] — the first concrete layer on the
 /// shared map.
 ///
-/// Only the recent loop is used ([maxFrames]), and each frame's raster layer is
-/// added lazily, the first time it enters a small window around the current
-/// frame: the current one is drawn, its immediate neighbours prefetch (visible
-/// but transparent) so scrubbing onto them is instant, and frames outside the
-/// window are hidden. So opening the map adds ~2 layers, not a thousand, and at
-/// most ~3 are ever active. Adding another weather layer later means writing a
-/// sibling of this class.
+/// The whole history the API serves (~a week of 10-min frames) is scrubbable,
+/// but only a small window is ever on the map: each frame's raster layer is
+/// added the first time it enters the window around the current frame — the
+/// current one drawn, its neighbours prefetching (visible but transparent) so a
+/// scrub onto them is instant — and frames that leave the window are removed. So
+/// the map holds ~3 layers regardless of how many frames exist. Adding another
+/// weather layer later means writing a sibling of this class.
 class RadarMapLayer implements MapLayer {
   RadarMapLayer(this._repository);
 
@@ -38,10 +38,6 @@ class RadarMapLayer implements MapLayer {
   /// onto a neighbour is instant while far frames stay unloaded and undrawn.
   static const int _prefetchRadius = 1;
 
-  static const RasterLayerProperties _hidden = RasterLayerProperties(
-    visibility: 'none',
-    rasterOpacity: 0,
-  );
   static const RasterLayerProperties _prefetching = RasterLayerProperties(
     visibility: 'visible',
     rasterOpacity: 0,
@@ -51,38 +47,31 @@ class RadarMapLayer implements MapLayer {
     rasterOpacity: _opacity,
   );
 
-  /// How many recent frames to keep. The API serves ~a week of 10-min frames
-  /// (~1000); the timeline shows just the recent loop, like the reference — and
-  /// bounding it keeps the map from ever adding a thousand layers.
-  static const int maxFrames = 24; // ~last 4 hours at 10-min cadence
-
   String _sourceId(String frameId) => 'radar-src-$frameId';
   String _layerId(String frameId) => 'radar-lyr-$frameId';
 
-  /// Every frame's id in chronological order — for neighbour lookup.
+  /// Every frame's id in chronological order, plus its index — for neighbour
+  /// lookup. The full week of frames lives here (cheap — just strings); only the
+  /// window is ever on the map.
   List<String> _orderedIds = const [];
+  Map<String, int> _indexById = const {};
 
-  /// Frame ids added to the map so far (added lazily as they enter a window).
-  final Set<String> _added = <String>{};
-
-  /// Frame ids currently in the live window (visible: the current one drawn,
-  /// its neighbours prefetching at opacity 0).
-  Set<String> _windowed = <String>{};
+  /// Frame ids currently on the map — the live window. Frames that leave it are
+  /// removed, so the map holds ~3 layers no matter how many frames there are.
+  final Set<String> _onMap = <String>{};
 
   String? _shownFrameId;
 
   @override
   Future<Result<List<MapFrame>>> frames() async {
     final result = await _repository.frames();
-    return result.map((raw) {
-      final all = [
-        for (final id in raw) MapFrame(id: id, time: _parseFrameTime(id)),
-      ]..sort((a, b) => a.time.compareTo(b.time));
-      // Keep only the most recent [maxFrames] — the recent radar loop.
-      return all.length <= maxFrames
-          ? all
-          : all.sublist(all.length - maxFrames);
-    });
+    // The whole list (the API serves ~a week of 10-min frames); the map only
+    // ever holds the window, so all of it is scrubbable without the layer cost.
+    return result.map(
+      (raw) =>
+          [for (final id in raw) MapFrame(id: id, time: _parseFrameTime(id))]
+            ..sort((a, b) => a.time.compareTo(b.time)),
+    );
   }
 
   @override
@@ -93,59 +82,57 @@ class RadarMapLayer implements MapLayer {
     // Only record the set — frames are added lazily by [show] as they enter the
     // window, so opening the map never pays to add every frame up front.
     _orderedIds = [for (final frame in frames) frame.id];
+    _indexById = {for (var i = 0; i < frames.length; i++) frames[i].id: i};
   }
 
   @override
   Future<void> show(MapLibreMapController controller, MapFrame frame) async {
     if (_shownFrameId == frame.id) return;
-    final index = _orderedIds.indexOf(frame.id);
-    if (index < 0) return; // not part of this layer's frames
+    final index = _indexById[frame.id];
+    if (index == null) return; // not part of this layer's frames
 
     final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
 
-    // Frames leaving the window → hidden (stop drawing + fetching).
-    for (final id in _windowed.difference(window)) {
-      if (_added.contains(id)) {
-        await controller.setLayerProperties(_layerId(id), _hidden);
+    // Drop frames that left the window so the map keeps only ~3 layers; their
+    // tiles stay in MapLibre's cache, so returning re-adds them cheaply.
+    final leaving = _onMap.difference(window);
+    for (final id in leaving) {
+      await controller.removeLayer(_layerId(id));
+      await controller.removeSource(_sourceId(id));
+    }
+    _onMap.removeAll(leaving);
+
+    // The current frame is drawn; its neighbours prefetch (visible, transparent)
+    // so a scrub onto them is instant. Add on first entry, else just retarget.
+    for (final id in window) {
+      final properties = id == frame.id ? _shown : _prefetching;
+      if (_onMap.contains(id)) {
+        await controller.setLayerProperties(_layerId(id), properties);
+      } else {
+        await controller.addSource(
+          _sourceId(id),
+          RasterSourceProperties(
+            tiles: [_repository.tileUrl(id)],
+            tileSize: 256,
+          ),
+        );
+        await controller.addRasterLayer(
+          _sourceId(id),
+          _layerId(id),
+          properties,
+          belowLayerId: outlineLayerId,
+        );
+        _onMap.add(id);
       }
     }
-    // Frames in the window → the current one drawn, neighbours prefetching;
-    // add on first entry so only what's needed is ever on the map.
-    for (final id in window) {
-      await _apply(controller, id, id == frame.id ? _shown : _prefetching);
-    }
-    _windowed = window;
     _shownFrameId = frame.id;
-  }
-
-  /// Sets [id]'s layer to [properties], adding its source/layer the first time.
-  Future<void> _apply(
-    MapLibreMapController controller,
-    String id,
-    RasterLayerProperties properties,
-  ) async {
-    if (_added.contains(id)) {
-      await controller.setLayerProperties(_layerId(id), properties);
-      return;
-    }
-    await controller.addSource(
-      _sourceId(id),
-      RasterSourceProperties(tiles: [_repository.tileUrl(id)], tileSize: 256),
-    );
-    await controller.addRasterLayer(
-      _sourceId(id),
-      _layerId(id),
-      properties,
-      belowLayerId: outlineLayerId,
-    );
-    _added.add(id);
   }
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
-    for (final id in _added) {
+    for (final id in _onMap) {
       await controller.removeLayer(_layerId(id));
       await controller.removeSource(_sourceId(id));
     }
@@ -156,9 +143,9 @@ class RadarMapLayer implements MapLayer {
   void onStyleReset() => _reset();
 
   void _reset() {
-    _added.clear();
-    _windowed = <String>{};
+    _onMap.clear();
     _orderedIds = const [];
+    _indexById = const {};
     _shownFrameId = null;
   }
 }
