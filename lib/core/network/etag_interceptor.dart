@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -71,15 +72,17 @@ class EtagInterceptor extends Interceptor {
       } else if (response.statusCode == 200) {
         final etag = response.headers.value('etag');
         if (etag != null && response.data != null) {
-          // Awaited deliberately: the payloads are small (gzip-9 of a JSON
-          // snapshot, plus a bounded-header prune), and completing the write
-          // before the response returns means an immediately-following request
-          // revalidates from cache instead of racing a pending write.
-          await _store.write(
-            url,
-            etag: etag,
-            body: jsonEncode(response.data),
-            contentType: response.headers.value(Headers.contentTypeHeader),
+          // Fire-and-forget so the best-effort cache never blocks the response.
+          // sqflite serializes operations FIFO, so this INSERT is enqueued
+          // before any following request's readEtag SELECT — read-after-write
+          // still holds without awaiting.
+          unawaited(
+            _store.write(
+              url,
+              etag: etag,
+              body: jsonEncode(response.data),
+              contentType: response.headers.value(Headers.contentTypeHeader),
+            ),
           );
         }
       }

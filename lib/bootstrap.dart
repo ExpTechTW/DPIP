@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
@@ -23,6 +21,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 /// Initializes platform services and launches the app.
 ///
@@ -99,13 +98,18 @@ Future<void> bootstrap() async {
   );
 }
 
-/// Opens the on-disk ETag cache under the platform cache directory. Best-effort:
-/// if the directory can't be resolved the app runs without HTTP caching rather
-/// than failing to launch.
+/// Opens the SQLite ETag cache under the platform cache directory. Best-effort:
+/// if the database can't be opened the app runs without HTTP caching rather than
+/// failing to launch.
 Future<EtagCacheStore?> _openEtagCache() async {
   try {
     final base = await getApplicationCacheDirectory();
-    return EtagCacheStore(Directory('${base.path}/http_etag'));
+    final db = await openDatabase(
+      '${base.path}/http_etag_cache.db',
+      version: 1,
+      onCreate: (db, _) => EtagCacheStore.createSchema(db),
+    );
+    return EtagCacheStore(db);
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;

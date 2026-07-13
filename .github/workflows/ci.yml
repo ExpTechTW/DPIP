@@ -47,5 +47,11 @@ jobs:
       - name: Analyze
         run: mise exec -- flutter analyze
 
+      # The ETag-cache tests run SQLite on the host via sqflite_common_ffi;
+      # ubuntu ships libsqlite3.so.0 but not the unversioned symlink its loader
+      # needs, so install the dev package.
+      - name: Install SQLite (sqflite_common_ffi host tests)
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
       - name: Test
         run: mise exec -- flutter test

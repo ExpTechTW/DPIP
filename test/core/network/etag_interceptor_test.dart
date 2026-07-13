@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// A Dio adapter that answers `304` when the request carries the matching
 /// `If-None-Match`, else `200` with [body] and (optionally) an ETag — enough to
@@ -43,7 +43,7 @@ class _FakeAdapter implements HttpClientAdapter {
 /// A store that claims to hold an etag (so `If-None-Match` is sent) but whose
 /// body is gone by response time — models an entry evicted mid-request.
 class _EvictedStore extends EtagCacheStore {
-  _EvictedStore(super.dir);
+  _EvictedStore(super.db);
 
   @override
   Future<String?> readEtag(String url) async => 'v1';
@@ -53,17 +53,18 @@ class _EvictedStore extends EtagCacheStore {
 }
 
 void main() {
-  late Directory dir;
+  late Database db;
   late EtagCacheStore store;
 
+  setUpAll(sqfliteFfiInit);
+
   setUp(() async {
-    dir = await Directory.systemTemp.createTemp('etag_interceptor_test');
-    store = EtagCacheStore(dir);
+    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    await EtagCacheStore.createSchema(db);
+    store = EtagCacheStore(db);
   });
 
-  tearDown(() async {
-    if (await dir.exists()) await dir.delete(recursive: true);
-  });
+  tearDown(() async => db.close());
 
   Dio dioWith(_FakeAdapter adapter) =>
       createDio(etagCache: store)..httpClientAdapter = adapter;
@@ -86,7 +87,7 @@ void main() {
   test(
     'a 304 whose cache entry was evicted fails, never null success',
     () async {
-      final dio = createDio(etagCache: _EvictedStore(dir))
+      final dio = createDio(etagCache: _EvictedStore(db))
         ..httpClientAdapter = _FakeAdapter(body: '{"n":1}', etag: 'v1');
 
       // If-None-Match 'v1' is sent (readEtag), the server 304s, but read() is

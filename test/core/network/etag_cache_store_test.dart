@@ -1,24 +1,22 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  late Directory dir;
+  late Database db;
   late EtagCacheStore store;
 
+  setUpAll(sqfliteFfiInit);
+
   setUp(() async {
-    dir = await Directory.systemTemp.createTemp('etag_store_test');
-    store = EtagCacheStore(dir);
+    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    await EtagCacheStore.createSchema(db);
+    store = EtagCacheStore(db);
   });
 
-  tearDown(() async {
-    if (await dir.exists()) await dir.delete(recursive: true);
-  });
-
-  File entryFile() => dir.listSync().whereType<File>().firstWhere(
-    (f) => f.path.endsWith('.entry'),
-  );
+  tearDown(() async => db.close());
 
   test('read on an empty cache is a miss', () async {
     expect(await store.read('https://x/a'), isNull);
@@ -40,18 +38,27 @@ void main() {
     expect(await store.readEtag('https://x/a'), 'W/"1"');
   });
 
-  test('the entry is one file with a gzip-compressed body', () async {
+  test('the same key updates in place (upsert) — one row', () async {
+    await store.write('https://x/a', etag: '1', body: 'A');
+    await store.write('https://x/a', etag: '2', body: 'B');
+    final entry = await store.read('https://x/a');
+    expect(entry!.etag, '2');
+    expect(entry.body, 'B');
+    final rows = await db.rawQuery('SELECT COUNT(*) AS c FROM http_cache');
+    expect(rows.first['c'], 1, reason: 'replaced, not duplicated');
+  });
+
+  test('the stored value is gzip-compressed', () async {
     final body = List.filled(500, 'compressible').join(',');
     await store.write('https://x/big', etag: '1', body: body);
-    final entries = dir.listSync().whereType<File>().where(
-      (f) => f.path.endsWith('.entry'),
+    final rows = await db.query(
+      'http_cache',
+      columns: ['value'],
+      where: 'key = ?',
+      whereArgs: ['https://x/big'],
     );
-    expect(entries, hasLength(1), reason: 'a single file per entry');
-    expect(
-      entries.single.lengthSync(),
-      lessThan(body.length),
-      reason: 'body is gzipped',
-    );
+    final blob = rows.first['value'] as Uint8List;
+    expect(blob.length, lessThan(body.length), reason: 'gzipped');
   });
 
   test('distinct URLs are independent entries', () async {
@@ -61,9 +68,16 @@ void main() {
     expect((await store.read('https://x/b'))!.body, 'B');
   });
 
-  test('a corrupt entry reads as a miss, not a crash', () async {
+  test('a corrupt value reads as a miss, not a crash', () async {
     await store.write('https://x/a', etag: '1', body: 'A');
-    await entryFile().writeAsBytes([0, 1, 2, 3]); // no header separator
+    await db.update(
+      'http_cache',
+      {
+        'value': Uint8List.fromList([0, 1, 2, 3]),
+      }, // not gzip
+      where: 'key = ?',
+      whereArgs: ['https://x/a'],
+    );
     expect(await store.read('https://x/a'), isNull);
     expect(await store.readEtag('https://x/a'), isNull);
   });
@@ -74,27 +88,26 @@ void main() {
     expect(await store.read('https://x/a'), isNull);
   });
 
-  test('evicts oldest-first when over the byte budget', () async {
-    // Same body and same-length URLs → identical entry size; sizing maxBytes to
-    // exactly one entry means the second write must evict the first.
-    final body = List.generate(40, (i) => 'item-$i-payload').join(',');
-    await store.write('https://x/old', etag: '1', body: body);
-    final oneSize = entryFile().lengthSync();
-    await store.clear();
+  test('a write sweeps entries older than maxAge (7 days)', () async {
+    await store.write('https://x/old', etag: '1', body: 'A');
+    final eightDaysAgo = DateTime.now()
+        .subtract(const Duration(days: 8))
+        .millisecondsSinceEpoch;
+    await db.update(
+      'http_cache',
+      {'time': eightDaysAgo},
+      where: 'key = ?',
+      whereArgs: ['https://x/old'],
+    );
 
-    final bounded = EtagCacheStore(dir, maxBytes: oneSize);
-    await bounded.write('https://x/old', etag: '1', body: body);
-    await bounded.write('https://x/new', etag: '2', body: body);
+    // Any fresh write triggers the age sweep.
+    await store.write('https://x/new', etag: '2', body: 'B');
 
     expect(
-      await bounded.read('https://x/old'),
+      await store.read('https://x/old'),
       isNull,
-      reason: 'oldest evicted',
+      reason: 'expired evicted',
     );
-    expect(
-      await bounded.read('https://x/new'),
-      isNotNull,
-      reason: 'newest kept',
-    );
+    expect(await store.read('https://x/new'), isNotNull);
   });
 }
