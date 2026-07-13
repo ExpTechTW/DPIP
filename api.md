@@ -77,9 +77,9 @@ Legacy `api-1`（待後端部署後移至 `core-tnn1`）—— 皆為預先登�
 | `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | `api-1.exptech.dev` |
 | `getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | `api-1.exptech.dev` |
 | `getEvent` | `/api/v1/dpip/event/{id}` | `legacyApi` | `api-1.exptech.dev` |
-| `updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `legacyApi` | `api-1.exptech.dev` |
-| `getNotify` | `/api/v2/notify/{token}` | `legacyApi` | `api-1.exptech.dev` |
-| `setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `legacyApi` | `api-1.exptech.dev` |
+| `✅ updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `legacyApi` | `api-1.exptech.dev` |
+| `✅ getNotify` | `/api/v2/notify/{token}` | `legacyApi` | `api-1.exptech.dev` |
+| `✅ setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `legacyApi` | `api-1.exptech.dev` |
 
 ## 暫時無 (unavailable)
 
@@ -93,7 +93,6 @@ Legacy `api-1`（待後端部署後移至 `core-tnn1`）—— 皆為預先登�
 |---|---|
 | `getLocalizationProgress` | `https://exptech.dev/api/v1/dpip/locale` |
 | `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases` |
-| `getStatus` | `https://status.exptech.dev/api/v1/status/data?duration=1d` |
 
 ## curl 可用性（2026-07-14，HTTP 狀態碼）
 
