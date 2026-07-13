@@ -8,6 +8,8 @@
 #   2. presentation must NOT import any feature's data layer (depend on domain).
 #   3. a feature must NOT import another feature's data or presentation
 #      (cross-feature coupling goes through shared/ or a domain interface).
+#   4. domain is the innermost, pure layer: no Flutter, no Dio, and it must not
+#      import any data or presentation (its own or another feature's).
 #
 # Usage:  tool/check_layering.sh   (run from the repo root)
 set -euo pipefail
@@ -22,6 +24,17 @@ report() {
 
 # All first-party source, excluding generated code.
 while IFS= read -r file; do
+  # Domain purity (no Flutter/Dio) — checked before the dpip-import short-circuit
+  # below, since a domain file might import only non-dpip packages.
+  case "$file" in
+    lib/features/*/domain/*)
+      while IFS= read -r bad; do
+        [ -z "$bad" ] && continue
+        report "$file → $bad (domain must be pure Dart — no Flutter/Dio)"
+      done < <(grep -oE "import 'package:(flutter|dio)/[^']+'" "$file" || true)
+      ;;
+  esac
+
   imports=$(grep -oE "import 'package:dpip/[^']+'" "$file" \
     | sed -E "s|import 'package:dpip/([^']+)'|\1|") || true
   [ -z "$imports" ] && continue
@@ -44,6 +57,10 @@ while IFS= read -r file; do
         *"/presentation/"*) in_pres=1 ;;
         *) in_pres=0 ;;
       esac
+      case "$file" in
+        *"/domain/"*) in_domain=1 ;;
+        *) in_domain=0 ;;
+      esac
       while IFS= read -r imp; do
         [ -z "$imp" ] && continue
         case "$imp" in
@@ -59,6 +76,15 @@ while IFS= read -r file; do
             fi
             if [ "$in_pres" = "1" ] && [ "$layer" = "data" ]; then
               report "$file → $imp (presentation must depend on domain, not data)"
+            fi
+            # domain must not reach into any data/presentation (own included);
+            # cross-feature is already caught above, so this covers own-feature.
+            if [ "$in_domain" = "1" ] && [ "$other" = "$self" ]; then
+              case "$layer" in
+                data | presentation)
+                  report "$file → $imp (domain must not import $layer — innermost layer)"
+                  ;;
+              esac
             fi
             ;;
         esac
