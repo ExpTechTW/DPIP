@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
@@ -138,10 +140,16 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _attempt = 0; // the connection is delivering — reset the backoff
     final retry = event.retry;
     if (retry != null) _serverRetry = retry;
-    if (event.isDefault) {
-      if (event.data.isEmpty) return; // metadata-only frame, not a payload
+    // A payload arrives either as the default event (plain JSON) or, under the
+    // `compress=1` flag, as `event: g` whose data is base64-gzipped JSON —
+    // decompressed here at the application layer.
+    if (event.name == _compressedEvent || event.isDefault) {
       try {
-        _latest = decode(event.data);
+        final json = event.name == _compressedEvent
+            ? utf8.decode(gzip.decode(base64.decode(event.data.trim())))
+            : event.data;
+        if (json.isEmpty) return; // metadata-only frame, not a payload
+        _latest = decode(json);
         _hasSnapshot = true;
         _lastEventMark = _elapsed.elapsed;
       } catch (error, stackTrace) {
@@ -152,6 +160,9 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
       Log.debug('[$_label] SSE served by ${event.data}');
     }
   }
+
+  /// ExpTech's `compress=1` streams the payload as `event: g` (base64 gzip).
+  static const String _compressedEvent = 'g';
 
   void _onClosed() {
     _subscription = null;

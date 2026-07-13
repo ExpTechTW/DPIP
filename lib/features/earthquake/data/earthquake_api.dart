@@ -23,13 +23,16 @@ class EarthquakeApi {
   /// Opens the **live** RTS feed as a Server-Sent Events stream — the transport
   /// the realtime channel runs on. A continuous ~1 Hz snapshot stream.
   ///
-  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts?sse=1`
+  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts?sse=1&compress=1`
   ///
-  /// Each default event's `data:` is the same JSON [getRtsRealtime] returns. A
-  /// fresh stream per call, so the source can reconnect by calling again.
-  Stream<SseEvent> openRtsSse() => HttpSseClient(
-    _client,
-  ).connect(ApiTier.lbApi, '/api/v2/trem/rts', query: const {'sse': 1});
+  /// `compress=1` streams the payload as `event: g` (base64-gzipped JSON, the
+  /// same JSON [getRtsRealtime] returns) — decompressed in the realtime source.
+  /// A fresh stream per call, so the source can reconnect by calling again.
+  Stream<SseEvent> openRtsSse() => HttpSseClient(_client).connect(
+    ApiTier.lbApi,
+    '/api/v2/trem/rts',
+    query: const {'sse': 1, 'compress': 1},
+  );
 
   /// Latest EEW list (one-shot snapshot).
   ///
@@ -41,14 +44,16 @@ class EarthquakeApi {
   /// the realtime channel runs on, replacing per-second polling with one
   /// server-pushed connection.
   ///
-  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew?sse=1`
+  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew?sse=1&compress=1`
   ///
-  /// Each default event's `data:` is the same JSON array [getEewRealtime]
-  /// returns, so the data format is unchanged. A fresh stream per call, so the
-  /// source can reconnect by calling again.
-  Stream<SseEvent> openEewSse() => HttpSseClient(
-    _client,
-  ).connect(ApiTier.lbApi, '/api/v2/eq/eew', query: const {'sse': 1});
+  /// `compress=1` streams the payload as `event: g` (base64-gzipped JSON, the
+  /// same JSON [getEewRealtime] returns) — decompressed in the realtime source.
+  /// A fresh stream per call, so the source can reconnect by calling again.
+  Stream<SseEvent> openEewSse() => HttpSseClient(_client).connect(
+    ApiTier.lbApi,
+    '/api/v2/eq/eew',
+    query: const {'sse': 1, 'compress': 1},
+  );
 
   /// Paginated earthquake report list.
   ///

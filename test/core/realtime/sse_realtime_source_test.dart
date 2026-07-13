@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -98,6 +100,16 @@ void main() {
       expect((await h.source.fetch()).valueOrNull, 'a');
       expect((await h.source.fetch()).valueOrNull, 'a');
       expect(h.connects, hasLength(1), reason: 'no reconnect churn while open');
+    });
+
+    test('decompresses a compressed payload (event: g, base64 gzip)', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      // What `compress=1` sends: event name "g", data = base64(gzip(json)).
+      final packed = base64.encode(gzip.encode(utf8.encode('shaken')));
+      h.current.add(SseEvent(name: 'g', data: packed));
+      await pumpEventQueue();
+      expect((await h.source.fetch()).valueOrNull, 'shaken');
     });
 
     test('metadata and empty-default frames are not a snapshot', () async {
