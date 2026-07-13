@@ -10,11 +10,10 @@
     <!-- Location (geolocator): resolve the device's township for local alerts. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <!-- Background reporting: a location foreground service keeps updating the
-         device township while the app is backgrounded (LocationForegroundService). -->
+    <!-- Background reporting: an adaptive-interval alarm updates the device
+         township while the app is backgrounded (LocationAlarmReceiver), instead
+         of a battery-hungry foreground service. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
 
     <application
         android:label="@string/app_name"
@@ -49,11 +48,19 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Background device-location reporting (native-first). -->
-        <service
-            android:name=".LocationForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="location" />
+        <!-- Background device-location reporting (native-first): an adaptive
+             alarm fires this receiver, which reports the fix and reschedules. -->
+        <receiver
+            android:name=".LocationAlarmReceiver"
+            android:exported="false" />
+        <!-- Re-arms the alarm after a reboot (elapsed-realtime alarms clear). -->
+        <receiver
+            android:name=".LocationBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

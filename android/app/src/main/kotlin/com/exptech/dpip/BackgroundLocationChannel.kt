@@ -1,18 +1,17 @@
 package com.exptech.dpip
 
 import android.content.Context
-import android.content.Intent
-import androidx.core.content.ContextCompat
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /**
  * Starts/stops autonomous background device-location reporting — the Android
- * counterpart of iOS `BackgroundLocationPlugin`. It drives
- * [LocationForegroundService], which keeps reporting to `updateDeviceLocation`
- * on distance-triggered moves while the app is backgrounded, so the report
- * doesn't need the Flutter isolate alive. The foreground `DeviceLocationReporter`
- * covers the app-open case; this is the terminated-state safety net.
+ * counterpart of iOS `BackgroundLocationPlugin`. Rather than a battery-hungry
+ * continuous foreground service, it drives a single self-rescheduling alarm
+ * ([LocationAlarmScheduler]) whose interval adapts to movement, so the report to
+ * `updateDeviceLocation` keeps targeting the right township with minimal wake-ups
+ * while the app is backgrounded. The foreground `DeviceLocationReporter` covers
+ * the app-open case; this is the terminated-state safety net.
  */
 class BackgroundLocationChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {
@@ -31,20 +30,27 @@ class BackgroundLocationChannel(private val context: Context) :
                     result.error("bad_args", "Missing start args", null)
                     return
                 }
-                val intent = Intent(context, LocationForegroundService::class.java).apply {
-                    action = LocationForegroundService.ACTION_START
-                    putExtra(LocationForegroundService.EXTRA_TOKEN, token)
-                    putExtra(LocationForegroundService.EXTRA_VERSION, version)
-                    putExtra(LocationForegroundService.EXTRA_PLATFORM, platform)
-                }
-                ContextCompat.startForegroundService(context, intent)
+                LocationAlarmScheduler.prefs(context).edit()
+                    .putBoolean(LocationAlarmScheduler.KEY_ENABLED, true)
+                    .putString(LocationAlarmScheduler.KEY_TOKEN, token)
+                    .putString(LocationAlarmScheduler.KEY_VERSION, version)
+                    .putInt(LocationAlarmScheduler.KEY_PLATFORM, platform)
+                    .putLong(
+                        LocationAlarmScheduler.KEY_INTERVAL_MIN,
+                        LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
+                    )
+                    .apply()
+                LocationAlarmScheduler.schedule(
+                    context, LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
+                )
                 result.success(null)
             }
 
             "stop" -> {
-                context.stopService(
-                    Intent(context, LocationForegroundService::class.java),
-                )
+                LocationAlarmScheduler.prefs(context).edit()
+                    .putBoolean(LocationAlarmScheduler.KEY_ENABLED, false)
+                    .apply()
+                LocationAlarmScheduler.cancel(context)
                 result.success(null)
             }
 

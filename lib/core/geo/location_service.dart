@@ -26,9 +26,6 @@ class LocationService {
   final Future<bool> Function() _isAvailable;
   final Future<GpsFix?> Function() _fix;
 
-  /// Whether location services + permission currently allow a fix.
-  Future<bool> isAvailable() => _isAvailable();
-
   /// Requests location permission (call from a screen, after explaining why).
   /// Returns whether a fix is now permitted.
   Future<bool> requestPermission() async {
@@ -39,6 +36,13 @@ class LocationService {
     return permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse;
   }
+
+  /// Whether background ("Always") location is granted — the precondition for
+  /// native background reporting. On Android the background alarm can't fetch a
+  /// fix (or prompt) with only "while in use", so callers must gate on this;
+  /// iOS requests Always from its own plugin.
+  Future<bool> backgroundGranted() async =>
+      await Geolocator.checkPermission() == LocationPermission.always;
 
   /// A distance-filtered stream of GPS fixes — each emission is a move of at
   /// least [distanceFilterMeters], which is exactly the trigger for a device-

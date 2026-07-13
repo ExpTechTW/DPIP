@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
@@ -116,7 +118,13 @@ class _AppServicesHostState extends State<_AppServicesHost> {
     if (!granted) return;
     widget.deviceLocationReporter.start();
     final token = widget.notificationService.token;
-    if (token != null) widget.backgroundLocation.start(token);
+    if (token == null) return;
+    // Background reporting needs "Always": iOS's plugin requests it on start;
+    // Android's alarm can't fetch a fix (or prompt) with only "while in use",
+    // so arm it there only when Always is already granted.
+    final background =
+        Platform.isIOS || await widget.locationService.backgroundGranted();
+    if (background && mounted) widget.backgroundLocation.start(token);
   }
 
   @override
