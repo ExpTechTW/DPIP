@@ -1,4 +1,4 @@
-import 'package:dpip/features/location/domain/town.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

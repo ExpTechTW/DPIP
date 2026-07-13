@@ -1,6 +1,6 @@
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/features/location/data/town_directory.dart';
-import 'package:dpip/features/location/domain/town.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// A GPS coordinate fix in decimal degrees.

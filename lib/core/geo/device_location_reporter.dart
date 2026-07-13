@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/features/location/data/location_service.dart' show GpsFix;
+import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 
 /// Reports the device location to the backend when it **moves a threshold
 /// distance** — not when the user switches the Home region.

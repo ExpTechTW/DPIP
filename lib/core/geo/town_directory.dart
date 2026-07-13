@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:dpip/features/location/domain/town.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// The Taiwan township directory, loaded from the bundled

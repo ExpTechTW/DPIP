@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:dpip/features/location/data/device_location_reporter.dart';
-import 'package:dpip/features/location/data/location_service.dart' show GpsFix;
+import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

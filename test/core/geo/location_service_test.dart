@@ -1,5 +1,5 @@
-import 'package:dpip/features/location/data/location_service.dart';
-import 'package:dpip/features/location/data/town_directory.dart';
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 TownDirectory _dir() => TownDirectory.fromJson({
