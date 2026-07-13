@@ -379,6 +379,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Observed'**
   String get mapTimelineObserved;
+
+  /// More-menu entry that opens the notification-settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings'**
+  String get notifySettingsMenu;
+
+  /// Title of the notification-settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifyTitle;
+
+  /// Shown on the notify page when there is no push token yet
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications aren\'t ready yet — try again shortly.'**
+  String get notifyUnavailable;
+
+  /// Snackbar shown when saving a notification channel fails
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the setting. Please try again.'**
+  String get notifySetFailed;
+
+  /// Notify page section header
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake early warning'**
+  String get notifySectionEew;
+
+  /// Notify page section header
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get notifySectionEarthquake;
+
+  /// Notify page section header
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get notifySectionWeather;
+
+  /// Notify page section header
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami'**
+  String get notifySectionTsunami;
+
+  /// Notify page section header
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get notifySectionOther;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency earthquake alert'**
+  String get notifyEew;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Strong-motion monitor'**
+  String get notifyMonitor;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake report'**
+  String get notifyReport;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity report'**
+  String get notifyIntensity;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm alerts'**
+  String get notifyThunderstorm;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Weather advisories'**
+  String get notifyAdvisory;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster information'**
+  String get notifyEvacuation;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami information'**
+  String get notifyTsunami;
+
+  /// Notify channel title
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get notifyAnnouncement;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get notifyOptOff;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Receive all'**
+  String get notifyOptAll;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Local intensity 4 or above'**
+  String get notifyOptLocalIntensity4;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Local intensity 1 or above'**
+  String get notifyOptLocalIntensity1;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Current location only'**
+  String get notifyOptWeatherLocal;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami warnings only'**
+  String get notifyOptTsunamiWarning;
+
+  /// Notify option label
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami advisories and warnings'**
+  String get notifyOptTsunamiAll;
 }
 
 class _AppLocalizationsDelegate

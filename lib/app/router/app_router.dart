@@ -7,6 +7,7 @@ import 'package:dpip/features/location/presentation/pages/region_select_page.dar
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
+import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
@@ -62,6 +63,11 @@ final GoRouter appRouter = GoRouter(
               RegionCityPage(city: state.pathParameters['city']!),
         ),
       ],
+    ),
+    GoRoute(
+      path: AppRoutes.notifySettingsPath,
+      name: AppRoutes.notifySettings,
+      builder: (_, _) => const NotifyPage(),
     ),
   ],
 );

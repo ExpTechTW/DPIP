@@ -38,4 +38,8 @@ abstract final class AppRoutes {
 
   static const String regionSelectCity = 'regionSelectCity';
   static const String regionSelectCityPath = ':city';
+
+  // Per-channel push notification settings.
+  static const String notifySettings = 'notifySettings';
+  static const String notifySettingsPath = '/notify-settings';
 }

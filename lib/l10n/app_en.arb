@@ -198,5 +198,63 @@
   "mapTimelineObserved": "Observed",
   "@mapTimelineObserved": {
     "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"
-  }
+  },
+  "notifySettingsMenu": "Notification settings",
+  "@notifySettingsMenu": {
+    "description": "More-menu entry that opens the notification-settings page"
+  },
+  "notifyTitle": "Notifications",
+  "@notifyTitle": {
+    "description": "Title of the notification-settings page"
+  },
+  "notifyUnavailable": "Push notifications aren't ready yet — try again shortly.",
+  "@notifyUnavailable": {
+    "description": "Shown on the notify page when there is no push token yet"
+  },
+  "notifySetFailed": "Couldn't save the setting. Please try again.",
+  "@notifySetFailed": {
+    "description": "Snackbar shown when saving a notification channel fails"
+  },
+  "notifySectionEew": "Earthquake early warning",
+  "@notifySectionEew": { "description": "Notify page section header" },
+  "notifySectionEarthquake": "Earthquake",
+  "@notifySectionEarthquake": { "description": "Notify page section header" },
+  "notifySectionWeather": "Weather",
+  "@notifySectionWeather": { "description": "Notify page section header" },
+  "notifySectionTsunami": "Tsunami",
+  "@notifySectionTsunami": { "description": "Notify page section header" },
+  "notifySectionOther": "Other",
+  "@notifySectionOther": { "description": "Notify page section header" },
+  "notifyEew": "Emergency earthquake alert",
+  "@notifyEew": { "description": "Notify channel title" },
+  "notifyMonitor": "Strong-motion monitor",
+  "@notifyMonitor": { "description": "Notify channel title" },
+  "notifyReport": "Earthquake report",
+  "@notifyReport": { "description": "Notify channel title" },
+  "notifyIntensity": "Intensity report",
+  "@notifyIntensity": { "description": "Notify channel title" },
+  "notifyThunderstorm": "Thunderstorm alerts",
+  "@notifyThunderstorm": { "description": "Notify channel title" },
+  "notifyAdvisory": "Weather advisories",
+  "@notifyAdvisory": { "description": "Notify channel title" },
+  "notifyEvacuation": "Disaster information",
+  "@notifyEvacuation": { "description": "Notify channel title" },
+  "notifyTsunami": "Tsunami information",
+  "@notifyTsunami": { "description": "Notify channel title" },
+  "notifyAnnouncement": "Announcements",
+  "@notifyAnnouncement": { "description": "Notify channel title" },
+  "notifyOptOff": "Off",
+  "@notifyOptOff": { "description": "Notify option label" },
+  "notifyOptAll": "Receive all",
+  "@notifyOptAll": { "description": "Notify option label" },
+  "notifyOptLocalIntensity4": "Local intensity 4 or above",
+  "@notifyOptLocalIntensity4": { "description": "Notify option label" },
+  "notifyOptLocalIntensity1": "Local intensity 1 or above",
+  "@notifyOptLocalIntensity1": { "description": "Notify option label" },
+  "notifyOptWeatherLocal": "Current location only",
+  "@notifyOptWeatherLocal": { "description": "Notify option label" },
+  "notifyOptTsunamiWarning": "Tsunami warnings only",
+  "@notifyOptTsunamiWarning": { "description": "Notify option label" },
+  "notifyOptTsunamiAll": "Tsunami advisories and warnings",
+  "@notifyOptTsunamiAll": { "description": "Notify option label" }
 }

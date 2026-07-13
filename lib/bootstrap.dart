@@ -23,6 +23,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
+import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,7 @@ Future<void> bootstrap() async {
         ...coreProviders(deps),
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
+        ...notificationProviders(deps),
         ...homeProviders(),
       ],
     ),

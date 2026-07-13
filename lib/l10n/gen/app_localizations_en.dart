@@ -155,4 +155,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'Observed';
+
+  @override
+  String get notifySettingsMenu => 'Notification settings';
+
+  @override
+  String get notifyTitle => 'Notifications';
+
+  @override
+  String get notifyUnavailable =>
+      'Push notifications aren\'t ready yet — try again shortly.';
+
+  @override
+  String get notifySetFailed => 'Couldn\'t save the setting. Please try again.';
+
+  @override
+  String get notifySectionEew => 'Earthquake early warning';
+
+  @override
+  String get notifySectionEarthquake => 'Earthquake';
+
+  @override
+  String get notifySectionWeather => 'Weather';
+
+  @override
+  String get notifySectionTsunami => 'Tsunami';
+
+  @override
+  String get notifySectionOther => 'Other';
+
+  @override
+  String get notifyEew => 'Emergency earthquake alert';
+
+  @override
+  String get notifyMonitor => 'Strong-motion monitor';
+
+  @override
+  String get notifyReport => 'Earthquake report';
+
+  @override
+  String get notifyIntensity => 'Intensity report';
+
+  @override
+  String get notifyThunderstorm => 'Thunderstorm alerts';
+
+  @override
+  String get notifyAdvisory => 'Weather advisories';
+
+  @override
+  String get notifyEvacuation => 'Disaster information';
+
+  @override
+  String get notifyTsunami => 'Tsunami information';
+
+  @override
+  String get notifyAnnouncement => 'Announcements';
+
+  @override
+  String get notifyOptOff => 'Off';
+
+  @override
+  String get notifyOptAll => 'Receive all';
+
+  @override
+  String get notifyOptLocalIntensity4 => 'Local intensity 4 or above';
+
+  @override
+  String get notifyOptLocalIntensity1 => 'Local intensity 1 or above';
+
+  @override
+  String get notifyOptWeatherLocal => 'Current location only';
+
+  @override
+  String get notifyOptTsunamiWarning => 'Tsunami warnings only';
+
+  @override
+  String get notifyOptTsunamiAll => 'Tsunami advisories and warnings';
 }

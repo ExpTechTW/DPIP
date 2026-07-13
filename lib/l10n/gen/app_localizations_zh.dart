@@ -154,4 +154,79 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get notifySettingsMenu => '通知設定';
+
+  @override
+  String get notifyTitle => '通知';
+
+  @override
+  String get notifyUnavailable => '推播尚未就緒，請稍後再試。';
+
+  @override
+  String get notifySetFailed => '設定失敗，請稍後再試。';
+
+  @override
+  String get notifySectionEew => '地震速報';
+
+  @override
+  String get notifySectionEarthquake => '地震';
+
+  @override
+  String get notifySectionWeather => '天氣';
+
+  @override
+  String get notifySectionTsunami => '海嘯';
+
+  @override
+  String get notifySectionOther => '其他';
+
+  @override
+  String get notifyEew => '緊急地震速報';
+
+  @override
+  String get notifyMonitor => '強震監視器';
+
+  @override
+  String get notifyReport => '地震報告';
+
+  @override
+  String get notifyIntensity => '震度速報';
+
+  @override
+  String get notifyThunderstorm => '雷雨即時訊息';
+
+  @override
+  String get notifyAdvisory => '天氣警特報';
+
+  @override
+  String get notifyEvacuation => '防災資訊';
+
+  @override
+  String get notifyTsunami => '海嘯資訊';
+
+  @override
+  String get notifyAnnouncement => '公告';
+
+  @override
+  String get notifyOptOff => '關閉';
+
+  @override
+  String get notifyOptAll => '接收全部';
+
+  @override
+  String get notifyOptLocalIntensity4 => '所在地震度4以上';
+
+  @override
+  String get notifyOptLocalIntensity1 => '所在地震度1以上';
+
+  @override
+  String get notifyOptWeatherLocal => '接收所在地';
+
+  @override
+  String get notifyOptTsunamiWarning => '只接收海嘯警報';
+
+  @override
+  String get notifyOptTsunamiAll => '海嘯消息、海嘯警報';
 }

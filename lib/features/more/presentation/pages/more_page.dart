@@ -32,6 +32,11 @@ class MorePage extends StatelessWidget {
                 title: l10n.regionManageTitle,
                 onTap: () => context.pushNamed(AppRoutes.regionSelect),
               ),
+              _MoreTile(
+                icon: Icons.notifications_outlined,
+                title: l10n.notifySettingsMenu,
+                onTap: () => context.pushNamed(AppRoutes.notifySettings),
+              ),
             ],
           ),
           SectionHeader(l10n.moreSectionAdvanced),
