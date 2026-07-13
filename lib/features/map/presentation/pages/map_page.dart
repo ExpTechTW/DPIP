@@ -1,7 +1,7 @@
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
-import 'package:dpip/shared/map/radar_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

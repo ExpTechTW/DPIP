@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/radar_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/map_snapshot.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';

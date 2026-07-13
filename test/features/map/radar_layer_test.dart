@@ -1,6 +1,6 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
-import 'package:dpip/shared/map/radar_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 

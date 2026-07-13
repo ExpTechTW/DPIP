@@ -12,7 +12,7 @@ import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/radar_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

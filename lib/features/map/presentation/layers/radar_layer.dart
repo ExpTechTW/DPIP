@@ -2,7 +2,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:dpip/shared/map/radar_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
