@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -19,12 +20,12 @@ class HomeSheetHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final foreground = Color.lerp(colors.onSurface, Colors.white, reveal)!;
-    final secondary = Color.lerp(
+    final foreground = lightenOnReveal(colors.onSurface, reveal);
+    final secondary = lightenOnReveal(
       colors.onSurfaceVariant,
-      Colors.white.withValues(alpha: 0.75),
       reveal,
-    )!;
+      toAlpha: 0.75,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -43,20 +44,10 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
   Widget build(BuildContext context) {
     final store = context.watch<RegionStore>();
     syncAreaPageOffscreen(store.selectedIndex);
-    return _build(
-      context,
-      blend: widget.blend,
-      dismiss: widget.dismiss,
-      areas: store.areas,
-    );
-  }
-
-  Widget _build(
-    BuildContext context, {
-    required double blend,
-    required double dismiss,
-    required List<HomeArea> areas,
-  }) {
+    // Read `areas` once (the getter allocates a fresh list each call).
+    final areas = store.areas;
+    final blend = widget.blend;
+    final dismiss = widget.dismiss;
     final colors = Theme.of(context).colorScheme;
     // Slide up by the bar's own height and fade out once the sheet invades it;
     // release taps to the sheet behind as soon as it is mostly gone.
@@ -130,12 +121,8 @@ class _RegionBadge extends StatelessWidget {
       Colors.white.withValues(alpha: 0.22),
       reveal,
     )!;
-    final restText = Color.lerp(colors.onSurface, Colors.white, reveal)!;
-    final centreText = Color.lerp(
-      colors.onPrimaryContainer,
-      Colors.white,
-      reveal,
-    )!;
+    final restText = lightenOnReveal(colors.onSurface, reveal);
+    final centreText = lightenOnReveal(colors.onPrimaryContainer, reveal);
 
     return GestureDetector(
       // Tapping a badge selects it — the other switch mode besides swiping.

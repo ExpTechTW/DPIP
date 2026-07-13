@@ -1,5 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
@@ -49,11 +50,7 @@ class HomeContent extends StatelessWidget {
     final selected = store.selected;
     // 所在地 is selected but GPS gave no fix — the slot stays, the body says so.
     final currentUnavailable = selected is CurrentArea && selected.code == null;
-    final cardColor = Color.lerp(
-      colors.surfaceContainerHighest.withValues(alpha: 0.55),
-      Colors.white.withValues(alpha: 0.16),
-      reveal,
-    )!;
+    final cardColor = glassSurface(colors, reveal);
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.fromLTRB(
@@ -111,16 +108,8 @@ class _CurrentUnavailableNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final foreground = Color.lerp(
-      colors.onSurfaceVariant,
-      Colors.white,
-      reveal,
-    )!;
-    final background = Color.lerp(
-      colors.surfaceContainerHighest.withValues(alpha: 0.55),
-      Colors.white.withValues(alpha: 0.16),
-      reveal,
-    )!;
+    final foreground = lightenOnReveal(colors.onSurfaceVariant, reveal);
+    final background = glassSurface(colors, reveal);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(

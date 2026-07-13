@@ -29,5 +29,5 @@ class NotifyRepositoryImpl implements NotifyRepository {
   );
 
   NotifySettings _map(List<dynamic> raw) =>
-      NotifySettings.fromWire([for (final value in raw) value as int]);
+      NotifySettings.fromWire(raw.cast<int>());
 }

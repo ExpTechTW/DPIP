@@ -35,7 +35,7 @@ class DeviceLocationReporter {
   }
 
   Future<void> _handle(GpsFix fix) async {
-    if (_last != null && fix.lat == _last!.lat && fix.lng == _last!.lng) return;
+    if (fix == _last) return; // records compare by value
     _last = fix;
     try {
       await _onMoved(fix);
