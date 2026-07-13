@@ -103,7 +103,12 @@ class _MapTimelineState extends State<MapTimeline> {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
     if (notification is ScrollUpdateNotification) {
-      if (centred != _liveIndex) setState(() => _liveIndex = centred);
+      if (centred != _liveIndex) {
+        setState(() => _liveIndex = centred);
+        // Report every frame the scrubber crosses, not just the final one, so
+        // the map animates through the loop as you drag.
+        if (widget.selectedIndex != centred) widget.onSelected(centred);
+      }
     } else if (notification is ScrollEndNotification && !_snapping) {
       if (widget.selectedIndex != centred) widget.onSelected(centred);
       _centreOn(centred, animate: true);

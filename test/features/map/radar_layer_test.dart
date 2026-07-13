@@ -44,6 +44,15 @@ class _RecordingController implements MapLibreMapController {
       calls.add('removeSource:$sourceId');
 
   @override
+  Future<void> setLayerProperties(
+    String layerId,
+    LayerProperties properties,
+  ) async {
+    final json = properties.toJson();
+    calls.add('set:$layerId:${json['visibility']}:${json['raster-opacity']}');
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
@@ -85,26 +94,69 @@ void main() {
     },
   );
 
-  test('re-renders the same frame after a style reset', () async {
-    final layer = RadarMapLayer(_FakeRadarRepository(['1700000000000']));
-    final frame = (await layer.frames()).valueOrNull!.single;
-    final controller = _RecordingController();
+  test(
+    'preloads all frames hidden, then windows a drawn frame + neighbours',
+    () async {
+      // Four frames, chronological ids f0..f3.
+      final layer = RadarMapLayer(
+        _FakeRadarRepository([
+          '1700001800000', // f3 (newest, API is newest-first)
+          '1700001200000', // f2
+          '1700000600000', // f1
+          '1700000000000', // f0
+        ]),
+      );
+      final frames = (await layer.frames()).valueOrNull!; // [f0, f1, f2, f3]
+      final controller = _RecordingController();
 
-    await layer.render(controller, frame);
-    expect(controller.calls, [
-      'addSource:radar-source',
-      'addRasterLayer:radar-layer',
-    ]);
+      await layer.prepare(controller, frames);
+      // Every frame added as a hidden raster source + layer.
+      expect(
+        controller.calls.where((c) => c.startsWith('addSource')).length,
+        4,
+      );
+      expect(
+        controller.calls.where((c) => c.startsWith('addRasterLayer')).length,
+        4,
+      );
 
-    // Same frame again → idempotent, no controller churn.
-    controller.calls.clear();
-    await layer.render(controller, frame);
-    expect(controller.calls, isEmpty);
+      // Preparing again is idempotent (no duplicate adds).
+      controller.calls.clear();
+      await layer.prepare(controller, frames);
+      expect(controller.calls, isEmpty);
 
-    // After a base-style reload wiped the map, the same frame must re-add.
-    controller.calls.clear();
-    layer.onStyleReset();
-    await layer.render(controller, frame);
-    expect(controller.calls, contains('addSource:radar-source'));
-  });
+      // Show newest (f3) → window {f2, f3}: f2 prefetches, f3 is drawn.
+      controller.calls.clear();
+      await layer.show(controller, frames[3]);
+      expect(controller.calls, [
+        'set:radar-lyr-1700001200000:visible:0', // f2 prefetch
+        'set:radar-lyr-1700001800000:visible:0.85', // f3 drawn
+      ]);
+
+      // Scrub to the oldest (f0) → window {f0, f1}: hide the frames that left,
+      // draw f0, prefetch f1.
+      controller.calls.clear();
+      await layer.show(controller, frames[0]);
+      expect(controller.calls, [
+        'set:radar-lyr-1700001200000:none:0', // f2 left the window
+        'set:radar-lyr-1700001800000:none:0', // f3 left the window
+        'set:radar-lyr-1700000000000:visible:0.85', // f0 drawn
+        'set:radar-lyr-1700000600000:visible:0', // f1 prefetch
+      ]);
+
+      // Same frame again → no-op.
+      controller.calls.clear();
+      await layer.show(controller, frames[0]);
+      expect(controller.calls, isEmpty);
+
+      // After a base-style reload wiped the map, prepare must re-add everything.
+      controller.calls.clear();
+      layer.onStyleReset();
+      await layer.prepare(controller, frames);
+      expect(
+        controller.calls.where((c) => c.startsWith('addSource')).length,
+        4,
+      );
+    },
+  );
 }

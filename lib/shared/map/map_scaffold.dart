@@ -74,7 +74,13 @@ class _MapScaffoldState extends State<MapScaffold> {
           _frames = frames;
           _selectedIndex = frames.isEmpty ? 0 : frames.length - 1; // newest
         });
-        if (frames.isNotEmpty) _renderSelected();
+        if (frames.isNotEmpty) {
+          // Preload the whole set (tiles prefetch), then reveal the newest.
+          final controller = _controller!;
+          final layer = _active;
+          _queue(() => layer.prepare(controller, frames));
+          _showSelected();
+        }
       },
       err: (failure) {
         Log.warning(
@@ -88,18 +94,27 @@ class _MapScaffoldState extends State<MapScaffold> {
     );
   }
 
-  void _renderSelected() {
+  void _showSelected() {
     final controller = _controller;
-    if (controller == null || _frames.isEmpty) return;
+    if (controller == null) return;
     final layer = _active;
-    final frame = _frames[_selectedIndex];
-    _queue(() => layer.render(controller, frame));
+    // Read the target at execution time so a burst of scrub selections
+    // coalesces to the latest frame instead of flooding the map with calls.
+    _queue(() {
+      if (_frames.isEmpty || !identical(layer, _active)) {
+        return Future<void>.value();
+      }
+      return layer.show(controller, _frames[_selectedIndex]);
+    });
   }
 
   void _onFrameSelected(int index) {
     if (index < 0 || index >= _frames.length || index == _selectedIndex) return;
-    setState(() => _selectedIndex = index);
-    _renderSelected();
+    // No setState: the map is updated imperatively via show(), so scrubbing
+    // never rebuilds the (expensive) platform-view map. The timeline drives its
+    // own display; _selectedIndex is just the source of truth for show().
+    _selectedIndex = index;
+    _showSelected();
   }
 
   void _onLayerSelected(MapLayer layer) {

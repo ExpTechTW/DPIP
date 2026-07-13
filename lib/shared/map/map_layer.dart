@@ -33,9 +33,11 @@ class MapFrame {
 /// controller. Implement one per data type in a feature's `presentation/layers/`
 /// so the map surface stays free of MapLibre-id bookkeeping.
 ///
-/// A layer instance is bound to a single map and keeps its own MapLibre state,
-/// so [render] may be called repeatedly with different frames (the timeline
-/// scrubbing) and should update in place.
+/// A layer instance is bound to a single map and keeps its own MapLibre state.
+/// The scaffold [prepare]s the whole frame set once (so tiles prefetch in the
+/// background) and then [show]s individual frames — [show] must be cheap enough
+/// to drive live timeline scrubbing, so the map animates like a loop instead of
+/// stalling on a per-frame fetch.
 abstract interface class MapLayer {
   /// Stable id; also namespaces this layer's MapLibre source/layer ids.
   String get id;
@@ -50,16 +52,21 @@ abstract interface class MapLayer {
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();
 
-  /// Shows [frame] on [controller], adding the layer's source/layer on first
-  /// call and updating in place on later calls (a no-op if [frame] is unchanged).
-  Future<void> render(MapLibreMapController controller, MapFrame frame);
+  /// Preloads every [frames] entry onto [controller] up front — hidden, so their
+  /// tiles fetch and cache in the background — making later [show] calls an
+  /// instant swap rather than a fetch. Idempotent; called once per frame set.
+  Future<void> prepare(MapLibreMapController controller, List<MapFrame> frames);
+
+  /// Instantly reveals the already-[prepare]d [frame] (hiding the previous one).
+  /// Cheap enough to call on every scrub tick, so the timeline can animate.
+  Future<void> show(MapLibreMapController controller, MapFrame frame);
 
   /// Removes this layer's sources/layers from [controller].
   Future<void> clear(MapLibreMapController controller);
 
   /// Forgets any on-map state after the base style reloaded (a theme / dark-mode
   /// change rebuilds the style, which drops every runtime source/layer). Must
-  /// NOT touch the controller — the map is already wiped — so the next [render]
-  /// re-adds from scratch instead of no-oping on a stale "already shown" guard.
+  /// NOT touch the controller — the map is already wiped — so the next [prepare]
+  /// re-adds from scratch instead of no-oping on stale "already added" state.
   void onStyleReset();
 }
