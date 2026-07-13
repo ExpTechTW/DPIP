@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'Announcements'**
   String get moreAnnouncements;
 
+  /// More-menu link to the DPIP notification send-record website
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP notification log'**
+  String get moreNotifyLog;
+
   /// Snackbar shown when an external link fails to open in the browser
   ///
   /// In en, this message translates to:

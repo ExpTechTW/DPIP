@@ -56,6 +56,10 @@
   "@moreAnnouncements": {
     "description": "More-menu link to the ExpTech announcements website"
   },
+  "moreNotifyLog": "DPIP notification log",
+  "@moreNotifyLog": {
+    "description": "More-menu link to the DPIP notification send-record website"
+  },
   "moreLinkOpenFailed": "Couldn't open the link",
   "@moreLinkOpenFailed": {
     "description": "Snackbar shown when an external link fails to open in the browser"

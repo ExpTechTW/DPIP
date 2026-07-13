@@ -14,6 +14,7 @@
   "moreTremReport": "TREM 檢知報告",
   "moreServerStatus": "伺服器狀態",
   "moreAnnouncements": "公告",
+  "moreNotifyLog": "DPIP 通知發送記錄",
   "moreLinkOpenFailed": "無法開啟連結",
   "weatherDynamicState": "天氣動態狀態",
   "weatherDynamicStateSubtitle": "覆寫首頁背景天氣",

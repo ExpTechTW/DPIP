@@ -51,6 +51,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAnnouncements => 'Announcements';
 
   @override
+  String get moreNotifyLog => 'DPIP notification log';
+
+  @override
   String get moreLinkOpenFailed => 'Couldn\'t open the link';
 
   @override

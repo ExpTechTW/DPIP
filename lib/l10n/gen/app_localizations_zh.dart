@@ -51,6 +51,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreNotifyLog => 'DPIP 通知發送記錄';
+
+  @override
   String get moreLinkOpenFailed => '無法開啟連結';
 
   @override
