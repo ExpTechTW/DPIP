@@ -32,7 +32,7 @@ class MapScaffold extends StatefulWidget {
   State<MapScaffold> createState() => _MapScaffoldState();
 }
 
-class _MapScaffoldState extends State<MapScaffold> {
+class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
@@ -46,6 +46,39 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   /// Serialises controller mutations so an add never races a remove.
   Future<void> _mapOps = Future<void>.value();
+
+  /// Whether tiles have been cached since the last clear — so backgrounding only
+  /// clears the shared cache when there's actually something to clear.
+  bool _cacheDirty = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Scrubbing a layer caches every frame's tiles in MapLibre's *shared*
+    // on-disk cache (removeSource doesn't evict them). That cache also backs the
+    // home page's off-screen map snapshot, and a bloated one stops its overlay
+    // from rendering. Clear it as the map backgrounds so the next launch's
+    // snapshot starts clean. Harmless: live tiles just refetch on resume.
+    if (state == AppLifecycleState.paused &&
+        _controller != null &&
+        _cacheDirty) {
+      _cacheDirty = false;
+      _controller!.clearAmbientCache().catchError((Object error) {
+        Log.warning('Failed to clear map ambient cache: $error');
+      });
+    }
+  }
 
   void _onMapCreated(MapLibreMapController controller) =>
       _controller = controller;
@@ -75,7 +108,7 @@ class _MapScaffoldState extends State<MapScaffold> {
           _selectedIndex = frames.isEmpty ? 0 : frames.length - 1; // newest
         });
         if (frames.isNotEmpty) {
-          // Preload the whole set (tiles prefetch), then reveal the newest.
+          // Register the set, then reveal the newest (a layer adds tiles lazily).
           final controller = _controller!;
           final layer = _active;
           _queue(() => layer.prepare(controller, frames));
@@ -98,6 +131,7 @@ class _MapScaffoldState extends State<MapScaffold> {
     final controller = _controller;
     if (controller == null) return;
     final layer = _active;
+    _cacheDirty = true; // showing a frame caches its tiles
     // Read the target at execution time so a burst of scrub selections
     // coalesces to the latest frame instead of flooding the map with calls.
     _queue(() {
