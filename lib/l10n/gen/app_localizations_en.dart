@@ -111,9 +111,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String areaPlaceholder(int number) {
-    return 'Area $number';
-  }
+  String get regionNationwide => 'Nationwide';
+
+  @override
+  String get regionCurrent => 'Current location';
+
+  @override
+  String get regionCurrentUnavailable => 'Can\'t get current location';
 
   @override
   String get weatherPrecipitation => 'Precipitation';

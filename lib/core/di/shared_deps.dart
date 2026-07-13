@@ -1,9 +1,12 @@
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// The shared infrastructure every feature module builds on, assembled once in
@@ -22,6 +25,9 @@ class SharedDeps {
     required this.serverClock,
     required this.realtimeService,
     required this.notificationService,
+    required this.townDirectory,
+    required this.regionStore,
+    required this.locationService,
   });
 
   /// Persistence for feature-local settings.
@@ -44,4 +50,14 @@ class SharedDeps {
 
   /// Push transport + channels (also provided).
   final NotificationService notificationService;
+
+  /// Taiwan township directory (code → town), for GPS resolution + region
+  /// labels. Loaded once at bootstrap.
+  final TownDirectory townDirectory;
+
+  /// App-wide Home region selection (also provided).
+  final RegionStore regionStore;
+
+  /// GPS → current township resolver (geolocator).
+  final LocationService locationService;
 }

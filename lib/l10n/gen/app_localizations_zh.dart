@@ -110,9 +110,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String areaPlaceholder(int number) {
-    return '地區$number';
-  }
+  String get regionNationwide => '全國';
+
+  @override
+  String get regionCurrent => '所在地';
+
+  @override
+  String get regionCurrentUnavailable => '無法取得所在地位置';
 
   @override
   String get weatherPrecipitation => '降水量';

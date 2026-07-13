@@ -296,11 +296,23 @@ abstract class AppLocalizations {
   /// **'M{magnitude} · depth {depth} km'**
   String eewSummary(String magnitude, String depth);
 
-  /// Placeholder name for a swipeable region in the region bar, until real saved locations exist
+  /// Region bar label for the whole-country view
   ///
   /// In en, this message translates to:
-  /// **'Area {number}'**
-  String areaPlaceholder(int number);
+  /// **'Nationwide'**
+  String get regionNationwide;
+
+  /// Region bar label for the current GPS township
+  ///
+  /// In en, this message translates to:
+  /// **'Current location'**
+  String get regionCurrent;
+
+  /// Shown when the current-location area is selected but GPS is off/unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t get current location'**
+  String get regionCurrentUnavailable;
 
   /// Label for the precipitation metric in the home weather header
   ///

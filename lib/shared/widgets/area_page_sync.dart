@@ -1,9 +1,9 @@
 import 'package:dpip/app/theme/app_motion.dart';
-import 'package:dpip/core/settings/area_selection.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// Binds a driven [PageController] to [AreaSelection] for a widget that only
+/// Binds a driven [PageController] to [RegionStore] for a widget that only
 /// *reflects* the selection (RegionBar's badge carousel, RegionPager's body).
 ///
 /// Owns the controller lifecycle, the selection listener, an in-flight guard so
@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 /// post-frame catch-up). Override [areaViewportFraction] for a peeking carousel.
 mixin AreaPageSyncMixin<W extends StatefulWidget> on State<W> {
   late final PageController areaPageController;
-  AreaSelection? _areas;
+  RegionStore? _areas;
   bool _animating = false;
 
   /// Fraction of the viewport each page occupies — 1 (full) by default; a
@@ -25,14 +25,14 @@ mixin AreaPageSyncMixin<W extends StatefulWidget> on State<W> {
     super.initState();
     areaPageController = PageController(
       viewportFraction: areaViewportFraction,
-      initialPage: context.read<AreaSelection>().selectedIndex,
+      initialPage: context.read<RegionStore>().selectedIndex,
     );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final areas = context.read<AreaSelection>();
+    final areas = context.read<RegionStore>();
     if (areas != _areas) {
       _areas?.removeListener(_animateToSelected);
       _areas = areas..addListener(_animateToSelected);

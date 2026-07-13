@@ -1,8 +1,11 @@
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/core/settings/area_selection.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/home_area.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/area_page_sync.dart';
+import 'package:dpip/shared/widgets/region_label.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +13,7 @@ import 'package:provider/provider.dart';
 /// of badges over page dots. The selected area sits in the middle with a filled
 /// badge; neighbours flank it and areas two or more away fade out.
 ///
-/// It only *displays* [AreaSelection]; switching is a horizontal swipe anywhere
+/// It only *displays* [RegionStore]; switching is a horizontal swipe anywhere
 /// (see `RegionSwipeArea`) and the carousel slides to re-centre. Two `0→1`
 /// dials drive its look over a backdrop, so the widget stays feature-agnostic:
 /// [blend] fades the background transparent and flips the badges to light;
@@ -38,13 +41,13 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
 
   @override
   Widget build(BuildContext context) {
-    final areas = context.watch<AreaSelection>();
-    syncAreaPageOffscreen(areas.selectedIndex);
+    final store = context.watch<RegionStore>();
+    syncAreaPageOffscreen(store.selectedIndex);
     return _build(
       context,
       blend: widget.blend,
       dismiss: widget.dismiss,
-      count: areas.count,
+      areas: store.areas,
     );
   }
 
@@ -52,7 +55,7 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
     BuildContext context, {
     required double blend,
     required double dismiss,
-    required int count,
+    required List<HomeArea> areas,
   }) {
     final colors = Theme.of(context).colorScheme;
     // Slide up by the bar's own height and fade out once the sheet invades it;
@@ -72,11 +75,12 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
                 child: PageView.builder(
                   controller: areaPageController,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: count,
+                  itemCount: areas.length,
                   itemBuilder: (context, index) => AnimatedBuilder(
                     animation: areaPageController,
                     builder: (context, _) => _RegionBadge(
                       index: index,
+                      area: areas[index],
                       distance: (areaPage - index).abs(),
                       reveal: blend,
                     ),
@@ -96,11 +100,13 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
 class _RegionBadge extends StatelessWidget {
   const _RegionBadge({
     required this.index,
+    required this.area,
     required this.distance,
     required this.reveal,
   });
 
   final int index;
+  final HomeArea area;
   final double distance;
   final double reveal;
 
@@ -109,6 +115,7 @@ class _RegionBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final label = regionAreaLabel(l10n, context.read<TownDirectory>(), area);
 
     // 1 at the centre → 0 one step away: badge fill and text emphasis.
     final fill = (1 - distance).clamp(0.0, 1.0);
@@ -133,7 +140,7 @@ class _RegionBadge extends StatelessWidget {
     return GestureDetector(
       // Tapping a badge selects it — the other switch mode besides swiping.
       behavior: HitTestBehavior.opaque,
-      onTap: () => context.read<AreaSelection>().select(index),
+      onTap: () => context.read<RegionStore>().select(index),
       child: Opacity(
         opacity: opacity,
         child: Center(
@@ -147,7 +154,7 @@ class _RegionBadge extends StatelessWidget {
               borderRadius: AppRadius.large,
             ),
             child: Text(
-              l10n.areaPlaceholder(index + 1),
+              label,
               maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.fade,

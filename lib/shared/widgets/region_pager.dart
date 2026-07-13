@@ -1,11 +1,11 @@
-import 'package:dpip/core/settings/area_selection.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/shared/widgets/area_page_sync.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 /// Pages a screen's body by area, so switching areas slides the *whole page*
 /// (not just the region bar). Like the bar, the pager is non-interactive — a
-/// horizontal swipe anywhere (see `RegionSwipeArea`) drives [AreaSelection] and
+/// horizontal swipe anywhere (see `RegionSwipeArea`) drives [RegionStore] and
 /// the pager slides to match (via [AreaPageSyncMixin]), keeping the bar and body
 /// in step.
 class RegionPager extends StatefulWidget {
@@ -21,7 +21,7 @@ class RegionPager extends StatefulWidget {
 class _RegionPagerState extends State<RegionPager> with AreaPageSyncMixin {
   @override
   Widget build(BuildContext context) {
-    final areas = context.watch<AreaSelection>();
+    final areas = context.watch<RegionStore>();
     syncAreaPageOffscreen(areas.selectedIndex);
     return PageView.builder(
       controller: areaPageController,

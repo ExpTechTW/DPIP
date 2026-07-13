@@ -136,12 +136,17 @@
       "depth": { "type": "String" }
     }
   },
-  "areaPlaceholder": "Area {number}",
-  "@areaPlaceholder": {
-    "description": "Placeholder name for a swipeable region in the region bar, until real saved locations exist",
-    "placeholders": {
-      "number": { "type": "int" }
-    }
+  "regionNationwide": "Nationwide",
+  "@regionNationwide": {
+    "description": "Region bar label for the whole-country view"
+  },
+  "regionCurrent": "Current location",
+  "@regionCurrent": {
+    "description": "Region bar label for the current GPS township"
+  },
+  "regionCurrentUnavailable": "Can't get current location",
+  "@regionCurrentUnavailable": {
+    "description": "Shown when the current-location area is selected but GPS is off/unavailable"
   },
   "weatherPrecipitation": "Precipitation",
   "@weatherPrecipitation": {

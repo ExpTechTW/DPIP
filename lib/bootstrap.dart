@@ -13,7 +13,10 @@ import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
@@ -73,6 +76,13 @@ Future<void> bootstrap() async {
     Log.handle(error, stackTrace, 'Notification init skipped');
   }
 
+  // Location: the township directory backs both GPS resolution and Home region
+  // labels; the region store holds the Home selection; the location service maps
+  // a GPS fix to a township. GPS itself is requested after the first frame.
+  final townDirectory = await TownDirectory.load();
+  final regionStore = RegionStore(prefs);
+  final locationService = LocationService(townDirectory);
+
   final deps = SharedDeps(
     prefs: prefs,
     apiClient: apiClient,
@@ -81,6 +91,9 @@ Future<void> bootstrap() async {
     serverClock: serverClock,
     realtimeService: realtimeService,
     notificationService: notificationService,
+    townDirectory: townDirectory,
+    regionStore: regionStore,
+    locationService: locationService,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime
