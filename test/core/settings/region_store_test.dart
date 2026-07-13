@@ -60,6 +60,19 @@ void main() {
     expect(store.selectedIndex, 3); // clamped to the new last
   });
 
+  test(
+    'removeSaved before the selection keeps the same region selected',
+    () async {
+      final store = await makeStore(['100', '200', '300']);
+      store.select(3); // 200 (index 3)
+      expect((store.selected as SavedArea).code, '200');
+      store.removeSaved('100'); // an area before the selected one
+      expect(store.savedCodes, ['200', '300']);
+      // Selection tracks 200 down to index 2, not silently onto 300.
+      expect((store.selected as SavedArea).code, '200');
+    },
+  );
+
   test('select / next / previous stay in range', () async {
     final store = await makeStore(['100']); // count 3
     store.select(0);

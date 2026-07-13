@@ -36,6 +36,13 @@ class NotifyController extends ChangeNotifier {
   NotifySettings? _settings;
   Failure? _failure;
   NotifyChannel? _saving;
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
   /// The load state.
   NotifyLoadStatus get status => _status;
@@ -62,7 +69,10 @@ class NotifyController extends ChangeNotifier {
     }
     _status = NotifyLoadStatus.loading;
     notifyListeners();
-    (await _repository.fetch(_token!)).when(
+    final result = await _repository.fetch(_token!);
+    // Page popped mid-load — don't touch a disposed notifier.
+    if (_disposed) return;
+    result.when(
       ok: (settings) {
         _settings = settings;
         _status = NotifyLoadStatus.ready;
@@ -86,6 +96,7 @@ class NotifyController extends ChangeNotifier {
     _saving = channel;
     notifyListeners();
     final result = await _repository.setChannel(_token!, channel, optionIndex);
+    if (_disposed) return false; // page popped mid-save — don't notify
     _saving = null;
     return result.when(
       ok: (settings) {

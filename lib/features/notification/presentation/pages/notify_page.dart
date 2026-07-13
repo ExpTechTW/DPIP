@@ -154,7 +154,7 @@ class _ChannelTile extends StatelessWidget {
     if (chosen == null) return;
 
     final ok = await controller.setChannel(channel, chosen);
-    if (!ok) {
+    if (!ok && context.mounted) {
       messenger
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(l10n.notifySetFailed)));

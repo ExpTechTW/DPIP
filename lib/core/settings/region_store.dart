@@ -85,14 +85,21 @@ class RegionStore extends ChangeNotifier {
     return true;
   }
 
-  /// Removes a saved township (no-op if absent). Keeps the selection valid.
+  /// Removes a saved township (no-op if absent). Preserves which area stays
+  /// selected: removing an area *before* the selected one shifts the selection
+  /// down with it (so the same region stays active, not its neighbour). Removing
+  /// the selected area itself, or one after it, leaves the index (then clamped).
   void removeSaved(String code) {
-    if (!_saved.contains(code)) return;
+    final position = _saved.indexOf(code);
+    if (position < 0) return;
+    // Saved areas start at index 2 (after 全國, 所在地).
+    final removedIndex = 2 + position;
     _saved = [
       for (final c in _saved)
         if (c != code) c,
     ];
     _persist();
+    if (removedIndex < _selectedIndex) _selectedIndex -= 1;
     _selectedIndex = _selectedIndex.clamp(0, count - 1);
     notifyListeners();
   }
