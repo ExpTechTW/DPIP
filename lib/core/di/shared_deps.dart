@@ -1,3 +1,4 @@
+import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
@@ -28,6 +29,7 @@ class SharedDeps {
     required this.townDirectory,
     required this.regionStore,
     required this.locationService,
+    required this.deviceLocationReporter,
   });
 
   /// Persistence for feature-local settings.
@@ -60,4 +62,8 @@ class SharedDeps {
 
   /// GPS → current township resolver (geolocator).
   final LocationService locationService;
+
+  /// Distance-triggered device-location reporter (foreground). Started by the
+  /// service host after GPS permission is granted.
+  final DeviceLocationReporter deviceLocationReporter;
 }

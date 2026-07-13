@@ -40,6 +40,17 @@ class LocationService {
         permission == LocationPermission.whileInUse;
   }
 
+  /// A distance-filtered stream of GPS fixes — each emission is a move of at
+  /// least [distanceFilterMeters], which is exactly the trigger for a device-
+  /// location report (see `DeviceLocationReporter`). Foreground only.
+  Stream<GpsFix> positionStream({int distanceFilterMeters = 250}) =>
+      Geolocator.getPositionStream(
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          distanceFilter: distanceFilterMeters,
+        ),
+      ).map((position) => (lat: position.latitude, lng: position.longitude));
+
   /// The current township from GPS, or null if unavailable / no fix.
   Future<Town?> currentTown() async {
     try {

@@ -2,6 +2,7 @@ import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
@@ -38,6 +39,7 @@ class DpipApp extends StatelessWidget {
         notificationService: deps.notificationService,
         locationService: deps.locationService,
         regionStore: deps.regionStore,
+        deviceLocationReporter: deps.deviceLocationReporter,
         child: MaterialApp.router(
           title: 'DPIP',
           debugShowCheckedModeBanner: false,
@@ -65,6 +67,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.notificationService,
     required this.locationService,
     required this.regionStore,
+    required this.deviceLocationReporter,
     required this.child,
   });
 
@@ -72,6 +75,7 @@ class _AppServicesHost extends StatefulWidget {
   final NotificationService notificationService;
   final LocationService locationService;
   final RegionStore regionStore;
+  final DeviceLocationReporter deviceLocationReporter;
   final Widget child;
 
   @override
@@ -94,20 +98,24 @@ class _AppServicesHostState extends State<_AppServicesHost> {
     });
   }
 
-  /// Requests GPS permission and resolves the current township into the region
-  /// store. On denial/error the current code stays null, so 所在地 renders its
-  /// "can't get current location" state rather than a wrong region.
+  /// Requests GPS permission, resolves the current township into the region
+  /// store, and — once permission is granted — starts the distance-triggered
+  /// device-location reporter. On denial/error the current code stays null, so
+  /// 所在地 renders its "can't get current location" state rather than a wrong
+  /// region, and no reporting starts.
   Future<void> _resolveCurrentLocation() async {
-    await widget.locationService.requestPermission();
+    final granted = await widget.locationService.requestPermission();
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
+    if (granted) widget.deviceLocationReporter.start();
   }
 
   @override
   void dispose() {
     NotificationTaps.onTap = null;
     _observer.dispose();
+    widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();
   }

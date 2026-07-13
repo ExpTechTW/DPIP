@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
@@ -22,6 +26,7 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -83,6 +88,28 @@ Future<void> bootstrap() async {
   final regionStore = RegionStore(prefs);
   final locationService = LocationService(townDirectory);
 
+  // Distance-triggered device-location report: on each meaningful move, POST the
+  // coordinates for push targeting (platform + push token + app version). Started
+  // after the first frame once GPS permission is granted; a null token (not yet
+  // registered) simply skips — it self-heals on the next move.
+  final locationApi = LocationApi(apiClient);
+  final appVersion = (await PackageInfo.fromPlatform()).version;
+  final reportPlatform = Platform.isIOS ? 1 : 0;
+  final deviceLocationReporter = DeviceLocationReporter(
+    positions: locationService.positionStream(),
+    onMoved: (fix) async {
+      final token = notificationService.token;
+      if (token == null) return;
+      await locationApi.updateDeviceLocation(
+        platform: reportPlatform,
+        token: token,
+        version: appVersion,
+        lat: fix.lat,
+        lng: fix.lng,
+      );
+    },
+  );
+
   final deps = SharedDeps(
     prefs: prefs,
     apiClient: apiClient,
@@ -94,6 +121,7 @@ Future<void> bootstrap() async {
     townDirectory: townDirectory,
     regionStore: regionStore,
     locationService: locationService,
+    deviceLocationReporter: deviceLocationReporter,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime
