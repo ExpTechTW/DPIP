@@ -15,8 +15,14 @@ tiers fail over across their regions.
 > feature's `data/` (or `core/` for infra) when that feature is implemented,
 > carrying its own `ApiTier`. Live today: earthquake EEW
 > (`features/earthquake/data/earthquake_api.dart`), radar
-> (`shared/map/radar_api.dart`), NTP (`core/realtime/ntp_api.dart`). The rest
-> below are staged here until their feature lands.
+> (`shared/map/radar_api.dart`). The rest below are staged here until their
+> feature lands.
+>
+> **Time sync is not an HTTP endpoint.** The app's clock uses real **SNTP**
+> (`flutter_ntp`, UDP/123) against `time.exptech.com.tw` (primary) /
+> `time.apple.com` (backup), not a `/ntp` HTTP call — see
+> `core/realtime/ntp_time_source.dart` + `app_time.dart` (`AppTime.utc` /
+> `AppTime.utc8`).
 
 ## 多活備援 (multi-active)
 
@@ -76,8 +82,6 @@ Not yet migrated — legacy `api-1` (move to `core-tnn1` as the backend deploys)
 | `getNotify` | `/api/v2/notify/{token}` | `legacyApi` | `api-1.exptech.dev` |
 | `setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `legacyApi` | `api-1.exptech.dev` |
 | `getNotificationHistory` | `/api/v1/notify/history` | `legacyApi` | `api-1.exptech.dev` |
-| `getNtp` | `/ntp` | `legacyApi` | `api-1.exptech.dev` |
-| `sendNetworkInfo` (POST) | `/api/v1/dpip/networkInfo` | `legacyApi` | `api-1.exptech.dev` |
 
 ## 暫時無 (unavailable)
 

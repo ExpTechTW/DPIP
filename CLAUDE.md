@@ -97,6 +97,14 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   pause polling on background and resume (recompute status → resync clock →
   refetch) on foreground; background alerting is push's job. A safety-critical
   feed that is `stale`/`offline` must never be presented as current.
+- **Calibrated time:** the `ServerClock` corrects device time via real **SNTP**
+  (`ntp_time_source.dart` → `flutter_ntp`, UDP/123, `time.exptech.com.tw` primary
+  / `time.apple.com` backup — not an HTTP endpoint), anchored to a monotonic
+  clock so a device-clock or timezone change can't move it (only a resync does).
+  `RealtimeService` resyncs it every 60s (paused in background, resynced on
+  resume). Read corrected time anywhere via the global `AppTime` facade
+  (`AppTime.utc` / `AppTime.utc8`, the fixed-offset Taipei wall clock) — never
+  `DateTime.now()` for anything the server timestamps.
 - **Async-state UI (contract):** render async/realtime state through the shared
   views in `shared/widgets/`, never a hand-rolled `FutureBuilder`/`Consumer` that
   drops the error or stale case into a blank screen. `AsyncView<T>` maps a

@@ -6,11 +6,12 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
-import 'package:dpip/core/realtime/ntp_api.dart';
+import 'package:dpip/core/realtime/elapsed.dart';
+import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
-import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
@@ -48,13 +49,16 @@ Future<void> bootstrap() async {
   final dio = createDio();
   final apiClient = ApiClient(dio, regions);
 
-  // Realtime spine: a corrected server clock feeds staleness. The initial clock
-  // sync is fire-and-forget so it never delays launch (EEW staleness is
-  // offset-independent — both instants come from this clock).
+  // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
+  // anchored to a monotonic clock, exposed globally via `AppTime` and resynced
+  // every 60s by the realtime service. The initial sync is fire-and-forget so it
+  // never delays launch (until it lands, the clock reads device time).
   final serverClock = ServerClock(
     const SystemClock(),
-    NtpServerTimeSource(NtpApi(apiClient).serverTimeMs),
+    SystemElapsed(),
+    NtpTimeSource(),
   );
+  AppTime.install(serverClock);
   serverClock.sync().ignore();
   final realtimeService = RealtimeService(serverClock);
 
