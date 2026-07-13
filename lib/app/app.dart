@@ -1,80 +1,38 @@
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/theme/app_theme.dart';
-import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
-import 'package:dpip/core/settings/area_selection.dart';
-import 'package:dpip/core/settings/home_sheet_extent.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
-import 'package:dpip/core/settings/experimental_settings.dart';
-import 'package:dpip/features/earthquake/domain/eew_repository.dart';
-import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
-import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 /// The root widget of the application.
 ///
-/// Provides app-wide services (region selection + API clients) and wires
-/// routing and theming.
+/// Installs the aggregated [providers] (assembled per-feature in `bootstrap`)
+/// and wires routing, theming, and the app-level service lifecycle. It stays
+/// feature-agnostic: adding a feature adds providers to the list, never a field
+/// here.
 class DpipApp extends StatelessWidget {
-  const DpipApp({
-    super.key,
-    required this.regions,
-    required this.experimental,
-    required this.radarRepository,
-    required this.eewRepository,
-    required this.realtimeService,
-    required this.eewController,
-    required this.notificationService,
-  });
+  const DpipApp({super.key, required this.deps, required this.providers});
 
-  /// Region selection state (also the endpoint-selection "state management").
-  final RegionSelection regions;
+  /// Shared infrastructure the service host needs (realtime + notifications).
+  final SharedDeps deps;
 
-  /// Experimental feature settings (e.g. the home weather-animation override).
-  final ExperimentalSettings experimental;
-
-  /// Radar echo frames (map overlay + home backdrop) — repository seam.
-  final RadarRepository radarRepository;
-
-  /// Earthquake Early Warning data (repository seam — presentation depends on
-  /// this abstraction, not the API).
-  final EewRepository eewRepository;
-
-  /// Realtime spine (server clock + polling channels + lifecycle fan-out).
-  final RealtimeService realtimeService;
-
-  /// Live EEW feed exposed to the UI as a [ChangeNotifier].
-  final EewRealtimeController eewController;
-
-  /// Push-notification setup (channels + FCM/APNs transport + tap routing).
-  final NotificationService notificationService;
+  /// Every feature's providers, aggregated in `bootstrap`.
+  final List<SingleChildWidget> providers;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: regions),
-        ChangeNotifierProvider.value(value: experimental),
-        ChangeNotifierProvider(create: (_) => AreaSelection()),
-        ChangeNotifierProvider(create: (_) => HomeSheetExtent()),
-        ChangeNotifierProvider(create: (_) => HomeResetSignal()),
-        Provider<RadarRepository>.value(value: radarRepository),
-        Provider<EewRepository>.value(value: eewRepository),
-        Provider<RealtimeService>.value(value: realtimeService),
-        Provider<NotificationService>.value(value: notificationService),
-        ChangeNotifierProvider<EewRealtimeController>.value(
-          value: eewController,
-        ),
-      ],
+      providers: providers,
       child: _AppServicesHost(
-        realtimeService: realtimeService,
-        notificationService: notificationService,
+        realtimeService: deps.realtimeService,
+        notificationService: deps.notificationService,
         child: MaterialApp.router(
           title: 'DPIP',
           debugShowCheckedModeBanner: false,
