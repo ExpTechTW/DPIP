@@ -36,6 +36,30 @@
   "@experimentalFeatures": {
     "description": "Title of the experimental-features settings page and its More-menu entry"
   },
+  "moreSectionLinks": "Links",
+  "@moreSectionLinks": {
+    "description": "Section header on the More page grouping external website links"
+  },
+  "moreCwaEew": "CWA earthquake early warning",
+  "@moreCwaEew": {
+    "description": "More-menu link to the CWA earthquake early warning publication log website"
+  },
+  "moreTremReport": "TREM detection report",
+  "@moreTremReport": {
+    "description": "More-menu link to the TREM detection report website"
+  },
+  "moreServerStatus": "Server status",
+  "@moreServerStatus": {
+    "description": "More-menu link to the ExpTech server status website"
+  },
+  "moreAnnouncements": "Announcements",
+  "@moreAnnouncements": {
+    "description": "More-menu link to the ExpTech announcements website"
+  },
+  "moreLinkOpenFailed": "Couldn't open the link",
+  "@moreLinkOpenFailed": {
+    "description": "Snackbar shown when an external link fails to open in the browser"
+  },
   "weatherDynamicState": "Weather animation",
   "@weatherDynamicState": {
     "description": "Setting that forces the home weather backdrop to a fixed state"

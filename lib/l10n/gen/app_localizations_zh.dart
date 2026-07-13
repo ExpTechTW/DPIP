@@ -36,6 +36,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get experimentalFeatures => '實驗性功能';
 
   @override
+  String get moreSectionLinks => '相關連結';
+
+  @override
+  String get moreCwaEew => '中央氣象署強震即時警報';
+
+  @override
+  String get moreTremReport => 'TREM 檢知報告';
+
+  @override
+  String get moreServerStatus => '伺服器狀態';
+
+  @override
+  String get moreAnnouncements => '公告';
+
+  @override
+  String get moreLinkOpenFailed => '無法開啟連結';
+
+  @override
   String get weatherDynamicState => '天氣動態狀態';
 
   @override

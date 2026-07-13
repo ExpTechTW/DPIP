@@ -152,6 +152,42 @@ abstract class AppLocalizations {
   /// **'Experimental features'**
   String get experimentalFeatures;
 
+  /// Section header on the More page grouping external website links
+  ///
+  /// In en, this message translates to:
+  /// **'Links'**
+  String get moreSectionLinks;
+
+  /// More-menu link to the CWA earthquake early warning publication log website
+  ///
+  /// In en, this message translates to:
+  /// **'CWA earthquake early warning'**
+  String get moreCwaEew;
+
+  /// More-menu link to the TREM detection report website
+  ///
+  /// In en, this message translates to:
+  /// **'TREM detection report'**
+  String get moreTremReport;
+
+  /// More-menu link to the ExpTech server status website
+  ///
+  /// In en, this message translates to:
+  /// **'Server status'**
+  String get moreServerStatus;
+
+  /// More-menu link to the ExpTech announcements website
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get moreAnnouncements;
+
+  /// Snackbar shown when an external link fails to open in the browser
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the link'**
+  String get moreLinkOpenFailed;
+
   /// Setting that forces the home weather backdrop to a fixed state
   ///
   /// In en, this message translates to:

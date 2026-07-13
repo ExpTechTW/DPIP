@@ -36,6 +36,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get experimentalFeatures => 'Experimental features';
 
   @override
+  String get moreSectionLinks => 'Links';
+
+  @override
+  String get moreCwaEew => 'CWA earthquake early warning';
+
+  @override
+  String get moreTremReport => 'TREM detection report';
+
+  @override
+  String get moreServerStatus => 'Server status';
+
+  @override
+  String get moreAnnouncements => 'Announcements';
+
+  @override
+  String get moreLinkOpenFailed => 'Couldn\'t open the link';
+
+  @override
   String get weatherDynamicState => 'Weather animation';
 
   @override
