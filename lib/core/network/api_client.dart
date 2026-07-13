@@ -1,7 +1,19 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
+
+/// A live byte stream plus the handle that aborts it — the result of
+/// [ApiClient.openStream]. [cancel] closes the underlying connection; [stream]
+/// ends or errors when the server closes it.
+class StreamedResponse {
+  const StreamedResponse(this.stream, this.cancel);
+
+  final Stream<Uint8List> stream;
+  final void Function() cancel;
+}
 
 /// Region-aware HTTP client.
 ///
@@ -75,6 +87,53 @@ class ApiClient {
         if (isLastHost || !_isRetryable(e)) rethrow;
         Log.warning(
           'ApiClient: ${tier.name} ${hosts[i]} failed (${_describe(e)}); '
+          'failing over to ${hosts[i + 1]}',
+        );
+      }
+    }
+    // Every tier yields at least one host, so this is unreachable in practice.
+    throw StateError('No hosts configured for $tier');
+  }
+
+  /// Opens a streaming GET against [tier] as a raw byte stream, trying each
+  /// region host in failover order (same policy as [request]).
+  ///
+  /// Built for long-lived responses (Server-Sent Events): the idle receive
+  /// timeout is **disabled** (a feed may be legitimately silent for minutes —
+  /// the EEW stream sends nothing between earthquakes), while the connect
+  /// timeout still bounds the initial handshake so a dead host fails over. The
+  /// returned [StreamedResponse.stream] ends or errors when the server closes
+  /// the connection — the caller treats that as "reconnect me". [cancel] aborts
+  /// an in-progress connection (e.g. on dispose).
+  Future<StreamedResponse> openStream(
+    ApiTier tier,
+    String path, {
+    Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+  }) async {
+    final hosts = hostsFor(tier);
+    for (var i = 0; i < hosts.length; i++) {
+      final cancelToken = CancelToken();
+      try {
+        final response = await _dio.request<ResponseBody>(
+          '${hosts[i]}$path',
+          queryParameters: query,
+          cancelToken: cancelToken,
+          options: Options(
+            method: 'GET',
+            responseType: ResponseType.stream,
+            // Disabled, not merged from BaseOptions' 10s: a quiet SSE feed must
+            // not be torn down mid-connection just because no bytes arrived.
+            receiveTimeout: Duration.zero,
+            headers: headers,
+          ),
+        );
+        return StreamedResponse(response.data!.stream, cancelToken.cancel);
+      } on DioException catch (e) {
+        final isLastHost = i == hosts.length - 1;
+        if (isLastHost || !_isRetryable(e)) rethrow;
+        Log.warning(
+          'ApiClient: ${tier.name} stream ${hosts[i]} failed (${_describe(e)}); '
           'failing over to ${hosts[i + 1]}',
         );
       }

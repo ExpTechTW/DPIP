@@ -22,10 +22,22 @@ tiers fail over across their regions.
 
 | Method | Path | Tier | Hosts (failover order = selected first) |
 |---|---|---|---|
+| `openEewSse` | `/api/v2/eq/eew?sse=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+
+> **Live feeds are SSE, not polling.** The `?sse=1` flag switches an endpoint to
+> `text/event-stream`: each event's `data:` is the *same JSON* the plain GET
+> returns (so models are unchanged), pushed on change instead of pulled each
+> second. `openEewSse` is the live EEW transport (`getEewRealtime` remains as the
+> one-shot snapshot); `/api/v2/trem/rts?sse=1` is the same shape for RTS when that
+> feed lands. Transport, buffering, and reconnection live behind the realtime
+> `RealtimeSource` seam (`core/realtime/sse_realtime_source.dart`) — the channel,
+> staleness classifier, and lifecycle are unchanged. EEW is **bursty** (silent
+> between earthquakes → liveness = "connection open"); RTS is **continuous**
+> (~1 Hz → liveness = "recent event").
 
 ## 沒多活備援 (single host, no failover)
 

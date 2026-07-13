@@ -152,6 +152,7 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
     _epoch++;
     _tickerHandle?.cancel();
     _tickerHandle = null;
+    _source.dispose(); // release a connection-holding source (e.g. SSE)
     _controller.close();
   }
 

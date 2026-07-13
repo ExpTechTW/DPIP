@@ -1,5 +1,7 @@
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/sse_client.dart';
+import 'package:dpip/core/network/sse_event.dart';
 
 /// Earthquake endpoints on the region-aware [ApiClient].
 ///
@@ -18,11 +20,24 @@ class EarthquakeApi {
   Future<dynamic> getRtsRealtime() =>
       _client.get(ApiTier.lbApi, '/api/v2/trem/rts');
 
-  /// Latest EEW list.
+  /// Latest EEW list (one-shot snapshot).
   ///
   /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew`
   Future<List<dynamic>> getEewRealtime() async =>
       (await _client.get(ApiTier.lbApi, '/api/v2/eq/eew')) as List<dynamic>;
+
+  /// Opens the **live** EEW feed as a Server-Sent Events stream — the transport
+  /// the realtime channel runs on, replacing per-second polling with one
+  /// server-pushed connection.
+  ///
+  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew?sse=1`
+  ///
+  /// Each default event's `data:` is the same JSON array [getEewRealtime]
+  /// returns, so the data format is unchanged. A fresh stream per call, so the
+  /// source can reconnect by calling again.
+  Stream<SseEvent> openEewSse() => HttpSseClient(
+    _client,
+  ).connect(ApiTier.lbApi, '/api/v2/eq/eew', query: const {'sse': 1});
 
   /// Paginated earthquake report list.
   ///

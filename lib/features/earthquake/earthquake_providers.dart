@@ -18,9 +18,12 @@ import 'package:provider/single_child_widget.dart';
 /// provider `create`), because `RealtimeService.startAll()` runs after the first
 /// frame and needs every channel already registered on the shared service.
 List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
-  final repository = EewRepositoryImpl(EarthquakeApi(deps.apiClient));
+  final api = EarthquakeApi(deps.apiClient);
+  final repository = EewRepositoryImpl(api);
   final channel = RealtimeChannel<List<Eew>>(
-    source: EewRealtimeSource(repository),
+    // Live EEW streams over SSE (`/api/v2/eq/eew?sse=1`) behind the source seam;
+    // the channel keeps polling this source's buffer, so nothing else changes.
+    source: EewRealtimeSource(api.openEewSse),
     clock: deps.serverClock,
     elapsed: SystemElapsed(),
     ticker: const SystemTicker(),

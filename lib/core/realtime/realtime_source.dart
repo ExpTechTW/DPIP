@@ -22,4 +22,10 @@ abstract class RealtimeSource<T> {
   /// stream emissions. Defaults to value equality; override for collections
   /// whose default `==` is identity (e.g. `List`).
   bool sameData(T? a, T? b) => identical(a, b) || a == b;
+
+  /// Releases any transport the source holds (e.g. an open SSE connection). A
+  /// poll source is stateless per [fetch] and uses this no-op default; a
+  /// connection-holding source (SSE) overrides it. The channel calls this from
+  /// its own `dispose()`, so a source never outlives its channel.
+  void dispose() {}
 }

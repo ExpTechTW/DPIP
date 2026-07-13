@@ -86,8 +86,14 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   against a corrected `ServerClock` — a feed ages to stale/offline on its own
   when polls stop, and a failed poll keeps the last data (never blanks). Add a
   feed by implementing `RealtimeSource` (in `data/`) and subclassing
-  `RealtimeNotifier` (in `presentation/`) — no engine change; transport stays
-  HTTP polling behind the source seam. `RealtimeService` + `AppLifecycleListener`
+  `RealtimeNotifier` (in `presentation/`) — no engine change; the transport
+  lives entirely behind the source seam. EEW now streams over **SSE**
+  (`sse_realtime_source.dart` holds one connection, buffers the latest event,
+  and answers each poll from that buffer — `Ok` while connected, `Err` while
+  reconnecting — so the channel/state/staleness are untouched); the `data:`
+  payload is the same JSON the GET returned. A bursty feed (EEW, silent between
+  events) uses connection-open liveness; a continuous feed (RTS, ~1 Hz) uses
+  event-recency. `RealtimeService` + `AppLifecycleListener`
   pause polling on background and resume (recompute status → resync clock →
   refetch) on foreground; background alerting is push's job. A safety-critical
   feed that is `stale`/`offline` must never be presented as current.
