@@ -49,4 +49,15 @@ void main() {
   test('nearest on an empty directory is null', () {
     expect(const TownDirectory(<String, Town>{}).nearest(25, 121), isNull);
   });
+
+  test('cities lists each city once in directory order', () {
+    expect(dir.cities, ['臺北市', '屏東縣', '花蓮縣']);
+  });
+
+  test('townsInCity returns only that city\'s townships', () {
+    final towns = dir.townsInCity('臺北市');
+    expect(towns.map((t) => t.code), ['100']);
+    expect(dir.townsInCity('花蓮縣').single.townName, '花蓮市');
+    expect(dir.townsInCity('不存在市'), isEmpty);
+  });
 }

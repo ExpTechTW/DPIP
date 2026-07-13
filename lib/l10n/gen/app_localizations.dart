@@ -140,6 +140,36 @@ abstract class AppLocalizations {
   /// **'Map (temporarily disabled)'**
   String get mapPlaceholderDisabled;
 
+  /// Section header on the More page grouping general settings entries
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get moreSectionGeneral;
+
+  /// More-menu entry that opens the region picker
+  ///
+  /// In en, this message translates to:
+  /// **'Saved regions'**
+  String get regionManageTitle;
+
+  /// Title of the region picker (city list) page
+  ///
+  /// In en, this message translates to:
+  /// **'Select a region'**
+  String get regionSelectTitle;
+
+  /// Header showing how many saved-region slots are used
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{max} selected'**
+  String regionSelectCount(int count, int max);
+
+  /// Snackbar shown when trying to add a region beyond the cap
+  ///
+  /// In en, this message translates to:
+  /// **'You can save up to {max} regions'**
+  String regionSelectFull(int max);
+
   /// Section header on the More page grouping advanced/developer entries
   ///
   /// In en, this message translates to:

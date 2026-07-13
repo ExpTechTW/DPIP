@@ -40,6 +40,23 @@ class TownDirectory {
   /// Every township.
   Iterable<Town> get all => _byCode.values;
 
+  /// City display names (`縣市`) in directory order, each listed once — the
+  /// first level of the region picker.
+  List<String> get cities {
+    final seen = <String>{};
+    return [
+      for (final town in _byCode.values)
+        if (seen.add(town.cityName)) town.cityName,
+    ];
+  }
+
+  /// The townships in [cityName] (matched on [Town.cityName]), in directory
+  /// order — the second level of the region picker.
+  List<Town> townsInCity(String cityName) => [
+    for (final town in _byCode.values)
+      if (town.cityName == cityName) town,
+  ];
+
   /// The township with [code], or null.
   Town? byCode(String? code) => code == null ? null : _byCode[code];
 

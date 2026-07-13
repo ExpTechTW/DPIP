@@ -28,6 +28,33 @@
   "@mapPlaceholderDisabled": {
     "description": "Placeholder shown in place of the map while MapLibre is disabled"
   },
+  "moreSectionGeneral": "General",
+  "@moreSectionGeneral": {
+    "description": "Section header on the More page grouping general settings entries"
+  },
+  "regionManageTitle": "Saved regions",
+  "@regionManageTitle": {
+    "description": "More-menu entry that opens the region picker"
+  },
+  "regionSelectTitle": "Select a region",
+  "@regionSelectTitle": {
+    "description": "Title of the region picker (city list) page"
+  },
+  "regionSelectCount": "{count}/{max} selected",
+  "@regionSelectCount": {
+    "description": "Header showing how many saved-region slots are used",
+    "placeholders": {
+      "count": { "type": "int" },
+      "max": { "type": "int" }
+    }
+  },
+  "regionSelectFull": "You can save up to {max} regions",
+  "@regionSelectFull": {
+    "description": "Snackbar shown when trying to add a region beyond the cap",
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
   "moreSectionAdvanced": "Advanced",
   "@moreSectionAdvanced": {
     "description": "Section header on the More page grouping advanced/developer entries"

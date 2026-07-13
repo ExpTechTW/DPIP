@@ -2,6 +2,8 @@ import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
+import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
@@ -47,6 +49,19 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.regionSelectPath,
+      name: AppRoutes.regionSelect,
+      builder: (_, _) => const RegionSelectPage(),
+      routes: [
+        GoRoute(
+          path: AppRoutes.regionSelectCityPath,
+          name: AppRoutes.regionSelectCity,
+          builder: (_, state) =>
+              RegionCityPage(city: state.pathParameters['city']!),
+        ),
+      ],
     ),
   ],
 );

@@ -30,6 +30,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
+  String get moreSectionGeneral => '一般';
+
+  @override
+  String get regionManageTitle => '常用地區';
+
+  @override
+  String get regionSelectTitle => '選擇地區';
+
+  @override
+  String regionSelectCount(int count, int max) {
+    return '已選 $count/$max';
+  }
+
+  @override
+  String regionSelectFull(int max) {
+    return '最多只能選擇 $max 個地區';
+  }
+
+  @override
   String get moreSectionAdvanced => '進階';
 
   @override

@@ -30,4 +30,12 @@ abstract final class AppRoutes {
 
   static const String log = 'log';
   static const String logPath = '/log';
+
+  // Region picker: the city list, then the township list within a city
+  // (`:city` path parameter). Saved townships feed the Home region bar.
+  static const String regionSelect = 'regionSelect';
+  static const String regionSelectPath = '/region-select';
+
+  static const String regionSelectCity = 'regionSelectCity';
+  static const String regionSelectCityPath = ':city';
 }

@@ -24,6 +24,16 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl,
         ),
         children: [
+          SectionHeader(l10n.moreSectionGeneral),
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.pin_drop_outlined,
+                title: l10n.regionManageTitle,
+                onTap: () => context.pushNamed(AppRoutes.regionSelect),
+              ),
+            ],
+          ),
           SectionHeader(l10n.moreSectionAdvanced),
           _MoreGroup(
             children: [

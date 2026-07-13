@@ -30,6 +30,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapPlaceholderDisabled => 'Map (temporarily disabled)';
 
   @override
+  String get moreSectionGeneral => 'General';
+
+  @override
+  String get regionManageTitle => 'Saved regions';
+
+  @override
+  String get regionSelectTitle => 'Select a region';
+
+  @override
+  String regionSelectCount(int count, int max) {
+    return '$count/$max selected';
+  }
+
+  @override
+  String regionSelectFull(int max) {
+    return 'You can save up to $max regions';
+  }
+
+  @override
   String get moreSectionAdvanced => 'Advanced';
 
   @override
