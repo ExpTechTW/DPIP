@@ -1,8 +1,8 @@
-import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/area_selection.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/area_page_sync.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,68 +31,15 @@ class RegionBar extends StatefulWidget {
   State<RegionBar> createState() => _RegionBarState();
 }
 
-class _RegionBarState extends State<RegionBar> {
-  late final PageController _controller;
-  AreaSelection? _areas;
-  bool _animating = false;
-
+class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
+  // Peeking carousel: the centre badge flanked by its neighbours.
   @override
-  void initState() {
-    super.initState();
-    _controller = PageController(
-      viewportFraction: 0.25,
-      initialPage: context.read<AreaSelection>().selectedIndex,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final areas = context.read<AreaSelection>();
-    if (areas != _areas) {
-      _areas?.removeListener(_animateToSelected);
-      _areas = areas..addListener(_animateToSelected);
-    }
-  }
-
-  double get _page => !_controller.hasClients
-      ? _controller.initialPage.toDouble()
-      : (_controller.page ?? _controller.initialPage.toDouble());
-
-  void _animateToSelected() {
-    if (!_controller.hasClients) return;
-    final index = _areas!.selectedIndex;
-    if (_page.round() == index) return;
-    _animating = true;
-    _controller
-        .animateToPage(
-          index,
-          duration: AppMotion.medium,
-          curve: Curves.easeInOutCubicEmphasized,
-        )
-        .whenComplete(() {
-          if (mounted) _animating = false;
-        });
-  }
-
-  @override
-  void dispose() {
-    _areas?.removeListener(_animateToSelected);
-    _controller.dispose();
-    super.dispose();
-  }
+  double get areaViewportFraction => 0.25;
 
   @override
   Widget build(BuildContext context) {
     final areas = context.watch<AreaSelection>();
-    // Safety net: snap to the shared selection if this bar missed a change while
-    // off-screen — keeps Home and Events in sync.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _animating || !_controller.hasClients) return;
-      if (_page.round() != areas.selectedIndex) {
-        _controller.jumpToPage(areas.selectedIndex);
-      }
-    });
+    syncAreaPageOffscreen(areas.selectedIndex);
     return _build(
       context,
       blend: widget.blend,
@@ -123,14 +70,14 @@ class _RegionBarState extends State<RegionBar> {
               child: SizedBox(
                 height: 44,
                 child: PageView.builder(
-                  controller: _controller,
+                  controller: areaPageController,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: count,
                   itemBuilder: (context, index) => AnimatedBuilder(
-                    animation: _controller,
+                    animation: areaPageController,
                     builder: (context, _) => _RegionBadge(
                       index: index,
-                      distance: (_page - index).abs(),
+                      distance: (areaPage - index).abs(),
                       reveal: blend,
                     ),
                   ),
