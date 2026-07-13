@@ -1,4 +1,5 @@
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/settings/persisted.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,60 +10,48 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// This is the "state management" for endpoint selection: instead of relying on
 /// DNS balancing, the app explicitly picks a region and controls failover.
 class RegionSelection extends ChangeNotifier {
-  RegionSelection(this._prefs)
-    : _lb = _read(_prefs, _lbKey, LbRegion.values, LbRegion.tpe1),
-      _core = _read(_prefs, _coreKey, CoreRegion.values, CoreRegion.tnn1);
+  RegionSelection(SharedPreferences prefs)
+    : _lb = PersistedEnum(
+        prefs,
+        key: 'network:region:lb',
+        values: LbRegion.values,
+        fallback: LbRegion.tpe1,
+        encode: (r) => r.code,
+      ),
+      _core = PersistedEnum(
+        prefs,
+        key: 'network:region:core',
+        values: CoreRegion.values,
+        fallback: CoreRegion.tnn1,
+        encode: (r) => r.code,
+      );
 
-  final SharedPreferences _prefs;
-
-  static const String _lbKey = 'network:region:lb';
-  static const String _coreKey = 'network:region:core';
-
-  LbRegion _lb;
-  CoreRegion _core;
+  final PersistedEnum<LbRegion> _lb;
+  final PersistedEnum<CoreRegion> _core;
 
   /// The selected LB (Taiwan edge) region.
-  LbRegion get lb => _lb;
+  LbRegion get lb => _lb.value;
 
   /// The selected Core region.
-  CoreRegion get core => _core;
+  CoreRegion get core => _core.value;
 
   set lb(LbRegion value) {
-    if (value == _lb) return;
-    _lb = value;
-    _prefs.setString(_lbKey, value.code);
-    notifyListeners();
+    if (_lb.set(value)) notifyListeners();
   }
 
   set core(CoreRegion value) {
-    if (value == _core) return;
-    _core = value;
-    _prefs.setString(_coreKey, value.code);
-    notifyListeners();
+    if (_core.set(value)) notifyListeners();
   }
 
   /// LB regions in failover order — the selected region first.
   List<LbRegion> get lbOrder => [
-    _lb,
-    ...LbRegion.values.where((r) => r != _lb),
+    _lb.value,
+    ...LbRegion.values.where((r) => r != _lb.value),
   ];
 
   /// Core regions in failover order — the selected region first.
   List<CoreRegion> get coreOrder => [
-    _core,
-    ...CoreRegion.values.where((r) => r != _core),
+    _core.value,
+    ...CoreRegion.values.where((r) => r != _core.value),
   ];
-
-  static T _read<T extends Enum>(
-    SharedPreferences prefs,
-    String key,
-    List<T> values,
-    T fallback,
-  ) {
-    final code = prefs.getString(key);
-    for (final v in values) {
-      if ((v as dynamic).code == code) return v;
-    }
-    return fallback;
-  }
 }
