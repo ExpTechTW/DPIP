@@ -14,11 +14,22 @@ class EarthquakeApi {
 
   final ApiClient _client;
 
-  /// Latest real-time station (RTS) shaking data.
+  /// Latest real-time station (RTS) shaking data (one-shot snapshot).
   ///
   /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts`
   Future<dynamic> getRtsRealtime() =>
       _client.get(ApiTier.lbApi, '/api/v2/trem/rts');
+
+  /// Opens the **live** RTS feed as a Server-Sent Events stream — the transport
+  /// the realtime channel runs on. A continuous ~1 Hz snapshot stream.
+  ///
+  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts?sse=1`
+  ///
+  /// Each default event's `data:` is the same JSON [getRtsRealtime] returns. A
+  /// fresh stream per call, so the source can reconnect by calling again.
+  Stream<SseEvent> openRtsSse() => HttpSseClient(
+    _client,
+  ).connect(ApiTier.lbApi, '/api/v2/trem/rts', query: const {'sse': 1});
 
   /// Latest EEW list (one-shot snapshot).
   ///

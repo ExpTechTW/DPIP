@@ -29,4 +29,14 @@ class RealtimeConfig {
     staleAfter: Duration(seconds: 3),
     offlineAfter: Duration(seconds: 10),
   );
+
+  /// RTS preset: a continuous ~1 Hz station feed. Poll every second; the source
+  /// reports `Err` once snapshots stop arriving (event-recency liveness), so the
+  /// channel flags stale after 3s and offline after 10s of no fresh contact.
+  /// Provisional (golden-pinned like [eew]) — tune against the live cadence.
+  static const RealtimeConfig rts = RealtimeConfig(
+    pollInterval: Duration(seconds: 1),
+    staleAfter: Duration(seconds: 3),
+    offlineAfter: Duration(seconds: 10),
+  );
 }
