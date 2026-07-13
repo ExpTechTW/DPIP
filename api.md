@@ -8,11 +8,11 @@
 - **路徑前綴：** 所有路徑都是 `/api/...`（由 curl 於 2026-07 驗證）。
 - **層級（Tier）：** `lbApi` = LB（多活）、`coreApi` = Core（多活）、
   `coreExclusiveApi` = 僅 `api.core-tnn1`、`coreStaticExclusive` =
-  僅 `static.core-tnn1`、`legacyApi` = `api-1`（尚未遷移）。
+  僅 `static.core-tnn1`、`legacyApi` = 舊 server `api-1`（逐步淘汰中）。
 
 > 這是**端點目錄**，不是程式碼對照表。沒有 `lib/api/` 巨石檔：每個端點在其所屬
 > feature 的 `data/`（基礎設施則在 `core/`）裡，於該功能實作時各自建成一個輕薄的
-> datasource，並帶著自己的 `ApiTier`。目前已上線：地震 EEW
+> datasource，並帶著自己的 `ApiTier`。目前已上線：地震 EEW / RTS 即時串流
 > （`features/earthquake/data/earthquake_api.dart`）、雷達
 > （`features/weather/data/radar_api.dart`）。其餘皆為預先登錄，待其功能落地。
 >
@@ -26,20 +26,22 @@
 
 | 方法 | 路徑 | 層級 | 主機（容錯順序 = 選定區域優先） |
 |---|---|---|---|
-| `openEewSse` | `/api/v2/eq/eew?sse=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `openEewSse` | `/api/v2/eq/eew?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
-> **即時串流走 SSE，不是輪詢。** `?sse=1` 旗標會把端點切換成
-> `text/event-stream`：每個事件的 `data:` 就是純 GET 會回傳的**同一份 JSON**
-> （模型不變），改為在變動時推送，而非每秒拉取。`openEewSse` 是 EEW 的即時傳輸
-> （`getEewRealtime` 保留為一次性快照）；RTS 落地時，`/api/v2/trem/rts?sse=1`
-> 是同樣的形狀。傳輸、緩衝與重連都藏在即時 `RealtimeSource` seam 後面
-> （`core/realtime/sse_realtime_source.dart`）—— channel、過期分類器與生命週期都不變。
-> EEW 是**突發型**（地震之間靜默 → 存活判定用「連線開著」）；RTS 是**連續型**
-> （約 1 Hz → 存活判定用「最近有事件」）。
+> **即時串流走 SSE（gzip 壓縮），不是輪詢。** `?sse=1` 把端點切換成
+> `text/event-stream`；再加 `&compress=1`，payload 會以 `event: g` 事件送出，其
+> `data:` 是 **base64 的 gzip**（解開後就是純 GET 的同一份 JSON，模型不變），由**應用層**
+> 在 `sse_realtime_source.dart` 解壓 —— 對 ~1 Hz 的 RTS 特別省流量。改為在變動時
+> 推送，而非每秒拉取。EEW（`openEewSse`）與 RTS（`openRtsSse`）都已上線走 SSE；
+> `getEewRealtime` / `getRtsRealtime` 保留為一次性快照。傳輸、緩衝與重連都藏在
+> `RealtimeSource` seam 後面（`core/realtime/sse_realtime_source.dart`）——
+> channel、過期分類器與生命週期都不變。EEW 是**突發型**（地震之間靜默 → 存活判定用
+> 「連線開著」）；RTS 是**連續型**（約 1 Hz → 存活判定用「最近有事件」）。
 
 ## 沒多活備援 (single host, no failover)
 
@@ -53,7 +55,17 @@
 | `getFrames` | `/api/v2/tiles/radar/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
 | `tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
-Legacy `api-1`（待後端部署後移至 `core-tnn1`）—— 皆為預先登錄，待其功能落地：
+**已遷移到 `core-tnn1`** —— 以下端點已從舊 server 搬到新主機 `api.core-tnn1`
+（`coreExclusiveApi`）：
+
+| 方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `getNotify` | `/api/v2/notify/{token}` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+
+**舊 server `api-1`（逐步淘汰中）** —— `api-1.exptech.dev` 是舊主機，後端會把端點
+陸續搬到 `core-tnn1`，這裡會隨之縮減。以下多為預先登錄，待其功能落地：
 
 | 方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
@@ -77,9 +89,6 @@ Legacy `api-1`（待後端部署後移至 `core-tnn1`）—— 皆為預先登�
 | `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | `api-1.exptech.dev` |
 | `getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | `api-1.exptech.dev` |
 | `getEvent` | `/api/v1/dpip/event/{id}` | `legacyApi` | `api-1.exptech.dev` |
-| `✅ updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `legacyApi` | `api-1.exptech.dev` |
-| `✅ getNotify` | `/api/v2/notify/{token}` | `legacyApi` | `api-1.exptech.dev` |
-| `✅ setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `legacyApi` | `api-1.exptech.dev` |
 
 ## 暫時無 (unavailable)
 
