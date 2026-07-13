@@ -1,6 +1,3 @@
-import 'package:dpip/api/exclusive_api.dart';
-import 'package:dpip/api/external_api.dart';
-import 'package:dpip/api/redundant_api.dart';
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
@@ -9,6 +6,7 @@ import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
+import 'package:dpip/core/realtime/ntp_api.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -16,6 +14,7 @@ import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
@@ -51,9 +50,7 @@ Future<void> bootstrap() async {
   final experimental = ExperimentalSettings(prefs);
   final dio = createDio();
   final apiClient = ApiClient(dio, regions);
-  final redundantApi = RedundantApi(apiClient);
-  final exclusiveApi = ExclusiveApi(apiClient);
-  final eewRepository = EewRepositoryImpl(redundantApi);
+  final eewRepository = EewRepositoryImpl(EarthquakeApi(apiClient));
 
   // Realtime spine: a corrected server clock feeds staleness; each feed is a
   // channel the service starts after the first frame and pauses on background.
@@ -61,7 +58,7 @@ Future<void> bootstrap() async {
   // staleness is offset-independent — both instants come from this clock).
   final serverClock = ServerClock(
     const SystemClock(),
-    NtpServerTimeSource(exclusiveApi.getNtp),
+    NtpServerTimeSource(NtpApi(apiClient).serverTimeMs),
   );
   serverClock.sync().ignore();
 
@@ -91,9 +88,6 @@ Future<void> bootstrap() async {
     DpipApp(
       regions: regions,
       experimental: experimental,
-      redundantApi: redundantApi,
-      exclusiveApi: exclusiveApi,
-      externalApi: ExternalApi(dio),
       radarRepository: RadarRepositoryImpl(RadarApi(apiClient)),
       eewRepository: eewRepository,
       realtimeService: realtimeService,

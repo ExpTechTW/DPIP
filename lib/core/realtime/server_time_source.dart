@@ -10,9 +10,9 @@ abstract interface class ServerTimeSource {
 
 /// Adapts a raw server-time fetcher to the [Result] contract.
 ///
-/// In production the fetcher is `ExclusiveApi.getNtp` (the offset-corrected
-/// `/ntp` round trip). Injecting the function — rather than importing the api
-/// surface — keeps `core` from depending on `lib/api`.
+/// In production the fetcher is `NtpApi.serverTimeMs` (the offset-corrected
+/// `/ntp` round trip). Injecting the function keeps this seam testable without a
+/// network.
 class NtpServerTimeSource implements ServerTimeSource {
   const NtpServerTimeSource(this._fetchServerTimeMs);
 

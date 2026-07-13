@@ -1,6 +1,3 @@
-import 'package:dpip/api/exclusive_api.dart';
-import 'package:dpip/api/external_api.dart';
-import 'package:dpip/api/redundant_api.dart';
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -29,9 +26,6 @@ class DpipApp extends StatelessWidget {
     super.key,
     required this.regions,
     required this.experimental,
-    required this.redundantApi,
-    required this.exclusiveApi,
-    required this.externalApi,
     required this.radarRepository,
     required this.eewRepository,
     required this.realtimeService,
@@ -44,15 +38,6 @@ class DpipApp extends StatelessWidget {
 
   /// Experimental feature settings (e.g. the home weather-animation override).
   final ExperimentalSettings experimental;
-
-  /// Multi-active (redundant) API surface.
-  final RedundantApi redundantApi;
-
-  /// Non-redundant (core-tnn1) API surface.
-  final ExclusiveApi exclusiveApi;
-
-  /// Third-party (GitHub/Crowdin/status) API surface.
-  final ExternalApi externalApi;
 
   /// Radar echo frames (map overlay + home backdrop) — repository seam.
   final RadarRepository radarRepository;
@@ -79,9 +64,6 @@ class DpipApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AreaSelection()),
         ChangeNotifierProvider(create: (_) => HomeSheetExtent()),
         ChangeNotifierProvider(create: (_) => HomeResetSignal()),
-        Provider.value(value: redundantApi),
-        Provider.value(value: exclusiveApi),
-        Provider.value(value: externalApi),
         Provider<RadarRepository>.value(value: radarRepository),
         Provider<EewRepository>.value(value: eewRepository),
         Provider<RealtimeService>.value(value: realtimeService),

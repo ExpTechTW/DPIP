@@ -1,16 +1,14 @@
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 
-/// Endpoints **with** multi-active redundancy — the only services replicated
-/// across regions. Every request fails over across its regions via [ApiClient].
+/// Earthquake endpoints on the region-aware [ApiClient].
 ///
-/// Verified availability (curl, 2026-07):
-/// - `rts` / `eew`: LB regions (tpe1, khh1)
-/// - `report` / `report/{id}`: Core regions (tyo1, tnn1)
-///
-/// Methods return raw decoded JSON; feature data layers map it to domain models.
-class RedundantApi {
-  const RedundantApi(this._client);
+/// `rts` / `eew` fail over across the LB regions (tpe1, khh1); `report` /
+/// `report/{id}` across the Core regions (tyo1, tnn1) — the redundancy is a
+/// transport property carried by [ApiTier], not a module boundary. Returns raw
+/// decoded JSON; the repository maps it to domain models.
+class EarthquakeApi {
+  const EarthquakeApi(this._client);
 
   final ApiClient _client;
 

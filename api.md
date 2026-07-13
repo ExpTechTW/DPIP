@@ -10,7 +10,15 @@ tiers fail over across their regions.
 - **Tiers:** `lbApi` = LB (multi-active), `coreApi` = Core (multi-active),
   `coreExclusiveApi` = `core-tnn1` only, `legacyApi` = `api-1` (not yet migrated).
 
-## 多活備援 (multi-active) — `lib/api/redundant_api.dart`
+> This is the **endpoint catalogue**, not a code map. There is no `lib/api/`
+> monolith: each endpoint is (re)built as a thin datasource in the owning
+> feature's `data/` (or `core/` for infra) when that feature is implemented,
+> carrying its own `ApiTier`. Live today: earthquake EEW
+> (`features/earthquake/data/earthquake_api.dart`), radar
+> (`shared/map/radar_api.dart`), NTP (`core/realtime/ntp_api.dart`). The rest
+> below are staged here until their feature lands.
+
+## 多活備援 (multi-active)
 
 | Method | Path | Tier | Hosts (failover order = selected first) |
 |---|---|---|---|
@@ -19,7 +27,7 @@ tiers fail over across their regions.
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
-## 沒多活備援 (single host, no failover) — `lib/api/exclusive_api.dart`
+## 沒多活備援 (single host, no failover)
 
 Migrated to the region topology (`core-tnn1`):
 
@@ -65,7 +73,7 @@ Not yet migrated — legacy `api-1` (move to `core-tnn1` as the backend deploys)
 |---|---|
 | `getTsunamiList` | Temporarily unavailable — throws `UnsupportedError`. |
 
-## External (third-party, no region) — `lib/api/external_api.dart`
+## External (third-party, no region)
 
 | Method | URL |
 |---|---|
