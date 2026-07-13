@@ -271,6 +271,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Humidity'**
   String get weatherHumidity;
+
+  /// Title of the map layer-picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Layers'**
+  String get mapLayers;
+
+  /// Name of the radar echo map layer in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get mapLayerRadar;
+
+  /// Label on the map timeline when the newest (latest) frame is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get mapTimelineNow;
 }
 
 class _AppLocalizationsDelegate

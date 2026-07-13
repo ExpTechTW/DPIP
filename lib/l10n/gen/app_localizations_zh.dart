@@ -98,4 +98,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get weatherHumidity => '濕度';
+
+  @override
+  String get mapLayers => '圖層';
+
+  @override
+  String get mapLayerRadar => '雷達回波';
+
+  @override
+  String get mapTimelineNow => '現在';
 }

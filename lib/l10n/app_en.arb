@@ -122,5 +122,17 @@
   "weatherHumidity": "Humidity",
   "@weatherHumidity": {
     "description": "Label for the humidity metric in the home weather header"
+  },
+  "mapLayers": "Layers",
+  "@mapLayers": {
+    "description": "Title of the map layer-picker sheet"
+  },
+  "mapLayerRadar": "Radar",
+  "@mapLayerRadar": {
+    "description": "Name of the radar echo map layer in the layer picker"
+  },
+  "mapTimelineNow": "Now",
+  "@mapTimelineNow": {
+    "description": "Label on the map timeline when the newest (latest) frame is selected"
   }
 }

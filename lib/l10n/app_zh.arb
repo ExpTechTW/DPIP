@@ -28,5 +28,8 @@
   "eewSummary": "規模 {magnitude}・深度 {depth} 公里",
   "areaPlaceholder": "地區{number}",
   "weatherPrecipitation": "降水量",
-  "weatherHumidity": "濕度"
+  "weatherHumidity": "濕度",
+  "mapLayers": "圖層",
+  "mapLayerRadar": "雷達回波",
+  "mapTimelineNow": "現在"
 }

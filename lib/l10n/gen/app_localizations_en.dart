@@ -99,4 +99,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weatherHumidity => 'Humidity';
+
+  @override
+  String get mapLayers => 'Layers';
+
+  @override
+  String get mapLayerRadar => 'Radar';
+
+  @override
+  String get mapTimelineNow => 'Now';
 }
