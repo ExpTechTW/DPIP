@@ -356,4 +356,14 @@ abstract final class NotificationChannels {
       vibrationPattern: lowVibrationPattern,
     ),
   ];
+
+  /// The group a [channelKey] belongs to (`group_eew`, `group_eq`, …), or null
+  /// if the key isn't a known channel. Lets the tap router resolve a screen by
+  /// group so a new channel routes correctly without touching the mapping.
+  static String? groupOf(String channelKey) {
+    for (final channel in channels) {
+      if (channel.channelKey == channelKey) return channel.channelGroupKey;
+    }
+    return null;
+  }
 }

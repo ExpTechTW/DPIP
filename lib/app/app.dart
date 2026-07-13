@@ -1,12 +1,13 @@
 import 'package:dpip/app/router/app_router.dart';
+import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -90,17 +91,11 @@ class _AppServicesHostState extends State<_AppServicesHost> {
     super.dispose();
   }
 
-  /// Sends a tapped notification to a tab by its channel key: EEW/earthquake to
-  /// the monitor, reports to the map, everything else home.
-  void _routeNotificationTap(String channelKey) {
-    final route = switch (channelKey) {
-      _ when channelKey.startsWith('eew') => AppRoutes.earthquake,
-      _ when channelKey.startsWith('eq') => AppRoutes.earthquake,
-      _ when channelKey.startsWith('int_report') => AppRoutes.earthquake,
-      _ when channelKey.startsWith('report') => AppRoutes.map,
-      _ => AppRoutes.home,
-    };
-    appRouter.goNamed(route);
+  /// Sends a tapped notification to a screen. The destination is resolved by the
+  /// declarative channel→route table; the tap's [NotificationTap.id] is carried
+  /// for the per-item detail routes to come.
+  void _routeNotificationTap(NotificationTap tap) {
+    appRouter.goNamed(routeForNotificationChannel(tap.channelKey));
   }
 
   @override

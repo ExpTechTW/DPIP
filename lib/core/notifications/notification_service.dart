@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -120,10 +121,8 @@ class NotificationService {
     }
   }
 
-  void _routeTap(Map<String, dynamic> data) {
-    final channelKey = data['channel'] as String?;
-    if (channelKey != null) NotificationTaps.route(channelKey);
-  }
+  void _routeTap(Map<String, dynamic> data) =>
+      NotificationTaps.route(NotificationTap.fromData(data));
 }
 
 /// Builds notification content from a message's `data` (preferred, legacy
@@ -135,11 +134,15 @@ NotificationContent? contentFromMessage(RemoteMessage message) {
   final title = (data['title'] as String?) ?? notification?.title;
   final body = (data['body'] as String?) ?? notification?.body;
   if (title == null && body == null) return null;
+  final channelKey = (data['channel'] as String?) ?? _fallbackChannelKey;
   return NotificationContent(
     id: int.tryParse((data['id'] as String?) ?? '') ?? 0,
-    channelKey: (data['channel'] as String?) ?? _fallbackChannelKey,
+    channelKey: channelKey,
     title: title,
     body: body,
+    // Carry channel + id on the payload so an awesome-displayed tap deep-links
+    // symmetrically with the FCM-delivered path.
+    payload: {'channel': channelKey, 'id': data['id'] as String?},
     wakeUpScreen: true,
     category: NotificationCategory.Alarm,
   );
