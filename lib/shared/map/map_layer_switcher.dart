@@ -49,16 +49,25 @@ class MapLayerSwitcher extends StatelessWidget {
               ),
               child: Text(l10n.mapLayers, style: theme.textTheme.titleMedium),
             ),
-            for (final layer in layers)
-              ListTile(
-                leading: Icon(layer.icon),
-                title: Text(layer.label(context)),
-                selected: layer.id == active.id,
-                trailing: layer.id == active.id
-                    ? Icon(Icons.check, color: theme.colorScheme.primary)
-                    : null,
-                onTap: () => Navigator.of(context).pop(layer),
+            // Scrolls when the layer list is taller than the sheet's capped
+            // height (the default modal caps at ~half the screen).
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final layer in layers)
+                    ListTile(
+                      leading: Icon(layer.icon),
+                      title: Text(layer.label(context)),
+                      selected: layer.id == active.id,
+                      trailing: layer.id == active.id
+                          ? Icon(Icons.check, color: theme.colorScheme.primary)
+                          : null,
+                      onTap: () => Navigator.of(context).pop(layer),
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),

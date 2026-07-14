@@ -12,6 +12,7 @@ import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -37,8 +38,13 @@ class RtsMapLayer implements MapLayer {
   static const String _sourceId = 'rts-src';
   static const String _circleId = 'rts-circle';
   static const int _maxStationRetries = 8;
-  static const double _liveOpacity = 0.9;
+  static const double _liveOpacity = 1.0;
   static const double _staleOpacity = 0.35;
+
+  /// A neutral hairline separating overlapping dots — legacy uses the theme's
+  /// outlineVariant, but render() has no BuildContext, so a mid-grey that reads
+  /// on both light and dark tiles stands in.
+  static const String _strokeColor = '#9E9E9E';
   static const Map<String, dynamic> _emptyCollection = {
     'type': 'FeatureCollection',
     'features': <dynamic>[],
@@ -75,7 +81,11 @@ class RtsMapLayer implements MapLayer {
       _sourceId,
       GeojsonSourceProperties(data: _geoJson()),
     );
-    await controller.addCircleLayer(_sourceId, _circleId, _circleProps(0.9));
+    await controller.addCircleLayer(
+      _sourceId,
+      _circleId,
+      _circleProps(_liveOpacity),
+    );
     _added = true;
     _appliedStatus = null;
     await _pushUpdate();
@@ -115,13 +125,17 @@ class RtsMapLayer implements MapLayer {
   }
 
   /// The full circle style at [opacity] — passed whole (not a partial update),
-  /// since setLayerProperties resets any property left null.
+  /// since setLayerProperties resets any property left null. Colour comes from
+  /// the shared instrumental-intensity palette, so the dots and the legend can
+  /// never drift.
   CircleLayerProperties _circleProps(double opacity) => CircleLayerProperties(
-    circleColor: _colorExpression,
+    circleColor: InstrumentalIntensityColors.mapLibreInterpolate,
     circleRadius: _radiusExpression,
-    circleStrokeColor: '#FFFFFF',
-    circleStrokeWidth: 0.6,
+    circleStrokeColor: _strokeColor,
+    circleStrokeWidth: 1,
     circleOpacity: opacity,
+    // Stronger stations sort above weaker ones so a hot dot is never hidden.
+    circleSortKey: _sortKey,
   );
 
   @override
@@ -199,45 +213,22 @@ class RtsMapLayer implements MapLayer {
     }
   }
 
-  /// `interpolate` on the raw intensity property `i`.
-  static const List<Object> _colorExpression = [
-    'interpolate',
-    ['linear'],
-    ['get', 'i'],
-    -3,
-    '#0005D0',
-    -2,
-    '#004BF8',
-    -1,
-    '#009EF8',
-    0,
-    '#79E5FD',
-    1,
-    '#49E9AD',
-    2,
-    '#44FA34',
-    3,
-    '#BEFF0C',
-    4,
-    '#FFF000',
-    5,
-    '#FF9300',
-    6,
-    '#FC5235',
-    7,
-    '#B720E9',
-  ];
-
-  /// Dots grow with zoom so they stay legible when zoomed in.
+  /// Dots scale with zoom so they stay legible zoomed in (legacy: 2px at z4 →
+  /// 8px at z12).
   static const List<Object> _radiusExpression = [
     'interpolate',
     ['linear'],
     ['zoom'],
     4,
-    3.0,
-    8,
-    5.0,
+    2.0,
     12,
-    9.0,
+    8.0,
+  ];
+
+  /// Higher instrumental intensity draws on top; stations without an `i` sink.
+  static const List<Object> _sortKey = [
+    'coalesce',
+    ['get', 'i'],
+    -5,
   ];
 }
