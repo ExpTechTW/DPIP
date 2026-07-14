@@ -8,6 +8,7 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +159,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     }
 
     final filter = _filterFor(townCode);
-    final box = _latLngBounds(bounds);
+    // Normalise the fit box: a degenerate/non-finite township box would make
+    // MapLibre's native camera fit abort the app (see camera_fit.dart).
+    final box = safeFitBounds(_latLngBounds(bounds));
+    if (box == null) return;
     // Publish the live framing so a tap can hand it to the map tab.
     _handoff?.homeBounds = box;
     final bottomInset = size.height * HomeSheetExtent.rest;

@@ -6,6 +6,7 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -101,8 +102,14 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
-  void _frameBounds(LatLngBounds bounds) =>
-      _controller?.moveCamera(CameraUpdate.newLatLngBounds(bounds));
+  /// Normalised through [safeFitBounds] first: a degenerate/non-finite box would
+  /// make MapLibre's native `setCamera` abort the process (see camera_fit.dart).
+  void _frameBounds(LatLngBounds bounds) {
+    final safe = safeFitBounds(bounds);
+    if (safe != null) {
+      _controller?.moveCamera(CameraUpdate.newLatLngBounds(safe));
+    }
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
