@@ -363,4 +363,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'ข้ามไปก่อน';
+
+  @override
+  String get moreRate => 'ให้คะแนน DPIP';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'ซอร์สโค้ด';
 }

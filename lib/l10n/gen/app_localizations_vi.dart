@@ -364,4 +364,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'Vẫn bỏ qua';
+
+  @override
+  String get moreRate => 'Đánh giá DPIP';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'Mã nguồn';
 }

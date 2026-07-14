@@ -111,5 +111,9 @@
   "onboardingSkipTitle": "Hindi pa naibibigay ang mga pahintulot",
   "onboardingSkipBody": "Kung walang lokasyon at mga notification, hindi ka maaalertuhan ng DPIP nang real time sa mga lindol at sakuna malapit sa iyo. Maaari mo pa ring ibigay ang mga ito sa ibang pagkakataon sa Settings.",
   "onboardingSkipStay": "Bumalik",
-  "onboardingSkipLeave": "Laktawan pa rin"
+  "onboardingSkipLeave": "Laktawan pa rin",
+  "moreRate": "I-rate ang DPIP",
+  "moreYoutube": "YouTube",
+  "moreGithub": "ExpTech GitHub",
+  "moreSourceCode": "Source code"
 }

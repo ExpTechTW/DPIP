@@ -365,4 +365,16 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'Tetap lewati';
+
+  @override
+  String get moreRate => 'Beri Nilai DPIP';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'Kode sumber';
 }

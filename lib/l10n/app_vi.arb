@@ -111,5 +111,9 @@
   "onboardingSkipTitle": "Chưa cấp quyền",
   "onboardingSkipBody": "Nếu không có quyền vị trí và thông báo, DPIP không thể cảnh báo tức thời về động đất và thiên tai gần bạn. Bạn vẫn có thể cấp quyền sau trong Cài đặt.",
   "onboardingSkipStay": "Quay lại",
-  "onboardingSkipLeave": "Vẫn bỏ qua"
+  "onboardingSkipLeave": "Vẫn bỏ qua",
+  "moreRate": "Đánh giá DPIP",
+  "moreYoutube": "YouTube",
+  "moreGithub": "ExpTech GitHub",
+  "moreSourceCode": "Mã nguồn"
 }

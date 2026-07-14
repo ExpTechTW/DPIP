@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -16,6 +18,11 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Rate-the-app links to this platform's own store.
+    final storeUrl = Platform.isIOS
+        ? 'https://apps.apple.com/tw/app/dpip/id6468026362'
+        : 'https://play.google.com/store/apps/details?id=com.exptech.dpip';
+    final storeHost = Platform.isIOS ? 'apps.apple.com' : 'play.google.com';
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
@@ -100,6 +107,30 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreNotifyLog,
                 host: 'status.exptech.com.tw',
                 url: 'https://status.exptech.com.tw/notify',
+              ),
+              _MoreLinkTile(
+                icon: Icons.star_outline,
+                title: l10n.moreRate,
+                host: storeHost,
+                url: storeUrl,
+              ),
+              _MoreLinkTile(
+                icon: Icons.smart_display_outlined,
+                title: l10n.moreYoutube,
+                host: 'youtube.com/@exptechtw',
+                url: 'https://www.youtube.com/@exptechtw',
+              ),
+              _MoreLinkTile(
+                icon: Icons.groups_outlined,
+                title: l10n.moreGithub,
+                host: 'github.com/ExpTechTW',
+                url: 'https://github.com/ExpTechTW',
+              ),
+              _MoreLinkTile(
+                icon: Icons.code_outlined,
+                title: l10n.moreSourceCode,
+                host: 'github.com/ExpTechTW/DPIP',
+                url: 'https://github.com/ExpTechTW/DPIP',
               ),
             ],
           ),

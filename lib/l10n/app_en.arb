@@ -468,5 +468,21 @@
   "onboardingSkipLeave": "Skip anyway",
   "@onboardingSkipLeave": {
     "description": "Proceed past onboarding without granting permissions"
+  },
+  "moreRate": "Rate DPIP",
+  "@moreRate": {
+    "description": "More-menu link to rate DPIP in the platform app store"
+  },
+  "moreYoutube": "YouTube",
+  "@moreYoutube": {
+    "description": "More-menu link to the ExpTech YouTube channel"
+  },
+  "moreGithub": "ExpTech GitHub",
+  "@moreGithub": {
+    "description": "More-menu link to the ExpTech GitHub organisation"
+  },
+  "moreSourceCode": "Source code",
+  "@moreSourceCode": {
+    "description": "More-menu link to DPIP's source repository on GitHub"
   }
 }

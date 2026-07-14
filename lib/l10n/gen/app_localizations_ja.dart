@@ -356,4 +356,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'このままスキップ';
+
+  @override
+  String get moreRate => 'DPIP を評価';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'ソースコード';
 }

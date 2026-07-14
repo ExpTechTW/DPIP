@@ -365,4 +365,16 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'Laktawan pa rin';
+
+  @override
+  String get moreRate => 'I-rate ang DPIP';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'Source code';
 }

@@ -363,4 +363,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingSkipLeave => 'Skip anyway';
+
+  @override
+  String get moreRate => 'Rate DPIP';
+
+  @override
+  String get moreYoutube => 'YouTube';
+
+  @override
+  String get moreGithub => 'ExpTech GitHub';
+
+  @override
+  String get moreSourceCode => 'Source code';
 }
