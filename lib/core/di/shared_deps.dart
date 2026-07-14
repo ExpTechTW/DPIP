@@ -3,6 +3,8 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/background_location.dart';
@@ -38,6 +40,8 @@ class SharedDeps {
     required this.locationMonitor,
     required this.onboarding,
     required this.locale,
+    this.etagCache,
+    this.networkUsage,
   });
 
   /// Persistence for feature-local settings.
@@ -89,4 +93,12 @@ class SharedDeps {
 
   /// The selected UI language override (also provided; drives `MaterialApp`).
   final LocaleController locale;
+
+  /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
+  /// opened. Exposed for the Debug page's cache stats.
+  final EtagCacheStore? etagCache;
+
+  /// Persisted network-usage accounting (also provided) — shares the cache DB,
+  /// so null when that is. Exposed for the Debug page's traffic stats.
+  final NetworkUsageStore? networkUsage;
 }

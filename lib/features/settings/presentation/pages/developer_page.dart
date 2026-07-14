@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/build_info.g.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -21,6 +23,19 @@ import 'package:provider/provider.dart';
 
 /// One labelled diagnostic value.
 typedef _Field = ({String label, String? value});
+
+/// Formats a byte count as a compact human string (B / KB / MB / GB).
+String _formatBytes(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  var value = bytes / 1024;
+  var unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit++;
+  }
+  return '${value.toStringAsFixed(value < 10 ? 1 : 0)} ${units[unit]}';
+}
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -39,10 +54,14 @@ class _DeveloperPageState extends State<DeveloperPage> {
   }
 
   Future<void> _load() async {
-    // Capture the provided service before any await.
+    // Capture provided services before any await.
     final notifications = context.read<NotificationService>();
+    final etagCache = context.read<EtagCacheStore?>();
+    final networkUsage = context.read<NetworkUsageStore?>();
 
     final info = await PackageInfo.fromPlatform();
+    final cacheStats = await etagCache?.stats();
+    final usage = await networkUsage?.stats();
     final device = await DeviceInfoService.load();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
@@ -88,6 +107,43 @@ class _DeveloperPageState extends State<DeveloperPage> {
         fields: [
           if (Platform.isAndroid) (label: 'FCM token', value: fcmToken),
           if (Platform.isIOS) (label: 'APNs token', value: apnsToken),
+        ],
+      ),
+      (
+        title: 'ETag cache',
+        fields: [
+          (
+            label: 'Entries',
+            value: cacheStats == null ? '—' : '${cacheStats.rows}',
+          ),
+          (
+            label: 'Size on disk',
+            value: cacheStats == null ? '—' : _formatBytes(cacheStats.bytes),
+          ),
+          (
+            label: 'Hit rate',
+            value: usage == null
+                ? '—'
+                : '${(usage.hitRate * 100).toStringAsFixed(0)}% '
+                      '(${usage.hits}/${usage.total})',
+          ),
+          (
+            label: 'Traffic saved (total)',
+            value: usage == null ? '—' : _formatBytes(usage.savedBytes),
+          ),
+        ],
+      ),
+      (
+        title: 'Network usage',
+        fields: [
+          (
+            label: 'Downloaded · last 24h',
+            value: usage == null ? '—' : _formatBytes(usage.last24h),
+          ),
+          (
+            label: 'Downloaded · last 7d',
+            value: usage == null ? '—' : _formatBytes(usage.last7d),
+          ),
         ],
       ),
     ];

@@ -10,6 +10,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -66,7 +67,8 @@ Future<void> bootstrap() async {
   final experimental = ExperimentalSettings(prefs);
   final onboarding = OnboardingStore(prefs);
   final locale = LocaleController(prefs);
-  final dio = createDio(etagCache: await _openEtagCache());
+  final cache = await _openCache();
+  final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
@@ -153,6 +155,8 @@ Future<void> bootstrap() async {
     locationMonitor: locationMonitor,
     onboarding: onboarding,
     locale: locale,
+    etagCache: cache?.etag,
+    networkUsage: cache?.usage,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime
@@ -171,10 +175,12 @@ Future<void> bootstrap() async {
   );
 }
 
-/// Opens the SQLite ETag cache under the platform cache directory. Best-effort:
-/// if the database can't be opened the app runs without HTTP caching rather than
-/// failing to launch.
-Future<EtagCacheStore?> _openEtagCache() async {
+/// Opens the SQLite ETag cache (and the network-usage tables it shares the
+/// database with) under the platform cache directory. Best-effort: if the
+/// database can't be opened the app runs without HTTP caching / accounting rather
+/// than failing to launch. The usage tables are created with `IF NOT EXISTS` on
+/// every open, so they're added to a pre-existing cache DB without a version bump.
+Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
   try {
     final base = await getApplicationCacheDirectory();
     final db = await openDatabase(
@@ -182,7 +188,8 @@ Future<EtagCacheStore?> _openEtagCache() async {
       version: 1,
       onCreate: (db, _) => EtagCacheStore.createSchema(db),
     );
-    return EtagCacheStore(db);
+    await NetworkUsageStore.createSchema(db);
+    return (etag: EtagCacheStore(db), usage: NetworkUsageStore(db));
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;

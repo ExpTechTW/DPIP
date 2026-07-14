@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -109,5 +111,35 @@ void main() {
       reason: 'expired evicted',
     );
     expect(await store.read('https://x/new'), isNotNull);
+  });
+
+  test('size round-trips', () async {
+    await store.write('https://x/a', etag: '1', body: 'ABCDE', size: 4096);
+    expect((await store.read('https://x/a'))!.size, 4096);
+  });
+
+  test('a legacy entry without a size falls back to body length', () async {
+    // Simulate a pre-`size` entry: a gzipped payload lacking the 'size' key.
+    final payload = GZipCodec(level: 9).encode(
+      utf8.encode(
+        jsonEncode({'etag': '1', 'contentType': null, 'body': 'ABCDE'}),
+      ),
+    );
+    await db.insert('http_cache', {
+      'key': 'https://x/legacy',
+      'value': Uint8List.fromList(payload),
+      'time': DateTime.now().millisecondsSinceEpoch,
+    });
+    expect((await store.read('https://x/legacy'))!.size, 'ABCDE'.length);
+  });
+
+  test('stats reports row count and total stored bytes', () async {
+    expect(await store.stats(), (rows: 0, bytes: 0));
+
+    await store.write('https://x/a', etag: '1', body: 'A');
+    await store.write('https://x/b', etag: '2', body: 'B');
+    final stats = await store.stats();
+    expect(stats.rows, 2);
+    expect(stats.bytes, greaterThan(0));
   });
 }

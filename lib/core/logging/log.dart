@@ -42,6 +42,14 @@ abstract final class Log {
     );
   }
 
+  /// Drops in-memory history entries older than [age]. The log screen calls this
+  /// on open, applying a retention window — the history isn't persisted across
+  /// launches and is otherwise bounded only by count (Talker's `maxHistoryItems`).
+  static void pruneOlderThan(Duration age) {
+    final cutoff = DateTime.now().subtract(age);
+    talker.history.removeWhere((entry) => entry.time.isBefore(cutoff));
+  }
+
   /// Routes uncaught Flutter and async errors into the log and the [crashSink]
   /// (as fatal reports).
   ///

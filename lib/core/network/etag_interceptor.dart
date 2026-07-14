@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 
 /// Dio interceptor implementing HTTP ETag revalidation against an
 /// [EtagCacheStore].
@@ -17,12 +18,29 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 /// cacheable nor safe to buffer. Requires the Dio `validateStatus` to accept
 /// 304 (set in `createDio`) so a 304 arrives here rather than throwing.
 class EtagInterceptor extends Interceptor {
-  EtagInterceptor(this._store);
+  EtagInterceptor(this._store, {this._usage});
 
   final EtagCacheStore _store;
 
+  /// Optional traffic accounting: records downloaded bytes, cache hits/misses,
+  /// and the bytes a `304` saved.
+  final NetworkUsageStore? _usage;
+
   static bool _cacheable(RequestOptions o) =>
       o.method.toUpperCase() == 'GET' && o.responseType != ResponseType.stream;
+
+  /// Best-effort transferred-byte estimate: the server's `Content-Length` when
+  /// present (the compressed wire size), else the decoded body length (an upper
+  /// bound — the platform strips Content-Length when it transparently gunzips).
+  static int _downBytes(Response<dynamic> response) {
+    final length = int.tryParse(
+      response.headers.value(Headers.contentLengthHeader) ?? '',
+    );
+    if (length != null && length > 0) return length;
+    final data = response.data;
+    if (data == null) return 0;
+    return utf8.encode(data is String ? data : jsonEncode(data)).length;
+  }
 
   @override
   Future<void> onRequest(
@@ -52,6 +70,10 @@ class EtagInterceptor extends Interceptor {
           // Present the revalidated cache as a normal 200 to callers above.
           response.statusCode = 200;
           response.data = jsonDecode(cached.body);
+          final usage = _usage;
+          if (usage != null) {
+            unawaited(usage.record(down: 0, hit: true, saved: cached.size));
+          }
           handler.next(response);
           return;
         }
@@ -70,6 +92,7 @@ class EtagInterceptor extends Interceptor {
         );
         return;
       } else if (response.statusCode == 200) {
+        final down = _downBytes(response);
         final etag = response.headers.value('etag');
         if (etag != null && response.data != null) {
           // Fire-and-forget so the best-effort cache never blocks the response.
@@ -82,8 +105,13 @@ class EtagInterceptor extends Interceptor {
               etag: etag,
               body: jsonEncode(response.data),
               contentType: response.headers.value(Headers.contentTypeHeader),
+              size: down,
             ),
           );
+        }
+        final usage = _usage;
+        if (usage != null) {
+          unawaited(usage.record(down: down, hit: false, saved: 0));
         }
       }
     }

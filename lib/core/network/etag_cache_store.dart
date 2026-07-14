@@ -5,18 +5,24 @@ import 'dart:typed_data';
 import 'package:sqflite/sqflite.dart';
 
 /// A cached HTTP response: the server [etag] to revalidate with, the response
-/// [body] (the JSON-encoded payload), and its [contentType].
+/// [body] (the JSON-encoded payload), its [contentType], and [size] — the wire
+/// bytes the original download cost (so a `304` can report the traffic saved).
 class CachedResponse {
   const CachedResponse({
     required this.etag,
     required this.body,
     this.contentType,
+    this.size = 0,
   });
 
   final String etag;
   final String body;
   final String? contentType;
+  final int size;
 }
+
+/// Row count and stored byte size of the ETag cache (for the Debug page).
+typedef EtagCacheStats = ({int rows, int bytes});
 
 /// On-disk ETag response cache backed by **SQLite**, so it stays fast with many
 /// entries and evicts by age with a single indexed query.
@@ -57,10 +63,13 @@ class EtagCacheStore {
     try {
       final entry = await _decode(url);
       if (entry == null) return null;
+      final body = entry['body'] as String;
       return CachedResponse(
         etag: entry['etag'] as String,
-        body: entry['body'] as String,
+        body: body,
         contentType: entry['contentType'] as String?,
+        // Pre-`size` entries fall back to the body's length.
+        size: (entry['size'] as num?)?.toInt() ?? body.length,
       );
     } catch (_) {
       return null;
@@ -84,10 +93,16 @@ class EtagCacheStore {
     required String etag,
     required String body,
     String? contentType,
+    int size = 0,
   }) async {
     try {
       final payload = utf8.encode(
-        jsonEncode({'etag': etag, 'contentType': contentType, 'body': body}),
+        jsonEncode({
+          'etag': etag,
+          'contentType': contentType,
+          'body': body,
+          'size': size,
+        }),
       );
       final now = DateTime.now().millisecondsSinceEpoch;
       await _db.insert(
@@ -114,6 +129,23 @@ class EtagCacheStore {
     try {
       await _db.delete(_table);
     } catch (_) {}
+  }
+
+  /// Row count and total stored (gzipped) byte size — for the Debug page.
+  /// Best-effort: returns zeros on error.
+  Future<EtagCacheStats> stats() async {
+    try {
+      final rows = await _db.rawQuery(
+        'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(value)), 0) AS b FROM $_table',
+      );
+      final row = rows.first;
+      return (
+        rows: (row['c'] as num).toInt(),
+        bytes: (row['b'] as num).toInt(),
+      );
+    } catch (_) {
+      return (rows: 0, bytes: 0);
+    }
   }
 
   /// Reads and inflates the entry for [url] into its decoded map, or null.

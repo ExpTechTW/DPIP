@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 
 /// Builds the shared [Dio] instance for the region-aware `ApiClient`.
 ///
@@ -15,7 +16,7 @@ import 'package:dpip/core/network/etag_interceptor.dart';
 /// feed polls every second, so a hung request should fail over (or surface as a
 /// [DioExceptionType.receiveTimeout]) quickly rather than block. A caller needing
 /// more slack passes its own `Options` per request.
-Dio createDio({EtagCacheStore? etagCache}) {
+Dio createDio({EtagCacheStore? etagCache, NetworkUsageStore? usage}) {
   final dio = Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 8),
@@ -30,7 +31,7 @@ Dio createDio({EtagCacheStore? etagCache}) {
     ),
   );
   if (etagCache != null) {
-    dio.interceptors.add(EtagInterceptor(etagCache));
+    dio.interceptors.add(EtagInterceptor(etagCache, usage: usage));
   }
   return dio;
 }
