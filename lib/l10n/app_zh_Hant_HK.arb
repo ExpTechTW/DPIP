@@ -113,8 +113,10 @@
   "onboardingSkipBody": "未授權定位與通知,DPIP 將無法即時通知你所在地的地震與災害。你仍可稍後在設定中開啟。",
   "onboardingSkipStay": "返回授權",
   "onboardingSkipLeave": "仍要略過",
-  "moreRate": "為 DPIP 評分",
   "moreYoutube": "YouTube",
   "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "原始碼"
+  "moreSourceCode": "原始碼",
+  "moreSectionApp": "取得 App",
+  "moreGooglePlay": "Google Play",
+  "moreAppStore": "App Store"
 }

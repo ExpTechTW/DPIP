@@ -794,12 +794,6 @@ abstract class AppLocalizations {
   /// **'Skip anyway'**
   String get onboardingSkipLeave;
 
-  /// More-menu link to rate DPIP in the platform app store
-  ///
-  /// In en, this message translates to:
-  /// **'Rate DPIP'**
-  String get moreRate;
-
   /// More-menu link to the ExpTech YouTube channel
   ///
   /// In en, this message translates to:
@@ -817,6 +811,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Source code'**
   String get moreSourceCode;
+
+  /// More-page section header for the app-store download links
+  ///
+  /// In en, this message translates to:
+  /// **'Get the app'**
+  String get moreSectionApp;
+
+  /// Google Play store link title (brand name)
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play'**
+  String get moreGooglePlay;
+
+  /// Apple App Store link title (brand name)
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get moreAppStore;
 }
 
 class _AppLocalizationsDelegate

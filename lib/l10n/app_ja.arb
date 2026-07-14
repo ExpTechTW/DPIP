@@ -113,8 +113,10 @@
   "onboardingSkipBody": "位置情報と通知を許可しないと、DPIP はお近くの地震や災害をリアルタイムでお知らせできません。設定から後で許可することもできます。",
   "onboardingSkipStay": "戻って許可",
   "onboardingSkipLeave": "このままスキップ",
-  "moreRate": "DPIP を評価",
   "moreYoutube": "YouTube",
   "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "ソースコード"
+  "moreSourceCode": "ソースコード",
+  "moreSectionApp": "アプリを入手",
+  "moreGooglePlay": "Google Play",
+  "moreAppStore": "App Store"
 }

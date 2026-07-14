@@ -370,9 +370,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get onboardingSkipLeave => 'Laktawan pa rin';
 
   @override
-  String get moreRate => 'I-rate ang DPIP';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -380,4 +377,13 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get moreSourceCode => 'Source code';
+
+  @override
+  String get moreSectionApp => 'Kunin ang app';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

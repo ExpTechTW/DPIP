@@ -473,10 +473,6 @@
   "@onboardingSkipLeave": {
     "description": "Proceed past onboarding without granting permissions"
   },
-  "moreRate": "Rate DPIP",
-  "@moreRate": {
-    "description": "More-menu link to rate DPIP in the platform app store"
-  },
   "moreYoutube": "YouTube",
   "@moreYoutube": {
     "description": "More-menu link to the ExpTech YouTube channel"
@@ -486,6 +482,18 @@
     "description": "More-menu link to the ExpTech GitHub organisation"
   },
   "moreSourceCode": "Source code",
+  "moreSectionApp": "Get the app",
+  "moreGooglePlay": "Google Play",
+  "moreAppStore": "App Store",
+  "@moreSectionApp": {
+    "description": "More-page section header for the app-store download links"
+  },
+  "@moreGooglePlay": {
+    "description": "Google Play store link title (brand name)"
+  },
+  "@moreAppStore": {
+    "description": "Apple App Store link title (brand name)"
+  },
   "@moreSourceCode": {
     "description": "More-menu link to DPIP's source repository on GitHub"
   }

@@ -361,9 +361,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingSkipLeave => 'このままスキップ';
 
   @override
-  String get moreRate => 'DPIP を評価';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -371,4 +368,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moreSourceCode => 'ソースコード';
+
+  @override
+  String get moreSectionApp => 'アプリを入手';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

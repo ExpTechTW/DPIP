@@ -369,9 +369,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingSkipLeave => 'Vẫn bỏ qua';
 
   @override
-  String get moreRate => 'Đánh giá DPIP';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -379,4 +376,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moreSourceCode => 'Mã nguồn';
+
+  @override
+  String get moreSectionApp => 'Tải ứng dụng';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

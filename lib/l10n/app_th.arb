@@ -113,8 +113,10 @@
   "onboardingSkipBody": "หากไม่อนุญาตตำแหน่งและการแจ้งเตือน DPIP จะไม่สามารถแจ้งเตือนแผ่นดินไหวและภัยพิบัติใกล้คุณแบบเรียลไทม์ได้ คุณยังสามารถเปิดใช้ภายหลังได้ในการตั้งค่า",
   "onboardingSkipStay": "กลับไปให้สิทธิ์",
   "onboardingSkipLeave": "ข้ามไปก่อน",
-  "moreRate": "ให้คะแนน DPIP",
   "moreYoutube": "YouTube",
   "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "ซอร์สโค้ด"
+  "moreSourceCode": "ซอร์สโค้ด",
+  "moreSectionApp": "ดาวน์โหลดแอป",
+  "moreGooglePlay": "Google Play",
+  "moreAppStore": "App Store"
 }

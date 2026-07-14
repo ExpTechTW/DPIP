@@ -357,9 +357,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingSkipLeave => '仍要略過';
 
   @override
-  String get moreRate => '為 DPIP 評分';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -367,6 +364,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moreSourceCode => '原始碼';
+
+  @override
+  String get moreSectionApp => '取得 App';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -722,9 +728,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get onboardingSkipLeave => '仍要跳过';
 
   @override
-  String get moreRate => '为 DPIP 评分';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -732,6 +735,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreSourceCode => '源代码';
+
+  @override
+  String get moreSectionApp => '获取 App';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1087,9 +1099,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingSkipLeave => '仍要略過';
 
   @override
-  String get moreRate => '為 DPIP 評分';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -1097,4 +1106,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moreSourceCode => '原始碼';
+
+  @override
+  String get moreSectionApp => '取得 App';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

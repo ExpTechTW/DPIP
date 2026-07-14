@@ -113,8 +113,10 @@
   "onboardingSkipBody": "Tanpa lokasi dan notifikasi, DPIP tidak dapat memperingatkan Anda tentang gempa dan bencana di sekitar Anda secara waktu nyata. Anda masih dapat memberikannya nanti di Pengaturan.",
   "onboardingSkipStay": "Kembali",
   "onboardingSkipLeave": "Tetap lewati",
-  "moreRate": "Beri Nilai DPIP",
   "moreYoutube": "YouTube",
   "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "Kode sumber"
+  "moreSourceCode": "Kode sumber",
+  "moreSectionApp": "Dapatkan aplikasi",
+  "moreGooglePlay": "Google Play",
+  "moreAppStore": "App Store"
 }

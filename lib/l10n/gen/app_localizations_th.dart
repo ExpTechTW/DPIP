@@ -368,9 +368,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingSkipLeave => 'ข้ามไปก่อน';
 
   @override
-  String get moreRate => 'ให้คะแนน DPIP';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -378,4 +375,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moreSourceCode => 'ซอร์สโค้ด';
+
+  @override
+  String get moreSectionApp => 'ดาวน์โหลดแอป';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

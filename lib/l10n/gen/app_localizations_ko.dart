@@ -361,9 +361,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingSkipLeave => '그래도 건너뛰기';
 
   @override
-  String get moreRate => 'DPIP 평가하기';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -371,4 +368,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moreSourceCode => '소스 코드';
+
+  @override
+  String get moreSectionApp => '앱 다운로드';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

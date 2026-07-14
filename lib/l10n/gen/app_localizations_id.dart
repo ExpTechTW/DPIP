@@ -370,9 +370,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingSkipLeave => 'Tetap lewati';
 
   @override
-  String get moreRate => 'Beri Nilai DPIP';
-
-  @override
   String get moreYoutube => 'YouTube';
 
   @override
@@ -380,4 +377,13 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get moreSourceCode => 'Kode sumber';
+
+  @override
+  String get moreSectionApp => 'Dapatkan aplikasi';
+
+  @override
+  String get moreGooglePlay => 'Google Play';
+
+  @override
+  String get moreAppStore => 'App Store';
 }

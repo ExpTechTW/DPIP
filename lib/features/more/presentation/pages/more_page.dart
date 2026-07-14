@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -18,11 +16,6 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    // Rate-the-app links to this platform's own store.
-    final storeUrl = Platform.isIOS
-        ? 'https://apps.apple.com/tw/app/dpip/id6468026362'
-        : 'https://play.google.com/store/apps/details?id=com.exptech.dpip';
-    final storeHost = Platform.isIOS ? 'apps.apple.com' : 'play.google.com';
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
@@ -72,12 +65,6 @@ class MorePage extends StatelessWidget {
           SectionHeader(l10n.moreSectionLinks),
           _MoreGroup(
             children: [
-              _MoreLinkTile(
-                icon: Icons.star_outline,
-                title: l10n.moreRate,
-                host: storeHost,
-                url: storeUrl,
-              ),
               _MoreLinkTile(
                 icon: Icons.crisis_alert_outlined,
                 title: l10n.moreCwaEew,
@@ -131,6 +118,25 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreSourceCode,
                 host: 'github.com/ExpTechTW/DPIP',
                 url: 'https://github.com/ExpTechTW/DPIP',
+              ),
+            ],
+          ),
+          // Both stores shown side by side — DPIP is cross-platform.
+          SectionHeader(l10n.moreSectionApp),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.android,
+                title: l10n.moreGooglePlay,
+                host: 'play.google.com',
+                url:
+                    'https://play.google.com/store/apps/details?id=com.exptech.dpip',
+              ),
+              _MoreLinkTile(
+                icon: Icons.apple,
+                title: l10n.moreAppStore,
+                host: 'apps.apple.com',
+                url: 'https://apps.apple.com/tw/app/dpip/id6468026362',
               ),
             ],
           ),
