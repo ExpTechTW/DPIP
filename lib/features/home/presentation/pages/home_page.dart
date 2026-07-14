@@ -1,4 +1,3 @@
-import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
@@ -50,17 +49,6 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-  /// Snaps to the nearest detent (rest or full) when a drag ends.
-  void _settle() {
-    if (!_sheet.isAttached) return;
-    final size = _sheet.size;
-    final target = size < (HomeSheet.restExtent + HomeSheet.maxExtent) / 2
-        ? HomeSheet.restExtent
-        : HomeSheet.maxExtent;
-    if ((size - target).abs() < 0.001) return;
-    _sheet.animateTo(target, duration: AppMotion.medium, curve: Curves.easeOut);
-  }
-
   /// Collapses the sheet to rest whenever Home is (re-)entered, so an expanded,
   /// chrome-hidden sheet never strands a fresh visitor with no visible nav.
   void _resetSheet() {
@@ -96,21 +84,23 @@ class _HomePageState extends State<HomePage> {
             // The one weather sheet — full-screen behind the region bar so its
             // weather fills up into (and past) the bar.
             Positioned.fill(
-              child: Listener(
-                onPointerUp: (_) => _settle(),
-                child: NotificationListener<DraggableScrollableNotification>(
-                  onNotification: _onExtentChanged,
-                  child: DraggableScrollableSheet(
-                    controller: _sheet,
-                    // Floor = rest: the sheet is never smaller than its default.
-                    initialChildSize: HomeSheet.restExtent,
-                    minChildSize: HomeSheet.restExtent,
-                    maxChildSize: HomeSheet.maxExtent,
-                    builder: (context, scrollController) => HomeSheet(
-                      scrollController: scrollController,
-                      extent: extent,
-                      weatherMode: weatherMode,
-                    ),
+              child: NotificationListener<DraggableScrollableNotification>(
+                onNotification: _onExtentChanged,
+                child: DraggableScrollableSheet(
+                  controller: _sheet,
+                  // Built-in velocity-aware snapping between the two detents, so
+                  // a flick keeps its momentum and settles up. The old manual
+                  // pointer-up settle snapped by position only (no velocity), so
+                  // any short drag up sprang back to rest with no inertia.
+                  snap: true,
+                  // Floor = rest: the sheet is never smaller than its default.
+                  initialChildSize: HomeSheet.restExtent,
+                  minChildSize: HomeSheet.restExtent,
+                  maxChildSize: HomeSheet.maxExtent,
+                  builder: (context, scrollController) => HomeSheet(
+                    scrollController: scrollController,
+                    extent: extent,
+                    weatherMode: weatherMode,
                   ),
                 ),
               ),
