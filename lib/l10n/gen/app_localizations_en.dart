@@ -70,6 +70,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAnnouncements => 'Announcements';
 
   @override
+  String get moreDiscord => 'Discord community';
+
+  @override
   String get moreNotifyLog => 'DPIP notification log';
 
   @override

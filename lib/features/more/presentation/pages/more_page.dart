@@ -85,6 +85,12 @@ class MorePage extends StatelessWidget {
                 url: 'https://announcement.exptech.com.tw/',
               ),
               _MoreLinkTile(
+                icon: Icons.discord,
+                title: l10n.moreDiscord,
+                host: 'exptech.com.tw/dc',
+                url: 'https://exptech.com.tw/dc',
+              ),
+              _MoreLinkTile(
                 icon: Icons.notifications_active_outlined,
                 title: l10n.moreNotifyLog,
                 host: 'status.exptech.com.tw',

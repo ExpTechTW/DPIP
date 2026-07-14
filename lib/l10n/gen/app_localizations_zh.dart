@@ -70,6 +70,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreDiscord => 'Discord 社群';
+
+  @override
   String get moreNotifyLog => 'DPIP 通知發送記錄';
 
   @override

@@ -212,6 +212,12 @@ abstract class AppLocalizations {
   /// **'Announcements'**
   String get moreAnnouncements;
 
+  /// More-menu link to the ExpTech Discord community
+  ///
+  /// In en, this message translates to:
+  /// **'Discord community'**
+  String get moreDiscord;
+
   /// More-menu link to the DPIP notification send-record website
   ///
   /// In en, this message translates to:
