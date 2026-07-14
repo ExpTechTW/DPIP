@@ -26,10 +26,13 @@ class OnboardingIntroPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-            child: Icon(
-              Icons.health_and_safety_outlined,
-              size: 72,
-              color: theme.colorScheme.primary,
+            child: Center(
+              child: Image.asset(
+                'assets/DPIP.png',
+                width: 96,
+                height: 96,
+                filterQuality: FilterQuality.medium,
+              ),
             ),
           ),
           Text(

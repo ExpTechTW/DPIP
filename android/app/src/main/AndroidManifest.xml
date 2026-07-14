@@ -21,7 +21,8 @@
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round">
         <!-- Monochrome status-bar icon for FCM/awesome notifications. -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
