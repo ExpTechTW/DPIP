@@ -75,6 +75,11 @@ dependencies {
     // the maplibre_gl plugin's SDK dependency isn't on the app's compile
     // classpath. Keep the version in sync with maplibre_gl (android-sdk).
     implementation("org.maplibre.gl:android-sdk:12.3.1")
+    // Lets the native background-location layer use the Fused Location Provider
+    // and Geofencing API directly. Already in the APK transitively via
+    // geolocator; this promotes it to the app's compile classpath (same reason
+    // as the maplibre-gl line above). Keep in sync with geolocator_android.
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     // Backports java.time/etc. for awesome_notifications (see compileOptions).
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

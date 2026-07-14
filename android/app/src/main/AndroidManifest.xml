@@ -48,8 +48,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Background device-location reporting (native-first): an adaptive
-             alarm fires this receiver, which reports the fix and reschedules. -->
+        <!-- Background device-location reporting (native-first). Primary spine:
+             a low-power EXIT geofence fires this receiver on real moves. -->
+        <receiver
+            android:name=".GeofenceReceiver"
+            android:exported="false" />
+        <!-- Fallback spine (de-Googled devices): an adaptive alarm fires this
+             receiver, which reports the fix and reschedules. -->
         <receiver
             android:name=".LocationAlarmReceiver"
             android:exported="false" />

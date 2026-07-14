@@ -88,13 +88,15 @@ class _AppServicesHost extends StatefulWidget {
   State<_AppServicesHost> createState() => _AppServicesHostState();
 }
 
-class _AppServicesHostState extends State<_AppServicesHost> {
+class _AppServicesHostState extends State<_AppServicesHost>
+    with WidgetsBindingObserver {
   late final RealtimeLifecycleObserver _observer;
 
   @override
   void initState() {
     super.initState();
     _observer = RealtimeLifecycleObserver(widget.realtimeService);
+    WidgetsBinding.instance.addObserver(this);
     NotificationTaps.onTap = _routeNotificationTap;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.realtimeService.startAll();
@@ -104,12 +106,18 @@ class _AppServicesHostState extends State<_AppServicesHost> {
     });
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-arm background reporting on resume: the Android geofence can be dropped
+    // by a Play-services update / location toggle (neither fires boot), so a
+    // warm foreground is the reliable re-arm point.
+    if (state == AppLifecycleState.resumed) _armBackground();
+  }
+
   /// Requests GPS permission, resolves the current township into the region
-  /// store, and — once permission is granted — starts both the foreground
-  /// device-location reporter and its native background counterpart (the latter
-  /// only when a push token exists to target). On denial/error the current code
-  /// stays null, so 所在地 renders its "can't get current location" state rather
-  /// than a wrong region, and no reporting starts.
+  /// store, and — once granted — starts the foreground reporter and arms native
+  /// background reporting. On denial/error the current code stays null, so 所在地
+  /// renders its "can't get current location" state rather than a wrong region.
   Future<void> _resolveCurrentLocation() async {
     final granted = await widget.locationService.requestPermission();
     final town = await widget.locationService.currentTown();
@@ -117,19 +125,31 @@ class _AppServicesHostState extends State<_AppServicesHost> {
     widget.regionStore.setCurrentCode(town?.code);
     if (!granted) return;
     widget.deviceLocationReporter.start();
+    await _armBackground(requestUpgrade: true);
+  }
+
+  /// Arms native background reporting when a push token and background ("Always")
+  /// location exist. On iOS the plugin self-requests Always, so we always start
+  /// it; on Android background delivery needs Always already granted (the
+  /// geofence can't prompt), so [requestUpgrade] makes a best-effort escalation
+  /// attempt on the first resolve (a full staged rationale flow belongs in
+  /// onboarding). Idempotent — safe to call repeatedly (e.g. on resume).
+  Future<void> _armBackground({bool requestUpgrade = false}) async {
     final token = widget.notificationService.token;
     if (token == null) return;
-    // Background reporting needs "Always": iOS's plugin requests it on start;
-    // Android's alarm can't fetch a fix (or prompt) with only "while in use",
-    // so arm it there only when Always is already granted.
-    final background =
+    var background =
         Platform.isIOS || await widget.locationService.backgroundGranted();
-    if (background && mounted) widget.backgroundLocation.start(token);
+    if (!background && requestUpgrade && !Platform.isIOS) {
+      background = await widget.locationService.requestBackground();
+    }
+    if (!mounted) return;
+    if (background) widget.backgroundLocation.start(token);
   }
 
   @override
   void dispose() {
     NotificationTaps.onTap = null;
+    WidgetsBinding.instance.removeObserver(this);
     _observer.dispose();
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();

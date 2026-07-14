@@ -38,11 +38,19 @@ class LocationService {
   }
 
   /// Whether background ("Always") location is granted — the precondition for
-  /// native background reporting. On Android the background alarm can't fetch a
-  /// fix (or prompt) with only "while in use", so callers must gate on this;
+  /// native background reporting. On Android the background geofence can't fetch
+  /// a fix (or prompt) with only "while in use", so callers must gate on this;
   /// iOS requests Always from its own plugin.
   Future<bool> backgroundGranted() async =>
       await Geolocator.checkPermission() == LocationPermission.always;
+
+  /// Best-effort escalation to background ("Always") permission, returning
+  /// whether it's now granted. On Android 10 this can grant inline; on Android
+  /// 11+ the OS requires the user to choose "Allow all the time" in Settings, so
+  /// it often can't grant here — a full staged rationale flow belongs in
+  /// onboarding. Safe to call when already granted (no re-prompt).
+  Future<bool> requestBackground() async =>
+      await Geolocator.requestPermission() == LocationPermission.always;
 
   /// A distance-filtered stream of GPS fixes — each emission is a move of at
   /// least [distanceFilterMeters], which is exactly the trigger for a device-

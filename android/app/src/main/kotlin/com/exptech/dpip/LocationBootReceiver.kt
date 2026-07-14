@@ -5,23 +5,28 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * Re-arms the background location alarm after a reboot.
+ * Re-arms the background spine after a reboot.
  *
- * The alarm uses elapsed-realtime triggers, which the system clears on restart,
- * so without this a device that reboots would silently stop reporting. Only
- * reschedules when reporting was enabled, at the last adapted interval.
+ * Geofences are cleared by the system on reboot (and on a Play-services update
+ * or app-data clear), and the fallback alarm uses elapsed-realtime triggers that
+ * also clear — so without this a device that reboots would silently stop
+ * reporting. Re-registers the geofence around the last centre (GMS) or the
+ * fallback alarm (de-Googled), only when reporting was enabled.
  */
 class LocationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
-        val prefs = LocationAlarmScheduler.prefs(context)
-        if (!prefs.getBoolean(LocationAlarmScheduler.KEY_ENABLED, false)) return
-        LocationAlarmScheduler.schedule(
-            context,
-            prefs.getLong(
-                LocationAlarmScheduler.KEY_INTERVAL_MIN,
-                LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
-            ),
-        )
+        if (!BgLocationStore.enabled(context)) return
+
+        if (GmsAvailability.available(context) && BgLocationStore.hasLast(context)) {
+            GeofenceManager.register(
+                context, BgLocationStore.lastLat(context), BgLocationStore.lastLng(context),
+            )
+        } else {
+            val interval = BgLocationStore.prefs(context).getLong(
+                BgLocationStore.KEY_INTERVAL_MIN, LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
+            )
+            LocationAlarmScheduler.schedule(context, interval)
+        }
     }
 }
