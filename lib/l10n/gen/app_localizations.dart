@@ -1009,6 +1009,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wind'**
   String get mapLayerWind;
+
+  /// Map layer switcher label for the real-time seismic monitor (RTS)
+  ///
+  /// In en, this message translates to:
+  /// **'Seismic Monitor'**
+  String get mapLayerMonitor;
+
+  /// Shown in the monitor panel before the first RTS snapshot arrives
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for data…'**
+  String get monitorWaiting;
 }
 
 class _AppLocalizationsDelegate

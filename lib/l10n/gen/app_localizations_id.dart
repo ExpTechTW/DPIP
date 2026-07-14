@@ -480,4 +480,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'Angin';
+
+  @override
+  String get mapLayerMonitor => 'Monitor Seismik';
+
+  @override
+  String get monitorWaiting => 'Menunggu data…';
 }

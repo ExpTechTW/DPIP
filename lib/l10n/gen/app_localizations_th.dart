@@ -478,4 +478,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'ลม';
+
+  @override
+  String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
+
+  @override
+  String get monitorWaiting => 'กำลังรอข้อมูล…';
 }

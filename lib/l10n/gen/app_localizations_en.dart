@@ -478,4 +478,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'Wind';
+
+  @override
+  String get mapLayerMonitor => 'Seismic Monitor';
+
+  @override
+  String get monitorWaiting => 'Waiting for data…';
 }

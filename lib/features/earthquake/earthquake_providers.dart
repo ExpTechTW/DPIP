@@ -2,14 +2,17 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
+import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
+import 'package:dpip/features/earthquake/data/trem_station_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
 import 'package:provider/provider.dart';
@@ -54,5 +57,11 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     Provider<EewRepository>.value(value: repository),
     ChangeNotifierProvider<EewRealtimeController>.value(value: eewController),
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),
+    // The RTS feed under its core supertype + the seismic station directory, so
+    // the map's RTS layer can consume both without importing this feature.
+    Provider<RealtimeNotifier<Rts>>.value(value: rtsController),
+    Provider<TremStationRepository>.value(
+      value: TremStationRepositoryImpl(deps.apiClient),
+    ),
   ];
 }

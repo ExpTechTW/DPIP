@@ -480,4 +480,10 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'Hangin';
+
+  @override
+  String get mapLayerMonitor => 'Seismic Monitor';
+
+  @override
+  String get monitorWaiting => 'Naghihintay ng data…';
 }

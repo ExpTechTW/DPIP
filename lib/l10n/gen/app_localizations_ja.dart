@@ -470,4 +470,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerWind => '風';
+
+  @override
+  String get mapLayerMonitor => '強震モニタ';
+
+  @override
+  String get monitorWaiting => 'データ待機中…';
 }

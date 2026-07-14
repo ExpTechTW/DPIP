@@ -148,5 +148,7 @@
   "trendNoData": "Tidak ada data tren",
   "mapLayerHumidity": "Kelembapan",
   "mapLayerPressure": "Tekanan",
-  "mapLayerWind": "Angin"
+  "mapLayerWind": "Angin",
+  "mapLayerMonitor": "Monitor Seismik",
+  "monitorWaiting": "Menunggu data…"
 }

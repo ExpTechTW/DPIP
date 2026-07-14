@@ -470,4 +470,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerWind => '바람';
+
+  @override
+  String get mapLayerMonitor => '실시간 지진 모니터';
+
+  @override
+  String get monitorWaiting => '데이터 대기 중…';
 }

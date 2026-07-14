@@ -148,5 +148,7 @@
   "trendNoData": "没有趋势数据",
   "mapLayerHumidity": "湿度",
   "mapLayerPressure": "气压",
-  "mapLayerWind": "风"
+  "mapLayerWind": "风",
+  "mapLayerMonitor": "强震监视器",
+  "monitorWaiting": "等待数据…"
 }

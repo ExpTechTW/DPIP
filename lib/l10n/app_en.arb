@@ -617,5 +617,13 @@
   "mapLayerWind": "Wind",
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind layer"
+  },
+  "mapLayerMonitor": "Seismic Monitor",
+  "@mapLayerMonitor": {
+    "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
+  },
+  "monitorWaiting": "Waiting for data…",
+  "@monitorWaiting": {
+    "description": "Shown in the monitor panel before the first RTS snapshot arrives"
   }
 }

@@ -148,5 +148,7 @@
   "trendNoData": "ไม่มีข้อมูลแนวโน้ม",
   "mapLayerHumidity": "ความชื้น",
   "mapLayerPressure": "ความกดอากาศ",
-  "mapLayerWind": "ลม"
+  "mapLayerWind": "ลม",
+  "mapLayerMonitor": "เครื่องตรวจแผ่นดินไหว",
+  "monitorWaiting": "กำลังรอข้อมูล…"
 }

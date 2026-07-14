@@ -466,6 +466,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapLayerWind => '風';
+
+  @override
+  String get mapLayerMonitor => '強震監視器';
+
+  @override
+  String get monitorWaiting => '等待資料…';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -930,6 +936,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerWind => '风';
+
+  @override
+  String get mapLayerMonitor => '强震监视器';
+
+  @override
+  String get monitorWaiting => '等待数据…';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1394,4 +1406,10 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLayerWind => '風';
+
+  @override
+  String get mapLayerMonitor => '強震監視器';
+
+  @override
+  String get monitorWaiting => '等待資料…';
 }

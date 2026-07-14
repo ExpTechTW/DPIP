@@ -1,6 +1,10 @@
+import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
+import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -26,6 +30,10 @@ class _MapPageState extends State<MapPage> {
   // Built once so each layer keeps its own MapLibre state across rebuilds.
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
+    RtsMapLayer(
+      context.read<RealtimeNotifier<Rts>>(),
+      context.read<TremStationRepository>(),
+    ),
     TemperatureMapLayer(context.read<MeteorWeatherRepository>()),
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),
     PressureMapLayer(context.read<MeteorWeatherRepository>()),

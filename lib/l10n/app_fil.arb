@@ -148,5 +148,7 @@
   "trendNoData": "Walang trend data",
   "mapLayerHumidity": "Halumigmig",
   "mapLayerPressure": "Presyon",
-  "mapLayerWind": "Hangin"
+  "mapLayerWind": "Hangin",
+  "mapLayerMonitor": "Seismic Monitor",
+  "monitorWaiting": "Naghihintay ng data…"
 }

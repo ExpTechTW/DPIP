@@ -148,5 +148,7 @@
   "trendNoData": "Không có dữ liệu xu hướng",
   "mapLayerHumidity": "Độ ẩm",
   "mapLayerPressure": "Áp suất",
-  "mapLayerWind": "Gió"
+  "mapLayerWind": "Gió",
+  "mapLayerMonitor": "Giám sát địa chấn",
+  "monitorWaiting": "Đang chờ dữ liệu…"
 }

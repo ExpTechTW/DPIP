@@ -479,4 +479,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'Gió';
+
+  @override
+  String get mapLayerMonitor => 'Giám sát địa chấn';
+
+  @override
+  String get monitorWaiting => 'Đang chờ dữ liệu…';
 }

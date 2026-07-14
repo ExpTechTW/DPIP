@@ -148,5 +148,7 @@
   "trendNoData": "추세 데이터 없음",
   "mapLayerHumidity": "습도",
   "mapLayerPressure": "기압",
-  "mapLayerWind": "바람"
+  "mapLayerWind": "바람",
+  "mapLayerMonitor": "실시간 지진 모니터",
+  "monitorWaiting": "데이터 대기 중…"
 }
