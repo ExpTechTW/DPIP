@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -35,16 +36,26 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
   RegionStore? _regions;
   int _requestId = 0;
   String? _renderedKey;
+  Timer? _debounce;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final regions = context.read<RegionStore>();
     if (regions != _regions) {
-      _regions?.removeListener(_refresh);
-      _regions = regions..addListener(_refresh);
+      _regions?.removeListener(_scheduleRefresh);
+      _regions = regions..addListener(_scheduleRefresh);
     }
     _refresh();
+  }
+
+  /// Debounces area switches so a fast swipe through several areas only renders
+  /// the one it settles on — each snapshot is an expensive native render.
+  void _scheduleRefresh() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) _refresh();
+    });
   }
 
   /// The selected township code, or null for the nationwide (whole-island) view.
@@ -102,7 +113,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
     if (id != _requestId || !mounted) return;
     if (base != null) setState(() => _image = base);
 
-    // Radar enhancement — re-capture with the latest echo if it resolves.
+    // Radar echo overlays only the whole-island view: zoomed into one township
+    // the tiles fail to snapshot (and the echo isn't meaningful at that scale).
+    if (code != null) return;
     final frames = (await radar.frames()).valueOrNull;
     if (id != _requestId || !mounted || frames == null || frames.isEmpty) {
       return;
@@ -150,7 +163,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop> {
 
   @override
   void dispose() {
-    _regions?.removeListener(_refresh);
+    _debounce?.cancel();
+    _regions?.removeListener(_scheduleRefresh);
     super.dispose();
   }
 
