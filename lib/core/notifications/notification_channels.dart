@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 /// The DPIP notification channel + group catalogue.
 ///
 /// Ported from the legacy app: 21 alert channels across 5 groups (EEW,
-/// earthquake, weather, tsunami, other), each with its own importance, critical-
+/// earthquake, weather, tsunami, other) — each with its own importance, critical-
 /// alert flag, sound (`resource://raw/<name>` — Android `.ogg` / iOS `.aiff`),
-/// and vibration. Android caches a channel's settings after first creation, so
-/// [version] is bumped whenever a definition changes to force a re-create on
-/// next launch.
+/// and vibration — plus a standalone `background` service channel. Android caches
+/// a channel's settings after first creation, so [version] is bumped whenever a
+/// definition changes to force a re-create on next launch. (Adding a brand-new
+/// channel needs no bump — `initialize` creates it without touching the others.)
 abstract final class NotificationChannels {
   const NotificationChannels._();
 
@@ -354,6 +355,22 @@ abstract final class NotificationChannels {
       ledColor: Colors.red,
       enableVibration: true,
       vibrationPattern: lowVibrationPattern,
+    ),
+    // Standalone (no group): a low-importance, silent channel for any background
+    // service notice. Kept for parity with the legacy catalogue; the rewrite's
+    // background location is geofence-based (no persistent notification), so it
+    // isn't actively posted to today.
+    NotificationChannel(
+      channelKey: 'background',
+      channelName: '自動定位',
+      channelDescription: '背景定位服務通知',
+      importance: NotificationImportance.Low,
+      defaultColor: const Color(0xFF2196F3),
+      channelShowBadge: false,
+      enableVibration: false,
+      enableLights: false,
+      playSound: false,
+      locked: true,
     ),
   ];
 

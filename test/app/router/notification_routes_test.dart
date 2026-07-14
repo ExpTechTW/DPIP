@@ -19,8 +19,11 @@ void main() {
     'group_other',
   };
 
-  test('every channel is in a known group and resolves to a valid route', () {
+  test('every alert channel is in a known group and routes to a valid tab', () {
     for (final channel in NotificationChannels.channels) {
+      // Non-alert service channels (e.g. `background`) have no group and aren't
+      // navigation targets — they're excluded from the routing invariant.
+      if (channel.channelGroupKey == null) continue;
       final key = channel.channelKey!;
       expect(
         NotificationChannels.groupOf(key),
@@ -33,6 +36,11 @@ void main() {
         reason: 'channel $key resolves to an invalid route',
       );
     }
+  });
+
+  test('the groupless background service channel falls back home', () {
+    expect(NotificationChannels.groupOf('background'), isNull);
+    expect(routeForNotificationChannel('background'), AppRoutes.home);
   });
 
   test('routes each family to the expected screen', () {
