@@ -317,4 +317,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingStart => 'Get started';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get languageSystem => 'System default';
 }

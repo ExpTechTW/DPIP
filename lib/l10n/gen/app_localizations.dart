@@ -685,6 +685,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get started'**
   String get onboardingStart;
+
+  /// Language picker tooltip / label
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// Language picker option: follow the system language
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get languageSystem;
 }
 
 class _AppLocalizationsDelegate

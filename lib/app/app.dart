@@ -12,6 +12,7 @@ import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
+import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -46,14 +47,18 @@ class DpipApp extends StatelessWidget {
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
         onboarding: deps.onboarding,
-        child: MaterialApp.router(
-          title: 'DPIP',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: appRouter,
+        // Rebuild MaterialApp when the language override changes (null = system).
+        child: Consumer<LocaleController>(
+          builder: (context, localeController, _) => MaterialApp.router(
+            title: 'DPIP',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            locale: localeController.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: appRouter,
+          ),
         ),
       ),
     );

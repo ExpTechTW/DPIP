@@ -7,6 +7,7 @@ import 'package:dpip/features/onboarding/presentation/widgets/onboarding_intro.d
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_terms.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/widgets/language_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -115,7 +116,8 @@ class _TopBar extends StatelessWidget {
               child: _Dots(count: pageCount, index: index),
             ),
           ),
-          const SizedBox(width: 56),
+          // Language selector in the top-right.
+          const LanguagePicker(),
         ],
       ),
     );

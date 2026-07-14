@@ -316,5 +316,9 @@
   "onboardingGranted": "Granted",
   "@onboardingGranted": { "description": "Permission granted label" },
   "onboardingStart": "Get started",
-  "@onboardingStart": { "description": "Onboarding finish button" }
+  "@onboardingStart": { "description": "Onboarding finish button" },
+  "language": "Language",
+  "@language": { "description": "Language picker tooltip / label" },
+  "languageSystem": "System default",
+  "@languageSystem": { "description": "Language picker option: follow the system language" }
 }

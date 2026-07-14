@@ -97,5 +97,7 @@
   "onboardingPermBatteryDesc": "允許 DPIP 在背景持續運作,避免警報延遲或漏收。",
   "onboardingGrant": "授權",
   "onboardingGranted": "已授權",
-  "onboardingStart": "開始使用"
+  "onboardingStart": "開始使用",
+  "language": "語言",
+  "languageSystem": "系統預設"
 }

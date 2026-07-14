@@ -309,4 +309,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onboardingStart => '開始使用';
+
+  @override
+  String get language => '語言';
+
+  @override
+  String get languageSystem => '系統預設';
 }

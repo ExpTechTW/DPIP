@@ -8,6 +8,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +35,7 @@ class SharedDeps {
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.onboarding,
+    required this.locale,
   });
 
   /// Persistence for feature-local settings.
@@ -78,4 +80,7 @@ class SharedDeps {
   /// First-launch onboarding completion (also provided) — gates the router and
   /// the app's permission requests.
   final OnboardingStore onboarding;
+
+  /// The selected UI language override (also provided; drives `MaterialApp`).
+  final LocaleController locale;
 }
