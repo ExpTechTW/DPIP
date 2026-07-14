@@ -74,9 +74,12 @@ class _HomePageState extends State<HomePage> {
       body: RegionSwipeArea(
         child: Stack(
           children: [
-            // Shared map backdrop; a tap opens the full map tab.
+            // Shared map backdrop; a tap opens the full map tab. Opaque so the
+            // detector is itself the hit target — the backdrop map ignores
+            // pointers (display-only), so deferToChild would never see a hit.
             Positioned.fill(
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => context.goNamed(AppRoutes.map),
                 child: const HomeMapBackdrop(),
               ),

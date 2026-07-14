@@ -11,14 +11,31 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// their own sources/layers in [onMapCreated] via the [MapLibreMapController],
 /// typically anchoring overlays below [outlineLayerId] so the borders stay on
 /// top.
+///
+/// [interactive] toggles every user gesture (pan/zoom/rotate/tilt) and the
+/// compass at once — pass `false` for a display-only surface like the home
+/// backdrop, where the map is driven entirely from code and the page's own
+/// gestures (tap to open, swipe to switch) must pass straight through.
 class BaseMap extends StatelessWidget {
-  const BaseMap({super.key, this.onMapCreated, this.onStyleLoaded});
+  const BaseMap({
+    super.key,
+    this.onMapCreated,
+    this.onStyleLoaded,
+    this.interactive = true,
+  });
 
   /// Centre of Taiwan.
   static const LatLng taiwanCenter = LatLng(23.60, 120.85);
 
   /// Default zoom framing the whole island.
   static const double taiwanZoom = 6.4;
+
+  /// Bounding box framing the main island (plus Penghu) — for fit-to-bounds
+  /// framing that can inset for overlaid chrome (e.g. the home sheet).
+  static final LatLngBounds taiwanBounds = LatLngBounds(
+    southwest: const LatLng(21.85, 119.35),
+    northeast: const LatLng(25.40, 122.05),
+  );
 
   /// Fixed 4–11 zoom range — the radar echo tiles require it.
   static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(4, 11);
@@ -28,6 +45,10 @@ class BaseMap extends StatelessWidget {
 
   /// Called once the style has finished loading (safe to add layers after this).
   final VoidCallback? onStyleLoaded;
+
+  /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
+  /// (all gestures + the compass off) so the surrounding page owns every gesture.
+  final bool interactive;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +63,16 @@ class BaseMap extends StatelessWidget {
         land: colors.surfaceContainer.toHexRgb(),
         countyTown: colors.surfaceContainerHigh.toHexRgb(),
         outline: colors.outline.toHexRgb(),
+        townOutline: colors.outlineVariant.toHexRgb(),
       ),
       minMaxZoomPreference: zoomRange,
       trackCameraPosition: true,
+      compassEnabled: interactive,
+      scrollGesturesEnabled: interactive,
+      zoomGesturesEnabled: interactive,
+      rotateGesturesEnabled: interactive,
+      tiltGesturesEnabled: interactive,
+      dragEnabled: interactive,
       onMapCreated: onMapCreated,
       onStyleLoadedCallback: onStyleLoaded,
     );
