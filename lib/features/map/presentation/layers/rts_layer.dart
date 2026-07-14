@@ -5,6 +5,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -29,9 +30,19 @@ class RtsMapLayer implements MapLayer {
   MapLibreMapController? _controller;
   bool _listening = false;
   bool _added = false;
+  RealtimeStatus? _appliedStatus;
+  bool _stationsFetching = false;
+  int _stationRetries = 0;
 
   static const String _sourceId = 'rts-src';
   static const String _circleId = 'rts-circle';
+  static const int _maxStationRetries = 8;
+  static const double _liveOpacity = 0.9;
+  static const double _staleOpacity = 0.35;
+  static const Map<String, dynamic> _emptyCollection = {
+    'type': 'FeatureCollection',
+    'features': <dynamic>[],
+  };
 
   @override
   String get id => 'monitor';
@@ -64,17 +75,10 @@ class RtsMapLayer implements MapLayer {
       _sourceId,
       GeojsonSourceProperties(data: _geoJson()),
     );
-    await controller.addCircleLayer(
-      _sourceId,
-      _circleId,
-      const CircleLayerProperties(
-        circleColor: _colorExpression,
-        circleRadius: _radiusExpression,
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: 0.6,
-      ),
-    );
+    await controller.addCircleLayer(_sourceId, _circleId, _circleProps(0.9));
     _added = true;
+    _appliedStatus = null;
+    await _pushUpdate();
     if (!_listening) {
       _feed.addListener(_onFeed);
       _listening = true;
@@ -86,12 +90,39 @@ class RtsMapLayer implements MapLayer {
   Future<void> _pushUpdate() async {
     final controller = _controller;
     if (controller == null || !_added) return;
+    if (_stations.isEmpty) await _ensureStations();
+    final status = _feed.state.status;
+    // Never present aged shaking as current: hide the dots when the feed is
+    // offline, and dim them while stale (the monitor panel flags the status too).
+    final offline = status == RealtimeStatus.offline;
     try {
-      await controller.setGeoJsonSource(_sourceId, _geoJson());
+      await controller.setGeoJsonSource(
+        _sourceId,
+        offline ? _emptyCollection : _geoJson(),
+      );
+      if (status != _appliedStatus) {
+        _appliedStatus = status;
+        await controller.setLayerProperties(
+          _circleId,
+          _circleProps(
+            status == RealtimeStatus.live ? _liveOpacity : _staleOpacity,
+          ),
+        );
+      }
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
     }
   }
+
+  /// The full circle style at [opacity] — passed whole (not a partial update),
+  /// since setLayerProperties resets any property left null.
+  CircleLayerProperties _circleProps(double opacity) => CircleLayerProperties(
+    circleColor: _colorExpression,
+    circleRadius: _radiusExpression,
+    circleStrokeColor: '#FFFFFF',
+    circleStrokeWidth: 0.6,
+    circleOpacity: opacity,
+  );
 
   @override
   Future<void> onMapTap(
@@ -115,10 +146,26 @@ class RtsMapLayer implements MapLayer {
   @override
   void onStyleReset() => _added = false;
 
+  /// Loads the station directory, retrying (bounded) on failure — a transient
+  /// fault would otherwise leave every dot dropped (blank monitor) for the whole
+  /// activation, since the feed carries only per-id intensities, not positions.
   Future<void> _ensureStations() async {
-    if (_stations.isNotEmpty) return;
-    final directory = (await _stationRepository.stations()).valueOrNull;
-    if (directory != null) _stations = directory;
+    if (_stations.isNotEmpty ||
+        _stationsFetching ||
+        _stationRetries >= _maxStationRetries) {
+      return;
+    }
+    _stationsFetching = true;
+    _stationRetries++;
+    try {
+      final directory = (await _stationRepository.stations()).valueOrNull;
+      if (directory != null && directory.isNotEmpty) {
+        _stations = directory;
+        _stationRetries = 0;
+      }
+    } finally {
+      _stationsFetching = false;
+    }
   }
 
   Map<String, dynamic> _geoJson() {

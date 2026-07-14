@@ -2,6 +2,8 @@
 /// station's current reading and its 24h / 7d trend chart.
 library;
 
+import 'dart:math' as math;
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
@@ -68,6 +70,10 @@ class StationSheet extends StatelessWidget {
           minChildSize: 0.14,
           maxChildSize: 0.85,
           snap: true,
+          // Keep the opening height a real rest detent — without it snap only
+          // rests at min/max, so the comfortable reading height is lost on the
+          // first drag.
+          snapSizes: const [0.42],
           builder: (context, scrollController) => _SheetSurface(
             child: _SheetBody(
               source: source,
@@ -276,7 +282,10 @@ class _TrendChart extends StatelessWidget {
     final colors = theme.colorScheme;
 
     final spots = <FlSpot>[];
-    for (var i = 0; i < series.times.length; i++) {
+    // Bound by the shorter series — the time axis and each value column are
+    // decoded from independent arrays, so a truncated payload could misalign.
+    final count = math.min(series.times.length, series.values.length);
+    for (var i = 0; i < count; i++) {
       final value = series.values[i];
       if (value != null) spots.add(FlSpot(series.times[i].toDouble(), value));
     }
@@ -380,6 +389,9 @@ class _TrendChart extends StatelessWidget {
         ),
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
+            // fl_chart's default tooltip background is a fixed dark slate; pair
+            // it with the theme's inverse surface so it's legible in both themes.
+            getTooltipColor: (_) => colors.inverseSurface,
             getTooltipItems: (touched) => [
               for (final spot in touched)
                 LineTooltipItem(
