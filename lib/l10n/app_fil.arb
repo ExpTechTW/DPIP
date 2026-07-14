@@ -1,7 +1,7 @@
 {
   "@@locale": "fil",
   "languageName": "Filipino",
-  "navHome": "Home",
+  "navHome": "Tahanan",
   "navEvents": "Mga Kaganapan",
   "navMap": "Mapa",
   "navEarthquake": "Lindol",
@@ -121,7 +121,7 @@
   "moreSectionApp": "Kunin ang app",
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
-  "displaySettings": "Display",
+  "displaySettings": "Pagpapakita",
   "displayTheme": "Tema",
   "themeSystem": "Sistema",
   "themeLight": "Maliwanag",

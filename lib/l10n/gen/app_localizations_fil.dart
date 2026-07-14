@@ -12,7 +12,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get languageName => 'Filipino';
 
   @override
-  String get navHome => 'Home';
+  String get navHome => 'Tahanan';
 
   @override
   String get navEvents => 'Mga Kaganapan';
@@ -394,7 +394,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get displaySettings => 'Display';
+  String get displaySettings => 'Pagpapakita';
 
   @override
   String get displayTheme => 'Tema';
