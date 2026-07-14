@@ -30,6 +30,13 @@ class BaseMap extends StatelessWidget {
   /// Default zoom framing the whole island.
   static const double taiwanZoom = 6.4;
 
+  /// Bounding box framing the main island (plus Penghu) — for the nationwide
+  /// fit-to-bounds framing on the home backdrop.
+  static final LatLngBounds taiwanBounds = LatLngBounds(
+    southwest: const LatLng(21.85, 119.35),
+    northeast: const LatLng(25.40, 122.05),
+  );
+
   /// Fixed 4–11 zoom range — the radar echo tiles require it.
   static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(4, 11);
 

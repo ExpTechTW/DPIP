@@ -8,7 +8,6 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
-import 'package:dpip/shared/map/map_camera.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -153,12 +152,28 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     }
 
     final filter = _filterFor(townCode);
+    final box = _latLngBounds(bounds);
+    final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
       await _addSelectedLayers(controller, filter);
-      // Instant, not animated: switching areas should snap the framing (the
-      // home backdrop is display-only — no fly-through between townships).
-      await controller.moveCamera(_cameraFor(bounds, size));
+      // Offset the map's focal point above the resting sheet with a bottom
+      // content inset, then fit the bounds — the native fit centres within the
+      // inset, so the framed area sits in the visible band, not behind the
+      // sheet. Instant (not animated): switching areas snaps the framing.
+      await controller.updateContentInsets(
+        EdgeInsets.only(bottom: bottomInset),
+        false,
+      );
+      await controller.moveCamera(
+        CameraUpdate.newLatLngBounds(
+          box,
+          left: _frameMargin,
+          top: _frameMargin,
+          right: _frameMargin,
+          bottom: _frameMargin,
+        ),
+      );
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });
@@ -260,22 +275,14 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     code ?? -1,
   ];
 
-  /// Fits [bounds] (or the whole island when null) into the band above the
-  /// resting sheet — the bottom inset subtracts the sheet's initial height, so
-  /// the framed area is centred in the visible band, not behind the sheet.
-  CameraUpdate _cameraFor(List<double>? bounds, Size size) {
-    final camera = fitBoundsCamera(
-      bounds ?? taiwanBounds,
-      width: size.width,
-      height: size.height,
-      padding: _frameMargin,
-      bottomInset: size.height * HomeSheetExtent.rest,
-    );
-    return CameraUpdate.newLatLngZoom(
-      LatLng(camera.latitude, camera.longitude),
-      camera.zoom,
-    );
-  }
+  /// The bounds to frame — the selected township, or the whole island for the
+  /// nationwide view.
+  LatLngBounds _latLngBounds(List<double>? bounds) => bounds == null
+      ? BaseMap.taiwanBounds
+      : LatLngBounds(
+          southwest: LatLng(bounds[1], bounds[0]),
+          northeast: LatLng(bounds[3], bounds[2]),
+        );
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
   /// failed map op degrades the backdrop, it never throws into the tree.
