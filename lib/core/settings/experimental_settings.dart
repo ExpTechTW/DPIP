@@ -1,16 +1,16 @@
 import 'package:dpip/core/settings/persisted.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-/// App-wide experimental feature settings, persisted to [SharedPreferences].
+/// App-wide experimental feature settings, persisted via [Prefs].
 ///
 /// Provided near the app root so any feature (e.g. the home weather backdrop)
 /// can react to changes.
 class ExperimentalSettings extends ChangeNotifier {
   /// Loads persisted values from [prefs].
-  ExperimentalSettings(SharedPreferences prefs)
+  ExperimentalSettings(Prefs prefs)
     : _weatherMode = PersistedEnum(
         prefs,
         key: PreferenceKeys.weatherMode,

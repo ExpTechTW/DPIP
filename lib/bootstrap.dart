@@ -25,6 +25,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
@@ -60,7 +61,7 @@ Future<void> bootstrap() async {
     Log.handle(error, stackTrace, 'Firebase init skipped (no config yet)');
   }
 
-  final prefs = await SharedPreferences.getInstance();
+  final prefs = Prefs(await SharedPreferences.getInstance());
   final regions = RegionSelection(prefs);
   final experimental = ExperimentalSettings(prefs);
   final onboarding = OnboardingStore(prefs);

@@ -1,17 +1,17 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 
-/// A single enum setting backed by [SharedPreferences] — reads with a fallback
-/// on construction and persists on change.
+/// A single enum setting backed by [Prefs] — reads with a fallback on
+/// construction and persists on change.
 ///
 /// A plain value holder, deliberately NOT a `ChangeNotifier`: [set] returns
 /// whether the value actually changed, so the owning settings object keeps
-/// deciding when to `notifyListeners()` (the app's provider convention). Pass
-/// [encode] when the enum persists as something other than its `name` (e.g. a
-/// region `.code`) — typed, so no `as dynamic` casts leak in.
+/// deciding when to `notifyListeners()`. Pass [encode] when the enum persists as
+/// something other than its `name` (e.g. a region `.code`).
 class PersistedEnum<T extends Enum> {
   PersistedEnum(
     this._prefs, {
-    required String key,
+    required PrefKey<String> key,
     required List<T> values,
     required T fallback,
     String Function(T value)? encode,
@@ -19,8 +19,8 @@ class PersistedEnum<T extends Enum> {
        _encode = encode ?? _name,
        _value = _read(_prefs, key, values, fallback, encode ?? _name);
 
-  final SharedPreferences _prefs;
-  final String _key;
+  final Prefs _prefs;
+  final PrefKey<String> _key;
   final String Function(T value) _encode;
   T _value;
 
@@ -39,8 +39,8 @@ class PersistedEnum<T extends Enum> {
   static String _name(Enum value) => value.name;
 
   static T _read<T extends Enum>(
-    SharedPreferences prefs,
-    String key,
+    Prefs prefs,
+    PrefKey<String> key,
     List<T> values,
     T fallback,
     String Function(T value) encode,

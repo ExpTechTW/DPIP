@@ -4,9 +4,9 @@ import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Fallback channel for a message with no/unknown `channel` — must be a
 /// registered channel or the OS rejects the notification.
@@ -28,7 +28,7 @@ const String _fallbackChannelKey = 'announcement-general-v2';
 class NotificationService {
   NotificationService(this._prefs);
 
-  final SharedPreferences _prefs;
+  final Prefs _prefs;
 
   /// The last push token, or null before registration.
   String? get token => _prefs.getString(PreferenceKeys.pushToken);

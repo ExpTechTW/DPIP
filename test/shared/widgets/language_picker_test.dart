@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -24,7 +25,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     SharedPreferences.setMockInitialValues({'app.locale': 'ja'});
-    final controller = LocaleController(await SharedPreferences.getInstance());
+    final controller = LocaleController(
+      Prefs(await SharedPreferences.getInstance()),
+    );
     expect(controller.locale, const Locale('ja'));
 
     await tester.pumpWidget(

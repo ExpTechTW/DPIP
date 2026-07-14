@@ -140,9 +140,28 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 - **Localization (i18n):** every user-facing string goes through
   `AppLocalizations` (`AppLocalizations.of(context).<key>`) — never hardcode
   display text. ARB sources live in `lib/l10n/` (`app_en.arb` is the template,
-  `app_zh.arb` is Traditional Chinese, the Taiwan default); generated code is in
-  `lib/l10n/gen/`. Add a language by dropping in `app_<locale>.arb`. Config in
-  `l10n.yaml`.
+  `app_zh.arb` is Traditional Chinese, the Taiwan default; `zh_Hant_HK` /
+  `zh_Hans` cover HK/Simplified); generated code is in `lib/l10n/gen/`. Each ARB
+  **self-describes** with a `languageName` key (the locale's own name), and the
+  language picker (`shared/widgets/language_picker.dart`) is built from
+  `AppLocalizations.supportedLocales` + that key — never a hardcoded list. So a
+  language is added by just dropping in `app_<locale>.arb` (with `languageName`);
+  the home/fallback locale is the one constant in `core/settings/locale_config.dart`.
+  Enforced by `tool/check_l10n.sh` (a CI gate, no packages): ARB key-parity with
+  the template + no hardcoded CJK/kana/Hangul/Thai string literals in
+  `features/*/presentation/**` or `shared/widgets/**`. A genuinely non-display or
+  throwaway literal is exempted with `// l10n-ignore: <reason>` (that line/the one
+  above) or `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
+- **Persistence keys (contract):** all `SharedPreferences` access goes through
+  the typed `Prefs` facade (`core/settings/prefs.dart`), keyed by a `PrefKey<T>`
+  from the `PreferenceKeys` registry (`core/settings/preference_keys.dart`) —
+  **never a raw string, never `SharedPreferences` directly.** `PrefKey`'s
+  constructor is private, so a key can only be minted in the registry; `Prefs`
+  has no `String`-taking overload, so an ad-hoc key can't reach storage — the
+  compiler rejects it, not review. Add a setting = add one `PrefKey<T>` constant
+  + use it; never change an existing key string without a migration. Only
+  `prefs.dart` (wraps it) and `bootstrap.dart` (mints the one instance) may
+  import `shared_preferences`, enforced by `tool/check_prefs.sh`.
 - Every file starts with a doc comment; one public declaration = one clear
   responsibility.
 
@@ -150,10 +169,12 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 
 `.github/workflows/ci.yml` runs on every push/PR and must stay green. It uses
 the mise-pinned toolchain and runs, in order: the layering gate
-(`tool/check_layering.sh`), `dart format --set-exit-if-changed`, a codegen-drift
-check (`build_runner` + `git diff --exit-code` — committed `*.g.dart` /
-`*.freezed.dart` must match a fresh build), `flutter analyze`, and
-`flutter test`. Run these locally before pushing. Safety-critical seismic math
+(`tool/check_layering.sh`), the localization gate (`tool/check_l10n.sh`), the
+prefs gate (`tool/check_prefs.sh`), `dart format --set-exit-if-changed`, a
+codegen-drift check (`build_runner` + `git diff --exit-code` — committed
+`*.g.dart` / `*.freezed.dart` must match a fresh build), `flutter analyze`, and
+`flutter test`. The three bash gates need only bash + python3 (no toolchain), so
+they fail fast. Run these locally before pushing. Safety-critical seismic math
 is pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
 if you change the EEW estimator, update those goldens deliberately.
 

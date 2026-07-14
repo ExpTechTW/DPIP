@@ -6,6 +6,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Town _town(String code, String town) => Town(
@@ -42,7 +43,7 @@ Future<RegionStore> _store([List<String>? saved]) async {
   SharedPreferences.setMockInitialValues(
     saved == null ? {} : {'home.savedRegionCodes': saved},
   );
-  return RegionStore(await SharedPreferences.getInstance());
+  return RegionStore(Prefs(await SharedPreferences.getInstance()));
 }
 
 void main() {

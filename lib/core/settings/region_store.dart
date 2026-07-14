@@ -1,7 +1,7 @@
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// The user's Home regions — nationwide, the current GPS township, and up to
 /// [maxSaved] saved townships — plus which one is selected for the Home display.
@@ -18,7 +18,7 @@ class RegionStore extends ChangeNotifier {
     : _saved =
           _prefs.getStringList(PreferenceKeys.savedRegionCodes) ?? const [];
 
-  final SharedPreferences _prefs;
+  final Prefs _prefs;
 
   /// Maximum saved townships (besides nationwide + current location).
   static const int maxSaved = 3;

@@ -11,8 +11,8 @@ import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// The shared infrastructure every feature module builds on, assembled once in
 /// `bootstrap()` and handed to each feature's `*Providers(deps)` function.
@@ -41,7 +41,7 @@ class SharedDeps {
   });
 
   /// Persistence for feature-local settings.
-  final SharedPreferences prefs;
+  final Prefs prefs;
 
   /// Region-aware HTTP surface for datasources.
   final ApiClient apiClient;

@@ -31,10 +31,12 @@ class HomeSheetHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
+          // l10n-ignore: placeholder area name — becomes selected-region data
           '臺南市 歸仁區',
           style: theme.textTheme.headlineSmall?.copyWith(color: foreground),
         ),
         const SizedBox(height: AppSpacing.sm),
+        // l10n-ignore: placeholder warning — becomes a localized warning label
         const _WarningBadge(label: '大豪雨特報'),
         const SizedBox(height: AppSpacing.lg),
         Row(

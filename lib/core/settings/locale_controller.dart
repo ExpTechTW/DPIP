@@ -2,8 +2,8 @@
 library;
 
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Holds the user's chosen [Locale] override, persisted across launches.
 ///
@@ -17,7 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocaleController extends ChangeNotifier {
   LocaleController(this._prefs);
 
-  final SharedPreferences _prefs;
+  final Prefs _prefs;
 
   /// The chosen locale, or null to follow the system.
   Locale? get locale {

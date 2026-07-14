@@ -1,8 +1,8 @@
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/settings/persisted.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Holds the user's selected LB and Core regions and exposes the failover
 /// order used by [ApiClient]. The selection is persisted so it survives
@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// This is the "state management" for endpoint selection: instead of relying on
 /// DNS balancing, the app explicitly picks a region and controls failover.
 class RegionSelection extends ChangeNotifier {
-  RegionSelection(SharedPreferences prefs)
+  RegionSelection(Prefs prefs)
     : _lb = PersistedEnum(
         prefs,
         key: PreferenceKeys.regionLb,

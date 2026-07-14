@@ -8,6 +8,11 @@ import 'package:intl/intl.dart';
 ///
 /// Placeholder events for now; swap [_placeholderEvents] for the history API's
 /// list — each row is driven purely by an [Event], so nothing else changes.
+///
+/// l10n-ignore-file: [_placeholderEvents] below is throwaway mock data (fixed
+/// titles + fully dynamic CJK sentences that could never be ARB keys). It is
+/// deleted the moment the events history API is wired, so localizing it is
+/// wasted effort. Real event labels will be localized at that point.
 class EventTimeline extends StatelessWidget {
   const EventTimeline({super.key});
 

@@ -1,6 +1,7 @@
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -10,7 +11,7 @@ void main() {
     SharedPreferences.setMockInitialValues(
       saved == null ? {} : {'home.savedRegionCodes': saved},
     );
-    return RegionStore(await SharedPreferences.getInstance());
+    return RegionStore(Prefs(await SharedPreferences.getInstance()));
   }
 
   test(

@@ -1,5 +1,6 @@
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -9,7 +10,7 @@ void main() {
     SharedPreferences.setMockInitialValues(
       complete ? {'onboarding.complete': true} : {},
     );
-    return OnboardingStore(await SharedPreferences.getInstance());
+    return OnboardingStore(Prefs(await SharedPreferences.getInstance()));
   }
 
   test('defaults to incomplete', () async {

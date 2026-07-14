@@ -5,6 +5,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A dio adapter that records the hosts it is asked to fetch and returns a
@@ -45,7 +46,7 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    regions = RegionSelection(await SharedPreferences.getInstance());
+    regions = RegionSelection(Prefs(await SharedPreferences.getInstance()));
   });
 
   ApiClient clientWith(_FakeAdapter adapter) =>

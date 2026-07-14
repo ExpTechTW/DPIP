@@ -5,6 +5,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Pumps [HomeContent] with everything it reads: a [RegionStore] to switch on
@@ -25,7 +26,7 @@ Future<RegionStore> _store() async {
   SharedPreferences.setMockInitialValues({
     'home.savedRegionCodes': ['100', '200'],
   });
-  return RegionStore(await SharedPreferences.getInstance());
+  return RegionStore(Prefs(await SharedPreferences.getInstance()));
 }
 
 void main() {

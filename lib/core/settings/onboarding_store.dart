@@ -2,8 +2,8 @@
 library;
 
 import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Persists a single "onboarding done" flag so the intro / terms / permissions
 /// flow is shown once, on first launch. The router redirects to onboarding
@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class OnboardingStore extends ChangeNotifier {
   OnboardingStore(this._prefs);
 
-  final SharedPreferences _prefs;
+  final Prefs _prefs;
 
   /// Whether onboarding has been finished.
   bool get isComplete =>

@@ -22,6 +22,15 @@ jobs:
       - name: Layering gate
         run: bash tool/check_layering.sh
 
+      # Localization gate — bash + python3 (preinstalled), no toolchain either:
+      # ARB parity + no hardcoded UI strings. See CLAUDE.md → Localization.
+      - name: Localization gate
+        run: bash tool/check_l10n.sh
+
+      # Prefs gate — SharedPreferences only via the typed Prefs facade.
+      - name: Prefs gate
+        run: bash tool/check_prefs.sh
+
       # Flutter/Dart come from mise.toml, so CI uses the exact pinned version
       # (3.44.3) developers run locally — one source of truth.
       - name: Install toolchain (mise)
