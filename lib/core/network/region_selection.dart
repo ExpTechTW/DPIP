@@ -1,5 +1,6 @@
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/settings/persisted.dart';
+import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,14 +14,14 @@ class RegionSelection extends ChangeNotifier {
   RegionSelection(SharedPreferences prefs)
     : _lb = PersistedEnum(
         prefs,
-        key: 'network:region:lb',
+        key: PreferenceKeys.regionLb,
         values: LbRegion.values,
         fallback: LbRegion.tpe1,
         encode: (r) => r.code,
       ),
       _core = PersistedEnum(
         prefs,
-        key: 'network:region:core',
+        key: PreferenceKeys.regionCore,
         values: CoreRegion.values,
         fallback: CoreRegion.tnn1,
         encode: (r) => r.code,

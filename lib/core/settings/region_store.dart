@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/home_area.dart';
+import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,11 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Replaces the placeholder `AreaSelection`.
 class RegionStore extends ChangeNotifier {
   RegionStore(this._prefs)
-    : _saved = _prefs.getStringList(_savedKey) ?? const [];
+    : _saved =
+          _prefs.getStringList(PreferenceKeys.savedRegionCodes) ?? const [];
 
   final SharedPreferences _prefs;
-
-  static const String _savedKey = 'home.savedRegionCodes';
 
   /// Maximum saved townships (besides nationwide + current location).
   static const int maxSaved = 3;
@@ -104,5 +104,6 @@ class RegionStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _persist() => _prefs.setStringList(_savedKey, _saved);
+  void _persist() =>
+      _prefs.setStringList(PreferenceKeys.savedRegionCodes, _saved);
 }

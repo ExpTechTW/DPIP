@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/persisted.dart';
+import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +13,7 @@ class ExperimentalSettings extends ChangeNotifier {
   ExperimentalSettings(SharedPreferences prefs)
     : _weatherMode = PersistedEnum(
         prefs,
-        key: 'experimental.weatherMode',
+        key: PreferenceKeys.weatherMode,
         values: WeatherMode.values,
         fallback: WeatherMode.auto,
       );

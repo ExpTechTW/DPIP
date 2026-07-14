@@ -3,14 +3,10 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
+import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-/// SharedPreferences keys. The token can be written from a background isolate
-/// (token refresh), so it lives in persistent storage, not memory.
-const String _tokenKey = 'notification.pushToken';
-const String _channelVersionKey = 'notification.channelVersion';
 
 /// Fallback channel for a message with no/unknown `channel` — must be a
 /// registered channel or the OS rejects the notification.
@@ -35,7 +31,7 @@ class NotificationService {
   final SharedPreferences _prefs;
 
   /// The last push token, or null before registration.
-  String? get token => _prefs.getString(_tokenKey);
+  String? get token => _prefs.getString(PreferenceKeys.pushToken);
 
   /// Whether the OS has granted notification permission.
   Future<bool> isAllowed() => AwesomeNotifications().isNotificationAllowed();
@@ -89,7 +85,7 @@ class NotificationService {
 
     // Android caches channel settings after first creation; force-update them
     // when the catalogue version changes.
-    final stored = _prefs.getInt(_channelVersionKey) ?? 0;
+    final stored = _prefs.getInt(PreferenceKeys.channelVersion) ?? 0;
     if (stored < NotificationChannels.version) {
       for (final channel in NotificationChannels.channels) {
         try {
@@ -98,7 +94,10 @@ class NotificationService {
           Log.handle(error, stackTrace, 'setChannel ${channel.channelKey}');
         }
       }
-      await _prefs.setInt(_channelVersionKey, NotificationChannels.version);
+      await _prefs.setInt(
+        PreferenceKeys.channelVersion,
+        NotificationChannels.version,
+      );
     }
   }
 
@@ -119,11 +118,13 @@ class NotificationService {
 
     messaging.onTokenRefresh.listen((token) {
       Log.debug('Push token refreshed');
-      _prefs.setString(_tokenKey, token);
+      _prefs.setString(PreferenceKeys.pushToken, token);
     });
     try {
       final token = await messaging.getToken();
-      if (token != null) await _prefs.setString(_tokenKey, token);
+      if (token != null) {
+        await _prefs.setString(PreferenceKeys.pushToken, token);
+      }
     } catch (error, stackTrace) {
       // On iOS getToken can fail until the APNs token is ready; onTokenRefresh
       // then supplies it.
