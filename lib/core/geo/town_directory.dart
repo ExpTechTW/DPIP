@@ -8,11 +8,11 @@ import 'package:flutter/services.dart' show rootBundle;
 /// The Taiwan township directory, loaded from the bundled
 /// `assets/location.json.gz`, with lookup by code and by GPS coordinate.
 ///
-/// GPS→township is **nearest centroid** for now (dependency-light and exact
-/// enough away from borders); a point-in-polygon upgrade — re-bundling the
-/// town-boundary polygons — can replace [nearest] later without touching
-/// callers. Pure and injectable — [fromJson] builds it from decoded data so the
-/// lookup is unit-testable without the asset.
+/// The centroid-based [nearest] lookup is the **fallback** for GPS→township
+/// resolution — used at sea, in a boundary gap, or before the boundary data
+/// loads; exact point-in-polygon is [TownBoundaries]. Pure and injectable —
+/// [fromJson] builds it from decoded data so the lookup is unit-testable without
+/// the asset.
 class TownDirectory {
   const TownDirectory(this._byCode);
 

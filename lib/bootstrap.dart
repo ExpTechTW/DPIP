@@ -19,6 +19,7 @@ import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
@@ -85,12 +86,17 @@ Future<void> bootstrap() async {
     Log.handle(error, stackTrace, 'Notification init skipped');
   }
 
-  // Location: the township directory backs both GPS resolution and Home region
-  // labels; the region store holds the Home selection; the location service maps
-  // a GPS fix to a township. GPS itself is requested after the first frame.
+  // Location: the township directory (centroids) backs Home region labels and
+  // the nearest-centroid fallback; the boundary polygons back exact
+  // point-in-polygon GPS resolution and load in the background so they never
+  // delay launch (a fix before they land falls back to nearest-centroid).
   final townDirectory = await TownDirectory.load();
+  final townBoundaries = TownBoundaries.load();
   final regionStore = RegionStore(prefs);
-  final locationService = LocationService(townDirectory);
+  final locationService = LocationService(
+    townDirectory,
+    boundaries: townBoundaries,
+  );
 
   // Distance-triggered device-location report: on each meaningful move, POST the
   // coordinates for push targeting (platform + push token + app version). Started

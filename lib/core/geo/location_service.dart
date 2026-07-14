@@ -1,4 +1,5 @@
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,23 +7,31 @@ import 'package:geolocator/geolocator.dart';
 /// A GPS coordinate fix in decimal degrees.
 typedef GpsFix = ({double lat, double lng});
 
-/// Resolves the device's current township from GPS via [TownDirectory].
+/// Resolves the device's current township from GPS.
 ///
 /// Wraps `geolocator` (native `CLLocationManager` / `FusedLocationProvider`).
 /// The availability check and the position fetch are injectable seams, so the
-/// resolution is unit-testable without the platform. [currentTown] returns null
-/// whenever a fix can't be had (services off, permission denied, timeout) — the
-/// caller then shows the "can't get current location" state and keeps the last
-/// known region.
+/// resolution is unit-testable without the platform. A fix resolves by exact
+/// **point-in-polygon** ([TownBoundaries]) when the boundary data is available,
+/// falling back to nearest-centroid ([TownDirectory]) at sea or before the
+/// boundaries finish loading. [currentTown] returns null whenever a fix can't be
+/// had (services off, permission denied, timeout) — the caller then shows the
+/// "can't get current location" state and keeps the last known region.
 class LocationService {
   LocationService(
     this._directory, {
+    this._boundaries,
     Future<bool> Function()? isAvailable,
     Future<GpsFix?> Function()? fix,
   }) : _isAvailable = isAvailable ?? _geolocatorAvailable,
        _fix = fix ?? _geolocatorFix;
 
   final TownDirectory _directory;
+
+  /// Township boundary polygons for exact point-in-polygon resolution, loaded
+  /// in the background (nullable / may still be pending — see [_resolve]).
+  final Future<TownBoundaries>? _boundaries;
+
   final Future<bool> Function() _isAvailable;
   final Future<GpsFix?> Function() _fix;
 
@@ -76,11 +85,23 @@ class LocationService {
       if (!await _isAvailable()) return null;
       final fix = await _fix();
       if (fix == null) return null;
-      return _directory.nearest(fix.lat, fix.lng);
+      return await _resolve(fix.lat, fix.lng);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'GPS fix');
       return null;
     }
+  }
+
+  /// Resolves ([lat], [lng]) to a township: exact point-in-polygon when the
+  /// boundary data is loaded, else nearest-centroid (at sea, in a boundary gap,
+  /// or before the background boundary load completes).
+  Future<Town?> _resolve(double lat, double lng) async {
+    final boundaries = _boundaries;
+    if (boundaries != null) {
+      final code = (await boundaries).codeAt(lat, lng);
+      if (code != null) return _directory.byCode(code);
+    }
+    return _directory.nearest(lat, lng);
   }
 
   static Future<bool> _geolocatorAvailable() async {
