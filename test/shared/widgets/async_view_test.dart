@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         AsyncView<int>(
-          future: completer.future,
+          future: () => completer.future,
           builder: (_, value) => Text('v $value'),
         ),
       ),
@@ -34,7 +34,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         AsyncView<int>(
-          future: Future.value(const Ok(5)),
+          future: () => Future.value(const Ok(5)),
           builder: (_, value) => Text('v $value'),
         ),
       ),
@@ -47,7 +47,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         AsyncView<List<int>>(
-          future: Future.value(const Ok(<int>[])),
+          future: () => Future.value(const Ok(<int>[])),
           isEmpty: (value) => value.isEmpty,
           builder: (_, _) => const Text('list'),
         ),
@@ -58,22 +58,32 @@ void main() {
     expect(find.text('list'), findsNothing);
   });
 
-  testWidgets('Err → error with a working retry', (tester) async {
-    var retried = false;
+  testWidgets('Err → friendly message + retry re-runs the request', (
+    tester,
+  ) async {
+    var calls = 0;
     await tester.pumpWidget(
       _wrap(
         AsyncView<int>(
-          future: Future.value(const Err(NetworkFailure('boom'))),
+          future: () async {
+            calls++;
+            return calls == 1 ? const Err(NetworkFailure('boom')) : const Ok(7);
+          },
           builder: (_, value) => Text('v $value'),
-          onRetry: () => retried = true,
         ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('boom'), findsOneWidget);
+    expect(find.text("Couldn't load data. Please try again."), findsOneWidget);
     expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('boom'), findsNothing, reason: 'raw detail is not shown');
 
     await tester.tap(find.text('Retry'));
-    expect(retried, isTrue);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('v 7'),
+      findsOneWidget,
+      reason: 'retry re-ran the factory',
+    );
   });
 }

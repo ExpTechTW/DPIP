@@ -332,6 +332,12 @@ abstract class AppLocalizations {
   /// **'Something went wrong'**
   String get commonError;
 
+  /// Error headline when a data request (AsyncView) fails, with a retry button
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load data. Please try again.'**
+  String get commonFetchFailed;
+
   /// Generic message when a loaded list is empty
   ///
   /// In en, this message translates to:

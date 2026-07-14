@@ -121,6 +121,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get commonError => 'Terjadi kesalahan';
 
   @override
+  String get commonFetchFailed => 'Tidak dapat memuat data. Silakan coba lagi.';
+
+  @override
   String get commonEmpty => 'Tidak ada yang ditampilkan';
 
   @override

@@ -8,12 +8,15 @@ import 'package:flutter/material.dart';
 
 /// Renders a one-shot `Future<Result<T>>` to the async-state contract:
 /// waiting → loading, [Ok] → [builder] (or [empty] when [isEmpty]), [Err] →
-/// error with the failure and an optional retry. Pairs with the repository
-/// `Result` contract so a feature never hand-rolls a `FutureBuilder` that drops
-/// the error case into a blank screen.
+/// error with "couldn't load data, please try again" and a **retry** button.
+/// Pairs with the repository `Result` contract so a feature never hand-rolls a
+/// `FutureBuilder` that drops the error case into a blank screen.
 ///
-/// [onRetry] typically rebuilds the caller with a fresh [future].
-class AsyncView<T> extends StatelessWidget {
+/// [future] is a **factory**, not a `Future`, so the built-in retry can re-run
+/// it — the error state always has a working button without the caller wiring
+/// one. This is the app's global data-fetch error handling: every API-backed
+/// screen inherits the same failure UI and recovery.
+class AsyncView<T> extends StatefulWidget {
   const AsyncView({
     super.key,
     required this.future,
@@ -22,11 +25,10 @@ class AsyncView<T> extends StatelessWidget {
     this.error,
     this.empty,
     this.isEmpty,
-    this.onRetry,
   });
 
-  /// The pending request.
-  final Future<Result<T>> future;
+  /// Produces the request. Re-invoked on retry.
+  final Future<Result<T>> Function() future;
 
   /// Builds the UI for a successful value.
   final Widget Function(BuildContext context, T value) builder;
@@ -34,8 +36,13 @@ class AsyncView<T> extends StatelessWidget {
   /// Overrides the loading state.
   final WidgetBuilder? loading;
 
-  /// Overrides the error state.
-  final Widget Function(BuildContext context, Failure failure)? error;
+  /// Overrides the error state (gets the failure and a retry callback).
+  final Widget Function(
+    BuildContext context,
+    Failure failure,
+    VoidCallback retry,
+  )?
+  error;
 
   /// Overrides the empty state (shown when [isEmpty] returns true).
   final WidgetBuilder? empty;
@@ -44,35 +51,54 @@ class AsyncView<T> extends StatelessWidget {
   /// [builder] (e.g. an empty list).
   final bool Function(T value)? isEmpty;
 
-  /// When non-null, the error state shows a retry button that invokes this.
-  final VoidCallback? onRetry;
+  @override
+  State<AsyncView<T>> createState() => _AsyncViewState<T>();
+}
+
+class _AsyncViewState<T> extends State<AsyncView<T>> {
+  late Future<Result<T>> _future;
+  int _attempt = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = widget.future();
+  }
+
+  void _retry() => setState(() {
+    _attempt++;
+    _future = widget.future();
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return FutureBuilder<Result<T>>(
-      future: future,
+      // Key by attempt so a retry re-subscribes to the fresh future rather than
+      // retaining the prior snapshot.
+      key: ValueKey(_attempt),
+      future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return loading?.call(context) ?? const LoadingView();
+          return widget.loading?.call(context) ?? const LoadingView();
         }
         // Repositories return Result and don't throw; a raw error here is
-        // unexpected, but surface it rather than showing a blank.
+        // unexpected, but surface the failure state rather than a blank.
         if (snapshot.hasError || !snapshot.hasData) {
-          return ErrorView(detail: '${snapshot.error}', onRetry: onRetry);
+          return ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry);
         }
         return switch (snapshot.data!) {
           Ok(:final value) =>
-            (isEmpty?.call(value) ?? false)
-                ? (empty?.call(context) ??
+            (widget.isEmpty?.call(value) ?? false)
+                ? (widget.empty?.call(context) ??
                       EmptyView(
                         icon: Icons.inbox_outlined,
                         message: l10n.commonEmpty,
                       ))
-                : builder(context, value),
+                : widget.builder(context, value),
           Err(:final failure) =>
-            error?.call(context, failure) ??
-                ErrorView(detail: failure.message, onRetry: onRetry),
+            widget.error?.call(context, failure, _retry) ??
+                ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
         };
       },
     );

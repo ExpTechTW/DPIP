@@ -121,6 +121,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonError => '發生錯誤';
 
   @override
+  String get commonFetchFailed => '無法獲取資料,請稍後重試';
+
+  @override
   String get commonEmpty => '沒有資料';
 
   @override
@@ -483,6 +486,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get commonError => '出错了';
 
   @override
+  String get commonFetchFailed => '无法获取数据,请稍后重试';
+
+  @override
   String get commonEmpty => '暂无内容';
 
   @override
@@ -843,6 +849,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get commonError => '發生錯誤';
+
+  @override
+  String get commonFetchFailed => '無法獲取資料,請稍後重試';
 
   @override
   String get commonEmpty => '沒有資料';

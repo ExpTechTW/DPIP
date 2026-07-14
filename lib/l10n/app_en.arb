@@ -154,6 +154,10 @@
     "description": "Button that re-runs a failed request"
   },
   "commonError": "Something went wrong",
+  "commonFetchFailed": "Couldn't load data. Please try again.",
+  "@commonFetchFailed": {
+    "description": "Error headline when a data request (AsyncView) fails, with a retry button"
+  },
   "@commonError": {
     "description": "Generic headline when an async request fails"
   },

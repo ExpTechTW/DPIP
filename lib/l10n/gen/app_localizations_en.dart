@@ -122,6 +122,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonError => 'Something went wrong';
 
   @override
+  String get commonFetchFailed => 'Couldn\'t load data. Please try again.';
+
+  @override
   String get commonEmpty => 'Nothing to show';
 
   @override

@@ -36,6 +36,7 @@
   "commonLoading": "Naglo-load…",
   "commonRetry": "Subukan Muli",
   "commonError": "May Nangyaring Mali",
+  "commonFetchFailed": "Hindi ma-load ang data. Pakisubukan muli.",
   "commonEmpty": "Walang Maipakita",
   "feedConnecting": "Kumokonekta…",
   "feedStale": "Maaaring luma na ang datos",

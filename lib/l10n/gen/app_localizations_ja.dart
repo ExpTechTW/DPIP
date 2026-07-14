@@ -121,6 +121,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonError => '問題が発生しました';
 
   @override
+  String get commonFetchFailed => 'データを取得できませんでした。しばらくしてから再度お試しください。';
+
+  @override
   String get commonEmpty => '表示する項目がありません';
 
   @override

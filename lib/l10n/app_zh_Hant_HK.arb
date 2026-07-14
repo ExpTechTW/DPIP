@@ -36,6 +36,7 @@
   "commonLoading": "載入中…",
   "commonRetry": "重試",
   "commonError": "發生錯誤",
+  "commonFetchFailed": "無法獲取資料,請稍後重試",
   "commonEmpty": "沒有資料",
   "feedConnecting": "連接中…",
   "feedStale": "資料可能已過期",

@@ -122,6 +122,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonError => 'Đã xảy ra lỗi';
 
   @override
+  String get commonFetchFailed => 'Không thể tải dữ liệu. Vui lòng thử lại.';
+
+  @override
   String get commonEmpty => 'Không có dữ liệu';
 
   @override

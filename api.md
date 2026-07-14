@@ -71,19 +71,26 @@
 |---|---|---|---|
 | `getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` | `api-1.exptech.dev` |
 | `getEewAt` | `/api/v2/eq/eew/{sec}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getStations` | `/api/v1/trem/station` | `legacyApi` | `api-1.exptech.dev` |
 | `getMeteorStation` | `/api/v2/meteor/station/{id}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getWeatherList` | `/api/v2/meteor/weather/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getWeather` | `/api/v2/meteor/weather/{time}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getWeatherRealtime` | `/api/v3/weather/realtime/{lat},{lon}` | `legacyApi` | `api-1.exptech.dev` |
 | `getWeatherForecast` | `/api/v3/weather/forecast/{region}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getRainList` | `/api/v2/meteor/rain/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getRain` | `/api/v2/meteor/rain/{time}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getLightningList` | `/api/v2/meteor/lightning/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getLightning` | `/api/v2/meteor/lightning/{time}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getTyphoonImagesList` | `/api/v2/meteor/typhoon/images/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getTyphoonGeojson` | `/api/v2/meteor/typhoon/geojson` | `legacyApi` | `api-1.exptech.dev` |
 | `getTsunami` | `/api/v1/tsunami/{id}` | `legacyApi` | `api-1.exptech.dev` |
+
 | `getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | `api-1.exptech.dev` |
 | `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | `api-1.exptech.dev` |

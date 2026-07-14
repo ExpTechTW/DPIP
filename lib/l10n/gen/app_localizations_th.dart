@@ -122,6 +122,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get commonError => 'เกิดข้อผิดพลาด';
 
   @override
+  String get commonFetchFailed => 'ไม่สามารถโหลดข้อมูลได้ โปรดลองอีกครั้ง';
+
+  @override
   String get commonEmpty => 'ไม่มีข้อมูล';
 
   @override

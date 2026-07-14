@@ -36,6 +36,7 @@
   "commonLoading": "Đang tải…",
   "commonRetry": "Thử lại",
   "commonError": "Đã xảy ra lỗi",
+  "commonFetchFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
   "commonEmpty": "Không có dữ liệu",
   "feedConnecting": "Đang kết nối…",
   "feedStale": "Dữ liệu có thể đã lỗi thời",

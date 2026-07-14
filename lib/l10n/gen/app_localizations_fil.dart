@@ -122,6 +122,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get commonError => 'May Nangyaring Mali';
 
   @override
+  String get commonFetchFailed => 'Hindi ma-load ang data. Pakisubukan muli.';
+
+  @override
   String get commonEmpty => 'Walang Maipakita';
 
   @override

@@ -121,6 +121,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get commonError => '문제가 발생했습니다';
 
   @override
+  String get commonFetchFailed => '데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
   String get commonEmpty => '표시할 내용이 없습니다';
 
   @override

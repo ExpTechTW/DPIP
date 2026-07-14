@@ -36,6 +36,7 @@
   "commonLoading": "กำลังโหลด…",
   "commonRetry": "ลองอีกครั้ง",
   "commonError": "เกิดข้อผิดพลาด",
+  "commonFetchFailed": "ไม่สามารถโหลดข้อมูลได้ โปรดลองอีกครั้ง",
   "commonEmpty": "ไม่มีข้อมูล",
   "feedConnecting": "กำลังเชื่อมต่อ…",
   "feedStale": "ข้อมูลอาจล้าสมัย",

@@ -36,6 +36,7 @@
   "commonLoading": "Memuat…",
   "commonRetry": "Coba lagi",
   "commonError": "Terjadi kesalahan",
+  "commonFetchFailed": "Tidak dapat memuat data. Silakan coba lagi.",
   "commonEmpty": "Tidak ada yang ditampilkan",
   "feedConnecting": "Menghubungkan…",
   "feedStale": "Data mungkin sudah usang",
