@@ -140,5 +140,10 @@
   "sponsorTerms": "利用規約",
   "sponsorPrivacy": "プライバシーポリシー",
   "sponsorRestoring": "購入を復元しています…",
-  "sponsorRestoreUnavailable": "ストアに接続できません。しばらくしてからもう一度お試しください。"
+  "sponsorRestoreUnavailable": "ストアに接続できません。しばらくしてからもう一度お試しください。",
+  "commonClose": "閉じる",
+  "mapLayerTemperature": "気温",
+  "trendRange24h": "24時間",
+  "trendRange7d": "7日間",
+  "trendNoData": "トレンドデータがありません"
 }

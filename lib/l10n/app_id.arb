@@ -140,5 +140,10 @@
   "sponsorTerms": "Ketentuan Penggunaan",
   "sponsorPrivacy": "Kebijakan Privasi",
   "sponsorRestoring": "Memulihkan pembelian…",
-  "sponsorRestoreUnavailable": "Tidak dapat terhubung ke toko. Coba lagi nanti."
+  "sponsorRestoreUnavailable": "Tidak dapat terhubung ke toko. Coba lagi nanti.",
+  "commonClose": "Tutup",
+  "mapLayerTemperature": "Suhu",
+  "trendRange24h": "24 jam",
+  "trendRange7d": "7 hari",
+  "trendNoData": "Tidak ada data tren"
 }

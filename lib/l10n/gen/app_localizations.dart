@@ -961,6 +961,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Can\'t reach the store. Please try again later.'**
   String get sponsorRestoreUnavailable;
+
+  /// Generic close button / action label
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commonClose;
+
+  /// Map layer switcher label for the air-temperature layer
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get mapLayerTemperature;
+
+  /// Trend chart range toggle: last 24 hours
+  ///
+  /// In en, this message translates to:
+  /// **'24h'**
+  String get trendRange24h;
+
+  /// Trend chart range toggle: last 7 days
+  ///
+  /// In en, this message translates to:
+  /// **'7d'**
+  String get trendRange7d;
+
+  /// Shown in the station trend chart when there is no data to plot
+  ///
+  /// In en, this message translates to:
+  /// **'No trend data'**
+  String get trendNoData;
 }
 
 class _AppLocalizationsDelegate

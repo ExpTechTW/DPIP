@@ -455,4 +455,19 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get sponsorRestoreUnavailable =>
       'Không thể kết nối tới cửa hàng. Vui lòng thử lại sau.';
+
+  @override
+  String get commonClose => 'Đóng';
+
+  @override
+  String get mapLayerTemperature => 'Nhiệt độ';
+
+  @override
+  String get trendRange24h => '24 giờ';
+
+  @override
+  String get trendRange7d => '7 ngày';
+
+  @override
+  String get trendNoData => 'Không có dữ liệu xu hướng';
 }

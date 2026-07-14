@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
@@ -146,11 +148,27 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _loadActive();
   }
 
-  /// Fetches the active layer's frames and renders the newest.
+  /// Forwards a map tap to the active (sheet) layer — it selects the nearest
+  /// feature, which opens its sheet.
+  void _onMapClick(LatLng latLng) {
+    final controller = _controller;
+    if (controller == null || _active.usesTimeline) return;
+    unawaited(_active.onMapTap(latLng, controller));
+  }
+
+  /// Renders the active layer: a sheet layer draws its static overlay; a
+  /// timeline layer fetches its frames and reveals the newest.
   Future<void> _loadActive() async {
     if (_controller == null || !_styleLoaded) return;
     final gen = ++_generation;
     setState(() => _error = null);
+    if (!_active.usesTimeline) {
+      final controller = _controller!;
+      final layer = _active;
+      setState(() => _frames = const []);
+      _queue(() => layer.render(controller));
+      return;
+    }
     final result = await _active.frames();
     if (!mounted || gen != _generation) return;
     result.when(
@@ -235,35 +253,40 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             child: BaseMap(
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
+              onMapClick: (_, latLng) => _onMapClick(latLng),
             ),
           ),
+          // A sheet layer's own collapsible detail sheet (empty until a tap).
+          if (!_active.usesTimeline)
+            Positioned.fill(child: _active.buildSheet(context)),
+          // A timeline layer's bottom scrubber / error strip.
+          if (_active.usesTimeline)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: _frames.isNotEmpty
+                    ? _timelinePanel(context)
+                    : _error != null
+                    ? _errorPanel(context)
+                    : const SizedBox.shrink(),
+              ),
+            ),
+          // Layer switcher — top-right, always above the sheet / timeline.
           Positioned(
-            left: 0,
+            top: 0,
             right: 0,
-            bottom: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.sm,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: MapLayerSwitcher(
-                      layers: widget.layers,
-                      active: _active,
-                      onSelected: _onLayerSelected,
-                    ),
-                  ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: MapLayerSwitcher(
+                  layers: widget.layers,
+                  active: _active,
+                  onSelected: _onLayerSelected,
                 ),
-                if (_frames.isNotEmpty)
-                  _timelinePanel(context)
-                else if (_error != null)
-                  _errorPanel(context),
-              ],
+              ),
             ),
           ),
         ],

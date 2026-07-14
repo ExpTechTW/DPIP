@@ -446,4 +446,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get sponsorRestoreUnavailable => 'ストアに接続できません。しばらくしてからもう一度お試しください。';
+
+  @override
+  String get commonClose => '閉じる';
+
+  @override
+  String get mapLayerTemperature => '気温';
+
+  @override
+  String get trendRange24h => '24時間';
+
+  @override
+  String get trendRange7d => '7日間';
+
+  @override
+  String get trendNoData => 'トレンドデータがありません';
 }

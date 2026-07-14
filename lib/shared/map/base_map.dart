@@ -21,6 +21,7 @@ class BaseMap extends StatelessWidget {
     super.key,
     this.onMapCreated,
     this.onStyleLoaded,
+    this.onMapClick,
     this.interactive = true,
   });
 
@@ -54,6 +55,10 @@ class BaseMap extends StatelessWidget {
   /// Called once the style has finished loading (safe to add layers after this).
   final VoidCallback? onStyleLoaded;
 
+  /// Called on a map tap with the tapped point + coordinate — for tap-driven
+  /// layers (e.g. selecting the nearest weather station).
+  final OnMapClickCallback? onMapClick;
+
   /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
@@ -83,6 +88,7 @@ class BaseMap extends StatelessWidget {
       rotateGesturesEnabled: interactive,
       tiltGesturesEnabled: interactive,
       dragEnabled: interactive,
+      onMapClick: onMapClick,
       onMapCreated: onMapCreated,
       onStyleLoadedCallback: onStyleLoaded,
     );

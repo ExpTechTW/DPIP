@@ -48,6 +48,25 @@ abstract interface class MapLayer {
   /// The switcher icon — outlined, per the app's icon convention.
   IconData get icon;
 
+  /// Whether this layer is scrubbed with the bottom **timeline** (radar), or
+  /// driven by a tap-to-open **sheet** ([buildSheet]) instead (station values,
+  /// typhoon). Timeline layers use [frames]/[prepare]/[show]; sheet layers draw
+  /// their static overlay in [render] and react to taps in [onMapTap].
+  bool get usesTimeline;
+
+  /// Draws this sheet layer's static overlay when it becomes active. Called once
+  /// per activation (behind the serial op queue). No-op for timeline layers.
+  Future<void> render(MapLibreMapController controller);
+
+  /// A map tap at [latLng] — sheet layers use it to select the nearest feature
+  /// (opening [buildSheet]); no-op for timeline layers.
+  Future<void> onMapTap(LatLng latLng, MapLibreMapController controller);
+
+  /// The bottom sheet for a sheet layer — a self-contained, collapsible panel
+  /// that shows the tapped feature's detail. `SizedBox.shrink()` for timeline
+  /// layers (the scaffold shows the timeline for those instead).
+  Widget buildSheet(BuildContext context);
+
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();

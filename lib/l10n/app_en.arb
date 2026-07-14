@@ -585,5 +585,25 @@
   "sponsorRestoreUnavailable": "Can't reach the store. Please try again later.",
   "@sponsorRestoreUnavailable": {
     "description": "Snackbar shown when the store can't be reached to restore"
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "Generic close button / action label"
+  },
+  "mapLayerTemperature": "Temperature",
+  "@mapLayerTemperature": {
+    "description": "Map layer switcher label for the air-temperature layer"
+  },
+  "trendRange24h": "24h",
+  "@trendRange24h": {
+    "description": "Trend chart range toggle: last 24 hours"
+  },
+  "trendRange7d": "7d",
+  "@trendRange7d": {
+    "description": "Trend chart range toggle: last 7 days"
+  },
+  "trendNoData": "No trend data",
+  "@trendNoData": {
+    "description": "Shown in the station trend chart when there is no data to plot"
   }
 }

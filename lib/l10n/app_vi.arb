@@ -140,5 +140,10 @@
   "sponsorTerms": "Điều khoản sử dụng",
   "sponsorPrivacy": "Chính sách quyền riêng tư",
   "sponsorRestoring": "Đang khôi phục giao dịch…",
-  "sponsorRestoreUnavailable": "Không thể kết nối tới cửa hàng. Vui lòng thử lại sau."
+  "sponsorRestoreUnavailable": "Không thể kết nối tới cửa hàng. Vui lòng thử lại sau.",
+  "commonClose": "Đóng",
+  "mapLayerTemperature": "Nhiệt độ",
+  "trendRange24h": "24 giờ",
+  "trendRange7d": "7 ngày",
+  "trendNoData": "Không có dữ liệu xu hướng"
 }

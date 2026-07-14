@@ -140,5 +140,10 @@
   "sponsorTerms": "이용약관",
   "sponsorPrivacy": "개인정보 처리방침",
   "sponsorRestoring": "구매를 복원하는 중…",
-  "sponsorRestoreUnavailable": "스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요."
+  "sponsorRestoreUnavailable": "스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요.",
+  "commonClose": "닫기",
+  "mapLayerTemperature": "기온",
+  "trendRange24h": "24시간",
+  "trendRange7d": "7일",
+  "trendNoData": "추세 데이터 없음"
 }

@@ -456,4 +456,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get sponsorRestoreUnavailable =>
       'Tidak dapat terhubung ke toko. Coba lagi nanti.';
+
+  @override
+  String get commonClose => 'Tutup';
+
+  @override
+  String get mapLayerTemperature => 'Suhu';
+
+  @override
+  String get trendRange24h => '24 jam';
+
+  @override
+  String get trendRange7d => '7 hari';
+
+  @override
+  String get trendNoData => 'Tidak ada data tren';
 }

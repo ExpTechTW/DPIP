@@ -442,6 +442,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sponsorRestoreUnavailable => '無法連線至商店，請稍後再試';
+
+  @override
+  String get commonClose => '關閉';
+
+  @override
+  String get mapLayerTemperature => '溫度';
+
+  @override
+  String get trendRange24h => '24 小時';
+
+  @override
+  String get trendRange7d => '7 天';
+
+  @override
+  String get trendNoData => '沒有趨勢資料';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -882,6 +897,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get sponsorRestoreUnavailable => '无法连接到商店，请稍后再试';
+
+  @override
+  String get commonClose => '关闭';
+
+  @override
+  String get mapLayerTemperature => '温度';
+
+  @override
+  String get trendRange24h => '24 小时';
+
+  @override
+  String get trendRange7d => '7 天';
+
+  @override
+  String get trendNoData => '没有趋势数据';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1322,4 +1352,19 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get sponsorRestoreUnavailable => '無法連線至商店，請稍後再試';
+
+  @override
+  String get commonClose => '關閉';
+
+  @override
+  String get mapLayerTemperature => '溫度';
+
+  @override
+  String get trendRange24h => '24 小時';
+
+  @override
+  String get trendRange7d => '7 天';
+
+  @override
+  String get trendNoData => '沒有趨勢資料';
 }

@@ -446,4 +446,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sponsorRestoreUnavailable => '스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요.';
+
+  @override
+  String get commonClose => '닫기';
+
+  @override
+  String get mapLayerTemperature => '기온';
+
+  @override
+  String get trendRange24h => '24시간';
+
+  @override
+  String get trendRange7d => '7일';
+
+  @override
+  String get trendNoData => '추세 데이터 없음';
 }

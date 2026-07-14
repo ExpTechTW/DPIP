@@ -454,4 +454,19 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get sponsorRestoreUnavailable =>
       'ไม่สามารถเชื่อมต่อร้านค้าได้ โปรดลองอีกครั้งภายหลัง';
+
+  @override
+  String get commonClose => 'ปิด';
+
+  @override
+  String get mapLayerTemperature => 'อุณหภูมิ';
+
+  @override
+  String get trendRange24h => '24 ชม.';
+
+  @override
+  String get trendRange7d => '7 วัน';
+
+  @override
+  String get trendNoData => 'ไม่มีข้อมูลแนวโน้ม';
 }

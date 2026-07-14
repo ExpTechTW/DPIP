@@ -140,5 +140,10 @@
   "sponsorTerms": "使用條款",
   "sponsorPrivacy": "私隱權政策",
   "sponsorRestoring": "正在恢復購買…",
-  "sponsorRestoreUnavailable": "無法連線至商店，請稍後再試"
+  "sponsorRestoreUnavailable": "無法連線至商店，請稍後再試",
+  "commonClose": "關閉",
+  "mapLayerTemperature": "溫度",
+  "trendRange24h": "24 小時",
+  "trendRange7d": "7 天",
+  "trendNoData": "沒有趨勢資料"
 }

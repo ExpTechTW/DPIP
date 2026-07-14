@@ -31,6 +31,21 @@ class RadarMapLayer implements MapLayer {
   @override
   IconData get icon => Icons.radar_outlined;
 
+  @override
+  bool get usesTimeline => true;
+
+  @override
+  Future<void> render(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onMapTap(
+    LatLng latLng,
+    MapLibreMapController controller,
+  ) async {}
+
+  @override
+  Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
   /// Opacity of the drawn frame.
   static const double _opacity = 0.85;
 

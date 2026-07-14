@@ -140,5 +140,10 @@
   "sponsorTerms": "Mga Tuntunin ng Paggamit",
   "sponsorPrivacy": "Patakaran sa Privacy",
   "sponsorRestoring": "Ibinabalik ang mga pagbili…",
-  "sponsorRestoreUnavailable": "Hindi maabot ang store. Pakisubukan muli mamaya."
+  "sponsorRestoreUnavailable": "Hindi maabot ang store. Pakisubukan muli mamaya.",
+  "commonClose": "Isara",
+  "mapLayerTemperature": "Temperatura",
+  "trendRange24h": "24 oras",
+  "trendRange7d": "7 araw",
+  "trendNoData": "Walang trend data"
 }

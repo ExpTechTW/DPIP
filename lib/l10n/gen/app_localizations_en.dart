@@ -454,4 +454,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sponsorRestoreUnavailable =>
       'Can\'t reach the store. Please try again later.';
+
+  @override
+  String get commonClose => 'Close';
+
+  @override
+  String get mapLayerTemperature => 'Temperature';
+
+  @override
+  String get trendRange24h => '24h';
+
+  @override
+  String get trendRange7d => '7d';
+
+  @override
+  String get trendNoData => 'No trend data';
 }

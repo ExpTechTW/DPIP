@@ -456,4 +456,19 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get sponsorRestoreUnavailable =>
       'Hindi maabot ang store. Pakisubukan muli mamaya.';
+
+  @override
+  String get commonClose => 'Isara';
+
+  @override
+  String get mapLayerTemperature => 'Temperatura';
+
+  @override
+  String get trendRange24h => '24 oras';
+
+  @override
+  String get trendRange7d => '7 araw';
+
+  @override
+  String get trendNoData => 'Walang trend data';
 }
