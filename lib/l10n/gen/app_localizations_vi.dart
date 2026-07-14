@@ -418,4 +418,41 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Giấy phép mã nguồn mở';
+
+  @override
+  String get sponsorTitle => 'Ủng hộ DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP cam kết cung cấp thông tin phòng chống thiên tai theo thời gian thực, không có quảng cáo hay mô hình lợi nhuận nào khác. Sự ủng hộ của bạn giúp chúng tôi duy trì máy chủ và tiếp tục phát triển.';
+
+  @override
+  String get sponsorSubscriptions => 'Gói đăng ký';
+
+  @override
+  String get sponsorRecommended => 'Đề xuất';
+
+  @override
+  String get sponsorOneTime => 'Ủng hộ một lần';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / tháng';
+  }
+
+  @override
+  String get sponsorRestore => 'Khôi phục giao dịch';
+
+  @override
+  String get sponsorTerms => 'Điều khoản sử dụng';
+
+  @override
+  String get sponsorPrivacy => 'Chính sách quyền riêng tư';
+
+  @override
+  String get sponsorRestoring => 'Đang khôi phục giao dịch…';
+
+  @override
+  String get sponsorRestoreUnavailable =>
+      'Không thể kết nối tới cửa hàng. Vui lòng thử lại sau.';
 }

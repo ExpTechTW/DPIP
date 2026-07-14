@@ -410,4 +410,40 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'オープンソースライセンス';
+
+  @override
+  String get sponsorTitle => 'DPIP を支援';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP はリアルタイムの防災情報の提供に取り組んでおり、広告やその他の収益モデルはありません。皆さまのご支援はサーバーの運用と継続的な開発に役立ちます。';
+
+  @override
+  String get sponsorSubscriptions => 'サブスクリプション';
+
+  @override
+  String get sponsorRecommended => 'おすすめ';
+
+  @override
+  String get sponsorOneTime => '一回限りの支援';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / 月';
+  }
+
+  @override
+  String get sponsorRestore => '購入を復元';
+
+  @override
+  String get sponsorTerms => '利用規約';
+
+  @override
+  String get sponsorPrivacy => 'プライバシーポリシー';
+
+  @override
+  String get sponsorRestoring => '購入を復元しています…';
+
+  @override
+  String get sponsorRestoreUnavailable => 'ストアに接続できません。しばらくしてからもう一度お試しください。';
 }

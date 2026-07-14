@@ -406,6 +406,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get openSourceLicenses => '引用套件';
+
+  @override
+  String get sponsorTitle => '支持 DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+
+  @override
+  String get sponsorSubscriptions => '訂閱制';
+
+  @override
+  String get sponsorRecommended => '推薦';
+
+  @override
+  String get sponsorOneTime => '單次支援';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / 月';
+  }
+
+  @override
+  String get sponsorRestore => '恢復購買';
+
+  @override
+  String get sponsorTerms => '使用條款';
+
+  @override
+  String get sponsorPrivacy => '隱私權政策';
+
+  @override
+  String get sponsorRestoring => '正在恢復購買…';
+
+  @override
+  String get sponsorRestoreUnavailable => '無法連線至商店，請稍後再試';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -810,6 +846,42 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get openSourceLicenses => '开源许可';
+
+  @override
+  String get sponsorTitle => '支持 DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP 致力于提供实时防灾信息，没有广告或其他盈利模式。您的支持能帮助我们维持服务器运行并持续开发。';
+
+  @override
+  String get sponsorSubscriptions => '订阅制';
+
+  @override
+  String get sponsorRecommended => '推荐';
+
+  @override
+  String get sponsorOneTime => '单次支持';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / 月';
+  }
+
+  @override
+  String get sponsorRestore => '恢复购买';
+
+  @override
+  String get sponsorTerms => '使用条款';
+
+  @override
+  String get sponsorPrivacy => '隐私政策';
+
+  @override
+  String get sponsorRestoring => '正在恢复购买…';
+
+  @override
+  String get sponsorRestoreUnavailable => '无法连接到商店，请稍后再试';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1214,4 +1286,40 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get openSourceLicenses => '引用套件';
+
+  @override
+  String get sponsorTitle => '支持 DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+
+  @override
+  String get sponsorSubscriptions => '訂閱制';
+
+  @override
+  String get sponsorRecommended => '推薦';
+
+  @override
+  String get sponsorOneTime => '單次支援';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / 月';
+  }
+
+  @override
+  String get sponsorRestore => '恢復購買';
+
+  @override
+  String get sponsorTerms => '使用條款';
+
+  @override
+  String get sponsorPrivacy => '私隱權政策';
+
+  @override
+  String get sponsorRestoring => '正在恢復購買…';
+
+  @override
+  String get sponsorRestoreUnavailable => '無法連線至商店，請稍後再試';
 }

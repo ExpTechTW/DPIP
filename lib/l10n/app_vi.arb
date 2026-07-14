@@ -129,5 +129,16 @@
   "moreSectionAbout": "Giới thiệu",
   "termsOfService": "Điều khoản dịch vụ",
   "faq": "Câu hỏi thường gặp",
-  "openSourceLicenses": "Giấy phép mã nguồn mở"
+  "openSourceLicenses": "Giấy phép mã nguồn mở",
+  "sponsorTitle": "Ủng hộ DPIP",
+  "sponsorIntro": "DPIP cam kết cung cấp thông tin phòng chống thiên tai theo thời gian thực, không có quảng cáo hay mô hình lợi nhuận nào khác. Sự ủng hộ của bạn giúp chúng tôi duy trì máy chủ và tiếp tục phát triển.",
+  "sponsorSubscriptions": "Gói đăng ký",
+  "sponsorRecommended": "Đề xuất",
+  "sponsorOneTime": "Ủng hộ một lần",
+  "sponsorPerMonth": "{price} / tháng",
+  "sponsorRestore": "Khôi phục giao dịch",
+  "sponsorTerms": "Điều khoản sử dụng",
+  "sponsorPrivacy": "Chính sách quyền riêng tư",
+  "sponsorRestoring": "Đang khôi phục giao dịch…",
+  "sponsorRestoreUnavailable": "Không thể kết nối tới cửa hàng. Vui lòng thử lại sau."
 }

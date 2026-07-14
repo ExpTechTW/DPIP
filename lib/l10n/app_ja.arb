@@ -129,5 +129,16 @@
   "moreSectionAbout": "情報",
   "termsOfService": "利用規約",
   "faq": "よくある質問",
-  "openSourceLicenses": "オープンソースライセンス"
+  "openSourceLicenses": "オープンソースライセンス",
+  "sponsorTitle": "DPIP を支援",
+  "sponsorIntro": "DPIP はリアルタイムの防災情報の提供に取り組んでおり、広告やその他の収益モデルはありません。皆さまのご支援はサーバーの運用と継続的な開発に役立ちます。",
+  "sponsorSubscriptions": "サブスクリプション",
+  "sponsorRecommended": "おすすめ",
+  "sponsorOneTime": "一回限りの支援",
+  "sponsorPerMonth": "{price} / 月",
+  "sponsorRestore": "購入を復元",
+  "sponsorTerms": "利用規約",
+  "sponsorPrivacy": "プライバシーポリシー",
+  "sponsorRestoring": "購入を復元しています…",
+  "sponsorRestoreUnavailable": "ストアに接続できません。しばらくしてからもう一度お試しください。"
 }

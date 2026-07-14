@@ -419,4 +419,41 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Mga lisensya ng open-source';
+
+  @override
+  String get sponsorTitle => 'Suportahan ang DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'Nakatuon ang DPIP sa pagbibigay ng real-time na impormasyon sa pag-iwas sa sakuna, nang walang ad o iba pang modelo ng kita. Tumutulong ang inyong suporta na mapanatili ang mga server at magpatuloy sa pagbuo.';
+
+  @override
+  String get sponsorSubscriptions => 'Mga subscription';
+
+  @override
+  String get sponsorRecommended => 'Inirerekomenda';
+
+  @override
+  String get sponsorOneTime => 'Isang beses';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / buwan';
+  }
+
+  @override
+  String get sponsorRestore => 'Ibalik ang mga pagbili';
+
+  @override
+  String get sponsorTerms => 'Mga Tuntunin ng Paggamit';
+
+  @override
+  String get sponsorPrivacy => 'Patakaran sa Privacy';
+
+  @override
+  String get sponsorRestoring => 'Ibinabalik ang mga pagbili…';
+
+  @override
+  String get sponsorRestoreUnavailable =>
+      'Hindi maabot ang store. Pakisubukan muli mamaya.';
 }

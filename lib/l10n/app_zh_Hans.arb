@@ -129,5 +129,16 @@
   "moreSectionAbout": "关于",
   "termsOfService": "服务条款",
   "faq": "常见问题",
-  "openSourceLicenses": "开源许可"
+  "openSourceLicenses": "开源许可",
+  "sponsorTitle": "支持 DPIP",
+  "sponsorIntro": "DPIP 致力于提供实时防灾信息，没有广告或其他盈利模式。您的支持能帮助我们维持服务器运行并持续开发。",
+  "sponsorSubscriptions": "订阅制",
+  "sponsorRecommended": "推荐",
+  "sponsorOneTime": "单次支持",
+  "sponsorPerMonth": "{price} / 月",
+  "sponsorRestore": "恢复购买",
+  "sponsorTerms": "使用条款",
+  "sponsorPrivacy": "隐私政策",
+  "sponsorRestoring": "正在恢复购买…",
+  "sponsorRestoreUnavailable": "无法连接到商店，请稍后再试"
 }

@@ -410,4 +410,40 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get openSourceLicenses => '오픈소스 라이선스';
+
+  @override
+  String get sponsorTitle => 'DPIP 후원하기';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP는 실시간 재난 예방 정보를 제공하는 데 전념하며, 광고나 다른 수익 모델이 없습니다. 여러분의 후원은 서버 운영과 지속적인 개발에 도움이 됩니다.';
+
+  @override
+  String get sponsorSubscriptions => '구독';
+
+  @override
+  String get sponsorRecommended => '추천';
+
+  @override
+  String get sponsorOneTime => '일회성 후원';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / 월';
+  }
+
+  @override
+  String get sponsorRestore => '구매 복원';
+
+  @override
+  String get sponsorTerms => '이용약관';
+
+  @override
+  String get sponsorPrivacy => '개인정보 처리방침';
+
+  @override
+  String get sponsorRestoring => '구매를 복원하는 중…';
+
+  @override
+  String get sponsorRestoreUnavailable => '스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요.';
 }

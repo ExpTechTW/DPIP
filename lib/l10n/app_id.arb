@@ -129,5 +129,16 @@
   "moreSectionAbout": "Tentang",
   "termsOfService": "Ketentuan Layanan",
   "faq": "FAQ",
-  "openSourceLicenses": "Lisensi sumber terbuka"
+  "openSourceLicenses": "Lisensi sumber terbuka",
+  "sponsorTitle": "Dukung DPIP",
+  "sponsorIntro": "DPIP berdedikasi menyediakan informasi mitigasi bencana secara real-time, tanpa iklan atau model bisnis lainnya. Dukungan Anda membantu kami menjaga server tetap berjalan dan terus mengembangkan aplikasi.",
+  "sponsorSubscriptions": "Langganan",
+  "sponsorRecommended": "Direkomendasikan",
+  "sponsorOneTime": "Sekali bayar",
+  "sponsorPerMonth": "{price} / bulan",
+  "sponsorRestore": "Pulihkan pembelian",
+  "sponsorTerms": "Ketentuan Penggunaan",
+  "sponsorPrivacy": "Kebijakan Privasi",
+  "sponsorRestoring": "Memulihkan pembelian…",
+  "sponsorRestoreUnavailable": "Tidak dapat terhubung ke toko. Coba lagi nanti."
 }

@@ -129,5 +129,16 @@
   "moreSectionAbout": "Tungkol",
   "termsOfService": "Mga Tuntunin ng Serbisyo",
   "faq": "Mga FAQ",
-  "openSourceLicenses": "Mga lisensya ng open-source"
+  "openSourceLicenses": "Mga lisensya ng open-source",
+  "sponsorTitle": "Suportahan ang DPIP",
+  "sponsorIntro": "Nakatuon ang DPIP sa pagbibigay ng real-time na impormasyon sa pag-iwas sa sakuna, nang walang ad o iba pang modelo ng kita. Tumutulong ang inyong suporta na mapanatili ang mga server at magpatuloy sa pagbuo.",
+  "sponsorSubscriptions": "Mga subscription",
+  "sponsorRecommended": "Inirerekomenda",
+  "sponsorOneTime": "Isang beses",
+  "sponsorPerMonth": "{price} / buwan",
+  "sponsorRestore": "Ibalik ang mga pagbili",
+  "sponsorTerms": "Mga Tuntunin ng Paggamit",
+  "sponsorPrivacy": "Patakaran sa Privacy",
+  "sponsorRestoring": "Ibinabalik ang mga pagbili…",
+  "sponsorRestoreUnavailable": "Hindi maabot ang store. Pakisubukan muli mamaya."
 }

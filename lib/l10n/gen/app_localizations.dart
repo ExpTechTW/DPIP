@@ -895,6 +895,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open-source licenses'**
   String get openSourceLicenses;
+
+  /// Support page title and the More-menu entry that opens it
+  ///
+  /// In en, this message translates to:
+  /// **'Support DPIP'**
+  String get sponsorTitle;
+
+  /// Support page intro paragraph explaining why donations help
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP is dedicated to real-time disaster-prevention information, with no ads or other revenue model. Your support helps us keep the servers running and keep developing.'**
+  String get sponsorIntro;
+
+  /// Support page section header for recurring subscription tiers
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get sponsorSubscriptions;
+
+  /// Badge on the recommended (subscription) support section
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get sponsorRecommended;
+
+  /// Support page section header for one-time tips
+  ///
+  /// In en, this message translates to:
+  /// **'One-time'**
+  String get sponsorOneTime;
+
+  /// Monthly price label for a subscription; price is the store-localized amount
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / month'**
+  String sponsorPerMonth(String price);
+
+  /// Footer action that restores previously bought purchases
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get sponsorRestore;
+
+  /// Footer link to the Terms of Use
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use'**
+  String get sponsorTerms;
+
+  /// Footer link to the Privacy Policy
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get sponsorPrivacy;
+
+  /// Snackbar shown when a purchase restore has been requested
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring purchases…'**
+  String get sponsorRestoring;
+
+  /// Snackbar shown when the store can't be reached to restore
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t reach the store. Please try again later.'**
+  String get sponsorRestoreUnavailable;
 }
 
 class _AppLocalizationsDelegate

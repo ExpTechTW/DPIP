@@ -129,5 +129,16 @@
   "moreSectionAbout": "關於",
   "termsOfService": "服務條款",
   "faq": "常見問題",
-  "openSourceLicenses": "引用套件"
+  "openSourceLicenses": "引用套件",
+  "sponsorTitle": "支持 DPIP",
+  "sponsorIntro": "DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。",
+  "sponsorSubscriptions": "訂閱制",
+  "sponsorRecommended": "推薦",
+  "sponsorOneTime": "單次支援",
+  "sponsorPerMonth": "{price} / 月",
+  "sponsorRestore": "恢復購買",
+  "sponsorTerms": "使用條款",
+  "sponsorPrivacy": "私隱權政策",
+  "sponsorRestoring": "正在恢復購買…",
+  "sponsorRestoreUnavailable": "無法連線至商店，請稍後再試"
 }

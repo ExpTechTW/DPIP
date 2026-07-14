@@ -27,6 +27,16 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
+          // Support CTA, kept prominent at the top in its own headerless group.
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.favorite_border,
+                title: l10n.sponsorTitle,
+                onTap: () => context.pushNamed(AppRoutes.sponsor),
+              ),
+            ],
+          ),
           SectionHeader(l10n.moreSectionGeneral),
           _MoreGroup(
             children: [

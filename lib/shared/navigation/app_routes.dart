@@ -62,4 +62,8 @@ abstract final class AppRoutes {
   // Per-channel push notification settings.
   static const String notifySettings = 'notifySettings';
   static const String notifySettingsPath = '/notify-settings';
+
+  // Support / in-app-purchase page.
+  static const String sponsor = 'sponsor';
+  static const String sponsorPath = '/sponsor';
 }

@@ -15,6 +15,7 @@ import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
+import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -110,6 +111,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.notifySettingsPath,
       name: AppRoutes.notifySettings,
       builder: (_, _) => const NotifyPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.sponsorPath,
+      name: AppRoutes.sponsor,
+      builder: (_, _) => const SponsorPage(),
     ),
   ],
 );

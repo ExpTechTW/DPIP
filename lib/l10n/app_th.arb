@@ -129,5 +129,16 @@
   "moreSectionAbout": "เกี่ยวกับ",
   "termsOfService": "ข้อกำหนดในการให้บริการ",
   "faq": "คำถามที่พบบ่อย",
-  "openSourceLicenses": "ใบอนุญาตโอเพนซอร์ส"
+  "openSourceLicenses": "ใบอนุญาตโอเพนซอร์ส",
+  "sponsorTitle": "สนับสนุน DPIP",
+  "sponsorIntro": "DPIP มุ่งมั่นให้ข้อมูลการป้องกันภัยพิบัติแบบเรียลไทม์ โดยไม่มีโฆษณาหรือรูปแบบหารายได้อื่น การสนับสนุนของคุณช่วยให้เรารักษาเซิร์ฟเวอร์และพัฒนาต่อไปได้",
+  "sponsorSubscriptions": "แบบสมัครสมาชิก",
+  "sponsorRecommended": "แนะนำ",
+  "sponsorOneTime": "สนับสนุนครั้งเดียว",
+  "sponsorPerMonth": "{price} / เดือน",
+  "sponsorRestore": "กู้คืนการซื้อ",
+  "sponsorTerms": "ข้อกำหนดการใช้งาน",
+  "sponsorPrivacy": "นโยบายความเป็นส่วนตัว",
+  "sponsorRestoring": "กำลังกู้คืนการซื้อ…",
+  "sponsorRestoreUnavailable": "ไม่สามารถเชื่อมต่อร้านค้าได้ โปรดลองอีกครั้งภายหลัง"
 }

@@ -21,6 +21,7 @@ dependencies:
   freezed_annotation: ^3.1.0
   geolocator: ^14.0.3
   go_router: ^17.3.0
+  in_app_purchase: ^3.2.3
   intl: ^0.20.2
   json_annotation: ^4.12.0
   maplibre_gl: ^0.25.0

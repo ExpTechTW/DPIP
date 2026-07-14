@@ -32,6 +32,7 @@ import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
+import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -173,6 +174,7 @@ Future<void> bootstrap() async {
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
         ...notificationProviders(deps),
+        ...sponsorProviders(),
         ...homeProviders(),
       ],
     ),

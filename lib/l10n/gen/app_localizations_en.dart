@@ -417,4 +417,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Open-source licenses';
+
+  @override
+  String get sponsorTitle => 'Support DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP is dedicated to real-time disaster-prevention information, with no ads or other revenue model. Your support helps us keep the servers running and keep developing.';
+
+  @override
+  String get sponsorSubscriptions => 'Subscriptions';
+
+  @override
+  String get sponsorRecommended => 'Recommended';
+
+  @override
+  String get sponsorOneTime => 'One-time';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / month';
+  }
+
+  @override
+  String get sponsorRestore => 'Restore purchases';
+
+  @override
+  String get sponsorTerms => 'Terms of Use';
+
+  @override
+  String get sponsorPrivacy => 'Privacy Policy';
+
+  @override
+  String get sponsorRestoring => 'Restoring purchases…';
+
+  @override
+  String get sponsorRestoreUnavailable =>
+      'Can\'t reach the store. Please try again later.';
 }

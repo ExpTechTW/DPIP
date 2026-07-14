@@ -419,4 +419,41 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Lisensi sumber terbuka';
+
+  @override
+  String get sponsorTitle => 'Dukung DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP berdedikasi menyediakan informasi mitigasi bencana secara real-time, tanpa iklan atau model bisnis lainnya. Dukungan Anda membantu kami menjaga server tetap berjalan dan terus mengembangkan aplikasi.';
+
+  @override
+  String get sponsorSubscriptions => 'Langganan';
+
+  @override
+  String get sponsorRecommended => 'Direkomendasikan';
+
+  @override
+  String get sponsorOneTime => 'Sekali bayar';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / bulan';
+  }
+
+  @override
+  String get sponsorRestore => 'Pulihkan pembelian';
+
+  @override
+  String get sponsorTerms => 'Ketentuan Penggunaan';
+
+  @override
+  String get sponsorPrivacy => 'Kebijakan Privasi';
+
+  @override
+  String get sponsorRestoring => 'Memulihkan pembelian…';
+
+  @override
+  String get sponsorRestoreUnavailable =>
+      'Tidak dapat terhubung ke toko. Coba lagi nanti.';
 }

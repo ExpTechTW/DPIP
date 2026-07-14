@@ -540,5 +540,50 @@
   "openSourceLicenses": "Open-source licenses",
   "@openSourceLicenses": {
     "description": "More-menu entry that opens the bundled open-source license list"
+  },
+  "sponsorTitle": "Support DPIP",
+  "@sponsorTitle": {
+    "description": "Support page title and the More-menu entry that opens it"
+  },
+  "sponsorIntro": "DPIP is dedicated to real-time disaster-prevention information, with no ads or other revenue model. Your support helps us keep the servers running and keep developing.",
+  "@sponsorIntro": {
+    "description": "Support page intro paragraph explaining why donations help"
+  },
+  "sponsorSubscriptions": "Subscriptions",
+  "@sponsorSubscriptions": {
+    "description": "Support page section header for recurring subscription tiers"
+  },
+  "sponsorRecommended": "Recommended",
+  "@sponsorRecommended": {
+    "description": "Badge on the recommended (subscription) support section"
+  },
+  "sponsorOneTime": "One-time",
+  "@sponsorOneTime": {
+    "description": "Support page section header for one-time tips"
+  },
+  "sponsorPerMonth": "{price} / month",
+  "@sponsorPerMonth": {
+    "description": "Monthly price label for a subscription; price is the store-localized amount",
+    "placeholders": { "price": { "type": "String", "example": "NT$75" } }
+  },
+  "sponsorRestore": "Restore purchases",
+  "@sponsorRestore": {
+    "description": "Footer action that restores previously bought purchases"
+  },
+  "sponsorTerms": "Terms of Use",
+  "@sponsorTerms": {
+    "description": "Footer link to the Terms of Use"
+  },
+  "sponsorPrivacy": "Privacy Policy",
+  "@sponsorPrivacy": {
+    "description": "Footer link to the Privacy Policy"
+  },
+  "sponsorRestoring": "Restoring purchases…",
+  "@sponsorRestoring": {
+    "description": "Snackbar shown when a purchase restore has been requested"
+  },
+  "sponsorRestoreUnavailable": "Can't reach the store. Please try again later.",
+  "@sponsorRestoreUnavailable": {
+    "description": "Snackbar shown when the store can't be reached to restore"
   }
 }

@@ -417,4 +417,41 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'ใบอนุญาตโอเพนซอร์ส';
+
+  @override
+  String get sponsorTitle => 'สนับสนุน DPIP';
+
+  @override
+  String get sponsorIntro =>
+      'DPIP มุ่งมั่นให้ข้อมูลการป้องกันภัยพิบัติแบบเรียลไทม์ โดยไม่มีโฆษณาหรือรูปแบบหารายได้อื่น การสนับสนุนของคุณช่วยให้เรารักษาเซิร์ฟเวอร์และพัฒนาต่อไปได้';
+
+  @override
+  String get sponsorSubscriptions => 'แบบสมัครสมาชิก';
+
+  @override
+  String get sponsorRecommended => 'แนะนำ';
+
+  @override
+  String get sponsorOneTime => 'สนับสนุนครั้งเดียว';
+
+  @override
+  String sponsorPerMonth(String price) {
+    return '$price / เดือน';
+  }
+
+  @override
+  String get sponsorRestore => 'กู้คืนการซื้อ';
+
+  @override
+  String get sponsorTerms => 'ข้อกำหนดการใช้งาน';
+
+  @override
+  String get sponsorPrivacy => 'นโยบายความเป็นส่วนตัว';
+
+  @override
+  String get sponsorRestoring => 'กำลังกู้คืนการซื้อ…';
+
+  @override
+  String get sponsorRestoreUnavailable =>
+      'ไม่สามารถเชื่อมต่อร้านค้าได้ โปรดลองอีกครั้งภายหลัง';
 }
