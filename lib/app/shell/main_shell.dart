@@ -2,6 +2,8 @@ import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/widgets/location_permission_banner.dart';
 import 'package:dpip/shared/widgets/notification_permission_banner.dart';
 import 'package:flutter/material.dart';
@@ -121,6 +123,12 @@ class _MainShellState extends State<MainShell> {
     // Re-entering Home (including re-tapping it while active) snaps its sheet
     // back to rest; the build-time guard above covers programmatic entry.
     if (index == 0) context.read<HomeResetSignal>().fire();
+    // Opening the map from the nav bar frames the nationwide view (matching
+    // Home's 全國); a tap on the Home backdrop hands off its own view instead
+    // (that path is a programmatic route, so it doesn't come through here).
+    if (index == 2) {
+      context.read<MapCameraHandoff>().request(BaseMap.taiwanBounds);
+    }
     widget.navigationShell.goBranch(
       index,
       // Tapping the active tab returns it to its initial route.

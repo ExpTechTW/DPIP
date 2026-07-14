@@ -104,6 +104,30 @@ class RegionStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Moves the saved township from [oldIndex] to [newIndex] — the post-removal
+  /// index, per `ReorderableListView.onReorderItem`. Keeps the same area selected
+  /// by re-pointing the selection at its township's new slot.
+  void reorderSaved(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= _saved.length) return;
+    final target = newIndex.clamp(0, _saved.length - 1);
+    if (target == oldIndex) return;
+
+    final selectedCode = switch (selected) {
+      SavedArea(:final code) => code,
+      _ => null,
+    };
+    final list = [..._saved];
+    list.insert(target, list.removeAt(oldIndex));
+    _saved = list;
+    _persist();
+    // Saved areas start at index 2 (after 全國, 所在地); keep the same one active.
+    if (selectedCode != null) {
+      final position = _saved.indexOf(selectedCode);
+      if (position >= 0) _selectedIndex = 2 + position;
+    }
+    notifyListeners();
+  }
+
   void _persist() =>
       _prefs.setStringList(PreferenceKeys.savedRegionCodes, _saved);
 }

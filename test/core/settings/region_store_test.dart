@@ -74,6 +74,36 @@ void main() {
     },
   );
 
+  test('reorderSaved moves a code and persists (onReorderItem index)', () async {
+    final store = await makeStore(['100', '200', '300']);
+    // Move '100' (0) to the end — onReorderItem gives the post-removal index 2.
+    store.reorderSaved(0, 2);
+    expect(store.savedCodes, ['200', '300', '100']);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getStringList('home.savedRegionCodes'), ['200', '300', '100']);
+  });
+
+  test('reorderSaved keeps the same area selected', () async {
+    final store = await makeStore(['100', '200', '300']);
+    store.select(3); // '200'
+    expect((store.selected as SavedArea).code, '200');
+    // Drag '300' (index 2) before '200' — post-removal index 1.
+    store.reorderSaved(2, 1);
+    expect(store.savedCodes, ['100', '300', '200']);
+    // Still '200', now at areas index 4.
+    expect((store.selected as SavedArea).code, '200');
+    expect(store.selectedIndex, 4);
+  });
+
+  test('reorderSaved ignores a no-op / out-of-range move', () async {
+    final store = await makeStore(['100', '200']);
+    store.reorderSaved(0, 0);
+    expect(store.savedCodes, ['100', '200']);
+    store.reorderSaved(5, 0); // out of range
+    expect(store.savedCodes, ['100', '200']);
+  });
+
   test('select / next / previous stay in range', () async {
     final store = await makeStore(['100']); // count 3
     store.select(0);

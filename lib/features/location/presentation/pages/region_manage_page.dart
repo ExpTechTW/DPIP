@@ -41,23 +41,38 @@ class RegionManagePage extends StatelessWidget {
           : null,
       body: saved.isEmpty
           ? EmptyView(icon: Icons.pin_drop_outlined, message: l10n.regionEmpty)
-          : ListView(
+          : ReorderableListView.builder(
+              // The drag handle is the only drag trigger, so a long-press on the
+              // row (e.g. to hit delete) doesn't start a reorder.
+              buildDefaultDragHandles: false,
               padding: const EdgeInsets.only(bottom: AppSpacing.xxl * 2),
-              children: [
-                SectionHeader(
-                  l10n.regionSelectCount(saved.length, RegionStore.maxSaved),
-                ),
-                for (final code in saved)
-                  ListTile(
-                    leading: const Icon(Icons.location_on_outlined),
-                    title: Text(directory.byCode(code)?.townName ?? code),
-                    subtitle: Text(directory.byCode(code)?.cityName ?? ''),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: () => store.removeSaved(code),
-                    ),
+              header: SectionHeader(
+                l10n.regionSelectCount(saved.length, RegionStore.maxSaved),
+              ),
+              itemCount: saved.length,
+              onReorderItem: store.reorderSaved,
+              itemBuilder: (context, index) {
+                final code = saved[index];
+                return ListTile(
+                  key: ValueKey(code),
+                  leading: const Icon(Icons.location_on_outlined),
+                  title: Text(directory.byCode(code)?.townName ?? code),
+                  subtitle: Text(directory.byCode(code)?.cityName ?? ''),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => store.removeSaved(code),
+                      ),
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: const Icon(Icons.drag_handle),
+                      ),
+                    ],
                   ),
-              ],
+                );
+              },
             ),
     );
   }

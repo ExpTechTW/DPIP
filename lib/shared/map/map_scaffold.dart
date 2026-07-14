@@ -5,11 +5,13 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_cache.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
 
 /// Ambient tile-cache ceiling for the live map — well above MapLibre's ~50 MB
 /// native default so a week of small WebP radar frames (plus base tiles) stays
@@ -42,9 +44,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
-  /// Whether the initial fit-to-Taiwan has run. Only on first load — a reload
-  /// (theme change) keeps whatever the user has panned/zoomed to.
+  /// Whether the initial framing has run. Only on first load — a reload (theme
+  /// change) keeps whatever the user has panned/zoomed to.
   bool _framed = false;
+
+  /// Hand-off of a target framing from whoever opened the map (the Home backdrop
+  /// tap, or the nav bar). A one-shot request per open; null keeps the view.
+  MapCameraHandoff? _handoff;
 
   late MapLayer _active = widget.layers.first;
   List<MapFrame> _frames = const [];
@@ -68,10 +74,33 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final handoff = context.read<MapCameraHandoff>();
+    if (handoff != _handoff) {
+      _handoff?.removeListener(_onHandoff);
+      _handoff = handoff..addListener(_onHandoff);
+    }
+  }
+
+  @override
   void dispose() {
+    _handoff?.removeListener(_onHandoff);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
+  /// A framing request arrived (map re-opened from Home / the nav bar) — apply it
+  /// once the style is up. Leaves it pending if not, for [_onStyleLoaded].
+  void _onHandoff() {
+    if (!_styleLoaded) return;
+    final bounds = _handoff?.takePending();
+    if (bounds != null) _frameBounds(bounds);
+  }
+
+  /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
+  void _frameBounds(LatLngBounds bounds) =>
+      _controller?.moveCamera(CameraUpdate.newLatLngBounds(bounds));
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -107,13 +136,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     for (final layer in widget.layers) {
       layer.onStyleReset();
     }
-    // Frame the island once, from its bounds (no hardcoded zoom). Only on first
-    // load — a reload keeps whatever the user has panned/zoomed to.
+    // Frame once on first load — the view handed off by whoever opened the map
+    // (Home's current view, or the nationwide default from the nav bar), else
+    // the island. A reload keeps whatever the user has panned/zoomed to.
     if (!_framed) {
       _framed = true;
-      _controller?.moveCamera(
-        CameraUpdate.newLatLngBounds(BaseMap.taiwanBounds),
-      );
+      _frameBounds(_handoff?.takePending() ?? BaseMap.taiwanBounds);
     }
     _loadActive();
   }

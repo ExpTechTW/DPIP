@@ -8,6 +8,7 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -43,7 +44,6 @@ class HomeMapBackdrop extends StatefulWidget {
 
 class _HomeMapBackdropState extends State<HomeMapBackdrop>
     with WidgetsBindingObserver {
-  static const String _selectedFillLayer = 'home-selected-fill';
   static const String _selectedLineLayer = 'home-selected-line';
   static const String _radarSource = 'home-radar-src';
   static const String _radarLayer = 'home-radar-lyr';
@@ -60,6 +60,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   bool _styleReady = false;
   RegionStore? _regions;
   HomeResetSignal? _resetSignal;
+  MapCameraHandoff? _handoff;
 
   /// Serialises controller mutations so an add never races a remove/setFilter.
   Future<void> _ops = Future<void>.value();
@@ -102,6 +103,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       _resetSignal?.removeListener(_refreshRadar);
       _resetSignal = reset..addListener(_refreshRadar);
     }
+    _handoff = context.read<MapCameraHandoff>();
   }
 
   @override
@@ -157,6 +159,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
 
     final filter = _filterFor(townCode);
     final box = _latLngBounds(bounds);
+    // Publish the live framing so a tap can hand it to the map tab.
+    _handoff?.homeBounds = box;
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
@@ -179,24 +183,16 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     });
   }
 
-  /// (Re)adds the purple selection fill + outline on the vector `town` layer
-  /// (filtered by `CODE`), left on top so they sit above the radar/borders.
-  /// Idempotent: any prior copy is removed first, so a reload race or partial
-  /// failure can't wedge the highlight.
+  /// (Re)adds the purple selection outline on the vector `town` layer (filtered
+  /// by `CODE`), left on top so it sits above the radar/borders. Outline only —
+  /// no fill, so the township's radar/base stays visible inside it. Idempotent:
+  /// any prior copy is removed first, so a reload race or partial failure can't
+  /// wedge the highlight.
   Future<void> _addSelectedLayers(
     MapLibreMapController controller,
     List<Object> filter,
   ) async {
-    await _removeLayerQuietly(controller, _selectedFillLayer);
     await _removeLayerQuietly(controller, _selectedLineLayer);
-    await controller.addFillLayer(
-      'exptech',
-      _selectedFillLayer,
-      const FillLayerProperties(fillColor: selectedColor, fillOpacity: 0.1),
-      sourceLayer: 'town',
-      filter: filter,
-      enableInteraction: false,
-    );
     await controller.addLineLayer(
       'exptech',
       _selectedLineLayer,

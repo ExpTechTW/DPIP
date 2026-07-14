@@ -4,6 +4,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
@@ -74,13 +75,17 @@ class _HomePageState extends State<HomePage> {
       body: RegionSwipeArea(
         child: Stack(
           children: [
-            // Shared map backdrop; a tap opens the full map tab. Opaque so the
-            // detector is itself the hit target — the backdrop map ignores
-            // pointers (display-only), so deferToChild would never see a hit.
+            // Shared map backdrop; a tap opens the full map tab framed on the
+            // same view (via the camera hand-off). Opaque so the detector is
+            // itself the hit target — the backdrop map ignores pointers
+            // (display-only), so deferToChild would never see a hit.
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => context.goNamed(AppRoutes.map),
+                onTap: () {
+                  context.read<MapCameraHandoff>().requestHomeView();
+                  context.goNamed(AppRoutes.map);
+                },
                 child: const HomeMapBackdrop(),
               ),
             ),
