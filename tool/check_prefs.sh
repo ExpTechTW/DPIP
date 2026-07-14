@@ -13,10 +13,13 @@ allow='lib/core/settings/prefs.dart lib/bootstrap.dart'
 fail=0
 while IFS= read -r file; do
   case " $allow " in *" $file "*) continue ;; esac
-  # Accept single- or double-quoted imports (repo uses single quotes, but don't
-  # let a double-quoted import slip the gate).
-  if grep -qE "import ['\"]package:shared_preferences/" "$file"; then
-    echo "  ✗ $file imports shared_preferences directly — use Prefs (lib/core/settings/prefs.dart)"
+  # Match import AND export (a re-export re-exposes the API just as well), any
+  # quote style, and the whole shared_preferences* family — the platform
+  # interface / platform impls (shared_preferences_platform_interface, …) drive
+  # the SAME native store, so no trailing '/' anchor. prefs.dart legitimately
+  # imports the base package but is allowlisted above.
+  if grep -qE "(import|export)[[:space:]]+['\"]package:shared_preferences" "$file"; then
+    echo "  ✗ $file reaches shared_preferences directly — use Prefs (lib/core/settings/prefs.dart)"
     fail=1
   fi
 done < <(find lib -name '*.dart' ! -name '*.g.dart' ! -name '*.freezed.dart' | sort)

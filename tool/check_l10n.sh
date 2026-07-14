@@ -134,23 +134,32 @@ def is_display_char(ch):
     if o == 0x30FB:                       # ・ data separator — allowed
         return False
     return (
-        0x4E00 <= o <= 0x9FFF or          # CJK Unified Ideographs
-        0x3400 <= o <= 0x4DBF or          # CJK Extension A
+        0x3000 <= o <= 0x303F or          # CJK Symbols & Punctuation 「」『』、。
         0x3040 <= o <= 0x309F or          # Hiragana
         0x30A0 <= o <= 0x30FF or          # Katakana (minus U+30FB above)
+        0x3100 <= o <= 0x312F or          # Bopomofo (Taiwan zhuyin)
+        0x31A0 <= o <= 0x31BF or          # Bopomofo Extended
+        0x3400 <= o <= 0x4DBF or          # CJK Extension A
+        0x4E00 <= o <= 0x9FFF or          # CJK Unified Ideographs
         0xAC00 <= o <= 0xD7A3 or          # Hangul syllables
         0x1100 <= o <= 0x11FF or          # Hangul Jamo
-        0x0E00 <= o <= 0x0E7F             # Thai
+        0x0E00 <= o <= 0x0E7F or          # Thai
+        0xF900 <= o <= 0xFAFF or          # CJK Compatibility Ideographs (name glyphs)
+        0xFF00 <= o <= 0xFFEF or          # Halfwidth/Fullwidth Forms （）！？ ｶﾅ
+        0x20000 <= o <= 0x2FA1F           # CJK Ext B–F + Compatibility Supplement
     )
 
-def scan(path, src):
+def scan(src, base_line=1):
     """Single pass that knows the difference between code, comments and string
     literals, so CJK inside a `///` note or a `/* */` block is never flagged —
-    only CJK inside an actual string literal is. Returns (line, snippet) hits."""
-    lines = src.split("\n")
+    only CJK inside an actual string literal is. Recurses into `${…}`
+    interpolation so a nested display literal (e.g. a ternary) is still caught,
+    while identifiers stay code. Returns (line, snippet) hits; the caller applies
+    the l10n-ignore hatch against the real file lines (so it works for recursed
+    hits too)."""
     n = len(src)
     i = 0
-    line = 1
+    line = base_line
     hits = []
     while i < n:
         c = src[i]
@@ -195,14 +204,20 @@ def scan(path, src):
                         line += 1
                     i += 2; continue
                 if not raw and d == "$" and i + 1 < n and src[i + 1] == "{":
-                    # ${…} interpolation is CODE, not text — skip balanced braces
-                    i += 2; bdepth = 1
+                    # ${…} interpolation is CODE — recurse so a nested display
+                    # literal is caught, but bare identifiers stay code.
+                    i += 2; bdepth = 1; interior = []; interp_line = line
                     while i < n and bdepth > 0:
                         e = src[i]
-                        if e == "{": bdepth += 1
-                        elif e == "}": bdepth -= 1
-                        elif e == "\n": line += 1
-                        i += 1
+                        if e == "{":
+                            bdepth += 1
+                        elif e == "}":
+                            bdepth -= 1
+                            if bdepth == 0:
+                                i += 1; break
+                        if e == "\n": line += 1
+                        interior.append(e); i += 1
+                    hits.extend(scan("".join(interior), interp_line))
                     continue
                 if triple and src[i:i + 3] == quote * 3:
                     i += 3; break
@@ -211,14 +226,10 @@ def scan(path, src):
                 buf.append(d); i += 1
             text = "".join(buf)
             if any(is_display_char(ch) for ch in text):
-                # inline escape hatch: `l10n-ignore` on this line or the one above
-                here = lines[start_line - 1] if start_line - 1 < len(lines) else ""
-                prev = lines[start_line - 2] if start_line - 2 >= 0 else ""
-                if "l10n-ignore" not in here and "l10n-ignore" not in prev:
-                    snip = text.strip().replace("\n", " ")
-                    if len(snip) > 40:
-                        snip = snip[:40] + "…"
-                    hits.append((start_line, snip))
+                snip = text.strip().replace("\n", " ")
+                if len(snip) > 40:
+                    snip = snip[:40] + "…"
+                hits.append((start_line, snip))
             continue
         if c == "\n":
             line += 1
@@ -233,7 +244,13 @@ for path in sys.argv[1:]:
         continue
     if "l10n-ignore-file" in src:   # whole-file exemption (mock/placeholder)
         continue
-    for ln, snip in scan(path, src):
+    file_lines = src.split("\n")
+    for ln, snip in scan(src):
+        # inline escape hatch: `l10n-ignore` on the hit's line or the one above.
+        here = file_lines[ln - 1] if 0 <= ln - 1 < len(file_lines) else ""
+        prev = file_lines[ln - 2] if 0 <= ln - 2 < len(file_lines) else ""
+        if "l10n-ignore" in here or "l10n-ignore" in prev:
+            continue
         print(f'{path}:{ln} → "{snip}" '
               f"(hardcoded user-facing string — route through AppLocalizations/ARB, "
               f"or mark the line `// l10n-ignore: <reason>` if it is not display text)")
