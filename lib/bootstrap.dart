@@ -18,6 +18,7 @@ import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -108,7 +109,7 @@ Future<void> bootstrap() async {
   final appVersion = (await PackageInfo.fromPlatform()).version;
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
-    positions: locationService.positionStream(),
+    positions: () => locationService.positionStream(),
     onMoved: (fix) async {
       final token = notificationService.token;
       if (token == null) return;
@@ -127,6 +128,14 @@ Future<void> bootstrap() async {
     version: appVersion,
   );
 
+  // Watches the OS location toggle / permission and recovers reporting after a
+  // mid-session change; drives the "fix it" banner.
+  final locationMonitor = LocationMonitor(
+    location: locationService,
+    reporter: deviceLocationReporter,
+    regions: regionStore,
+  );
+
   final deps = SharedDeps(
     prefs: prefs,
     apiClient: apiClient,
@@ -140,6 +149,7 @@ Future<void> bootstrap() async {
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
     backgroundLocation: backgroundLocation,
+    locationMonitor: locationMonitor,
     onboarding: onboarding,
     locale: locale,
   );

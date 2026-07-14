@@ -92,12 +92,17 @@
   "onboardingPermCritical": "重大通知",
   "onboardingPermCriticalDesc": "讓危及生命的強震即時警報,即使在靜音或勿擾模式下也能發出聲響。",
   "onboardingPermLocation": "定位",
-  "onboardingPermLocationDesc": "自動依你所在位置推送在地警報,包含背景更新。",
+  "onboardingPermLocationDesc": "依你所在位置推送在地警報。",
+  "onboardingPermBackground": "背景定位",
+  "onboardingPermBackgroundDesc": "選擇「一律允許」,關閉 App 也能推送在地警報。",
   "onboardingPermBattery": "省電白名單",
   "onboardingPermBatteryDesc": "允許 DPIP 在背景持續運作,避免警報延遲或漏收。",
   "onboardingGrant": "授權",
   "onboardingGranted": "已授權",
   "onboardingStart": "開始使用",
   "language": "語言",
-  "languageSystem": "系統預設"
+  "languageSystem": "系統預設",
+  "locationBannerServiceOff": "定位服務已關閉,無法針對你的所在地推送警報。",
+  "locationBannerPermission": "尚未授權定位,無法針對你的所在地推送警報。",
+  "locationBannerFix": "開啟設定"
 }

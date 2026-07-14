@@ -1,4 +1,5 @@
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
@@ -34,6 +35,7 @@ class SharedDeps {
     required this.locationService,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
+    required this.locationMonitor,
     required this.onboarding,
     required this.locale,
   });
@@ -76,6 +78,10 @@ class SharedDeps {
   /// Native background device-location reporting (terminated/background). The
   /// terminated-state counterpart to [deviceLocationReporter].
   final BackgroundLocationService backgroundLocation;
+
+  /// App-wide location health monitor (also provided) — status + recovery when
+  /// GPS / permission changes mid-session.
+  final LocationMonitor locationMonitor;
 
   /// First-launch onboarding completion (also provided) — gates the router and
   /// the app's permission requests.

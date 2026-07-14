@@ -33,6 +33,7 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
   bool _notify = false;
   bool _critical = false;
   bool _location = false;
+  bool _background = false;
   bool _batteryOk = false;
 
   @override
@@ -63,12 +64,14 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
         ? await notifications.criticalAllowed()
         : false;
     final locationGranted = await location.granted();
+    final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
     if (!mounted) return;
     setState(() {
       _notify = notify;
       _critical = critical;
       _location = locationGranted;
+      _background = backgroundGranted;
       _batteryOk = batteryOk;
     });
   }
@@ -78,10 +81,17 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
     if (mounted) await _refresh();
   }
 
+  // Foreground location only. Background ("Always") is a SEPARATE step —
+  // Android 11+ silently denies both if they're requested in the same gesture.
   Future<void> _grantLocation() async {
-    final location = context.read<LocationService>();
-    await location.requestPermission();
-    await location.requestBackground(); // escalate to Always for background
+    await context.read<LocationService>().requestPermission();
+    if (mounted) await _refresh();
+  }
+
+  // Background ("Always"): only meaningful after foreground is granted; on
+  // Android 11+ this routes to Settings, re-checked on resume.
+  Future<void> _grantBackground() async {
+    await context.read<LocationService>().requestBackground();
     if (mounted) await _refresh();
   }
 
@@ -116,6 +126,14 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
         description: l10n.onboardingPermLocationDesc,
         granted: _location,
         onGrant: _grantLocation,
+      ),
+      // Background ("Always") — a separate step, unlocked once foreground is on.
+      _PermissionRow(
+        icon: Icons.my_location_outlined,
+        title: l10n.onboardingPermBackground,
+        description: l10n.onboardingPermBackgroundDesc,
+        granted: _background,
+        onGrant: _location ? _grantBackground : null,
       ),
       if (Platform.isAndroid)
         _PermissionRow(
@@ -175,7 +193,9 @@ class _PermissionRow extends StatelessWidget {
   final String title;
   final String description;
   final bool granted;
-  final Future<void> Function() onGrant;
+
+  /// Grant handler; null disables the button (e.g. background before foreground).
+  final Future<void> Function()? onGrant;
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +236,7 @@ class _PermissionRow extends StatelessWidget {
             Icon(Icons.check_circle, color: theme.colorScheme.primary)
           else
             FilledButton.tonal(
-              onPressed: () => onGrant(),
+              onPressed: onGrant == null ? null : () => onGrant!(),
               child: Text(l10n.onboardingGrant),
             ),
         ],

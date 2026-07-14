@@ -1,4 +1,5 @@
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -23,6 +24,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<LocationService>.value(value: deps.locationService),
+  ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
 ];

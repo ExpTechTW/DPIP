@@ -305,8 +305,12 @@
   "@onboardingPermCriticalDesc": { "description": "Permission row description: critical alerts" },
   "onboardingPermLocation": "Location",
   "@onboardingPermLocation": { "description": "Permission row: location" },
-  "onboardingPermLocationDesc": "Automatically target alerts to where you are — including in the background.",
+  "onboardingPermLocationDesc": "Target alerts to where you are.",
   "@onboardingPermLocationDesc": { "description": "Permission row description: location" },
+  "onboardingPermBackground": "Background location",
+  "@onboardingPermBackground": { "description": "Permission row: background/Always location" },
+  "onboardingPermBackgroundDesc": "Allow \"Always\" so alerts still target you when the app is closed.",
+  "@onboardingPermBackgroundDesc": { "description": "Permission row description: background location" },
   "onboardingPermBattery": "Battery exemption",
   "@onboardingPermBattery": { "description": "Permission row: battery optimization (Android)" },
   "onboardingPermBatteryDesc": "Allow DPIP to keep running in the background so alerts aren't delayed or missed.",
@@ -320,5 +324,11 @@
   "language": "Language",
   "@language": { "description": "Language picker tooltip / label" },
   "languageSystem": "System default",
-  "@languageSystem": { "description": "Language picker option: follow the system language" }
+  "@languageSystem": { "description": "Language picker option: follow the system language" },
+  "locationBannerServiceOff": "Location services are off — local alerts can't target your area.",
+  "@locationBannerServiceOff": { "description": "Banner when the OS location toggle is off" },
+  "locationBannerPermission": "Location permission is off — local alerts can't target your area.",
+  "@locationBannerPermission": { "description": "Banner when location permission is denied" },
+  "locationBannerFix": "Open settings",
+  "@locationBannerFix": { "description": "Action on the location banner to open system settings" }
 }

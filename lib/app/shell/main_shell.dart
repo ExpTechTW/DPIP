@@ -2,6 +2,7 @@ import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/location_permission_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +80,14 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       // Let the Home weather backdrop show through behind the bar.
       extendBody: true,
-      body: widget.navigationShell,
+      // A location "fix it" banner sits above the active tab (zero height when
+      // location is healthy, so Home's full-bleed layout is unaffected).
+      body: Column(
+        children: [
+          const LocationPermissionBanner(),
+          Expanded(child: widget.navigationShell),
+        ],
+      ),
       // Only Home dismisses the bar; every other tab keeps it (dismiss 0).
       bottomNavigationBar: ValueListenableBuilder<double>(
         valueListenable: context.read<HomeSheetExtent>(),

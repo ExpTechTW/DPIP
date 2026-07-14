@@ -1,4 +1,5 @@
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/geo/town.dart';
@@ -35,38 +36,108 @@ class LocationService {
   final Future<bool> Function() _isAvailable;
   final Future<GpsFix?> Function() _fix;
 
-  /// Requests location permission (call from a screen, after explaining why).
-  /// Returns whether a fix is now permitted.
-  Future<bool> requestPermission() async {
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+  /// The combined location-availability [LocationStatus] (services + permission).
+  /// Never throws — a fault degrades to [LocationStatus.denied].
+  Future<LocationStatus> status() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        return LocationStatus.serviceOff;
+      }
+      return switch (await Geolocator.checkPermission()) {
+        LocationPermission.always => LocationStatus.ready,
+        LocationPermission.whileInUse => LocationStatus.whileInUseOnly,
+        LocationPermission.deniedForever => LocationStatus.deniedForever,
+        LocationPermission.denied ||
+        LocationPermission.unableToDetermine => LocationStatus.denied,
+      };
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'location status');
+      return LocationStatus.denied;
     }
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
   }
 
-  /// Whether any location permission (while-in-use or Always) is granted.
+  /// Emits `true`/`false` when the OS location services are toggled on/off — the
+  /// signal used to recover a dead position stream and refresh the status.
+  Stream<bool> serviceEnabledStream() => Geolocator.getServiceStatusStream()
+      .map((s) => s == ServiceStatus.enabled);
+
+  /// Opens the system app-settings so the user can grant a permission that can't
+  /// be requested in-app (permanently denied, or Android 11+ background
+  /// location). Best-effort.
+  Future<void> openSettings() async {
+    try {
+      await Geolocator.openAppSettings();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'openAppSettings');
+    }
+  }
+
+  /// Requests **foreground** location permission (call from a screen, after
+  /// explaining why); returns whether a fix is now permitted. If permission is
+  /// permanently denied, re-requesting can't prompt, so it routes to Settings.
+  /// Never throws.
+  Future<bool> requestPermission() async {
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return false;
+      }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      return permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'requestPermission');
+      return false;
+    }
+  }
+
+  /// Whether any location permission (while-in-use or Always) is granted. Never
+  /// throws.
   Future<bool> granted() async {
-    final permission = await Geolocator.checkPermission();
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
+    try {
+      final permission = await Geolocator.checkPermission();
+      return permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'granted');
+      return false;
+    }
   }
 
   /// Whether background ("Always") location is granted — the precondition for
   /// native background reporting. On Android the background geofence can't fetch
-  /// a fix (or prompt) with only "while in use", so callers must gate on this;
-  /// iOS requests Always from its own plugin.
-  Future<bool> backgroundGranted() async =>
-      await Geolocator.checkPermission() == LocationPermission.always;
+  /// a fix (or prompt) with only "while in use", so callers must gate on this.
+  /// Never throws.
+  Future<bool> backgroundGranted() async {
+    try {
+      return await Geolocator.checkPermission() == LocationPermission.always;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'backgroundGranted');
+      return false;
+    }
+  }
 
-  /// Best-effort escalation to background ("Always") permission, returning
-  /// whether it's now granted. On Android 10 this can grant inline; on Android
-  /// 11+ the OS requires the user to choose "Allow all the time" in Settings, so
-  /// it often can't grant here — a full staged rationale flow belongs in
-  /// onboarding. Safe to call when already granted (no re-prompt).
-  Future<bool> requestBackground() async =>
-      await Geolocator.requestPermission() == LocationPermission.always;
+  /// Best-effort escalation to background ("Always") permission — call it as a
+  /// **separate** step, only after foreground is already granted (Android 11+
+  /// rejects a bundled request). On Android 10 / iOS this can prompt; on Android
+  /// 11+ "Allow all the time" lives in Settings, so a false return means the
+  /// caller should [openSettings] and re-check on resume. Never throws.
+  Future<bool> requestBackground() async {
+    try {
+      if (await Geolocator.checkPermission() ==
+          LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return false;
+      }
+      return await Geolocator.requestPermission() == LocationPermission.always;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'requestBackground');
+      return false;
+    }
+  }
 
   /// A distance-filtered stream of GPS fixes — each emission is a move of at
   /// least [distanceFilterMeters], which is exactly the trigger for a device-

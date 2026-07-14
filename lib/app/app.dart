@@ -1,10 +1,9 @@
-import 'dart:io' show Platform;
-
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
@@ -46,6 +45,7 @@ class DpipApp extends StatelessWidget {
         regionStore: deps.regionStore,
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
+        locationMonitor: deps.locationMonitor,
         onboarding: deps.onboarding,
         // Rebuild MaterialApp when the language override changes (null = system).
         child: Consumer<LocaleController>(
@@ -80,6 +80,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.regionStore,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
+    required this.locationMonitor,
     required this.onboarding,
     required this.child,
   });
@@ -90,6 +91,7 @@ class _AppServicesHost extends StatefulWidget {
   final RegionStore regionStore;
   final DeviceLocationReporter deviceLocationReporter;
   final BackgroundLocationService backgroundLocation;
+  final LocationMonitor locationMonitor;
   final OnboardingStore onboarding;
   final Widget child;
 
@@ -122,53 +124,48 @@ class _AppServicesHostState extends State<_AppServicesHost>
     if (widget.onboarding.isComplete) _onReady();
   }
 
-  /// Runs the permission-dependent app setup once (after onboarding): ensures
-  /// notification permission and resolves + arms location reporting.
+  /// Runs the permission-*dependent* app setup once, after onboarding (which
+  /// owns the permission *requests*). Starts the location monitor and, only if
+  /// permission is already granted, resolves + arms reporting — cold launch must
+  /// not re-request (a denied user can't be re-prompted and it gives false
+  /// confidence; the monitor's banner is the recovery path).
   void _onReady() {
     if (_ready) return;
     _ready = true;
-    widget.notificationService.requestPermission();
-    _resolveCurrentLocation();
+    widget.locationMonitor.start();
+    _startLocationIfGranted();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Re-arm background reporting on resume: the Android geofence can be dropped
     // by a Play-services update / location toggle (neither fires boot), so a
-    // warm foreground is the reliable re-arm point.
+    // warm foreground is the reliable re-arm point. (The monitor handles the
+    // foreground reporter + town on resume.)
     if (state == AppLifecycleState.resumed && _ready) _armBackground();
   }
 
-  /// Requests GPS permission, resolves the current township into the region
-  /// store, and — once granted — starts the foreground reporter and arms native
-  /// background reporting. On denial/error the current code stays null, so 所在地
-  /// renders its "can't get current location" state rather than a wrong region.
-  Future<void> _resolveCurrentLocation() async {
-    final granted = await widget.locationService.requestPermission();
+  /// Resolves the current township and starts reporting — but only when
+  /// foreground location is already granted. Never requests (see [_onReady]).
+  Future<void> _startLocationIfGranted() async {
+    if (!await widget.locationService.granted()) return;
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
-    if (!granted) return;
     widget.deviceLocationReporter.start();
-    await _armBackground(requestUpgrade: true);
+    await _armBackground();
   }
 
-  /// Arms native background reporting when a push token and background ("Always")
-  /// location exist. On iOS the plugin self-requests Always, so we always start
-  /// it; on Android background delivery needs Always already granted (the
-  /// geofence can't prompt), so [requestUpgrade] makes a best-effort escalation
-  /// attempt on the first resolve (a full staged rationale flow belongs in
-  /// onboarding). Idempotent — safe to call repeatedly (e.g. on resume).
-  Future<void> _armBackground({bool requestUpgrade = false}) async {
+  /// Arms native background reporting when a push token exists and background
+  /// ("Always") location is actually granted — on both platforms (iOS delivers
+  /// zero SLC/region events without Always, so assuming it is armed is wrong).
+  /// Idempotent; safe to call on every resume.
+  Future<void> _armBackground() async {
     final token = widget.notificationService.token;
     if (token == null) return;
-    var background =
-        Platform.isIOS || await widget.locationService.backgroundGranted();
-    if (!background && requestUpgrade && !Platform.isIOS) {
-      background = await widget.locationService.requestBackground();
-    }
+    if (!await widget.locationService.backgroundGranted()) return;
     if (!mounted) return;
-    if (background) widget.backgroundLocation.start(token);
+    widget.backgroundLocation.start(token);
   }
 
   @override
@@ -177,6 +174,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.onboarding.removeListener(_onOnboardingChanged);
     WidgetsBinding.instance.removeObserver(this);
     _observer.dispose();
+    widget.locationMonitor.dispose();
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();

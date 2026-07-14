@@ -293,7 +293,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get onboardingPermLocationDesc => '自動依你所在位置推送在地警報,包含背景更新。';
+  String get onboardingPermLocationDesc => '依你所在位置推送在地警報。';
+
+  @override
+  String get onboardingPermBackground => '背景定位';
+
+  @override
+  String get onboardingPermBackgroundDesc => '選擇「一律允許」,關閉 App 也能推送在地警報。';
 
   @override
   String get onboardingPermBattery => '省電白名單';
@@ -315,4 +321,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageSystem => '系統預設';
+
+  @override
+  String get locationBannerServiceOff => '定位服務已關閉,無法針對你的所在地推送警報。';
+
+  @override
+  String get locationBannerPermission => '尚未授權定位,無法針對你的所在地推送警報。';
+
+  @override
+  String get locationBannerFix => '開啟設定';
 }

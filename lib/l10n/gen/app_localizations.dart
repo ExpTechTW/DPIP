@@ -653,8 +653,20 @@ abstract class AppLocalizations {
   /// Permission row description: location
   ///
   /// In en, this message translates to:
-  /// **'Automatically target alerts to where you are — including in the background.'**
+  /// **'Target alerts to where you are.'**
   String get onboardingPermLocationDesc;
+
+  /// Permission row: background/Always location
+  ///
+  /// In en, this message translates to:
+  /// **'Background location'**
+  String get onboardingPermBackground;
+
+  /// Permission row description: background location
+  ///
+  /// In en, this message translates to:
+  /// **'Allow \"Always\" so alerts still target you when the app is closed.'**
+  String get onboardingPermBackgroundDesc;
 
   /// Permission row: battery optimization (Android)
   ///
@@ -697,6 +709,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System default'**
   String get languageSystem;
+
+  /// Banner when the OS location toggle is off
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are off — local alerts can\'t target your area.'**
+  String get locationBannerServiceOff;
+
+  /// Banner when location permission is denied
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is off — local alerts can\'t target your area.'**
+  String get locationBannerPermission;
+
+  /// Action on the location banner to open system settings
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get locationBannerFix;
 }
 
 class _AppLocalizationsDelegate

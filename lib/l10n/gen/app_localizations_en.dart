@@ -299,8 +299,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPermLocation => 'Location';
 
   @override
-  String get onboardingPermLocationDesc =>
-      'Automatically target alerts to where you are — including in the background.';
+  String get onboardingPermLocationDesc => 'Target alerts to where you are.';
+
+  @override
+  String get onboardingPermBackground => 'Background location';
+
+  @override
+  String get onboardingPermBackgroundDesc =>
+      'Allow \"Always\" so alerts still target you when the app is closed.';
 
   @override
   String get onboardingPermBattery => 'Battery exemption';
@@ -323,4 +329,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageSystem => 'System default';
+
+  @override
+  String get locationBannerServiceOff =>
+      'Location services are off — local alerts can\'t target your area.';
+
+  @override
+  String get locationBannerPermission =>
+      'Location permission is off — local alerts can\'t target your area.';
+
+  @override
+  String get locationBannerFix => 'Open settings';
 }
