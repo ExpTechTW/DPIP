@@ -5,6 +5,7 @@ library;
 import 'dart:io';
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/build_info.g.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
@@ -43,11 +44,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
 
     final info = await PackageInfo.fromPlatform();
     final device = await DeviceInfoService.load();
-    // Track the build by the git commit it was built from — pass it at build
-    // time: `--dart-define=GIT_COMMIT=$(git rev-parse --short HEAD)`. Falls back
-    // to the platform build number when not provided.
-    const gitCommit = String.fromEnvironment('GIT_COMMIT');
-    final buildRef = gitCommit.isEmpty ? info.buildNumber : gitCommit;
+    // Track the build by the git commit it was built from (kGitCommit is kept
+    // current by the .githooks generator — see tool/setup.sh), falling back to
+    // the platform build number outside a repo.
+    final buildRef = kGitCommit == 'unknown' ? info.buildNumber : kGitCommit;
     // Show the platform's own push token: FCM on Android, APNs on iOS.
     final fcmToken = Platform.isAndroid
         ? (notifications.token ?? await _fcmToken())

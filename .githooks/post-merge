@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Refresh lib/core/build_info.g.dart after HEAD moves. See tool/setup.sh.
+exec "$(git rev-parse --show-toplevel)/tool/gen_build_info.sh"
