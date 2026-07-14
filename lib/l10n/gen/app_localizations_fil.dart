@@ -471,4 +471,13 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get trendNoData => 'Walang trend data';
+
+  @override
+  String get mapLayerHumidity => 'Halumigmig';
+
+  @override
+  String get mapLayerPressure => 'Presyon';
+
+  @override
+  String get mapLayerWind => 'Hangin';
 }

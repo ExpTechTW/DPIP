@@ -145,5 +145,8 @@
   "mapLayerTemperature": "Nhiệt độ",
   "trendRange24h": "24 giờ",
   "trendRange7d": "7 ngày",
-  "trendNoData": "Không có dữ liệu xu hướng"
+  "trendNoData": "Không có dữ liệu xu hướng",
+  "mapLayerHumidity": "Độ ẩm",
+  "mapLayerPressure": "Áp suất",
+  "mapLayerWind": "Gió"
 }

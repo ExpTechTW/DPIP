@@ -135,12 +135,17 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     return station == null ? null : '${station.county} · ${station.town}';
   }
 
+  /// The station's latest observation — for a subclass to read extra fields
+  /// (e.g. wind direction) in an overridden [reading].
+  @protected
+  WeatherObservation? observationOf(String id) => _observations[id];
+
   @override
   String? reading(String id) {
     final observation = _observations[id];
     if (observation == null) return null;
     final value = valueOf(observation);
-    return value == null ? null : '${value.toStringAsFixed(decimals)}$unit';
+    return value == null ? null : '${value.toStringAsFixed(decimals)} $unit';
   }
 
   @override

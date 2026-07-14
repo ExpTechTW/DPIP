@@ -461,4 +461,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trendNoData => 'トレンドデータがありません';
+
+  @override
+  String get mapLayerHumidity => '湿度';
+
+  @override
+  String get mapLayerPressure => '気圧';
+
+  @override
+  String get mapLayerWind => '風';
 }

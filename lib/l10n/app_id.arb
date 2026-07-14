@@ -145,5 +145,8 @@
   "mapLayerTemperature": "Suhu",
   "trendRange24h": "24 jam",
   "trendRange7d": "7 hari",
-  "trendNoData": "Tidak ada data tren"
+  "trendNoData": "Tidak ada data tren",
+  "mapLayerHumidity": "Kelembapan",
+  "mapLayerPressure": "Tekanan",
+  "mapLayerWind": "Angin"
 }

@@ -605,5 +605,17 @@
   "trendNoData": "No trend data",
   "@trendNoData": {
     "description": "Shown in the station trend chart when there is no data to plot"
+  },
+  "mapLayerHumidity": "Humidity",
+  "@mapLayerHumidity": {
+    "description": "Map layer switcher label for the humidity layer"
+  },
+  "mapLayerPressure": "Pressure",
+  "@mapLayerPressure": {
+    "description": "Map layer switcher label for the air-pressure layer"
+  },
+  "mapLayerWind": "Wind",
+  "@mapLayerWind": {
+    "description": "Map layer switcher label for the wind layer"
   }
 }

@@ -469,4 +469,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trendNoData => 'No trend data';
+
+  @override
+  String get mapLayerHumidity => 'Humidity';
+
+  @override
+  String get mapLayerPressure => 'Pressure';
+
+  @override
+  String get mapLayerWind => 'Wind';
 }

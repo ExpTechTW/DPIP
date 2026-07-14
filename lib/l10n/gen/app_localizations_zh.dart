@@ -457,6 +457,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String get mapLayerHumidity => '濕度';
+
+  @override
+  String get mapLayerPressure => '氣壓';
+
+  @override
+  String get mapLayerWind => '風';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -912,6 +921,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '没有趋势数据';
+
+  @override
+  String get mapLayerHumidity => '湿度';
+
+  @override
+  String get mapLayerPressure => '气压';
+
+  @override
+  String get mapLayerWind => '风';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1367,4 +1385,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String get mapLayerHumidity => '濕度';
+
+  @override
+  String get mapLayerPressure => '氣壓';
+
+  @override
+  String get mapLayerWind => '風';
 }

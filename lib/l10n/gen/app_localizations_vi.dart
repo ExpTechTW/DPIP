@@ -470,4 +470,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get trendNoData => 'Không có dữ liệu xu hướng';
+
+  @override
+  String get mapLayerHumidity => 'Độ ẩm';
+
+  @override
+  String get mapLayerPressure => 'Áp suất';
+
+  @override
+  String get mapLayerWind => 'Gió';
 }

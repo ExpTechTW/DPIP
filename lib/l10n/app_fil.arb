@@ -145,5 +145,8 @@
   "mapLayerTemperature": "Temperatura",
   "trendRange24h": "24 oras",
   "trendRange7d": "7 araw",
-  "trendNoData": "Walang trend data"
+  "trendNoData": "Walang trend data",
+  "mapLayerHumidity": "Halumigmig",
+  "mapLayerPressure": "Presyon",
+  "mapLayerWind": "Hangin"
 }

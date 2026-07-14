@@ -145,5 +145,8 @@
   "mapLayerTemperature": "気温",
   "trendRange24h": "24時間",
   "trendRange7d": "7日間",
-  "trendNoData": "トレンドデータがありません"
+  "trendNoData": "トレンドデータがありません",
+  "mapLayerHumidity": "湿度",
+  "mapLayerPressure": "気圧",
+  "mapLayerWind": "風"
 }

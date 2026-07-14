@@ -991,6 +991,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No trend data'**
   String get trendNoData;
+
+  /// Map layer switcher label for the humidity layer
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get mapLayerHumidity;
+
+  /// Map layer switcher label for the air-pressure layer
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get mapLayerPressure;
+
+  /// Map layer switcher label for the wind layer
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get mapLayerWind;
 }
 
 class _AppLocalizationsDelegate

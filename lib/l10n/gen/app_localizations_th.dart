@@ -469,4 +469,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get trendNoData => 'ไม่มีข้อมูลแนวโน้ม';
+
+  @override
+  String get mapLayerHumidity => 'ความชื้น';
+
+  @override
+  String get mapLayerPressure => 'ความกดอากาศ';
+
+  @override
+  String get mapLayerWind => 'ลม';
 }

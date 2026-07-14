@@ -1,5 +1,8 @@
+import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
+import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
+import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
@@ -24,6 +27,9 @@ class _MapPageState extends State<MapPage> {
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
     TemperatureMapLayer(context.read<MeteorWeatherRepository>()),
+    HumidityMapLayer(context.read<MeteorWeatherRepository>()),
+    PressureMapLayer(context.read<MeteorWeatherRepository>()),
+    WindMapLayer(context.read<MeteorWeatherRepository>()),
   ];
 
   @override

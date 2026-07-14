@@ -471,4 +471,13 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get trendNoData => 'Tidak ada data tren';
+
+  @override
+  String get mapLayerHumidity => 'Kelembapan';
+
+  @override
+  String get mapLayerPressure => 'Tekanan';
+
+  @override
+  String get mapLayerWind => 'Angin';
 }

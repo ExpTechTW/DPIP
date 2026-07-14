@@ -145,5 +145,8 @@
   "mapLayerTemperature": "溫度",
   "trendRange24h": "24 小時",
   "trendRange7d": "7 天",
-  "trendNoData": "沒有趨勢資料"
+  "trendNoData": "沒有趨勢資料",
+  "mapLayerHumidity": "濕度",
+  "mapLayerPressure": "氣壓",
+  "mapLayerWind": "風"
 }
