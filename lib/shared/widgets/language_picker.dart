@@ -3,15 +3,11 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/core/settings/locale_config.dart';
+import 'package:dpip/core/settings/language_options.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-/// One offered language: its [locale] and its own native name (taken from that
-/// locale's ARB `languageName` — never hardcoded here).
-typedef _LanguageOption = ({Locale locale, String name});
 
 class LanguagePicker extends StatelessWidget {
   const LanguagePicker({super.key, this.label});
@@ -24,22 +20,6 @@ class LanguagePicker extends StatelessWidget {
   /// never be selected — we use the BCP-47 "undetermined" tag as a non-null
   /// marker and map it back to `null` (clear the override) on selection.
   static const Locale _systemLocale = Locale('und');
-
-  /// Loads each supported locale's own name from its ARB. Cached for the
-  /// process — the supported set is fixed at build time. `delegate.load` is
-  /// synchronous under the hood (gen-l10n), so the picker paints immediately.
-  static Future<List<_LanguageOption>>? _optionsCache;
-  static Future<List<_LanguageOption>> _options() =>
-      _optionsCache ??= _loadOptions();
-
-  static Future<List<_LanguageOption>> _loadOptions() async {
-    final options = <_LanguageOption>[];
-    for (final locale in appSupportedLocales) {
-      final l10n = await AppLocalizations.delegate.load(locale);
-      options.add((locale: locale, name: l10n.languageName));
-    }
-    return options;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +36,8 @@ class LanguagePicker extends StatelessWidget {
               const Icon(Icons.language),
             ],
           );
-    return FutureBuilder<List<_LanguageOption>>(
-      future: _options(),
+    return FutureBuilder<List<LanguageOption>>(
+      future: loadLanguageOptions(),
       builder: (context, snapshot) {
         final options = snapshot.data ?? const [];
         return PopupMenuButton<Locale>(

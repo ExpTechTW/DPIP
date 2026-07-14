@@ -12,6 +12,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -25,6 +26,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<RegionStore>.value(value: deps.regionStore),
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
+  ChangeNotifierProvider<ThemeController>.value(value: deps.theme),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),

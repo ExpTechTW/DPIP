@@ -15,6 +15,7 @@ import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,20 +49,23 @@ class DpipApp extends StatelessWidget {
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
         onboarding: deps.onboarding,
-        // Rebuild MaterialApp when the language override changes (null = system).
-        child: Consumer<LocaleController>(
-          builder: (context, localeController, _) => MaterialApp.router(
-            title: 'DPIP',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            locale: localeController.locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            // Home locale first, so an unmatched device language falls back to
-            // Traditional Chinese (Taiwan), not the English template.
-            supportedLocales: appSupportedLocales,
-            routerConfig: appRouter,
-          ),
+        // Rebuild MaterialApp when the language override or theme mode changes
+        // (a null locale / system mode follows the OS).
+        child: Consumer2<LocaleController, ThemeController>(
+          builder: (context, localeController, themeController, _) =>
+              MaterialApp.router(
+                title: 'DPIP',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light,
+                darkTheme: AppTheme.dark,
+                themeMode: themeController.mode,
+                locale: localeController.locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                // Home locale first, so an unmatched device language falls back to
+                // Traditional Chinese (Taiwan), not the English template.
+                supportedLocales: appSupportedLocales,
+                routerConfig: appRouter,
+              ),
         ),
       ),
     );

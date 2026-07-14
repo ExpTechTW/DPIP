@@ -120,5 +120,14 @@
   "moreSourceCode": "Mã nguồn",
   "moreSectionApp": "Tải ứng dụng",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "Hiển thị",
+  "displayTheme": "Giao diện",
+  "themeSystem": "Hệ thống",
+  "themeLight": "Sáng",
+  "themeDark": "Tối",
+  "moreSectionAbout": "Giới thiệu",
+  "termsOfService": "Điều khoản dịch vụ",
+  "faq": "Câu hỏi thường gặp",
+  "openSourceLicenses": "Giấy phép mã nguồn mở"
 }

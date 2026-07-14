@@ -156,7 +156,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
       await _addSelectedLayers(controller, filter);
-      await controller.animateCamera(_cameraFor(bounds, size));
+      // Instant, not animated: switching areas should snap the framing (the
+      // home backdrop is display-only — no fly-through between townships).
+      await controller.moveCamera(_cameraFor(bounds, size));
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });

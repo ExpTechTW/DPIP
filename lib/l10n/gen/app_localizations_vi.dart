@@ -391,4 +391,31 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => 'Hiển thị';
+
+  @override
+  String get displayTheme => 'Giao diện';
+
+  @override
+  String get themeSystem => 'Hệ thống';
+
+  @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
+
+  @override
+  String get moreSectionAbout => 'Giới thiệu';
+
+  @override
+  String get termsOfService => 'Điều khoản dịch vụ';
+
+  @override
+  String get faq => 'Câu hỏi thường gặp';
+
+  @override
+  String get openSourceLicenses => 'Giấy phép mã nguồn mở';
 }

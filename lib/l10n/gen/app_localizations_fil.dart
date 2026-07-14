@@ -392,4 +392,31 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => 'Display';
+
+  @override
+  String get displayTheme => 'Tema';
+
+  @override
+  String get themeSystem => 'Sistema';
+
+  @override
+  String get themeLight => 'Maliwanag';
+
+  @override
+  String get themeDark => 'Madilim';
+
+  @override
+  String get moreSectionAbout => 'Tungkol';
+
+  @override
+  String get termsOfService => 'Mga Tuntunin ng Serbisyo';
+
+  @override
+  String get faq => 'Mga FAQ';
+
+  @override
+  String get openSourceLicenses => 'Mga lisensya ng open-source';
 }

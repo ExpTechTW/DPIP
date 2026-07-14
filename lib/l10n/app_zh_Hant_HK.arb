@@ -120,5 +120,14 @@
   "moreSourceCode": "原始碼",
   "moreSectionApp": "取得 App",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "顯示設定",
+  "displayTheme": "主題",
+  "themeSystem": "跟隨系統",
+  "themeLight": "淺色",
+  "themeDark": "深色",
+  "moreSectionAbout": "關於",
+  "termsOfService": "服務條款",
+  "faq": "常見問題",
+  "openSourceLicenses": "引用套件"
 }

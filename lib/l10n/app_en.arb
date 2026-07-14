@@ -504,5 +504,41 @@
   },
   "@moreSourceCode": {
     "description": "More-menu link to DPIP's source repository on GitHub"
+  },
+  "displaySettings": "Display",
+  "@displaySettings": {
+    "description": "Display-settings menu entry and page title (theme mode)"
+  },
+  "displayTheme": "Theme",
+  "@displayTheme": {
+    "description": "Section header for the theme-mode chooser on the Display settings page"
+  },
+  "themeSystem": "System",
+  "@themeSystem": {
+    "description": "Theme option: follow the system light/dark setting"
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme option: always light"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme option: always dark"
+  },
+  "moreSectionAbout": "About",
+  "@moreSectionAbout": {
+    "description": "More-menu section header for about / legal links"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "More-menu link title for the Terms of Service"
+  },
+  "faq": "FAQ",
+  "@faq": {
+    "description": "More-menu link title for the FAQ / help page"
+  },
+  "openSourceLicenses": "Open-source licenses",
+  "@openSourceLicenses": {
+    "description": "More-menu entry that opens the bundled open-source license list"
   }
 }

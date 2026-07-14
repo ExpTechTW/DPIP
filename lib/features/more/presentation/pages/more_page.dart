@@ -36,6 +36,16 @@ class MorePage extends StatelessWidget {
                 onTap: () => context.pushNamed(AppRoutes.regionManage),
               ),
               _MoreTile(
+                icon: Icons.translate_outlined,
+                title: l10n.languageSettings,
+                onTap: () => context.pushNamed(AppRoutes.language),
+              ),
+              _MoreTile(
+                icon: Icons.brightness_6_outlined,
+                title: l10n.displaySettings,
+                onTap: () => context.pushNamed(AppRoutes.display),
+              ),
+              _MoreTile(
                 icon: Icons.notifications_outlined,
                 title: l10n.notifySettingsMenu,
                 onTap: () => context.pushNamed(AppRoutes.notifySettings),
@@ -137,6 +147,30 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreAppStore,
                 host: 'apps.apple.com',
                 url: 'https://apps.apple.com/tw/app/dpip/id6468026362',
+              ),
+            ],
+          ),
+          SectionHeader(l10n.moreSectionAbout),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.gavel_outlined,
+                title: l10n.termsOfService,
+                host: 'exptech.com.tw',
+                url: 'https://exptech.com.tw/tos',
+              ),
+              _MoreTile(
+                icon: Icons.inventory_2_outlined,
+                title: l10n.openSourceLicenses,
+                // Flutter's built-in license viewer — no third-party package.
+                onTap: () =>
+                    showLicensePage(context: context, applicationName: 'DPIP'),
+              ),
+              _MoreLinkTile(
+                icon: Icons.help_outline,
+                title: l10n.faq,
+                host: 'exptech.com.tw',
+                url: 'https://exptech.com.tw',
               ),
             ],
           ),

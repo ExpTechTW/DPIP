@@ -392,4 +392,31 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => 'Tampilan';
+
+  @override
+  String get displayTheme => 'Tema';
+
+  @override
+  String get themeSystem => 'Sistem';
+
+  @override
+  String get themeLight => 'Terang';
+
+  @override
+  String get themeDark => 'Gelap';
+
+  @override
+  String get moreSectionAbout => 'Tentang';
+
+  @override
+  String get termsOfService => 'Ketentuan Layanan';
+
+  @override
+  String get faq => 'FAQ';
+
+  @override
+  String get openSourceLicenses => 'Lisensi sumber terbuka';
 }

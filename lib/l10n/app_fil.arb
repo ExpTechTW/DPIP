@@ -120,5 +120,14 @@
   "moreSourceCode": "Source code",
   "moreSectionApp": "Kunin ang app",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "Display",
+  "displayTheme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Maliwanag",
+  "themeDark": "Madilim",
+  "moreSectionAbout": "Tungkol",
+  "termsOfService": "Mga Tuntunin ng Serbisyo",
+  "faq": "Mga FAQ",
+  "openSourceLicenses": "Mga lisensya ng open-source"
 }

@@ -379,6 +379,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => '顯示設定';
+
+  @override
+  String get displayTheme => '主題';
+
+  @override
+  String get themeSystem => '跟隨系統';
+
+  @override
+  String get themeLight => '淺色';
+
+  @override
+  String get themeDark => '深色';
+
+  @override
+  String get moreSectionAbout => '關於';
+
+  @override
+  String get termsOfService => '服務條款';
+
+  @override
+  String get faq => '常見問題';
+
+  @override
+  String get openSourceLicenses => '引用套件';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -756,6 +783,33 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => '显示设置';
+
+  @override
+  String get displayTheme => '主题';
+
+  @override
+  String get themeSystem => '跟随系统';
+
+  @override
+  String get themeLight => '浅色';
+
+  @override
+  String get themeDark => '深色';
+
+  @override
+  String get moreSectionAbout => '关于';
+
+  @override
+  String get termsOfService => '服务条款';
+
+  @override
+  String get faq => '常见问题';
+
+  @override
+  String get openSourceLicenses => '开源许可';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1133,4 +1187,31 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => '顯示設定';
+
+  @override
+  String get displayTheme => '主題';
+
+  @override
+  String get themeSystem => '跟隨系統';
+
+  @override
+  String get themeLight => '淺色';
+
+  @override
+  String get themeDark => '深色';
+
+  @override
+  String get moreSectionAbout => '關於';
+
+  @override
+  String get termsOfService => '服務條款';
+
+  @override
+  String get faq => '常見問題';
+
+  @override
+  String get openSourceLicenses => '引用套件';
 }

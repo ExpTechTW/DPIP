@@ -11,13 +11,12 @@ abstract final class AppTheme {
   /// Dark theme.
   static ThemeData get dark => _base(Brightness.dark);
 
+  /// The color scheme for a [brightness] — exposed so a theme picker can paint a
+  /// true-to-theme preview without instantiating a whole [ThemeData].
+  static ColorScheme scheme(Brightness brightness) =>
+      ColorScheme.fromSeed(seedColor: _seed, brightness: brightness);
+
   static ThemeData _base(Brightness brightness) {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: _seed,
-        brightness: brightness,
-      ),
-    );
+    return ThemeData(useMaterial3: true, colorScheme: scheme(brightness));
   }
 }

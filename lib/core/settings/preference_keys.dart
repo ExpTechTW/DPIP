@@ -44,6 +44,10 @@ abstract final class PreferenceKeys {
   /// `LocaleController`.
   static const PrefKey<String> locale = PrefKey<String>._('app.locale');
 
+  /// Selected theme mode (`light` / `dark`; empty/absent = follow system). See
+  /// `ThemeController`.
+  static const PrefKey<String> themeMode = PrefKey<String>._('app.themeMode');
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const PrefKey<List<String>> savedRegionCodes = PrefKey<List<String>>._(
     'home.savedRegionCodes',

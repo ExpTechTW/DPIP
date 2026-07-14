@@ -383,4 +383,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => '表示';
+
+  @override
+  String get displayTheme => 'テーマ';
+
+  @override
+  String get themeSystem => 'システム';
+
+  @override
+  String get themeLight => 'ライト';
+
+  @override
+  String get themeDark => 'ダーク';
+
+  @override
+  String get moreSectionAbout => '情報';
+
+  @override
+  String get termsOfService => '利用規約';
+
+  @override
+  String get faq => 'よくある質問';
+
+  @override
+  String get openSourceLicenses => 'オープンソースライセンス';
 }

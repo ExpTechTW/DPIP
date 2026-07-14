@@ -841,6 +841,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App Store'**
   String get moreAppStore;
+
+  /// Display-settings menu entry and page title (theme mode)
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get displaySettings;
+
+  /// Section header for the theme-mode chooser on the Display settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get displayTheme;
+
+  /// Theme option: follow the system light/dark setting
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// Theme option: always light
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Theme option: always dark
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// More-menu section header for about / legal links
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get moreSectionAbout;
+
+  /// More-menu link title for the Terms of Service
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// More-menu link title for the FAQ / help page
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ'**
+  String get faq;
+
+  /// More-menu entry that opens the bundled open-source license list
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licenses'**
+  String get openSourceLicenses;
 }
 
 class _AppLocalizationsDelegate

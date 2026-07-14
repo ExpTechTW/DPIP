@@ -120,5 +120,14 @@
   "moreSourceCode": "ソースコード",
   "moreSectionApp": "アプリを入手",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "表示",
+  "displayTheme": "テーマ",
+  "themeSystem": "システム",
+  "themeLight": "ライト",
+  "themeDark": "ダーク",
+  "moreSectionAbout": "情報",
+  "termsOfService": "利用規約",
+  "faq": "よくある質問",
+  "openSourceLicenses": "オープンソースライセンス"
 }

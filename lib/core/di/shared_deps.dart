@@ -16,6 +16,7 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/theme_controller.dart';
 
 /// The shared infrastructure every feature module builds on, assembled once in
 /// `bootstrap()` and handed to each feature's `*Providers(deps)` function.
@@ -42,6 +43,7 @@ class SharedDeps {
     required this.locationMonitor,
     required this.onboarding,
     required this.locale,
+    required this.theme,
     this.etagCache,
     this.networkUsage,
   });
@@ -99,6 +101,9 @@ class SharedDeps {
 
   /// The selected UI language override (also provided; drives `MaterialApp`).
   final LocaleController locale;
+
+  /// The selected theme mode (also provided; drives `MaterialApp.themeMode`).
+  final ThemeController theme;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

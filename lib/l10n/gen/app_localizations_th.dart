@@ -390,4 +390,31 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => 'การแสดงผล';
+
+  @override
+  String get displayTheme => 'ธีม';
+
+  @override
+  String get themeSystem => 'ระบบ';
+
+  @override
+  String get themeLight => 'สว่าง';
+
+  @override
+  String get themeDark => 'มืด';
+
+  @override
+  String get moreSectionAbout => 'เกี่ยวกับ';
+
+  @override
+  String get termsOfService => 'ข้อกำหนดในการให้บริการ';
+
+  @override
+  String get faq => 'คำถามที่พบบ่อย';
+
+  @override
+  String get openSourceLicenses => 'ใบอนุญาตโอเพนซอร์ส';
 }

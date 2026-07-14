@@ -390,4 +390,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => 'Display';
+
+  @override
+  String get displayTheme => 'Theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get moreSectionAbout => 'About';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get faq => 'FAQ';
+
+  @override
+  String get openSourceLicenses => 'Open-source licenses';
 }

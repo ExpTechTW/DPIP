@@ -36,6 +36,13 @@ abstract final class AppRoutes {
   static const String developer = 'developer';
   static const String developerPath = '/developer';
 
+  // Appearance / language settings, pushed over the shell from the More tab.
+  static const String display = 'display';
+  static const String displayPath = '/display';
+
+  static const String language = 'language';
+  static const String languagePath = '/language';
+
   static const String log = 'log';
   static const String logPath = '/log';
 

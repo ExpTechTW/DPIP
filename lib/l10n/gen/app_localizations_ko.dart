@@ -383,4 +383,31 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moreAppStore => 'App Store';
+
+  @override
+  String get displaySettings => '화면';
+
+  @override
+  String get displayTheme => '테마';
+
+  @override
+  String get themeSystem => '시스템';
+
+  @override
+  String get themeLight => '라이트';
+
+  @override
+  String get themeDark => '다크';
+
+  @override
+  String get moreSectionAbout => '정보';
+
+  @override
+  String get termsOfService => '서비스 약관';
+
+  @override
+  String get faq => '자주 묻는 질문';
+
+  @override
+  String get openSourceLicenses => '오픈소스 라이선스';
 }

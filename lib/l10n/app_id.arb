@@ -120,5 +120,14 @@
   "moreSourceCode": "Kode sumber",
   "moreSectionApp": "Dapatkan aplikasi",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "Tampilan",
+  "displayTheme": "Tema",
+  "themeSystem": "Sistem",
+  "themeLight": "Terang",
+  "themeDark": "Gelap",
+  "moreSectionAbout": "Tentang",
+  "termsOfService": "Ketentuan Layanan",
+  "faq": "FAQ",
+  "openSourceLicenses": "Lisensi sumber terbuka"
 }

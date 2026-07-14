@@ -28,6 +28,7 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
@@ -67,6 +68,7 @@ Future<void> bootstrap() async {
   final experimental = ExperimentalSettings(prefs);
   final onboarding = OnboardingStore(prefs);
   final locale = LocaleController(prefs);
+  final theme = ThemeController(prefs);
   final cache = await _openCache();
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
@@ -156,6 +158,7 @@ Future<void> bootstrap() async {
     locationMonitor: locationMonitor,
     onboarding: onboarding,
     locale: locale,
+    theme: theme,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
   );

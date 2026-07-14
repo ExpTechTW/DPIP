@@ -120,5 +120,14 @@
   "moreSourceCode": "ซอร์สโค้ด",
   "moreSectionApp": "ดาวน์โหลดแอป",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "การแสดงผล",
+  "displayTheme": "ธีม",
+  "themeSystem": "ระบบ",
+  "themeLight": "สว่าง",
+  "themeDark": "มืด",
+  "moreSectionAbout": "เกี่ยวกับ",
+  "termsOfService": "ข้อกำหนดในการให้บริการ",
+  "faq": "คำถามที่พบบ่อย",
+  "openSourceLicenses": "ใบอนุญาตโอเพนซอร์ส"
 }

@@ -120,5 +120,14 @@
   "moreSourceCode": "소스 코드",
   "moreSectionApp": "앱 다운로드",
   "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store"
+  "moreAppStore": "App Store",
+  "displaySettings": "화면",
+  "displayTheme": "테마",
+  "themeSystem": "시스템",
+  "themeLight": "라이트",
+  "themeDark": "다크",
+  "moreSectionAbout": "정보",
+  "termsOfService": "서비스 약관",
+  "faq": "자주 묻는 질문",
+  "openSourceLicenses": "오픈소스 라이선스"
 }
