@@ -59,7 +59,9 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),
     // The RTS feed under its core supertype + the seismic station directory, so
     // the map's RTS layer can consume both without importing this feature.
-    Provider<RealtimeNotifier<Rts>>.value(value: rtsController),
+    // ChangeNotifierProvider (not Provider) because RealtimeNotifier is a
+    // Listenable — a plain Provider throws the invalid-value-type check.
+    ChangeNotifierProvider<RealtimeNotifier<Rts>>.value(value: rtsController),
     Provider<TremStationRepository>.value(
       value: TremStationRepositoryImpl(deps.apiClient),
     ),
