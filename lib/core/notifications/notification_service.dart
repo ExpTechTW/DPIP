@@ -138,11 +138,11 @@ class NotificationService {
   /// On iOS the FCM token needs the **APNs** token first, which arrives
   /// asynchronously after `registerForRemoteNotifications` (handled by the
   /// FlutterFire app-delegate proxy). So poll `getAPNSToken` briefly before
-  /// asking — else `getToken` throws `apns-token-not-set`. The APNs token is
-  /// **null on the iOS Simulator**, so push needs a physical device (and the
-  /// APNs auth key uploaded to the Firebase console). Best-effort: a failure
-  /// just leaves the token unset until [requestPermission] or `onTokenRefresh`
-  /// tries again.
+  /// asking — else `getToken` throws `apns-token-not-set`. Recent iOS 16+
+  /// Simulators do provision an APNs token (older ones return null); either way
+  /// delivery still needs the APNs auth key uploaded to the Firebase console.
+  /// Best-effort: a failure just leaves the token unset until [requestPermission]
+  /// or `onTokenRefresh` tries again.
   Future<void> _fetchToken() async {
     final messaging = FirebaseMessaging.instance;
     try {

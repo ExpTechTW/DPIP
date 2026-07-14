@@ -34,6 +34,7 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
+import 'package:dpip/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -47,10 +48,11 @@ import 'package:sqflite/sqflite.dart';
 /// then lets every feature contribute its own providers — so this stays a fixed
 /// spine plus a one-line-per-feature aggregate, not a god-function.
 ///
-/// Firebase reads its configuration from the native `google-services.json` /
-/// `GoogleService-Info.plist`. Firebase init and notification setup are
-/// best-effort: a failure is logged and the app still launches (push is simply
-/// unavailable until the environment is complete).
+/// Firebase is initialized with **explicit** [DefaultFirebaseOptions] rather
+/// than the native `GoogleService-Info.plist` / `google-services.json`, so init
+/// doesn't depend on the iOS plist being added to the Xcode target's bundle
+/// resources. Firebase init and notification setup are best-effort: a failure is
+/// logged and the app still launches (push is simply unavailable).
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -58,7 +60,9 @@ Future<void> bootstrap() async {
   Log.info('DPIP starting up');
 
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     Log.info('Firebase initialized');
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'Firebase init skipped (no config yet)');
