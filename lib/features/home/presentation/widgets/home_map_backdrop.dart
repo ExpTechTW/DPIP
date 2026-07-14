@@ -49,8 +49,11 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   static const String _radarLayer = 'home-radar-lyr';
   static const double _radarOpacity = 0.85;
 
-  /// Inset kept around the framed area on every side.
-  static const double _frameMargin = 24;
+  /// The tightest zoom the framing uses — a small township fits to this instead
+  /// of zooming all the way in, so every area frames at a consistent scale.
+  /// Capped at 11 (the radar echo tiles only exist to zoom 11); lower it to
+  /// frame selections looser.
+  static const double _frameMaxZoom = 11;
 
   MapLibreMapController? _controller;
   bool _styleReady = false;
@@ -165,15 +168,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         EdgeInsets.only(bottom: bottomInset),
         false,
       );
-      await controller.moveCamera(
-        CameraUpdate.newLatLngBounds(
-          box,
-          left: _frameMargin,
-          top: _frameMargin,
-          right: _frameMargin,
-          bottom: _frameMargin,
-        ),
-      );
+      await controller.moveCamera(CameraUpdate.newLatLngBounds(box));
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });
@@ -308,6 +303,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     return IgnorePointer(
       child: BaseMap(
         interactive: false,
+        maxZoom: _frameMaxZoom,
         onMapCreated: _onMapCreated,
         onStyleLoaded: _onStyleLoaded,
       ),
