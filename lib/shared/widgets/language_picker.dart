@@ -19,6 +19,12 @@ class LanguagePicker extends StatelessWidget {
   /// Optional text shown to the left of the globe (e.g. "語言設定" on welcome).
   final String? label;
 
+  /// Menu sentinel for the "follow system" entry. `PopupMenuButton` reports a
+  /// dismissal as a `null` result and swallows it, so a `null`-valued item can
+  /// never be selected — we use the BCP-47 "undetermined" tag as a non-null
+  /// marker and map it back to `null` (clear the override) on selection.
+  static const Locale _systemLocale = Locale('und');
+
   /// Loads each supported locale's own name from its ARB. Cached for the
   /// process — the supported set is fixed at build time. `delegate.load` is
   /// synchronous under the hood (gen-l10n), so the picker paints immediately.
@@ -54,12 +60,13 @@ class LanguagePicker extends StatelessWidget {
       future: _options(),
       builder: (context, snapshot) {
         final options = snapshot.data ?? const [];
-        return PopupMenuButton<Locale?>(
+        return PopupMenuButton<Locale>(
           tooltip: l10n.language,
-          initialValue: current,
+          initialValue: current ?? _systemLocale,
           enabled: options.isNotEmpty,
-          onSelected: (locale) =>
-              context.read<LocaleController>().setLocale(locale),
+          onSelected: (locale) => context.read<LocaleController>().setLocale(
+            locale == _systemLocale ? null : locale,
+          ),
           position: PopupMenuPosition.under,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -69,13 +76,13 @@ class LanguagePicker extends StatelessWidget {
             child: trigger,
           ),
           itemBuilder: (context) => [
-            CheckedPopupMenuItem<Locale?>(
-              value: null,
+            CheckedPopupMenuItem<Locale>(
+              value: _systemLocale,
               checked: current == null,
               child: Text(l10n.languageSystem),
             ),
             for (final option in options)
-              CheckedPopupMenuItem<Locale?>(
+              CheckedPopupMenuItem<Locale>(
                 value: option.locale,
                 checked: current == option.locale,
                 child: Text(option.name),
