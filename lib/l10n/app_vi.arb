@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "Bản đồ (tạm thời vô hiệu hóa)",
   "moreSectionGeneral": "Chung",
   "regionManageTitle": "Khu vực đã lưu",
+  "regionAddButton": "Thêm khu vực",
+  "regionEmpty": "Chưa có khu vực nào được lưu",
   "regionSelectTitle": "Chọn khu vực",
   "regionSelectCount": "Đã chọn {count}/{max}",
   "regionSelectFull": "Bạn chỉ có thể lưu tối đa {max} khu vực",

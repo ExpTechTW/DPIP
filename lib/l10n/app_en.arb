@@ -37,6 +37,14 @@
     "description": "Section header on the More page grouping general settings entries"
   },
   "regionManageTitle": "Saved regions",
+  "regionAddButton": "Add a region",
+  "regionEmpty": "No saved regions yet",
+  "@regionAddButton": {
+    "description": "Button to open the region picker to add a saved region"
+  },
+  "@regionEmpty": {
+    "description": "Empty state on the saved-regions manage page"
+  },
   "@regionManageTitle": {
     "description": "More-menu entry that opens the region picker"
   },

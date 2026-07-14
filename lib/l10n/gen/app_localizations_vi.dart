@@ -39,6 +39,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get regionManageTitle => 'Khu vực đã lưu';
 
   @override
+  String get regionAddButton => 'Thêm khu vực';
+
+  @override
+  String get regionEmpty => 'Chưa có khu vực nào được lưu';
+
+  @override
   String get regionSelectTitle => 'Chọn khu vực';
 
   @override

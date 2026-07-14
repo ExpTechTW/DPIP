@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "地図(一時的に無効)",
   "moreSectionGeneral": "一般",
   "regionManageTitle": "登録地域",
+  "regionAddButton": "地域を追加",
+  "regionEmpty": "登録地域がありません",
   "regionSelectTitle": "地域を選択",
   "regionSelectCount": "{count}/{max} 件選択中",
   "regionSelectFull": "地域は最大 {max} 件まで登録できます",

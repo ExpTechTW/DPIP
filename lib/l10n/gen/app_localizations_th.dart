@@ -39,6 +39,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get regionManageTitle => 'พื้นที่ที่ใช้บ่อย';
 
   @override
+  String get regionAddButton => 'เพิ่มพื้นที่';
+
+  @override
+  String get regionEmpty => 'ยังไม่มีพื้นที่ที่บันทึกไว้';
+
+  @override
   String get regionSelectTitle => 'เลือกพื้นที่';
 
   @override

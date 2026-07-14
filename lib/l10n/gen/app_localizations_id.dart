@@ -39,6 +39,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get regionManageTitle => 'Wilayah tersimpan';
 
   @override
+  String get regionAddButton => 'Tambah wilayah';
+
+  @override
+  String get regionEmpty => 'Belum ada wilayah tersimpan';
+
+  @override
   String get regionSelectTitle => 'Pilih wilayah';
 
   @override

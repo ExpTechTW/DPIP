@@ -4,6 +4,7 @@ import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
+import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
@@ -74,6 +75,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.developerPath,
       name: AppRoutes.developer,
       builder: (_, _) => const DeveloperPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.regionManagePath,
+      name: AppRoutes.regionManage,
+      builder: (_, _) => const RegionManagePage(),
     ),
     GoRoute(
       path: AppRoutes.regionSelectPath,

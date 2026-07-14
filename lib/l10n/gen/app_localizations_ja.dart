@@ -39,6 +39,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regionManageTitle => '登録地域';
 
   @override
+  String get regionAddButton => '地域を追加';
+
+  @override
+  String get regionEmpty => '登録地域がありません';
+
+  @override
   String get regionSelectTitle => '地域を選択';
 
   @override

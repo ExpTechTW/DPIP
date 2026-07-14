@@ -33,7 +33,7 @@ class MorePage extends StatelessWidget {
               _MoreTile(
                 icon: Icons.pin_drop_outlined,
                 title: l10n.regionManageTitle,
-                onTap: () => context.pushNamed(AppRoutes.regionSelect),
+                onTap: () => context.pushNamed(AppRoutes.regionManage),
               ),
               _MoreTile(
                 icon: Icons.notifications_outlined,

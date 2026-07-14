@@ -176,6 +176,18 @@ abstract class AppLocalizations {
   /// **'Saved regions'**
   String get regionManageTitle;
 
+  /// Button to open the region picker to add a saved region
+  ///
+  /// In en, this message translates to:
+  /// **'Add a region'**
+  String get regionAddButton;
+
+  /// Empty state on the saved-regions manage page
+  ///
+  /// In en, this message translates to:
+  /// **'No saved regions yet'**
+  String get regionEmpty;
+
   /// Title of the region picker (city list) page
   ///
   /// In en, this message translates to:

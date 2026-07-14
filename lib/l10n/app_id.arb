@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "Peta (dinonaktifkan sementara)",
   "moreSectionGeneral": "Umum",
   "regionManageTitle": "Wilayah tersimpan",
+  "regionAddButton": "Tambah wilayah",
+  "regionEmpty": "Belum ada wilayah tersimpan",
   "regionSelectTitle": "Pilih wilayah",
   "regionSelectCount": "{count}/{max} dipilih",
   "regionSelectFull": "Anda dapat menyimpan hingga {max} wilayah",

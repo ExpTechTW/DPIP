@@ -39,6 +39,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get regionManageTitle => '常用地區';
 
   @override
+  String get regionAddButton => '新增地區';
+
+  @override
+  String get regionEmpty => '尚未新增常用地區';
+
+  @override
   String get regionSelectTitle => '選擇地區';
 
   @override
@@ -410,6 +416,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get regionManageTitle => '常用地区';
 
   @override
+  String get regionAddButton => '添加地区';
+
+  @override
+  String get regionEmpty => '尚未添加常用地区';
+
+  @override
   String get regionSelectTitle => '选择地区';
 
   @override
@@ -779,6 +791,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get regionManageTitle => '常用地區';
+
+  @override
+  String get regionAddButton => '新增地區';
+
+  @override
+  String get regionEmpty => '尚未新增常用地區';
 
   @override
   String get regionSelectTitle => '選擇地區';

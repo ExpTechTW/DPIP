@@ -39,8 +39,13 @@ abstract final class AppRoutes {
   static const String log = 'log';
   static const String logPath = '/log';
 
+  // Saved-region management: the manage page (view/remove saved townships)
+  // opens the picker to add. Saved townships feed the Home region bar.
+  static const String regionManage = 'regionManage';
+  static const String regionManagePath = '/region';
+
   // Region picker: the city list, then the township list within a city
-  // (`:city` path parameter). Saved townships feed the Home region bar.
+  // (`:city` path parameter).
   static const String regionSelect = 'regionSelect';
   static const String regionSelectPath = '/region-select';
 

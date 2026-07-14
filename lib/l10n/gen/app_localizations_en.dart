@@ -39,6 +39,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regionManageTitle => 'Saved regions';
 
   @override
+  String get regionAddButton => 'Add a region';
+
+  @override
+  String get regionEmpty => 'No saved regions yet';
+
+  @override
   String get regionSelectTitle => 'Select a region';
 
   @override

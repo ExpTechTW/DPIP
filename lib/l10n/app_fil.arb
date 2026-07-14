@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "Mapa (pansamantalang naka-disable)",
   "moreSectionGeneral": "Pangkalahatan",
   "regionManageTitle": "Mga naka-save na rehiyon",
+  "regionAddButton": "Magdagdag ng rehiyon",
+  "regionEmpty": "Wala pang naka-save na rehiyon",
   "regionSelectTitle": "Pumili ng rehiyon",
   "regionSelectCount": "{count}/{max} ang napili",
   "regionSelectFull": "Maaari kang mag-save ng hanggang {max} na rehiyon",

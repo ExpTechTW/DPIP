@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "แผนที่ (ปิดใช้งานชั่วคราว)",
   "moreSectionGeneral": "ทั่วไป",
   "regionManageTitle": "พื้นที่ที่ใช้บ่อย",
+  "regionAddButton": "เพิ่มพื้นที่",
+  "regionEmpty": "ยังไม่มีพื้นที่ที่บันทึกไว้",
   "regionSelectTitle": "เลือกพื้นที่",
   "regionSelectCount": "เลือกแล้ว {count}/{max}",
   "regionSelectFull": "บันทึกได้สูงสุด {max} พื้นที่",

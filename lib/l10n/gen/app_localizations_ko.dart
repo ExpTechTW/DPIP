@@ -39,6 +39,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get regionManageTitle => '저장한 지역';
 
   @override
+  String get regionAddButton => '지역 추가';
+
+  @override
+  String get regionEmpty => '저장된 지역이 없습니다';
+
+  @override
   String get regionSelectTitle => '지역 선택';
 
   @override

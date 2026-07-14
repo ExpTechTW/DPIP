@@ -39,6 +39,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get regionManageTitle => 'Mga naka-save na rehiyon';
 
   @override
+  String get regionAddButton => 'Magdagdag ng rehiyon';
+
+  @override
+  String get regionEmpty => 'Wala pang naka-save na rehiyon';
+
+  @override
   String get regionSelectTitle => 'Pumili ng rehiyon';
 
   @override

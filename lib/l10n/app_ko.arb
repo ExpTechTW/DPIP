@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "지도 (일시 사용 중지)",
   "moreSectionGeneral": "일반",
   "regionManageTitle": "저장한 지역",
+  "regionAddButton": "지역 추가",
+  "regionEmpty": "저장된 지역이 없습니다",
   "regionSelectTitle": "지역 선택",
   "regionSelectCount": "{count}/{max} 선택됨",
   "regionSelectFull": "최대 {max}개 지역까지 저장할 수 있습니다",

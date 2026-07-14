@@ -10,6 +10,8 @@
   "mapPlaceholderDisabled": "地图（暂时禁用）",
   "moreSectionGeneral": "通用",
   "regionManageTitle": "常用地区",
+  "regionAddButton": "添加地区",
+  "regionEmpty": "尚未添加常用地区",
   "regionSelectTitle": "选择地区",
   "regionSelectCount": "已选 {count}/{max}",
   "regionSelectFull": "最多只能选择 {max} 个地区",
