@@ -42,6 +42,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
+  /// Whether the initial fit-to-Taiwan has run. Only on first load — a reload
+  /// (theme change) keeps whatever the user has panned/zoomed to.
+  bool _framed = false;
+
   late MapLayer _active = widget.layers.first;
   List<MapFrame> _frames = const [];
   int _selectedIndex = 0;
@@ -102,6 +106,14 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // forget its on-map state so the re-render re-adds instead of no-oping.
     for (final layer in widget.layers) {
       layer.onStyleReset();
+    }
+    // Frame the island once, from its bounds (no hardcoded zoom). Only on first
+    // load — a reload keeps whatever the user has panned/zoomed to.
+    if (!_framed) {
+      _framed = true;
+      _controller?.moveCamera(
+        CameraUpdate.newLatLngBounds(BaseMap.taiwanBounds),
+      );
     }
     _loadActive();
   }

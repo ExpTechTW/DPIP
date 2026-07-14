@@ -24,22 +24,29 @@ class BaseMap extends StatelessWidget {
     this.interactive = true,
   });
 
-  /// Centre of Taiwan.
-  static const LatLng taiwanCenter = LatLng(23.60, 120.85);
-
-  /// Default zoom framing the whole island.
-  static const double taiwanZoom = 6.4;
-
-  /// Bounding box framing the Taiwan main island — for the nationwide
-  /// fit-to-bounds framing on the home backdrop. Kept to the main island (no
-  /// Penghu/Kinmen/Matsu) so the nationwide view isn't dominated by open sea.
+  /// Bounding box framing the Taiwan main island — the single source of the
+  /// nationwide framing, fit to the viewport (never a hardcoded zoom). Kept to
+  /// the main island (no Penghu/Kinmen/Matsu) so it isn't dominated by open sea.
   static final LatLngBounds taiwanBounds = LatLngBounds(
-    southwest: const LatLng(21.85, 119.95),
-    northeast: const LatLng(25.35, 122.05),
+    southwest: const LatLng(22.2, 119),
+    northeast: const LatLng(25.35, 121.05),
+  );
+
+  /// Centre of [taiwanBounds] — only the pre-layout camera target, before a
+  /// fit-to-bounds frames the island properly. Derived, so it can't drift from
+  /// the bounds.
+  static LatLng get taiwanCenter => LatLng(
+    (taiwanBounds.southwest.latitude + taiwanBounds.northeast.latitude) / 2,
+    (taiwanBounds.southwest.longitude + taiwanBounds.northeast.longitude) / 2,
   );
 
   /// Fixed 4–11 zoom range — the radar echo tiles require it.
-  static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(4, 11);
+  static const double minZoom = 4;
+  static const double maxZoom = 11;
+  static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(
+    minZoom,
+    maxZoom,
+  );
 
   /// Called with the controller once the map is ready — add overlay layers here.
   final void Function(MapLibreMapController controller)? onMapCreated;
@@ -55,9 +62,11 @@ class BaseMap extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return MapLibreMap(
-      initialCameraPosition: const CameraPosition(
+      // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
+      // own selection) once the map is laid out, so no hardcoded framing zoom.
+      initialCameraPosition: CameraPosition(
         target: taiwanCenter,
-        zoom: taiwanZoom,
+        zoom: minZoom,
       ),
       styleString: exptechVectorStyle(
         sea: colors.surface.toHexRgb(),
