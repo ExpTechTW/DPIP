@@ -10,6 +10,7 @@ import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
@@ -68,6 +69,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.developerPath,
+      name: AppRoutes.developer,
+      builder: (_, _) => const DeveloperPage(),
     ),
     GoRoute(
       path: AppRoutes.regionSelectPath,

@@ -176,6 +176,24 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get moreSectionAdvanced;
 
+  /// More-menu entry / title for the developer diagnostics page
+  ///
+  /// In en, this message translates to:
+  /// **'Developer settings'**
+  String get moreDeveloper;
+
+  /// Snackbar shown after copying a diagnostic value
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get developerCopied;
+
+  /// Tooltip for the copy-all action on the developer page
+  ///
+  /// In en, this message translates to:
+  /// **'Copy all'**
+  String get developerCopyAll;
+
   /// Title of the experimental-features settings page and its More-menu entry
   ///
   /// In en, this message translates to:

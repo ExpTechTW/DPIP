@@ -20,6 +20,7 @@ class DeviceInfoChannel(private val context: Context) :
         when (call.method) {
             "getDeviceInfo" -> result.success(
                 mapOf(
+                    "manufacturer" to Build.MANUFACTURER,
                     "model" to Build.MODEL,
                     "osVersion" to Build.VERSION.RELEASE,
                     "sdkInt" to Build.VERSION.SDK_INT,

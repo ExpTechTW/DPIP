@@ -52,6 +52,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreSectionAdvanced => '進階';
 
   @override
+  String get moreDeveloper => '開發者設定';
+
+  @override
+  String get developerCopied => '已複製到剪貼簿';
+
+  @override
+  String get developerCopyAll => '全部複製';
+
+  @override
   String get experimentalFeatures => '實驗性功能';
 
   @override

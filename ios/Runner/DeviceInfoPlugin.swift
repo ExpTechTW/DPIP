@@ -20,6 +20,7 @@ public class DeviceInfoPlugin: NSObject, FlutterPlugin {
     switch call.method {
     case "getDeviceInfo":
       result([
+        "manufacturer": "Apple",
         "model": DeviceInfoPlugin.machineCode(),
         "osVersion": UIDevice.current.systemVersion,
         "sdkInt": NSNull(),

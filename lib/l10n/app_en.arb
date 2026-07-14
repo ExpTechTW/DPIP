@@ -59,6 +59,18 @@
   "@moreSectionAdvanced": {
     "description": "Section header on the More page grouping advanced/developer entries"
   },
+  "moreDeveloper": "Developer settings",
+  "@moreDeveloper": {
+    "description": "More-menu entry / title for the developer diagnostics page"
+  },
+  "developerCopied": "Copied to clipboard",
+  "@developerCopied": {
+    "description": "Snackbar shown after copying a diagnostic value"
+  },
+  "developerCopyAll": "Copy all",
+  "@developerCopyAll": {
+    "description": "Tooltip for the copy-all action on the developer page"
+  },
   "experimentalFeatures": "Experimental features",
   "@experimentalFeatures": {
     "description": "Title of the experimental-features settings page and its More-menu entry"

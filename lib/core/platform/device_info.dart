@@ -5,11 +5,15 @@ import 'package:flutter/services.dart';
 /// Immutable snapshot of the host device.
 class DeviceDetails {
   const DeviceDetails({
+    required this.manufacturer,
     required this.model,
     required this.osVersion,
     this.sdkInt,
     this.identifier,
   });
+
+  /// Device maker / OEM — `Build.MANUFACTURER` (Android) or `Apple` (iOS).
+  final String manufacturer;
 
   /// Marketing model name (iOS) or `Build.MODEL` (Android).
   final String model;
@@ -43,12 +47,14 @@ abstract final class DeviceInfoService {
     final raw =
         await _channel.invokeMapMethod<String, dynamic>('getDeviceInfo') ??
         const <String, dynamic>{};
+    final manufacturer = (raw['manufacturer'] as String?) ?? 'Unknown';
     final model = (raw['model'] as String?) ?? 'Unknown';
     final osVersion = (raw['osVersion'] as String?) ?? '';
     final sdkInt = (raw['sdkInt'] as num?)?.toInt();
     final identifier = raw['identifier'] as String?;
 
     return DeviceDetails(
+      manufacturer: manufacturer,
       model: Platform.isIOS ? (_iPhoneNames[model] ?? model) : model,
       osVersion: osVersion,
       sdkInt: sdkInt,

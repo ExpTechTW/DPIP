@@ -33,6 +33,9 @@ abstract final class AppRoutes {
   static const String experimental = 'experimental';
   static const String experimentalPath = '/experimental';
 
+  static const String developer = 'developer';
+  static const String developerPath = '/developer';
+
   static const String log = 'log';
   static const String logPath = '/log';
 
