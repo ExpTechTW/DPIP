@@ -61,4 +61,36 @@ void main() {
       isNotNull,
     );
   });
+
+  testWidgets('re-checks when content shrinks to fit (e.g. language switch)', (
+    tester,
+  ) async {
+    Widget scaffold(double height) => _wrap(
+      OnboardingScaffold(
+        child: SizedBox(height: height, child: const Text('terms')),
+        actionBuilder: (context, atEnd) => FilledButton(
+          onPressed: atEnd ? () {} : null,
+          child: const Text('go'),
+        ),
+      ),
+    );
+
+    // Tall content overflows the viewport → must scroll → locked.
+    await tester.pumpWidget(scaffold(4000));
+    await tester.pump();
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
+
+    // Content shrinks to fit (a shorter-language terms body). No scroll event
+    // fires, so the scaffold must re-evaluate after layout and unlock.
+    await tester.pumpWidget(scaffold(50));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNotNull,
+      reason: 'content that now fits must unlock without a scroll',
+    );
+  });
 }

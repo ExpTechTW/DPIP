@@ -37,6 +37,17 @@ class _OnboardingScaffoldState extends State<OnboardingScaffold> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _check());
   }
 
+  @override
+  void didUpdateWidget(OnboardingScaffold oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The body may have changed size — e.g. switching language shortens the
+    // terms so they now fit without scrolling. That fires no scroll event, so
+    // re-evaluate "at end" after the new content lays out; otherwise a
+    // scroll-gated step (the terms) would stay locked with an un-scrollable
+    // "scroll to continue" hint.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _check());
+  }
+
   void _check() {
     if (!_controller.hasClients) return;
     final position = _controller.position;
