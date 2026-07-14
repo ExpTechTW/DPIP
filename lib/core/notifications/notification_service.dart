@@ -40,6 +40,16 @@ class NotificationService {
   /// Whether the OS has granted notification permission.
   Future<bool> isAllowed() => AwesomeNotifications().isNotificationAllowed();
 
+  /// Whether the **critical-alert** permission is granted — lets EEW override
+  /// silent / Do-Not-Disturb (iOS; guarded by the app entitlement). Shown as a
+  /// separate onboarding step on iOS.
+  Future<bool> criticalAllowed() async {
+    final granted = await AwesomeNotifications().checkPermissionList(
+      permissions: const [NotificationPermission.CriticalAlert],
+    );
+    return granted.contains(NotificationPermission.CriticalAlert);
+  }
+
   /// Initializes channels, the tap listener, and the FCM/APNs transport. Call
   /// once at start-up; safe to await best-effort (a failure just means no push).
   Future<void> init() async {

@@ -229,4 +229,72 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notifyOptTsunamiAll => '海嘯消息、海嘯警報';
+
+  @override
+  String get onboardingNext => '下一步';
+
+  @override
+  String get onboardingBack => '上一步';
+
+  @override
+  String get onboardingScrollHint => '往下捲動以繼續';
+
+  @override
+  String get onboardingIntroTitle => '歡迎使用 DPIP';
+
+  @override
+  String get onboardingIntroBody =>
+      'DPIP 是與你並肩的防災夥伴,整合強震即時警報、地震報告、天氣與各類災害資訊,在關鍵時刻即時通知你。\n\n• 地震:強震即時警報、震度速報與地震報告\n• 天氣:雷雨即時訊息、天氣警特報\n• 海嘯與防災資訊\n\n接下來,我們會請你閱讀服務條款,並授權幾項讓 DPIP 能即時守護你的權限。';
+
+  @override
+  String get onboardingTermsTitle => '服務條款';
+
+  @override
+  String get onboardingTermsBody =>
+      '歡迎使用 DPIP(防災資訊平台)。使用本應用程式前,請詳閱以下條款。\n\n一、服務性質:DPIP 彙整中央氣象署(CWA)、ExpTech 及其他來源之地震、天氣與防災資訊,以盡力方式即時提供。本服務僅供參考,不得取代政府官方警報與指示;實際災害應變請以中央氣象署及各級主管機關發布之資訊為準。\n\n二、即時性與準確性:資訊之傳遞可能因網路、裝置、系統或第三方服務而延遲、中斷或不完整。強震即時警報等具有先天不確定性,可能誤報或漏報,請勿完全依賴本服務作為唯一之防災依據。\n\n三、位置與資料:為提供在地化警報,本服務會在前景及背景蒐集並上傳您的概略位置與裝置推播識別碼,僅用於決定應向您推送之警報。\n\n四、責任限制:於法律允許之最大範圍內,ExpTech 及其開發者對於因使用或無法使用本服務所致之任何直接或間接損害,不負賠償責任。\n\n五、條款變更:本條款得隨時更新,恕不另行個別通知;繼續使用即視為同意最新條款。\n\n點選下方「同意並繼續」即表示您已閱讀、理解並同意本服務條款。';
+
+  @override
+  String get onboardingTermsAgree => '我已閱讀並同意服務條款';
+
+  @override
+  String get onboardingAgreeContinue => '同意並繼續';
+
+  @override
+  String get onboardingPermsTitle => '權限授權';
+
+  @override
+  String get onboardingPermsBody => '為了在災害發生的第一時間通知你,請授權以下權限。你隨時可以在系統設定中變更。';
+
+  @override
+  String get onboardingPermNotify => '通知';
+
+  @override
+  String get onboardingPermNotifyDesc => '在地震、天氣與災害發生時,即時傳遞警報通知。';
+
+  @override
+  String get onboardingPermCritical => '重大通知';
+
+  @override
+  String get onboardingPermCriticalDesc => '讓危及生命的強震即時警報,即使在靜音或勿擾模式下也能發出聲響。';
+
+  @override
+  String get onboardingPermLocation => '定位';
+
+  @override
+  String get onboardingPermLocationDesc => '自動依你所在位置推送在地警報,包含背景更新。';
+
+  @override
+  String get onboardingPermBattery => '省電白名單';
+
+  @override
+  String get onboardingPermBatteryDesc => '允許 DPIP 在背景持續運作,避免警報延遲或漏收。';
+
+  @override
+  String get onboardingGrant => '授權';
+
+  @override
+  String get onboardingGranted => '已授權';
+
+  @override
+  String get onboardingStart => '開始使用';
 }

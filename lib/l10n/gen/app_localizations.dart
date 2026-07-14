@@ -529,6 +529,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tsunami advisories and warnings'**
   String get notifyOptTsunamiAll;
+
+  /// Onboarding next-step button
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// Onboarding back button
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get onboardingBack;
+
+  /// Hint shown until the user scrolls to the end
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll down to continue'**
+  String get onboardingScrollHint;
+
+  /// Onboarding intro page title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to DPIP'**
+  String get onboardingIntroTitle;
+
+  /// Onboarding intro page body
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP is your disaster-prevention companion. It brings together earthquake early warnings, earthquake reports, weather, and hazard information, and alerts you the moment it matters.\n\n• Earthquakes: early warnings, intensity reports, and detailed reports\n• Weather: real-time thunderstorm messages and weather advisories\n• Tsunami and disaster information\n\nNext, we\'ll ask you to review the Terms of Service and grant a few permissions so DPIP can protect you in real time.'**
+  String get onboardingIntroBody;
+
+  /// Onboarding terms page title
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get onboardingTermsTitle;
+
+  /// Onboarding terms of service body
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to DPIP (Disaster Prevention Information Platform). Please read these terms before using the app.\n\n1. Nature of service: DPIP aggregates earthquake, weather, and disaster information from the Central Weather Administration (CWA), ExpTech, and other sources on a best-effort basis. It is for reference only and does not replace official government warnings and instructions; for actual disaster response, follow the CWA and the competent authorities.\n\n2. Timeliness and accuracy: Delivery may be delayed, interrupted, or incomplete due to network, device, system, or third-party factors. Earthquake early warnings are inherently uncertain and may produce false or missed alarms — do not rely on this service as your sole means of disaster preparedness.\n\n3. Location and data: To provide localized alerts, the app collects and uploads your approximate location and push identifier, in the foreground and background, solely to decide which alerts to send you.\n\n4. Limitation of liability: To the maximum extent permitted by law, ExpTech and its developers are not liable for any direct or indirect damages arising from the use of, or inability to use, this service.\n\n5. Changes: These terms may be updated at any time without individual notice; continued use constitutes acceptance of the latest terms.\n\nBy tapping \"Agree and continue\" you confirm that you have read, understood, and agree to these Terms of Service.'**
+  String get onboardingTermsBody;
+
+  /// Terms agreement checkbox label
+  ///
+  /// In en, this message translates to:
+  /// **'I have read and agree to the Terms of Service'**
+  String get onboardingTermsAgree;
+
+  /// Terms page continue button
+  ///
+  /// In en, this message translates to:
+  /// **'Agree and continue'**
+  String get onboardingAgreeContinue;
+
+  /// Onboarding permissions page title
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get onboardingPermsTitle;
+
+  /// Onboarding permissions page intro
+  ///
+  /// In en, this message translates to:
+  /// **'So DPIP can alert you the moment disaster strikes, please grant the following. You can change these anytime in system settings.'**
+  String get onboardingPermsBody;
+
+  /// Permission row: notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get onboardingPermNotify;
+
+  /// Permission row description: notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Deliver earthquake, weather, and disaster alerts the moment they happen.'**
+  String get onboardingPermNotifyDesc;
+
+  /// Permission row: critical alerts (iOS)
+  ///
+  /// In en, this message translates to:
+  /// **'Critical alerts'**
+  String get onboardingPermCritical;
+
+  /// Permission row description: critical alerts
+  ///
+  /// In en, this message translates to:
+  /// **'Let life-threatening earthquake warnings sound even in silent mode or Do Not Disturb.'**
+  String get onboardingPermCriticalDesc;
+
+  /// Permission row: location
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get onboardingPermLocation;
+
+  /// Permission row description: location
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically target alerts to where you are — including in the background.'**
+  String get onboardingPermLocationDesc;
+
+  /// Permission row: battery optimization (Android)
+  ///
+  /// In en, this message translates to:
+  /// **'Battery exemption'**
+  String get onboardingPermBattery;
+
+  /// Permission row description: battery
+  ///
+  /// In en, this message translates to:
+  /// **'Allow DPIP to keep running in the background so alerts aren\'t delayed or missed.'**
+  String get onboardingPermBatteryDesc;
+
+  /// Permission grant button
+  ///
+  /// In en, this message translates to:
+  /// **'Grant'**
+  String get onboardingGrant;
+
+  /// Permission granted label
+  ///
+  /// In en, this message translates to:
+  /// **'Granted'**
+  String get onboardingGranted;
+
+  /// Onboarding finish button
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get onboardingStart;
 }
 
 class _AppLocalizationsDelegate

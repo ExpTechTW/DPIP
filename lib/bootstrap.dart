@@ -21,6 +21,7 @@ import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
@@ -59,6 +60,7 @@ Future<void> bootstrap() async {
   final prefs = await SharedPreferences.getInstance();
   final regions = RegionSelection(prefs);
   final experimental = ExperimentalSettings(prefs);
+  final onboarding = OnboardingStore(prefs);
   final dio = createDio(etagCache: await _openEtagCache());
   final apiClient = ApiClient(dio, regions);
 
@@ -130,6 +132,7 @@ Future<void> bootstrap() async {
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
     backgroundLocation: backgroundLocation,
+    onboarding: onboarding,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime

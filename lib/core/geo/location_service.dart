@@ -37,6 +37,13 @@ class LocationService {
         permission == LocationPermission.whileInUse;
   }
 
+  /// Whether any location permission (while-in-use or Always) is granted.
+  Future<bool> granted() async {
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
+
   /// Whether background ("Always") location is granted — the precondition for
   /// native background reporting. On Android the background geofence can't fetch
   /// a fix (or prompt) with only "while in use", so callers must gate on this;

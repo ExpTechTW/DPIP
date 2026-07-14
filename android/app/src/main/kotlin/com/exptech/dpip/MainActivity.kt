@@ -26,6 +26,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, BackgroundLocationChannel.NAME)
             .setMethodCallHandler(BackgroundLocationChannel(applicationContext))
 
+        MethodChannel(messenger, BatteryOptimizationChannel.NAME)
+            .setMethodCallHandler(BatteryOptimizationChannel(applicationContext))
+
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
     }

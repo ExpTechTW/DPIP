@@ -24,6 +24,11 @@ abstract final class AppRoutes {
   static const String more = 'more';
   static const String morePath = '/more';
 
+  // First-launch onboarding (intro → terms → permissions), shown before the
+  // shell until completed.
+  static const String onboarding = 'onboarding';
+  static const String onboardingPath = '/onboarding';
+
   // Full-screen routes pushed over the shell.
   static const String experimental = 'experimental';
   static const String experimentalPath = '/experimental';

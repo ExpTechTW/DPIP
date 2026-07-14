@@ -12,6 +12,7 @@ import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
+import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,7 @@ class DpipApp extends StatelessWidget {
         regionStore: deps.regionStore,
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
+        onboarding: deps.onboarding,
         child: MaterialApp.router(
           title: 'DPIP',
           debugShowCheckedModeBanner: false,
@@ -73,6 +75,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.regionStore,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
+    required this.onboarding,
     required this.child,
   });
 
@@ -82,6 +85,7 @@ class _AppServicesHost extends StatefulWidget {
   final RegionStore regionStore;
   final DeviceLocationReporter deviceLocationReporter;
   final BackgroundLocationService backgroundLocation;
+  final OnboardingStore onboarding;
   final Widget child;
 
   @override
@@ -91,6 +95,7 @@ class _AppServicesHost extends StatefulWidget {
 class _AppServicesHostState extends State<_AppServicesHost>
     with WidgetsBindingObserver {
   late final RealtimeLifecycleObserver _observer;
+  bool _ready = false;
 
   @override
   void initState() {
@@ -98,12 +103,27 @@ class _AppServicesHostState extends State<_AppServicesHost>
     _observer = RealtimeLifecycleObserver(widget.realtimeService);
     WidgetsBinding.instance.addObserver(this);
     NotificationTaps.onTap = _routeNotificationTap;
+    widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.realtimeService.startAll();
       NotificationTaps.drainPending();
-      widget.notificationService.requestPermission();
-      _resolveCurrentLocation();
+      // Permissions belong to onboarding — only run the permission-dependent
+      // setup once it's complete (immediately for returning users).
+      if (widget.onboarding.isComplete) _onReady();
     });
+  }
+
+  void _onOnboardingChanged() {
+    if (widget.onboarding.isComplete) _onReady();
+  }
+
+  /// Runs the permission-dependent app setup once (after onboarding): ensures
+  /// notification permission and resolves + arms location reporting.
+  void _onReady() {
+    if (_ready) return;
+    _ready = true;
+    widget.notificationService.requestPermission();
+    _resolveCurrentLocation();
   }
 
   @override
@@ -111,7 +131,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     // Re-arm background reporting on resume: the Android geofence can be dropped
     // by a Play-services update / location toggle (neither fires boot), so a
     // warm foreground is the reliable re-arm point.
-    if (state == AppLifecycleState.resumed) _armBackground();
+    if (state == AppLifecycleState.resumed && _ready) _armBackground();
   }
 
   /// Requests GPS permission, resolves the current township into the region
@@ -149,6 +169,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
   @override
   void dispose() {
     NotificationTaps.onTap = null;
+    widget.onboarding.removeListener(_onOnboardingChanged);
     WidgetsBinding.instance.removeObserver(this);
     _observer.dispose();
     widget.deviceLocationReporter.dispose();

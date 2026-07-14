@@ -8,6 +8,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +33,7 @@ class SharedDeps {
     required this.locationService,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
+    required this.onboarding,
   });
 
   /// Persistence for feature-local settings.
@@ -72,4 +74,8 @@ class SharedDeps {
   /// Native background device-location reporting (terminated/background). The
   /// terminated-state counterpart to [deviceLocationReporter].
   final BackgroundLocationService backgroundLocation;
+
+  /// First-launch onboarding completion (also provided) — gates the router and
+  /// the app's permission requests.
+  final OnboardingStore onboarding;
 }

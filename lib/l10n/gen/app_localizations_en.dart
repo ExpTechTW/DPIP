@@ -231,4 +231,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifyOptTsunamiAll => 'Tsunami advisories and warnings';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingBack => 'Back';
+
+  @override
+  String get onboardingScrollHint => 'Scroll down to continue';
+
+  @override
+  String get onboardingIntroTitle => 'Welcome to DPIP';
+
+  @override
+  String get onboardingIntroBody =>
+      'DPIP is your disaster-prevention companion. It brings together earthquake early warnings, earthquake reports, weather, and hazard information, and alerts you the moment it matters.\n\n• Earthquakes: early warnings, intensity reports, and detailed reports\n• Weather: real-time thunderstorm messages and weather advisories\n• Tsunami and disaster information\n\nNext, we\'ll ask you to review the Terms of Service and grant a few permissions so DPIP can protect you in real time.';
+
+  @override
+  String get onboardingTermsTitle => 'Terms of Service';
+
+  @override
+  String get onboardingTermsBody =>
+      'Welcome to DPIP (Disaster Prevention Information Platform). Please read these terms before using the app.\n\n1. Nature of service: DPIP aggregates earthquake, weather, and disaster information from the Central Weather Administration (CWA), ExpTech, and other sources on a best-effort basis. It is for reference only and does not replace official government warnings and instructions; for actual disaster response, follow the CWA and the competent authorities.\n\n2. Timeliness and accuracy: Delivery may be delayed, interrupted, or incomplete due to network, device, system, or third-party factors. Earthquake early warnings are inherently uncertain and may produce false or missed alarms — do not rely on this service as your sole means of disaster preparedness.\n\n3. Location and data: To provide localized alerts, the app collects and uploads your approximate location and push identifier, in the foreground and background, solely to decide which alerts to send you.\n\n4. Limitation of liability: To the maximum extent permitted by law, ExpTech and its developers are not liable for any direct or indirect damages arising from the use of, or inability to use, this service.\n\n5. Changes: These terms may be updated at any time without individual notice; continued use constitutes acceptance of the latest terms.\n\nBy tapping \"Agree and continue\" you confirm that you have read, understood, and agree to these Terms of Service.';
+
+  @override
+  String get onboardingTermsAgree =>
+      'I have read and agree to the Terms of Service';
+
+  @override
+  String get onboardingAgreeContinue => 'Agree and continue';
+
+  @override
+  String get onboardingPermsTitle => 'Permissions';
+
+  @override
+  String get onboardingPermsBody =>
+      'So DPIP can alert you the moment disaster strikes, please grant the following. You can change these anytime in system settings.';
+
+  @override
+  String get onboardingPermNotify => 'Notifications';
+
+  @override
+  String get onboardingPermNotifyDesc =>
+      'Deliver earthquake, weather, and disaster alerts the moment they happen.';
+
+  @override
+  String get onboardingPermCritical => 'Critical alerts';
+
+  @override
+  String get onboardingPermCriticalDesc =>
+      'Let life-threatening earthquake warnings sound even in silent mode or Do Not Disturb.';
+
+  @override
+  String get onboardingPermLocation => 'Location';
+
+  @override
+  String get onboardingPermLocationDesc =>
+      'Automatically target alerts to where you are — including in the background.';
+
+  @override
+  String get onboardingPermBattery => 'Battery exemption';
+
+  @override
+  String get onboardingPermBatteryDesc =>
+      'Allow DPIP to keep running in the background so alerts aren\'t delayed or missed.';
+
+  @override
+  String get onboardingGrant => 'Grant';
+
+  @override
+  String get onboardingGranted => 'Granted';
+
+  @override
+  String get onboardingStart => 'Get started';
 }
