@@ -8,6 +8,7 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_camera.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -258,20 +259,19 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   ];
 
   /// Fits [bounds] (or the whole island when null) into the band above the
-  /// resting sheet — the bottom inset subtracts the sheet's initial height.
+  /// resting sheet — the bottom inset subtracts the sheet's initial height, so
+  /// the framed area is centred in the visible band, not behind the sheet.
   CameraUpdate _cameraFor(List<double>? bounds, Size size) {
-    final box = bounds == null
-        ? BaseMap.taiwanBounds
-        : LatLngBounds(
-            southwest: LatLng(bounds[1], bounds[0]),
-            northeast: LatLng(bounds[3], bounds[2]),
-          );
-    return CameraUpdate.newLatLngBounds(
-      box,
-      left: _frameMargin,
-      top: _frameMargin,
-      right: _frameMargin,
-      bottom: size.height * HomeSheetExtent.rest + _frameMargin,
+    final camera = fitBoundsCamera(
+      bounds ?? taiwanBounds,
+      width: size.width,
+      height: size.height,
+      padding: _frameMargin,
+      bottomInset: size.height * HomeSheetExtent.rest,
+    );
+    return CameraUpdate.newLatLngZoom(
+      LatLng(camera.latitude, camera.longitude),
+      camera.zoom,
     );
   }
 
