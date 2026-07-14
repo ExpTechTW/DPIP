@@ -55,7 +55,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionAdvanced => '고급';
 
   @override
-  String get moreDeveloper => '개발자 설정';
+  String get moreDeveloper => '디버그 정보';
 
   @override
   String get developerCopied => '클립보드에 복사되었습니다';

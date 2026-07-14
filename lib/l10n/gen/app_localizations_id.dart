@@ -55,7 +55,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreSectionAdvanced => 'Lanjutan';
 
   @override
-  String get moreDeveloper => 'Pengaturan pengembang';
+  String get moreDeveloper => 'Info debug';
 
   @override
   String get developerCopied => 'Disalin ke papan klip';

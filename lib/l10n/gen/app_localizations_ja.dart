@@ -55,7 +55,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionAdvanced => '詳細設定';
 
   @override
-  String get moreDeveloper => '開発者設定';
+  String get moreDeveloper => 'デバッグ情報';
 
   @override
   String get developerCopied => 'クリップボードにコピーしました';

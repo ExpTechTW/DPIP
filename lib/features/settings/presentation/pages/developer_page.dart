@@ -43,7 +43,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
 
     final info = await PackageInfo.fromPlatform();
     final device = await DeviceInfoService.load();
-    final fcmToken = notifications.token ?? await _fcmToken();
+    // Track the build by the git commit it was built from — pass it at build
+    // time: `--dart-define=GIT_COMMIT=$(git rev-parse --short HEAD)`. Falls back
+    // to the platform build number when not provided.
+    const gitCommit = String.fromEnvironment('GIT_COMMIT');
+    final buildRef = gitCommit.isEmpty ? info.buildNumber : gitCommit;
+    // Show the platform's own push token: FCM on Android, APNs on iOS.
+    final fcmToken = Platform.isAndroid
+        ? (notifications.token ?? await _fcmToken())
+        : null;
     final apnsToken = Platform.isIOS ? await _apnsToken() : null;
 
     final sections = <({String title, List<_Field> fields})>[
@@ -53,7 +61,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           (label: 'Name', value: info.appName),
           (label: 'Package', value: info.packageName),
           (label: 'Version', value: info.version),
-          (label: 'Build', value: info.buildNumber),
+          (label: 'Build', value: buildRef),
           (label: 'Build mode', value: _buildMode),
         ],
       ),
@@ -78,7 +86,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
       (
         title: 'Push',
         fields: [
-          (label: 'FCM token', value: fcmToken),
+          if (Platform.isAndroid) (label: 'FCM token', value: fcmToken),
           if (Platform.isIOS) (label: 'APNs token', value: apnsToken),
         ],
       ),

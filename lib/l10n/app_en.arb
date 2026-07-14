@@ -48,22 +48,28 @@
   "@regionSelectCount": {
     "description": "Header showing how many saved-region slots are used",
     "placeholders": {
-      "count": { "type": "int" },
-      "max": { "type": "int" }
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "regionSelectFull": "You can save up to {max} regions",
   "@regionSelectFull": {
     "description": "Snackbar shown when trying to add a region beyond the cap",
     "placeholders": {
-      "max": { "type": "int" }
+      "max": {
+        "type": "int"
+      }
     }
   },
   "moreSectionAdvanced": "Advanced",
   "@moreSectionAdvanced": {
     "description": "Section header on the More page grouping advanced/developer entries"
   },
-  "moreDeveloper": "Developer settings",
+  "moreDeveloper": "Debug info",
   "@moreDeveloper": {
     "description": "More-menu entry / title for the developer diagnostics page"
   },
@@ -179,8 +185,12 @@
   "@eewSummary": {
     "description": "One-line summary of an EEW alert's magnitude and depth",
     "placeholders": {
-      "magnitude": { "type": "String" },
-      "depth": { "type": "String" }
+      "magnitude": {
+        "type": "String"
+      },
+      "depth": {
+        "type": "String"
+      }
     }
   },
   "regionNationwide": "Nationwide",
@@ -236,115 +246,227 @@
     "description": "Snackbar shown when saving a notification channel fails"
   },
   "notifySectionEew": "Earthquake early warning",
-  "@notifySectionEew": { "description": "Notify page section header" },
+  "@notifySectionEew": {
+    "description": "Notify page section header"
+  },
   "notifySectionEarthquake": "Earthquake",
-  "@notifySectionEarthquake": { "description": "Notify page section header" },
+  "@notifySectionEarthquake": {
+    "description": "Notify page section header"
+  },
   "notifySectionWeather": "Weather",
-  "@notifySectionWeather": { "description": "Notify page section header" },
+  "@notifySectionWeather": {
+    "description": "Notify page section header"
+  },
   "notifySectionTsunami": "Tsunami",
-  "@notifySectionTsunami": { "description": "Notify page section header" },
+  "@notifySectionTsunami": {
+    "description": "Notify page section header"
+  },
   "notifySectionOther": "Other",
-  "@notifySectionOther": { "description": "Notify page section header" },
+  "@notifySectionOther": {
+    "description": "Notify page section header"
+  },
   "notifyEew": "Emergency earthquake alert",
-  "@notifyEew": { "description": "Notify channel title" },
+  "@notifyEew": {
+    "description": "Notify channel title"
+  },
   "notifyMonitor": "Strong-motion monitor",
-  "@notifyMonitor": { "description": "Notify channel title" },
+  "@notifyMonitor": {
+    "description": "Notify channel title"
+  },
   "notifyReport": "Earthquake report",
-  "@notifyReport": { "description": "Notify channel title" },
+  "@notifyReport": {
+    "description": "Notify channel title"
+  },
   "notifyIntensity": "Intensity report",
-  "@notifyIntensity": { "description": "Notify channel title" },
+  "@notifyIntensity": {
+    "description": "Notify channel title"
+  },
   "notifyThunderstorm": "Thunderstorm alerts",
-  "@notifyThunderstorm": { "description": "Notify channel title" },
+  "@notifyThunderstorm": {
+    "description": "Notify channel title"
+  },
   "notifyAdvisory": "Weather advisories",
-  "@notifyAdvisory": { "description": "Notify channel title" },
+  "@notifyAdvisory": {
+    "description": "Notify channel title"
+  },
   "notifyEvacuation": "Disaster information",
-  "@notifyEvacuation": { "description": "Notify channel title" },
+  "@notifyEvacuation": {
+    "description": "Notify channel title"
+  },
   "notifyTsunami": "Tsunami information",
-  "@notifyTsunami": { "description": "Notify channel title" },
+  "@notifyTsunami": {
+    "description": "Notify channel title"
+  },
   "notifyAnnouncement": "Announcements",
-  "@notifyAnnouncement": { "description": "Notify channel title" },
+  "@notifyAnnouncement": {
+    "description": "Notify channel title"
+  },
   "notifyOptOff": "Off",
-  "@notifyOptOff": { "description": "Notify option label" },
+  "@notifyOptOff": {
+    "description": "Notify option label"
+  },
   "notifyOptAll": "Receive all",
-  "@notifyOptAll": { "description": "Notify option label" },
+  "@notifyOptAll": {
+    "description": "Notify option label"
+  },
   "notifyOptLocalIntensity4": "Local intensity 4 or above",
-  "@notifyOptLocalIntensity4": { "description": "Notify option label" },
+  "@notifyOptLocalIntensity4": {
+    "description": "Notify option label"
+  },
   "notifyOptLocalIntensity1": "Local intensity 1 or above",
-  "@notifyOptLocalIntensity1": { "description": "Notify option label" },
+  "@notifyOptLocalIntensity1": {
+    "description": "Notify option label"
+  },
   "notifyOptWeatherLocal": "Current location only",
-  "@notifyOptWeatherLocal": { "description": "Notify option label" },
+  "@notifyOptWeatherLocal": {
+    "description": "Notify option label"
+  },
   "notifyOptTsunamiWarning": "Tsunami warnings only",
-  "@notifyOptTsunamiWarning": { "description": "Notify option label" },
+  "@notifyOptTsunamiWarning": {
+    "description": "Notify option label"
+  },
   "notifyOptTsunamiAll": "Tsunami advisories and warnings",
-  "@notifyOptTsunamiAll": { "description": "Notify option label" },
+  "@notifyOptTsunamiAll": {
+    "description": "Notify option label"
+  },
   "onboardingNext": "Next",
-  "@onboardingNext": { "description": "Onboarding next-step button" },
+  "@onboardingNext": {
+    "description": "Onboarding next-step button"
+  },
   "onboardingBack": "Back",
-  "@onboardingBack": { "description": "Onboarding back button" },
+  "@onboardingBack": {
+    "description": "Onboarding back button"
+  },
   "onboardingScrollHint": "Scroll down to continue",
-  "@onboardingScrollHint": { "description": "Hint shown until the user scrolls to the end" },
+  "@onboardingScrollHint": {
+    "description": "Hint shown until the user scrolls to the end"
+  },
   "onboardingIntroTitle": "Welcome to DPIP",
-  "@onboardingIntroTitle": { "description": "Onboarding intro page title" },
+  "@onboardingIntroTitle": {
+    "description": "Onboarding intro page title"
+  },
   "onboardingIntroBody": "DPIP is your disaster-prevention companion. It brings together earthquake early warnings, earthquake reports, weather, and hazard information, and alerts you the moment it matters.\n\n• Earthquakes: early warnings, intensity reports, and detailed reports\n• Weather: real-time thunderstorm messages and weather advisories\n• Tsunami and disaster information\n\nNext, we'll ask you to review the Terms of Service and grant a few permissions so DPIP can protect you in real time.",
-  "@onboardingIntroBody": { "description": "Onboarding intro page body" },
+  "@onboardingIntroBody": {
+    "description": "Onboarding intro page body"
+  },
   "onboardingTermsTitle": "Terms of Service",
-  "@onboardingTermsTitle": { "description": "Onboarding terms page title" },
+  "@onboardingTermsTitle": {
+    "description": "Onboarding terms page title"
+  },
   "onboardingTermsBody": "Please read the following notices before using DPIP:\n\n• All information should defer to the content published by the Central Weather Administration (CWA).\n\n• Depending on network, server, app, and upstream data-source conditions, information may not be received; we make every effort to avoid this but cannot guarantee it never happens.\n\n• Strong shaking may reach your location before the notification does.\n\n• Earthquake early warnings are fast-computed results that may carry significant error — understand this and use them with caution.\n\n• Any behavior not sanctioned by the authorities may carry legal risk; please follow all applicable regulations.\n\nIn addition, to provide localized alerts, this service collects and uploads your approximate location and push identifier — in the foreground and background — solely to decide which alerts to send you.\n\nBy tapping \"Agree and continue\" you confirm that you have read, understood, and agree to the above.",
-  "@onboardingTermsBody": { "description": "Onboarding terms of service body" },
+  "@onboardingTermsBody": {
+    "description": "Onboarding terms of service body"
+  },
   "onboardingTermsAgree": "I have read and agree to the Terms of Service",
-  "@onboardingTermsAgree": { "description": "Terms agreement checkbox label" },
+  "@onboardingTermsAgree": {
+    "description": "Terms agreement checkbox label"
+  },
   "onboardingAgreeContinue": "Agree and continue",
-  "@onboardingAgreeContinue": { "description": "Terms page continue button" },
+  "@onboardingAgreeContinue": {
+    "description": "Terms page continue button"
+  },
   "onboardingPermsTitle": "Permissions",
-  "@onboardingPermsTitle": { "description": "Onboarding permissions page title" },
+  "@onboardingPermsTitle": {
+    "description": "Onboarding permissions page title"
+  },
   "onboardingPermsBody": "So DPIP can alert you the moment disaster strikes, please grant the following. You can change these anytime in system settings.",
-  "@onboardingPermsBody": { "description": "Onboarding permissions page intro" },
+  "@onboardingPermsBody": {
+    "description": "Onboarding permissions page intro"
+  },
   "onboardingPermNotify": "Notifications",
-  "@onboardingPermNotify": { "description": "Permission row: notifications" },
+  "@onboardingPermNotify": {
+    "description": "Permission row: notifications"
+  },
   "onboardingPermNotifyDesc": "Deliver earthquake, weather, and disaster alerts the moment they happen.",
-  "@onboardingPermNotifyDesc": { "description": "Permission row description: notifications" },
+  "@onboardingPermNotifyDesc": {
+    "description": "Permission row description: notifications"
+  },
   "onboardingPermCritical": "Critical alerts",
-  "@onboardingPermCritical": { "description": "Permission row: critical alerts (iOS)" },
+  "@onboardingPermCritical": {
+    "description": "Permission row: critical alerts (iOS)"
+  },
   "onboardingPermCriticalDesc": "Let life-threatening earthquake warnings sound even in silent mode or Do Not Disturb.",
-  "@onboardingPermCriticalDesc": { "description": "Permission row description: critical alerts" },
+  "@onboardingPermCriticalDesc": {
+    "description": "Permission row description: critical alerts"
+  },
   "onboardingPermLocation": "Location",
-  "@onboardingPermLocation": { "description": "Permission row: location" },
+  "@onboardingPermLocation": {
+    "description": "Permission row: location"
+  },
   "onboardingPermLocationDesc": "Target alerts to where you are.",
-  "@onboardingPermLocationDesc": { "description": "Permission row description: location" },
+  "@onboardingPermLocationDesc": {
+    "description": "Permission row description: location"
+  },
   "onboardingPermBackground": "Background location",
-  "@onboardingPermBackground": { "description": "Permission row: background/Always location" },
+  "@onboardingPermBackground": {
+    "description": "Permission row: background/Always location"
+  },
   "onboardingPermBackgroundDesc": "Allow \"Always\" so alerts still target you when the app is closed.",
-  "@onboardingPermBackgroundDesc": { "description": "Permission row description: background location" },
+  "@onboardingPermBackgroundDesc": {
+    "description": "Permission row description: background location"
+  },
   "onboardingPermBattery": "Battery exemption",
-  "@onboardingPermBattery": { "description": "Permission row: battery optimization (Android)" },
+  "@onboardingPermBattery": {
+    "description": "Permission row: battery optimization (Android)"
+  },
   "onboardingPermBatteryDesc": "Allow DPIP to keep running in the background so alerts aren't delayed or missed.",
-  "@onboardingPermBatteryDesc": { "description": "Permission row description: battery" },
+  "@onboardingPermBatteryDesc": {
+    "description": "Permission row description: battery"
+  },
   "onboardingGrant": "Grant",
-  "@onboardingGrant": { "description": "Permission grant button" },
+  "@onboardingGrant": {
+    "description": "Permission grant button"
+  },
   "onboardingGranted": "Granted",
-  "@onboardingGranted": { "description": "Permission granted label" },
+  "@onboardingGranted": {
+    "description": "Permission granted label"
+  },
   "onboardingStart": "Get started",
-  "@onboardingStart": { "description": "Onboarding finish button" },
+  "@onboardingStart": {
+    "description": "Onboarding finish button"
+  },
   "language": "Language",
-  "@language": { "description": "Language picker tooltip / label" },
+  "@language": {
+    "description": "Language picker tooltip / label"
+  },
   "languageSettings": "Language",
-  "@languageSettings": { "description": "Label next to the language picker on the welcome screen" },
+  "@languageSettings": {
+    "description": "Label next to the language picker on the welcome screen"
+  },
   "languageSystem": "System default",
-  "@languageSystem": { "description": "Language picker option: follow the system language" },
+  "@languageSystem": {
+    "description": "Language picker option: follow the system language"
+  },
   "locationBannerServiceOff": "Location services are off — local alerts can't target your area.",
-  "@locationBannerServiceOff": { "description": "Banner when the OS location toggle is off" },
+  "@locationBannerServiceOff": {
+    "description": "Banner when the OS location toggle is off"
+  },
   "locationBannerPermission": "Location permission is off — local alerts can't target your area.",
-  "@locationBannerPermission": { "description": "Banner when location permission is denied" },
+  "@locationBannerPermission": {
+    "description": "Banner when location permission is denied"
+  },
   "locationBannerFix": "Open settings",
-  "@locationBannerFix": { "description": "Action on the location banner to open system settings" },
+  "@locationBannerFix": {
+    "description": "Action on the location banner to open system settings"
+  },
   "notifyBannerDisabled": "Notifications are off — you won't receive disaster alerts.",
-  "@notifyBannerDisabled": { "description": "App-wide banner shown when notification permission is disabled" },
+  "@notifyBannerDisabled": {
+    "description": "App-wide banner shown when notification permission is disabled"
+  },
   "onboardingSkipTitle": "Permissions not granted",
-  "@onboardingSkipTitle": { "description": "Title of the confirm dialog shown when finishing onboarding without key permissions" },
+  "@onboardingSkipTitle": {
+    "description": "Title of the confirm dialog shown when finishing onboarding without key permissions"
+  },
   "onboardingSkipBody": "Without location and notifications, DPIP can't alert you to earthquakes and disasters near you in real time. You can still grant them later in Settings.",
-  "@onboardingSkipBody": { "description": "Body of the skip-permissions confirmation dialog" },
+  "@onboardingSkipBody": {
+    "description": "Body of the skip-permissions confirmation dialog"
+  },
   "onboardingSkipStay": "Go back",
-  "@onboardingSkipStay": { "description": "Dismiss the skip dialog and return to grant permissions" },
+  "@onboardingSkipStay": {
+    "description": "Dismiss the skip dialog and return to grant permissions"
+  },
   "onboardingSkipLeave": "Skip anyway",
-  "@onboardingSkipLeave": { "description": "Proceed past onboarding without granting permissions" }
+  "@onboardingSkipLeave": {
+    "description": "Proceed past onboarding without granting permissions"
+  }
 }

@@ -55,7 +55,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreSectionAdvanced => 'Advanced';
 
   @override
-  String get moreDeveloper => 'Mga setting ng developer';
+  String get moreDeveloper => 'Impormasyon sa debug';
 
   @override
   String get developerCopied => 'Nakopya sa clipboard';

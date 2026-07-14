@@ -203,7 +203,7 @@ abstract class AppLocalizations {
   /// More-menu entry / title for the developer diagnostics page
   ///
   /// In en, this message translates to:
-  /// **'Developer settings'**
+  /// **'Debug info'**
   String get moreDeveloper;
 
   /// Snackbar shown after copying a diagnostic value

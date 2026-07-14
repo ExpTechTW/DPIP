@@ -55,7 +55,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSectionAdvanced => 'Advanced';
 
   @override
-  String get moreDeveloper => 'Developer settings';
+  String get moreDeveloper => 'Debug info';
 
   @override
   String get developerCopied => 'Copied to clipboard';

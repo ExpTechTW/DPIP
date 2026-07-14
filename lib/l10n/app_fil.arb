@@ -14,7 +14,7 @@
   "regionSelectCount": "{count}/{max} ang napili",
   "regionSelectFull": "Maaari kang mag-save ng hanggang {max} na rehiyon",
   "moreSectionAdvanced": "Advanced",
-  "moreDeveloper": "Mga setting ng developer",
+  "moreDeveloper": "Impormasyon sa debug",
   "developerCopied": "Nakopya sa clipboard",
   "developerCopyAll": "Kopyahin lahat",
   "experimentalFeatures": "Mga experimental na feature",

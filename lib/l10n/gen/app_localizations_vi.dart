@@ -55,7 +55,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSectionAdvanced => 'Nâng cao';
 
   @override
-  String get moreDeveloper => 'Cài đặt nhà phát triển';
+  String get moreDeveloper => 'Thông tin gỡ lỗi';
 
   @override
   String get developerCopied => 'Đã sao chép vào bảng nhớ tạm';

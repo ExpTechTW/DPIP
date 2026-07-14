@@ -55,7 +55,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreSectionAdvanced => '進階';
 
   @override
-  String get moreDeveloper => '開發者設定';
+  String get moreDeveloper => '除錯資訊';
 
   @override
   String get developerCopied => '已複製到剪貼簿';
@@ -405,7 +405,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreSectionAdvanced => '高级';
 
   @override
-  String get moreDeveloper => '开发者设置';
+  String get moreDeveloper => '调试信息';
 
   @override
   String get developerCopied => '已复制到剪贴板';
@@ -755,7 +755,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreSectionAdvanced => '進階';
 
   @override
-  String get moreDeveloper => '開發者設定';
+  String get moreDeveloper => '偵錯資訊';
 
   @override
   String get developerCopied => '已複製到剪貼簿';

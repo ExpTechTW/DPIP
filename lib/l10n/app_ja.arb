@@ -14,7 +14,7 @@
   "regionSelectCount": "{count}/{max} 件選択中",
   "regionSelectFull": "地域は最大 {max} 件まで登録できます",
   "moreSectionAdvanced": "詳細設定",
-  "moreDeveloper": "開発者設定",
+  "moreDeveloper": "デバッグ情報",
   "developerCopied": "クリップボードにコピーしました",
   "developerCopyAll": "すべてコピー",
   "experimentalFeatures": "実験的機能",

@@ -55,7 +55,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionAdvanced => 'ขั้นสูง';
 
   @override
-  String get moreDeveloper => 'การตั้งค่านักพัฒนา';
+  String get moreDeveloper => 'ข้อมูลดีบัก';
 
   @override
   String get developerCopied => 'คัดลอกไปยังคลิปบอร์ดแล้ว';

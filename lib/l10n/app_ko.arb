@@ -14,7 +14,7 @@
   "regionSelectCount": "{count}/{max} 선택됨",
   "regionSelectFull": "최대 {max}개 지역까지 저장할 수 있습니다",
   "moreSectionAdvanced": "고급",
-  "moreDeveloper": "개발자 설정",
+  "moreDeveloper": "디버그 정보",
   "developerCopied": "클립보드에 복사되었습니다",
   "developerCopyAll": "모두 복사",
   "experimentalFeatures": "실험적 기능",

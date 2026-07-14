@@ -14,7 +14,7 @@
   "regionSelectCount": "已選 {count}/{max}",
   "regionSelectFull": "最多只能選擇 {max} 個地區",
   "moreSectionAdvanced": "進階",
-  "moreDeveloper": "開發者設定",
+  "moreDeveloper": "偵錯資訊",
   "developerCopied": "已複製到剪貼簿",
   "developerCopyAll": "全部複製",
   "experimentalFeatures": "實驗性功能",

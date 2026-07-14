@@ -14,7 +14,7 @@
   "regionSelectCount": "{count}/{max} dipilih",
   "regionSelectFull": "Anda dapat menyimpan hingga {max} wilayah",
   "moreSectionAdvanced": "Lanjutan",
-  "moreDeveloper": "Pengaturan pengembang",
+  "moreDeveloper": "Info debug",
   "developerCopied": "Disalin ke papan klip",
   "developerCopyAll": "Salin semua",
   "experimentalFeatures": "Fitur eksperimental",
