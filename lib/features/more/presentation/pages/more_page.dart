@@ -73,6 +73,12 @@ class MorePage extends StatelessWidget {
           _MoreGroup(
             children: [
               _MoreLinkTile(
+                icon: Icons.star_outline,
+                title: l10n.moreRate,
+                host: storeHost,
+                url: storeUrl,
+              ),
+              _MoreLinkTile(
                 icon: Icons.crisis_alert_outlined,
                 title: l10n.moreCwaEew,
                 host: 'eew.exptech.dev',
@@ -107,12 +113,6 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreNotifyLog,
                 host: 'status.exptech.com.tw',
                 url: 'https://status.exptech.com.tw/notify',
-              ),
-              _MoreLinkTile(
-                icon: Icons.star_outline,
-                title: l10n.moreRate,
-                host: storeHost,
-                url: storeUrl,
               ),
               _MoreLinkTile(
                 icon: Icons.smart_display_outlined,
