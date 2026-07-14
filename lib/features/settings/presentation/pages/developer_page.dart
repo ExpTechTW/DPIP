@@ -77,8 +77,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
       (
         title: 'App',
         fields: [
-          (label: 'Name', value: info.appName),
-          (label: 'Package', value: info.packageName),
           (label: 'Version', value: info.version),
           (label: 'Build', value: buildRef),
           (label: 'Build mode', value: _buildMode),
