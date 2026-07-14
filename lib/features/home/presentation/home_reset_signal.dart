@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 
-/// A one-shot signal that asks the home page to reset its sheet to rest.
+/// A one-shot signal fired when the home tab is re-selected.
 ///
-/// The home tab lives in a persistent [IndexedStack] branch, so its sheet keeps
-/// whatever position it was dragged to. Firing this when the home tab is
-/// re-selected snaps the sheet back to its resting detent.
+/// The home tab lives in a persistent [IndexedStack] branch, so its state
+/// survives navigating away. Firing this on re-selection lets the page refresh
+/// what would otherwise go stale: the sheet snaps back to its resting detent,
+/// and the map backdrop re-captures with the latest radar frame.
 class HomeResetSignal extends ChangeNotifier {
-  /// Requests a reset. The home page listens and returns its sheet to rest.
+  /// Requests a reset. Listeners restore the sheet and refresh the map.
   void fire() => notifyListeners();
 }

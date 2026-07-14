@@ -26,7 +26,7 @@ String exptechVectorStyle({
   required String countyTown,
   required String outline,
   String? radarTileUrl,
-  String? selectedTownGeoJson,
+  int? selectedTownCode,
 }) {
   final radarSource = radarTileUrl == null
       ? ''
@@ -34,19 +34,18 @@ String exptechVectorStyle({
   final radarLayer = radarTileUrl == null
       ? ''
       : '{"id":"radar","type":"raster","source":"radar","paint":{"raster-opacity":0.8}},';
-  // Selected township: a purple fill + border, drawn on top of the outlines.
-  final selectedSource = selectedTownGeoJson == null
+  // Selected township: a purple fill + border, filtered directly on the vector
+  // `town` layer by its `CODE` property (an integer) — no extra GeoJSON source.
+  final selectedFilter = '["==", ["get", "CODE"], $selectedTownCode]';
+  final selectedLayers = selectedTownCode == null
       ? ''
-      : ',"selected":{"type":"geojson","data":{"type":"Feature","properties":{},"geometry":$selectedTownGeoJson}}';
-  final selectedLayers = selectedTownGeoJson == null
-      ? ''
-      : ',{ "id": "selected-fill", "type": "fill", "source": "selected", "paint": { "fill-color": "$selectedColor", "fill-opacity": 0.12 } },'
-            '{ "id": "selected-outline", "type": "line", "source": "selected", "paint": { "line-color": "$selectedColor", "line-width": 2.5 } }';
+      : ',{ "id": "selected-fill", "type": "fill", "source": "exptech", "source-layer": "town", "filter": $selectedFilter, "paint": { "fill-color": "$selectedColor", "fill-opacity": 0.1 } },'
+            '{ "id": "selected-outline", "type": "line", "source": "exptech", "source-layer": "town", "filter": $selectedFilter, "paint": { "line-color": "$selectedColor", "line-width": 2.5 } }';
   return '''
 {
   "version": 8,
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf"], "maxzoom": 12 }$radarSource$selectedSource
+    "exptech": { "type": "vector", "tiles": ["https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf"], "maxzoom": 12 }$radarSource
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$sea" } },
