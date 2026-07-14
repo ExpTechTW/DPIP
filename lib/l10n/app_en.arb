@@ -323,6 +323,8 @@
   "@onboardingStart": { "description": "Onboarding finish button" },
   "language": "Language",
   "@language": { "description": "Language picker tooltip / label" },
+  "languageSettings": "Language",
+  "@languageSettings": { "description": "Label next to the language picker on the welcome screen" },
   "languageSystem": "System default",
   "@languageSystem": { "description": "Language picker option: follow the system language" },
   "locationBannerServiceOff": "Location services are off — local alerts can't target your area.",

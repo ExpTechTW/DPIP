@@ -3,6 +3,7 @@ library;
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_intro.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_terms.dart';
@@ -116,8 +117,8 @@ class _TopBar extends StatelessWidget {
               child: _Dots(count: pageCount, index: index),
             ),
           ),
-          // Language selector in the top-right.
-          const LanguagePicker(),
+          // "語言設定" + globe, top-right.
+          LanguagePicker(label: AppLocalizations.of(context).languageSettings),
         ],
       ),
     );

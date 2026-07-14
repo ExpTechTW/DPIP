@@ -704,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// Label next to the language picker on the welcome screen
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageSettings;
+
   /// Language picker option: follow the system language
   ///
   /// In en, this message translates to:

@@ -101,6 +101,7 @@
   "onboardingGranted": "已授權",
   "onboardingStart": "開始使用",
   "language": "語言",
+  "languageSettings": "語言設定",
   "languageSystem": "系統預設",
   "locationBannerServiceOff": "定位服務已關閉,無法針對你的所在地推送警報。",
   "locationBannerPermission": "尚未授權定位,無法針對你的所在地推送警報。",
