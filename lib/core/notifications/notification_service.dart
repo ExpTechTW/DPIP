@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
@@ -63,16 +65,22 @@ class NotificationService {
   /// launch.
   Future<bool> requestPermission() async {
     if (await AwesomeNotifications().isNotificationAllowed()) return true;
-    return AwesomeNotifications().requestPermissionToSendNotifications(
-      permissions: const [
-        NotificationPermission.Alert,
-        NotificationPermission.Sound,
-        NotificationPermission.Badge,
-        NotificationPermission.Vibration,
-        NotificationPermission.Light,
-        NotificationPermission.CriticalAlert,
-      ],
-    );
+    final granted = await AwesomeNotifications()
+        .requestPermissionToSendNotifications(
+          permissions: const [
+            NotificationPermission.Alert,
+            NotificationPermission.Sound,
+            NotificationPermission.Badge,
+            NotificationPermission.Vibration,
+            NotificationPermission.Light,
+            NotificationPermission.CriticalAlert,
+          ],
+        );
+    // Permission is usually granted well after launch (onboarding) — by then the
+    // launch-time token fetch may have found no APNs token yet. Retry now that
+    // the user has decided (background; never blocks the caller).
+    if (granted) unawaited(_fetchToken());
+    return granted;
   }
 
   Future<void> _initChannels() async {
@@ -120,14 +128,35 @@ class NotificationService {
       Log.debug('Push token refreshed');
       _prefs.setString(PreferenceKeys.pushToken, token);
     });
+    // Fire-and-forget: this can wait seconds for the iOS APNs token, and
+    // `init()` is awaited at launch, so it must not block start-up.
+    unawaited(_fetchToken());
+  }
+
+  /// Fetches the FCM push token and persists it.
+  ///
+  /// On iOS the FCM token needs the **APNs** token first, which arrives
+  /// asynchronously after `registerForRemoteNotifications` (handled by the
+  /// FlutterFire app-delegate proxy). So poll `getAPNSToken` briefly before
+  /// asking — else `getToken` throws `apns-token-not-set`. The APNs token is
+  /// **null on the iOS Simulator**, so push needs a physical device (and the
+  /// APNs auth key uploaded to the Firebase console). Best-effort: a failure
+  /// just leaves the token unset until [requestPermission] or `onTokenRefresh`
+  /// tries again.
+  Future<void> _fetchToken() async {
+    final messaging = FirebaseMessaging.instance;
     try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        for (var attempt = 0; attempt < 5; attempt++) {
+          if (await messaging.getAPNSToken() != null) break;
+          await Future<void>.delayed(const Duration(seconds: 1));
+        }
+      }
       final token = await messaging.getToken();
       if (token != null) {
         await _prefs.setString(PreferenceKeys.pushToken, token);
       }
     } catch (error, stackTrace) {
-      // On iOS getToken can fail until the APNs token is ready; onTokenRefresh
-      // then supplies it.
       Log.handle(error, stackTrace, 'getToken (APNs may not be ready)');
     }
   }
