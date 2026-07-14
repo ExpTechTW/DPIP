@@ -3,6 +3,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/location_permission_banner.dart';
+import 'package:dpip/shared/widgets/notification_permission_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -85,6 +86,7 @@ class _MainShellState extends State<MainShell> {
       body: Column(
         children: [
           const LocationPermissionBanner(),
+          const NotificationPermissionBanner(),
           Expanded(child: widget.navigationShell),
         ],
       ),

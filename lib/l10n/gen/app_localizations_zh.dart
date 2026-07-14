@@ -336,6 +336,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get locationBannerFix => '開啟設定';
+
+  @override
+  String get notifyBannerDisabled => '通知已關閉,將收不到災害警報。';
+
+  @override
+  String get onboardingSkipTitle => '尚未完成授權';
+
+  @override
+  String get onboardingSkipBody =>
+      '未授權定位與通知,DPIP 將無法即時通知你所在地的地震與災害。你仍可稍後在設定中開啟。';
+
+  @override
+  String get onboardingSkipStay => '返回授權';
+
+  @override
+  String get onboardingSkipLeave => '仍要略過';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -670,6 +686,22 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get locationBannerFix => '打开设置';
+
+  @override
+  String get notifyBannerDisabled => '通知已关闭,将收不到灾害警报。';
+
+  @override
+  String get onboardingSkipTitle => '尚未完成授权';
+
+  @override
+  String get onboardingSkipBody =>
+      '未授权定位与通知,DPIP 将无法实时通知你所在地的地震与灾害。你仍可稍后在设置中开启。';
+
+  @override
+  String get onboardingSkipStay => '返回授权';
+
+  @override
+  String get onboardingSkipLeave => '仍要跳过';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1004,4 +1036,20 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get locationBannerFix => '開啟設定';
+
+  @override
+  String get notifyBannerDisabled => '通知已關閉,將收不到災害警報。';
+
+  @override
+  String get onboardingSkipTitle => '尚未完成授權';
+
+  @override
+  String get onboardingSkipBody =>
+      '未授權定位與通知,DPIP 將無法即時通知你所在地的地震與災害。你仍可稍後在設定中開啟。';
+
+  @override
+  String get onboardingSkipStay => '返回授權';
+
+  @override
+  String get onboardingSkipLeave => '仍要略過';
 }

@@ -757,6 +757,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open settings'**
   String get locationBannerFix;
+
+  /// App-wide banner shown when notification permission is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off — you won\'t receive disaster alerts.'**
+  String get notifyBannerDisabled;
+
+  /// Title of the confirm dialog shown when finishing onboarding without key permissions
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions not granted'**
+  String get onboardingSkipTitle;
+
+  /// Body of the skip-permissions confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Without location and notifications, DPIP can\'t alert you to earthquakes and disasters near you in real time. You can still grant them later in Settings.'**
+  String get onboardingSkipBody;
+
+  /// Dismiss the skip dialog and return to grant permissions
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get onboardingSkipStay;
+
+  /// Proceed past onboarding without granting permissions
+  ///
+  /// In en, this message translates to:
+  /// **'Skip anyway'**
+  String get onboardingSkipLeave;
 }
 
 class _AppLocalizationsDelegate

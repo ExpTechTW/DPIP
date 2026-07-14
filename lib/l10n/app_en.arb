@@ -336,5 +336,15 @@
   "locationBannerPermission": "Location permission is off — local alerts can't target your area.",
   "@locationBannerPermission": { "description": "Banner when location permission is denied" },
   "locationBannerFix": "Open settings",
-  "@locationBannerFix": { "description": "Action on the location banner to open system settings" }
+  "@locationBannerFix": { "description": "Action on the location banner to open system settings" },
+  "notifyBannerDisabled": "Notifications are off — you won't receive disaster alerts.",
+  "@notifyBannerDisabled": { "description": "App-wide banner shown when notification permission is disabled" },
+  "onboardingSkipTitle": "Permissions not granted",
+  "@onboardingSkipTitle": { "description": "Title of the confirm dialog shown when finishing onboarding without key permissions" },
+  "onboardingSkipBody": "Without location and notifications, DPIP can't alert you to earthquakes and disasters near you in real time. You can still grant them later in Settings.",
+  "@onboardingSkipBody": { "description": "Body of the skip-permissions confirmation dialog" },
+  "onboardingSkipStay": "Go back",
+  "@onboardingSkipStay": { "description": "Dismiss the skip dialog and return to grant permissions" },
+  "onboardingSkipLeave": "Skip anyway",
+  "@onboardingSkipLeave": { "description": "Proceed past onboarding without granting permissions" }
 }

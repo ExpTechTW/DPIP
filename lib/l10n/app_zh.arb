@@ -106,5 +106,10 @@
   "languageSystem": "系統預設",
   "locationBannerServiceOff": "定位服務已關閉,無法針對你的所在地推送警報。",
   "locationBannerPermission": "尚未授權定位,無法針對你的所在地推送警報。",
-  "locationBannerFix": "開啟設定"
+  "locationBannerFix": "開啟設定",
+  "notifyBannerDisabled": "通知已關閉,將收不到災害警報。",
+  "onboardingSkipTitle": "尚未完成授權",
+  "onboardingSkipBody": "未授權定位與通知,DPIP 將無法即時通知你所在地的地震與災害。你仍可稍後在設定中開啟。",
+  "onboardingSkipStay": "返回授權",
+  "onboardingSkipLeave": "仍要略過"
 }

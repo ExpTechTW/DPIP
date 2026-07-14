@@ -348,4 +348,21 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get locationBannerFix => 'Buka pengaturan';
+
+  @override
+  String get notifyBannerDisabled =>
+      'Notifikasi mati — Anda tidak akan menerima peringatan bencana.';
+
+  @override
+  String get onboardingSkipTitle => 'Izin belum diberikan';
+
+  @override
+  String get onboardingSkipBody =>
+      'Tanpa lokasi dan notifikasi, DPIP tidak dapat memperingatkan Anda tentang gempa dan bencana di sekitar Anda secara waktu nyata. Anda masih dapat memberikannya nanti di Pengaturan.';
+
+  @override
+  String get onboardingSkipStay => 'Kembali';
+
+  @override
+  String get onboardingSkipLeave => 'Tetap lewati';
 }

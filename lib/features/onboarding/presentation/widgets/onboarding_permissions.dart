@@ -99,6 +99,37 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
     await _battery.request(); // re-checked on resume
   }
 
+  /// Finishes onboarding — but if a permission that makes localized alerts work
+  /// (notifications or location) is still missing, confirm first. We *can't*
+  /// require them (App Store 5.1.2(i) / 4.5.4 forbid gating the app on a
+  /// permission), so this is a strong nudge, never a block; a persistent in-app
+  /// banner keeps reminding afterwards.
+  Future<void> _finish() async {
+    if (_notify && _location) {
+      widget.onFinish();
+      return;
+    }
+    final l10n = AppLocalizations.of(context);
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.onboardingSkipTitle),
+        content: Text(l10n.onboardingSkipBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.onboardingSkipStay),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.onboardingSkipLeave),
+          ),
+        ],
+      ),
+    );
+    if (leave ?? false) widget.onFinish();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -147,10 +178,8 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
 
     return OnboardingScaffold(
       requireScrollToEnd: false,
-      actionBuilder: (context, _) => OnboardingCta(
-        label: l10n.onboardingStart,
-        onPressed: widget.onFinish,
-      ),
+      actionBuilder: (context, _) =>
+          OnboardingCta(label: l10n.onboardingStart, onPressed: _finish),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

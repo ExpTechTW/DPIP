@@ -348,4 +348,21 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get locationBannerFix => 'Buksan ang mga setting';
+
+  @override
+  String get notifyBannerDisabled =>
+      'Naka-off ang mga notification — hindi ka makakatanggap ng mga alerto sa sakuna.';
+
+  @override
+  String get onboardingSkipTitle => 'Hindi pa naibibigay ang mga pahintulot';
+
+  @override
+  String get onboardingSkipBody =>
+      'Kung walang lokasyon at mga notification, hindi ka maaalertuhan ng DPIP nang real time sa mga lindol at sakuna malapit sa iyo. Maaari mo pa ring ibigay ang mga ito sa ibang pagkakataon sa Settings.';
+
+  @override
+  String get onboardingSkipStay => 'Bumalik';
+
+  @override
+  String get onboardingSkipLeave => 'Laktawan pa rin';
 }

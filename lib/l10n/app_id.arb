@@ -106,5 +106,10 @@
   "languageSystem": "Bawaan sistem",
   "locationBannerServiceOff": "Layanan lokasi mati — peringatan lokal tidak dapat menargetkan wilayah Anda.",
   "locationBannerPermission": "Izin lokasi mati — peringatan lokal tidak dapat menargetkan wilayah Anda.",
-  "locationBannerFix": "Buka pengaturan"
+  "locationBannerFix": "Buka pengaturan",
+  "notifyBannerDisabled": "Notifikasi mati — Anda tidak akan menerima peringatan bencana.",
+  "onboardingSkipTitle": "Izin belum diberikan",
+  "onboardingSkipBody": "Tanpa lokasi dan notifikasi, DPIP tidak dapat memperingatkan Anda tentang gempa dan bencana di sekitar Anda secara waktu nyata. Anda masih dapat memberikannya nanti di Pengaturan.",
+  "onboardingSkipStay": "Kembali",
+  "onboardingSkipLeave": "Tetap lewati"
 }

@@ -346,4 +346,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationBannerFix => 'Open settings';
+
+  @override
+  String get notifyBannerDisabled =>
+      'Notifications are off — you won\'t receive disaster alerts.';
+
+  @override
+  String get onboardingSkipTitle => 'Permissions not granted';
+
+  @override
+  String get onboardingSkipBody =>
+      'Without location and notifications, DPIP can\'t alert you to earthquakes and disasters near you in real time. You can still grant them later in Settings.';
+
+  @override
+  String get onboardingSkipStay => 'Go back';
+
+  @override
+  String get onboardingSkipLeave => 'Skip anyway';
 }

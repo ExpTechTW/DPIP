@@ -340,4 +340,20 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get locationBannerFix => '설정 열기';
+
+  @override
+  String get notifyBannerDisabled => '알림이 꺼져 있어 재난 경보를 받을 수 없습니다.';
+
+  @override
+  String get onboardingSkipTitle => '권한이 허용되지 않았습니다';
+
+  @override
+  String get onboardingSkipBody =>
+      '위치 및 알림 권한이 없으면 DPIP가 주변의 지진과 재난을 실시간으로 알려드릴 수 없습니다. 나중에 설정에서 권한을 허용할 수 있습니다.';
+
+  @override
+  String get onboardingSkipStay => '돌아가기';
+
+  @override
+  String get onboardingSkipLeave => '그래도 건너뛰기';
 }

@@ -347,4 +347,21 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get locationBannerFix => 'Mở cài đặt';
+
+  @override
+  String get notifyBannerDisabled =>
+      'Thông báo đã tắt — bạn sẽ không nhận được cảnh báo thiên tai.';
+
+  @override
+  String get onboardingSkipTitle => 'Chưa cấp quyền';
+
+  @override
+  String get onboardingSkipBody =>
+      'Nếu không có quyền vị trí và thông báo, DPIP không thể cảnh báo tức thời về động đất và thiên tai gần bạn. Bạn vẫn có thể cấp quyền sau trong Cài đặt.';
+
+  @override
+  String get onboardingSkipStay => 'Quay lại';
+
+  @override
+  String get onboardingSkipLeave => 'Vẫn bỏ qua';
 }

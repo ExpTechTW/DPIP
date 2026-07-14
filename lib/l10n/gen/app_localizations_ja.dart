@@ -340,4 +340,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get locationBannerFix => '設定を開く';
+
+  @override
+  String get notifyBannerDisabled => '通知がオフです — 災害警報を受け取れません。';
+
+  @override
+  String get onboardingSkipTitle => '権限が許可されていません';
+
+  @override
+  String get onboardingSkipBody =>
+      '位置情報と通知を許可しないと、DPIP はお近くの地震や災害をリアルタイムでお知らせできません。設定から後で許可することもできます。';
+
+  @override
+  String get onboardingSkipStay => '戻って許可';
+
+  @override
+  String get onboardingSkipLeave => 'このままスキップ';
 }

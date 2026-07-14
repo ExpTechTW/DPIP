@@ -346,4 +346,21 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get locationBannerFix => 'เปิดการตั้งค่า';
+
+  @override
+  String get notifyBannerDisabled =>
+      'ปิดการแจ้งเตือนอยู่ — คุณจะไม่ได้รับการเตือนภัยพิบัติ';
+
+  @override
+  String get onboardingSkipTitle => 'ยังไม่ได้ให้สิทธิ์';
+
+  @override
+  String get onboardingSkipBody =>
+      'หากไม่อนุญาตตำแหน่งและการแจ้งเตือน DPIP จะไม่สามารถแจ้งเตือนแผ่นดินไหวและภัยพิบัติใกล้คุณแบบเรียลไทม์ได้ คุณยังสามารถเปิดใช้ภายหลังได้ในการตั้งค่า';
+
+  @override
+  String get onboardingSkipStay => 'กลับไปให้สิทธิ์';
+
+  @override
+  String get onboardingSkipLeave => 'ข้ามไปก่อน';
 }

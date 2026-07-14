@@ -106,5 +106,10 @@
   "languageSystem": "Default ng system",
   "locationBannerServiceOff": "Naka-off ang mga serbisyo ng lokasyon — hindi matutukoy ng mga lokal na alerto ang iyong lugar.",
   "locationBannerPermission": "Naka-off ang pahintulot sa lokasyon — hindi matutukoy ng mga lokal na alerto ang iyong lugar.",
-  "locationBannerFix": "Buksan ang mga setting"
+  "locationBannerFix": "Buksan ang mga setting",
+  "notifyBannerDisabled": "Naka-off ang mga notification — hindi ka makakatanggap ng mga alerto sa sakuna.",
+  "onboardingSkipTitle": "Hindi pa naibibigay ang mga pahintulot",
+  "onboardingSkipBody": "Kung walang lokasyon at mga notification, hindi ka maaalertuhan ng DPIP nang real time sa mga lindol at sakuna malapit sa iyo. Maaari mo pa ring ibigay ang mga ito sa ibang pagkakataon sa Settings.",
+  "onboardingSkipStay": "Bumalik",
+  "onboardingSkipLeave": "Laktawan pa rin"
 }
