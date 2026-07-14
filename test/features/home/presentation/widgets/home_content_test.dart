@@ -1,24 +1,51 @@
+import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// The header only calls [MeteorWeatherRepository.realtime]; with an empty town
+/// directory no coordinate resolves, so it's never invoked.
+class _FakeWeatherRepository implements MeteorWeatherRepository {
+  @override
+  Future<Result<WeatherRealtime?>> realtime(double lat, double lng) async =>
+      const Ok(null);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
 
 /// Pumps [HomeContent] with everything it reads: a [RegionStore] to switch on
 /// and localizations for the body.
-Widget _wrap(RegionStore store) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
-  supportedLocales: AppLocalizations.supportedLocales,
-  locale: const Locale('en'),
-  home: ChangeNotifierProvider<RegionStore>.value(
-    value: store,
-    child: Scaffold(body: HomeContent(scrollController: ScrollController())),
-  ),
-);
+Widget _wrap(RegionStore store) {
+  const directory = TownDirectory(<String, Town>{});
+  return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    home: MultiProvider(
+      providers: [
+        ChangeNotifierProvider<RegionStore>.value(value: store),
+        Provider<TownDirectory>.value(value: directory),
+        ChangeNotifierProvider<HomeWeatherController>(
+          create: (_) =>
+              HomeWeatherController(_FakeWeatherRepository(), store, directory),
+        ),
+      ],
+      child: Scaffold(body: HomeContent(scrollController: ScrollController())),
+    ),
+  );
+}
 
 /// A store with two saved regions → four areas (全國, 所在地, +2), so the
 /// switch tests have room to move (select(2) / next twice).

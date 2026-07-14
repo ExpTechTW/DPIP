@@ -1,16 +1,20 @@
 import 'package:dpip/app/theme/app_glass.dart';
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/home_area.dart';
+import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-/// The header at the top of the home sheet: the selected area, its active
-/// warning, and the current weather — condition icon + temperature on the left
-/// (2/3), precipitation + humidity stacked on the right (1/3).
+/// The header at the top of the home sheet: the selected area name and its
+/// current weather — condition icon + temperature on the left (2/3),
+/// precipitation + humidity stacked on the right (1/3).
 ///
-/// [reveal] (0→1) shifts the text to light as the weather backdrop takes over,
-/// so it stays legible. Values are placeholders until the weather/area API is
-/// wired.
+/// Weather follows the selected area via [HomeWeatherController]; a dash shows
+/// while the first fetch is in flight. [reveal] (0→1) shifts the text to light
+/// as the weather backdrop takes over, so it stays legible.
 class HomeSheetHeader extends StatelessWidget {
   const HomeSheetHeader({super.key, this.reveal = 0});
 
@@ -18,6 +22,7 @@ class HomeSheetHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final foreground = lightenOnReveal(colors.onSurface, reveal);
@@ -27,17 +32,27 @@ class HomeSheetHeader extends StatelessWidget {
       toAlpha: 0.75,
     );
 
+    final directory = context.read<TownDirectory>();
+    final area = context.watch<RegionStore>().selected;
+    final areaName = switch (area) {
+      NationwideArea() => l10n.regionNationwide,
+      CurrentArea(:final code) =>
+        directory.byCode(code)?.fullName ?? l10n.regionCurrent,
+      SavedArea(:final code) => directory.byCode(code)?.fullName ?? '',
+    };
+
+    final data = context.watch<HomeWeatherController>().weather?.data;
+    final temp = data?.temperature;
+    final humidity = data?.humidity;
+    final rain = data?.rain;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          // l10n-ignore: placeholder area name — becomes selected-region data
-          '臺南市 歸仁區',
+          areaName,
           style: theme.textTheme.headlineSmall?.copyWith(color: foreground),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        // l10n-ignore: placeholder warning — becomes a localized warning label
-        const _WarningBadge(label: '大豪雨特報'),
         const SizedBox(height: AppSpacing.lg),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,7 +68,7 @@ class HomeSheetHeader extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: '26.6',
+                          text: temp?.toStringAsFixed(1) ?? '—',
                           style: theme.textTheme.displaySmall?.copyWith(
                             color: foreground,
                           ),
@@ -78,15 +93,15 @@ class HomeSheetHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _Metric(
-                    label: AppLocalizations.of(context).weatherPrecipitation,
-                    value: '0.0 mm',
+                    label: l10n.weatherPrecipitation,
+                    value: '${rain?.toStringAsFixed(1) ?? '0.0'} mm',
                     foreground: foreground,
                     secondary: secondary,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   _Metric(
-                    label: AppLocalizations.of(context).weatherHumidity,
-                    value: '90%',
+                    label: l10n.weatherHumidity,
+                    value: humidity == null ? '—' : '$humidity%',
                     foreground: foreground,
                     secondary: secondary,
                   ),
@@ -96,47 +111,6 @@ class HomeSheetHeader extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// A pill flagging the area's active warning.
-class _WarningBadge extends StatelessWidget {
-  const _WarningBadge({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: colors.tertiaryContainer,
-        borderRadius: AppRadius.large,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.warning_amber_rounded,
-            size: 18,
-            color: colors.onTertiaryContainer,
-          ),
-          const SizedBox(width: AppSpacing.xs),
-          Text(
-            label,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: colors.onTertiaryContainer,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
