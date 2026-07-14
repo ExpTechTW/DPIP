@@ -56,6 +56,12 @@ abstract final class Log {
   /// Call once during start-up (see `bootstrap`).
   static void installErrorHandlers() {
     FlutterError.onError = (details) {
+      // Overriding onError replaces the framework's own console presentation,
+      // whose dump carries the diagnostics our summary drops — for a layout
+      // fault (e.g. a RenderFlex overflow) that includes *which* widget and its
+      // creation `file:line`. Keep that rich dump in debug so such errors stay
+      // locatable; release stays quiet (presentError is a near no-op there).
+      if (kDebugMode) FlutterError.presentError(details);
       talker.handle(
         details.exception,
         details.stack,

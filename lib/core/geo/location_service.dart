@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -170,6 +172,12 @@ class LocationService {
       final fix = await _fix();
       if (fix == null) return null;
       return await _resolve(fix.lat, fix.lng);
+    } on TimeoutException {
+      // No fix within the window (indoors, moving, or a simulator with no set
+      // location) is a normal outcome, not an error — don't forward routine "no
+      // fix" to crash reporting; the caller keeps the last known region.
+      Log.warning('GPS fix timed out — no current location available');
+      return null;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'GPS fix');
       return null;
