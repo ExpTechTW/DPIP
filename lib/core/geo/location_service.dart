@@ -122,17 +122,30 @@ class LocationService {
 
   /// Best-effort escalation to background ("Always") permission — call it as a
   /// **separate** step, only after foreground is already granted (Android 11+
-  /// rejects a bundled request). On Android 10 / iOS this can prompt; on Android
-  /// 11+ "Allow all the time" lives in Settings, so a false return means the
-  /// caller should [openSettings] and re-check on resume. Never throws.
+  /// rejects a bundled request).
+  ///
+  /// In-app escalation only works on Android ≤10 (and a never-yet-shown iOS
+  /// "Always" prompt). It **cannot** happen in-app on iOS once "While Using" is
+  /// granted (geolocator's `requestPermission` returns the current status
+  /// without ever calling `requestAlwaysAuthorization`) nor on Android 11+ —
+  /// there "Allow all the time" only exists in system Settings. So: try the
+  /// in-app prompt, and if that doesn't land on "Always", open Settings, where
+  /// the grant lives. Either way the caller re-checks on resume. Never throws.
   Future<bool> requestBackground() async {
     try {
-      if (await Geolocator.checkPermission() ==
-          LocationPermission.deniedForever) {
+      final current = await Geolocator.checkPermission();
+      if (current == LocationPermission.always) return true;
+      if (current == LocationPermission.deniedForever) {
         await Geolocator.openAppSettings();
         return false;
       }
-      return await Geolocator.requestPermission() == LocationPermission.always;
+      if (await Geolocator.requestPermission() == LocationPermission.always) {
+        return true;
+      }
+      // Couldn't escalate in-app (iOS after "While Using", or Android 11+) —
+      // "Always" lives in system Settings.
+      await Geolocator.openAppSettings();
+      return false;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestBackground');
       return false;
