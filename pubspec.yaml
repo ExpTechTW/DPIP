@@ -53,5 +53,5 @@ flutter:
   assets:
     - assets/DPIP.png
     - assets/location.json.gz
-    - assets/map/town_boundaries.json.gz
+    - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz
