@@ -1,6 +1,7 @@
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -33,6 +34,7 @@ class SharedDeps {
     required this.realtimeService,
     required this.notificationService,
     required this.townDirectory,
+    required this.townBoundaries,
     required this.regionStore,
     required this.locationService,
     required this.deviceLocationReporter,
@@ -68,6 +70,10 @@ class SharedDeps {
   /// Taiwan township directory (code → town), for GPS resolution + region
   /// labels. Loaded once at bootstrap.
   final TownDirectory townDirectory;
+
+  /// Township boundary polygons (loads in the background) — GPS→township PIP and
+  /// the selected-region outline on the home map.
+  final Future<TownBoundaries> townBoundaries;
 
   /// App-wide Home region selection (also provided).
   final RegionStore regionStore;

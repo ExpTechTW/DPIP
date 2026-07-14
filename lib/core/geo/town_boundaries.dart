@@ -134,6 +134,33 @@ class TownBoundaries {
     }
     return null;
   }
+
+  /// Township [code]'s bounding box as `[minLng, minLat, maxLng, maxLat]`, or
+  /// null if unknown — for framing the map on a selected region.
+  List<double>? boundsFor(String code) {
+    final shape = _shapes[code];
+    return shape == null
+        ? null
+        : [shape.minLng, shape.minLat, shape.maxLng, shape.maxLat];
+  }
+
+  /// Township [code]'s outline as a **GeoJSON MultiPolygon** geometry string
+  /// (coordinates `[lng, lat]`), or null if unknown — for drawing the selected
+  /// region's border on a map.
+  String? geometryJsonFor(String code) {
+    final shape = _shapes[code];
+    if (shape == null) return null;
+    final coordinates = [
+      for (final polygon in shape.polygons)
+        [
+          for (final ring in polygon)
+            [
+              for (var i = 0; i < ring.length; i += 2) [ring[i], ring[i + 1]],
+            ],
+        ],
+    ];
+    return jsonEncode({'type': 'MultiPolygon', 'coordinates': coordinates});
+  }
 }
 
 /// One township's boundary: a bounding box (fast rejection) and its polygons.

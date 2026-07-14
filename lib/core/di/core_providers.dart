@@ -1,6 +1,7 @@
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -25,6 +26,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
   Provider<TownDirectory>.value(value: deps.townDirectory),
+  Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
   Provider<RealtimeService>.value(value: deps.realtimeService),

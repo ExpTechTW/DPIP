@@ -148,6 +148,7 @@ Future<void> bootstrap() async {
     realtimeService: realtimeService,
     notificationService: notificationService,
     townDirectory: townDirectory,
+    townBoundaries: townBoundaries,
     regionStore: regionStore,
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
