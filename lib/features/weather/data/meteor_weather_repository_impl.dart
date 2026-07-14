@@ -6,8 +6,11 @@ import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/core/network/meteor_decode.dart';
 import 'package:dpip/features/weather/data/meteor_weather_api.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/weather_forecast.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
+import 'package:dpip/features/weather/domain/weather_trend.dart';
 
 /// Maps the datasource's raw JSON to domain models, converting transport/decode
 /// errors to typed failures via [guardResult].
@@ -39,4 +42,25 @@ class MeteorWeatherRepositoryImpl implements MeteorWeatherRepository {
   @override
   Future<Result<WeatherSnapshot>> at(int second) =>
       guardResult(() async => WeatherSnapshot.decode(await _api.getAt(second)));
+
+  @override
+  Future<Result<WeatherTrend>> trend(String id, {String range = '24h'}) =>
+      guardResult(
+        () async => WeatherTrend.decode(await _api.getTrend(id, range)),
+      );
+
+  @override
+  Future<Result<WeatherRealtime?>> realtime(
+    double latitude,
+    double longitude,
+  ) => guardResult(() async {
+    final raw = await _api.getRealtime(latitude, longitude);
+    // Outside Taiwan the API returns `{}` — a valid "no station", not an error.
+    return raw.isEmpty ? null : WeatherRealtime.fromJson(raw);
+  });
+
+  @override
+  Future<Result<WeatherForecast>> forecast(String code) => guardResult(
+    () async => WeatherForecast.fromJson(await _api.getForecast(code)),
+  );
 }

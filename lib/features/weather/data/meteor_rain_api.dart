@@ -1,34 +1,33 @@
-/// v5 meteor **weather** endpoints on the region-aware [ApiClient].
+/// v5 meteor **rain** endpoints on the region-aware [ApiClient].
 library;
 
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 
-/// Weather station directory + observation snapshots — **API v5**
-/// (`/api/v5/meteor/weather`).
+/// Rain station directory + accumulation snapshots + per-station trend — **API
+/// v5** (`/api/v5/meteor/rain`).
 ///
 /// **Cache-split dual host** (both on `core-tnn1`): a history URL ending in a
 /// 10-digit second is immutable and served from `static.core-tnn1`
 /// ([ApiTier.coreStaticExclusive], 1-year cache); everything else (latest, list,
-/// trend, realtime, forecast, station) is served from `api.core-tnn1`
-/// ([ApiTier.coreExclusiveApi], 1-second cache
-/// with ETag/304). Returns raw decoded JSON; the repository decodes the
-/// field-arrays / delta-seconds into domain models.
-class MeteorWeatherApi {
-  const MeteorWeatherApi(this._client);
+/// trend, station) is served from `api.core-tnn1` ([ApiTier.coreExclusiveApi],
+/// 1-second cache with ETag/304). Returns raw decoded JSON; the repository
+/// decodes the field-arrays / delta-seconds into domain models.
+class MeteorRainApi {
+  const MeteorRainApi(this._client);
 
   final ApiClient _client;
 
-  /// Latest / list / directory / trend / realtime / forecast (mutable) live on
-  /// `api.core-tnn1`.
+  /// Latest / list / directory / trend (mutable) live on `api.core-tnn1`.
   static const ApiTier _api = ApiTier.coreExclusiveApi;
 
   /// Timestamped history (immutable) lives on `static.core-tnn1`.
   static const ApiTier _static = ApiTier.coreStaticExclusive;
 
-  static const String _base = '/api/v5/meteor/weather';
+  static const String _base = '/api/v5/meteor/rain';
 
-  /// Static station directory `{ code: {n,c,t,alt,lat,lon} }` (ETag-cached).
+  /// Static station directory `{ code: {n,c,t,alt,lat,lon} }` (ETag-cached) —
+  /// same shape as weather's, so the domain reuses `WeatherStation`.
   Future<Map<String, dynamic>> getStation() async =>
       (await _client.get(_api, '$_base/station')) as Map<String, dynamic>;
 
@@ -44,22 +43,8 @@ class MeteorWeatherApi {
   Future<Map<String, dynamic>> getAt(int second) async =>
       (await _client.get(_static, '$_base/$second')) as Map<String, dynamic>;
 
-  /// Per-station weather trend for [id] over [range] (`24h` | `7d`).
+  /// Per-station rainfall trend for [id] over [range] (`24h` | `7d`).
   Future<Map<String, dynamic>> getTrend(String id, String range) async =>
       (await _client.get(_api, '$_base/trend/$id', query: {'range': range}))
-          as Map<String, dynamic>;
-
-  /// Nearest station to [latitude],[longitude] (the `:coords` = `lat,lng` path).
-  /// Returns `{}` when the coordinate is outside Taiwan.
-  Future<Map<String, dynamic>> getRealtime(
-    double latitude,
-    double longitude,
-  ) async =>
-      (await _client.get(_api, '$_base/realtime/$latitude,$longitude'))
-          as Map<String, dynamic>;
-
-  /// Township forecast for the 3-digit [code].
-  Future<Map<String, dynamic>> getForecast(String code) async =>
-      (await _client.get(_api, '$_base/forecast/$code'))
           as Map<String, dynamic>;
 }
