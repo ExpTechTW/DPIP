@@ -1,17 +1,17 @@
 /// The 強震監視器 overlay UI: the instrumental-intensity legend (top-left,
 /// matching the station-dot colours) and a bottom freshness strip showing the
-/// feed status and the snapshot time.
+/// feed status and the live snapshot latency (ms).
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
 /// `buildSheet` slot): a fixed legend at top-left and a freshness strip at the
@@ -36,7 +36,7 @@ class RtsMonitorPanel extends StatelessWidget {
             ),
           ),
         ),
-        // Feed freshness + snapshot time — bottom strip.
+        // Feed freshness + snapshot latency — bottom strip.
         Positioned(
           left: 0,
           right: 0,
@@ -78,7 +78,8 @@ class _LegendCard extends StatelessWidget {
   }
 }
 
-/// A compact bottom card: status dot + title + monospaced snapshot time.
+/// A compact bottom card: status dot + title + the live latency (ms), or the
+/// feed status word when not live.
 class _StatusBar extends StatelessWidget {
   const _StatusBar({required this.state});
 
@@ -90,9 +91,17 @@ class _StatusBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
+    // Latency of the newest snapshot: SNTP-corrected now minus the snapshot's
+    // own millisecond timestamp (both on the server clock, so the difference is
+    // the true end-to-end lag, immune to device-clock skew). Null before the
+    // first snapshot; floored at 0 against sub-sync jitter.
+    final snapshot = state.data?.time ?? 0;
+    final raw = AppTime.utc.millisecondsSinceEpoch - snapshot;
+    final int? delayMs = snapshot == 0 ? null : (raw < 0 ? 0 : raw);
+
     // Freshness is spoken as text (not colour alone, for colour-blind users) and
-    // an aged snapshot is never shown as if current — only a *live* feed shows
-    // the snapshot time; stale/offline show the status word instead.
+    // an aged snapshot is never shown as if current — only a *live* feed shows a
+    // latency; stale/offline show the status word instead.
     final (
       Color dot,
       String trailing,
@@ -100,8 +109,8 @@ class _StatusBar extends StatelessWidget {
     ) = switch (state.status) {
       RealtimeStatus.live => (
         Colors.green,
-        _snapshotTime(state.data?.time, l10n),
-        colors.onSurfaceVariant,
+        delayMs == null ? l10n.monitorWaiting : l10n.monitorDelay(delayMs),
+        _delayColor(delayMs, colors),
       ),
       RealtimeStatus.stale => (Colors.amber, l10n.feedStale, colors.tertiary),
       RealtimeStatus.offline => (Colors.red, l10n.feedOffline, colors.error),
@@ -157,16 +166,13 @@ class _StatusBar extends StatelessWidget {
     );
   }
 
-  /// The snapshot wall-clock (UTC+8) from the millisecond [time], or the waiting
-  /// placeholder before the first snapshot.
-  String _snapshotTime(int? time, AppLocalizations l10n) {
-    if (time == null || time == 0) return l10n.monitorWaiting;
-    return DateFormat('HH:mm:ss').format(
-      DateTime.fromMillisecondsSinceEpoch(
-        time,
-        isUtc: true,
-      ).add(const Duration(hours: 8)),
-    );
+  /// The latency reading's colour: normal under 1 s, warning to 5 s, error
+  /// beyond — a live feed sits at a few hundred ms, so a large lag flags trouble.
+  Color _delayColor(int? ms, ColorScheme colors) {
+    if (ms == null) return colors.onSurfaceVariant;
+    if (ms >= 5000) return colors.error;
+    if (ms >= 1000) return colors.tertiary;
+    return colors.onSurfaceVariant;
   }
 }
 

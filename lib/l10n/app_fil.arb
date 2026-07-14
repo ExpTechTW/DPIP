@@ -150,5 +150,6 @@
   "mapLayerPressure": "Presyon",
   "mapLayerWind": "Hangin",
   "mapLayerMonitor": "Seismic Monitor",
+  "monitorDelay": "Pagkaantala {ms} ms",
   "monitorWaiting": "Naghihintay ng data…"
 }

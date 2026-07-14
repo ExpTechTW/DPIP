@@ -471,6 +471,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String monitorDelay(int ms) {
+    return '延遲 $ms ms';
+  }
+
+  @override
   String get monitorWaiting => '等待資料…';
 }
 
@@ -941,6 +946,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerMonitor => '强震监视器';
 
   @override
+  String monitorDelay(int ms) {
+    return '延迟 $ms ms';
+  }
+
+  @override
   String get monitorWaiting => '等待数据…';
 }
 
@@ -1409,6 +1419,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLayerMonitor => '強震監視器';
+
+  @override
+  String monitorDelay(int ms) {
+    return '延遲 $ms ms';
+  }
 
   @override
   String get monitorWaiting => '等待資料…';

@@ -475,5 +475,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerMonitor => '強震モニタ';
 
   @override
+  String monitorDelay(int ms) {
+    return '遅延 $ms ms';
+  }
+
+  @override
   String get monitorWaiting => 'データ待機中…';
 }

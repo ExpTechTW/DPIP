@@ -150,5 +150,6 @@
   "mapLayerPressure": "Áp suất",
   "mapLayerWind": "Gió",
   "mapLayerMonitor": "Giám sát địa chấn",
+  "monitorDelay": "Độ trễ {ms} ms",
   "monitorWaiting": "Đang chờ dữ liệu…"
 }

@@ -483,5 +483,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override
+  String monitorDelay(int ms) {
+    return 'หน่วงเวลา $ms ms';
+  }
+
+  @override
   String get monitorWaiting => 'กำลังรอข้อมูล…';
 }

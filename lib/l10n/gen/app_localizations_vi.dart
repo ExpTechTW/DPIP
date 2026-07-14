@@ -484,5 +484,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override
+  String monitorDelay(int ms) {
+    return 'Độ trễ $ms ms';
+  }
+
+  @override
   String get monitorWaiting => 'Đang chờ dữ liệu…';
 }

@@ -150,5 +150,6 @@
   "mapLayerPressure": "ความกดอากาศ",
   "mapLayerWind": "ลม",
   "mapLayerMonitor": "เครื่องตรวจแผ่นดินไหว",
+  "monitorDelay": "หน่วงเวลา {ms} ms",
   "monitorWaiting": "กำลังรอข้อมูล…"
 }

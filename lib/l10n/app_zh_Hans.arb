@@ -150,5 +150,6 @@
   "mapLayerPressure": "气压",
   "mapLayerWind": "风",
   "mapLayerMonitor": "强震监视器",
+  "monitorDelay": "延迟 {ms} ms",
   "monitorWaiting": "等待数据…"
 }
