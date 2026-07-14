@@ -9,8 +9,8 @@ import 'package:flutter/services.dart' show rootBundle;
 /// `assets/location.json.gz`, with lookup by code and by GPS coordinate.
 ///
 /// GPS→township is **nearest centroid** for now (dependency-light and exact
-/// enough away from borders); a point-in-polygon upgrade using
-/// `assets/map/town.json.zst` can replace [nearest] later without touching
+/// enough away from borders); a point-in-polygon upgrade — re-bundling the
+/// town-boundary polygons — can replace [nearest] later without touching
 /// callers. Pure and injectable — [fromJson] builds it from decoded data so the
 /// lookup is unit-testable without the asset.
 class TownDirectory {
