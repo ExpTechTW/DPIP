@@ -6,6 +6,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_fil.dart';
+import 'app_localizations_id.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_th.dart';
+import 'app_localizations_vi.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -95,8 +101,26 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('fil'),
+    Locale('id'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('th'),
+    Locale('vi'),
     Locale('zh'),
+    Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+    Locale.fromSubtags(
+      languageCode: 'zh',
+      countryCode: 'HK',
+      scriptCode: 'Hant',
+    ),
   ];
+
+  /// This language's own name, shown in the in-app language picker. Each locale's ARB names itself; the picker is built from these, never a hardcoded list.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageName;
 
   /// Bottom-nav label and page title for the Home tab
   ///
@@ -745,18 +769,56 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'en',
+    'fil',
+    'id',
+    'ja',
+    'ko',
+    'th',
+    'vi',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+script+country codes are specified.
+  switch (locale.toString()) {
+    case 'zh_Hant_HK':
+      return AppLocalizationsZhHantHk();
+  }
+
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.scriptCode) {
+          case 'Hans':
+            return AppLocalizationsZhHans();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'fil':
+      return AppLocalizationsFil();
+    case 'id':
+      return AppLocalizationsId();
+    case 'ja':
+      return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
+    case 'th':
+      return AppLocalizationsTh();
+    case 'vi':
+      return AppLocalizationsVi();
     case 'zh':
       return AppLocalizationsZh();
   }

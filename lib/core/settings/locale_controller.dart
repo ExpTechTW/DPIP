@@ -11,9 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// resolves it against the supported locales. Setting a locale forces that
 /// language app-wide; the app root watches this and rebuilds `MaterialApp`.
 ///
-/// Persisted as a `language_COUNTRY` tag (e.g. `zh_TW`, `zh_HK`, `ja`) so
-/// region-specific variants (Traditional Chinese for Taiwan vs Hong Kong) are
-/// distinguishable.
+/// Persisted as a BCP-47 language tag (e.g. `zh-Hant-HK`, `zh-Hans`, `ja`) so
+/// script- and region-specific variants — Traditional vs Simplified, Taiwan vs
+/// Hong Kong — round-trip losslessly, not just the bare language code.
 class LocaleController extends ChangeNotifier {
   LocaleController(this._prefs);
 
@@ -23,8 +23,7 @@ class LocaleController extends ChangeNotifier {
   Locale? get locale {
     final tag = _prefs.getString(PreferenceKeys.locale);
     if (tag == null || tag.isEmpty) return null;
-    final parts = tag.split('_');
-    return parts.length > 1 ? Locale(parts[0], parts[1]) : Locale(parts[0]);
+    return _parseTag(tag);
   }
 
   /// Sets the locale override; null clears it (back to the system language).
@@ -32,12 +31,29 @@ class LocaleController extends ChangeNotifier {
     if (locale == null) {
       await _prefs.remove(PreferenceKeys.locale);
     } else {
-      final country = locale.countryCode;
-      final tag = country == null
-          ? locale.languageCode
-          : '${locale.languageCode}_$country';
-      await _prefs.setString(PreferenceKeys.locale, tag);
+      await _prefs.setString(PreferenceKeys.locale, locale.toLanguageTag());
     }
     notifyListeners();
+  }
+
+  /// Parses a BCP-47 tag (`zh-Hant-HK`) back into a [Locale], recognising the
+  /// 4-letter script subtag so it survives the round-trip. Also tolerates the
+  /// legacy `_` separator from earlier builds.
+  static Locale _parseTag(String tag) {
+    final parts = tag.split(RegExp('[-_]'));
+    String? script;
+    String? country;
+    for (final part in parts.skip(1)) {
+      if (part.length == 4) {
+        script = part; // script subtags are 4 letters (Hant, Hans)
+      } else {
+        country = part.toUpperCase();
+      }
+    }
+    return Locale.fromSubtags(
+      languageCode: parts.first,
+      scriptCode: script,
+      countryCode: country,
+    );
   }
 }

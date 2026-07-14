@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "languageName": "English",
+  "@languageName": {
+    "description": "This language's own name, shown in the in-app language picker. Each locale's ARB names itself; the picker is built from these, never a hardcoded list."
+  },
   "navHome": "Home",
   "@navHome": {
     "description": "Bottom-nav label and page title for the Home tab"

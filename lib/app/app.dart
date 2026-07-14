@@ -11,6 +11,7 @@ import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -56,7 +57,9 @@ class DpipApp extends StatelessWidget {
             darkTheme: AppTheme.dark,
             locale: localeController.locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
+            // Home locale first, so an unmatched device language falls back to
+            // Traditional Chinese (Taiwan), not the English template.
+            supportedLocales: appSupportedLocales,
             routerConfig: appRouter,
           ),
         ),
