@@ -54,7 +54,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   /// surrounding context instead of edge-to-edge. Fitting the (expanded) bounds
   /// keeps the zoom device-independent (MapLibre derives it from the box and the
   /// viewport). Raise for a looser frame.
-  static const double _frameExpansion = 0.4;
+  static const double _frameExpansion = 1;
 
   MapLibreMapController? _controller;
   bool _styleReady = false;
@@ -161,15 +161,19 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
       await _addSelectedLayers(controller, filter);
-      // Offset the map's focal point above the resting sheet with a bottom
-      // content inset, then fit the bounds — the native fit centres within the
-      // inset, so the framed area sits in the visible band, not behind the
-      // sheet. Instant (not animated): switching areas snaps the framing.
+      // Frame the bounds in the strip above the resting sheet. Both knobs use
+      // the sheet height: the content inset offsets the camera's focus up, and
+      // the matching bottom padding shrinks the fit area to the same strip.
+      // Together they seat the bounds in the visible band without clipping —
+      // the inset alone clips a tall fit (it doesn't shrink the fit), and the
+      // padding alone centres it behind the sheet. Instant: switching snaps.
       await controller.updateContentInsets(
         EdgeInsets.only(bottom: bottomInset),
         false,
       );
-      await controller.moveCamera(CameraUpdate.newLatLngBounds(box));
+      await controller.moveCamera(
+        CameraUpdate.newLatLngBounds(box, bottom: bottomInset),
+      );
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });
