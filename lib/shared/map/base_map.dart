@@ -22,7 +22,6 @@ class BaseMap extends StatelessWidget {
     this.onMapCreated,
     this.onStyleLoaded,
     this.interactive = true,
-    this.maxZoom = 11,
   });
 
   /// Centre of Taiwan.
@@ -38,8 +37,8 @@ class BaseMap extends StatelessWidget {
     northeast: const LatLng(25.40, 122.05),
   );
 
-  /// Lowest zoom the map will show — the radar echo tiles start here.
-  static const double minZoom = 4;
+  /// Fixed 4–11 zoom range — the radar echo tiles require it.
+  static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(4, 11);
 
   /// Called with the controller once the map is ready — add overlay layers here.
   final void Function(MapLibreMapController controller)? onMapCreated;
@@ -50,11 +49,6 @@ class BaseMap extends StatelessWidget {
   /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
-
-  /// Highest zoom the map will show — also the tightest a fit-to-bounds framing
-  /// zooms in. Defaults to 11, the ceiling the radar echo tiles exist at; a
-  /// display surface can lower it to frame selections looser.
-  final double maxZoom;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +65,7 @@ class BaseMap extends StatelessWidget {
         outline: colors.outline.toHexRgb(),
         townOutline: colors.outlineVariant.toHexRgb(),
       ),
-      minMaxZoomPreference: MinMaxZoomPreference(minZoom, maxZoom),
+      minMaxZoomPreference: zoomRange,
       trackCameraPosition: true,
       compassEnabled: interactive,
       scrollGesturesEnabled: interactive,

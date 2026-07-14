@@ -49,11 +49,12 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   static const String _radarLayer = 'home-radar-lyr';
   static const double _radarOpacity = 0.85;
 
-  /// The tightest zoom the framing uses — a small township fits to this instead
-  /// of zooming all the way in, so every area frames at a consistent scale.
-  /// Capped at 11 (the radar echo tiles only exist to zoom 11); lower it to
-  /// frame selections looser.
-  static const double _frameMaxZoom = 11;
+  /// How far the selected township's bounds are pushed outward before fitting —
+  /// a fraction of the box's span added to every side — so it frames with
+  /// surrounding context instead of edge-to-edge. Fitting the (expanded) bounds
+  /// keeps the zoom device-independent (MapLibre derives it from the box and the
+  /// viewport). Raise for a looser frame.
+  static const double _frameExpansion = 0.4;
 
   MapLibreMapController? _controller;
   bool _styleReady = false;
@@ -270,14 +271,20 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     code ?? -1,
   ];
 
-  /// The bounds to frame — the selected township, or the whole island for the
-  /// nationwide view.
-  LatLngBounds _latLngBounds(List<double>? bounds) => bounds == null
-      ? BaseMap.taiwanBounds
-      : LatLngBounds(
-          southwest: LatLng(bounds[1], bounds[0]),
-          northeast: LatLng(bounds[3], bounds[2]),
-        );
+  /// The bounds to frame — the selected township (pushed outward by
+  /// [_frameExpansion] for breathing room), or the whole island (already
+  /// framed with margin) for the nationwide view.
+  LatLngBounds _latLngBounds(List<double>? bounds) {
+    if (bounds == null) return BaseMap.taiwanBounds;
+    final minLng = bounds[0], minLat = bounds[1], maxLng = bounds[2];
+    final maxLat = bounds[3];
+    final dLng = (maxLng - minLng) * _frameExpansion;
+    final dLat = (maxLat - minLat) * _frameExpansion;
+    return LatLngBounds(
+      southwest: LatLng(minLat - dLat, minLng - dLng),
+      northeast: LatLng(maxLat + dLat, maxLng + dLng),
+    );
+  }
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
   /// failed map op degrades the backdrop, it never throws into the tree.
@@ -303,7 +310,6 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     return IgnorePointer(
       child: BaseMap(
         interactive: false,
-        maxZoom: _frameMaxZoom,
         onMapCreated: _onMapCreated,
         onStyleLoaded: _onStyleLoaded,
       ),
