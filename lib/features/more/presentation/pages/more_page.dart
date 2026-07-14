@@ -19,9 +19,12 @@ class MorePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
-        padding: const EdgeInsets.only(
+        // The shell uses extendBody, so the list runs behind the bottom nav bar;
+        // pad the bottom by the obscured height (reported via MediaQuery) so the
+        // last rows can scroll clear of it.
+        padding: EdgeInsets.only(
           top: AppSpacing.sm,
-          bottom: AppSpacing.xl,
+          bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
           SectionHeader(l10n.moreSectionGeneral),

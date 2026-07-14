@@ -44,7 +44,14 @@ class _EewAlertList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      // extendBody: pad the bottom past the nav bar (its height comes through
+      // MediaQuery) so the last card can scroll clear of it.
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
+      ),
       itemCount: alerts.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) => _EewCard(eew: alerts[index]),
