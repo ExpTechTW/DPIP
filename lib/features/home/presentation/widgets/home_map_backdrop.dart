@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -164,6 +163,12 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
     final box = safeFitBounds(_latLngBounds(bounds));
     if (box == null) return;
+    // Hand the township box to the map tab directly — it fits it full-screen.
+    // (An earlier version projected the on-screen band via controller.toLatLng,
+    // but the plugin's screen coordinates didn't line up with MediaQuery's
+    // logical size and mis-framed the map onto the strait, so the simple box is
+    // used instead.)
+    _handoff?.homeBounds = box;
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
@@ -181,55 +186,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(box, bottom: bottomInset),
       );
-      // Publish what's actually VISIBLE in the band above the sheet (projected
-      // from the applied camera), not the raw fit box — so a tap opens the map,
-      // which fits full-screen, on the same horizontal framing instead of
-      // re-fitting the box into a taller viewport at a different scale.
-      _handoff?.homeBounds = await _visibleBandBounds(
-        controller,
-        size,
-        bottomInset,
-        box,
-      );
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });
-  }
-
-  /// The geographic bounds under the visible band (the screen above the resting
-  /// sheet), projected from the current camera. Falls back to [fallback] if the
-  /// projection isn't available (map not laid out) or is non-finite.
-  Future<LatLngBounds> _visibleBandBounds(
-    MapLibreMapController controller,
-    Size size,
-    double bottomInset,
-    LatLngBounds fallback,
-  ) async {
-    try {
-      final topLeft = await controller.toLatLng(const math.Point(0, 0));
-      final bottomRight = await controller.toLatLng(
-        math.Point(size.width, size.height - bottomInset),
-      );
-      final corners = [
-        topLeft.latitude,
-        topLeft.longitude,
-        bottomRight.latitude,
-        bottomRight.longitude,
-      ];
-      if (corners.any((v) => !v.isFinite)) return fallback;
-      return LatLngBounds(
-        southwest: LatLng(
-          math.min(topLeft.latitude, bottomRight.latitude),
-          math.min(topLeft.longitude, bottomRight.longitude),
-        ),
-        northeast: LatLng(
-          math.max(topLeft.latitude, bottomRight.latitude),
-          math.max(topLeft.longitude, bottomRight.longitude),
-        ),
-      );
-    } catch (_) {
-      return fallback;
-    }
   }
 
   /// (Re)adds the purple selection outline on the vector `town` layer (filtered

@@ -78,14 +78,45 @@ class WindMapLayer extends WeatherStationLayer {
         iconImage: _arrowImageId,
         iconRotate: <Object>['get', 'blow_to'],
         iconColor: _colorExpression(),
+        // Size scales with wind speed (bigger = stronger) and with zoom. Zoom
+        // must be the OUTERMOST interpolate input (MapLibre only allows [zoom]
+        // at the top level), with the speed interpolate nested per zoom stop.
         iconSize: <Object>[
           'interpolate',
           <Object>['linear'],
           <Object>['zoom'],
           5,
-          0.4,
+          <Object>[
+            'interpolate',
+            <Object>['linear'],
+            <Object>['get', 'value'],
+            0.0,
+            0.18,
+            3.4,
+            0.22,
+            8.0,
+            0.28,
+            13.9,
+            0.34,
+            32.7,
+            0.48,
+          ],
           11,
-          0.8,
+          <Object>[
+            'interpolate',
+            <Object>['linear'],
+            <Object>['get', 'value'],
+            0.0,
+            0.45,
+            3.4,
+            0.55,
+            8.0,
+            0.68,
+            13.9,
+            0.82,
+            32.7,
+            1.20,
+          ],
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -96,13 +127,21 @@ class WindMapLayer extends WeatherStationLayer {
     );
   }
 
-  /// The speed colour ramp as a MapLibre `interpolate` on `value` — the same
-  /// stops the base dot would use, reused here to tint the arrows.
+  /// Discrete speed → colour, matching legacy's 5 wind buckets (white / cyan /
+  /// blue / purple / pink) on the same 3.4 / 8.0 / 13.9 / 32.7 m/s thresholds —
+  /// a `step`, not a continuous ramp.
   List<Object> _colorExpression() => <Object>[
-    'interpolate',
-    <Object>['linear'],
+    'step',
     <Object>['get', 'value'],
-    for (final (at, color) in colorStops) ...[at, color],
+    '#FFFFFF',
+    3.4,
+    '#00FFF0',
+    8.0,
+    '#0085FF',
+    13.9,
+    '#8000FF',
+    32.7,
+    '#FF006B',
   ];
 
   /// Renders [Icons.navigation] (points north at 0°) to a white PNG for use as
@@ -154,12 +193,15 @@ class WindMapLayer extends WeatherStationLayer {
     return arrows[index];
   }
 
+  // Legacy's 5 discrete wind-speed colours (white → pink). Not used for the
+  // arrow tint (that's the [step] in _colorExpression), but kept as the layer's
+  // declared ramp for the base contract.
   @override
   List<(double, String)> get colorStops => const [
-    (0, '#ABD9E9'),
-    (5, '#FFFFBF'),
-    (10, '#FDAE61'),
-    (17, '#F46D43'),
-    (25, '#D73027'),
+    (0, '#FFFFFF'),
+    (3.4, '#00FFF0'),
+    (8.0, '#0085FF'),
+    (13.9, '#8000FF'),
+    (32.7, '#FF006B'),
   ];
 }

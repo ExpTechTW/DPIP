@@ -103,25 +103,33 @@ class _StationSheetState extends State<StationSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: _controller,
-      initialChildSize: _peek,
-      minChildSize: _peek,
-      maxChildSize: 0.85,
-      snap: true,
-      // Keep the rest height a real snap detent, so a drag settles there and not
-      // only at the peek / full extremes.
-      snapSizes: const [_rest],
-      builder: (context, scrollController) => _SheetSurface(
-        child: ValueListenableBuilder<String?>(
-          valueListenable: widget.source.selection,
-          builder: (context, stationId, _) => stationId == null
-              ? _EmptyBody(scrollController: scrollController)
-              : _SheetBody(
-                  source: widget.source,
-                  stationId: stationId,
-                  scrollController: scrollController,
-                ),
+    // Bottom-anchored + expand:false so the sheet's box is only its current
+    // fraction, not the whole screen. A full-screen overlay over the MapLibre
+    // platform view swallows taps and the map's native onMapClick never fires
+    // (Flutter #71608) — which is why tapping a station stopped selecting it.
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: DraggableScrollableSheet(
+        expand: false,
+        controller: _controller,
+        initialChildSize: _peek,
+        minChildSize: _peek,
+        maxChildSize: 0.85,
+        snap: true,
+        // Keep the rest height a real snap detent, so a drag settles there and
+        // not only at the peek / full extremes.
+        snapSizes: const [_rest],
+        builder: (context, scrollController) => _SheetSurface(
+          child: ValueListenableBuilder<String?>(
+            valueListenable: widget.source.selection,
+            builder: (context, stationId, _) => stationId == null
+                ? _EmptyBody(scrollController: scrollController)
+                : _SheetBody(
+                    source: widget.source,
+                    stationId: stationId,
+                    scrollController: scrollController,
+                  ),
+          ),
         ),
       ),
     );

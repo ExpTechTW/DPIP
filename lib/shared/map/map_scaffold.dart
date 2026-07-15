@@ -97,8 +97,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// once the style is up. Leaves it pending if not, for [_onStyleLoaded].
   void _onHandoff() {
     if (!_styleLoaded) return;
-    final bounds = _handoff?.takePending();
-    if (bounds != null) _frameBounds(bounds);
+    // A handoff usually arrives mid-navigation — the nav/home tap that requests
+    // it switches tabs in the same gesture, so this map is still offstage in the
+    // shell's IndexedStack and a moveCamera here would be dropped, stranding the
+    // map on its previous view. Apply it next frame, once the switch has put the
+    // map onstage, so re-entry reframes reliably.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final bounds = _handoff?.takePending();
+      if (bounds != null) _frameBounds(bounds);
+    });
   }
 
   /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
