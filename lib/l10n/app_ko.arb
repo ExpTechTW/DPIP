@@ -150,6 +150,7 @@
   "mapLayerPressure": "기압",
   "mapLayerWind": "바람",
   "mapLayerMonitor": "실시간 지진 모니터",
+  "stationSheetEmpty": "관측소를 눌러 관측값 보기",
   "monitorDelay": "지연 {value} s",
   "monitorWaiting": "데이터 대기 중…"
 }

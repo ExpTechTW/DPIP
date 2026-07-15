@@ -483,6 +483,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get stationSheetEmpty => 'Tap a station to see its reading';
+
+  @override
   String monitorDelay(String value) {
     return 'Delay $value s';
   }

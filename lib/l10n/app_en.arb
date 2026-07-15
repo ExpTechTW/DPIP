@@ -622,6 +622,10 @@
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
   },
+  "stationSheetEmpty": "Tap a station to see its reading",
+  "@stationSheetEmpty": {
+    "description": "Empty-state hint in the map station-value sheet, shown before any station is selected"
+  },
   "monitorDelay": "Delay {value} s",
   "@monitorDelay": {
     "description": "RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. \"0.3\"",

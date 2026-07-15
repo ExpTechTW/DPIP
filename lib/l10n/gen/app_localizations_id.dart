@@ -485,6 +485,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
+  String get stationSheetEmpty => 'Ketuk stasiun untuk melihat bacaannya';
+
+  @override
   String monitorDelay(String value) {
     return 'Latensi $value s';
   }

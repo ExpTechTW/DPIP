@@ -150,6 +150,7 @@
   "mapLayerPressure": "Tekanan",
   "mapLayerWind": "Angin",
   "mapLayerMonitor": "Monitor Seismik",
+  "stationSheetEmpty": "Ketuk stasiun untuk melihat bacaannya",
   "monitorDelay": "Latensi {value} s",
   "monitorWaiting": "Menunggu data…"
 }

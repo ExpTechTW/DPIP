@@ -475,6 +475,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerMonitor => '強震モニタ';
 
   @override
+  String get stationSheetEmpty => '観測点をタップして値を表示';
+
+  @override
   String monitorDelay(String value) {
     return '遅延 $value s';
   }

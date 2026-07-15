@@ -4,6 +4,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
@@ -51,38 +52,142 @@ abstract interface class StationSheetSource {
   void close();
 }
 
-/// A draggable bottom sheet that appears when a station is tapped and collapses
-/// fully (via close) when deselected. Shows the station's reading and a
-/// range-switchable (24h / 7d) trend chart.
-class StationSheet extends StatelessWidget {
+/// A draggable bottom sheet for a station-value layer. Always present as a small
+/// peek (with a "tap a station" hint); picking a station on the map pops it up
+/// to a comfortable rest height showing the reading and a range-switchable
+/// (24h / 7d) trend chart, and deselecting settles it back to the peek.
+class StationSheet extends StatefulWidget {
   const StationSheet({super.key, required this.source});
 
   final StationSheetSource source;
 
   @override
+  State<StationSheet> createState() => _StationSheetState();
+}
+
+class _StationSheetState extends State<StationSheet> {
+  final DraggableScrollableController _controller =
+      DraggableScrollableController();
+
+  /// Collapsed peek height — the sheet never goes below this, so the hint (and
+  /// grab handle) always show. A tap pops it up to [_rest].
+  static const double _peek = 0.14;
+  static const double _rest = 0.42;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.source.selection.addListener(_onSelectionChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.source.selection.removeListener(_onSelectionChanged);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Pop up to [_rest] when a station is picked; settle back to [_peek] when it
+  /// is deselected. Driven explicitly so the height is reliable regardless of
+  /// where the sheet was last dragged.
+  void _onSelectionChanged() {
+    if (!_controller.isAttached) return;
+    final target = widget.source.selection.value == null ? _peek : _rest;
+    if ((_controller.size - target).abs() < 0.005) return;
+    _controller.animateTo(
+      target,
+      duration: AppMotion.medium,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String?>(
-      valueListenable: source.selection,
-      builder: (context, stationId, _) {
-        if (stationId == null) return const SizedBox.shrink();
-        return DraggableScrollableSheet(
-          initialChildSize: 0.42,
-          minChildSize: 0.14,
-          maxChildSize: 0.85,
-          snap: true,
-          // Keep the opening height a real rest detent — without it snap only
-          // rests at min/max, so the comfortable reading height is lost on the
-          // first drag.
-          snapSizes: const [0.42],
-          builder: (context, scrollController) => _SheetSurface(
-            child: _SheetBody(
-              source: source,
-              stationId: stationId,
-              scrollController: scrollController,
-            ),
+    return DraggableScrollableSheet(
+      controller: _controller,
+      initialChildSize: _peek,
+      minChildSize: _peek,
+      maxChildSize: 0.85,
+      snap: true,
+      // Keep the rest height a real snap detent, so a drag settles there and not
+      // only at the peek / full extremes.
+      snapSizes: const [_rest],
+      builder: (context, scrollController) => _SheetSurface(
+        child: ValueListenableBuilder<String?>(
+          valueListenable: widget.source.selection,
+          builder: (context, stationId, _) => stationId == null
+              ? _EmptyBody(scrollController: scrollController)
+              : _SheetBody(
+                  source: widget.source,
+                  stationId: stationId,
+                  scrollController: scrollController,
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The peek content shown before any station is picked: the grab handle over a
+/// short "tap a station" hint.
+class _EmptyBody extends StatelessWidget {
+  const _EmptyBody({required this.scrollController});
+
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return ListView(
+      controller: scrollController,
+      children: [
+        const _Grip(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.lg,
           ),
-        );
-      },
+          child: Row(
+            children: [
+              Icon(Icons.touch_app_outlined, color: colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  l10n.stationSheetEmpty,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The sheet's grab handle.
+class _Grip extends StatelessWidget {
+  const _Grip();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
     );
   }
 }
@@ -167,17 +272,7 @@ class _SheetBodyState extends State<_SheetBody> {
       controller: widget.scrollController,
       padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       children: [
-        Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
+        const _Grip(),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,

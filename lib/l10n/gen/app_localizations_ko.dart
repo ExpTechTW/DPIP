@@ -475,6 +475,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
+  String get stationSheetEmpty => '관측소를 눌러 관측값 보기';
+
+  @override
   String monitorDelay(String value) {
     return '지연 $value s';
   }

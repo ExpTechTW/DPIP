@@ -484,6 +484,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override
+  String get stationSheetEmpty => 'Chạm vào một trạm để xem số liệu';
+
+  @override
   String monitorDelay(String value) {
     return 'Độ trễ $value s';
   }

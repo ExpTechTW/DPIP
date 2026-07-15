@@ -1016,6 +1016,12 @@ abstract class AppLocalizations {
   /// **'Seismic Monitor'**
   String get mapLayerMonitor;
 
+  /// Empty-state hint in the map station-value sheet, shown before any station is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a station to see its reading'**
+  String get stationSheetEmpty;
+
   /// RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. "0.3"
   ///
   /// In en, this message translates to:

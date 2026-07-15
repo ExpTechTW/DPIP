@@ -485,6 +485,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get stationSheetEmpty => 'I-tap ang istasyon para makita ang datos';
+
+  @override
   String monitorDelay(String value) {
     return 'Pagkaantala $value s';
   }

@@ -150,6 +150,7 @@
   "mapLayerPressure": "气压",
   "mapLayerWind": "风",
   "mapLayerMonitor": "强震监视器",
+  "stationSheetEmpty": "点选任一测站查看观测值",
   "monitorDelay": "延迟 {value} s",
   "monitorWaiting": "等待数据…"
 }
