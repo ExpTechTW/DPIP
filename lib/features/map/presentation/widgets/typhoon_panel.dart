@@ -34,7 +34,9 @@ class TyphoonPanel extends StatelessWidget {
         return Align(
           alignment: Alignment.bottomCenter,
           child: DraggableScrollableSheet(
-            key: ValueKey(expanded),
+            // Key on the tapped label so tapping a different waypoint remounts
+            // and re-pops (see station_sheet for the #121954 rationale).
+            key: ValueKey(tapped),
             expand: false,
             initialChildSize: expanded ? _rest : _peek,
             minChildSize: _peek,

@@ -66,6 +66,11 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   List<String> get extraLayerIds => const [];
 
   final ValueNotifier<String?> _selected = ValueNotifier<String?>(null);
+
+  /// Bumped on every tap that (re-)selects a station — even the same one — so the
+  /// sheet can pop back up after the user collapsed it (a same-value [_selected]
+  /// wouldn't notify on its own).
+  final ValueNotifier<int> _selectionRevision = ValueNotifier<int>(0);
   Map<String, WeatherStation> _stations = const {};
   Map<String, WeatherObservation> _observations = const {};
   bool _loaded = false;
@@ -157,7 +162,10 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         best = entry.key;
       }
     }
-    if (best != null) _selected.value = best;
+    if (best != null) {
+      _selected.value = best;
+      _selectionRevision.value++;
+    }
   }
 
   @override
@@ -177,6 +185,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
 
   @override
   ValueListenable<String?> get selection => _selected;
+
+  @override
+  ValueListenable<int> get selectionRevision => _selectionRevision;
 
   @override
   String title(BuildContext context) => label(context);

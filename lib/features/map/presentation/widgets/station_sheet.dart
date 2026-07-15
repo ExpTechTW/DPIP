@@ -29,6 +29,10 @@ abstract interface class StationSheetSource {
   /// The selected station code, or null when none is tapped.
   ValueListenable<String?> get selection;
 
+  /// Bumped on every tap that (re-)selects a station, so the sheet can re-pop
+  /// even when the same station is tapped again after being collapsed.
+  ValueListenable<int> get selectionRevision;
+
   /// The station's display name for [id].
   String stationName(String id);
 
@@ -66,43 +70,45 @@ class StationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String?>(
-      valueListenable: source.selection,
-      builder: (context, stationId, _) {
-        final selected = stationId != null;
-        // Bottom-anchored + expand:false so the sheet only overlays its own
-        // height and the map above stays tappable — a full-screen overlay
-        // swallows the platform view's taps (Flutter #71608).
-        //
-        // The size is driven by a KEY-SWAP on select/deselect, not
-        // controller.animateTo, which is unreliable with expand:false (it closes
-        // the sheet instead of stopping at the target — Flutter #121954).
-        // Toggling ValueKey(selected) remounts the sheet at the new
-        // initialChildSize, so it reliably pops to [_rest] on select and settles
-        // to [_peek] on deselect; a same-selection change (station→station) keeps
-        // the key, so the sheet stays put and only its content refreshes.
-        return Align(
-          alignment: Alignment.bottomCenter,
-          child: DraggableScrollableSheet(
-            key: ValueKey(selected),
-            expand: false,
-            initialChildSize: selected ? _rest : _peek,
-            minChildSize: _peek,
-            maxChildSize: 0.85,
-            snap: true,
-            snapSizes: const [_rest],
-            builder: (context, scrollController) => _SheetSurface(
-              child: stationId == null
-                  ? _EmptyBody(scrollController: scrollController)
-                  : _SheetBody(
-                      source: source,
-                      stationId: stationId,
-                      scrollController: scrollController,
-                    ),
+    return ValueListenableBuilder<int>(
+      valueListenable: source.selectionRevision,
+      builder: (context, revision, _) => ValueListenableBuilder<String?>(
+        valueListenable: source.selection,
+        builder: (context, stationId, _) {
+          final selected = stationId != null;
+          // Bottom-anchored + expand:false so the sheet only overlays its own
+          // height and the map above stays tappable — a full-screen overlay
+          // swallows the platform view's taps (Flutter #71608).
+          //
+          // The size is driven by a KEY-SWAP, not controller.animateTo, which is
+          // unreliable with expand:false (it closes the sheet instead of
+          // stopping at the target — Flutter #121954). The key carries the
+          // selection *revision*, so EVERY tap-select (even re-tapping the same
+          // station after collapsing it) remounts the sheet at [_rest] and it
+          // pops again; with no selection it settles at [_peek].
+          return Align(
+            alignment: Alignment.bottomCenter,
+            child: DraggableScrollableSheet(
+              key: ValueKey(selected ? 'sel-$revision' : 'peek'),
+              expand: false,
+              initialChildSize: selected ? _rest : _peek,
+              minChildSize: _peek,
+              maxChildSize: 0.85,
+              snap: true,
+              snapSizes: const [_rest],
+              builder: (context, scrollController) => _SheetSurface(
+                child: stationId == null
+                    ? _EmptyBody(scrollController: scrollController)
+                    : _SheetBody(
+                        source: source,
+                        stationId: stationId,
+                        scrollController: scrollController,
+                      ),
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
