@@ -60,12 +60,16 @@ Future<void> bootstrap() async {
   Log.info('DPIP starting up');
 
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Hot-restart safe: the native Firebase app survives a Dart hot restart, so
+    // re-initializing then throws — only initialize when no default app exists.
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
     Log.info('Firebase initialized');
   } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'Firebase init skipped (no config yet)');
+    Log.handle(error, stackTrace, 'Firebase init failed (push unavailable)');
   }
 
   final prefs = Prefs(await SharedPreferences.getInstance());
