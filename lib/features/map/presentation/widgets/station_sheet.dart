@@ -4,7 +4,6 @@ library;
 
 import 'dart:math' as math;
 
-import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
@@ -56,82 +55,54 @@ abstract interface class StationSheetSource {
 /// peek (with a "tap a station" hint); picking a station on the map pops it up
 /// to a comfortable rest height showing the reading and a range-switchable
 /// (24h / 7d) trend chart, and deselecting settles it back to the peek.
-class StationSheet extends StatefulWidget {
+class StationSheet extends StatelessWidget {
   const StationSheet({super.key, required this.source});
 
   final StationSheetSource source;
 
-  @override
-  State<StationSheet> createState() => _StationSheetState();
-}
-
-class _StationSheetState extends State<StationSheet> {
-  final DraggableScrollableController _controller =
-      DraggableScrollableController();
-
-  /// Collapsed peek height — the sheet never goes below this, so the hint (and
-  /// grab handle) always show. A tap pops it up to [_rest].
+  /// Collapsed peek height, and the height it pops to when a station is picked.
   static const double _peek = 0.14;
   static const double _rest = 0.42;
 
   @override
-  void initState() {
-    super.initState();
-    widget.source.selection.addListener(_onSelectionChanged);
-  }
-
-  @override
-  void dispose() {
-    widget.source.selection.removeListener(_onSelectionChanged);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  /// Pop up to [_rest] when a station is picked; settle back to [_peek] when it
-  /// is deselected. Driven explicitly so the height is reliable regardless of
-  /// where the sheet was last dragged.
-  void _onSelectionChanged() {
-    if (!_controller.isAttached) return;
-    final target = widget.source.selection.value == null ? _peek : _rest;
-    if ((_controller.size - target).abs() < 0.005) return;
-    _controller.animateTo(
-      target,
-      duration: AppMotion.medium,
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Bottom-anchored + expand:false so the sheet's box is only its current
-    // fraction, not the whole screen. A full-screen overlay over the MapLibre
-    // platform view swallows taps and the map's native onMapClick never fires
-    // (Flutter #71608) — which is why tapping a station stopped selecting it.
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: DraggableScrollableSheet(
-        expand: false,
-        controller: _controller,
-        initialChildSize: _peek,
-        minChildSize: _peek,
-        maxChildSize: 0.85,
-        snap: true,
-        // Keep the rest height a real snap detent, so a drag settles there and
-        // not only at the peek / full extremes.
-        snapSizes: const [_rest],
-        builder: (context, scrollController) => _SheetSurface(
-          child: ValueListenableBuilder<String?>(
-            valueListenable: widget.source.selection,
-            builder: (context, stationId, _) => stationId == null
-                ? _EmptyBody(scrollController: scrollController)
-                : _SheetBody(
-                    source: widget.source,
-                    stationId: stationId,
-                    scrollController: scrollController,
-                  ),
+    return ValueListenableBuilder<String?>(
+      valueListenable: source.selection,
+      builder: (context, stationId, _) {
+        final selected = stationId != null;
+        // Bottom-anchored + expand:false so the sheet only overlays its own
+        // height and the map above stays tappable — a full-screen overlay
+        // swallows the platform view's taps (Flutter #71608).
+        //
+        // The size is driven by a KEY-SWAP on select/deselect, not
+        // controller.animateTo, which is unreliable with expand:false (it closes
+        // the sheet instead of stopping at the target — Flutter #121954).
+        // Toggling ValueKey(selected) remounts the sheet at the new
+        // initialChildSize, so it reliably pops to [_rest] on select and settles
+        // to [_peek] on deselect; a same-selection change (station→station) keeps
+        // the key, so the sheet stays put and only its content refreshes.
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: DraggableScrollableSheet(
+            key: ValueKey(selected),
+            expand: false,
+            initialChildSize: selected ? _rest : _peek,
+            minChildSize: _peek,
+            maxChildSize: 0.85,
+            snap: true,
+            snapSizes: const [_rest],
+            builder: (context, scrollController) => _SheetSurface(
+              child: stationId == null
+                  ? _EmptyBody(scrollController: scrollController)
+                  : _SheetBody(
+                      source: source,
+                      stationId: stationId,
+                      scrollController: scrollController,
+                    ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

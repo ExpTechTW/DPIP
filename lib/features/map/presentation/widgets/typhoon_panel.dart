@@ -5,7 +5,6 @@
 /// full-screen overlay blocks the platform view's taps (Flutter #71608).
 library;
 
-import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
@@ -14,73 +13,51 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TyphoonPanel extends StatefulWidget {
+class TyphoonPanel extends StatelessWidget {
   const TyphoonPanel({super.key, required this.layer});
 
   final TyphoonMapLayer layer;
-
-  @override
-  State<TyphoonPanel> createState() => _TyphoonPanelState();
-}
-
-class _TyphoonPanelState extends State<TyphoonPanel> {
-  final DraggableScrollableController _controller =
-      DraggableScrollableController();
 
   static const double _peek = 0.16;
   static const double _rest = 0.42;
 
   @override
-  void initState() {
-    super.initState();
-    widget.layer.tapped.addListener(_onTapped);
-  }
-
-  @override
-  void dispose() {
-    widget.layer.tapped.removeListener(_onTapped);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  /// Pop the sheet up to the rest height when a forecast waypoint is tapped.
-  void _onTapped() {
-    if (!_controller.isAttached || widget.layer.tapped.value == null) return;
-    if ((_controller.size - _rest).abs() < 0.005) return;
-    _controller.animateTo(
-      _rest,
-      duration: AppMotion.medium,
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: DraggableScrollableSheet(
-        expand: false,
-        controller: _controller,
-        initialChildSize: _peek,
-        minChildSize: _peek,
-        maxChildSize: 0.85,
-        snap: true,
-        snapSizes: const [_rest],
-        builder: (context, scrollController) => _Surface(
-          child: ListView(
-            controller: scrollController,
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.paddingOf(context).bottom,
+    return ValueListenableBuilder<String?>(
+      valueListenable: layer.tapped,
+      builder: (context, tapped, _) {
+        // Pop to rest when a forecast waypoint is tapped, back to peek when
+        // cleared — via a key-swap remount, not controller.animateTo, which is
+        // unreliable with expand:false (it closes instead of stopping, Flutter
+        // #121954). expand:false keeps the map above the sheet tappable (#71608).
+        final expanded = tapped != null;
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: DraggableScrollableSheet(
+            key: ValueKey(expanded),
+            expand: false,
+            initialChildSize: expanded ? _rest : _peek,
+            minChildSize: _peek,
+            maxChildSize: 0.85,
+            snap: true,
+            snapSizes: const [_rest],
+            builder: (context, scrollController) => _Surface(
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(context).bottom,
+                ),
+                children: [
+                  const _Grip(),
+                  _Summary(layer: layer),
+                  _TappedWaypoint(layer: layer),
+                  _TimeSelector(layer: layer),
+                ],
+              ),
             ),
-            children: [
-              const _Grip(),
-              _Summary(layer: widget.layer),
-              _TappedWaypoint(layer: widget.layer),
-              _TimeSelector(layer: widget.layer),
-            ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
