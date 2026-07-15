@@ -110,13 +110,21 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
-  /// The fit is computed in Dart ([boundsFitCamera]) and applied as a plain
-  /// centre+zoom, never MapLibre's native `newLatLngBounds`, which aborts the
-  /// process on a degenerate/unready viewport (see camera_fit.dart).
+  /// Reserves the same bottom band as the home ([MapCameraHandoff.bottomInsetFraction])
+  /// so a handoff lands on the home's exact camera and the transition is seamless
+  /// (Taiwan doesn't jump bigger / re-centre). The fit is computed in Dart
+  /// ([boundsFitCamera]) and applied as a plain centre+zoom, never MapLibre's
+  /// native `newLatLngBounds`, which aborts the process on a degenerate/unready
+  /// viewport (see camera_fit.dart).
   void _frameBounds(LatLngBounds bounds) {
     final safe = safeFitBounds(bounds);
     if (safe == null || !mounted) return;
-    final fit = boundsFitCamera(safe, viewport: MediaQuery.sizeOf(context));
+    final size = MediaQuery.sizeOf(context);
+    final fit = boundsFitCamera(
+      safe,
+      viewport: size,
+      bottomInset: size.height * (_handoff?.bottomInsetFraction ?? 0),
+    );
     if (fit != null) {
       _controller?.moveCamera(CameraUpdate.newLatLngZoom(fit.target, fit.zoom));
     }
