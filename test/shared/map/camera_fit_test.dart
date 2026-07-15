@@ -1,8 +1,44 @@
+import 'dart:ui' show Size;
+
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 void main() {
+  group('boundsFitCamera', () {
+    final box = LatLngBounds(
+      southwest: const LatLng(22.0, 120.0),
+      northeast: const LatLng(25.0, 122.0),
+    );
+    const viewport = Size(400, 800);
+
+    test('centres on the box with a finite, in-range fit zoom', () {
+      final fit = boundsFitCamera(box, viewport: viewport)!;
+      expect(fit.zoom.isFinite, isTrue);
+      expect(fit.zoom, inInclusiveRange(2, 16));
+      expect(fit.target.longitude, closeTo(121.0, 0.05));
+      expect(fit.target.latitude, closeTo(23.5, 0.3));
+    });
+
+    test(
+      'a bottom inset lifts the box into the band (target shifts south)',
+      () {
+        final plain = boundsFitCamera(box, viewport: viewport)!;
+        final inset = boundsFitCamera(
+          box,
+          viewport: viewport,
+          bottomInset: 300,
+        )!;
+        expect(inset.target.latitude, lessThan(plain.target.latitude));
+      },
+    );
+
+    test('returns null when the viewport leaves no room', () {
+      expect(boundsFitCamera(box, viewport: const Size(400, 40)), isNull);
+      expect(boundsFitCamera(box, viewport: Size.zero), isNull);
+    });
+  });
+
   group('safeFitBounds', () {
     test('leaves a normal, well-ordered box intact', () {
       final result = safeFitBounds(

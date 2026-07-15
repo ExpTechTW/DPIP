@@ -173,19 +173,20 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
       await _addSelectedLayers(controller, filter);
-      // Frame the bounds in the strip above the resting sheet. Both knobs use
-      // the sheet height: the content inset offsets the camera's focus up, and
-      // the matching bottom padding shrinks the fit area to the same strip.
-      // Together they seat the bounds in the visible band without clipping —
-      // the inset alone clips a tall fit (it doesn't shrink the fit), and the
-      // padding alone centres it behind the sheet. Instant: switching snaps.
-      await controller.updateContentInsets(
-        EdgeInsets.only(bottom: bottomInset),
-        false,
+      // Frame the box in the band above the resting sheet — computed in Dart
+      // (boundsFitCamera) and applied as a plain centre+zoom, so a degenerate or
+      // not-yet-laid-out viewport can't abort the app the way MapLibre's native
+      // bounds-fit (newLatLngBounds) does.
+      final fit = boundsFitCamera(
+        box,
+        viewport: size,
+        bottomInset: bottomInset,
       );
-      await controller.moveCamera(
-        CameraUpdate.newLatLngBounds(box, bottom: bottomInset),
-      );
+      if (fit != null) {
+        await controller.moveCamera(
+          CameraUpdate.newLatLngZoom(fit.target, fit.zoom),
+        );
+      }
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });

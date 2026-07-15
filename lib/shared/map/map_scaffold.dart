@@ -110,12 +110,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
-  /// Normalised through [safeFitBounds] first: a degenerate/non-finite box would
-  /// make MapLibre's native `setCamera` abort the process (see camera_fit.dart).
+  /// The fit is computed in Dart ([boundsFitCamera]) and applied as a plain
+  /// centre+zoom, never MapLibre's native `newLatLngBounds`, which aborts the
+  /// process on a degenerate/unready viewport (see camera_fit.dart).
   void _frameBounds(LatLngBounds bounds) {
     final safe = safeFitBounds(bounds);
-    if (safe != null) {
-      _controller?.moveCamera(CameraUpdate.newLatLngBounds(safe));
+    if (safe == null || !mounted) return;
+    final fit = boundsFitCamera(safe, viewport: MediaQuery.sizeOf(context));
+    if (fit != null) {
+      _controller?.moveCamera(CameraUpdate.newLatLngZoom(fit.target, fit.zoom));
     }
   }
 
