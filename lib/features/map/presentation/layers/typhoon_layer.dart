@@ -41,6 +41,11 @@ class TyphoonMapLayer implements MapLayer {
   final ValueNotifier<TyphoonCyclone?> summary = ValueNotifier(null);
   final ValueNotifier<String?> tapped = ValueNotifier(null);
 
+  /// Bumped on every tap that hits a waypoint — even the same one — so the panel
+  /// re-pops after the user collapsed it (a same-value [tapped] wouldn't notify).
+  /// Mirrors the station sheet's selectionRevision.
+  final ValueNotifier<int> tapRevision = ValueNotifier(0);
+
   /// Tappable waypoints from the latest geojson.
   final List<_StormPoint> _points = [];
 
@@ -262,6 +267,7 @@ class TyphoonMapLayer implements MapLayer {
       }
     }
     tapped.value = best?.label;
+    if (best != null) tapRevision.value++;
   }
 
   @override

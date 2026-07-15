@@ -23,43 +23,47 @@ class TyphoonPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String?>(
-      valueListenable: layer.tapped,
-      builder: (context, tapped, _) {
-        // Pop to rest when a forecast waypoint is tapped, back to peek when
-        // cleared — via a key-swap remount, not controller.animateTo, which is
-        // unreliable with expand:false (it closes instead of stopping, Flutter
-        // #121954). expand:false keeps the map above the sheet tappable (#71608).
-        final expanded = tapped != null;
-        return Align(
-          alignment: Alignment.bottomCenter,
-          child: DraggableScrollableSheet(
-            // Key on the tapped label so tapping a different waypoint remounts
-            // and re-pops (see station_sheet for the #121954 rationale).
-            key: ValueKey(tapped),
-            expand: false,
-            initialChildSize: expanded ? _rest : _peek,
-            minChildSize: _peek,
-            maxChildSize: 0.85,
-            snap: true,
-            snapSizes: const [_rest],
-            builder: (context, scrollController) => _Surface(
-              child: ListView(
-                controller: scrollController,
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.paddingOf(context).bottom,
+    return ValueListenableBuilder<int>(
+      valueListenable: layer.tapRevision,
+      builder: (context, revision, _) => ValueListenableBuilder<String?>(
+        valueListenable: layer.tapped,
+        builder: (context, tapped, _) {
+          // Pop to rest when a forecast waypoint is tapped, back to peek when
+          // cleared — via a key-swap remount, not controller.animateTo, which is
+          // unreliable with expand:false (it closes instead of stopping, Flutter
+          // #121954). expand:false keeps the map above the sheet tappable
+          // (#71608). The key carries tapRevision so EVERY waypoint tap (even
+          // re-tapping the same one after collapsing) remounts and re-pops —
+          // matching the station sheet's selectionRevision.
+          final expanded = tapped != null;
+          return Align(
+            alignment: Alignment.bottomCenter,
+            child: DraggableScrollableSheet(
+              key: ValueKey(expanded ? 'wp-$revision' : 'peek'),
+              expand: false,
+              initialChildSize: expanded ? _rest : _peek,
+              minChildSize: _peek,
+              maxChildSize: 0.85,
+              snap: true,
+              snapSizes: const [_rest],
+              builder: (context, scrollController) => _Surface(
+                child: ListView(
+                  controller: scrollController,
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.paddingOf(context).bottom,
+                  ),
+                  children: [
+                    const _Grip(),
+                    _Summary(layer: layer),
+                    _TappedWaypoint(layer: layer),
+                    _TimeSelector(layer: layer),
+                  ],
                 ),
-                children: [
-                  const _Grip(),
-                  _Summary(layer: layer),
-                  _TappedWaypoint(layer: layer),
-                  _TimeSelector(layer: layer),
-                ],
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
