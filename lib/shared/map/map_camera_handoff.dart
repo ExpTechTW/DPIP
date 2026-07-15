@@ -7,13 +7,17 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// A hand-off of "frame the map to these bounds when it next opens".
 ///
 /// The home backdrop keeps [homeBounds] in sync with what it currently shows;
-/// tapping it requests that same framing so the map tab lands on the same view.
-/// Entering the map from the nav bar requests the nationwide framing instead.
-/// The map surface consumes one pending request per open (a one-shot), so a
-/// later manual pan/zoom is never clobbered.
+/// tapping it (only when a current/saved township is selected) requests that
+/// same view so the map tab lands on it. Every other entry — the nav bar, or a
+/// tap while 全國 / a GPS-less 所在地 is selected — requests the nationwide
+/// framing instead. The map surface consumes one pending request per open (a
+/// one-shot), so a later manual pan/zoom is never clobbered.
 class MapCameraHandoff extends ChangeNotifier {
-  /// The bounds the home backdrop is currently framing — updated as it reframes,
-  /// so a tap can hand off the live view.
+  /// The geography currently VISIBLE in the home band (the screen above the
+  /// resting sheet), projected from the backdrop's camera — not the raw fit box.
+  /// The map fits it full-screen, so handing off the visible band (rather than
+  /// the box the backdrop fit into a shorter viewport) reproduces the same
+  /// horizontal framing instead of re-fitting at a different scale.
   LatLngBounds? homeBounds;
 
   LatLngBounds? _pending;

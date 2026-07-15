@@ -1,9 +1,12 @@
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/home_area.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
@@ -83,7 +86,22 @@ class _HomePageState extends State<HomePage> {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  context.read<MapCameraHandoff>().requestHomeView();
+                  final handoff = context.read<MapCameraHandoff>();
+                  // Only a current/saved township hands off Home's framing; every
+                  // other selection (全國, or 所在地 with no GPS fix) opens the map
+                  // on the whole of Taiwan, matching the nav-bar entry.
+                  final framesTownship = switch (context
+                      .read<RegionStore>()
+                      .selected) {
+                    CurrentArea(:final code) => code != null,
+                    SavedArea() => true,
+                    _ => false,
+                  };
+                  if (framesTownship && handoff.homeBounds != null) {
+                    handoff.requestHomeView();
+                  } else {
+                    handoff.request(BaseMap.taiwanBounds);
+                  }
                   context.goNamed(AppRoutes.map);
                 },
                 child: const HomeMapBackdrop(),
