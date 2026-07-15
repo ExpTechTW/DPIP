@@ -485,8 +485,8 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
-  String monitorDelay(int ms) {
-    return 'Pagkaantala $ms ms';
+  String monitorDelay(String value) {
+    return 'Pagkaantala $value s';
   }
 
   @override

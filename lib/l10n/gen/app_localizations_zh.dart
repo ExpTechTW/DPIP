@@ -471,8 +471,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerMonitor => '強震監視器';
 
   @override
-  String monitorDelay(int ms) {
-    return '延遲 $ms ms';
+  String monitorDelay(String value) {
+    return '延遲 $value s';
   }
 
   @override
@@ -946,8 +946,8 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerMonitor => '强震监视器';
 
   @override
-  String monitorDelay(int ms) {
-    return '延迟 $ms ms';
+  String monitorDelay(String value) {
+    return '延迟 $value s';
   }
 
   @override
@@ -1421,8 +1421,8 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerMonitor => '強震監視器';
 
   @override
-  String monitorDelay(int ms) {
-    return '延遲 $ms ms';
+  String monitorDelay(String value) {
+    return '延遲 $value s';
   }
 
   @override

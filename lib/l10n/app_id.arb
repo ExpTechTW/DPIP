@@ -150,6 +150,6 @@
   "mapLayerPressure": "Tekanan",
   "mapLayerWind": "Angin",
   "mapLayerMonitor": "Monitor Seismik",
-  "monitorDelay": "Latensi {ms} ms",
+  "monitorDelay": "Latensi {value} s",
   "monitorWaiting": "Menunggu data…"
 }

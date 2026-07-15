@@ -1016,11 +1016,11 @@ abstract class AppLocalizations {
   /// **'Seismic Monitor'**
   String get mapLayerMonitor;
 
-  /// RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in milliseconds
+  /// RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. "0.3"
   ///
   /// In en, this message translates to:
-  /// **'Delay {ms} ms'**
-  String monitorDelay(int ms);
+  /// **'Delay {value} s'**
+  String monitorDelay(String value);
 
   /// Shown in the monitor panel before the first RTS snapshot arrives
   ///

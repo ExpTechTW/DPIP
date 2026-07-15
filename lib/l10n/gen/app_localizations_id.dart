@@ -485,8 +485,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
-  String monitorDelay(int ms) {
-    return 'Latensi $ms ms';
+  String monitorDelay(String value) {
+    return 'Latensi $value s';
   }
 
   @override

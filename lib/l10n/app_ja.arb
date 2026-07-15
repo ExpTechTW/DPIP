@@ -150,6 +150,6 @@
   "mapLayerPressure": "気圧",
   "mapLayerWind": "風",
   "mapLayerMonitor": "強震モニタ",
-  "monitorDelay": "遅延 {ms} ms",
+  "monitorDelay": "遅延 {value} s",
   "monitorWaiting": "データ待機中…"
 }

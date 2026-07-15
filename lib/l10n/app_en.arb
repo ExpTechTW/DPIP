@@ -622,12 +622,12 @@
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
   },
-  "monitorDelay": "Delay {ms} ms",
+  "monitorDelay": "Delay {value} s",
   "@monitorDelay": {
-    "description": "RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in milliseconds",
+    "description": "RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. \"0.3\"",
     "placeholders": {
-      "ms": {
-        "type": "int"
+      "value": {
+        "type": "String"
       }
     }
   },

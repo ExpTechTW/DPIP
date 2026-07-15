@@ -475,8 +475,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
-  String monitorDelay(int ms) {
-    return '지연 $ms ms';
+  String monitorDelay(String value) {
+    return '지연 $value s';
   }
 
   @override
