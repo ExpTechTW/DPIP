@@ -111,13 +111,17 @@ class RadarMapLayer implements MapLayer {
     final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
 
     // Drop frames that left the window so the map keeps only ~3 layers; their
-    // tiles stay in MapLibre's cache, so returning re-adds them cheaply.
+    // tiles stay in MapLibre's cache, so returning re-adds them cheaply. Remove
+    // tolerantly and update [_onMap] per id: a raw remove throws if the frame is
+    // already gone (a racing fast scrub, or a style reload), and an unguarded
+    // throw here aborts this op *before* it re-adds the current frame — which
+    // blanks the radar to bare map and desyncs [_onMap], the "stuck on scrub"
+    // bug.
     final leaving = _onMap.difference(window);
     for (final id in leaving) {
-      await controller.removeLayer(_layerId(id));
-      await controller.removeSource(_sourceId(id));
+      await _removeFrame(controller, id);
+      _onMap.remove(id);
     }
-    _onMap.removeAll(leaving);
 
     // The current frame is drawn; its neighbours prefetch (visible, transparent)
     // so a scrub onto them is instant. Add on first entry, else just retarget.
@@ -148,10 +152,25 @@ class RadarMapLayer implements MapLayer {
   @override
   Future<void> clear(MapLibreMapController controller) async {
     for (final id in _onMap) {
-      await controller.removeLayer(_layerId(id));
-      await controller.removeSource(_sourceId(id));
+      await _removeFrame(controller, id);
     }
     _reset();
+  }
+
+  /// Removes a frame's raster layer and source, tolerating a missing one — so a
+  /// remove during a fast scrub or style reload can never throw and abort the
+  /// caller before it re-adds the current frame.
+  Future<void> _removeFrame(MapLibreMapController controller, String id) async {
+    try {
+      await controller.removeLayer(_layerId(id));
+    } catch (_) {
+      // Already gone — fine.
+    }
+    try {
+      await controller.removeSource(_sourceId(id));
+    } catch (_) {
+      // Already gone — fine.
+    }
   }
 
   @override

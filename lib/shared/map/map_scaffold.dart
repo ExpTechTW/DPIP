@@ -311,11 +311,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       color: colors.surface.withValues(alpha: 0.92),
       borderRadius: AppRadius.topSheet,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
+        // The bottom-nav clearance is the SafeArea wrapper's job (see build);
+        // adding MediaQuery's bottom inset here too double-counted it.
+        padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
           AppSpacing.md,
           AppSpacing.sm,
-          AppSpacing.md + MediaQuery.paddingOf(context).bottom,
+          AppSpacing.md,
         ),
         child: Row(
           children: [
@@ -344,13 +346,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       color: colors.surface.withValues(alpha: 0.92),
       borderRadius: AppRadius.topSheet,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          AppSpacing.md,
-          AppSpacing.md,
-          // Lift clear of the bottom nav (the shell body extends behind it).
-          AppSpacing.md + MediaQuery.paddingOf(context).bottom,
-        ),
+        // The bottom-nav clearance is the SafeArea wrapper's job (see build);
+        // adding MediaQuery's bottom inset here too made the panel very tall.
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: MapTimeline(
           frames: _frames,
           selectedIndex: _selectedIndex,
