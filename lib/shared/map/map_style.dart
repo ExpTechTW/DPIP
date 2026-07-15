@@ -16,9 +16,11 @@ const String townOutlineLayerId = 'town-outline';
 /// Colours are theme-driven so the map adapts to light/dark: [sea] behind,
 /// [land] for the global fill, [countyTown] for the county/town fills,
 /// [townOutline] for the faint township borders, and [outline] for the stronger
-/// county borders drawn on top. Label-free; overlays (radar) anchor below
-/// [outlineLayerId] so the county borders stay legible. Used by every map
-/// surface (live map tab, home backdrop) so they look identical.
+/// county borders drawn on top. The base draws no labels itself, but declares a
+/// `glyphs` endpoint (the ExpTech map-assets CDN) so overlay layers can render
+/// `text-field` symbols (e.g. station name/value labels). Overlays (radar)
+/// anchor below [outlineLayerId] so the county borders stay legible. Used by
+/// every map surface (live map tab, home backdrop) so they look identical.
 String exptechVectorStyle({
   required String sea,
   required String land,
@@ -29,6 +31,7 @@ String exptechVectorStyle({
   return '''
 {
   "version": 8,
+  "glyphs": "https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf",
   "sources": {
     "exptech": { "type": "vector", "tiles": ["https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf"], "maxzoom": 12 }
   },

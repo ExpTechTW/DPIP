@@ -41,6 +41,30 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   /// `(value, hex colour)` stops for the dot colour, ascending by value.
   List<(double, String)> get colorStops;
 
+  /// Whether to draw the value-coloured dot. A subclass may replace it with its
+  /// own symbology (e.g. wind arrows) by returning false.
+  @protected
+  bool get drawCircle => true;
+
+  /// Extra per-feature GeoJSON properties a subclass needs on the map — merged
+  /// into each feature's `properties`.
+  @protected
+  Map<String, Object?> extraProperties(WeatherObservation observation) =>
+      const {};
+
+  /// Hook for a subclass to add its own layer(s) on [sourceId] after the base
+  /// dot + labels. Any layer id added here must be listed in [extraLayerIds] so
+  /// it's torn down with the rest.
+  @protected
+  Future<void> decorate(
+    MapLibreMapController controller,
+    String sourceId,
+  ) async {}
+
+  /// Ids of layers a subclass adds in [decorate], removed before the source.
+  @protected
+  List<String> get extraLayerIds => const [];
+
   final ValueNotifier<String?> _selected = ValueNotifier<String?>(null);
   Map<String, WeatherStation> _stations = const {};
   Map<String, WeatherObservation> _observations = const {};
@@ -48,6 +72,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
 
   String get _sourceId => 'wx-$id-src';
   String get _circleId => 'wx-$id-circle';
+  String get _labelId => 'wx-$id-label';
 
   @override
   bool get usesTimeline => false;
@@ -69,17 +94,42 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
       _sourceId,
       GeojsonSourceProperties(data: _geoJson()),
     );
-    await controller.addCircleLayer(
+    if (drawCircle) {
+      await controller.addCircleLayer(
+        _sourceId,
+        _circleId,
+        CircleLayerProperties(
+          circleColor: _colorExpression(),
+          circleRadius: 6,
+          circleStrokeColor: '#FFFFFF',
+          circleStrokeWidth: 1,
+          circleOpacity: 0.9,
+        ),
+      );
+    }
+    // Name + value labels — shown only when zoomed in; the engine places and
+    // orients them (variable anchor + collision) so they never pile up.
+    await controller.addSymbolLayer(
       _sourceId,
-      _circleId,
-      CircleLayerProperties(
-        circleColor: _colorExpression(),
-        circleRadius: 6,
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: 1,
-        circleOpacity: 0.9,
+      _labelId,
+      SymbolLayerProperties(
+        textField: <Object>['get', 'label'],
+        textFont: const ['Noto Sans TC Regular'],
+        textSize: 11,
+        textColor: '#FFFFFF',
+        textHaloColor: '#000000',
+        textHaloWidth: 1.2,
+        textLineHeight: 1.1,
+        textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
+        textRadialOffset: 0.9,
+        textJustify: 'auto',
+        textAllowOverlap: false,
+        textOptional: true,
       ),
+      minzoom: 9,
     );
+    // Let a subclass add its own symbology (e.g. wind arrows) on the source.
+    await decorate(controller, _sourceId);
   }
 
   @override
@@ -184,7 +234,15 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
           'type': 'Point',
           'coordinates': [station.longitude, station.latitude],
         },
-        'properties': {'id': entry.key, 'value': value},
+        'properties': {
+          'id': entry.key,
+          'value': value,
+          // Preformatted here (name from data, value + unit from the layer) so
+          // the SymbolLayer just reads one `label` string — keeps CJK out of any
+          // hardcoded literal and the l10n gate clean.
+          'label': '${station.name}\n${value.toStringAsFixed(decimals)} $unit',
+          ...extraProperties(observation),
+        },
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
@@ -198,10 +256,13 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   ];
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
-    try {
-      await controller.removeLayer(_circleId);
-    } catch (_) {
-      // Expected when the layer isn't on the map yet.
+    // Layers must go before their source; tolerate any that aren't on the map.
+    for (final layerId in [_circleId, _labelId, ...extraLayerIds]) {
+      try {
+        await controller.removeLayer(layerId);
+      } catch (_) {
+        // Expected when the layer isn't on the map yet.
+      }
     }
     try {
       await controller.removeSource(_sourceId);

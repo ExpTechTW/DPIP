@@ -37,6 +37,7 @@ class RtsMapLayer implements MapLayer {
 
   static const String _sourceId = 'rts-src';
   static const String _circleId = 'rts-circle';
+  static const String _labelId = 'rts-label';
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
   static const double _staleOpacity = 0.35;
@@ -86,6 +87,14 @@ class RtsMapLayer implements MapLayer {
       _circleId,
       _circleProps(_liveOpacity),
     );
+    // Station id + raw intensity as a label — only when zoomed in; the engine
+    // places and de-collides them (strongest-first).
+    await controller.addSymbolLayer(
+      _sourceId,
+      _labelId,
+      _labelProps(_liveOpacity),
+      minzoom: 10,
+    );
     _added = true;
     _appliedStatus = null;
     await _pushUpdate();
@@ -112,12 +121,11 @@ class RtsMapLayer implements MapLayer {
       );
       if (status != _appliedStatus) {
         _appliedStatus = status;
-        await controller.setLayerProperties(
-          _circleId,
-          _circleProps(
-            status == RealtimeStatus.live ? _liveOpacity : _staleOpacity,
-          ),
-        );
+        final opacity = status == RealtimeStatus.live
+            ? _liveOpacity
+            : _staleOpacity;
+        await controller.setLayerProperties(_circleId, _circleProps(opacity));
+        await controller.setLayerProperties(_labelId, _labelProps(opacity));
       }
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
@@ -136,6 +144,26 @@ class RtsMapLayer implements MapLayer {
     circleOpacity: opacity,
     // Stronger stations sort above weaker ones so a hot dot is never hidden.
     circleSortKey: _sortKey,
+  );
+
+  /// The full label style at [opacity] — station id over its raw intensity.
+  /// Passed whole (setLayerProperties nulls anything omitted). Strongest labels
+  /// win placement, matching the dots' sort.
+  SymbolLayerProperties _labelProps(double opacity) => SymbolLayerProperties(
+    textField: <Object>['get', 'label'],
+    textFont: const ['Noto Sans TC Regular'],
+    textSize: 10,
+    textColor: '#FFFFFF',
+    textHaloColor: '#000000',
+    textHaloWidth: 1.2,
+    textLineHeight: 1.1,
+    textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
+    textRadialOffset: 0.8,
+    textJustify: 'auto',
+    textAllowOverlap: false,
+    textOptional: true,
+    textOpacity: opacity,
+    symbolSortKey: _labelSortKey,
   );
 
   @override
@@ -194,17 +222,24 @@ class RtsMapLayer implements MapLayer {
           'type': 'Point',
           'coordinates': [station.longitude, station.latitude],
         },
-        'properties': {'i': entry.value.intensityRaw},
+        'properties': {
+          'i': entry.value.intensityRaw,
+          'label':
+              '${entry.key}\n${entry.value.intensityRaw.toStringAsFixed(1)}',
+        },
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
   }
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
-    try {
-      await controller.removeLayer(_circleId);
-    } catch (_) {
-      // Expected when the layer isn't on the map yet.
+    // Layers before their source; tolerate any not currently on the map.
+    for (final layerId in [_circleId, _labelId]) {
+      try {
+        await controller.removeLayer(layerId);
+      } catch (_) {
+        // Expected when the layer isn't on the map yet.
+      }
     }
     try {
       await controller.removeSource(_sourceId);
@@ -230,5 +265,17 @@ class RtsMapLayer implements MapLayer {
     'coalesce',
     ['get', 'i'],
     -5,
+  ];
+
+  /// Labels place strongest-first: a symbol's *lower* sort key wins a collision,
+  /// so negate the intensity — a hot station's reading never loses to a calm one.
+  static const List<Object> _labelSortKey = [
+    '-',
+    0,
+    [
+      'coalesce',
+      ['get', 'i'],
+      -5,
+    ],
   ];
 }
