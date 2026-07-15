@@ -11,7 +11,6 @@ import 'package:dpip/features/map/presentation/widgets/typhoon_panel.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,6 @@ class TyphoonMapLayer implements MapLayer {
 
   MapLibreMapController? _controller;
   bool _added = false;
-  bool _framed = false;
   Future<void> _ops = Future<void>.value();
 
   /// Satellite-image times (Unix seconds, ascending) and the shown index — read
@@ -121,6 +119,9 @@ class TyphoonMapLayer implements MapLayer {
       await _addImage(controller, images.last);
     }
     // Track vector overlays — one source, one layer per `kind` via a filter.
+    // All are non-interactive so a tap anywhere in the storm routes to
+    // map#onMapClick → onMapTap (our nearest-waypoint math), not the unhandled
+    // native feature#onTap.
     await controller.addSource(_src, GeojsonSourceProperties(data: geo));
     await controller.addFillLayer(
       _src,
@@ -131,6 +132,7 @@ class TyphoonMapLayer implements MapLayer {
       ),
       filter: _kindIs('cone'),
       belowLayerId: outlineLayerId,
+      enableInteraction: false,
     );
     await controller.addLineLayer(
       _src,
@@ -142,6 +144,7 @@ class TyphoonMapLayer implements MapLayer {
         lineJoin: 'round',
       ),
       filter: _kindIs('past'),
+      enableInteraction: false,
     );
     await controller.addLineLayer(
       _src,
@@ -153,6 +156,7 @@ class TyphoonMapLayer implements MapLayer {
         lineCap: 'round',
       ),
       filter: _kindIs('forecast'),
+      enableInteraction: false,
     );
     await controller.addCircleLayer(
       _src,
@@ -164,6 +168,7 @@ class TyphoonMapLayer implements MapLayer {
         circleStrokeWidth: 1.5,
       ),
       filter: _kindIs('forecastPoint'),
+      enableInteraction: false,
     );
     await controller.addSymbolLayer(
       _src,
@@ -181,6 +186,7 @@ class TyphoonMapLayer implements MapLayer {
       ),
       filter: _kindIs('forecastPoint'),
       minzoom: 5,
+      enableInteraction: false,
     );
     await controller.addCircleLayer(
       _src,
@@ -192,26 +198,9 @@ class TyphoonMapLayer implements MapLayer {
         circleStrokeWidth: 2,
       ),
       filter: _kindIs('current'),
+      enableInteraction: false,
     );
     _added = true;
-
-    // Frame the whole storm once per activation (not on a theme reload).
-    if (!_framed) {
-      _framed = true;
-      final bounds = typhoonGeojsonBounds(geo);
-      final safe = bounds == null ? null : safeFitBounds(bounds);
-      if (safe != null) {
-        await controller.animateCamera(
-          CameraUpdate.newLatLngBounds(
-            safe,
-            left: 48,
-            top: 48,
-            right: 48,
-            bottom: 160,
-          ),
-        );
-      }
-    }
   }
 
   static List<Object> _kindIs(String kind) => <Object>[
@@ -282,7 +271,6 @@ class TyphoonMapLayer implements MapLayer {
   @override
   Future<void> clear(MapLibreMapController controller) async {
     await _removeFromMap(controller);
-    _framed = false;
     tapped.value = null;
     _controller = null;
   }

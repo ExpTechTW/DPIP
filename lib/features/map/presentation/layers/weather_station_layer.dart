@@ -105,6 +105,10 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
           circleStrokeWidth: 1,
           circleOpacity: 0.9,
         ),
+        // Non-interactive: we do our own nearest-station math in onMapTap and
+        // want EVERY tap via map#onMapClick — an interactive layer would eat an
+        // on-dot tap as feature#onTap (unhandled) so the station never selects.
+        enableInteraction: false,
       );
     }
     // Name + value labels — shown only when zoomed in; the engine places and
@@ -127,6 +131,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         textOptional: true,
       ),
       minzoom: 9,
+      enableInteraction: false,
     );
     // Let a subclass add its own symbology (e.g. wind arrows) on the source.
     await decorate(controller, _sourceId);

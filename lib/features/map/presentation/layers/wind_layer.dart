@@ -124,6 +124,9 @@ class WindMapLayer extends WeatherStationLayer {
         iconRotationAlignment: 'map',
       ),
       filter: <Object>['has', 'blow_to'],
+      // Non-interactive so taps route to map#onMapClick → onMapTap (the base
+      // does its own nearest-station selection), not the unhandled feature#onTap.
+      enableInteraction: false,
     );
   }
 

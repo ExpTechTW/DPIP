@@ -82,17 +82,19 @@ LatLngBounds? safeFitBounds(LatLngBounds bounds) {
     return null;
   }
 
-  // The largest zoom whose world (256·2^z px) still fits the box in the area.
+  // The largest zoom whose world still fits the box in the area. MapLibre Native
+  // uses 512px tiles, so the world is 512·2^z px — using 256 would over-zoom by
+  // exactly one level (the box would render ~2× too large and crop).
   final zoom = math
       .min(
-        _log2(availWidth / (256 * spanX)),
-        _log2(availHeight / (256 * spanY)),
+        _log2(availWidth / (512 * spanX)),
+        _log2(availHeight / (512 * spanY)),
       )
       .clamp(minZoom, maxZoom)
       .toDouble();
   if (!zoom.isFinite) return null;
 
-  final worldPx = 256 * math.pow(2, zoom).toDouble();
+  final worldPx = 512 * math.pow(2, zoom).toDouble();
   final centreX = (x1 + x2) / 2;
   // Shift the camera centre south by half the bottom inset so the box sits in
   // the visible band above the sheet rather than at the screen centre.
