@@ -472,6 +472,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerWind => '바람';
 
   @override
+  String get mapLayerTyphoon => '태풍';
+
+  @override
+  String get typhoonNoActive => '활성 태풍 없음';
+
+  @override
+  String get typhoonWind => '풍속';
+
+  @override
+  String get typhoonGust => '순간최대풍속';
+
+  @override
+  String get typhoonPressure => '기압';
+
+  @override
+  String get typhoonMotion => '이동';
+
+  @override
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override

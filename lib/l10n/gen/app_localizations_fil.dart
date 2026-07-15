@@ -482,6 +482,24 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerWind => 'Hangin';
 
   @override
+  String get mapLayerTyphoon => 'Bagyo';
+
+  @override
+  String get typhoonNoActive => 'Walang aktibong bagyo';
+
+  @override
+  String get typhoonWind => 'Hangin';
+
+  @override
+  String get typhoonGust => 'Ugong';
+
+  @override
+  String get typhoonPressure => 'Presyon';
+
+  @override
+  String get typhoonMotion => 'Gumagalaw';
+
+  @override
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override

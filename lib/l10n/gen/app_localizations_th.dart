@@ -480,6 +480,24 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerWind => 'ลม';
 
   @override
+  String get mapLayerTyphoon => 'ไต้ฝุ่น';
+
+  @override
+  String get typhoonNoActive => 'ไม่มีไต้ฝุ่น';
+
+  @override
+  String get typhoonWind => 'ความเร็วลม';
+
+  @override
+  String get typhoonGust => 'ลมกระโชก';
+
+  @override
+  String get typhoonPressure => 'ความกดอากาศ';
+
+  @override
+  String get typhoonMotion => 'เคลื่อนที่';
+
+  @override
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override

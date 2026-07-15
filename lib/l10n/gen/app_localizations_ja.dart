@@ -472,6 +472,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerWind => '風';
 
   @override
+  String get mapLayerTyphoon => '台風';
+
+  @override
+  String get typhoonNoActive => '発生中の台風なし';
+
+  @override
+  String get typhoonWind => '風速';
+
+  @override
+  String get typhoonGust => '最大瞬間風速';
+
+  @override
+  String get typhoonPressure => '気圧';
+
+  @override
+  String get typhoonMotion => '進行';
+
+  @override
   String get mapLayerMonitor => '強震モニタ';
 
   @override

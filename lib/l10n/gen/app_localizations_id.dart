@@ -482,6 +482,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerWind => 'Angin';
 
   @override
+  String get mapLayerTyphoon => 'Topan';
+
+  @override
+  String get typhoonNoActive => 'Tidak ada topan aktif';
+
+  @override
+  String get typhoonWind => 'Angin';
+
+  @override
+  String get typhoonGust => 'Embusan';
+
+  @override
+  String get typhoonPressure => 'Tekanan';
+
+  @override
+  String get typhoonMotion => 'Bergerak';
+
+  @override
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override

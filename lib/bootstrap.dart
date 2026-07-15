@@ -33,6 +33,7 @@ import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
+import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -181,6 +182,7 @@ Future<void> bootstrap() async {
         ...coreProviders(deps),
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
+        ...typhoonProviders(deps),
         ...notificationProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),

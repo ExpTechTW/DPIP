@@ -481,6 +481,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerWind => 'Gió';
 
   @override
+  String get mapLayerTyphoon => 'Bão';
+
+  @override
+  String get typhoonNoActive => 'Không có bão';
+
+  @override
+  String get typhoonWind => 'Sức gió';
+
+  @override
+  String get typhoonGust => 'Gió giật';
+
+  @override
+  String get typhoonPressure => 'Áp suất';
+
+  @override
+  String get typhoonMotion => 'Di chuyển';
+
+  @override
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override

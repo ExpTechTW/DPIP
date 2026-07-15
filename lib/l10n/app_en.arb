@@ -615,6 +615,15 @@
     "description": "Map layer switcher label for the air-pressure layer"
   },
   "mapLayerWind": "Wind",
+  "mapLayerTyphoon": "Typhoon",
+  "@mapLayerTyphoon": {
+    "description": "Layer-switcher label for the typhoon map layer"
+  },
+  "typhoonNoActive": "No active typhoon",
+  "typhoonWind": "Wind",
+  "typhoonGust": "Gust",
+  "typhoonPressure": "Pressure",
+  "typhoonMotion": "Moving",
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind layer"
   },

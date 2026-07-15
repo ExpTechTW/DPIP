@@ -1010,6 +1010,42 @@ abstract class AppLocalizations {
   /// **'Wind'**
   String get mapLayerWind;
 
+  /// Layer-switcher label for the typhoon map layer
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get mapLayerTyphoon;
+
+  /// No description provided for @typhoonNoActive.
+  ///
+  /// In en, this message translates to:
+  /// **'No active typhoon'**
+  String get typhoonNoActive;
+
+  /// No description provided for @typhoonWind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get typhoonWind;
+
+  /// No description provided for @typhoonGust.
+  ///
+  /// In en, this message translates to:
+  /// **'Gust'**
+  String get typhoonGust;
+
+  /// No description provided for @typhoonPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get typhoonPressure;
+
+  /// No description provided for @typhoonMotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving'**
+  String get typhoonMotion;
+
   /// Map layer switcher label for the real-time seismic monitor (RTS)
   ///
   /// In en, this message translates to:

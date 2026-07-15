@@ -468,6 +468,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerWind => '風';
 
   @override
+  String get mapLayerTyphoon => '颱風';
+
+  @override
+  String get typhoonNoActive => '目前無颱風';
+
+  @override
+  String get typhoonWind => '風速';
+
+  @override
+  String get typhoonGust => '陣風';
+
+  @override
+  String get typhoonPressure => '氣壓';
+
+  @override
+  String get typhoonMotion => '移動';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -946,6 +964,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerWind => '风';
 
   @override
+  String get mapLayerTyphoon => '台风';
+
+  @override
+  String get typhoonNoActive => '目前无台风';
+
+  @override
+  String get typhoonWind => '风速';
+
+  @override
+  String get typhoonGust => '阵风';
+
+  @override
+  String get typhoonPressure => '气压';
+
+  @override
+  String get typhoonMotion => '移动';
+
+  @override
   String get mapLayerMonitor => '强震监视器';
 
   @override
@@ -1422,6 +1458,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLayerWind => '風';
+
+  @override
+  String get mapLayerTyphoon => '颱風';
+
+  @override
+  String get typhoonNoActive => '目前無颱風';
+
+  @override
+  String get typhoonWind => '風速';
+
+  @override
+  String get typhoonGust => '陣風';
+
+  @override
+  String get typhoonPressure => '氣壓';
+
+  @override
+  String get typhoonMotion => '移動';
 
   @override
   String get mapLayerMonitor => '強震監視器';

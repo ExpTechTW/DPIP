@@ -6,9 +6,11 @@ import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
+import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
+import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class _MapPageState extends State<MapPage> {
   // Built once so each layer keeps its own MapLibre state across rebuilds.
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
+    TyphoonMapLayer(context.read<MeteorTyphoonRepository>()),
     RtsMapLayer(
       context.read<RealtimeNotifier<Rts>>(),
       context.read<TremStationRepository>(),

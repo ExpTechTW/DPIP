@@ -480,6 +480,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerWind => 'Wind';
 
   @override
+  String get mapLayerTyphoon => 'Typhoon';
+
+  @override
+  String get typhoonNoActive => 'No active typhoon';
+
+  @override
+  String get typhoonWind => 'Wind';
+
+  @override
+  String get typhoonGust => 'Gust';
+
+  @override
+  String get typhoonPressure => 'Pressure';
+
+  @override
+  String get typhoonMotion => 'Moving';
+
+  @override
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
