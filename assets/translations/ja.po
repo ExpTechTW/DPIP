@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-07-27 02:44\n"
+"PO-Revision-Date: 2026-07-27 03:59\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -70,7 +70,7 @@ msgstr "サウンドテストは端末上でのみ実行され、通知受信時
 
 #: ./lib/app/settings/notify/page.dart:82
 msgid "伺服器排隊中，請稍候…"
-msgstr "サーバーで順番待ち中です。しばらくお待ちください…"
+msgstr "サーバーが混雑しているため、順番待ちをしています。しばらくお待ちください…"
 
 #: ./lib/app/welcome/4-permissions/page.dart:166
 msgid "通知"
