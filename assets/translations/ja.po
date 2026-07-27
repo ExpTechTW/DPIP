@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2026-07-11 03:42\n"
+"PO-Revision-Date: 2026-07-27 02:44\n"
 
 #: ./lib/core/service.dart:291
 msgid "正在更新位置"
@@ -50,7 +50,7 @@ msgstr "現在地のみ受信"
 
 #: ./lib/app/settings/notify/page.dart:27
 msgid "所在地震度4以上"
-msgstr "現在地で震度4以上を受信"
+msgstr "現在地で震度4以上の揺れを観測した場合"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:28
 msgid "音效測試"
@@ -786,7 +786,7 @@ msgstr "カスタム"
 
 #: ./lib/app/settings/theme/color/page.dart:72
 msgid "自訂色彩"
-msgstr ""
+msgstr "カスタムカラー"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:84
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
@@ -794,7 +794,7 @@ msgstr "お住まいの地域付近で激しい雷雨または降雨が発生し
 
 #: ./lib/app/home/_widgets/forecast_card.dart:59
 msgid "天氣預報(24h)"
-msgstr ""
+msgstr "天気予報（24時間）"
 
 #: ./lib/app/home/_widgets/location_out_of_service.dart:28
 msgid "服務區域外，僅在臺灣各地可用"
@@ -806,7 +806,7 @@ msgstr "レーダー"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:497
 msgid "無資料"
-msgstr ""
+msgstr "データがありません。"
 
 #: ./lib/app/home/_widgets/wind_card.dart:372
 msgid "{wind}級 {Desc}"
@@ -842,11 +842,11 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/wind_card.dart:538
 msgid "附近有強磁場干擾，指北針方向可能完全不準確。請遠離磁鐵、電子裝置或金屬物品。"
-msgstr ""
+msgstr "方位磁針が正確ではありません。付近の磁場と干渉している可能性があるため、磁石や電子機器などから遠ざけてください。"
 
 #: ./lib/app/home/_widgets/wind_card.dart:539
 msgid "附近可能有磁場干擾，指北針方向可能有偏差。"
-msgstr ""
+msgstr "方位磁針が正確ではありません。付近の磁場と干渉している可能性があります。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:145
 msgid "確定"
@@ -922,27 +922,27 @@ msgstr ""
 
 #: ./lib/app/home/_widgets/hero_weather.dart:185
 msgid "無天氣資料"
-msgstr ""
+msgstr "気象データがありません。"
 
 #: ./lib/app/home/_widgets/mode_toggle_button.dart:14
 msgid "全國 · 生效中"
-msgstr ""
+msgstr "全国・リアルタイム"
 
 #: ./lib/app/home/_widgets/mode_toggle_button.dart:16
 msgid "全國 · 歷史"
-msgstr ""
+msgstr "全国・タイムライン"
 
 #: ./lib/app/home/_widgets/mode_toggle_button.dart:18
 msgid "所在地 · 生效中"
-msgstr ""
+msgstr "現在地・リアルタイム"
 
 #: ./lib/app/home/_widgets/mode_toggle_button.dart:20
 msgid "所在地 · 歷史"
-msgstr ""
+msgstr "現在地・タイムライン"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1258
 msgid "EEW"
-msgstr ""
+msgstr "緊急地震速報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1397
 msgid "第 {serial} 報"
@@ -986,15 +986,15 @@ msgstr ""
 
 #: ./lib/app/home/page.dart:777
 msgid "上午"
-msgstr ""
+msgstr "午前"
 
 #: ./lib/app/home/page.dart:777
 msgid "下午"
-msgstr ""
+msgstr "午後"
 
 #: ./lib/app/changelog/page.dart:76
 msgid "發生錯誤"
-msgstr ""
+msgstr "エラーが発生しました。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:85
 msgid "再試一次"
@@ -1090,7 +1090,7 @@ msgstr "ユーザーが手動で設定から該当の権限を有効にする必
 
 #: ./lib/app/welcome/4-permissions/page.dart:376
 msgid "需要背景位置權限"
-msgstr ""
+msgstr "位置情報を「常に許可」に設定し、バックグラウンドでも情報が取得できるようにしてください。"
 
 #: ./lib/app/welcome/4-permissions/page.dart:378
 msgid "為了在背景持續提供即時防災資訊，DPIP 需要「永遠允許」位置權限。\n\n"
