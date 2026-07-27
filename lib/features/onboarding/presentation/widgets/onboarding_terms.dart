@@ -2,6 +2,7 @@
 /// checkbox, then agree.
 library;
 
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_scaffold.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -37,6 +38,7 @@ class _OnboardingTermsPageState extends State<OnboardingTermsPage> {
               title: Text(l10n.onboardingTermsAgree),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(borderRadius: AppRadius.medium),
             ),
             const SizedBox(height: AppSpacing.sm),
             OnboardingCta(

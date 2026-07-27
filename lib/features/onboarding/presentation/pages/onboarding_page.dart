@@ -101,24 +101,28 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 56,
-      child: Row(
+      child: Stack(
         children: [
-          SizedBox(
-            width: 56,
-            child: onBack == null
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: onBack,
-                  ),
-          ),
-          Expanded(
-            child: Center(
-              child: _Dots(count: pageCount, index: index),
+          Center(child: _Dots(count: pageCount, index: index)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 56,
+              child: onBack == null
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: onBack,
+                    ),
             ),
           ),
           // "語言設定" + globe, top-right.
-          LanguagePicker(label: AppLocalizations.of(context).languageSettings),
+          Align(
+            alignment: Alignment.centerRight,
+            child: LanguagePicker(
+              label: AppLocalizations.of(context).languageSettings,
+            ),
+          ),
         ],
       ),
     );
