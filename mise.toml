@@ -1,2 +1,5 @@
 [tools]
-flutter = "3.44.8-stable"
+# Pin the numeric stable release only — the platform URLs already append
+# `-stable`. A bare `"3.44.8-stable"` makes mise request
+# `…_3.44.8-stable-stable.{tar.xz,zip}` and 404s on install (breaks CI).
+flutter = { version = "3.44.8", platforms = { linux-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_{{ version }}-stable.tar.xz" }, macos-arm64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_{{ version }}-stable.zip" }, macos-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_{{ version }}-stable.zip" }, windows-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_{{ version }}-stable.zip" } }, version_expr = 'fromJSON(body).releases | filter({ #.channel == "stable" }) | map({ replace(#.version, "-stable", "") }) | sortVersions()', version_list_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json" }
