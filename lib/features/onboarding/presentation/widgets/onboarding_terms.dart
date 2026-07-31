@@ -38,7 +38,9 @@ class _OnboardingTermsPageState extends State<OnboardingTermsPage> {
               title: Text(l10n.onboardingTermsAgree),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
-              shape: const RoundedRectangleBorder(borderRadius: AppRadius.medium),
+              shape: const RoundedRectangleBorder(
+                borderRadius: AppRadius.medium,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             OnboardingCta(

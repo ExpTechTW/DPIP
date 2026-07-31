@@ -103,7 +103,9 @@ class _TopBar extends StatelessWidget {
       height: 56,
       child: Stack(
         children: [
-          Center(child: _Dots(count: pageCount, index: index)),
+          Center(
+            child: _Dots(count: pageCount, index: index),
+          ),
           Align(
             alignment: Alignment.centerLeft,
             child: SizedBox(
