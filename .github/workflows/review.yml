@@ -4,11 +4,11 @@
 # (pull_request_target: opened/synchronize/reopened) and on-demand re-review
 # via comments starting with '/open-code-review' or '@open-code-review'.
 #
-# Required secrets/vars (Settings -> Secrets and variables -> Actions):
-#   secret    OCR_LLM_URL            LLM API endpoint
-#   secret    OCR_LLM_AUTH_TOKEN     LLM auth token (mapped to OCR_LLM_TOKEN)
-#   variable  OCR_LLM_MODEL          model name
-#   variable  OCR_LLM_USE_ANTHROPIC  'true' for Anthropic, 'false' for OpenAI-compatible
+# Required org/repo secrets (Settings -> Secrets and variables -> Actions):
+#   OCR_LLM_URL            LLM API endpoint
+#   OCR_LLM_AUTH_TOKEN     LLM auth token (mapped to OCR_LLM_TOKEN)
+#   OCR_LLM_MODEL          model name
+#   OCR_LLM_USE_ANTHROPIC  'true' for Anthropic, 'false' for OpenAI-compatible
 #
 # For the full list of action inputs/outputs and the four comment-posting modes
 # (sticky / incremental), see action.yml at the repo root.
@@ -115,8 +115,8 @@ jobs:
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
-          llm_model: ${{ vars.OCR_LLM_MODEL }}
-          llm_use_anthropic: ${{ vars.OCR_LLM_USE_ANTHROPIC }}
+          llm_model: ${{ secrets.OCR_LLM_MODEL }}
+          language: 中文
           # For issue_comment triggers, pass the resolved refs; for
           # pull_request_target the action resolves them from the event.
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
