@@ -11,6 +11,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -150,6 +151,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     if (controller == null || !_styleReady) return;
     // Read context-bound values before any await.
     final size = _mapViewSize ?? MediaQuery.sizeOf(context);
+    // The map fills the page, but the region bar is layered over its top and the
+    // sheet over its bottom, so the band actually visible is shorter at both
+    // ends. Frame into that band, not the whole map.
+    final topInset = MediaQuery.paddingOf(context).top + RegionBar.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final code = _selectedCode;
     final styleEpoch = _styleEpoch;
@@ -191,6 +196,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       final fit = boundsFitCamera(
         box,
         viewport: size,
+        topInset: topInset,
         bottomInset: bottomInset,
       );
       if (fit != null) {

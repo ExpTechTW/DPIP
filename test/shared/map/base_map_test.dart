@@ -9,8 +9,12 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 const _extremes = <String, LatLng>{
   '富貴角 (north)': LatLng(25.298, 121.536),
   '鵝鑾鼻 (south)': LatLng(21.896, 120.851),
-  '國聖港燈塔 (west)': LatLng(23.111, 120.035),
   '三貂角 (east)': LatLng(25.008, 122.007),
+  // The nationwide view must also frame Kinmen, far west of the main island.
+  '金門本島 (west)': LatLng(24.449, 118.318),
+  '烈嶼/小金門 (west)': LatLng(24.432, 118.240),
+  // Penghu sits inside the Taiwan–Kinmen span and so is framed for free.
+  '澎湖 (mid-strait)': LatLng(23.566, 119.579),
 };
 
 void main() {
@@ -38,18 +42,16 @@ void main() {
       });
     });
 
-    test('is centred on the island, not out in the strait', () {
-      final centreLng =
-          (bounds.southwest.longitude + bounds.northeast.longitude) / 2;
-      // The island spans roughly 120.0–122.0°E, so its centre is near 121.0.
-      // The old box centred on 120.02, pushing Taiwan to the screen edge.
-      expect(centreLng, closeTo(121.0, 0.2));
+    test('reaches west far enough for Kinmen but no further', () {
+      // Lieyu is the westernmost point that must be framed (~118.24°E); going
+      // much past it only adds mainland-China coast and open sea.
+      expect(bounds.southwest.longitude, lessThan(118.24));
+      expect(bounds.southwest.longitude, greaterThan(117.9));
     });
 
     test('does not pad the box with open sea', () {
-      // Margin beyond each extreme, in degrees. Generous enough for breathing
-      // room, tight enough that the island still dominates the frame.
-      expect(bounds.southwest.longitude, greaterThan(119.8));
+      // Margin beyond each extreme, in degrees — enough for breathing room,
+      // tight enough that land still dominates the frame.
       expect(bounds.northeast.longitude, lessThan(122.3));
       expect(bounds.southwest.latitude, greaterThan(21.6));
       expect(bounds.northeast.latitude, lessThan(25.6));

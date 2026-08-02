@@ -25,22 +25,25 @@ class BaseMap extends StatelessWidget {
     this.interactive = true,
   });
 
-  /// Bounding box framing the Taiwan main island — the single source of the
-  /// nationwide framing, fit to the viewport (never a hardcoded zoom). Kept to
-  /// the main island (no Penghu/Kinmen/Matsu) so it isn't dominated by open sea.
+  /// Bounding box for the nationwide (全國) framing — the Taiwan main island
+  /// **plus Kinmen**, fit to the viewport (never a hardcoded zoom). Penghu falls
+  /// inside the span already; Matsu does not (it sits at ~26.15°N, north of the
+  /// box) — add it here if it should be framed too.
   ///
-  /// The corners are the island's real extremes, with a little margin:
-  /// Fugui Cape 25.30°N, Eluanbi 21.90°N, Guosheng Lighthouse 120.04°E, Sandiao
-  /// Cape 122.01°E. An earlier box read `(22.2, 119) → (25.35, 121.05)`, which
-  /// reached ~110 km into the strait on the west yet stopped at 121.05°E — inside
-  /// the island — so the whole east coast (Yilan / Hualien / Taitung) fell outside
-  /// the box and the fit centred on 120.02°E, pushing Taiwan against the right
-  /// edge with open sea filling the left.
+  /// The corners are the real extremes, with a little margin: Fugui Cape
+  /// 25.30°N, Eluanbi 21.90°N, Sandiao Cape 122.01°E, and Lieyu (Little Kinmen)
+  /// ~118.20°E.
+  ///
+  /// An earlier box read `(22.2, 119) → (25.35, 121.05)`: it reached ~110 km into
+  /// the strait on the west yet stopped at 121.05°E — *inside* the island — so
+  /// the whole east coast (Yilan / Hualien / Taitung) fell outside the box and the
+  /// fit centred on 120.02°E, pushing Taiwan against the right edge with open sea
+  /// filling the left.
   ///
   /// A getter, not a `static final`: a lazily-initialised static keeps its first
   /// value across hot reload, so editing these numbers would appear to do nothing.
   static LatLngBounds get taiwanBounds => LatLngBounds(
-    southwest: const LatLng(21.87, 119.99),
+    southwest: const LatLng(21.87, 118.15),
     northeast: const LatLng(25.32, 122.05),
   );
 

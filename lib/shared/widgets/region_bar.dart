@@ -24,6 +24,11 @@ import 'package:provider/provider.dart';
 class RegionBar extends StatefulWidget {
   const RegionBar({super.key, this.blend = 0, this.dismiss = 0});
 
+  /// The bar's own height, below the status bar it is inset by. Public because
+  /// the Home map is laid out *behind* this bar, so its camera fit has to
+  /// subtract this much from the top to frame inside the band the user can see.
+  static const double height = 44;
+
   /// How much the bar blends into the backdrop (0 opaque → 1 transparent, light
   /// badges).
   final double blend;
@@ -62,7 +67,7 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
             child: SafeArea(
               bottom: false,
               child: SizedBox(
-                height: 44,
+                height: RegionBar.height,
                 child: PageView.builder(
                   controller: areaPageController,
                   physics: const NeverScrollableScrollPhysics(),

@@ -63,13 +63,17 @@ LatLngBounds? safeFitBounds(LatLngBounds bounds) {
 ({LatLng target, double zoom})? boundsFitCamera(
   LatLngBounds bounds, {
   required Size viewport,
+  double topInset = 0,
   double bottomInset = 0,
   double padding = 24,
   double minZoom = 2,
   double maxZoom = 16,
 }) {
   final availWidth = viewport.width - padding * 2;
-  final availHeight = viewport.height - bottomInset - padding * 2;
+  // Both insets come off the height: the map fills the screen but chrome is
+  // layered over it — a region bar at the top, a sheet at the bottom — so the
+  // band the user can actually see is shorter than the map at both ends.
+  final availHeight = viewport.height - topInset - bottomInset - padding * 2;
   if (availWidth <= 0 || availHeight <= 0) return null;
 
   final x1 = _mercatorX(bounds.southwest.longitude);
@@ -96,9 +100,12 @@ LatLngBounds? safeFitBounds(LatLngBounds bounds) {
 
   final worldPx = 512 * math.pow(2, zoom).toDouble();
   final centreX = (x1 + x2) / 2;
-  // Shift the camera centre south by half the bottom inset so the box sits in
-  // the visible band above the sheet rather than at the screen centre.
-  final centreY = (yNorth + ySouth) / 2 + (bottomInset / 2) / worldPx;
+  // The camera target renders at the view's centre, but the box should land in
+  // the centre of the *visible band*, which sits (topInset - bottomInset) / 2
+  // pixels below it. Offsetting the target by the opposite amount puts the box
+  // there — so a taller sheet lifts the box and a taller top bar pushes it down.
+  final centreY =
+      (yNorth + ySouth) / 2 + ((bottomInset - topInset) / 2) / worldPx;
   return (
     target: LatLng(_mercatorLat(centreY), _mercatorLng(centreX)),
     zoom: zoom,

@@ -33,9 +33,55 @@ void main() {
       },
     );
 
+    test('a top inset pushes the box down into the band below the bar', () {
+      final plain = boundsFitCamera(box, viewport: viewport)!;
+      final inset = boundsFitCamera(box, viewport: viewport, topInset: 300)!;
+      // Reserving space at the top moves the box south on screen, i.e. the
+      // camera target sits north of the plain one.
+      expect(inset.target.latitude, greaterThan(plain.target.latitude));
+    });
+
+    test('equal top and bottom insets keep the box centred', () {
+      final plain = boundsFitCamera(box, viewport: viewport)!;
+      final both = boundsFitCamera(
+        box,
+        viewport: viewport,
+        topInset: 150,
+        bottomInset: 150,
+      )!;
+      expect(both.target.latitude, closeTo(plain.target.latitude, 1e-9));
+      // ...but the usable band is shorter, so it must zoom out to still fit.
+      expect(both.zoom, lessThan(plain.zoom));
+    });
+
+    test('both insets shrink the fit, not just the bottom one', () {
+      final bottomOnly = boundsFitCamera(
+        box,
+        viewport: viewport,
+        bottomInset: 200,
+      )!;
+      final bothEnds = boundsFitCamera(
+        box,
+        viewport: viewport,
+        topInset: 200,
+        bottomInset: 200,
+      )!;
+      expect(bothEnds.zoom, lessThan(bottomOnly.zoom));
+    });
+
     test('returns null when the viewport leaves no room', () {
       expect(boundsFitCamera(box, viewport: const Size(400, 40)), isNull);
       expect(boundsFitCamera(box, viewport: Size.zero), isNull);
+      // Insets that together exceed the height leave nothing to fit into.
+      expect(
+        boundsFitCamera(
+          box,
+          viewport: viewport,
+          topInset: 400,
+          bottomInset: 400,
+        ),
+        isNull,
+      );
     });
   });
 
