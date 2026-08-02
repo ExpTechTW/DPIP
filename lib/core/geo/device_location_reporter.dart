@@ -30,6 +30,17 @@ class DeviceLocationReporter {
   GpsFix? _last;
   bool _running = false;
 
+  final StreamController<GpsFix> _fixes = StreamController<GpsFix>.broadcast();
+
+  /// Every fix this pipeline accepts, for the other foreground consumer of the
+  /// device's position: keeping the current township ([LocationMonitor]) in step
+  /// with where the user actually is.
+  ///
+  /// Shared rather than opened twice because each `getPositionStream` call starts
+  /// its own native location session — two subscriptions would mean two GPS
+  /// consumers draining the battery to compute the same fix.
+  Stream<GpsFix> get fixes => _fixes.stream;
+
   /// Begins reporting on each distance-triggered position (idempotent).
   void start() {
     _running = true;
@@ -64,6 +75,9 @@ class DeviceLocationReporter {
   Future<void> _handle(GpsFix fix) async {
     if (fix == _last) return; // records compare by value
     _last = fix;
+    // Publish before the upload: the current township must track the move even
+    // when the server report fails or is skipped for a missing push token.
+    if (!_fixes.isClosed) _fixes.add(fix);
     try {
       await _onMoved(fix);
     } catch (error, stackTrace) {
@@ -78,5 +92,8 @@ class DeviceLocationReporter {
     _sub = null;
   }
 
-  void dispose() => stop();
+  void dispose() {
+    stop();
+    _fixes.close();
+  }
 }

@@ -91,4 +91,43 @@ void main() {
       await c.close();
     }
   });
+
+  test('shares accepted fixes on [fixes] for the township tracker', () async {
+    final positions = StreamController<GpsFix>();
+    final reporter = DeviceLocationReporter(
+      positions: () => positions.stream,
+      onMoved: (fix) async {},
+    );
+    final seen = <GpsFix>[];
+    reporter.fixes.listen(seen.add);
+    reporter.start();
+
+    positions
+      ..add((lat: 25.0, lng: 121.0))
+      ..add((lat: 25.0, lng: 121.0)) // identical → skipped, as for reporting
+      ..add((lat: 24.1, lng: 120.6));
+    await pumpEventQueue();
+
+    expect(seen, [(lat: 25.0, lng: 121.0), (lat: 24.1, lng: 120.6)]);
+    await positions.close();
+  });
+
+  test('a fix is shared even when the server report throws', () async {
+    // The current township must still follow the user when the upload fails or
+    // is skipped (e.g. no push token yet).
+    final positions = StreamController<GpsFix>();
+    final reporter = DeviceLocationReporter(
+      positions: () => positions.stream,
+      onMoved: (fix) async => throw StateError('no token'),
+    );
+    final seen = <GpsFix>[];
+    reporter.fixes.listen(seen.add);
+    reporter.start();
+
+    positions.add((lat: 23.5, lng: 120.4));
+    await pumpEventQueue();
+
+    expect(seen, [(lat: 23.5, lng: 120.4)]);
+    await positions.close();
+  });
 }
