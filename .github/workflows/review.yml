@@ -117,7 +117,11 @@ jobs:
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ secrets.OCR_LLM_MODEL }}
           llm_use_anthropic: false
-          language: 繁體中文
+          with:
+          language: 中文
+          background: |
+            一律使用台灣繁體中文撰寫所有 review 評論與摘要。
+            禁止簡體字、禁止英文為主的評論（程式識別子除外）。
           # For issue_comment triggers, pass the resolved refs; for
           # pull_request_target the action resolves them from the event.
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
