@@ -258,8 +258,8 @@ void main() {
   // bounded across the whole canvas instead of diverging at the bottom edge.
   // That divergence was the vertical-streak artefact: past ~8x the fBM is
   // sampled far outside the range the hash stays smooth over.
-  const float HZ = 1.34;
-  float depth = clamp(HZ - uv.y, 0.30, HZ);
+  const float HZ = 2.05;
+  float depth = clamp(HZ - uv.y, 0.85, HZ);
   vec2 sky = vec2((uv.x - 0.5) * aspect, 0.85) / depth;
   sky += vec2(0.05 + 0.20 * iWind, 0.012) * t + vec2(0.0, scrollN * 0.6);
 
@@ -267,8 +267,11 @@ void main() {
   // Ridged x smooth: the ridged sum's creases carve the lumpy silhouette that a
   // near-Gaussian value-noise field can never produce on its own. Free — the
   // ridged accumulator rides along in the same octave loop.
-  vec2 sr = fbm2(sky * 1.15 + 2.1 * q);   // .x smooth, .y ridged
-  float field = sr.x * (sr.y + sr.x) * 1.25;
+  vec2 sr = fbm2(sky * 1.15 + 1.15 * q);  // .x smooth, .y ridged
+  // Blend the ridged product in rather than replacing the field with it: at full
+  // strength its creases become the silhouette, and the deck reads as torn cloth
+  // radiating from the zenith instead of as cloud.
+  float field = mix(sr.x, sr.x * (sr.y + sr.x) * 1.25, 0.60);
 
   // Erode the base shape with INVERTED Worley, via a remap rather than a
   // multiply. Nubis 2017: "as opposed to MULTIPLYING the noises together,
@@ -277,18 +280,27 @@ void main() {
   // https://advances.realtimerendering.com/s2017/Nubis%20-%20Authoring%20Realtime%20Volumetric%20Cloudscapes%20with%20the%20Decima%20Engine%20-%20Final%20.pdf
   // The clamp is load-bearing: this hash's F1 overshoots 1.0 on a fraction of a
   // percent of cells, where a raw 1-F1 would go negative.
-  float billow = clamp(1.0 - worley(sky * 2.3), 0.0, 1.0);
-  field = clamp((field - billow * 0.28) / max(1.0 - billow * 0.28, 0.25), 0.0, 1.0);
+  float billow = clamp(1.0 - worley(sky * 3.1), 0.0, 1.0);
+  // More erosion when the sky is clearer, so low coverage breaks the deck into
+  // separate clouds instead of showing the same silhouette at lower opacity.
+  float erode = mix(0.26, 0.12, overcast);
+  field = clamp((field - billow * erode) / max(1.0 - billow * erode, 0.25),
+                0.0, 1.0);
 
-  float lo = mix(0.70, 0.22, overcast);
+  float lo = mix(0.72, 0.26, overcast);
   // A sharp shoulder, not a 0.30-wide feather. Bouthors et al. (INRIA 2008 §2.1):
   // "Real convective clouds are not blurry on boundaries, they are usually sharp
   // or wispy… density variations are visually more important on the clouds
   // boundaries — where they are directly visible — than in the cloud core."
   // http://maverick.inria.fr/Publications/2008/BNMBC08/cloudsFINAL.pdf
   float sharpK = mix(-5.64, -1.74, overcast);  // log2(0.02) .. log2(0.30)
-  float c = max(field - lo, 0.0);
-  float cover = 1.0 - exp2(c * sharpK);
+  // Normalise by the range ABOVE the threshold. Using the raw (field - lo) meant
+  // a high threshold also capped how far the shoulder could travel — at lo=0.72
+  // cover topped out near 0.66, so a sparse sky could only ever draw
+  // semi-transparent haze, never an opaque cloud. Coverage should decide how
+  // MUCH sky is cloud, not how solid that cloud is allowed to be.
+  float c = max((field - lo) / max(1.0 - lo, 0.06), 0.0);
+  float cover = clamp(1.0 - exp2(c * sharpK), 0.0, 1.0);
   // These stay MULTIPLIES: they are frame vignettes, not erosion.
   float topFade = mix(smoothstep(0.0, 0.16, uv.y), 1.0, overcast);
   cover *= topFade * smoothstep(1.06, 0.86, uv.y);
