@@ -65,7 +65,9 @@ class StationSheet extends StatelessWidget {
   final StationSheetSource source;
 
   /// Collapsed peek height, and the height it pops to when a station is picked.
-  static const double _peek = 0.14;
+  /// [peekExtent] is public because the map scaffold subtracts the resting sheet
+  /// from the map when framing, so the two must agree on one number.
+  static const double peekExtent = 0.14;
   static const double _rest = 0.42;
 
   @override
@@ -85,14 +87,14 @@ class StationSheet extends StatelessWidget {
           // stopping at the target — Flutter #121954). The key carries the
           // selection *revision*, so EVERY tap-select (even re-tapping the same
           // station after collapsing it) remounts the sheet at [_rest] and it
-          // pops again; with no selection it settles at [_peek].
+          // pops again; with no selection it settles at [peekExtent].
           return Align(
             alignment: Alignment.bottomCenter,
             child: DraggableScrollableSheet(
               key: ValueKey(selected ? 'sel-$revision' : 'peek'),
               expand: false,
-              initialChildSize: selected ? _rest : _peek,
-              minChildSize: _peek,
+              initialChildSize: selected ? _rest : peekExtent,
+              minChildSize: peekExtent,
               maxChildSize: 0.85,
               snap: true,
               snapSizes: const [_rest],

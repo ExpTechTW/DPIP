@@ -65,6 +65,9 @@ class RtsMapLayer implements MapLayer {
   bool get usesTimeline => false;
 
   @override
+  double get bottomChromeFraction => RtsMonitorPanel.bottomStripFraction;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override

@@ -97,6 +97,9 @@ class TyphoonMapLayer implements MapLayer {
   bool get usesTimeline => false;
 
   @override
+  double get bottomChromeFraction => TyphoonPanel.peekExtent;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override

@@ -18,7 +18,9 @@ class TyphoonPanel extends StatelessWidget {
 
   final TyphoonMapLayer layer;
 
-  static const double _peek = 0.16;
+  /// Resting height of the collapsed sheet. Public so the map scaffold can
+  /// subtract it when framing — one number, one source.
+  static const double peekExtent = 0.16;
   static const double _rest = 0.42;
 
   @override
@@ -41,8 +43,8 @@ class TyphoonPanel extends StatelessWidget {
             child: DraggableScrollableSheet(
               key: ValueKey(expanded ? 'wp-$revision' : 'peek'),
               expand: false,
-              initialChildSize: expanded ? _rest : _peek,
-              minChildSize: _peek,
+              initialChildSize: expanded ? _rest : peekExtent,
+              minChildSize: peekExtent,
               maxChildSize: 0.85,
               snap: true,
               snapSizes: const [_rest],

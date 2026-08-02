@@ -176,15 +176,13 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
     final box = safeFitBounds(_latLngBounds(bounds));
     if (box == null) return;
-    // Hand the township box AND the framing inset to the map tab, so it re-fits
-    // with the same box + inset and lands on the identical camera — the Home→Map
-    // transition is then seamless (no jump in scale or position).
+    // Hand the framed geography to the map tab; it fits the same box into its
+    // own visible band (different chrome, so a different camera).
     // (An earlier version projected the on-screen band via controller.toLatLng,
     // but the plugin's screen coordinates didn't line up with MediaQuery's
     // logical size and mis-framed the map onto the strait, so the simple box is
     // used instead.)
     _handoff?.homeBounds = box;
-    _handoff?.bottomInsetFraction = HomeSheetExtent.rest;
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;

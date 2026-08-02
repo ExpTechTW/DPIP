@@ -54,6 +54,19 @@ abstract interface class MapLayer {
   /// their static overlay in [render] and react to taps in [onMapTap].
   bool get usesTimeline;
 
+  /// How much of the map's height this layer's **resting** chrome covers at the
+  /// bottom, as a fraction (0–1) — a collapsed sheet's peek, a status strip.
+  ///
+  /// The map fills the screen and every layer's chrome is layered *over* it, so
+  /// the band the user can actually see is shorter than the map. The scaffold
+  /// subtracts this when framing, which is why switching layers re-frames: each
+  /// layer hides a different amount. Report only the resting height — a sheet the
+  /// user drags open is their own doing and must not move the camera.
+  ///
+  /// Timeline layers return 0: the scaffold owns the timeline widget and measures
+  /// its real height instead of taking a declared number.
+  double get bottomChromeFraction;
+
   /// Draws this sheet layer's static overlay when it becomes active. Called once
   /// per activation (behind the serial op queue). No-op for timeline layers.
   Future<void> render(MapLibreMapController controller);

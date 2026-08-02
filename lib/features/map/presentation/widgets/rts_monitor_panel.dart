@@ -22,6 +22,11 @@ class RtsMonitorPanel extends StatelessWidget {
 
   final RealtimeNotifier<Rts> feed;
 
+  /// Roughly how much of the map height the bottom status strip covers at rest.
+  /// Declared (not measured) because the strip is a floating overlay, not a
+  /// bounded child the scaffold can size; the map subtracts it when framing.
+  static const double bottomStripFraction = 0.1;
+
   @override
   Widget build(BuildContext context) {
     return Stack(

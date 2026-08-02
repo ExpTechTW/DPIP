@@ -14,17 +14,10 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// one-shot), so a later manual pan/zoom is never clobbered.
 class MapCameraHandoff extends ChangeNotifier {
   /// The fit box the home backdrop currently frames (nationwide island, or the
-  /// selected township). The map re-fits it with the SAME [bottomInsetFraction],
-  /// so it reproduces the home's exact camera and the Home→Map transition is
-  /// seamless (no jump in Taiwan's size or position).
+  /// selected township). Only the *geography* is handed over — the map re-fits it
+  /// into its own visible band, which differs from Home's (no region bar, and a
+  /// timeline or a collapsed sheet instead of the weather sheet).
   LatLngBounds? homeBounds;
-
-  /// The fraction of the viewport height the map leaves unused at the bottom when
-  /// it frames a handoff, so the target sits in the band above the sheet rather
-  /// than screen-centred. Kept in sync with the home sheet's resting extent by
-  /// the home backdrop, so the map frames the view exactly as the home shows it.
-  /// Defaults to the home sheet's resting third.
-  double bottomInsetFraction = 1 / 3;
 
   LatLngBounds? _pending;
 

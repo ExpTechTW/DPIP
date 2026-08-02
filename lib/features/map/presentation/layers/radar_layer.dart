@@ -34,6 +34,11 @@ class RadarMapLayer implements MapLayer {
   @override
   bool get usesTimeline => true;
 
+  // The scaffold owns the timeline panel and measures its real height, so this
+  // layer declares nothing of its own.
+  @override
+  double get bottomChromeFraction => 0;
+
   @override
   Future<void> render(MapLibreMapController controller) async {}
 

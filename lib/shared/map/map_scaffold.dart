@@ -84,8 +84,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// release always lands within one render instead of dozens.
   bool _showQueued = false;
 
-  /// The map view's own size, captured at layout — see [_frameBounds].
+  /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
+
+  /// The geography the map is framed on, kept across layer switches so each
+  /// layer re-frames the *same* place into its own visible band.
+  LatLngBounds? _target;
+
+  /// Measured height of the timeline panel (0 when the active layer has none).
+  double _timelineHeight = 0;
+  final GlobalKey _timelineKey = GlobalKey();
 
   @override
   void initState() {
@@ -126,28 +134,61 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     });
   }
 
-  /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
-  /// Reserves the same bottom band as the home ([MapCameraHandoff.bottomInsetFraction])
-  /// so a handoff lands on the home's exact camera and the transition is seamless
-  /// (Taiwan doesn't jump bigger / re-centre). The fit is computed in Dart
-  /// ([boundsFitCamera]) and applied as a plain centre+zoom, never MapLibre's
-  /// native `newLatLngBounds`, which aborts the process on a degenerate/unready
-  /// viewport (see camera_fit.dart).
+  /// Adopts [bounds] as the framing target and applies it.
   void _frameBounds(LatLngBounds bounds) {
-    final safe = safeFitBounds(bounds);
-    if (safe == null || !mounted) return;
+    _target = safeFitBounds(bounds);
+    _applyFraming();
+  }
+
+  /// Points the camera at [_target], fitted into the band the user can actually
+  /// see right now.
+  ///
+  /// Re-run whenever that band changes — a layer switch, or the timeline being
+  /// measured — because each layer covers a different amount of the map: radar
+  /// puts a timeline along the bottom, a station layer a collapsed sheet, RTS a
+  /// status strip. Keeping [_target] separate from the camera is what lets the
+  /// same place stay framed across those switches (pick a township on Home, then
+  /// switch to radar, and the township is still the subject).
+  ///
+  /// The fit is computed in Dart ([boundsFitCamera]) and applied as a plain
+  /// centre+zoom, never MapLibre's native `newLatLngBounds` — that aborts the
+  /// process on a degenerate box, and its padding is dropped on the `camera#move`
+  /// path anyway (see camera_fit.dart).
+  void _applyFraming() {
+    final target = _target;
+    if (target == null || !mounted || _controller == null) return;
     // The map's own size, not MediaQuery's screen size: this surface sits inside
-    // the shell (below the status bar, above the nav bar), so the two differ by a
-    // device-dependent amount and a zoom derived from the screen mis-frames.
+    // the shell, so the two differ by a device-dependent amount and a zoom
+    // derived from the screen mis-frames.
     final size = _mapViewSize ?? MediaQuery.sizeOf(context);
     final fit = boundsFitCamera(
-      safe,
+      target,
       viewport: size,
-      bottomInset: size.height * (_handoff?.bottomInsetFraction ?? 0),
+      topInset: MediaQuery.paddingOf(context).top,
+      bottomInset: _bottomInset(size),
     );
     if (fit != null) {
       _controller?.moveCamera(CameraUpdate.newLatLngZoom(fit.target, fit.zoom));
     }
+  }
+
+  /// How much of the map's bottom the active layer's resting chrome hides: the
+  /// layer's own declared share (a collapsed sheet, a status strip) plus the
+  /// timeline, whose real height the scaffold measures because it owns it.
+  double _bottomInset(Size size) =>
+      size.height * _active.bottomChromeFraction + _timelineHeight;
+
+  /// Measures the timeline panel after layout and re-frames if it changed, so a
+  /// timeline layer frames into the band above the scrubber rather than behind it.
+  void _measureTimeline() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final box = _timelineKey.currentContext?.findRenderObject() as RenderBox?;
+      final height = (box != null && box.hasSize) ? box.size.height : 0.0;
+      if ((height - _timelineHeight).abs() < 0.5) return;
+      _timelineHeight = height;
+      _applyFraming();
+    });
   }
 
   @override
@@ -285,8 +326,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       _active = layer;
       _frames = const [];
       _error = null;
+      // The old layer's chrome is gone; the new one measures itself (a timeline
+      // layer re-measures in build, a sheet layer declares its own share).
+      _timelineHeight = 0;
     });
     if (controller != null) _queue(() => previous.clear(controller));
+    // Re-frame the same target into the new layer's band — switching to radar
+    // after picking a township keeps the township framed, and each layer's
+    // different chrome height is accounted for instead of reusing the old one.
+    _applyFraming();
     _loadActive();
   }
 
@@ -312,6 +360,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   Widget _body(BuildContext context) {
+    // The timeline's height depends on its content, so measure it after every
+    // build; a change re-frames (see [_measureTimeline]).
+    if (_active.usesTimeline) _measureTimeline();
     return Stack(
       children: [
         Positioned.fill(
@@ -324,13 +375,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         // A sheet layer's own collapsible detail sheet (empty until a tap).
         if (!_active.usesTimeline)
           Positioned.fill(child: _active.buildSheet(context)),
-        // A timeline layer's bottom scrubber / error strip.
+        // A timeline layer's bottom scrubber / error strip. Keyed so its real
+        // height can be measured and subtracted when framing.
         if (_active.usesTimeline)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: SafeArea(
+              key: _timelineKey,
               top: false,
               child: _frames.isNotEmpty
                   ? _timelinePanel(context)
