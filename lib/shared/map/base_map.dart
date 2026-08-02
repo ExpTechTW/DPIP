@@ -28,9 +28,20 @@ class BaseMap extends StatelessWidget {
   /// Bounding box framing the Taiwan main island — the single source of the
   /// nationwide framing, fit to the viewport (never a hardcoded zoom). Kept to
   /// the main island (no Penghu/Kinmen/Matsu) so it isn't dominated by open sea.
-  static final LatLngBounds taiwanBounds = LatLngBounds(
-    southwest: const LatLng(22.2, 119),
-    northeast: const LatLng(25.35, 121.05),
+  ///
+  /// The corners are the island's real extremes, with a little margin:
+  /// Fugui Cape 25.30°N, Eluanbi 21.90°N, Guosheng Lighthouse 120.04°E, Sandiao
+  /// Cape 122.01°E. An earlier box read `(22.2, 119) → (25.35, 121.05)`, which
+  /// reached ~110 km into the strait on the west yet stopped at 121.05°E — inside
+  /// the island — so the whole east coast (Yilan / Hualien / Taitung) fell outside
+  /// the box and the fit centred on 120.02°E, pushing Taiwan against the right
+  /// edge with open sea filling the left.
+  ///
+  /// A getter, not a `static final`: a lazily-initialised static keeps its first
+  /// value across hot reload, so editing these numbers would appear to do nothing.
+  static LatLngBounds get taiwanBounds => LatLngBounds(
+    southwest: const LatLng(21.87, 119.99),
+    northeast: const LatLng(25.32, 122.05),
   );
 
   /// Centre of [taiwanBounds] — only the pre-layout camera target, before a
