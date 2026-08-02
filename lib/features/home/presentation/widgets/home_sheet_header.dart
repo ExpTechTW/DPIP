@@ -46,6 +46,12 @@ class HomeSheetHeader extends StatelessWidget {
     final humidity = data?.humidity;
     final rain = data?.rain;
 
+    // 所在地 is selected but there is no GPS fix. Say so here, at the resting
+    // sheet height where it is actually read, instead of showing a reading row:
+    // with no location there is no location's weather, and a row of dashes reads
+    // as "we are here, the weather is unknown" rather than "we can't locate you".
+    final currentUnavailable = area is CurrentArea && area.code == null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -54,62 +60,80 @@ class HomeSheetHeader extends StatelessWidget {
           style: theme.textTheme.headlineSmall?.copyWith(color: foreground),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Left 2/3 — condition icon + temperature.
-            Expanded(
-              flex: 2,
-              child: Row(
-                children: [
-                  Icon(Icons.cloud_outlined, size: 48, color: secondary),
-                  const SizedBox(width: AppSpacing.md),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: temp?.toStringAsFixed(1) ?? '—',
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            color: foreground,
+        if (currentUnavailable)
+          Row(
+            children: [
+              Icon(Icons.location_off_outlined, size: 20, color: secondary),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.regionCurrentUnavailable,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
+                ),
+              ),
+            ],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left 2/3 — condition icon + temperature.
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Icon(Icons.cloud_outlined, size: 48, color: secondary),
+                    const SizedBox(width: AppSpacing.md),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: temp?.toStringAsFixed(1) ?? '—',
+                            style: theme.textTheme.displaySmall?.copyWith(
+                              color: foreground,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: '°C',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: secondary,
+                          TextSpan(
+                            text: '°C',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: secondary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // Right 1/3 — precipitation over humidity.
-            Expanded(
-              flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _Metric(
-                    label: l10n.weatherPrecipitation,
-                    value: '${rain?.toStringAsFixed(1) ?? '0.0'} mm',
-                    foreground: foreground,
-                    secondary: secondary,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  _Metric(
-                    label: l10n.weatherHumidity,
-                    value: humidity == null ? '—' : '$humidity%',
-                    foreground: foreground,
-                    secondary: secondary,
-                  ),
-                ],
+              // Right 1/3 — precipitation over humidity.
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Metric(
+                      label: l10n.weatherPrecipitation,
+                      // A missing reading is a dash, never a fabricated 0.0 — "no
+                      // rain" and "no data" must not look the same.
+                      value: rain == null
+                          ? '—'
+                          : '${rain.toStringAsFixed(1)} mm',
+                      foreground: foreground,
+                      secondary: secondary,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _Metric(
+                      label: l10n.weatherHumidity,
+                      value: humidity == null ? '—' : '$humidity%',
+                      foreground: foreground,
+                      secondary: secondary,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
   }

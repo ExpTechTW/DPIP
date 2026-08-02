@@ -112,4 +112,49 @@ void main() {
     expect(find.byType(HomeSheetHeader), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('no GPS fix → the header says the location is unavailable', (
+    tester,
+  ) async {
+    final store = await _store();
+    // 所在地 is index 1; leaving currentCode null is exactly the no-fix state.
+    store.select(1);
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.regionCurrentUnavailable), findsOneWidget);
+    expect(find.byIcon(Icons.location_off_outlined), findsOneWidget);
+  });
+
+  testWidgets('no GPS fix → no weather readout stands in for the location', (
+    tester,
+  ) async {
+    final store = await _store();
+    store.select(1);
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    // Without a location there is no location's weather. A dashed-out reading
+    // row would read as "we are here, the weather is unknown"; worse, the
+    // precipitation slot used to fabricate "0.0 mm" for missing data, which is
+    // indistinguishable from a real "no rain" reading.
+    expect(find.textContaining('mm'), findsNothing);
+    expect(find.byIcon(Icons.cloud_outlined), findsNothing);
+  });
+
+  testWidgets('a located area shows the reading row, not the notice', (
+    tester,
+  ) async {
+    final store = await _store();
+    store
+      ..select(1)
+      ..setCurrentCode('100');
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.regionCurrentUnavailable), findsNothing);
+    expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
+  });
 }

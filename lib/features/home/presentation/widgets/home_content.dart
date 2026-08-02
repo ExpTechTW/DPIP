@@ -4,10 +4,8 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
-import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,9 +45,6 @@ class HomeContent extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
-    final selected = store.selected;
-    // 所在地 is selected but GPS gave no fix — the slot stays, the body says so.
-    final currentUnavailable = selected is CurrentArea && selected.code == null;
     final cardColor = glassSurface(colors, reveal);
     return ListView(
       controller: scrollController,
@@ -71,11 +66,6 @@ class HomeContent extends StatelessWidget {
             children: [
               HomeSheetHeader(reveal: reveal),
               const SizedBox(height: AppSpacing.lg),
-              if (currentUnavailable)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: _CurrentUnavailableNotice(reveal: reveal),
-                ),
               // Placeholder cards until the real sections land.
               for (var i = 0; i < 6; i++)
                 Padding(
@@ -92,44 +82,6 @@ class HomeContent extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Shown at the top of the 所在地 panel when GPS gave no fix — the current-
-/// location slot stays selectable, but the body explains why it's empty and
-/// nudges the user toward enabling location.
-class _CurrentUnavailableNotice extends StatelessWidget {
-  const _CurrentUnavailableNotice({required this.reveal});
-
-  final double reveal;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    final foreground = lightenOnReveal(colors.onSurfaceVariant, reveal);
-    final background = glassSurface(colors, reveal);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: AppRadius.medium,
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.location_off_outlined, color: foreground, size: 20),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Text(
-              l10n.regionCurrentUnavailable,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: foreground),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

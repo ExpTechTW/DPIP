@@ -48,7 +48,7 @@
   "eewSummary": "規模 {magnitude}・深度 {depth} 公里",
   "regionNationwide": "全國",
   "regionCurrent": "所在地",
-  "regionCurrentUnavailable": "無法取得所在地位置",
+  "regionCurrentUnavailable": "無法取得所在地位置資訊",
   "weatherPrecipitation": "降水量",
   "weatherHumidity": "濕度",
   "mapLayers": "圖層",

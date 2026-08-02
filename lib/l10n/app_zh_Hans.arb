@@ -48,7 +48,7 @@
   "eewSummary": "震级 {magnitude}·深度 {depth} 公里",
   "regionNationwide": "全国",
   "regionCurrent": "当前位置",
-  "regionCurrentUnavailable": "无法获取当前位置",
+  "regionCurrentUnavailable": "无法获取所在地位置信息",
   "weatherPrecipitation": "降水量",
   "weatherHumidity": "湿度",
   "mapLayers": "图层",
