@@ -22,7 +22,7 @@ dependencies:
   geolocator: ^14.0.3
   fl_chart: ^1.2.0
   go_router: ^17.3.0
-  in_app_purchase: ^3.2.3
+  in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
   # Requires MapLibre 6.27.0 exactly — both its podspec and its Package.swift
