@@ -84,6 +84,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// release always lands within one render instead of dozens.
   bool _showQueued = false;
 
+  /// The map view's own size, captured at layout — see [_frameBounds].
+  Size? _mapViewSize;
+
   @override
   void initState() {
     super.initState();
@@ -133,7 +136,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   void _frameBounds(LatLngBounds bounds) {
     final safe = safeFitBounds(bounds);
     if (safe == null || !mounted) return;
-    final size = MediaQuery.sizeOf(context);
+    // The map's own size, not MediaQuery's screen size: this surface sits inside
+    // the shell (below the status bar, above the nav bar), so the two differ by a
+    // device-dependent amount and a zoom derived from the screen mis-frames.
+    final size = _mapViewSize ?? MediaQuery.sizeOf(context);
     final fit = boundsFitCamera(
       safe,
       viewport: size,
@@ -295,50 +301,60 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: BaseMap(
-              onMapCreated: _onMapCreated,
-              onStyleLoaded: _onStyleLoaded,
-              onMapClick: (_, latLng) => _onMapClick(latLng),
-            ),
-          ),
-          // A sheet layer's own collapsible detail sheet (empty until a tap).
-          if (!_active.usesTimeline)
-            Positioned.fill(child: _active.buildSheet(context)),
-          // A timeline layer's bottom scrubber / error strip.
-          if (_active.usesTimeline)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: SafeArea(
-                top: false,
-                child: _frames.isNotEmpty
-                    ? _timelinePanel(context)
-                    : _error != null
-                    ? _errorPanel(context)
-                    : const SizedBox.shrink(),
-              ),
-            ),
-          // Layer switcher — top-right, always above the sheet / timeline.
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: MapLayerSwitcher(
-                  layers: widget.layers,
-                  active: _active,
-                  onSelected: _onLayerSelected,
-                ),
-              ),
-            ),
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final measured = constraints.biggest;
+          if (measured.isFinite) _mapViewSize = measured;
+          return _body(context);
+        },
       ),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: BaseMap(
+            onMapCreated: _onMapCreated,
+            onStyleLoaded: _onStyleLoaded,
+            onMapClick: (_, latLng) => _onMapClick(latLng),
+          ),
+        ),
+        // A sheet layer's own collapsible detail sheet (empty until a tap).
+        if (!_active.usesTimeline)
+          Positioned.fill(child: _active.buildSheet(context)),
+        // A timeline layer's bottom scrubber / error strip.
+        if (_active.usesTimeline)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: _frames.isNotEmpty
+                  ? _timelinePanel(context)
+                  : _error != null
+                  ? _errorPanel(context)
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        // Layer switcher — top-right, always above the sheet / timeline.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MapLayerSwitcher(
+                layers: widget.layers,
+                active: _active,
+                onSelected: _onLayerSelected,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

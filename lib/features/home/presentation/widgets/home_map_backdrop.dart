@@ -85,6 +85,14 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   String? _radarFrameOnMap;
   int _radarFrameEpoch = -1;
 
+  /// The map view's own size, captured at layout. The camera fit must be
+  /// computed against **this**, not `MediaQuery` — MediaQuery describes the whole
+  /// screen, so on any device whose map area differs from it (system chrome, a
+  /// different aspect ratio) the derived zoom drifts and the framing is wrong by
+  /// a device-dependent amount. Null until the first layout; callers fall back to
+  /// MediaQuery for that one frame.
+  Size? _mapViewSize;
+
   @override
   void initState() {
     super.initState();
@@ -141,7 +149,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final controller = _controller;
     if (controller == null || !_styleReady) return;
     // Read context-bound values before any await.
-    final size = MediaQuery.sizeOf(context);
+    final size = _mapViewSize ?? MediaQuery.sizeOf(context);
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final code = _selectedCode;
     final styleEpoch = _styleEpoch;
@@ -320,10 +328,28 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // ignored for hit-testing, so the page's tap (open map) and horizontal swipe
     // (switch area) pass straight through.
     return IgnorePointer(
-      child: BaseMap(
-        interactive: false,
-        onMapCreated: _onMapCreated,
-        onStyleLoaded: _onStyleLoaded,
+      // LayoutBuilder measures the map itself, so the camera fit is derived from
+      // the surface the map actually occupies rather than the whole screen. A
+      // size change (rotation, split view, a different device) re-frames.
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final measured = constraints.biggest;
+          if (measured != _mapViewSize && measured.isFinite) {
+            _mapViewSize = measured;
+            // Re-frame once the new size is laid out. Bypasses the
+            // unchanged-selection guard, which only tracks the code, not the size.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _appliedCode = null;
+              _applySelection();
+            });
+          }
+          return BaseMap(
+            interactive: false,
+            onMapCreated: _onMapCreated,
+            onStyleLoaded: _onStyleLoaded,
+          );
+        },
       ),
     );
   }
