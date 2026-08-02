@@ -30,10 +30,14 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
 
-  # Use the vendored MapLibre xcframework (ios/vendor/maplibre) instead of
-  # downloading it every build — the upstream GitHub release CDN stalls
-  # unreliably here. Version must match maplibre_gl's `MapLibre` dependency.
-  pod 'MapLibre', :path => 'vendor/maplibre'
+  # NOTE: MapLibre is NOT declared here. The project builds with Swift Package
+  # Manager (`enable-swift-package-manager: true` in pubspec.yaml), and
+  # maplibre_gl's Package.swift already pins MapLibre 6.27.0 exactly, so SPM
+  # supplies and embeds it. Declaring the vendored pod as well made two build
+  # commands produce Runner.app/Frameworks/MapLibre.framework and the build
+  # failed. The vendored copy at ios/vendor/maplibre (also 6.27.0) is kept only
+  # as the CocoaPods fallback: re-add `pod 'MapLibre', :path => 'vendor/maplibre'`
+  # here if SPM is ever turned back off.
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do

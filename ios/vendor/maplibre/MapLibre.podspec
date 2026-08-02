@@ -1,9 +1,9 @@
 Pod::Spec.new do |s|
   s.name             = 'MapLibre'
-  s.version          = '6.19.1'
+  s.version          = '6.27.0'
   s.summary          = 'MapLibre Native iOS SDK — vendored xcframework.'
   s.description      = <<-DESC
-    Vendored copy of the MapLibre Native iOS dynamic xcframework (v6.19.1),
+    Vendored copy of the MapLibre Native iOS dynamic xcframework (v6.27.0),
     committed to the repo so `pod install` never downloads it. The upstream
     GitHub release CDN stalls unreliably here; this keeps the iOS build
     deterministic and offline-capable. Satisfies maplibre_gl's `MapLibre`

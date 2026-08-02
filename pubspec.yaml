@@ -25,6 +25,10 @@ dependencies:
   in_app_purchase: ^3.2.3
   intl: ^0.20.2
   json_annotation: ^4.12.0
+  # Requires MapLibre 6.27.0 exactly — both its podspec and its Package.swift
+  # pin that version. ios/vendor/maplibre vendors that exact xcframework, so
+  # bump the two together: a mismatch fails `pod install` with a version
+  # conflict (and SPM resolution with the same `exact:` constraint).
   maplibre_gl: ^0.26.2
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
@@ -45,7 +49,7 @@ dev_dependencies:
 
 flutter:
   config:
-    enable-swift-package-manager: false
+    enable-swift-package-manager: true
   uses-material-design: true
   generate: true
   shaders:
