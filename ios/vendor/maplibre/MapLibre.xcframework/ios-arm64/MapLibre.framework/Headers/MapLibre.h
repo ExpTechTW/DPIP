@@ -1,5 +1,6 @@
 #import <MapLibre/MLNBackgroundStyleLayer.h>
 #import <MapLibre/MLNCircleStyleLayer.h>
+#import <MapLibre/MLNColorReliefStyleLayer.h>
 #import <MapLibre/MLNFillExtrusionStyleLayer.h>
 #import <MapLibre/MLNFillStyleLayer.h>
 #import <MapLibre/MLNHeatmapStyleLayer.h>
@@ -22,6 +23,7 @@
 #import <MapLibre/MLNCustomDrawableStyleLayer.h>
 #import <MapLibre/MLNCustomStyleLayer.h>
 #import <MapLibre/MLNDefaultStyle.h>
+#import <MapLibre/MLNDisplayUtils.h>
 #import <MapLibre/MLNDistanceFormatter.h>
 #import <MapLibre/MLNFeature.h>
 #import <MapLibre/MLNForegroundStyleLayer.h>
@@ -35,6 +37,7 @@
 #import <MapLibre/MLNMapSnapshotter.h>
 #import <MapLibre/MLNMultiPoint.h>
 #import <MapLibre/MLNNetworkConfiguration.h>
+#import <MapLibre/MLNNetworkResponse.h>
 #import <MapLibre/MLNOfflinePack.h>
 #import <MapLibre/MLNOfflineRegion.h>
 #import <MapLibre/MLNOfflineStorage.h>

@@ -24,6 +24,44 @@ typedef NS_ENUM(NSUInteger, MLNHillshadeIlluminationAnchor) {
 };
 
 /**
+ The hillshade algorithm to use, one of `MLNHillshadeMethodStandard`,
+ `MLNHillshadeMethodBasic`, `MLNHillshadeMethodCombined`,
+ `MLNHillshadeMethodIgor`, or `MLNHillshadeMethodMultidirectional`.
+ ![image](assets/hillshade_methods.png)
+
+ Values of this type are used in the ``MLNHillshadeStyleLayer/hillshadeMethod``
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MLNHillshadeMethod) {
+    /**
+     The legacy hillshade method.
+     */
+    MLNHillshadeMethodStandard,
+    /**
+     Basic hillshade. Uses a simple physics model where the reflected light
+     intensity is proportional to the cosine of the angle between the incident
+     light and the surface normal. Similar to GDAL's `gdaldem` default
+     algorithm.
+     */
+    MLNHillshadeMethodBasic,
+    /**
+     Hillshade algorithm whose intensity scales with slope. Similar to GDAL's
+     `gdaldem` with `Combined` option.
+     */
+    MLNHillshadeMethodCombined,
+    /**
+     Hillshade algorithm which tries to minimize effects on other map features
+     beneath. Similar to GDAL's `gdaldem` with `Igor` option.
+     */
+    MLNHillshadeMethodIgor,
+    /**
+     Hillshade with multiple illumination directions. Uses the basic hillshade
+     model with multiple independent light sources.
+     */
+    MLNHillshadeMethodMultidirectional,
+};
+
+/**
  An ``MLNHillshadeStyleLayer`` is a style layer that renders raster <a
  href="https://en.wikipedia.org/wiki/Digital_elevation_model">digital elevation
  model</a> (DEM) tiles on the map.
@@ -149,15 +187,17 @@ MLN_EXPORT
 
 #if TARGET_OS_IPHONE
 /**
- The shading color of areas that faces towards the light source.
+ The shading color of areas that faces towards the light source(s). Only when
+ `hillshadeMethod` is set to `MLNHillshadeMethodMultidirectional` can you
+ specify multiple light sources.
  
- The default value of this property is an expression that evaluates to
- `UIColor.whiteColor`. Set this property to `nil` to reset it to the default
+ The default value of this property is an expression that evaluates to an array
+ of `UIColor` objects. Set this property to `nil` to reset it to the default
  value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant `UIColor` values
+ * Constant `UIColor` array values
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -169,15 +209,17 @@ MLN_EXPORT
 @property (nonatomic, null_resettable) NSExpression *hillshadeHighlightColor;
 #else
 /**
- The shading color of areas that faces towards the light source.
+ The shading color of areas that faces towards the light source(s). Only when
+ `hillshadeMethod` is set to `MLNHillshadeMethodMultidirectional` can you
+ specify multiple light sources.
  
- The default value of this property is an expression that evaluates to
- `NSColor.whiteColor`. Set this property to `nil` to reset it to the default
+ The default value of this property is an expression that evaluates to an array
+ of `NSColor` objects. Set this property to `nil` to reset it to the default
  value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant `NSColor` values
+ * Constant `NSColor` array values
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -195,6 +237,27 @@ MLN_EXPORT
  This property corresponds to the `hillshade-highlight-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MLNTransition hillshadeHighlightColorTransition;
+
+/**
+ The altitude of the light source(s) used to generate the hillshading with 0 as
+ sunset and 90 as noon. Only when `hillshadeMethod` is set to
+ `MLNHillshadeMethodMultidirectional` can you specify multiple light sources.
+ 
+ The default value of this property is an expression that evaluates to an array
+ of numeric values. Set this property to `nil` to reset it to the default value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant numeric array values between 0 and 90 inclusive
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationAltitude;
 
 /**
  Direction of light source when map is rotated.
@@ -221,17 +284,19 @@ MLN_EXPORT
 @property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationAnchor;
 
 /**
- The direction of the light source used to generate the hillshading with 0 as
+ The direction of the light source(s) used to generate the hillshading with 0 as
  the top of the viewport if `hillshadeIlluminationAnchor` is set to
  `MLNHillshadeIlluminationAnchorViewport` and due north if
  `hillshadeIlluminationAnchor` is set to `MLNHillshadeIlluminationAnchorMap`.
+ Only when `hillshadeMethod` is set to `MLNHillshadeMethodMultidirectional` can
+ you specify multiple light sources.
  
- The default value of this property is an expression that evaluates to the float
- `335`. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to an array
+ of numeric values. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values between 0 and 359 inclusive
+ * Constant numeric array values between 0 and 359 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -242,17 +307,53 @@ MLN_EXPORT
  */
 @property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationDirection;
 
-#if TARGET_OS_IPHONE
 /**
- The shading color of areas that face away from the light source.
+ The hillshade algorithm to use, one of `MLNHillshadeMethodStandard`,
+ `MLNHillshadeMethodBasic`, `MLNHillshadeMethodCombined`,
+ `MLNHillshadeMethodIgor`, or `MLNHillshadeMethodMultidirectional`.
+ ![image](assets/hillshade_methods.png)
  
  The default value of this property is an expression that evaluates to
- `UIColor.blackColor`. Set this property to `nil` to reset it to the default
+ `standard`. Set this property to `nil` to reset it to the default value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MLNHillshadeMethod` values
+ * Any of the following constant string values:
+   * `standard`: The legacy hillshade method.
+   * `basic`: Basic hillshade. Uses a simple physics model where the reflected
+ light intensity is proportional to the cosine of the angle between the incident
+ light and the surface normal. Similar to GDAL's `gdaldem` default algorithm.
+   * `combined`: Hillshade algorithm whose intensity scales with slope. Similar
+ to GDAL's `gdaldem` with `-combined` option.
+   * `igor`: Hillshade algorithm which tries to minimize effects on other map
+ features beneath. Similar to GDAL's `gdaldem` with `-igor` option.
+   * `multidirectional`: Hillshade with multiple illumination directions. Uses
+ the basic hillshade model with multiple independent light sources.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *hillshadeMethod;
+
+#if TARGET_OS_IPHONE
+/**
+ The shading color of areas that face away from the light source(s). Only when
+ `hillshadeMethod` is set to `MLNHillshadeMethodMultidirectional` can you
+ specify multiple light sources.
+ 
+ The default value of this property is an expression that evaluates to an array
+ of `UIColor` objects. Set this property to `nil` to reset it to the default
  value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant `UIColor` values
+ * Constant `UIColor` array values
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -264,15 +365,17 @@ MLN_EXPORT
 @property (nonatomic, null_resettable) NSExpression *hillshadeShadowColor;
 #else
 /**
- The shading color of areas that face away from the light source.
+ The shading color of areas that face away from the light source(s). Only when
+ `hillshadeMethod` is set to `MLNHillshadeMethodMultidirectional` can you
+ specify multiple light sources.
  
- The default value of this property is an expression that evaluates to
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ The default value of this property is an expression that evaluates to an array
+ of `NSColor` objects. Set this property to `nil` to reset it to the default
  value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant `NSColor` values
+ * Constant `NSColor` array values
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -313,6 +416,19 @@ MLN_EXPORT
  The ``MLNHillshadeIlluminationAnchor`` enumeration representation of the value.
  */
 @property (readonly) MLNHillshadeIlluminationAnchor MLNHillshadeIlluminationAnchorValue;
+
+/**
+ Creates a new value object containing the given `MLNHillshadeMethod` enumeration.
+
+ @param hillshadeMethod The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMLNHillshadeMethod:(MLNHillshadeMethod)hillshadeMethod;
+
+/**
+ The ``MLNHillshadeMethod`` enumeration representation of the value.
+ */
+@property (readonly) MLNHillshadeMethod MLNHillshadeMethodValue;
 
 @end
 

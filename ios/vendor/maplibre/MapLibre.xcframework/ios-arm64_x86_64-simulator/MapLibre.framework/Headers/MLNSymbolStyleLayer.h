@@ -1741,8 +1741,10 @@ MLN_EXPORT
  `textVariableAnchor`, `textOffset`, and `textRadialOffset`. 
  
   ```json 
+ 
   { "text-variable-anchor-offset": ["top", [0, 4], "left", [3,0], "bottom", [1,
  1]] } 
+ 
   ``` 
  
   When the renderer chooses the `top` anchor, `[0, 4]` will be used for
@@ -1784,8 +1786,10 @@ MLN_EXPORT
  `textVariableAnchor`, `textOffset`, and `textRadialOffset`. 
  
   ```json 
+ 
   { "text-variable-anchor-offset": ["top", [0, 4], "left", [3,0], "bottom", [1,
  1]] } 
+ 
   ``` 
  
   When the renderer chooses the `top` anchor, `[0, 4]` will be used for
@@ -1988,6 +1992,7 @@ MLN_EXPORT
 
 /**
  Distance of halo to the icon outline. 
+ 
  The unit is in points only for SDF sprites that were created with a blur radius
  of 8, multiplied by the display density. I.e., the radius needs to be 16 for
  `@2x` sprites, etc.

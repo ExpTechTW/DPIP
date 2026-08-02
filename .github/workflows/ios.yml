@@ -41,24 +41,22 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Cache CocoaPods
+      # The iOS build uses Swift Package Manager, not CocoaPods (there is no
+      # Podfile). Cache SPM's clone/artifact store keyed on the resolved pins.
+      - name: Cache Swift Packages
         uses: actions/cache@v4
         with:
           path: |
-            ios/Pods
-            ~/Library/Caches/CocoaPods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-spm-
 
       - name: Install dependencies and run build_runner
         run: |
           flutter pub get
           dart run build_runner build --delete-conflicting-outputs
-
-      - name: Install iOS Pods
-        working-directory: ios
-        run: pod install --repo-update
 
       - name: Build iOS App and create IPA
         run: |
