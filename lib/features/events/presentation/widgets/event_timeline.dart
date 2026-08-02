@@ -27,6 +27,7 @@ class EventTimeline extends StatelessWidget {
       key: ValueKey(regionCode),
       future: () => repository.events(regionCode: regionCode),
       isEmpty: (events) => events.isEmpty,
+      refreshable: true,
       builder: (context, events) => ListView.builder(
         padding: EdgeInsets.fromLTRB(
           AppSpacing.lg,

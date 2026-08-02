@@ -25,6 +25,7 @@ class AsyncView<T> extends StatefulWidget {
     this.error,
     this.empty,
     this.isEmpty,
+    this.refreshable = false,
   });
 
   /// Produces the request. Re-invoked on retry.
@@ -51,6 +52,15 @@ class AsyncView<T> extends StatefulWidget {
   /// [builder] (e.g. an empty list).
   final bool Function(T value)? isEmpty;
 
+  /// Wraps every state in a pull-to-refresh that re-runs [future].
+  ///
+  /// The empty and error states get it too: those are exactly the moments a user
+  /// pulls — an empty feed after a dropped connection is indistinguishable from
+  /// a genuinely quiet one, and reaching for the retry button is not the reflex.
+  /// They are made scrollable (they otherwise fit the viewport and could not
+  /// overscroll) so the gesture is available there at all.
+  final bool refreshable;
+
   @override
   State<AsyncView<T>> createState() => _AsyncViewState<T>();
 }
@@ -58,6 +68,12 @@ class AsyncView<T> extends StatefulWidget {
 class _AsyncViewState<T> extends State<AsyncView<T>> {
   late Future<Result<T>> _future;
   int _attempt = 0;
+
+  /// The last value that loaded successfully, kept so a refresh renders the
+  /// existing content under the spinner instead of tearing the screen down to a
+  /// loading state — pulling to check for news should never first take away the
+  /// news you already had.
+  T? _loaded;
 
   @override
   void initState() {
@@ -70,8 +86,55 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
     _future = widget.future();
   });
 
+  /// Re-runs the request and completes when it settles, so the refresh spinner
+  /// stays up until there is actually something new to show.
+  Future<void> _refresh() async {
+    final future = widget.future();
+    setState(() {
+      _attempt++;
+      _future = future;
+    });
+    await future;
+  }
+
+  /// Makes a non-scrolling state (empty / error) overscrollable so a pull can
+  /// still start there, without stretching its content.
+  /// The success UI for [value] — the empty state when [AsyncView.isEmpty] says
+  /// so, else the caller's builder.
+  Widget _content(BuildContext context, T value) {
+    _loaded = value;
+    if (widget.isEmpty?.call(value) ?? false) {
+      return _wrap(
+        widget.empty?.call(context) ??
+            EmptyView(
+              icon: Icons.inbox_outlined,
+              message: AppLocalizations.of(context).commonEmpty,
+            ),
+      );
+    }
+    return widget.builder(context, value);
+  }
+
+  Widget _wrap(Widget child) => widget.refreshable ? _pullable(child) : child;
+
+  Widget _pullable(Widget child) => LayoutBuilder(
+    builder: (context, constraints) => SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: child,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
+    final view = _buildState(context);
+    if (!widget.refreshable) return view;
+    return RefreshIndicator(onRefresh: _refresh, child: view);
+  }
+
+  Widget _buildState(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return FutureBuilder<Result<T>>(
       // Key by attempt so a retry re-subscribes to the fresh future rather than
@@ -80,25 +143,23 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
+          final previous = _loaded;
+          if (previous != null) return _content(context, previous);
           return widget.loading?.call(context) ?? const LoadingView();
         }
         // Repositories return Result and don't throw; a raw error here is
         // unexpected, but surface the failure state rather than a blank.
         if (snapshot.hasError || !snapshot.hasData) {
-          return ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry);
+          return _wrap(
+            ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
+          );
         }
         return switch (snapshot.data!) {
-          Ok(:final value) =>
-            (widget.isEmpty?.call(value) ?? false)
-                ? (widget.empty?.call(context) ??
-                      EmptyView(
-                        icon: Icons.inbox_outlined,
-                        message: l10n.commonEmpty,
-                      ))
-                : widget.builder(context, value),
-          Err(:final failure) =>
+          Ok(:final value) => _content(context, value),
+          Err(:final failure) => _wrap(
             widget.error?.call(context, failure, _retry) ??
                 ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
+          ),
         };
       },
     );

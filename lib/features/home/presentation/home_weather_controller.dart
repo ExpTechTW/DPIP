@@ -45,6 +45,16 @@ class HomeWeatherController extends ChangeNotifier {
     NationwideArea() => _regions.currentCode,
   };
 
+  /// Re-fetches the current area's weather even though the area has not changed
+  /// — the pull-to-refresh entry point. Completes when the fetch settles so the
+  /// caller can hold its spinner up until there is something new.
+  Future<void> refresh() async {
+    final code = _areaCode;
+    final town = code == null ? null : _directory.byCode(code);
+    if (town == null) return;
+    await _load(town.lat, town.lng);
+  }
+
   void _sync() {
     final code = _areaCode;
     if (code == _loadedCode) return;

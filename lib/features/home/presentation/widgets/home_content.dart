@@ -5,6 +5,8 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,43 +48,60 @@ class HomeContent extends StatelessWidget {
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
     final cardColor = glassSurface(colors, reveal);
-    return ListView(
-      controller: scrollController,
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        topInset,
-        AppSpacing.lg,
-        // Clear the bottom nav (the body extends behind it — extendBody).
-        AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
-      ),
-      children: [
-        Opacity(opacity: handleOpacity, child: const HomeSheetHandle()),
-        // The grab handle above stays put; only the per-area panel slides.
-        _AreaSlide(
-          index: areaIndex,
-          child: Column(
-            key: ValueKey(areaIndex),
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              HomeSheetHeader(reveal: reveal),
-              const SizedBox(height: AppSpacing.lg),
-              // Placeholder cards until the real sections land.
-              for (var i = 0; i < 6; i++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Container(
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: AppRadius.medium,
+    return RefreshIndicator(
+      onRefresh: () => _refresh(context),
+      // Drop the spinner below the region bar rather than behind it.
+      edgeOffset: topInset,
+      child: ListView(
+        controller: scrollController,
+        // The sheet's floor is its resting height, so at rest there is nothing
+        // left for a downward drag to collapse into; this makes that drag
+        // overscroll the list (and start the refresh) instead of being swallowed.
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          topInset,
+          AppSpacing.lg,
+          // Clear the bottom nav (the body extends behind it — extendBody).
+          AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
+        ),
+        children: [
+          Opacity(opacity: handleOpacity, child: const HomeSheetHandle()),
+          // The grab handle above stays put; only the per-area panel slides.
+          _AreaSlide(
+            index: areaIndex,
+            child: Column(
+              key: ValueKey(areaIndex),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                HomeSheetHeader(reveal: reveal),
+                const SizedBox(height: AppSpacing.lg),
+                // Placeholder cards until the real sections land.
+                for (var i = 0; i < 6; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: Container(
+                      height: 96,
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: AppRadius.medium,
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  /// Refreshes everything on this screen that goes stale: the header's weather
+  /// for the selected area, and the backdrop's radar frame (via the same signal
+  /// a tab re-selection fires). Awaited together so one pull settles the screen.
+  Future<void> _refresh(BuildContext context) async {
+    context.read<HomeResetSignal>().fire();
+    await context.read<HomeWeatherController>().refresh();
   }
 }
 
