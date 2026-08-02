@@ -159,7 +159,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get regionCurrent => '所在地';
 
   @override
-  String get regionCurrentUnavailable => '無法取得所在地位置';
+  String get regionCurrentUnavailable => '無法取得所在地位置資訊';
 
   @override
   String get weatherPrecipitation => '降水量';
@@ -655,7 +655,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get regionCurrent => '当前位置';
 
   @override
-  String get regionCurrentUnavailable => '无法获取当前位置';
+  String get regionCurrentUnavailable => '无法获取所在地位置信息';
 
   @override
   String get weatherPrecipitation => '降水量';
@@ -1151,7 +1151,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get regionCurrent => '所在地';
 
   @override
-  String get regionCurrentUnavailable => '無法取得所在地位置';
+  String get regionCurrentUnavailable => '無法取得所在地位置資訊';
 
   @override
   String get weatherPrecipitation => '降水量';

@@ -4,6 +4,7 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/location_permission_banner.dart';
 import 'package:dpip/shared/widgets/notification_permission_banner.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,17 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int? _lastIndex;
 
+  /// Which branch is on screen. The branches live in an IndexedStack and stay
+  /// mounted while hidden, so this is how a page learns it was returned to
+  /// (see [RefreshOnAppear]).
+  final VisibleTab _visibleTab = VisibleTab();
+
+  @override
+  void dispose() {
+    _visibleTab.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -48,6 +60,13 @@ class _MainShellState extends State<MainShell> {
       });
     }
     _lastIndex = index;
+    // Publish after the frame: pages listening to this rebuild on the edge, and
+    // a notify during build would land mid-build for them.
+    if (_visibleTab.value != index) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _visibleTab.value = index;
+      });
+    }
 
     // Bottom-navigation destinations, in branch order. The 4th slot
     // (navEarthquake) is intentionally swappable — replace this one entry (and
@@ -89,7 +108,12 @@ class _MainShellState extends State<MainShell> {
         children: [
           const LocationPermissionBanner(),
           const NotificationPermissionBanner(),
-          Expanded(child: widget.navigationShell),
+          Expanded(
+            child: VisibleTabScope(
+              visibleTab: _visibleTab,
+              child: widget.navigationShell,
+            ),
+          ),
         ],
       ),
       // Only Home dismisses the bar; every other tab keeps it (dismiss 0).

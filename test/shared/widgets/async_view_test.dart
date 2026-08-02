@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,115 +88,54 @@ void main() {
     );
   });
 
-  testWidgets('refreshable: a pull re-runs the request', (tester) async {
+  testWidgets('refreshSignal re-runs the request', (tester) async {
+    final signal = RefreshSignal();
     var calls = 0;
     await tester.pumpWidget(
       _wrap(
         AsyncView<int>(
-          refreshable: true,
+          refreshSignal: signal,
           future: () async => Ok(++calls),
-          builder: (_, value) => ListView(
-            children: [SizedBox(height: 600, child: Text('v $value'))],
-          ),
+          builder: (_, value) => Text('v $value'),
         ),
       ),
     );
     await tester.pumpAndSettle();
     expect(find.text('v 1'), findsOneWidget);
 
-    await tester.fling(find.byType(ListView), const Offset(0, 320), 1000);
+    signal.fire();
     await tester.pumpAndSettle();
-
-    expect(calls, 2, reason: 'the pull should re-run the request');
     expect(find.text('v 2'), findsOneWidget);
   });
 
-  testWidgets('refreshable: content stays on screen while refreshing', (
-    tester,
-  ) async {
+  testWidgets('a refresh keeps the current content on screen', (tester) async {
+    final signal = RefreshSignal();
     var calls = 0;
     late Completer<Result<int>> pending;
     await tester.pumpWidget(
       _wrap(
         AsyncView<int>(
-          refreshable: true,
+          refreshSignal: signal,
           future: () {
             calls++;
             if (calls == 1) return Future.value(const Ok(1));
             return (pending = Completer<Result<int>>()).future;
           },
-          builder: (_, value) => ListView(
-            children: [SizedBox(height: 600, child: Text('v $value'))],
-          ),
+          builder: (_, value) => Text('v $value'),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    await tester.fling(find.byType(ListView), const Offset(0, 320), 1000);
-    // The indicator invokes onRefresh only after its snap settles, so pump
-    // frames until the second request is actually in flight.
-    for (var i = 0; i < 20 && calls < 2; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-    expect(calls, 2, reason: 'the pull should have started a second request');
-
-    // Mid-refresh the old value is still shown — pulling to check for news must
-    // not first take away the news you already had.
+    signal.fire();
+    await tester.pump();
+    // Refreshing on every appearance would be intolerable if it blanked the
+    // screen each time, so the old value stays until the new one lands.
     expect(find.text('v 1'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
 
     pending.complete(const Ok(2));
     await tester.pumpAndSettle();
     expect(find.text('v 2'), findsOneWidget);
-  });
-
-  testWidgets('refreshable: the empty state can be pulled too', (tester) async {
-    var calls = 0;
-    await tester.pumpWidget(
-      _wrap(
-        AsyncView<List<int>>(
-          refreshable: true,
-          future: () async {
-            calls++;
-            return const Ok(<int>[]);
-          },
-          isEmpty: (v) => v.isEmpty,
-          builder: (_, _) => const SizedBox.shrink(),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // An empty feed after a dropped connection looks exactly like a quiet one,
-    // so the gesture has to work here — the state is otherwise unscrollable.
-    await tester.fling(
-      find.byType(SingleChildScrollView),
-      const Offset(0, 320),
-      1000,
-    );
-    await tester.pumpAndSettle();
-    expect(calls, 2);
-  });
-
-  testWidgets('not refreshable by default: no indicator, no pull', (
-    tester,
-  ) async {
-    var calls = 0;
-    await tester.pumpWidget(
-      _wrap(
-        AsyncView<int>(
-          future: () async => Ok(++calls),
-          builder: (_, value) => ListView(
-            children: [SizedBox(height: 600, child: Text('v $value'))],
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.byType(RefreshIndicator), findsNothing);
-
-    await tester.fling(find.byType(ListView), const Offset(0, 320), 1000);
-    await tester.pumpAndSettle();
-    expect(calls, 1);
   });
 }

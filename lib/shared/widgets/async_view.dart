@@ -25,7 +25,7 @@ class AsyncView<T> extends StatefulWidget {
     this.error,
     this.empty,
     this.isEmpty,
-    this.refreshable = false,
+    this.refreshSignal,
   });
 
   /// Produces the request. Re-invoked on retry.
@@ -52,14 +52,12 @@ class AsyncView<T> extends StatefulWidget {
   /// [builder] (e.g. an empty list).
   final bool Function(T value)? isEmpty;
 
-  /// Wraps every state in a pull-to-refresh that re-runs [future].
+  /// Re-runs [future] whenever this fires — the screen's "refresh now" signal
+  /// (see `RefreshOnAppear`: entering the tab, or returning from the background).
   ///
-  /// The empty and error states get it too: those are exactly the moments a user
-  /// pulls — an empty feed after a dropped connection is indistinguishable from
-  /// a genuinely quiet one, and reaching for the retry button is not the reflex.
-  /// They are made scrollable (they otherwise fit the viewport and could not
-  /// overscroll) so the gesture is available there at all.
-  final bool refreshable;
+  /// The previous value stays on screen while the new one loads, so a routine
+  /// refresh never flashes the screen back to a spinner.
+  final Listenable? refreshSignal;
 
   @override
   State<AsyncView<T>> createState() => _AsyncViewState<T>();
@@ -79,6 +77,22 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
   void initState() {
     super.initState();
     _future = widget.future();
+    widget.refreshSignal?.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(covariant AsyncView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshSignal != widget.refreshSignal) {
+      oldWidget.refreshSignal?.removeListener(_refresh);
+      widget.refreshSignal?.addListener(_refresh);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.refreshSignal?.removeListener(_refresh);
+    super.dispose();
   }
 
   void _retry() => setState(() {
@@ -86,55 +100,32 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
     _future = widget.future();
   });
 
-  /// Re-runs the request and completes when it settles, so the refresh spinner
-  /// stays up until there is actually something new to show.
-  Future<void> _refresh() async {
-    final future = widget.future();
+  /// Re-runs the request, keeping the current content on screen until the new
+  /// value lands.
+  void _refresh() {
+    if (!mounted) return;
     setState(() {
       _attempt++;
-      _future = future;
+      _future = widget.future();
     });
-    await future;
   }
 
-  /// Makes a non-scrolling state (empty / error) overscrollable so a pull can
-  /// still start there, without stretching its content.
   /// The success UI for [value] — the empty state when [AsyncView.isEmpty] says
   /// so, else the caller's builder.
   Widget _content(BuildContext context, T value) {
     _loaded = value;
     if (widget.isEmpty?.call(value) ?? false) {
-      return _wrap(
-        widget.empty?.call(context) ??
-            EmptyView(
-              icon: Icons.inbox_outlined,
-              message: AppLocalizations.of(context).commonEmpty,
-            ),
-      );
+      return widget.empty?.call(context) ??
+          EmptyView(
+            icon: Icons.inbox_outlined,
+            message: AppLocalizations.of(context).commonEmpty,
+          );
     }
     return widget.builder(context, value);
   }
 
-  Widget _wrap(Widget child) => widget.refreshable ? _pullable(child) : child;
-
-  Widget _pullable(Widget child) => LayoutBuilder(
-    builder: (context, constraints) => SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: constraints.maxHeight),
-        child: child,
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
-    final view = _buildState(context);
-    if (!widget.refreshable) return view;
-    return RefreshIndicator(onRefresh: _refresh, child: view);
-  }
-
-  Widget _buildState(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return FutureBuilder<Result<T>>(
       // Key by attempt so a retry re-subscribes to the fresh future rather than
@@ -150,16 +141,13 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
         // Repositories return Result and don't throw; a raw error here is
         // unexpected, but surface the failure state rather than a blank.
         if (snapshot.hasError || !snapshot.hasData) {
-          return _wrap(
-            ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
-          );
+          return ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry);
         }
         return switch (snapshot.data!) {
           Ok(:final value) => _content(context, value),
-          Err(:final failure) => _wrap(
+          Err(:final failure) =>
             widget.error?.call(context, failure, _retry) ??
                 ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
-          ),
         };
       },
     );

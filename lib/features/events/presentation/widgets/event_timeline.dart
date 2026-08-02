@@ -14,10 +14,13 @@ import 'package:provider/provider.dart';
 /// an error with retry rather than an empty thread — "nothing happened here" and
 /// "we could not reach the server" must never look the same in a disaster app.
 class EventTimeline extends StatelessWidget {
-  const EventTimeline({super.key, this.regionCode});
+  const EventTimeline({super.key, this.regionCode, this.refreshSignal});
 
   /// The township whose events to show; null for the nationwide feed.
   final String? regionCode;
+
+  /// Fires when the page reappears (tab entry / app resume) — re-fetches.
+  final Listenable? refreshSignal;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,7 @@ class EventTimeline extends StatelessWidget {
       key: ValueKey(regionCode),
       future: () => repository.events(regionCode: regionCode),
       isEmpty: (events) => events.isEmpty,
-      refreshable: true,
+      refreshSignal: refreshSignal,
       builder: (context, events) => ListView.builder(
         padding: EdgeInsets.fromLTRB(
           AppSpacing.lg,
