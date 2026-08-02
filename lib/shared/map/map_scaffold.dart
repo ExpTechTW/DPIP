@@ -70,6 +70,20 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// clears the shared cache when there's actually something to clear.
   bool _cacheDirty = false;
 
+  /// Whether a frame-show op is already queued and hasn't started running yet.
+  ///
+  /// The timeline reports *every* frame the scrubber crosses (so the map
+  /// animates during the drag), and each show does real platform work — add /
+  /// remove raster sources and layers, then load their tiles. Queueing one op
+  /// per reported frame let a fast scrub build a backlog of renders for frames
+  /// the user had already passed, so releasing the scrubber stalled until that
+  /// whole backlog drained. This flag coalesces the burst instead: while an op
+  /// is pending, further selections only move [_selectedIndex], and the pending
+  /// op renders whatever is current *when it runs*. At most one op is queued
+  /// behind the running one, so the map still animates through the scrub but a
+  /// release always lands within one render instead of dozens.
+  bool _showQueued = false;
+
   @override
   void initState() {
     super.initState();
@@ -228,12 +242,20 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (controller == null) return;
     final layer = _active;
     _cacheDirty = true; // showing a frame caches its tiles
-    // Read the target at execution time so a burst of scrub selections
-    // coalesces to the latest frame instead of flooding the map with calls.
+    // Already queued: that op will pick up this newer selection when it runs, so
+    // don't stack another one (see [_showQueued]).
+    if (_showQueued) return;
+    _showQueued = true;
     _queue(() {
+      // Cleared as the op *starts*, not when it finishes: a selection arriving
+      // while this render is in flight then queues exactly one follow-up, so the
+      // final scrub position is always rendered and never more than one op waits.
+      _showQueued = false;
       if (_frames.isEmpty || !identical(layer, _active)) {
         return Future<void>.value();
       }
+      // Read the target at execution time so the render is the newest frame, not
+      // the one that was current when this op was queued.
       return layer.show(controller, _frames[_selectedIndex]);
     });
   }
