@@ -66,25 +66,52 @@ float ign(vec2 p) {
   return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
 }
 
-// One sheared column of rain streaks (no drop loops, no textures).
+// One depth layer of falling drops.
 //
-// `len` shortens the dash: a streak is a falling drop caught by the eye, not a
-// wire from top to bottom, and long ones read as scratched glass.
-float rainLayer(vec2 uv, float t, float cols, float spd, float slant, float len,
-                float aa) {
-  uv.x += uv.y * slant;
-  uv.x *= cols;
-  float c = floor(uv.x);
-  float fx = fract(uv.x) - 0.5;
-  float s = hash12(vec2(c, 1.0));
-  float y = uv.y * (1.0 + s * 0.5) - t * spd * (0.6 + s) + s * 10.0;
-  float fy = fract(y);
-  float row = floor(y);
-  float streak = smoothstep(0.0, 0.06, fy) * smoothstep(len, len * 0.35, fy);
-  float w = 0.05 + s * 0.03;
-  float line = smoothstep(w + aa * cols, w - aa * cols, abs(fx));
-  float on = step(0.62, hash12(vec2(c * 7.1, row * 3.3)));
-  return line * streak * on;
+// Drops live on a JITTERED CELL LATTICE, not in `fract` stripes. Stripes give
+// every drop in a column the same x, so the eye reads the columns rather than
+// the rain — which is what made the old curtain look like tick marks. Each cell
+// hashes its own x offset, fall phase, speed, length and brightness, and the
+// lattice is pre-warped by noise so the grid itself never becomes visible.
+// (Technique: monster555/flutter_shady_weather_demo `drops.frag` — cell lattice,
+// per-cell continuous radius, pre-warp.)
+//
+// `soft` is the layer's edge width: far layers are blurrier, which is the
+// cheapest depth cue available without a second pass.
+float rainLayer(vec2 uv, float t, float density, float spd, float shear,
+                float soft, float seed) {
+  // Pre-warp: bends the lattice so its rows/columns stop lining up.
+  vec2 warp = vec2(vnoise(uv * 2.7 + seed), vnoise(uv * 2.7 + seed + 19.3));
+  uv += (warp - 0.5) * 0.10;
+  uv.x += uv.y * shear;
+
+  // Anisotropic cells: drops are spaced widely across and tightly down, so the
+  // streak has room to fall without the cell clipping it.
+  vec2 p = vec2(uv.x * density, uv.y * density * 0.5);
+  vec2 cell = floor(p);
+  vec2 f = fract(p);
+
+  // Fold the seed into the hash so layers never correlate.
+  float h = hash12(cell + seed);
+  float g = hash12(cell + seed + 47.11);
+  // Roughly a third of cells carry a drop — a continuous weight, not a step, so
+  // drops fade in and out instead of popping.
+  float alive = smoothstep(0.55, 0.95, g);
+
+  float cx = 0.18 + 0.64 * h;                        // jitter across
+  float fall = fract(h * 6.37 + t * spd * (0.75 + 0.5 * g));  // and along
+  float len = 0.22 + 0.42 * g;                       // per-drop streak length
+
+  float dx = f.x - cx;
+  float dy = f.y - fall;
+  // Wrap so a streak crossing the cell edge stays continuous.
+  dy -= floor(dy + 0.5);
+
+  float w = 0.030 + 0.022 * h;
+  float lateral = smoothstep(w + soft, w * 0.15, abs(dx));
+  // The tail trails BEHIND the head (upward), fading along its length.
+  float along = smoothstep(-len, -len * 0.12, dy) * smoothstep(0.045, -0.010, dy);
+  return lateral * along * alive * (0.45 + 0.55 * h);
 }
 
 void main() {
@@ -184,42 +211,59 @@ void main() {
   cloudCol += sunCol * pow(shade, 3.0) * 0.30 * sunVis * exp(-ang * 3.0);
   col = mix(col, cloudCol, cover);
 
-  // --- rain (3 parallax streak layers + wet grade) ---
+  // --- rain (3 parallax drop layers + wet grade) ---
   float rainAmt = clamp(iRain, 0.0, 1.0);
-  float aa = 1.5 / iResolution.y;
   vec2 ruv = vec2(uv.x * aspect, uv.y + scrollN * 0.4);
-  // Near layers are fewer, faster and longer; far ones denser and fainter, so
-  // the curtain has depth instead of one flat screen of wires.
-  float rain = rainLayer(ruv, t, 46.0, 1.1, 0.05 + 0.10 * iWind, 0.16, aa) * 0.30 +
-               rainLayer(ruv, t, 30.0, 1.7, 0.07 + 0.14 * iWind, 0.24, aa) * 0.50 +
-               rainLayer(ruv, t, 18.0, 2.5, 0.09 + 0.18 * iWind, 0.34, aa) * 0.75;
-  rain *= rainAmt * smoothstep(0.0, 0.35, uv.y);
-  col += mix(vec3(0.62, 0.70, 0.82), vec3(0.42, 0.52, 0.68), wNight) * rain * 0.38;
+  // Near layers: sparser, faster, sharper. Far layers: denser, slower, blurrier
+  // — per-layer edge width is the depth cue (snow.frag, same repo).
+  float rain =
+      rainLayer(ruv, t, 26.0, 0.85, 0.05 + 0.10 * iWind, 0.055, 3.0) * 0.40 +
+      rainLayer(ruv, t, 17.0, 1.25, 0.07 + 0.14 * iWind, 0.028, 61.0) * 0.70 +
+      rainLayer(ruv, t, 11.0, 1.75, 0.09 + 0.18 * iWind, 0.012, 131.0) * 1.00;
+  rain *= rainAmt * smoothstep(0.0, 0.22, uv.y);
+  // Rain is lit by whatever light there is, so a lightning flash lights it too.
+  vec3 rainCol = mix(vec3(0.72, 0.79, 0.90), vec3(0.46, 0.56, 0.72), wNight);
+  col += rainCol * rain * (0.30 + 0.9 * clamp(iLightning, 0.0, 1.0));
   float luma = dot(col, vec3(0.299, 0.587, 0.114));
-  col = mix(col, vec3(luma) * vec3(0.86, 0.90, 0.98), 0.34 * rainAmt);
-  col *= 1.0 - 0.20 * rainAmt;
+  col = mix(col, vec3(luma) * vec3(0.86, 0.90, 0.98), 0.30 * rainAmt);
+  col *= 1.0 - 0.18 * rainAmt;
 
-  // --- fog: an aerial-perspective haze that eats the horizon upward ---
+  // --- fog: extinction toward airlight, not a tint ---------------------
   //
-  // Not a second cloud field. Fog is what distance does to contrast: it lifts
-  // the darks, drains saturation, and swallows the horizon first.
+  // The previous version lerped the sky toward grey, which is what "washed out"
+  // looks like — never fog. Fog OCCLUDES: light from the scene is extinguished
+  // over distance and REPLACED by airlight, so at high density nothing of the
+  // scene survives. That is the Beer-Lambert / airlight model
+  // (https://iquilezles.org/articles/fog/), and it is why this now reads as fog
+  // at the top of frame too, where a height-only band left clear blue.
   float fogAmt = clamp(iFog, 0.0, 1.0);
-  // Dense fog reaches higher: at full density it swallows nearly the whole
-  // frame, which is what distinguishes fog from a low cloud deck.
-  float band = smoothstep(0.30 - 0.42 * fogAmt, 1.00 - 0.55 * fogAmt, uv.y);
-  float breath = fbm(vec2(uv.x * aspect * 1.6 + t * 0.02, uv.y * 2.2)) * 0.35 + 0.75;
-  // Dense fog needs a floor as well as a gradient: standing *in* fog there is
-  // haze overhead too, so the band alone left clear sky in the top corners.
-  float fog = clamp(mix(band, 1.0, 0.45 * fogAmt) * breath, 0.0, 1.0) * fogAmt;
-  vec3 fogCol = mix(vec3(0.78, 0.80, 0.83), vec3(0.09, 0.11, 0.14), wNight);
-  fogCol = mix(fogCol, mix(fogCol, sunCol, 0.35), sunVis * (wDawn + wSun));
-  col = mix(col, vec3(dot(col, vec3(0.2126, 0.7152, 0.0722))), 0.55 * fog);
-  col = mix(col, fogCol, 0.80 * fog);
+  // No depth buffer here, so screen height stands in for distance: the sky meets
+  // the ground far away at the bottom of the frame.
+  float dist = mix(0.45, 1.0, smoothstep(0.0, 0.95, uv.y));
+  // Drifting banks: two domain-warped sheets counter-scrolling at ~5x speed, so
+  // the fog churns rather than sliding as one texture
+  // (https://iquilezles.org/articles/warp/, /articles/dynclouds/).
+  vec2 g1 = vec2(uv.x * aspect * 1.25 + t * 0.010, uv.y * 1.9 - t * 0.005);
+  vec2 g2 = vec2(uv.x * aspect * 2.60 - t * 0.048, uv.y * 3.3 + t * 0.022);
+  vec2 gw = vec2(fbm(g1), fbm(g1 + vec2(3.1, 7.7)));
+  float bank = fbm(g1 + 1.7 * gw) * 0.65 + fbm(g2) * 0.35;
+  float density = fogAmt * (2.0 + 4.4 * fogAmt) * dist * (0.30 + 1.6 * bank);
+  float trans = exp(-density);
+  // Airlight: what the fog replaces the scene with. It must match the light in
+  // the scene, so it carries the sun's colour near the sun
+  // (in-scattering, iq) and goes near-black at night.
+  vec3 air = mix(vec3(0.82, 0.85, 0.88), vec3(0.09, 0.11, 0.15), wNight);
+  air = mix(air, sunCol, 0.35 * sunVis * pow(max(1.0 - ang, 0.0), 3.0));
+  col = mix(air, col, trans);
 
   // --- lightning (uniform flash + branchless bolt) ---
   float flash = clamp(iLightning, 0.0, 1.0);
-  col += vec3(0.85, 0.90, 1.0) * flash * (0.35 + 0.45 * cover);
-  col = mix(col, vec3(0.92, 0.95, 1.0), flash * 0.35);
+  // A flash lights the cloud base and lifts the shadows; it does not wash the
+  // frame to white. At full strength the previous gain blew every channel past
+  // 1.0 across the whole sky, so the storm briefly had no cloud, no rain and no
+  // depth — the one moment it should look most dramatic.
+  col += vec3(0.72, 0.80, 0.98) * flash * (0.10 + 0.30 * cover);
+  col = mix(col, vec3(0.82, 0.87, 0.98), flash * 0.14);
   vec2 buv = uv - vec2(0.5, 0.0);
   buv.x *= aspect;
   float seed = floor(t * 3.0);
