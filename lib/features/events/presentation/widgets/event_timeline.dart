@@ -1,36 +1,46 @@
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_repository.dart';
+import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 /// A vertical timeline of disaster events, connected by a line so the feed reads
 /// as one continuous thread (icon dot per event + line between them).
 ///
-/// Placeholder events for now; swap [_placeholderEvents] for the history API's
-/// list — each row is driven purely by an [Event], so nothing else changes.
-///
-/// l10n-ignore-file: [_placeholderEvents] below is throwaway mock data (fixed
-/// titles + fully dynamic CJK sentences that could never be ARB keys). It is
-/// deleted the moment the events history API is wired, so localizing it is
-/// wasted effort. Real event labels will be localized at that point.
+/// Fed by [EventRepository] for one area: [regionCode] is the township being
+/// viewed, or null for 全國. Rendered through [AsyncView] so a failed fetch shows
+/// an error with retry rather than an empty thread — "nothing happened here" and
+/// "we could not reach the server" must never look the same in a disaster app.
 class EventTimeline extends StatelessWidget {
-  const EventTimeline({super.key});
+  const EventTimeline({super.key, this.regionCode});
+
+  /// The township whose events to show; null for the nationwide feed.
+  final String? regionCode;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.lg,
-        // Clear the bottom nav (the shell body extends behind it).
-        AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
-      ),
-      itemCount: _placeholderEvents.length,
-      itemBuilder: (context, index) => _EventTile(
-        event: _placeholderEvents[index],
-        isFirst: index == 0,
-        isLast: index == _placeholderEvents.length - 1,
+    final repository = context.read<EventRepository>();
+    return AsyncView<List<Event>>(
+      // Keyed by area so switching pages refetches for the new township.
+      key: ValueKey(regionCode),
+      future: () => repository.events(regionCode: regionCode),
+      isEmpty: (events) => events.isEmpty,
+      builder: (context, events) => ListView.builder(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          // Clear the bottom nav (the shell body extends behind it).
+          AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
+        ),
+        itemCount: events.length,
+        itemBuilder: (context, index) => _EventTile(
+          event: events[index],
+          isFirst: index == 0,
+          isLast: index == events.length - 1,
+        ),
       ),
     );
   }
@@ -156,49 +166,3 @@ IconData _iconFor(EventType type) => switch (type) {
   EventType.tsunami => Icons.tsunami_outlined,
   EventType.other => Icons.notifications_outlined,
 };
-
-/// Placeholder feed until the history API is wired.
-final List<Event> _placeholderEvents = [
-  Event(
-    id: '1',
-    type: EventType.earthquake,
-    time: DateTime(2026, 7, 13, 5, 28),
-    title: '地震報告',
-    description: '臺南市 楠西區 發生規模 5.2 地震,最大震度 4 級。',
-  ),
-  Event(
-    id: '2',
-    type: EventType.weatherWarning,
-    time: DateTime(2026, 7, 13, 4, 10),
-    title: '大豪雨特報',
-    description: '臺南市 歸仁區 發布大豪雨特報,慎防坍方與積淹水。',
-  ),
-  Event(
-    id: '3',
-    type: EventType.thunderstorm,
-    time: DateTime(2026, 7, 13, 3, 45),
-    title: '雷雨即時訊息',
-    description: '山區有局部大雷雨,請留意雷擊與強陣風。',
-  ),
-  Event(
-    id: '4',
-    type: EventType.intensity,
-    time: DateTime(2026, 7, 13, 2, 12),
-    title: '震度速報',
-    description: '花蓮縣 實測最大震度 3 級。',
-  ),
-  Event(
-    id: '5',
-    type: EventType.report,
-    time: DateTime(2026, 7, 12, 23, 50),
-    title: '地震報告',
-    description: '宜蘭縣 近海 發生規模 4.1 地震。',
-  ),
-  Event(
-    id: '6',
-    type: EventType.tsunami,
-    time: DateTime(2026, 7, 12, 21, 5),
-    title: '海嘯消息',
-    description: '太平洋發生地震,經研判對臺灣無影響。',
-  ),
-];

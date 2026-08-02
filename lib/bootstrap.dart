@@ -30,6 +30,7 @@ import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
+import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
@@ -183,6 +184,7 @@ Future<void> bootstrap() async {
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
         ...typhoonProviders(deps),
+        ...eventsProviders(deps),
         ...notificationProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
