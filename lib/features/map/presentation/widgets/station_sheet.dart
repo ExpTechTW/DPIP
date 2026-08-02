@@ -42,6 +42,11 @@ abstract interface class StationSheetSource {
   /// The current reading text for [id] (e.g. "27.8°C"), or null if unknown.
   String? reading(String id);
 
+  /// The colour this station's value has on the map, or null when it has no
+  /// reading. Shown as a small mark beside the name so the sheet is visibly the
+  /// dot the user just tapped — identity carried by a mark, not by tinting text.
+  Color? valueColor(String id);
+
   /// The layer's short title (e.g. "溫度"), for the sheet header.
   String title(BuildContext context);
 
@@ -268,7 +273,16 @@ class _SheetBodyState extends State<_SheetBody> {
             AppSpacing.sm,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // The station's own colour from the map ramp: identity travels as a
+              // mark, so the reading itself can stay in plain ink.
+              if (widget.source.valueColor(id) case final dot?) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 5, right: AppSpacing.sm),
+                  child: _StationDot(color: dot),
+                ),
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +290,7 @@ class _SheetBodyState extends State<_SheetBody> {
                     Text(
                       widget.source.stationName(id),
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     if (widget.source.stationSubtitle(id) case final sub?)
@@ -289,39 +303,53 @@ class _SheetBodyState extends State<_SheetBody> {
                   ],
                 ),
               ),
-              if (reading != null)
-                Text(
-                  reading,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               IconButton(
                 icon: const Icon(Icons.close),
                 tooltip: l10n.commonClose,
+                visualDensity: VisualDensity.compact,
                 onPressed: widget.source.close,
               ),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: SegmentedButton<String>(
-            segments: [
-              ButtonSegment(value: '24h', label: Text(l10n.trendRange24h)),
-              ButtonSegment(value: '7d', label: Text(l10n.trendRange7d)),
-            ],
-            selected: {_range},
-            onSelectionChanged: (s) => _setRange(s.first),
-            showSelectedIcon: false,
+        // The reading is the one number this sheet exists for, so it leads —
+        // large, in ink, with proportional figures (tabular digits make a lone
+        // display-size number look gappy).
+        if (reading != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xs,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
+            child: Text(
+              reading,
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: colors.onSurface,
+                fontWeight: FontWeight.w600,
+                height: 1,
+              ),
+            ),
           ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.md,
+          ),
+          child: _RangeToggle(range: _range, onChanged: _setRange),
         ),
-        const SizedBox(height: AppSpacing.lg),
         SizedBox(
-          height: 220,
+          height: 200,
           child: Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.lg,
+              0,
+            ),
             child: FutureBuilder<Result<TrendSeries>>(
               key: ValueKey(_attempt),
               future: _future,
@@ -340,7 +368,114 @@ class _SheetBodyState extends State<_SheetBody> {
             ),
           ),
         ),
+        const SizedBox(height: AppSpacing.lg),
       ],
+    );
+  }
+}
+
+/// The station's map colour, ringed in the surface so it stays legible on any
+/// backdrop — the same 2px surface ring the chart's end marker uses.
+class _StationDot extends StatelessWidget {
+  const _StationDot({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.surface,
+          width: 2,
+        ),
+      ),
+    );
+  }
+}
+
+/// A compact two-option range switch.
+///
+/// Sized to its labels rather than the full width: it is a minor control on a
+/// sheet whose subject is the reading and its curve, and a full-bleed pill gave
+/// it more visual weight than either.
+class _RangeToggle extends StatelessWidget {
+  const _RangeToggle({required this.range, required this.onChanged});
+
+  final String range;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest,
+          borderRadius: AppRadius.large,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _RangeChip(
+              label: l10n.trendRange24h,
+              selected: range == '24h',
+              onTap: () => onChanged('24h'),
+            ),
+            _RangeChip(
+              label: l10n.trendRange7d,
+              selected: range == '7d',
+              onTap: () => onChanged('7d'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RangeChip extends StatelessWidget {
+  const _RangeChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: selected ? colors.surface : Colors.transparent,
+      borderRadius: AppRadius.large,
+      child: InkWell(
+        borderRadius: AppRadius.large,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: selected ? colors.onSurface : colors.onSurfaceVariant,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -388,11 +523,20 @@ class _TrendChart extends StatelessWidget {
       if (s.y < minY) minY = s.y;
       if (s.y > maxY) maxY = s.y;
     }
-    final pad = ((maxY - minY).abs() * 0.15).clamp(1.0, double.infinity);
-    minY -= pad;
-    maxY += pad;
-    // ~4 labels along the time axis.
-    final xInterval = ((maxX - minX) / 4).clamp(1.0, double.infinity);
+    // Round the value axis onto a "nice" step and snap the bounds to it, so the
+    // ticks land on 30 / 32 / 34 rather than wherever the data happened to stop.
+    // Without this the axis read 35, 34, 32 — unequal gaps, which makes the eye
+    // misjudge every slope on the curve.
+    final yInterval = niceAxisStep((maxY - minY).abs(), 4);
+    final headroom = yInterval / 2;
+    minY = ((minY - headroom) / yInterval).floorToDouble() * yInterval;
+    maxY = ((maxY + headroom) / yInterval).ceilToDouble() * yInterval;
+    // ~3 labels along the time axis, and a margin at each end: fl_chart centres
+    // a label on its tick, so one landing near a bound gets cropped by the plot
+    // edge. Dropping those is better than shipping a half-drawn timestamp.
+    final xSpan = (maxX - minX).abs();
+    final xInterval = (xSpan / 3).clamp(1.0, double.infinity);
+    final xMargin = xSpan * 0.08;
 
     String timeLabel(double x) {
       final t = DateTime.fromMillisecondsSinceEpoch(
@@ -415,17 +559,39 @@ class _TrendChart extends StatelessWidget {
             preventCurveOverShooting: true,
             color: colors.primary,
             barWidth: 2,
-            dotData: const FlDotData(show: false),
+            isStrokeCapRound: true,
+            isStrokeJoinRound: true,
+            // Only the latest point is marked. A dot on every reading is noise;
+            // one on the end says "you are here" and anchors the hero value
+            // above to the right end of the curve.
+            dotData: FlDotData(
+              checkToShowDot: (spot, bar) => spot == bar.spots.last,
+              getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+                radius: 4,
+                color: colors.primary,
+                // A surface ring, not a border: it keeps the marker legible
+                // where it sits on the line and the axis.
+                strokeColor: colors.surface,
+                strokeWidth: 2,
+              ),
+            ),
             belowBarData: BarAreaData(
               show: true,
-              color: colors.primary.withValues(alpha: 0.12),
+              // A wash, never a saturated block — the line carries the reading.
+              color: colors.primary.withValues(alpha: 0.10),
             ),
           ),
         ],
         gridData: FlGridData(
           drawVerticalLine: false,
-          getDrawingHorizontalLine: (_) =>
-              FlLine(color: colors.outlineVariant, strokeWidth: 0.5),
+          horizontalInterval: yInterval,
+          // Solid hairlines one step off the surface: a grid is scaffolding, so
+          // it should be findable and never compete with the curve. (Dashes
+          // would read as a threshold rather than a grid.)
+          getDrawingHorizontalLine: (_) => FlLine(
+            color: colors.outlineVariant.withValues(alpha: 0.5),
+            strokeWidth: 1,
+          ),
         ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
@@ -438,13 +604,28 @@ class _TrendChart extends StatelessWidget {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 40,
-              getTitlesWidget: (value, meta) => Text(
-                value.toStringAsFixed(0),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
+              // Matches the grid so every line is labelled and vice versa.
+              interval: yInterval,
+              reservedSize: 34,
+              getTitlesWidget: (value, meta) {
+                // fl_chart also emits the axis ends; drawing those would clip
+                // against the plot edge.
+                if (value <= minY || value >= maxY) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.xs),
+                  child: Text(
+                    _axisLabel(value, yInterval),
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      // Ticks are a column of numbers, so they align.
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           bottomTitles: AxisTitles(
@@ -453,7 +634,7 @@ class _TrendChart extends StatelessWidget {
               reservedSize: 22,
               interval: xInterval,
               getTitlesWidget: (value, meta) {
-                if (value <= minX || value >= maxX) {
+                if (value <= minX + xMargin || value >= maxX - xMargin) {
                   return const SizedBox.shrink();
                 }
                 return Padding(
@@ -462,6 +643,7 @@ class _TrendChart extends StatelessWidget {
                     timeLabel(value),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colors.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 );
@@ -489,3 +671,31 @@ class _TrendChart extends StatelessWidget {
     );
   }
 }
+
+/// A "nice" axis step (1, 2, 5 × a power of ten) that splits [span] into roughly
+/// [targetTicks] intervals. Public so the tick maths is unit-testable.
+///
+/// Axis ticks have to sit on numbers a reader can subtract in their head: with an
+/// arbitrary step the gaps between labels are unequal, and the eye reads slope
+/// from spacing, so an uneven axis quietly misrepresents the curve.
+double niceAxisStep(double span, int targetTicks) {
+  if (!span.isFinite || span <= 0) return 1;
+  final rough = span / targetTicks;
+  final magnitude = math
+      .pow(10, (math.log(rough) / math.ln10).floor())
+      .toDouble();
+  final normalised = rough / magnitude;
+  final step = normalised <= 1
+      ? 1.0
+      : normalised <= 2
+      ? 2.0
+      : normalised <= 5
+      ? 5.0
+      : 10.0;
+  return step * magnitude;
+}
+
+/// An axis value printed with just enough decimals for its [step], so a 0.5 step
+/// doesn't collapse to two identical labels.
+String _axisLabel(double value, double step) =>
+    value.toStringAsFixed(step >= 1 ? 0 : 1);
