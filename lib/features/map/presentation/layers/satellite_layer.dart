@@ -81,6 +81,7 @@ class SatelliteMapLayer implements MapLayer {
   Map<String, int> _indexById = const {};
   final Set<String> _onMap = <String>{};
   String? _shownFrameId;
+  bool _blackOutlineOnMap = false;
 
   @override
   Future<Result<List<MapFrame>>> frames() async {
@@ -129,6 +130,8 @@ class SatelliteMapLayer implements MapLayer {
             tileSize: 256,
           ),
         );
+        // Below the themed county outline; the black IR outline sits on top
+        // of both (see [_ensureBlackOutline]).
         await controller.addRasterLayer(
           _sourceId(id),
           _layerId(id),
@@ -138,7 +141,54 @@ class SatelliteMapLayer implements MapLayer {
         _onMap.add(id);
       }
     }
+    await _ensureBlackOutline(controller);
     _shownFrameId = frame.id;
+  }
+
+  /// Black land borders above the IR stack — `global` for every country, then
+  /// `city` for Taiwan counties. Greyscale tiles wash out the themed outline.
+  Future<void> _ensureBlackOutline(MapLibreMapController controller) async {
+    if (_blackOutlineOnMap) return;
+    try {
+      await controller.addLineLayer(
+        'exptech',
+        satelliteGlobalOutlineLayerId,
+        const LineLayerProperties(
+          lineColor: satelliteOutlineColor,
+          lineWidth: 1.0,
+        ),
+        sourceLayer: 'global',
+        enableInteraction: false,
+      );
+      await controller.addLineLayer(
+        'exptech',
+        satelliteCountyOutlineLayerId,
+        const LineLayerProperties(
+          lineColor: satelliteOutlineColor,
+          lineWidth: 1.0,
+        ),
+        sourceLayer: 'city',
+        enableInteraction: false,
+      );
+      _blackOutlineOnMap = true;
+    } catch (_) {
+      // Style mid-reload — next show() retries. Drop a partial add.
+      await _removeBlackOutline(controller);
+    }
+  }
+
+  Future<void> _removeBlackOutline(MapLibreMapController controller) async {
+    for (final id in [
+      satelliteCountyOutlineLayerId,
+      satelliteGlobalOutlineLayerId,
+    ]) {
+      try {
+        await controller.removeLayer(id);
+      } catch (_) {
+        // Already gone with the style.
+      }
+    }
+    _blackOutlineOnMap = false;
   }
 
   @override
@@ -146,6 +196,7 @@ class SatelliteMapLayer implements MapLayer {
     for (final id in _onMap) {
       await _removeFrame(controller, id);
     }
+    await _removeBlackOutline(controller);
     _reset();
   }
 
@@ -170,6 +221,7 @@ class SatelliteMapLayer implements MapLayer {
     _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
+    _blackOutlineOnMap = false;
   }
 }
 

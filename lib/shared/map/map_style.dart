@@ -1,23 +1,56 @@
 /// MapLibre style definitions for the app's base map.
 ///
-/// The base is the ExpTech vector map (fixed palette, no API key), shared by
-/// the live map tab and the home backdrop so both look identical.
+/// The base is the ExpTech vector map (palette by brightness, no API key),
+/// shared by the live map tab and the home backdrop so both look identical.
 library;
 
-/// Fixed base-map palette — independent of [ColorScheme] so light/dark UI
-/// doesn't recolour the cartography (overlays stay readable on a stable ground).
-abstract final class MapColors {
+import 'dart:ui' show Brightness;
+
+/// One brightness's cartographic hex colours — MapLibre paint strings only.
+///
+/// Do not invent map hexes at call sites; resolve via [MapColors.of].
+final class MapPalette {
+  const MapPalette({
+    required this.background,
+    required this.fill,
+    required this.outline,
+    required this.townOutline,
+  });
+
   /// Sea / canvas behind the land fills.
-  static const background = '#1f2025';
+  final String background;
 
   /// Land, county, and town fills.
-  static const fill = '#3F4045';
+  final String fill;
 
   /// County (city) borders.
-  static const outline = '#a9b4bc';
+  final String outline;
 
-  /// Township borders — a step lighter than [fill], still quieter than [outline].
-  static const townOutline = '#6A6B72';
+  /// Township borders — quieter than [outline], close to [fill].
+  final String townOutline;
+}
+
+/// Sole registry of base-map paint colours (light + dark).
+abstract final class MapColors {
+  /// Dark-mode cartography (default disaster-map look).
+  static const dark = MapPalette(
+    background: '#1f2025',
+    fill: '#3F4045',
+    outline: '#a9b4bc',
+    townOutline: '#6A6B72',
+  );
+
+  /// Light-mode cartography — pale sea, mid-grey land.
+  static const light = MapPalette(
+    background: '#E0E0E0',
+    fill: '#ADADAD',
+    outline: '#6B6B6B',
+    townOutline: '#9A9A9A',
+  );
+
+  /// Palette for the given UI [brightness].
+  static MapPalette of(Brightness brightness) =>
+      brightness == Brightness.dark ? dark : light;
 }
 
 /// Id of the county-outline layer — overlays (radar) anchor below it so the
@@ -29,17 +62,15 @@ const String townOutlineLayerId = 'town-outline';
 
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
 ///
-/// Defaults to [MapColors]. Optional overrides keep call sites / tests flexible.
-/// The base draws no labels itself, but declares a `glyphs` endpoint (the
-/// ExpTech map-assets CDN) so overlay layers can render `text-field` symbols.
-/// Overlays (radar) anchor below [outlineLayerId] so the county borders stay
-/// legible. Used by every map surface so they look identical.
-String exptechVectorStyle({
-  String background = MapColors.background,
-  String fill = MapColors.fill,
-  String outline = MapColors.outline,
-  String townOutline = MapColors.townOutline,
-}) {
+/// Pass [MapColors.of] for the active brightness — never ad-hoc hexes. The base
+/// draws no labels itself, but declares a `glyphs` endpoint (the ExpTech
+/// map-assets CDN) so overlay layers can render `text-field` symbols. Overlays
+/// (radar) anchor below [outlineLayerId] so the county borders stay legible.
+String exptechVectorStyle(MapPalette palette) {
+  final background = palette.background;
+  final fill = palette.fill;
+  final outline = palette.outline;
+  final townOutline = palette.townOutline;
   return '''
 {
   "version": 8,
@@ -60,3 +91,13 @@ String exptechVectorStyle({
 
 /// Purple used to highlight the selected township (fill + border).
 const String selectedColor = '#7C4DFF';
+
+/// Borders drawn on top of IR satellite imagery — black so they stay readable
+/// on greyscale Himawari tiles (themed [MapPalette.outline] does not).
+const String satelliteOutlineColor = '#000000';
+
+/// Runtime line layer: world land / country edges (`global` source-layer).
+const String satelliteGlobalOutlineLayerId = 'satellite-global-outline';
+
+/// Runtime line layer: Taiwan county edges (`city` source-layer).
+const String satelliteCountyOutlineLayerId = 'satellite-county-outline';
