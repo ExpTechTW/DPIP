@@ -67,6 +67,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterDatePick => 'Pilih tanggal';
 
   @override
+  String get reportFilterDateStartNote => 'Hari mulai: dari 00:00（Taipei）';
+
+  @override
+  String get reportFilterDateEndNote => 'Hari akhir: hingga 24:00（Taipei）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }

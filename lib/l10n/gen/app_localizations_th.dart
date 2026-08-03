@@ -67,6 +67,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterDatePick => 'เลือกวันที่';
 
   @override
+  String get reportFilterDateStartNote => 'วันเริ่ม: 00:00 ของวันนั้น（ไทเป）';
+
+  @override
+  String get reportFilterDateEndNote => 'วันสิ้นสุด: 24:00 ของวันนั้น（ไทเป）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }

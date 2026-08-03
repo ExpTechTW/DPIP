@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "날짜",
   "reportFilterDatePick": "날짜 선택",
+  "reportFilterDateStartNote": "시작일: 당일 00:00（타이베이）",
+  "reportFilterDateEndNote": "종료일: 당일 24:00（타이베이）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "위치",
   "reportFilterLocationHint": "예: 화롄, 해역",

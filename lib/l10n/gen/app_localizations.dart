@@ -224,6 +224,18 @@ abstract class AppLocalizations {
   /// **'Pick dates'**
   String get reportFilterDatePick;
 
+  /// Explains that startTime covers from midnight on that calendar day
+  ///
+  /// In en, this message translates to:
+  /// **'Start day: from 00:00 (Taipei)'**
+  String get reportFilterDateStartNote;
+
+  /// Explains that endTime covers through the end of that calendar day
+  ///
+  /// In en, this message translates to:
+  /// **'End day: through 24:00 (Taipei)'**
+  String get reportFilterDateEndNote;
+
   /// Displays a selected filter range (intensity, magnitude, depth, or dates)
   ///
   /// In en, this message translates to:

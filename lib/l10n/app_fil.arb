@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "Petsa",
   "reportFilterDatePick": "Pumili ng petsa",
+  "reportFilterDateStartNote": "Start day: from 00:00（Taipei）",
+  "reportFilterDateEndNote": "End day: through 24:00（Taipei）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "Lokasyon",
   "reportFilterLocationHint": "hal. Hualien, offshore",

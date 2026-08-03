@@ -67,6 +67,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportFilterDatePick => 'Chọn ngày';
 
   @override
+  String get reportFilterDateStartNote => 'Ngày bắt đầu: từ 00:00（Đài Bắc）';
+
+  @override
+  String get reportFilterDateEndNote => 'Ngày kết thúc: đến 24:00（Đài Bắc）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }

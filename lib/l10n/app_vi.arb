@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "Ngày",
   "reportFilterDatePick": "Chọn ngày",
+  "reportFilterDateStartNote": "Ngày bắt đầu: từ 00:00（Đài Bắc）",
+  "reportFilterDateEndNote": "Ngày kết thúc: đến 24:00（Đài Bắc）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "Địa điểm",
   "reportFilterLocationHint": "vd: Hoa Liên, ngoài khơi",

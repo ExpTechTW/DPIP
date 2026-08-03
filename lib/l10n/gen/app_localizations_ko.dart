@@ -67,6 +67,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterDatePick => '날짜 선택';
 
   @override
+  String get reportFilterDateStartNote => '시작일: 당일 00:00（타이베이）';
+
+  @override
+  String get reportFilterDateEndNote => '종료일: 당일 24:00（타이베이）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }

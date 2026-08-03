@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "日付",
   "reportFilterDatePick": "日付を選択",
+  "reportFilterDateStartNote": "開始日：当日 00:00（台北時間）",
+  "reportFilterDateEndNote": "終了日：当日 24:00（台北時間）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "場所",
   "reportFilterLocationHint": "例：花蓮、海域",

@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "วันที่",
   "reportFilterDatePick": "เลือกวันที่",
+  "reportFilterDateStartNote": "วันเริ่ม: 00:00 ของวันนั้น（ไทเป）",
+  "reportFilterDateEndNote": "วันสิ้นสุด: 24:00 ของวันนั้น（ไทเป）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "สถานที่",
   "reportFilterLocationHint": "เช่น ฮวาเหลียน",

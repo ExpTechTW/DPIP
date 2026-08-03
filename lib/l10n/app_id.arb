@@ -18,6 +18,8 @@
   "reportFilterDepthKm": "{depth} km",
   "reportFilterDate": "Tanggal",
   "reportFilterDatePick": "Pilih tanggal",
+  "reportFilterDateStartNote": "Hari mulai: dari 00:00（Taipei）",
+  "reportFilterDateEndNote": "Hari akhir: hingga 24:00（Taipei）",
   "reportFilterRange": "{start} – {end}",
   "reportFilterLocation": "Lokasi",
   "reportFilterLocationHint": "mis. Hualien, lepas pantai",

@@ -67,6 +67,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportFilterDatePick => '選擇日期';
 
   @override
+  String get reportFilterDateStartNote => '開始日：當日 00:00（臺北時間）';
+
+  @override
+  String get reportFilterDateEndNote => '結束日：當日 24:00（臺北時間）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }
@@ -837,6 +843,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportFilterDatePick => '选择日期';
 
   @override
+  String get reportFilterDateStartNote => '开始日：当日 00:00（台北时间）';
+
+  @override
+  String get reportFilterDateEndNote => '结束日：当日 24:00（台北时间）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }
@@ -1605,6 +1617,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get reportFilterDatePick => '選擇日期';
+
+  @override
+  String get reportFilterDateStartNote => '開始日：當日 00:00（台北時間）';
+
+  @override
+  String get reportFilterDateEndNote => '結束日：當日 24:00（台北時間）';
 
   @override
   String reportFilterRange(String start, String end) {

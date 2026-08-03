@@ -79,6 +79,14 @@
   "@reportFilterDatePick": {
     "description": "Button to open the date-range picker when none selected"
   },
+  "reportFilterDateStartNote": "Start day: from 00:00 (Taipei)",
+  "@reportFilterDateStartNote": {
+    "description": "Explains that startTime covers from midnight on that calendar day"
+  },
+  "reportFilterDateEndNote": "End day: through 24:00 (Taipei)",
+  "@reportFilterDateEndNote": {
+    "description": "Explains that endTime covers through the end of that calendar day"
+  },
   "reportFilterRange": "{start} – {end}",
   "@reportFilterRange": {
     "description": "Displays a selected filter range (intensity, magnitude, depth, or dates)",

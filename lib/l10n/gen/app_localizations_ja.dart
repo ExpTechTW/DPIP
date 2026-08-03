@@ -67,6 +67,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterDatePick => '日付を選択';
 
   @override
+  String get reportFilterDateStartNote => '開始日：当日 00:00（台北時間）';
+
+  @override
+  String get reportFilterDateEndNote => '終了日：当日 24:00（台北時間）';
+
+  @override
   String reportFilterRange(String start, String end) {
     return '$start – $end';
   }

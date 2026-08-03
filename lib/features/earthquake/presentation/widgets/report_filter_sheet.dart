@@ -22,7 +22,16 @@ Future<ReportListQuery?> showReportFilterSheet(
     isScrollControlled: true,
     showDragHandle: true,
     useSafeArea: true,
-    builder: (context) => _ReportFilterSheet(initial: initial),
+    builder: (context) => DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.72,
+      minChildSize: 0.45,
+      maxChildSize: 1,
+      builder: (context, scrollController) => _ReportFilterSheet(
+        initial: initial,
+        scrollController: scrollController,
+      ),
+    ),
   );
 }
 
@@ -30,13 +39,17 @@ const double _magMin = 0;
 const double _magMax = 8;
 const double _depthFloor = 0;
 const double _depthCeil = 150; // top of slider = no max-depth filter
-const double _intensityMin = 0;
+const double _intensityMin = 1;
 const double _intensityMax = 9;
 
 class _ReportFilterSheet extends StatefulWidget {
-  const _ReportFilterSheet({required this.initial});
+  const _ReportFilterSheet({
+    required this.initial,
+    required this.scrollController,
+  });
 
   final ReportListQuery initial;
+  final ScrollController scrollController;
 
   @override
   State<_ReportFilterSheet> createState() => _ReportFilterSheetState();
@@ -44,8 +57,12 @@ class _ReportFilterSheet extends StatefulWidget {
 
 class _ReportFilterSheetState extends State<_ReportFilterSheet> {
   late RangeValues _intensity = RangeValues(
-    (widget.initial.minIntensity ?? _intensityMin.toInt()).toDouble(),
-    (widget.initial.maxIntensity ?? _intensityMax.toInt()).toDouble(),
+    (widget.initial.minIntensity ?? _intensityMin.toInt())
+        .clamp(_intensityMin.toInt(), _intensityMax.toInt())
+        .toDouble(),
+    (widget.initial.maxIntensity ?? _intensityMax.toInt())
+        .clamp(_intensityMin.toInt(), _intensityMax.toInt())
+        .toDouble(),
   );
   late RangeValues _magnitude = RangeValues(
     widget.initial.minMagnitude ?? _magMin,
@@ -136,171 +153,187 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: viewInsets),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(
-            child: SingleChildScrollView(
+          Expanded(
+            child: ListView(
+              controller: widget.scrollController,
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.lg,
                 0,
                 AppSpacing.lg,
                 AppSpacing.md,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.tune, color: colors.primary),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          l10n.reportFilterTitle,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.tune, color: colors.primary),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.reportFilterTitle,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      TextButton(
-                        onPressed: _reset,
-                        child: Text(l10n.reportFilterReset),
+                    ),
+                    TextButton(
+                      onPressed: _reset,
+                      child: Text(l10n.reportFilterReset),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _SectionCard(
+                  icon: Icons.vibration,
+                  title: l10n.reportFilterIntensity,
+                  trailing: _ValuePill(
+                    label: _intensityFull
+                        ? l10n.reportFilterAny
+                        : l10n.reportFilterRange(
+                            Intensity.label(_intensity.start.round()),
+                            Intensity.label(_intensity.end.round()),
+                          ),
+                  ),
+                  child: SliderTheme(
+                    data: _sliderTheme(context),
+                    child: RangeSlider(
+                      values: _intensity,
+                      min: _intensityMin,
+                      max: _intensityMax,
+                      divisions: 8,
+                      labels: RangeLabels(
+                        Intensity.label(_intensity.start.round()),
+                        Intensity.label(_intensity.end.round()),
+                      ),
+                      onChanged: (v) => setState(() => _intensity = v),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _SectionCard(
+                  icon: Icons.speed_outlined,
+                  title: l10n.reportFilterMagnitude,
+                  trailing: _ValuePill(
+                    label: _magnitudeFull
+                        ? l10n.reportFilterAny
+                        : l10n.reportFilterRange(
+                            'M${_magnitude.start.toStringAsFixed(1)}',
+                            'M${_magnitude.end.toStringAsFixed(1)}',
+                          ),
+                  ),
+                  child: SliderTheme(
+                    data: _sliderTheme(context),
+                    child: RangeSlider(
+                      values: _magnitude,
+                      min: _magMin,
+                      max: _magMax,
+                      divisions: 16,
+                      labels: RangeLabels(
+                        'M${_magnitude.start.toStringAsFixed(1)}',
+                        'M${_magnitude.end.toStringAsFixed(1)}',
+                      ),
+                      onChanged: (v) => setState(() => _magnitude = v),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _SectionCard(
+                  icon: Icons.vertical_align_bottom_outlined,
+                  title: l10n.reportFilterDepth,
+                  trailing: _ValuePill(
+                    label: _depthFull
+                        ? l10n.reportFilterAny
+                        : l10n.reportFilterRange(
+                            l10n.reportFilterDepthKm(
+                              _depth.start.toStringAsFixed(0),
+                            ),
+                            _depth.end >= _depthCeil
+                                ? l10n.reportFilterAny
+                                : l10n.reportFilterDepthKm(
+                                    _depth.end.toStringAsFixed(0),
+                                  ),
+                          ),
+                  ),
+                  child: SliderTheme(
+                    data: _sliderTheme(context),
+                    child: RangeSlider(
+                      values: _depth,
+                      min: _depthFloor,
+                      max: _depthCeil,
+                      divisions: 30,
+                      labels: RangeLabels(
+                        l10n.reportFilterDepthKm(
+                          _depth.start.toStringAsFixed(0),
+                        ),
+                        _depth.end >= _depthCeil
+                            ? l10n.reportFilterAny
+                            : l10n.reportFilterDepthKm(
+                                _depth.end.toStringAsFixed(0),
+                              ),
+                      ),
+                      onChanged: (v) => setState(() => _depth = v),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _SectionCard(
+                  icon: Icons.date_range_outlined,
+                  title: l10n.reportFilterDate,
+                  trailing: _ValuePill(
+                    label: _dates == null
+                        ? l10n.reportFilterAny
+                        : l10n.reportFilterRange(
+                            dateFmt.format(_dates!.start),
+                            dateFmt.format(_dates!.end),
+                          ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: _pickDates,
+                              icon: const Icon(Icons.calendar_month_outlined),
+                              label: Text(
+                                _dates == null
+                                    ? l10n.reportFilterDatePick
+                                    : l10n.reportFilterRange(
+                                        dateFmt.format(_dates!.start),
+                                        dateFmt.format(_dates!.end),
+                                      ),
+                              ),
+                            ),
+                          ),
+                          if (_dates != null) ...[
+                            const SizedBox(width: AppSpacing.sm),
+                            IconButton.filledTonal(
+                              tooltip: l10n.reportFilterReset,
+                              onPressed: () => setState(() => _dates = null),
+                              icon: const Icon(Icons.clear),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        l10n.reportFilterDateStartNote,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        l10n.reportFilterDateEndNote,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  _SectionCard(
-                    icon: Icons.vibration,
-                    title: l10n.reportFilterIntensity,
-                    trailing: _ValuePill(
-                      label: _intensityFull
-                          ? l10n.reportFilterAny
-                          : l10n.reportFilterRange(
-                              Intensity.label(_intensity.start.round()),
-                              Intensity.label(_intensity.end.round()),
-                            ),
-                    ),
-                    child: SliderTheme(
-                      data: _sliderTheme(context),
-                      child: RangeSlider(
-                        values: _intensity,
-                        min: _intensityMin,
-                        max: _intensityMax,
-                        divisions: 9,
-                        labels: RangeLabels(
-                          Intensity.label(_intensity.start.round()),
-                          Intensity.label(_intensity.end.round()),
-                        ),
-                        onChanged: (v) => setState(() => _intensity = v),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _SectionCard(
-                    icon: Icons.speed_outlined,
-                    title: l10n.reportFilterMagnitude,
-                    trailing: _ValuePill(
-                      label: _magnitudeFull
-                          ? l10n.reportFilterAny
-                          : l10n.reportFilterRange(
-                              'M${_magnitude.start.toStringAsFixed(1)}',
-                              'M${_magnitude.end.toStringAsFixed(1)}',
-                            ),
-                    ),
-                    child: SliderTheme(
-                      data: _sliderTheme(context),
-                      child: RangeSlider(
-                        values: _magnitude,
-                        min: _magMin,
-                        max: _magMax,
-                        divisions: 16,
-                        labels: RangeLabels(
-                          'M${_magnitude.start.toStringAsFixed(1)}',
-                          'M${_magnitude.end.toStringAsFixed(1)}',
-                        ),
-                        onChanged: (v) => setState(() => _magnitude = v),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _SectionCard(
-                    icon: Icons.vertical_align_bottom_outlined,
-                    title: l10n.reportFilterDepth,
-                    trailing: _ValuePill(
-                      label: _depthFull
-                          ? l10n.reportFilterAny
-                          : l10n.reportFilterRange(
-                              l10n.reportFilterDepthKm(
-                                _depth.start.toStringAsFixed(0),
-                              ),
-                              _depth.end >= _depthCeil
-                                  ? l10n.reportFilterAny
-                                  : l10n.reportFilterDepthKm(
-                                      _depth.end.toStringAsFixed(0),
-                                    ),
-                            ),
-                    ),
-                    child: SliderTheme(
-                      data: _sliderTheme(context),
-                      child: RangeSlider(
-                        values: _depth,
-                        min: _depthFloor,
-                        max: _depthCeil,
-                        divisions: 30,
-                        labels: RangeLabels(
-                          l10n.reportFilterDepthKm(
-                            _depth.start.toStringAsFixed(0),
-                          ),
-                          _depth.end >= _depthCeil
-                              ? l10n.reportFilterAny
-                              : l10n.reportFilterDepthKm(
-                                  _depth.end.toStringAsFixed(0),
-                                ),
-                        ),
-                        onChanged: (v) => setState(() => _depth = v),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _SectionCard(
-                    icon: Icons.date_range_outlined,
-                    title: l10n.reportFilterDate,
-                    trailing: _ValuePill(
-                      label: _dates == null
-                          ? l10n.reportFilterAny
-                          : l10n.reportFilterRange(
-                              dateFmt.format(_dates!.start),
-                              dateFmt.format(_dates!.end),
-                            ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _pickDates,
-                            icon: const Icon(Icons.calendar_month_outlined),
-                            label: Text(
-                              _dates == null
-                                  ? l10n.reportFilterDatePick
-                                  : l10n.reportFilterRange(
-                                      dateFmt.format(_dates!.start),
-                                      dateFmt.format(_dates!.end),
-                                    ),
-                            ),
-                          ),
-                        ),
-                        if (_dates != null) ...[
-                          const SizedBox(width: AppSpacing.sm),
-                          IconButton.filledTonal(
-                            tooltip: l10n.reportFilterReset,
-                            onPressed: () => setState(() => _dates = null),
-                            icon: const Icon(Icons.clear),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Padding(
