@@ -53,7 +53,7 @@
   "weatherHumidity": "濕度",
   "mapLayers": "圖層",
   "mapLayerRadar": "雷達合成回波圖",
-  "mapLayerSatellite": "向日葵 紅外線圖",
+  "mapLayerSatellite": "ひまわり 紅外線圖",
   "mapTimelineNow": "現在",
   "mapTimelineObserved": "觀測",
   "notifySettingsMenu": "通知設定",

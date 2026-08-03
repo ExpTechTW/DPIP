@@ -174,7 +174,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => '向日葵 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
   String get mapTimelineNow => '現在';
@@ -1126,7 +1126,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get languageName => '繁體中文(香港)';
 
   @override
-  String get navHome => '首頁';
+  String get navHome => '主頁';
 
   @override
   String get navEvents => '事件';
@@ -1214,7 +1214,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherDynamicState => '天氣動態狀態';
 
   @override
-  String get weatherDynamicStateSubtitle => '覆寫首頁背景天氣';
+  String get weatherDynamicStateSubtitle => '覆寫主頁背景天氣';
 
   @override
   String get weatherModeAuto => '自動';
@@ -1288,7 +1288,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => '向日葵 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
   String get mapTimelineNow => '現在';
