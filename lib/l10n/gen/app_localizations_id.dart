@@ -91,7 +91,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterAny => 'Semua';
 
   @override
-  String get reportFilterApply => 'Selesai';
+  String get reportFilterApply => 'Terapkan';
 
   @override
   String get reportFilterReset => 'Reset';
@@ -132,6 +132,9 @@ class AppLocalizationsId extends AppLocalizations {
   String regionSelectFull(int max) {
     return 'Anda dapat menyimpan hingga $max wilayah';
   }
+
+  @override
+  String get regionEdit => 'Ubah';
 
   @override
   String get moreSectionAdvanced => 'Lanjutan';

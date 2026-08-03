@@ -198,6 +198,7 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
     }
     final picked = await showDateRangePicker(
       context: context,
+      locale: Localizations.localeOf(context),
       firstDate: earliest,
       lastDate: today,
       initialDateRange: initialRange,

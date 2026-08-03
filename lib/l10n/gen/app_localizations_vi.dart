@@ -90,7 +90,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportFilterAny => 'Tất cả';
 
   @override
-  String get reportFilterApply => 'Xong';
+  String get reportFilterApply => 'Áp dụng';
 
   @override
   String get reportFilterReset => 'Đặt lại';
@@ -131,6 +131,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String regionSelectFull(int max) {
     return 'Bạn chỉ có thể lưu tối đa $max khu vực';
   }
+
+  @override
+  String get regionEdit => 'Sửa';
 
   @override
   String get moreSectionAdvanced => 'Nâng cao';

@@ -90,7 +90,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterAny => '전체';
 
   @override
-  String get reportFilterApply => '완료';
+  String get reportFilterApply => '적용';
 
   @override
   String get reportFilterReset => '초기화';
@@ -131,6 +131,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String regionSelectFull(int max) {
     return '최대 $max개 지역까지 저장할 수 있습니다';
   }
+
+  @override
+  String get regionEdit => '수정';
 
   @override
   String get moreSectionAdvanced => '고급';

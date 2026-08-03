@@ -134,6 +134,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get regionEdit => 'Edit';
+
+  @override
   String get moreSectionAdvanced => 'Advanced';
 
   @override

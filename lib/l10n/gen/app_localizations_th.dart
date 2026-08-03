@@ -90,7 +90,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterAny => 'ทั้งหมด';
 
   @override
-  String get reportFilterApply => 'เสร็จ';
+  String get reportFilterApply => 'ใช้';
 
   @override
   String get reportFilterReset => 'รีเซ็ต';
@@ -131,6 +131,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String regionSelectFull(int max) {
     return 'บันทึกได้สูงสุด $max พื้นที่';
   }
+
+  @override
+  String get regionEdit => 'แก้ไข';
 
   @override
   String get moreSectionAdvanced => 'ขั้นสูง';

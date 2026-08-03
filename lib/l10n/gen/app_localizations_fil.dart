@@ -91,7 +91,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportFilterAny => 'Lahat';
 
   @override
-  String get reportFilterApply => 'Tapos';
+  String get reportFilterApply => 'I-apply';
 
   @override
   String get reportFilterReset => 'I-reset';
@@ -132,6 +132,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String regionSelectFull(int max) {
     return 'Maaari kang mag-save ng hanggang $max na rehiyon';
   }
+
+  @override
+  String get regionEdit => 'I-edit';
 
   @override
   String get moreSectionAdvanced => 'Advanced';

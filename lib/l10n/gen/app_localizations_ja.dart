@@ -90,7 +90,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterAny => '指定なし';
 
   @override
-  String get reportFilterApply => '完了';
+  String get reportFilterApply => '適用';
 
   @override
   String get reportFilterReset => 'リセット';
@@ -131,6 +131,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String regionSelectFull(int max) {
     return '地域は最大 $max 件まで登録できます';
   }
+
+  @override
+  String get regionEdit => '変更';
 
   @override
   String get moreSectionAdvanced => '詳細設定';

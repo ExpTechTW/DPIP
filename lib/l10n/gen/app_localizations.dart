@@ -114,6 +114,7 @@ abstract class AppLocalizations {
       countryCode: 'HK',
       scriptCode: 'Hant',
     ),
+    Locale('zh', 'TW'),
   ];
 
   /// This language's own name, shown in the in-app language picker. Each locale's ARB names itself; the picker is built from these, never a hardcoded list.
@@ -343,6 +344,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can save up to {max} regions'**
   String regionSelectFull(int max);
+
+  /// Edit action on a saved-region bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get regionEdit;
 
   /// Section header on the More page grouping advanced/developer entries
   ///
@@ -1626,6 +1633,18 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
         switch (locale.scriptCode) {
           case 'Hans':
             return AppLocalizationsZhHans();
+        }
+        break;
+      }
+  }
+
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.countryCode) {
+          case 'TW':
+            return AppLocalizationsZhTw();
         }
         break;
       }
