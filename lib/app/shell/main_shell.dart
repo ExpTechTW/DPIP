@@ -5,8 +5,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
-import 'package:dpip/shared/widgets/location_permission_banner.dart';
-import 'package:dpip/shared/widgets/notification_permission_banner.dart';
+import 'package:dpip/shared/widgets/permission_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -104,8 +103,7 @@ class _MainShellState extends State<MainShell> {
       // location is healthy, so Home's full-bleed layout is unaffected).
       body: Column(
         children: [
-          const LocationPermissionBanner(),
-          const NotificationPermissionBanner(),
+          const PermissionBanners(),
           Expanded(
             child: VisibleTabScope(
               visibleTab: _visibleTab,
