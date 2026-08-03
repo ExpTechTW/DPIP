@@ -17,7 +17,7 @@ class EarthquakePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navEarthquake)),
+      appBar: AppBar(title: Text(l10n.eewTitle)),
       body: Consumer<EewRealtimeController>(
         builder: (context, controller, _) {
           return RealtimeView<List<Eew>>(

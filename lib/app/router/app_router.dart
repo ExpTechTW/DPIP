@@ -1,6 +1,8 @@
 import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
+import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
@@ -55,10 +57,26 @@ final GoRouter appRouter = GoRouter(
           (_, _) => const EventsPage(),
         ),
         _branch(AppRoutes.mapPath, AppRoutes.map, (_, _) => const MapPage()),
-        _branch(
-          AppRoutes.earthquakePath,
-          AppRoutes.earthquake,
-          (_, _) => const EarthquakePage(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.dataPath,
+              name: AppRoutes.data,
+              builder: (_, _) => const DataPage(),
+              routes: [
+                GoRoute(
+                  path: AppRoutes.earthquakePath,
+                  name: AppRoutes.earthquake,
+                  builder: (_, _) => const ReportListPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.eewPath,
+                  name: AppRoutes.eew,
+                  builder: (_, _) => const EarthquakePage(),
+                ),
+              ],
+            ),
+          ],
         ),
         _branch(AppRoutes.morePath, AppRoutes.more, (_, _) => const MorePage()),
       ],

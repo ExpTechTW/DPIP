@@ -16,9 +16,33 @@
   "@navMap": {
     "description": "Bottom-nav label and page title for the Map tab"
   },
+  "navData": "Data",
+  "@navData": {
+    "description": "Bottom-nav label and page title for the Data hub tab"
+  },
   "navEarthquake": "Earthquake",
   "@navEarthquake": {
-    "description": "Bottom-nav label and page title for the Earthquake tab (the swappable slot)"
+    "description": "Earthquake report catalogue title (entry under the Data hub)"
+  },
+  "dataSectionSeismic": "Seismic",
+  "@dataSectionSeismic": {
+    "description": "Section header on the Data hub for earthquake-related entries"
+  },
+  "dataEarthquakeSubtitle": "Earthquake reports",
+  "@dataEarthquakeSubtitle": {
+    "description": "Subtitle under the Earthquake tile on the Data hub"
+  },
+  "reportListEmpty": "No earthquake reports",
+  "@reportListEmpty": {
+    "description": "Empty state when the report catalogue has no rows"
+  },
+  "reportListMeta": "M{magnitude} · {depth} km",
+  "@reportListMeta": {
+    "description": "Magnitude and depth line on a report list row",
+    "placeholders": {
+      "magnitude": {"type": "String"},
+      "depth": {"type": "String"}
+    }
   },
   "navMore": "More",
   "@navMore": {

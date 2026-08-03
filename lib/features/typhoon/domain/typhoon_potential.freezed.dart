@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ForecastPoint {
 
-/// Human label (e.g. `07月14日14時`).
+/// Human label from the wire (e.g. `07月14日14時`); display shortens via
+/// [shortenTyphoonTimeLabel] to `14日14時`.
  String get label;@JsonKey(name: 'lat') double get latitude;@JsonKey(name: 'lng') double get longitude;
 /// Create a copy of ForecastPoint
 /// with the given fields replaced by the non-null parameter values.
@@ -215,7 +216,8 @@ class _ForecastPoint implements ForecastPoint {
   const _ForecastPoint({required this.label, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'lng') required this.longitude});
   factory _ForecastPoint.fromJson(Map<String, dynamic> json) => _$ForecastPointFromJson(json);
 
-/// Human label (e.g. `07月14日14時`).
+/// Human label from the wire (e.g. `07月14日14時`); display shortens via
+/// [shortenTyphoonTimeLabel] to `14日14時`.
 @override final  String label;
 @override@JsonKey(name: 'lat') final  double latitude;
 @override@JsonKey(name: 'lng') final  double longitude;

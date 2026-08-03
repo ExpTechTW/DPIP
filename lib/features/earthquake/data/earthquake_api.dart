@@ -55,18 +55,61 @@ class EarthquakeApi {
     query: const {'sse': 1, 'compress': 1},
   );
 
-  /// Paginated earthquake report list.
+  /// Latest earthquake reports including area `list` (no pagination filters).
   ///
-  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report?limit=&page=`
-  Future<List<dynamic>> getReportList({int limit = 50, int page = 1}) async =>
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v1/eq/report?limit=`
+  Future<List<dynamic>> getLatestReports({int limit = 1}) async =>
       (await _client.get(
             ApiTier.coreApi,
-            '/api/v2/eq/report',
-            query: {'limit': limit, 'page': page},
+            '/api/v1/eq/report',
+            query: {'limit': limit},
           ))
           as List<dynamic>;
 
-  /// Full earthquake report by [reportId].
+  /// Paginated earthquake report list (no area `list`; includes `md5` / `int`).
+  ///
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report?limit=&page=`
+  Future<List<dynamic>> getReportList({
+    int limit = 50,
+    int page = 1,
+    int? minIntensity,
+    int? maxIntensity,
+    double? minMagnitude,
+    double? maxMagnitude,
+    double? minDepth,
+    double? maxDepth,
+    int? startTime,
+    int? endTime,
+    String? loc,
+    String? city,
+    int? cityMinInt,
+    int? cityMaxInt,
+  }) async {
+    final query = <String, dynamic>{
+      'limit': limit,
+      'page': page,
+      'minIntensity': ?minIntensity,
+      'maxIntensity': ?maxIntensity,
+      'minMagnitude': ?minMagnitude,
+      'maxMagnitude': ?maxMagnitude,
+      'minDepth': ?minDepth,
+      'maxDepth': ?maxDepth,
+      'startTime': ?startTime,
+      'endTime': ?endTime,
+      'loc': ?loc,
+      'city': ?city,
+      'cityMinInt': ?cityMinInt,
+      'cityMaxInt': ?cityMaxInt,
+    };
+    return (await _client.get(
+          ApiTier.coreApi,
+          '/api/v2/eq/report',
+          query: query,
+        ))
+        as List<dynamic>;
+  }
+
+  /// Full earthquake report by [reportId] (includes area `list`).
   ///
   /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report/{reportId}`
   Future<dynamic> getReport(String reportId) =>

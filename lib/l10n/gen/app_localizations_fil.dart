@@ -21,7 +21,24 @@ class AppLocalizationsFil extends AppLocalizations {
   String get navMap => 'Mapa';
 
   @override
+  String get navData => 'Datos';
+
+  @override
   String get navEarthquake => 'Lindol';
+
+  @override
+  String get dataSectionSeismic => 'Seismic';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Mga ulat ng lindol';
+
+  @override
+  String get reportListEmpty => 'Walang ulat ng lindol';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'Higit Pa';

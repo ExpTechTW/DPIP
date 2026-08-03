@@ -21,7 +21,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navMap => '地圖';
 
   @override
+  String get navData => '資料';
+
+  @override
   String get navEarthquake => '地震';
+
+  @override
+  String get dataSectionSeismic => '地震';
+
+  @override
+  String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get reportListEmpty => '目前沒有地震報告';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth 公里';
+  }
 
   @override
   String get navMore => '更多';
@@ -728,7 +745,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get navMap => '地图';
 
   @override
+  String get navData => '资料';
+
+  @override
   String get navEarthquake => '地震';
+
+  @override
+  String get dataSectionSeismic => '地震';
+
+  @override
+  String get dataEarthquakeSubtitle => '地震报告';
+
+  @override
+  String get reportListEmpty => '当前没有地震报告';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth 公里';
+  }
 
   @override
   String get navMore => '更多';
@@ -1435,7 +1469,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get navMap => '地圖';
 
   @override
+  String get navData => '資料';
+
+  @override
   String get navEarthquake => '地震';
+
+  @override
+  String get dataSectionSeismic => '地震';
+
+  @override
+  String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get reportListEmpty => '目前沒有地震報告';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth 公里';
+  }
 
   @override
   String get navMore => '更多';

@@ -9,8 +9,10 @@ import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/trem_station_repository_impl.dart';
+import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_repository.dart';
+import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
@@ -18,8 +20,8 @@ import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.da
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-/// Earthquake providers: the EEW repository and the live EEW + RTS realtime
-/// feeds, both streaming over SSE behind the `RealtimeSource` seam.
+/// Earthquake providers: the EEW repository, report catalogue, and the live
+/// EEW + RTS realtime feeds (SSE behind the `RealtimeSource` seam).
 ///
 /// Each realtime channel is built and registered **eagerly** here (not in a lazy
 /// provider `create`), because `RealtimeService.startAll()` runs after the first
@@ -27,6 +29,7 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   final api = EarthquakeApi(deps.apiClient);
   final repository = EewRepositoryImpl(api);
+  final reports = ReportRepositoryImpl(api);
 
   // Live EEW over SSE (`/api/v2/eq/eew?sse=1`) — bursty, connection-open liveness.
   final eewChannel = RealtimeChannel<List<Eew>>(
@@ -55,6 +58,7 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
 
   return [
     Provider<EewRepository>.value(value: repository),
+    Provider<ReportRepository>.value(value: reports),
     ChangeNotifierProvider<EewRealtimeController>.value(value: eewController),
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),
     // The RTS feed under its core supertype + the seismic station directory, so

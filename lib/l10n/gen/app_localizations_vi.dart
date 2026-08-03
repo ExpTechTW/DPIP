@@ -21,7 +21,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get navMap => 'Bản đồ';
 
   @override
+  String get navData => 'Dữ liệu';
+
+  @override
   String get navEarthquake => 'Động đất';
+
+  @override
+  String get dataSectionSeismic => 'Địa chấn';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Báo cáo động đất';
+
+  @override
+  String get reportListEmpty => 'Không có báo cáo động đất';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'Thêm';

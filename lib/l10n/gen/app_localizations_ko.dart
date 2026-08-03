@@ -21,7 +21,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navMap => '지도';
 
   @override
+  String get navData => '자료';
+
+  @override
   String get navEarthquake => '지진';
+
+  @override
+  String get dataSectionSeismic => '지진';
+
+  @override
+  String get dataEarthquakeSubtitle => '지진 보고서';
+
+  @override
+  String get reportListEmpty => '지진 보고서가 없습니다';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => '더보기';

@@ -68,9 +68,7 @@ class _MainShellState extends State<MainShell> {
       });
     }
 
-    // Bottom-navigation destinations, in branch order. The 4th slot
-    // (navEarthquake) is intentionally swappable — replace this one entry (and
-    // its branch in the router) to surface a different feature there.
+    // Bottom-navigation destinations, in branch order.
     final destinations = <NavigationDestination>[
       NavigationDestination(
         icon: const Icon(Icons.home_outlined),
@@ -88,9 +86,9 @@ class _MainShellState extends State<MainShell> {
         label: l10n.navMap,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.monitor_heart_outlined),
-        selectedIcon: const Icon(Icons.monitor_heart),
-        label: l10n.navEarthquake,
+        icon: const Icon(Icons.folder_outlined),
+        selectedIcon: const Icon(Icons.folder),
+        label: l10n.navData,
       ),
       NavigationDestination(
         icon: const Icon(Icons.menu),

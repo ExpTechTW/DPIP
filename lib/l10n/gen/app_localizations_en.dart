@@ -21,7 +21,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navMap => 'Map';
 
   @override
+  String get navData => 'Data';
+
+  @override
   String get navEarthquake => 'Earthquake';
+
+  @override
+  String get dataSectionSeismic => 'Seismic';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Earthquake reports';
+
+  @override
+  String get reportListEmpty => 'No earthquake reports';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'More';

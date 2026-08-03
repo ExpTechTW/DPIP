@@ -140,11 +140,41 @@ abstract class AppLocalizations {
   /// **'Map'**
   String get navMap;
 
-  /// Bottom-nav label and page title for the Earthquake tab (the swappable slot)
+  /// Bottom-nav label and page title for the Data hub tab
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get navData;
+
+  /// Earthquake report catalogue title (entry under the Data hub)
   ///
   /// In en, this message translates to:
   /// **'Earthquake'**
   String get navEarthquake;
+
+  /// Section header on the Data hub for earthquake-related entries
+  ///
+  /// In en, this message translates to:
+  /// **'Seismic'**
+  String get dataSectionSeismic;
+
+  /// Subtitle under the Earthquake tile on the Data hub
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake reports'**
+  String get dataEarthquakeSubtitle;
+
+  /// Empty state when the report catalogue has no rows
+  ///
+  /// In en, this message translates to:
+  /// **'No earthquake reports'**
+  String get reportListEmpty;
+
+  /// Magnitude and depth line on a report list row
+  ///
+  /// In en, this message translates to:
+  /// **'M{magnitude} · {depth} km'**
+  String reportListMeta(String magnitude, String depth);
 
   /// Bottom-nav label and page title for the More tab
   ///

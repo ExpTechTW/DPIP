@@ -21,7 +21,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get navMap => 'Peta';
 
   @override
+  String get navData => 'Data';
+
+  @override
   String get navEarthquake => 'Gempa Bumi';
+
+  @override
+  String get dataSectionSeismic => 'Seismik';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Laporan gempa';
+
+  @override
+  String get reportListEmpty => 'Tidak ada laporan gempa';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'Lainnya';

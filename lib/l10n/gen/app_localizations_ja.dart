@@ -21,7 +21,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navMap => '地図';
 
   @override
+  String get navData => 'データ';
+
+  @override
   String get navEarthquake => '地震';
+
+  @override
+  String get dataSectionSeismic => '地震';
+
+  @override
+  String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get reportListEmpty => '地震報告はありません';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'その他';

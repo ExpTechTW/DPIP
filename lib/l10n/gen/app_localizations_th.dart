@@ -21,7 +21,24 @@ class AppLocalizationsTh extends AppLocalizations {
   String get navMap => 'แผนที่';
 
   @override
+  String get navData => 'ข้อมูล';
+
+  @override
   String get navEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get dataSectionSeismic => 'แผ่นดินไหว';
+
+  @override
+  String get dataEarthquakeSubtitle => 'รายงานแผ่นดินไหว';
+
+  @override
+  String get reportListEmpty => 'ไม่มีรายงานแผ่นดินไหว';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
 
   @override
   String get navMore => 'เพิ่มเติม';
