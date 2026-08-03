@@ -123,7 +123,8 @@ class SatelliteMapLayer implements MapLayer {
 
   static const double _opacity = 1;
 
-  static const int _prefetchRadius = 1;
+  /// 0 — neighbour MapLibre sources force full-viewport fetches that scrub discards.
+  static const int _prefetchRadius = 0;
 
   static const RasterLayerProperties _prefetching = RasterLayerProperties(
     visibility: 'visible',
@@ -168,8 +169,10 @@ class SatelliteMapLayer implements MapLayer {
     final index = _indexById[frame.id];
     if (index == null) return;
 
-    // Scrub storms: abort any in-flight Dio tile warm immediately.
+    // Scrub storms: abort Dio warm + native in-flight tile HTTP before we tear
+    // the old source / mount the new one (removeSource alone does not cancel).
     _repository.cancelTilePrefetch();
+    unawaited(cancelMapLibreTileFetches());
 
     final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
@@ -259,6 +262,7 @@ class SatelliteMapLayer implements MapLayer {
   @override
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
+    unawaited(cancelMapLibreTileFetches());
     for (final id in _onMap) {
       await _removeFrame(controller, id);
     }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
@@ -14,14 +15,13 @@ import 'package:dpip/core/settings/prefs.dart';
 /// `LocationApi.updateDeviceLocation` POST). Consecutive identical fixes are
 /// skipped, and a report failure is logged, never thrown.
 ///
-/// Uploads are **client-throttled to once per [minUploadInterval]** (default
-/// 60s), keyed by [PreferenceKeys.deviceLocationUpdatedAtMs]. A move inside the
-/// window still updates the local township via [fixes], but skips the API
-/// silently (no log) — avoids hammering `/v2/location` into HTTP 429.
-///
-/// [onMoved] returns `true` when an upload was attempted (token present); the
-/// throttle stamp is written only then (or when the attempt throws), so a
-/// missing push token does not burn the 60s window.
+/// Upload gates (in order):
+/// 1. **60s throttle** — keyed by [PreferenceKeys.deviceLocationUpdatedAtMs].
+///    Inside the window: still publish [fixes], skip API silently.
+/// 2. **1-in-4 lottery** — after the throttle clears; a miss skips without
+///    burning the stamp so a later move can try again.
+/// 3. On a fired attempt (or throw), the stamp is written — so a missing push
+///    token (`onMoved` → `false`) does not burn the window.
 ///
 /// The positions come from a **factory** (`Stream<GpsFix> Function()`), not a
 /// single stream instance, because geolocator's position stream *errors and
@@ -38,12 +38,15 @@ class DeviceLocationReporter {
     required this._prefs,
     this.minUploadInterval = const Duration(seconds: 60),
     DateTime Function()? now,
-  }) : _now = now ?? DateTime.now;
+    bool Function()? uploadRoll,
+  }) : _now = now ?? DateTime.now,
+       _uploadRoll = uploadRoll ?? (() => Random().nextInt(4) == 0);
 
   final Stream<GpsFix> Function() _positions;
   final Future<bool> Function(GpsFix fix) _onMoved;
   final Prefs _prefs;
   final DateTime Function() _now;
+  final bool Function() _uploadRoll;
 
   /// Minimum gap between `/v2/location` POSTs.
   final Duration minUploadInterval;
@@ -107,6 +110,7 @@ class DeviceLocationReporter {
     if (lastMs != null && nowMs - lastMs < minUploadInterval.inMilliseconds) {
       return; // silent — no API, no log
     }
+    if (!_uploadRoll()) return; // 1-in-4 miss — no stamp
 
     try {
       final attempted = await _onMoved(fix);

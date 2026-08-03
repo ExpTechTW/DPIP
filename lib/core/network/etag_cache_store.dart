@@ -143,9 +143,12 @@ class EtagCacheStore {
     Database db, {
     int pageCacheKiB = defaultPageCacheKiB,
   }) async {
+    // PRAGMAs that return a row must use [rawQuery] — on Darwin, [execute]
+    // treats the result as an error ("not an error") and would abort bootstrap
+    // into "ETag cache unavailable".
     // Negative cache_size = kibibytes reserved for the pager (~25 MiB default).
-    await db.execute('PRAGMA cache_size = -$pageCacheKiB');
-    await db.execute('PRAGMA mmap_size = ${64 * 1024 * 1024}');
+    await db.rawQuery('PRAGMA cache_size = -$pageCacheKiB');
+    await db.rawQuery('PRAGMA mmap_size = ${64 * 1024 * 1024}');
   }
 
   /// Migrates v1 (single `value` blob envelope) → v2 columnar schema.

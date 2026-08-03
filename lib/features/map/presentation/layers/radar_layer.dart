@@ -139,9 +139,10 @@ class RadarMapLayer implements MapLayer {
   /// Opacity of the drawn frame.
   static const double _opacity = 0.85;
 
-  /// Frames kept loaded on each side of the current one (prev/next), so a scrub
-  /// onto a neighbour is instant while far frames stay unloaded and undrawn.
-  static const int _prefetchRadius = 1;
+  /// Frames kept loaded on each side of the current one. 0 during scrub storms
+  /// — neighbour sources force MapLibre to fetch whole viewports that are then
+  /// discarded; URL cache still makes re-entry cheap.
+  static const int _prefetchRadius = 0;
 
   static const RasterLayerProperties _prefetching = RasterLayerProperties(
     visibility: 'visible',
@@ -196,8 +197,10 @@ class RadarMapLayer implements MapLayer {
     final index = _indexById[frame.id];
     if (index == null) return; // not part of this layer's frames
 
-    // Scrub storms: abort any in-flight Dio tile warm immediately.
+    // Scrub storms: abort Dio warm + native in-flight tile HTTP before we tear
+    // the old source / mount the new one (removeSource alone does not cancel).
     _repository.cancelTilePrefetch();
+    unawaited(cancelMapLibreTileFetches());
 
     final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
@@ -248,6 +251,7 @@ class RadarMapLayer implements MapLayer {
   @override
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
+    unawaited(cancelMapLibreTileFetches());
     for (final id in _onMap) {
       await _removeFrame(controller, id);
     }

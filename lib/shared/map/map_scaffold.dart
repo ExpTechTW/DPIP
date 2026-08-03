@@ -83,16 +83,12 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   /// Whether a frame-show op is already queued and hasn't started running yet.
   ///
-  /// The timeline reports *every* frame the scrubber crosses (so the map
-  /// animates during the drag), and each show does real platform work — add /
-  /// remove raster sources and layers, then load their tiles. Queueing one op
-  /// per reported frame let a fast scrub build a backlog of renders for frames
-  /// the user had already passed, so releasing the scrubber stalled until that
-  /// whole backlog drained. This flag coalesces the burst instead: while an op
-  /// is pending, further selections only move [_selectedIndex], and the pending
-  /// op renders whatever is current *when it runs*. At most one op is queued
-  /// behind the running one, so the map still animates through the scrub but a
-  /// release always lands within one render instead of dozens.
+  /// The timeline only reports when a scrub **settles** (see [MapTimeline]), so
+  /// a fast drag does not enqueue one show per crossed frame. This flag still
+  /// coalesces bursts from settle + snap + fling end: while an op is pending,
+  /// further selections only move [_selectedIndex], and the pending op renders
+  /// whatever is current *when it runs*. At most one op waits behind the
+  /// running one.
   bool _showQueued = false;
 
   /// The map view's own size, captured at layout — see [_applyFraming].

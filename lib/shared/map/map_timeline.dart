@@ -103,23 +103,22 @@ class _MapTimelineState extends State<MapTimeline> {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
     if (notification is ScrollUpdateNotification) {
+      // Label only during the drag — do **not** tell the map. Every
+      // onSelected → addSource/removeSource → full viewport of tile HTTP;
+      // MapLibre does not cancel those when the source is torn down, so a
+      // fast scrub piles thousands of LocalDataTasks that then time out.
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
-        // Report every frame the scrubber crosses, not just the final one, so
-        // the map animates through the loop as you drag.
-        //
-        // Compare against [_liveIndex] (before the update), never
-        // [widget.selectedIndex]: the parent keeps that prop stale on purpose
-        // (no setState during scrub, so the platform-view map isn't rebuilt).
-        // Guarding on the prop meant sliding back to the initial "now" frame
-        // looked like a no-op and the map stayed stuck on now−1.
-        widget.onSelected(centred);
       }
     } else if (notification is ScrollEndNotification && !_snapping) {
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
-        widget.onSelected(centred);
       }
+      // Settle: snap + one map render for the frame under the scrubber.
+      // Compare against the live index path so sliding back to the parent's
+      // stale selectedIndex (kept stale on purpose — no setState during scrub)
+      // still fires, otherwise the map stays stuck on now−1.
+      widget.onSelected(centred);
       _centreOn(centred, animate: true);
     }
     return false;
