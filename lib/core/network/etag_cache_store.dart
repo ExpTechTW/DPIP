@@ -7,9 +7,8 @@
 ///   PDF / text / SVG / … Already entropy-packed formats (WebP / JPEG / PNG /
 ///   zip / woff / …) stay raw — outer gzip is a no-op or expands them.
 ///
-/// Hot path:
-/// 1. **Memory LRU** (~48 MB *decoded* binary) — zero I/O.
-/// 2. **SQLite** row → inflate if [kindBinaryGzip], else raw copy.
+/// Hot path is SQLite only — no Dart-side decoded LRU. Repeated reads rely on
+/// SQLite's pager / page cache (see [configureConnection], ~25 MiB).
 ///
 /// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
 /// [maxBytes]. Last-used bumps are **buffered** and flushed in batches (same
@@ -17,12 +16,11 @@
 /// All ops best-effort.
 ///
 /// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
-/// (memory LRU **or** SQLite→memory) records one hit + saved wire bytes —
-/// callers must not also meter those serves.
+/// records one hit + saved wire bytes — callers must not also meter those
+/// serves.
 library;
 
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
@@ -72,15 +70,14 @@ class EtagCacheStore {
     this._db, {
     this.maxAge = const Duration(days: 7),
     this.maxBytes = defaultMaxBytes,
-    this.memoryMaxBytes = defaultMemoryMaxBytes,
     this._usage,
   });
 
   final Database _db;
 
-  /// Optional traffic accounting for binary [readBytes] hits (memory LRU **and**
-  /// SQLite→memory). Callers must not also [NetworkUsageStore.record] those
-  /// serves — misses / JSON `304`s stay at the interceptor / MapLibre put path.
+  /// Optional traffic accounting for binary [readBytes] hits. Callers must not
+  /// also [NetworkUsageStore.record] those serves — misses / JSON `304`s stay
+  /// at the interceptor / MapLibre put path.
   final NetworkUsageStore? _usage;
 
   /// Entries whose **last-used** is older than this are swept on the next write.
@@ -89,14 +86,11 @@ class EtagCacheStore {
   /// Soft ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first.
   final int maxBytes;
 
-  /// In-process decoded-binary ceiling (LRU).
-  final int memoryMaxBytes;
-
   /// Default size budget (~150 MB of body blobs on disk).
   static const int defaultMaxBytes = 150 * 1024 * 1024;
 
-  /// Default memory LRU (~48 MB of decoded tile bytes).
-  static const int defaultMemoryMaxBytes = 48 * 1024 * 1024;
+  /// SQLite page-cache size in kibibytes (negative PRAGMA = KiB, not pages).
+  static const int defaultPageCacheKiB = 25 * 1024;
 
   static const String _table = 'http_cache';
   static const int kindJson = 0;
@@ -116,10 +110,6 @@ class EtagCacheStore {
     'font/woff',
     'font/woff2',
   };
-
-  /// Insertion-ordered LRU of decoded binary tiles.
-  final LinkedHashMap<String, CachedBytes> _memory = LinkedHashMap();
-  int _memoryBytes = 0;
 
   /// Pending last-used bumps — coalesced into batched `UPDATE … IN (…)`.
   final Set<String> _pendingTouch = {};
@@ -145,6 +135,17 @@ class EtagCacheStore {
     await db.execute(
       'CREATE INDEX IF NOT EXISTS ${_table}_time ON $_table(time)',
     );
+  }
+
+  /// Connection-level SQLite knobs for hot tile reads (page cache + mmap).
+  /// Call once after [openDatabase].
+  static Future<void> configureConnection(
+    Database db, {
+    int pageCacheKiB = defaultPageCacheKiB,
+  }) async {
+    // Negative cache_size = kibibytes reserved for the pager (~25 MiB default).
+    await db.execute('PRAGMA cache_size = -$pageCacheKiB');
+    await db.execute('PRAGMA mmap_size = ${64 * 1024 * 1024}');
   }
 
   /// Migrates v1 (single `value` blob envelope) → v2 columnar schema.
@@ -176,17 +177,11 @@ class EtagCacheStore {
 
   /// Returns the cached **binary** entry for [url], or null on a miss.
   ///
-  /// Hits the memory LRU first, else SQLite (inflate + [_memoryPut]). Every
-  /// successful serve is metered once via [_usage] when wired.
-  /// [touch] schedules an async last-used bump.
+  /// Reads SQLite (inflate when [kindBinaryGzip]). Every successful serve is
+  /// metered once via [_usage] when wired. [touch] schedules an async last-used
+  /// bump.
   Future<CachedBytes?> readBytes(String url, {bool touch = true}) async {
     try {
-      final mem = _memoryTake(url);
-      if (mem != null) {
-        if (touch) _scheduleTouch(url);
-        _recordBinaryHit(mem);
-        return mem;
-      }
       final row = await _queryRow(url);
       if (row == null) return null;
       final kind = row['kind'] as int;
@@ -202,7 +197,6 @@ class EtagCacheStore {
         contentType: row['content_type'] as String?,
         size: (row['size'] as num).toInt(),
       );
-      _memoryPut(url, entry);
       _recordBinaryHit(entry);
       return entry;
     } catch (_) {
@@ -220,11 +214,6 @@ class EtagCacheStore {
   /// Returns just the cached etag for [url], or null on a miss.
   Future<String?> readEtag(String url) async {
     try {
-      final mem = _memory[url];
-      if (mem != null) {
-        _scheduleTouch(url);
-        return mem.etag;
-      }
       final rows = await _db.query(
         _table,
         columns: ['etag'],
@@ -276,9 +265,7 @@ class EtagCacheStore {
   /// Stores [bytes] for [url] under [etag]. Best-effort.
   ///
   /// Compressible payloads (PBF / MVT / PDF / text / …) are gzip-1 on disk when
-  /// that shrinks them; entropy-packed formats (WebP / JPEG / …) stay raw. The
-  /// memory LRU always holds the decoded bytes so the next hit skips both
-  /// SQLite and inflate.
+  /// that shrinks them; entropy-packed formats (WebP / JPEG / …) stay raw.
   Future<void> writeBytes(
     String url, {
     required String etag,
@@ -286,13 +273,7 @@ class EtagCacheStore {
     String? contentType,
     int size = 0,
   }) async {
-    final entry = CachedBytes(
-      etag: etag,
-      bytes: bytes,
-      contentType: contentType,
-      size: size > 0 ? size : bytes.length,
-    );
-    _memoryPut(url, entry);
+    final entrySize = size > 0 ? size : bytes.length;
     try {
       final encoded = await _encodeBinary(bytes, contentType);
       await _insert(
@@ -301,7 +282,7 @@ class EtagCacheStore {
         contentType: contentType,
         kind: encoded.kind,
         body: encoded.body,
-        size: entry.size,
+        size: entrySize,
       );
     } catch (_) {}
   }
@@ -337,8 +318,6 @@ class EtagCacheStore {
   Future<void> _trimToMaxBytes() async {
     if (maxBytes <= 0) {
       await _db.delete(_table);
-      _memory.clear();
-      _memoryBytes = 0;
       return;
     }
     final totalRows = await _db.rawQuery(
@@ -362,19 +341,13 @@ class EtagCacheStore {
       where: 'key IN (${List.filled(keys.length, '?').join(',')})',
       whereArgs: keys,
     );
-    for (final k in keys) {
-      final evicted = _memory.remove(k);
-      if (evicted != null) _memoryBytes -= evicted.bytes.length;
-    }
   }
 
-  /// Deletes every cached entry (disk + memory).
+  /// Deletes every cached entry.
   Future<void> clear() async {
     try {
       await _db.delete(_table);
     } catch (_) {}
-    _memory.clear();
-    _memoryBytes = 0;
   }
 
   /// Row count and total stored body bytes — for the Debug page.
@@ -500,24 +473,6 @@ class EtagCacheStore {
     final usage = _usage;
     if (usage == null) return;
     unawaited(usage.record(down: 0, hit: true, saved: entry.size));
-  }
-
-  CachedBytes? _memoryTake(String url) {
-    final hit = _memory.remove(url);
-    if (hit == null) return null;
-    _memory[url] = hit; // MRU
-    return hit;
-  }
-
-  void _memoryPut(String url, CachedBytes entry) {
-    final existing = _memory.remove(url);
-    if (existing != null) _memoryBytes -= existing.bytes.length;
-    _memory[url] = entry;
-    _memoryBytes += entry.bytes.length;
-    while (_memoryBytes > memoryMaxBytes && _memory.isNotEmpty) {
-      final evicted = _memory.remove(_memory.keys.first);
-      if (evicted != null) _memoryBytes -= evicted.bytes.length;
-    }
   }
 
   void _scheduleTouch(String url) {

@@ -147,7 +147,7 @@ void main() {
     );
     expect(pbfRows.first['kind'], EtagCacheStore.kindBinaryGzip);
 
-    final cold = EtagCacheStore(db, memoryMaxBytes: 0);
+    final cold = EtagCacheStore(db);
     expect((await cold.readBytes('https://x/a.mvt'))!.bytes, mvt);
     expect(
       (await cold.readBytes(
@@ -174,55 +174,49 @@ void main() {
       whereArgs: ['https://x/i.svg'],
     );
     expect(rows.first['kind'], EtagCacheStore.kindBinaryGzip);
-    final cold = EtagCacheStore(db, memoryMaxBytes: 0);
+    final cold = EtagCacheStore(db);
     expect((await cold.readBytes('https://x/i.svg'))!.bytes, svg);
   });
 
-  test(
-    'binary memory LRU serves a second read without re-querying shape',
-    () async {
-      final bytes = Uint8List.fromList([9, 8, 7]);
-      await store.writeBytes('https://x/m', etag: '1', bytes: bytes);
-      final first = await store.readBytes('https://x/m');
-      final second = await store.readBytes('https://x/m');
-      expect(identical(first!.bytes, second!.bytes), isTrue);
-    },
-  );
+  test('binary readBytes round-trips from SQLite', () async {
+    final bytes = Uint8List.fromList([9, 8, 7]);
+    await store.writeBytes('https://x/m', etag: '1', bytes: bytes);
+    final first = await store.readBytes('https://x/m');
+    final second = await store.readBytes('https://x/m');
+    expect(first!.bytes, bytes);
+    expect(second!.bytes, bytes);
+  });
 
-  test(
-    'cold SQLite→memory readBytes records one hit and saved bytes',
-    () async {
-      final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
-      // Writer fills disk (+ its own memory LRU); cold reader has empty memory.
-      await store.writeBytes(
-        'https://x/tile.pbf',
-        etag: 'W/"t"',
-        bytes: bytes,
-        contentType: 'application/octet-stream',
-        size: 4096,
-      );
-      final usage = NetworkUsageStore(db);
-      final cold = EtagCacheStore(db, usage: usage);
+  test('readBytes records one hit and saved bytes', () async {
+    final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+    await store.writeBytes(
+      'https://x/tile.pbf',
+      etag: 'W/"t"',
+      bytes: bytes,
+      contentType: 'application/octet-stream',
+      size: 4096,
+    );
+    final usage = NetworkUsageStore(db);
+    final cold = EtagCacheStore(db, usage: usage);
 
-      final hit = await cold.readBytes('https://x/tile.pbf');
-      expect(hit, isNotNull);
-      expect(hit!.bytes, bytes);
+    final hit = await cold.readBytes('https://x/tile.pbf');
+    expect(hit, isNotNull);
+    expect(hit!.bytes, bytes);
 
-      final stats = await usage.stats();
-      expect(stats.hits, 1);
-      expect(stats.misses, 0);
-      expect(stats.savedBytes, 4096);
-    },
-  );
+    final stats = await usage.stats();
+    expect(stats.hits, 1);
+    expect(stats.misses, 0);
+    expect(stats.savedBytes, 4096);
+  });
 
-  test('memory LRU readBytes also meters a hit once', () async {
+  test('repeated readBytes meters each serve', () async {
     final usage = NetworkUsageStore(db);
     final metered = EtagCacheStore(db, usage: usage);
     final bytes = Uint8List.fromList([9, 8, 7]);
     await metered.writeBytes('https://x/m', etag: '1', bytes: bytes, size: 128);
 
-    await metered.readBytes('https://x/m'); // memory hit
-    await metered.readBytes('https://x/m'); // second memory hit
+    await metered.readBytes('https://x/m');
+    await metered.readBytes('https://x/m');
 
     final stats = await usage.stats();
     expect(stats.hits, 2);
@@ -323,7 +317,7 @@ void main() {
   });
 
   test('size trim drops least-recently-used rows when over maxBytes', () async {
-    final tight = EtagCacheStore(db, maxBytes: 120, memoryMaxBytes: 0);
+    final tight = EtagCacheStore(db, maxBytes: 120);
     // WebP CT → raw on disk (zeros would otherwise gzip tiny and never trim).
     final fat = Uint8List(100);
     await tight.writeBytes(
@@ -365,7 +359,7 @@ void main() {
     );
     final two = (await store.stats()).bytes;
     await store.clear();
-    final tight = EtagCacheStore(db, maxBytes: two, memoryMaxBytes: 0);
+    final tight = EtagCacheStore(db, maxBytes: two);
 
     await tight.writeBytes(
       'https://x/a',

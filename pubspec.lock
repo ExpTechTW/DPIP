@@ -642,7 +642,7 @@ packages:
     description:
       path: maplibre_gl
       ref: main
-      resolved-ref: "66c439e162ed150f0dd21ed7edf9ac4223fe8af9"
+      resolved-ref: d78acc3e524a57d0e6d3ea812047076863d8298c
       url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
     source: git
     version: "0.26.2"

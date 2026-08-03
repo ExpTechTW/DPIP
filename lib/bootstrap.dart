@@ -84,7 +84,7 @@ Future<void> bootstrap() async {
   final theme = ThemeController(prefs);
   final cache = await _openCache();
   if (cache != null) {
-    await installMapLibreTileCache(store: cache.etag, usage: cache.usage);
+    await installMapLibreTileCache(store: cache.etag);
   }
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
@@ -220,6 +220,7 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
       },
     );
     await NetworkUsageStore.createSchema(db);
+    await EtagCacheStore.configureConnection(db);
     final usage = NetworkUsageStore(db);
     return (etag: EtagCacheStore(db, usage: usage), usage: usage);
   } catch (error, stackTrace) {

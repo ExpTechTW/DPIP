@@ -1,6 +1,6 @@
-/// Warms Dart's [EtagCacheStore] (memory LRU + SQLite) for viewport tiles via
-/// [ApiClient.getBytes]. MapLibre then hits the same URLs through the native
-/// HTTPS intercept → Dart get (see [installMapLibreTileCache]).
+/// Warms Dart's [EtagCacheStore] (SQLite) for viewport tiles via
+/// [ApiClient.getBytes]. MapLibre then **only** serves those URLs from Dart get
+/// — native never downloads ExpTech tiles (see [installMapLibreTileCache]).
 ///
 /// Does **not** call `MLNOfflineStorage.preload` / ambient pin — that races
 /// MapLibre's own cache lookup on iOS.
@@ -203,8 +203,8 @@ class AmbientPrefetcher {
         if (pending.isEmpty) return;
         final job = pending.removeLast();
         try {
-          // EtagInterceptor writes SQLite + memory LRU on 200; MapLibre's next
-          // request for [job.url] hits via native → Dart get.
+          // EtagInterceptor writes SQLite on 200; MapLibre's next request for
+          // [job.url] hits via native → Dart get.
           if (job.tier != null) {
             await _client.getBytes(
               job.tier!,
