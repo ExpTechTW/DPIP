@@ -30,10 +30,17 @@ void main() {
       expect(d.colorLevel, 7);
     });
 
-    test('7 →「7」+ 7 color index', () {
-      final d = Intensity.displayForReport(7, legacyInstant);
+    test('9 →「7」+ 7 color index (舊制無 7/8)', () {
+      final d = Intensity.displayForReport(9, legacyInstant);
       expect(d.label, '7');
       expect(d.colorLevel, 9);
+    });
+
+    test('7 / 8 are not remapped (absent on 舊制 wire)', () {
+      expect(Intensity.displayForReport(7, legacyInstant).label, '7');
+      expect(Intensity.displayForReport(7, legacyInstant).colorLevel, 7);
+      expect(Intensity.displayForReport(8, legacyInstant).label, '8');
+      expect(Intensity.displayForReport(8, legacyInstant).colorLevel, 8);
     });
 
     test('4 stays plain', () {

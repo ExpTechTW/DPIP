@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
+import 'package:dpip/core/settings/preference_keys.dart';
+import 'package:dpip/core/settings/prefs.dart';
 
 /// Reports the device location to the backend when it **moves a threshold
 /// distance** — not when the user switches the Home region.
@@ -12,6 +14,15 @@ import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 /// `LocationApi.updateDeviceLocation` POST). Consecutive identical fixes are
 /// skipped, and a report failure is logged, never thrown.
 ///
+/// Uploads are **client-throttled to once per [minUploadInterval]** (default
+/// 60s), keyed by [PreferenceKeys.deviceLocationUpdatedAtMs]. A move inside the
+/// window still updates the local township via [fixes], but skips the API
+/// silently (no log) — avoids hammering `/v2/location` into HTTP 429.
+///
+/// [onMoved] returns `true` when an upload was attempted (token present); the
+/// throttle stamp is written only then (or when the attempt throws), so a
+/// missing push token does not burn the 60s window.
+///
 /// The positions come from a **factory** (`Stream<GpsFix> Function()`), not a
 /// single stream instance, because geolocator's position stream *errors and
 /// finishes* when location services are turned off mid-session and does not
@@ -21,10 +32,21 @@ import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 ///
 /// Foreground only; the app-closed case is the native background-location task.
 class DeviceLocationReporter {
-  DeviceLocationReporter({required this._positions, required this._onMoved});
+  DeviceLocationReporter({
+    required this._positions,
+    required this._onMoved,
+    required this._prefs,
+    this.minUploadInterval = const Duration(seconds: 60),
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
 
   final Stream<GpsFix> Function() _positions;
-  final Future<void> Function(GpsFix fix) _onMoved;
+  final Future<bool> Function(GpsFix fix) _onMoved;
+  final Prefs _prefs;
+  final DateTime Function() _now;
+
+  /// Minimum gap between `/v2/location` POSTs.
+  final Duration minUploadInterval;
 
   StreamSubscription<GpsFix>? _sub;
   GpsFix? _last;
@@ -76,11 +98,24 @@ class DeviceLocationReporter {
     if (fix == _last) return; // records compare by value
     _last = fix;
     // Publish before the upload: the current township must track the move even
-    // when the server report fails or is skipped for a missing push token.
+    // when the server report fails or is skipped for a missing push token /
+    // throttle window.
     if (!_fixes.isClosed) _fixes.add(fix);
+
+    final nowMs = _now().toUtc().millisecondsSinceEpoch;
+    final lastMs = _prefs.getInt(PreferenceKeys.deviceLocationUpdatedAtMs);
+    if (lastMs != null && nowMs - lastMs < minUploadInterval.inMilliseconds) {
+      return; // silent — no API, no log
+    }
+
     try {
-      await _onMoved(fix);
+      final attempted = await _onMoved(fix);
+      if (attempted) {
+        await _prefs.setInt(PreferenceKeys.deviceLocationUpdatedAtMs, nowMs);
+      }
     } catch (error, stackTrace) {
+      // Cool down after hard failures (incl. HTTP 429) so we don't retry-storm.
+      await _prefs.setInt(PreferenceKeys.deviceLocationUpdatedAtMs, nowMs);
       Log.handle(error, stackTrace, 'updateDeviceLocation');
     }
   }

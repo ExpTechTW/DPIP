@@ -49,11 +49,11 @@ abstract final class Intensity {
 
   /// Label + palette index for a report's max intensity.
   ///
-  /// **2020 以前是舊制**：震度只有 0–7（沒有 5弱/5強/6弱/6強）。wire 上的
-  /// `5` / `6` / `7` 是舊制「5 級 / 6 級 / 7 級」，不是新制 index。顯示時：
+  /// **2020 以前是舊制**：震度只有 0–7（沒有 5弱/5強/6弱/6強），且 wire
+  /// **不會出現 7、8**（那是新制 6弱/6強）。顯示時：
   /// - 5 →「5」，顏色用新制 5弱（index 5）
   /// - 6 →「6」，顏色用新制 6弱（index 7）
-  /// - 7 →「7」，顏色用新制 7（index 9）
+  /// - 9 →「7」，顏色用新制 7（index 9）— 舊制最高級在資料裡對到新制 index 9
   ///
   /// 2020 起（含）走 [label] + raw index 上色。
   static IntensityPresentation displayForReport(
@@ -64,7 +64,7 @@ abstract final class Intensity {
       return switch (intensity) {
         5 => const IntensityPresentation(label: '5', colorLevel: 5),
         6 => const IntensityPresentation(label: '6', colorLevel: 7),
-        7 => const IntensityPresentation(label: '7', colorLevel: 9),
+        9 => const IntensityPresentation(label: '7', colorLevel: 9),
         _ => IntensityPresentation(
           label: '$intensity',
           colorLevel: intensity.clamp(0, 9),

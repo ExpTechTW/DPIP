@@ -69,6 +69,12 @@ abstract final class PreferenceKeys {
     'notification.channelVersion',
   );
 
+  /// Last successful *attempt* to POST `updateDeviceLocation` (UTC millis).
+  /// Foreground reporter skips a new call within 60s — server 429 guard.
+  static const PrefKey<int> deviceLocationUpdatedAtMs = PrefKey<int>._(
+    'location.deviceLocationUpdatedAtMs',
+  );
+
   /// Selected LB / Core API region. See `RegionSelection`.
   ///
   /// Colon-form kept as-is (pre-existing storage address).

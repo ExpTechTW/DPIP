@@ -126,9 +126,10 @@ Future<void> bootstrap() async {
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
+    prefs: prefs,
     onMoved: (fix) async {
       final token = notificationService.token;
-      if (token == null) return;
+      if (token == null) return false;
       await locationApi.updateDeviceLocation(
         platform: reportPlatform,
         token: token,
@@ -136,6 +137,7 @@ Future<void> bootstrap() async {
         lat: fix.lat,
         lng: fix.lng,
       );
+      return true;
     },
   );
   // Terminated/background counterpart: native reports on significant moves.
