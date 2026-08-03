@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:dpip/shared/map/map_cache.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

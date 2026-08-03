@@ -373,18 +373,27 @@ void main() {
       bytes: fat,
       contentType: 'image/webp',
     );
-    await Future<void>.delayed(const Duration(milliseconds: 2));
     await tight.writeBytes(
       'https://x/b',
       etag: '2',
       bytes: fat,
       contentType: 'image/webp',
     );
-    await tight.readBytes('https://x/a');
-    await tight.touch(
-      'https://x/a',
-    ); // await the last-used bump (read's is fire-and-forget)
-    await Future<void>.delayed(const Duration(milliseconds: 2));
+    // Pin last-used near "now" so the 7-day age sweep won't eat them, but b
+    // stays older than a (buffered touch timers can't scramble the order).
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.update(
+      'http_cache',
+      {'time': now - 2_000},
+      where: 'key = ?',
+      whereArgs: ['https://x/a'],
+    );
+    await db.update(
+      'http_cache',
+      {'time': now - 4_000},
+      where: 'key = ?',
+      whereArgs: ['https://x/b'],
+    );
     await tight.writeBytes(
       'https://x/c',
       etag: '3',
