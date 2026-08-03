@@ -261,6 +261,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatellite => '히마와리 적외';
 
   @override
+  String get mapLayerLightning => '번개';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '대지로 · $minutes분 이내';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '구름 사이 · $minutes분 이내';
+  }
+
+  @override
   String get mapTimelineNow => '현재';
 
   @override

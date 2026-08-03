@@ -597,6 +597,24 @@ abstract class AppLocalizations {
   /// **'Himawari Infrared'**
   String get mapLayerSatellite;
 
+  /// Map layer switcher label for the lightning strike timeline
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning'**
+  String get mapLayerLightning;
+
+  /// Lightning legend: cloud-to-ground strike within N minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-to-ground · {minutes} min'**
+  String lightningLegendCg(int minutes);
+
+  /// Lightning legend: cloud-to-cloud strike within N minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-to-cloud · {minutes} min'**
+  String lightningLegendCc(int minutes);
+
   /// Label on the map timeline when the newest (latest) frame is selected
   ///
   /// In en, this message translates to:

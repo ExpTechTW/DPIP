@@ -706,7 +706,7 @@ class TyphoonMapLayer implements MapLayer {
         zoom: zoom,
       );
       if (kind == TyphoonWeatherOverlay.radar) {
-        await radar.prefetchFrameTiles(
+        await radar.warmFrameTiles(
           frames: args.frames,
           south: args.south,
           west: args.west,
@@ -715,7 +715,7 @@ class TyphoonMapLayer implements MapLayer {
           zoom: args.zoom,
         );
       } else {
-        await satellite.prefetchFrameTiles(
+        await satellite.warmFrameTiles(
           frames: args.frames,
           south: args.south,
           west: args.west,

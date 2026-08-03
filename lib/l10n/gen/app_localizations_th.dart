@@ -262,6 +262,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatellite => 'ฮิมาวาริ อินฟราเรด';
 
   @override
+  String get mapLayerLightning => 'ฟ้าผ่า';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'เมฆสู่พื้น · $minutes นาที';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'เมฆสู่เมฆ · $minutes นาที';
+  }
+
+  @override
   String get mapTimelineNow => 'ตอนนี้';
 
   @override

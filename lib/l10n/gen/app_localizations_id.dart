@@ -263,6 +263,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Inframerah';
 
   @override
+  String get mapLayerLightning => 'Petir';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Awan–tanah · $minutes mnt';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Awan–awan · $minutes mnt';
+  }
+
+  @override
   String get mapTimelineNow => 'Sekarang';
 
   @override

@@ -17,6 +17,8 @@ import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 
 /// The shared infrastructure every feature module builds on, assembled once in
 /// `bootstrap()` and handed to each feature's `*Providers(deps)` function.
@@ -46,6 +48,7 @@ class SharedDeps {
     required this.theme,
     this.etagCache,
     this.networkUsage,
+    this.mapTileCache,
   });
 
   /// Persistence for feature-local settings.
@@ -112,4 +115,15 @@ class SharedDeps {
   /// Persisted network-usage accounting (also provided) — shares the cache DB,
   /// so null when that is. Exposed for the Debug page's traffic stats.
   final NetworkUsageStore? networkUsage;
+
+  /// MapLibre's tile authority — backed by [etagCache], so null when that is.
+  /// Map layers warm frames through it before revealing them.
+  final MapTileCache? mapTileCache;
+
+  /// A fresh warm scheduler over [mapTileCache].
+  ///
+  /// One per consumer, never shared: a warmer's [MapTileWarmer.cancel] abandons
+  /// *its* schedule, so sharing one would let a layer switch silently drop a
+  /// different layer's warm.
+  MapTileWarmer mapTileWarmer() => MapTileWarmer(mapTileCache);
 }

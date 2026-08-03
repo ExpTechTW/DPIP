@@ -352,6 +352,28 @@
   "@mapLayerSatellite": {
     "description": "Name of the Himawari infrared layer in the layer picker"
   },
+  "mapLayerLightning": "Lightning",
+  "@mapLayerLightning": {
+    "description": "Map layer switcher label for the lightning strike timeline"
+  },
+  "lightningLegendCg": "Cloud-to-ground · {minutes} min",
+  "@lightningLegendCg": {
+    "description": "Lightning legend: cloud-to-ground strike within N minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lightningLegendCc": "Cloud-to-cloud · {minutes} min",
+  "@lightningLegendCc": {
+    "description": "Lightning legend: cloud-to-cloud strike within N minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "mapTimelineNow": "Now",
   "@mapTimelineNow": {
     "description": "Label on the map timeline when the newest (latest) frame is selected"

@@ -263,6 +263,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Infrared';
 
   @override
+  String get mapLayerLightning => 'Lightning';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Cloud-to-ground · $minutes min';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Cloud-to-cloud · $minutes min';
+  }
+
+  @override
   String get mapTimelineNow => 'Now';
 
   @override

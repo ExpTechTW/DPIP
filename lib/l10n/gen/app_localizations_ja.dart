@@ -261,6 +261,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 赤外線図';
 
   @override
+  String get mapLayerLightning => '雷';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '対地 · $minutes 分以内';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '雲間 · $minutes 分以内';
+  }
+
+  @override
   String get mapTimelineNow => '現在';
 
   @override

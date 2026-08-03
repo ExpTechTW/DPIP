@@ -1,18 +1,20 @@
-/// Prefetches DPM MVT tiles through [AmbientPrefetcher] (ApiClient + ETag).
+/// Warms DPM MVT viewport tiles into MapLibre's tile memory.
 library;
 
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
-import 'package:dpip/shared/map/ambient_prefetcher.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 
-/// Thin DPM wrapper over the shared ambient spine.
+/// Thin DPM wrapper over the shared warm spine ([MapTileWarmer]).
 class DpmTilePrefetcher {
-  DpmTilePrefetcher(this._ambient);
+  DpmTilePrefetcher(this._client, this._warmer);
 
-  final AmbientPrefetcher _ambient;
+  final ApiClient _client;
+  final MapTileWarmer _warmer;
 
   static const ApiTier _tier = ApiTier.coreStaticExclusive;
 
-  void cancel() => _ambient.cancel();
+  void cancel() => _warmer.cancel();
 
   Future<void> prefetch({
     required String layer,
@@ -21,7 +23,8 @@ class DpmTilePrefetcher {
     required double north,
     required double east,
     required double zoom,
-  }) => _ambient.prefetchViewport(
+  }) => _warmer.warmViewport(
+    client: _client,
     tier: _tier,
     pathFor: (z, x, y) => '/api/v2/tiles/dpm/$layer/$z/$x/$y.mvt',
     south: south,

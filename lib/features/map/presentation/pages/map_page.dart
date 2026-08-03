@@ -4,6 +4,7 @@ import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
+import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
@@ -13,6 +14,7 @@ import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
+import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
@@ -39,6 +41,7 @@ class _MapPageState extends State<MapPage> {
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
     SatelliteMapLayer(context.read<SatelliteRepository>()),
+    LightningMapLayer(context.read<MeteorLightningRepository>()),
     TyphoonMapLayer(
       context.read<MeteorTyphoonRepository>(),
       radar: context.read<RadarRepository>(),

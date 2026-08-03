@@ -1000,7 +1000,8 @@ class _TrendChart extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               interval: yInterval,
-              reservedSize: 36,
+              // Wide enough for "1007.5" without soft-wrapping mid-number.
+              reservedSize: 44,
               getTitlesWidget: (value, meta) {
                 if (value <= minY || value >= maxY) {
                   return const SizedBox.shrink();
@@ -1010,6 +1011,9 @@ class _TrendChart extends StatelessWidget {
                   child: Text(
                     _axisLabel(value, yInterval),
                     textAlign: TextAlign.right,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colors.onSurfaceVariant,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -1032,39 +1036,48 @@ class _TrendChart extends StatelessWidget {
                 }
                 final time = Text(
                   timeLabel(value),
+                  softWrap: false,
+                  maxLines: 1,
+                  overflow: TextOverflow.visible,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colors.onSurfaceVariant,
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 );
+                // fl_chart sizes each title to the tick slot; without
+                // UnconstrainedBox, "20時" wraps to 20 / 時.
                 if (!isWind) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    child: time,
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: AppSpacing.xs,
+                    child: UnconstrainedBox(child: time),
                   );
                 }
                 final from = directionNear(value);
-                return Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Arrow row sits on the X-axis; clock labels underneath.
-                      if (from != null)
-                        Transform.rotate(
-                          // Blow-toward, same as the map layer.
-                          angle: (from + 180) * math.pi / 180,
-                          child: Icon(
-                            Icons.navigation,
-                            size: 12,
-                            color: lineColor,
-                          ),
-                        )
-                      else
-                        const SizedBox(height: 12),
-                      const SizedBox(height: 2),
-                      time,
-                    ],
+                return SideTitleWidget(
+                  meta: meta,
+                  space: 2,
+                  child: UnconstrainedBox(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Arrow row sits on the X-axis; clock labels underneath.
+                        if (from != null)
+                          Transform.rotate(
+                            // Blow-toward, same as the map layer.
+                            angle: (from + 180) * math.pi / 180,
+                            child: Icon(
+                              Icons.navigation,
+                              size: 12,
+                              color: lineColor,
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 12),
+                        const SizedBox(height: 2),
+                        time,
+                      ],
+                    ),
                   ),
                 );
               },
@@ -1217,7 +1230,11 @@ double niceAxisStep(double span, int targetTicks) {
   return step * magnitude;
 }
 
-/// An axis value printed with just enough decimals for its [step], so a 0.5 step
-/// doesn't collapse to two identical labels.
-String _axisLabel(double value, double step) =>
-    value.toStringAsFixed(step >= 1 ? 0 : 1);
+/// An axis value printed with just enough decimals for its [step], so a 0.5
+/// step doesn't collapse to two identical labels. Trailing `.0` is dropped so
+/// "1007.0" stays "1007" and fits the left gutter.
+String _axisLabel(double value, double step) {
+  if (step >= 1) return value.toStringAsFixed(0);
+  final label = value.toStringAsFixed(1);
+  return label.endsWith('.0') ? label.substring(0, label.length - 2) : label;
+}

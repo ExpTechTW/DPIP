@@ -1,14 +1,23 @@
-/// Configures MapLibre's shared **ambient tile cache** — size ceiling + preload
-/// of bytes fetched by the Flutter HTTP stack (ETag / SQLite) under the same
-/// HTTPS URL MapLibre will request.
+/// Sizes MapLibre's own **ambient tile database** (iOS `MLNOfflineStorage` /
+/// Android `OfflineManager`).
 library;
-
-import 'dart:io';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/services.dart';
 
-/// Native ambient-cache bridge (iOS `MLNOfflineStorage` / Android `OfflineManager`).
+/// Native ambient-cache bridge.
+///
+/// This is the *hot* tier and it is MapLibre's, not the app's: responses it has
+/// already downloaded are answered from here without a request ever reaching
+/// the app. Tiles are served with an immutable `Cache-Control` (their URLs are
+/// content-addressed), so this tier does real work — before that they were
+/// treated as expired and re-requested on every reveal.
+///
+/// The durable tier is the app's own [EtagCacheStore] (~150 MB, metered, swept
+/// on the app's policy), which is what [MapTileCache] warms from. So this one
+/// is deliberately smaller: it only has to hold the frames of the session in
+/// progress, and sizing both at 150 MB just spent 300 MB storing each tile
+/// twice.
 class MapCache {
   const MapCache();
 
@@ -16,10 +25,12 @@ class MapCache {
     'com.exptech.dpip/map_cache',
   );
 
-  static final GZipCodec _gzip = GZipCodec();
+  /// Ambient ceiling shared by every map surface. Native's own default (~50 MB)
+  /// is too small to hold a scrubbed radar loop.
+  static const int defaultAmbientBytes = 64 * 1024 * 1024;
 
   /// Caps the shared ambient cache at [bytes], trimming (LRU) if already larger.
-  Future<void> setMaximumSize(int bytes) async {
+  Future<void> setMaximumSize([int bytes = defaultAmbientBytes]) async {
     try {
       await _channel.invokeMethod<void>('setMaximumAmbientCacheSize', {
         'bytes': bytes,
@@ -29,38 +40,5 @@ class MapCache {
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'setMaximumAmbientCacheSize');
     }
-  }
-
-  /// Inserts [data] into ambient under [url] — same key MapLibre uses for HTTPS
-  /// tile requests. [data] must be uncompressed (gzip magic is inflated here).
-  Future<void> preload({
-    required String url,
-    required Uint8List data,
-    String? etag,
-    int modified = 0,
-    int expires = 0,
-    bool mustRevalidate = false,
-  }) async {
-    try {
-      await _channel.invokeMethod<void>('preload', {
-        'url': url,
-        'data': _uncompressed(data),
-        'etag': etag,
-        'modified': modified,
-        'expires': expires,
-        'mustRevalidate': mustRevalidate,
-      });
-    } on MissingPluginException {
-      // Platform without the handler.
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'MapCache.preload');
-    }
-  }
-
-  static Uint8List _uncompressed(Uint8List data) {
-    if (data.length >= 2 && data[0] == 0x1f && data[1] == 0x8b) {
-      return Uint8List.fromList(_gzip.decode(data));
-    }
-    return data;
   }
 }

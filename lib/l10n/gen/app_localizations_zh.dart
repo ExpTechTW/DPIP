@@ -261,6 +261,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
+  String get mapLayerLightning => '閃電';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '對地 · $minutes 分內';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '雲間 · $minutes 分內';
+  }
+
+  @override
   String get mapTimelineNow => '現在';
 
   @override
@@ -1139,6 +1152,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerSatellite => 'ひまわり 红外线图';
+
+  @override
+  String get mapLayerLightning => '闪电';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '对地 · $minutes 分钟内';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '云间 · $minutes 分钟内';
+  }
 
   @override
   String get mapTimelineNow => '现在';
@@ -2021,6 +2047,19 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
+  String get mapLayerLightning => '閃電';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '對地 · $minutes 分內';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '雲間 · $minutes 分內';
+  }
+
+  @override
   String get mapTimelineNow => '現在';
 
   @override
@@ -2899,6 +2938,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
+
+  @override
+  String get mapLayerLightning => '閃電';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '對地 · $minutes 分內';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '雲間 · $minutes 分內';
+  }
 
   @override
   String get mapTimelineNow => '現在';

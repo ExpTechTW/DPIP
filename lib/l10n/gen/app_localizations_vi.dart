@@ -262,6 +262,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari hồng ngoại';
 
   @override
+  String get mapLayerLightning => 'Sét';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Mây–đất · $minutes phút';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Mây–mây · $minutes phút';
+  }
+
+  @override
   String get mapTimelineNow => 'Bây giờ';
 
   @override

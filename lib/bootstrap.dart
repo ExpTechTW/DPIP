@@ -11,7 +11,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:dpip/shared/map/map_tile_cache_binding.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -83,9 +83,12 @@ Future<void> bootstrap() async {
   final locale = LocaleController(prefs);
   final theme = ThemeController(prefs);
   final cache = await _openCache();
-  if (cache != null) {
-    await installMapLibreTileCache(store: cache.etag, usage: cache.usage);
-  }
+  // MapLibre asks Dart for every ExpTech tile before it asks the network, so
+  // this must be bound before the first map is built.
+  final mapTileCache = cache == null
+      ? null
+      : MapTileCache(cache.etag, usage: cache.usage);
+  await mapTileCache?.install();
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
 
@@ -179,6 +182,7 @@ Future<void> bootstrap() async {
     theme: theme,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
+    mapTileCache: mapTileCache,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime

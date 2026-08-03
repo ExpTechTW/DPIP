@@ -126,7 +126,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    unawaited(const MapCache().setMaximumSize(150 * 1024 * 1024));
+    unawaited(const MapCache().setMaximumSize());
   }
 
   void _onStyleLoaded() {

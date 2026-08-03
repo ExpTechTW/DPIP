@@ -264,6 +264,19 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Infrared';
 
   @override
+  String get mapLayerLightning => 'Kidlat';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Ulap–lupa · $minutes min';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Ulap–ulap · $minutes min';
+  }
+
+  @override
   String get mapTimelineNow => 'Ngayon';
 
   @override

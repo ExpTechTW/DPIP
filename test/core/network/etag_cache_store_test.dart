@@ -223,7 +223,7 @@ void main() {
     expect(stats.savedBytes, 256);
   });
 
-  test('readBytesMany returns parallel hits', () async {
+  test('readBytesBatch returns hits keyed by URL, misses absent', () async {
     await store.writeBytes(
       'https://x/1',
       etag: '1',
@@ -234,14 +234,49 @@ void main() {
       etag: '2',
       bytes: Uint8List.fromList([2]),
     );
-    final hits = await store.readBytesMany([
+    final hits = await store.readBytesBatch([
       'https://x/1',
       'https://x/miss',
       'https://x/2',
     ]);
-    expect(hits[0]!.bytes, [1]);
-    expect(hits[1], isNull);
-    expect(hits[2]!.bytes, [2]);
+    expect(hits.keys, unorderedEquals(['https://x/1', 'https://x/2']));
+    expect(hits['https://x/1']!.bytes, [1]);
+    expect(hits['https://x/2']!.bytes, [2]);
+  });
+
+  test('readBytesBatch inflates gzipped bodies (basemap PBF)', () async {
+    // Compressible + big enough that the store actually gzips it.
+    final pbf = Uint8List.fromList(List<int>.filled(4096, 0x41));
+    await store.writeBytes(
+      'https://x/tile.pbf',
+      etag: 'p',
+      bytes: pbf,
+      contentType: 'application/octet-stream',
+    );
+    final hits = await store.readBytesBatch(['https://x/tile.pbf']);
+    expect(hits['https://x/tile.pbf']!.bytes, pbf);
+  });
+
+  test('writeBytesBatch stores every entry in one pass', () async {
+    await store.writeBytesBatch([
+      (
+        url: 'https://x/a',
+        etag: 'a',
+        bytes: Uint8List.fromList([1, 2]),
+        contentType: 'image/webp',
+        size: 2,
+      ),
+      (
+        url: 'https://x/b',
+        etag: 'b',
+        bytes: Uint8List.fromList([3, 4]),
+        contentType: 'image/webp',
+        size: 2,
+      ),
+    ]);
+    final hits = await store.readBytesBatch(['https://x/a', 'https://x/b']);
+    expect(hits['https://x/a']!.bytes, [1, 2]);
+    expect(hits['https://x/b']!.bytes, [3, 4]);
   });
 
   test('distinct URLs are independent entries', () async {

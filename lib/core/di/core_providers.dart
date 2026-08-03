@@ -14,6 +14,7 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -38,4 +39,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),
   Provider<NetworkUsageStore?>.value(value: deps.networkUsage),
+  // MapLibre's tile authority — map surfaces warm through it. Nullable for the
+  // same reason as the cache above.
+  Provider<MapTileCache?>.value(value: deps.mapTileCache),
 ];

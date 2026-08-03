@@ -1,124 +1,102 @@
-import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
-class _FakeSatelliteRepository implements SatelliteRepository {
-  _FakeSatelliteRepository(this._frames);
-  final List<String> _frames;
+import 'raster_timeline_harness.dart';
 
-  @override
-  Future<Result<List<String>>> frames() async => Ok(_frames);
+class _FakeSatelliteRepository extends FakeRasterFrameSource
+    implements SatelliteRepository {
+  _FakeSatelliteRepository(super.frames);
 
   @override
-  String tileUrl(String frame) => 'https://host/$frame/{z}/{x}/{y}.webp';
-
-  @override
-  Future<void> prefetchFrameTiles({
-    required List<String> frames,
-    required double south,
-    required double west,
-    required double north,
-    required double east,
-    required double zoom,
-  }) async {}
-
-  @override
-  void cancelTilePrefetch() {}
-}
-
-class _RecordingController implements MapLibreMapController {
-  final List<String> calls = [];
-
-  @override
-  Future<void> addSource(String sourceId, SourceProperties properties) async =>
-      calls.add('addSource:$sourceId');
-
-  @override
-  Future<void> addRasterLayer(
-    String sourceId,
-    String layerId,
-    RasterLayerProperties properties, {
-    String? belowLayerId,
-    String? sourceLayer,
-    double? minzoom,
-    double? maxzoom,
-  }) async => calls.add('addRasterLayer:$layerId');
-
-  @override
-  Future<void> addLineLayer(
-    String sourceId,
-    String layerId,
-    LineLayerProperties properties, {
-    String? belowLayerId,
-    String? sourceLayer,
-    double? minzoom,
-    double? maxzoom,
-    dynamic filter,
-    bool enableInteraction = true,
-  }) async => calls.add('addLineLayer:$layerId');
-
-  @override
-  Future<void> removeLayer(String layerId) async =>
-      calls.add('removeLayer:$layerId');
-
-  @override
-  Future<void> removeSource(String sourceId) async =>
-      calls.add('removeSource:$sourceId');
-
-  @override
-  Future<void> setLayerProperties(
-    String layerId,
-    LayerProperties properties,
-  ) async {
-    final json = properties.toJson();
-    calls.add('set:$layerId:${json['visibility']}:${json['raster-opacity']}');
-  }
-
-  @override
-  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
-    southwest: const LatLng(22, 120),
-    northeast: const LatLng(25, 122),
-  );
-
-  @override
-  CameraPosition? get cameraPosition =>
-      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
+  String tileUrl(String frame) =>
+      'https://host/api/v2/tiles/satellite/$frame/{z}/{x}/{y}.webp';
 }
 
 void main() {
   test('frames chronological', () async {
     final layer = SatelliteMapLayer(
-      _FakeSatelliteRepository(['1700000600000', '1700000000000']),
+      _FakeSatelliteRepository(['1700000600', '1700000000']),
     );
     final frames = (await layer.frames()).valueOrNull!;
-    expect(frames.map((f) => f.id), ['1700000000000', '1700000600000']);
+    expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
   });
 
-  test('scrub hot path is only prev-hide + curr-show', () async {
-    final layer = SatelliteMapLayer(
-      _FakeSatelliteRepository([
-        '1700001800000',
-        '1700001200000',
-        '1700000600000',
-        '1700000000000',
-      ]),
-    );
+  test('the shown frame is fully opaque', () async {
+    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
     final frames = (await layer.frames()).valueOrNull!;
-    final controller = _RecordingController();
+    final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
-    await layer.show(controller, frames[3]);
+    await layer.show(controller, frames[2]);
+
+    expect(controller.opacityOf('satellite-lyr-${frames[2].id}'), '1.0');
+  });
+
+  test(
+    'scrubbing inside the ring is two opacity writes, nothing else',
+    () async {
+      final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(9)));
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      controller.calls.clear();
+
+      await layer.show(controller, frames[3], scrubbing: true);
+
+      expect(controller.calls, [
+        'set:satellite-lyr-${frames[4].id}:visible:0.0',
+        'set:satellite-lyr-${frames[3].id}:visible:1.0',
+      ]);
+    },
+  );
+
+  test('dark boundary outlines are added once and removed on clear', () async {
+    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    await layer.show(controller, frames[0]);
+
+    expect(
+      controller.calls
+          .where((c) => c == 'addLineLayer:$satelliteGlobalOutlineLayerId')
+          .length,
+      1,
+      reason: 'a second settle must not re-add the outlines',
+    );
 
     controller.calls.clear();
-    await layer.show(controller, frames[2], scrubbing: true);
-    expect(controller.calls, [
-      'set:satellite-lyr-1700001800000:none:0',
-      'set:satellite-lyr-1700001200000:visible:1.0',
-    ]);
+    await layer.clear(controller);
+    expect(
+      controller.calls,
+      containsAll([
+        'removeLayer:$satelliteCountyOutlineLayerId',
+        'removeLayer:$satelliteGlobalOutlineLayerId',
+      ]),
+    );
+  });
+
+  test('clear releases tiles', () async {
+    final source = _FakeSatelliteRepository(_ids(5));
+    final layer = SatelliteMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    await layer.clear(controller);
+
+    expect(source.released, 1);
   });
 }
+
+/// [count] frame ids, newest first (the wire order).
+List<String> _ids(int count) => [
+  for (var i = count - 1; i >= 0; i--) '${1700000000 + i * 600}',
+];

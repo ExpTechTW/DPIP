@@ -7,9 +7,9 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
-import 'package:dpip/core/network/api_client.dart';
-import 'package:dpip/shared/map/ambient_prefetcher.dart';
 import 'package:dpip/shared/map/map_cache.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
@@ -20,10 +20,6 @@ import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
-
-/// Ambient tile-cache ceiling for the live map — aligned with the app ETag
-/// SQLite budget (~150 MB). Native default is only ~50 MB.
-const int _ambientCacheBytes = 150 * 1024 * 1024;
 
 /// Basemap XYZ origin — warmed into SQLite + MapLibre ambient via ApiClient.
 /// LB has no ETag; [EtagInterceptor] synthesises one from the URL hash.
@@ -77,9 +73,8 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
   int _cameraEpoch = 0;
 
-  /// Basemap PBF warm-up (ApiClient → SQLite → ambient). Own instance so layer
-  /// prefetch cancel doesn't abort it.
-  AmbientPrefetcher? _basemapPrefetch;
+  /// Basemap tile warm-up. Its own warmer so a layer's cancel can't abort it.
+  MapTileWarmer? _basemapWarmer;
 
   /// Whether a frame-show op is already queued and hasn't started running yet.
   ///
@@ -89,6 +84,9 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   /// Finger down / fling in flight — raster layers skip cold mounts.
   bool _scrubbing = false;
+
+  /// Whether a scrub reveal is running (see [_pumpScrub]).
+  bool _scrubInFlight = false;
 
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
@@ -113,7 +111,7 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   @override
   void dispose() {
-    _basemapPrefetch?.cancel();
+    _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     super.dispose();
   }
@@ -193,17 +191,16 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    _basemapPrefetch ??= AmbientPrefetcher(context.read<ApiClient>());
-    unawaited(const MapCache().setMaximumSize(_ambientCacheBytes));
+    _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
+    unawaited(const MapCache().setMaximumSize());
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {
-    final prefetch = _basemapPrefetch;
-    if (prefetch == null) return;
+    final warmer = _basemapWarmer;
+    if (warmer == null) return;
     try {
       final bounds = await controller.getVisibleRegion();
-      final zoom = controller.cameraPosition?.zoom ?? 8;
-      await prefetch.prefetchViewportAbsolute(
+      await warmer.warmViewportAbsolute(
         urlFor: (z, x, y) => _basemapTileUrl
             .replaceAll('{z}', '$z')
             .replaceAll('{x}', '$x')
@@ -212,12 +209,12 @@ class _MapScaffoldState extends State<MapScaffold> {
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
         east: bounds.northeast.longitude,
-        zoom: zoom,
+        zoom: controller.cameraPosition?.zoom ?? 8,
         maxZoom: 12,
         logLabel: 'basemap',
       );
     } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'basemap viewport prefetch');
+      Log.handle(error, stackTrace, 'basemap viewport warm');
     }
   }
 
@@ -328,20 +325,36 @@ class _MapScaffoldState extends State<MapScaffold> {
     // own display; _selectedIndex is just the source of truth for show().
     _selectedIndex = index;
     if (_scrubbing) {
-      // Resident visibility flip only — must not go through [_queue] coalesce
-      // (that drops intermediate frames). See RadarMapLayer hot-path docs.
-      final controller = _controller;
-      if (controller == null || _frames.isEmpty) return;
-      unawaited(
-        _active
-            .show(controller, _frames[index], scrubbing: true)
-            .catchError((Object e, StackTrace st) {
-              Log.handle(e, st, 'Map scrub reveal (${_active.id})');
-            }),
-      );
+      _pumpScrub();
       return;
     }
     _showSelected();
+  }
+
+  /// Drives scrub reveals **latest-wins**: at most one in flight, and whatever
+  /// index the finger has reached by the time it finishes is what runs next.
+  ///
+  /// A fling crosses frames faster than a reveal completes. Firing one
+  /// unawaited `show` per crossed frame piled up platform calls for frames
+  /// already scrolled past — the map fell behind the finger and kept working
+  /// after it stopped. Intermediate frames are *meant* to be dropped here; the
+  /// settle ([_onScrubbing]) always renders the final position.
+  void _pumpScrub() {
+    if (_scrubInFlight) return;
+    final controller = _controller;
+    if (controller == null || _frames.isEmpty) return;
+    _scrubInFlight = true;
+    final index = _selectedIndex;
+    _active
+        .show(controller, _frames[index], scrubbing: true)
+        .catchError((Object e, StackTrace st) {
+          Log.handle(e, st, 'Map scrub reveal (${_active.id})');
+        })
+        .whenComplete(() {
+          _scrubInFlight = false;
+          // The finger moved on while that ran — chase it.
+          if (_scrubbing && _selectedIndex != index) _pumpScrub();
+        });
   }
 
   void _onLayerSelected(MapLayer layer) {
