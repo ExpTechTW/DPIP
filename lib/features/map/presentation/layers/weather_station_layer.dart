@@ -197,6 +197,12 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   void onMapGestureEnd() {}
 
   @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
   Widget buildSheet(BuildContext context) =>
       StationSheet(key: ValueKey(id), source: this);
 

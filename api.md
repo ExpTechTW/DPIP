@@ -118,7 +118,6 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | `getTyphoonProbability` | `/api/v5/meteor/typhoon/probability` | `coreExclusiveApi` |
 | `getTyphoonWarning` | `/api/v5/meteor/typhoon/warning` | `coreExclusiveApi` |
 | `getTyphoonGeojson` | `/api/v5/meteor/typhoon/geojson` | `coreExclusiveApi` |
-| `getTyphoonImagesList` | `/api/v5/meteor/typhoon/images/list` | `coreExclusiveApi` |
 | `getTyphoonKindList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreExclusiveApi` |
 | `getTyphoonKindAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStaticExclusive` |
 
@@ -185,7 +184,6 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | `/api/v5/meteor/rain/list` | 404 | 404 | 404 | **200** | 404 |
 | `/api/v5/meteor/lightning/list` | 404 | 404 | 404 | **200** | 404 |
 | `/api/v5/meteor/typhoon/geojson` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/typhoon/images/list` | 404 | 404 | 404 | **200** | 404 |
 | `/api/v2/meteor/weather/list`（舊） | 404 | 404 | 404 | 404 | 200 |
 | `/api/v2/meteor/rain/list`（舊） | 404 | 404 | 404 | 404 | 200 |
 | `/api/v2/meteor/lightning/list`（舊） | 404 | 404 | 404 | 404 | 200 |

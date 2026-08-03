@@ -2,6 +2,7 @@
 /// base style while active, with a typhoon-style tune menu; tap → detail sheet.
 library;
 
+import 'dart:async';
 import 'dart:math' show Point;
 
 import 'package:dpip/core/error/result.dart';
@@ -20,8 +21,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 ///
 /// Switcher entry is 「防災地圖」; [DisasterMapOverlayMenu] toggles sub-layers
 /// (AED for now). AED MVT is **baked into the style JSON** via
-/// [bakedAedTileUrl] (same path as the ExpTech basemap) — runtime
-/// `VectorSource` addSource was not painting on device. Detail on tap via
+/// [bakedAedTileUrl]. Viewport tiles are app-fetched (`getBytes` + binary
+/// ETag) and pinned into MapLibre ambient (`MapCache.preload`) so native
+/// cache-control is not the only policy. Detail on tap via
 /// [DisasterMapRepository.aedDetail].
 class DisasterMapLayer implements MapLayer {
   DisasterMapLayer(this._repository);
@@ -79,7 +81,13 @@ class DisasterMapLayer implements MapLayer {
   void setShowAed(bool value) {
     if (showAed.value == value) return;
     showAed.value = value;
-    if (!value) close();
+    if (!value) {
+      _repository.cancelTilePrefetch();
+      close();
+    } else {
+      final c = _controller;
+      if (c != null) unawaited(_prefetchViewport(c));
+    }
     _applyOverlayVisibility();
   }
 
@@ -89,6 +97,8 @@ class DisasterMapLayer implements MapLayer {
     _styleHasAed = true;
     Log.info('DPM AED style tiles: $bakedAedTileUrl');
     await _applyOverlayVisibilityAsync(controller);
+    // Warm ambient before MapLibre's own fetches race past us.
+    unawaited(_prefetchViewport(controller));
   }
 
   @override
@@ -196,9 +206,35 @@ class DisasterMapLayer implements MapLayer {
   void onMapGestureEnd() {}
 
   @override
+  Future<void> onCameraIdle(MapLibreMapController controller) =>
+      _prefetchViewport(controller);
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) =>
+      _prefetchViewport(controller);
+
+  Future<void> _prefetchViewport(MapLibreMapController controller) async {
+    if (!_styleHasAed || !showAed.value) return;
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 10;
+      await _repository.prefetchAedTiles(
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'DPM viewport prefetch');
+    }
+  }
+
+  @override
   Future<void> clear(MapLibreMapController controller) async {
     // AED lives in the style JSON; leaving this layer drops [bakedAedTileUrl]
     // so MapScaffold rebuilds the style without it.
+    _repository.cancelTilePrefetch();
     _controller = null;
     _styleHasAed = false;
     close();

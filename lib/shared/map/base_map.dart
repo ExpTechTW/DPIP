@@ -122,7 +122,12 @@ class BaseMap extends StatelessWidget {
       initialCameraPosition: CameraPosition(target: taiwanCenter, zoom: floor),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
-      styleString: exptechVectorStyle(palette, aedTileUrl: aedTileUrl),
+      styleString: exptechVectorStyle(
+        palette,
+        basemapTileUrl: basemapOriginTileUrl,
+        glyphsUrl: glyphsOriginUrl,
+        aedTileUrl: aedTileUrl,
+      ),
       minMaxZoomPreference: MinMaxZoomPreference(floor, ceiling),
       trackCameraPosition: true,
       compassEnabled: interactive,

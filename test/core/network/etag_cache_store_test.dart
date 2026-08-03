@@ -90,7 +90,7 @@ void main() {
     expect(await store.read('https://x/a'), isNull);
   });
 
-  test('a write sweeps entries older than maxAge (7 days)', () async {
+  test('a write sweeps entries last-used older than maxAge (7 days)', () async {
     await store.write('https://x/old', etag: '1', body: 'A');
     final eightDaysAgo = DateTime.now()
         .subtract(const Duration(days: 8))
@@ -112,6 +112,27 @@ void main() {
     );
     expect(await store.read('https://x/new'), isNotNull);
   });
+
+  test(
+    'a recent read keeps an otherwise-old entry past the age sweep',
+    () async {
+      await store.write('https://x/kept', etag: '1', body: 'A');
+      final eightDaysAgo = DateTime.now()
+          .subtract(const Duration(days: 8))
+          .millisecondsSinceEpoch;
+      await db.update(
+        'http_cache',
+        {'time': eightDaysAgo},
+        where: 'key = ?',
+        whereArgs: ['https://x/kept'],
+      );
+      // Touch last-used to now.
+      expect(await store.read('https://x/kept'), isNotNull);
+
+      await store.write('https://x/new', etag: '2', body: 'B');
+      expect(await store.read('https://x/kept'), isNotNull);
+    },
+  );
 
   test('size round-trips', () async {
     await store.write('https://x/a', etag: '1', body: 'ABCDE', size: 4096);
@@ -141,5 +162,39 @@ void main() {
     final stats = await store.stats();
     expect(stats.rows, 2);
     expect(stats.bytes, greaterThan(0));
+  });
+
+  test('size trim drops least-recently-used rows when over maxBytes', () async {
+    // Tiny ceiling so a few compressible-but-non-empty rows overflow.
+    final tight = EtagCacheStore(db, maxBytes: 80);
+    final fat = List.filled(200, 'x').join();
+    await tight.write('https://x/old', etag: '1', body: fat);
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await tight.write('https://x/new', etag: '2', body: fat);
+
+    expect(await tight.read('https://x/old'), isNull, reason: 'LRU trimmed');
+    expect(await tight.read('https://x/new'), isNotNull);
+    expect((await tight.stats()).bytes, lessThanOrEqualTo(80));
+  });
+
+  test('size trim prefers unread rows over recently-read ones', () async {
+    final fat = List.filled(200, 'x').join();
+    // Find a ceiling that holds two rows but not three.
+    await store.write('https://x/probe1', etag: '1', body: fat);
+    await store.write('https://x/probe2', etag: '2', body: fat);
+    final two = (await store.stats()).bytes;
+    await store.clear();
+    final tight = EtagCacheStore(db, maxBytes: two);
+
+    await tight.write('https://x/a', etag: '1', body: fat);
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await tight.write('https://x/b', etag: '2', body: fat);
+    await tight.read('https://x/a'); // bump last-used
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await tight.write('https://x/c', etag: '3', body: fat);
+
+    expect(await tight.read('https://x/b'), isNull, reason: 'unread LRU');
+    expect(await tight.read('https://x/a'), isNotNull);
+    expect(await tight.read('https://x/c'), isNotNull);
   });
 }

@@ -204,6 +204,12 @@ class RtsMapLayer implements MapLayer {
   void onMapGestureEnd() {}
 
   @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
   Widget buildLegend(BuildContext context) => const MapLegendCard(
     child: IntensityLegend(mode: IntensityLegendMode.rts),
   );

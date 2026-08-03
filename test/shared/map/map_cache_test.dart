@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dpip/shared/map/map_cache.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,16 +29,31 @@ void main() {
     },
   );
 
-  test('a missing native handler degrades to a no-op (never throws)', () async {
-    // No mock handler → MissingPluginException, which MapCache swallows.
-    await expectLater(const MapCache().setMaximumSize(1024), completes);
-  });
-
-  test('a native error is swallowed (best-effort, never throws)', () async {
+  test('preload invokes the native channel with url and bytes', () async {
+    MethodCall? received;
     messenger.setMockMethodCallHandler(channel, (call) async {
-      throw PlatformException(code: 'cache_failed', message: 'boom');
+      received = call;
+      return null;
     });
 
+    await const MapCache().preload(
+      url: 'https://example/t.webp',
+      data: Uint8List.fromList([1, 2, 3]),
+      etag: 'W/"1"',
+    );
+
+    expect(received?.method, 'preload');
+    final args = received!.arguments as Map;
+    expect(args['url'], 'https://example/t.webp');
+    expect(args['etag'], 'W/"1"');
+    expect(args['data'], Uint8List.fromList([1, 2, 3]));
+  });
+
+  test('a missing native handler degrades to a no-op (never throws)', () async {
     await expectLater(const MapCache().setMaximumSize(1024), completes);
+    await expectLater(
+      const MapCache().preload(url: 'https://x', data: Uint8List(0)),
+      completes,
+    );
   });
 }

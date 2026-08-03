@@ -7,10 +7,13 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
+import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/shared/map/ambient_prefetcher.dart';
 import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
@@ -18,10 +21,13 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
-/// Ambient tile-cache ceiling for the live map — well above MapLibre's ~50 MB
-/// native default so a week of small WebP radar frames (plus base tiles) stays
-/// cached and scrubbing the timeline re-fetches far less.
-const int _ambientCacheBytes = 128 * 1024 * 1024;
+/// Ambient tile-cache ceiling for the live map — aligned with the app ETag
+/// SQLite budget (~150 MB). Native default is only ~50 MB.
+const int _ambientCacheBytes = 150 * 1024 * 1024;
+
+/// Basemap XYZ origin — warmed into SQLite + MapLibre ambient via ApiClient.
+/// LB has no ETag; [EtagInterceptor] synthesises one from the URL hash.
+const String _basemapTileUrl = basemapOriginTileUrl;
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
@@ -45,7 +51,7 @@ class MapScaffold extends StatefulWidget {
   State<MapScaffold> createState() => _MapScaffoldState();
 }
 
-class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
+class _MapScaffoldState extends State<MapScaffold> {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
@@ -71,9 +77,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
   int _cameraEpoch = 0;
 
-  /// Whether tiles have been cached since the last clear — so backgrounding only
-  /// clears the shared cache when there's actually something to clear.
-  bool _cacheDirty = false;
+  /// Basemap PBF warm-up (ApiClient → SQLite → ambient). Own instance so layer
+  /// prefetch cancel doesn't abort it.
+  AmbientPrefetcher? _basemapPrefetch;
 
   /// Whether a frame-show op is already queued and hasn't started running yet.
   ///
@@ -101,12 +107,6 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   final GlobalKey _timelineKey = GlobalKey();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final handoff = context.read<MapCameraHandoff>();
@@ -118,8 +118,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _basemapPrefetch?.cancel();
     _handoff?.removeListener(_onHandoff);
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -196,30 +196,34 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     });
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Scrubbing a layer caches every frame's tiles in MapLibre's *shared*
-    // on-disk cache (removeSource doesn't evict them). That cache also backs the
-    // home page's off-screen map snapshot, and a bloated one stops its overlay
-    // from rendering. Clear it as the map backgrounds so the next launch's
-    // snapshot starts clean. Harmless: live tiles just refetch on resume.
-    if (state == AppLifecycleState.paused &&
-        _controller != null &&
-        _cacheDirty) {
-      _cacheDirty = false;
-      _controller!.clearAmbientCache().catchError((Object error) {
-        Log.warning('Failed to clear map ambient cache: $error');
-      });
-    }
-  }
-
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    // Raise the shared ambient-cache ceiling (MapLibre's default is only ~50 MB)
-    // now that the map exists so MapLibre is initialised on both platforms. The
-    // cache stays bounded (LRU) and is still cleared on background so the home
-    // snapshot starts clean.
-    const MapCache().setMaximumSize(_ambientCacheBytes);
+    _basemapPrefetch ??= AmbientPrefetcher(context.read<ApiClient>());
+    unawaited(const MapCache().setMaximumSize(_ambientCacheBytes));
+  }
+
+  Future<void> _warmBasemap(MapLibreMapController controller) async {
+    final prefetch = _basemapPrefetch;
+    if (prefetch == null) return;
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
+      await prefetch.prefetchViewportAbsolute(
+        urlFor: (z, x, y) => _basemapTileUrl
+            .replaceAll('{z}', '$z')
+            .replaceAll('{x}', '$x')
+            .replaceAll('{y}', '$y'),
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+        maxZoom: 12,
+        logLabel: 'basemap',
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'basemap viewport prefetch');
+    }
   }
 
   void _onStyleLoaded() {
@@ -293,7 +297,6 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final controller = _controller;
     if (controller == null) return;
     final layer = _active;
-    _cacheDirty = true; // showing a frame caches its tiles
     // Already queued: that op will pick up this newer selection when it runs, so
     // don't stack another one (see [_showQueued]).
     if (_showQueued) return;
@@ -395,6 +398,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               onMapClick: (_, latLng) => _onMapClick(latLng),
               onCameraIdle: () {
                 _active.onMapGestureEnd();
+                final controller = _controller;
+                if (controller != null) {
+                  unawaited(_active.onCameraIdle(controller));
+                  unawaited(_warmBasemap(controller));
+                }
                 if (!mounted) return;
                 setState(() => _cameraEpoch++);
               },

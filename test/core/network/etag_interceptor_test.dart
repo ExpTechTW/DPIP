@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -120,4 +121,25 @@ void main() {
       expect(await store.read('https://x.test/stream'), isNull);
     },
   );
+
+  test('live / personal paths are never cached', () async {
+    final adapter = _FakeAdapter(body: '[]', etag: 'v1');
+    final dio = dioWith(adapter);
+    const urls = [
+      'https://api.lb-tpe1.exptech.dev/api/v2/eq/eew',
+      'https://api.lb-tpe1.exptech.dev/api/v2/trem/rts',
+      'https://api.core-tnn1.exptech.dev/api/v2/location/1/tok/1.0/25,121',
+      'https://api.core-tnn1.exptech.dev/api/v2/notify/tok',
+    ];
+    for (final url in urls) {
+      await dio.get<dynamic>(url);
+      expect(await store.read(url), isNull, reason: url);
+      expect(EtagInterceptor.isUncacheablePath(Uri.parse(url).path), isTrue);
+    }
+    // setNotify has extra segments — still cacheable by path policy.
+    expect(
+      EtagInterceptor.isUncacheablePath('/api/v2/notify/tok/eew/1'),
+      isFalse,
+    );
+  });
 }

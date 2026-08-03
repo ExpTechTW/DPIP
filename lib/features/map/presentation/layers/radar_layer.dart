@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -74,6 +77,40 @@ class RadarMapLayer implements MapLayer {
 
   @override
   void onMapGestureEnd() {}
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {
+    final id = _shownFrameId;
+    if (id == null) return;
+    unawaited(_warmFrames(controller, [id]));
+  }
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {
+    final id = _shownFrameId;
+    if (id == null) return;
+    await _warmFrames(controller, [id]);
+  }
+
+  Future<void> _warmFrames(
+    MapLibreMapController controller,
+    List<String> frames,
+  ) async {
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
+      await _repository.prefetchFrameTiles(
+        frames: frames,
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'radar viewport prefetch');
+    }
+  }
 
   /// CWA radar reflectivity (dBZ) — same stops as legacy's radar ColorLegend.
   @override
@@ -159,6 +196,9 @@ class RadarMapLayer implements MapLayer {
     final index = _indexById[frame.id];
     if (index == null) return; // not part of this layer's frames
 
+    // Scrub storms: abort any in-flight Dio tile warm immediately.
+    _repository.cancelTilePrefetch();
+
     final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
@@ -200,10 +240,14 @@ class RadarMapLayer implements MapLayer {
       }
     }
     _shownFrameId = frame.id;
+    // Warm only the *current* frame — neighbours load via MapLibre; warming
+    // the whole window (×3) on every scrub tick overwhelmed Dio/cache.
+    unawaited(_warmFrames(controller, [frame.id]));
   }
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
+    _repository.cancelTilePrefetch();
     for (final id in _onMap) {
       await _removeFrame(controller, id);
     }

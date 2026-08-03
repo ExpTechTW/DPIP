@@ -15,6 +15,15 @@ class StreamedResponse {
   final void Function() cancel;
 }
 
+/// Raw bytes from [ApiClient.getBytes], with the response [etag] when present
+/// (from a fresh `200` or a revalidated `304` rewrite).
+class BytePayload {
+  const BytePayload({required this.bytes, this.etag});
+
+  final Uint8List bytes;
+  final String? etag;
+}
+
 /// Region-aware HTTP client.
 ///
 /// Resolves concrete, region-pinned hosts from the current [RegionSelection]
@@ -38,6 +47,54 @@ class ApiClient {
     CancelToken? cancelToken,
   }) async =>
       (await request(tier, path, query: query, cancelToken: cancelToken)).data;
+
+  /// GET [path] as raw bytes (MVT / WebP / …) with ETag revalidation.
+  ///
+  /// Uses [ResponseType.bytes] so [EtagInterceptor] stores a binary envelope
+  /// instead of `jsonEncode`. Returns the body plus the response ETag (for
+  /// MapLibre ambient preload at the same URL).
+  Future<BytePayload> getBytes(
+    ApiTier tier,
+    String path, {
+    Map<String, dynamic>? query,
+    CancelToken? cancelToken,
+  }) async {
+    final response = await request(
+      tier,
+      path,
+      query: query,
+      cancelToken: cancelToken,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return _bytePayload(response);
+  }
+
+  /// Absolute-URL GET as bytes with ETag (no region failover).
+  ///
+  /// For hosts already baked into the MapLibre style (basemap `lb.exptech.dev`,
+  /// glyphs CDN) that are not an [ApiTier]. Prefer [getBytes] for region-pinned
+  /// ExpTech paths.
+  Future<BytePayload> getBytesAbsolute(
+    String url, {
+    CancelToken? cancelToken,
+  }) async {
+    final response = await _dio.request<dynamic>(
+      url,
+      cancelToken: cancelToken,
+      options: Options(method: 'GET', responseType: ResponseType.bytes),
+    );
+    return _bytePayload(response);
+  }
+
+  static BytePayload _bytePayload(Response<dynamic> response) {
+    final data = response.data;
+    final Uint8List bytes = switch (data) {
+      final Uint8List b => b,
+      final List<int> list => Uint8List.fromList(list),
+      _ => throw StateError('Expected bytes, got ${data.runtimeType}'),
+    };
+    return BytePayload(bytes: bytes, etag: response.headers.value('etag'));
+  }
 
   /// POST [data] to [path] on [tier] with failover; returns the decoded body.
   Future<dynamic> post(

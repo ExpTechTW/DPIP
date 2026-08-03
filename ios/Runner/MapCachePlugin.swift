@@ -2,11 +2,9 @@ import Flutter
 import MapLibre
 import UIKit
 
-/// MethodChannel plugin that raises MapLibre's shared **ambient tile-cache**
-/// ceiling via `MLNOfflineStorage` — `maplibre_gl` exposes no size bound and the
-/// native default is only ~50 MB. It writes to `MLNOfflineStorage.shared`, the
-/// same storage the live map view and the home snapshot read, so more radar
-/// frames stay cached and scrubbing re-fetches less.
+/// MethodChannel plugin for MapLibre's shared **ambient tile-cache**:
+/// raise the size ceiling and preload resources fetched by the Flutter HTTP
+/// stack (ETag-aware) so MapLibre tile requests hit ambient at the same URL.
 public class MapCachePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(
@@ -25,8 +23,6 @@ public class MapCachePlugin: NSObject, FlutterPlugin {
         result(FlutterError(code: "bad_args", message: "Missing bytes", details: nil))
         return
       }
-      // Lowering the ceiling trims (LRU) immediately; raising it just lifts the
-      // cap. Completion runs on the main queue.
       MLNOfflineStorage.shared.setMaximumAmbientCacheSize(UInt(bytes)) { error in
         if let error = error {
           result(FlutterError(code: "cache_failed", message: error.localizedDescription, details: nil))
@@ -34,6 +30,42 @@ public class MapCachePlugin: NSObject, FlutterPlugin {
           result(nil)
         }
       }
+    case "preload":
+      guard
+        let args = call.arguments as? [String: Any],
+        let urlString = args["url"] as? String,
+        let url = URL(string: urlString),
+        let typed = args["data"] as? FlutterStandardTypedData
+      else {
+        result(FlutterError(code: "bad_args", message: "Missing url/data", details: nil))
+        return
+      }
+      let etag = args["etag"] as? String
+      let modifiedSec = (args["modified"] as? NSNumber)?.doubleValue ?? 0
+      let expiresSec = (args["expires"] as? NSNumber)?.doubleValue ?? 0
+      let mustRevalidate = args["mustRevalidate"] as? Bool ?? false
+      let modified: Date? = modifiedSec > 0
+        ? Date(timeIntervalSince1970: modifiedSec) : nil
+      let expires: Date? = expiresSec > 0
+        ? Date(timeIntervalSince1970: expiresSec) : nil
+      MLNOfflineStorage.shared.preload(
+        typed.data,
+        for: url,
+        modificationDate: modified,
+        expirationDate: expires,
+        eTag: etag,
+        mustRevalidate: mustRevalidate,
+        completionHandler: { _, error in
+          if let error = error {
+            result(FlutterError(
+              code: "preload_failed",
+              message: error.localizedDescription,
+              details: nil))
+          } else {
+            result(nil)
+          }
+        }
+      )
     default:
       result(FlutterMethodNotImplemented)
     }

@@ -1,3 +1,20 @@
+/// On-disk ETag response cache backed by **SQLite**, so it stays fast with many
+/// entries (JSON + small MVT/WebP tiles).
+///
+/// One table, three columns — `key` (request URL), `value` (the whole entry
+/// gzip level 9 for minimal space), `time` (**last used** ms — written on store
+/// and bumped on every successful read). A write is a single-row
+/// `INSERT OR REPLACE`, so re-fetching a URL updates it in place and body/etag
+/// can never diverge. Each write then:
+/// 1. sweeps rows whose last-used is older than [maxAge] (7 days), and
+/// 2. trims **least-recently-used** rows until stored blobs fit under
+///    [maxBytes] (~150 MB).
+///
+/// All operations are best-effort: any error is swallowed to a cache miss /
+/// no-op — the cache must never break a request.
+library;
+
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -42,29 +59,29 @@ class CachedBytes {
 /// Row count and stored byte size of the ETag cache (for the Debug page).
 typedef EtagCacheStats = ({int rows, int bytes});
 
-/// On-disk ETag response cache backed by **SQLite**, so it stays fast with many
-/// entries and evicts by age with a single indexed query.
-///
-/// One table, three columns — `key` (request URL), `value` (the whole entry
-/// gzip level 9 for minimal space), `time` (write instant in ms). A write is a
-/// single-row `INSERT OR REPLACE`, so re-fetching a URL updates it in place and
-/// body/etag can never diverge (SQLite commits the row atomically — no torn
-/// write). Each write also sweeps rows older than [maxAge] (7 days by default),
-/// which suits high-churn feeds like the radar frame list. All operations are
-/// best-effort: any error is swallowed to a cache miss / no-op — the cache must
-/// never break a request.
+/// See library doc.
 class EtagCacheStore {
-  EtagCacheStore(this._db, {this.maxAge = const Duration(days: 7)});
+  EtagCacheStore(
+    this._db, {
+    this.maxAge = const Duration(days: 7),
+    this.maxBytes = defaultMaxBytes,
+  });
 
   final Database _db;
 
-  /// Entries whose [time] is older than this are swept on the next write.
+  /// Entries whose **last-used** is older than this are swept on the next write.
   final Duration maxAge;
+
+  /// Soft ceiling on `SUM(LENGTH(value))` — least-recently-used rows drop first.
+  final int maxBytes;
+
+  /// Default size budget (~150 MB of gzipped envelopes on disk).
+  static const int defaultMaxBytes = 150 * 1024 * 1024;
 
   static const String _table = 'http_cache';
   static final GZipCodec _gzip9 = GZipCodec(level: 9);
 
-  /// Creates the cache table and its time index (idempotent) — call from
+  /// Creates the cache table and its last-used index (idempotent) — call from
   /// `openDatabase`'s `onCreate`.
   static Future<void> createSchema(Database db) async {
     await db.execute(
@@ -77,10 +94,11 @@ class EtagCacheStore {
   }
 
   /// Returns the cached **JSON** entry for [url], or null on a miss /
-  /// corruption / binary entry (those are [readBytes] only).
+  /// corruption / binary entry (those are [readBytes] only). Bumps last-used
+  /// asynchronously (does not block the read).
   Future<CachedResponse?> read(String url) async {
     try {
-      final entry = await _decode(url);
+      final entry = await _decode(url, touch: true);
       if (entry == null || entry['binary'] == true) return null;
       final body = entry['body'] as String;
       return CachedResponse(
@@ -97,9 +115,12 @@ class EtagCacheStore {
 
   /// Returns the cached **binary** entry for [url], or null on a miss /
   /// corruption / JSON entry.
-  Future<CachedBytes?> readBytes(String url) async {
+  ///
+  /// [touch] defaults to true (async last-used bump). Pass `false` on the
+  /// MapLibre tile hot path when a memory cache already tracks recency.
+  Future<CachedBytes?> readBytes(String url, {bool touch = true}) async {
     try {
-      final entry = await _decode(url);
+      final entry = await _decode(url, touch: touch);
       if (entry == null || entry['binary'] != true) return null;
       final raw = base64Decode(entry['body'] as String);
       return CachedBytes(
@@ -114,18 +135,21 @@ class EtagCacheStore {
   }
 
   /// Returns just the cached etag for [url] (for `If-None-Match` on the request
-  /// path), or null on a miss.
+  /// path), or null on a miss. Bumps last-used asynchronously.
   Future<String?> readEtag(String url) async {
     try {
-      return (await _decode(url))?['etag'] as String?;
+      return (await _decode(url, touch: true))?['etag'] as String?;
     } catch (_) {
       return null;
     }
   }
 
+  /// Bumps last-used for [url] without reading the body (tile hot path).
+  Future<void> touch(String url) => _touch(url);
+
   /// Stores a JSON [body] for [url] under [etag], gzip-9, replacing any
-  /// existing entry; then sweeps entries older than [maxAge]. Best-effort —
-  /// errors are swallowed.
+  /// existing entry; then age-sweeps and size-trims. Best-effort — errors are
+  /// swallowed.
   Future<void> write(
     String url, {
     required String etag,
@@ -191,9 +215,39 @@ class EtagCacheStore {
         where: 'time < ?',
         whereArgs: [now - maxAge.inMilliseconds],
       );
+      await _trimToMaxBytes();
     } catch (_) {
       // Caching is an optimisation; a write failure must not surface.
     }
+  }
+
+  /// Drops least-recently-used rows until `SUM(LENGTH(value)) <= [maxBytes]`.
+  Future<void> _trimToMaxBytes() async {
+    if (maxBytes <= 0) {
+      await _db.delete(_table);
+      return;
+    }
+    final totalRows = await _db.rawQuery(
+      'SELECT COALESCE(SUM(LENGTH(value)), 0) AS b FROM $_table',
+    );
+    var total = (totalRows.first['b'] as num).toInt();
+    if (total <= maxBytes) return;
+
+    final rows = await _db.rawQuery(
+      'SELECT key, LENGTH(value) AS b FROM $_table ORDER BY time ASC',
+    );
+    final keys = <String>[];
+    for (final row in rows) {
+      if (total <= maxBytes) break;
+      keys.add(row['key'] as String);
+      total -= (row['b'] as num).toInt();
+    }
+    if (keys.isEmpty) return;
+    await _db.delete(
+      _table,
+      where: 'key IN (${List.filled(keys.length, '?').join(',')})',
+      whereArgs: keys,
+    );
   }
 
   /// Deletes every cached entry.
@@ -221,7 +275,12 @@ class EtagCacheStore {
   }
 
   /// Reads and inflates the entry for [url] into its decoded map, or null.
-  Future<Map<String, dynamic>?> _decode(String url) async {
+  /// When [touch] is true, schedules an async last-used bump (never blocks the
+  /// tile hot path on an UPDATE).
+  Future<Map<String, dynamic>?> _decode(
+    String url, {
+    required bool touch,
+  }) async {
     final rows = await _db.query(
       _table,
       columns: ['value'],
@@ -231,6 +290,20 @@ class EtagCacheStore {
     );
     if (rows.isEmpty) return null;
     final blob = rows.first['value'] as Uint8List;
-    return jsonDecode(utf8.decode(gzip.decode(blob))) as Map<String, dynamic>;
+    final map =
+        jsonDecode(utf8.decode(gzip.decode(blob))) as Map<String, dynamic>;
+    if (touch) unawaited(_touch(url));
+    return map;
+  }
+
+  Future<void> _touch(String url) async {
+    try {
+      await _db.update(
+        _table,
+        {'time': DateTime.now().millisecondsSinceEpoch},
+        where: 'key = ?',
+        whereArgs: [url],
+      );
+    } catch (_) {}
   }
 }

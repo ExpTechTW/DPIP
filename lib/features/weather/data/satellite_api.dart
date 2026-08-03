@@ -6,8 +6,8 @@ import 'package:dpip/core/network/api_region.dart';
 /// Everything is keyed by 10-digit Unix **seconds**; a frame id *is* the second.
 /// The frame list is delta-encoded (`[baseSec, Δ, Δ, …]`) and served from
 /// `api.core-tnn1` with ETag/304. Tiles are WebP on `static.core-tnn1`
-/// ([ApiTier.coreStaticExclusive]), fetched directly by MapLibre. Same dual-host
-/// + delta-list shape as the v2 radar feed.
+/// ([ApiTier.coreStaticExclusive]); Prefetch warms SQLite + ambient. Same
+/// dual-host + delta-list shape as radar.
 class SatelliteApi {
   const SatelliteApi(this._client);
 

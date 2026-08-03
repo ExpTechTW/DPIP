@@ -3,6 +3,7 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -33,6 +34,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
+  Provider<ApiClient>.value(value: deps.apiClient),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),
   Provider<NetworkUsageStore?>.value(value: deps.networkUsage),

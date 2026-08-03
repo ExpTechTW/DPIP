@@ -13,6 +13,19 @@ class _FakeRadarRepository implements RadarRepository {
 
   @override
   String tileUrl(String frame) => 'https://host/$frame/{z}/{x}/{y}.png';
+
+  @override
+  Future<void> prefetchFrameTiles({
+    required List<String> frames,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+  }) async {}
+
+  @override
+  void cancelTilePrefetch() {}
 }
 
 /// Records the source/layer mutations a [MapLayer] makes; everything else on the
@@ -51,6 +64,16 @@ class _RecordingController implements MapLibreMapController {
     final json = properties.toJson();
     calls.add('set:$layerId:${json['visibility']}:${json['raster-opacity']}');
   }
+
+  @override
+  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
+    southwest: const LatLng(22, 120),
+    northeast: const LatLng(25, 122),
+  );
+
+  @override
+  CameraPosition? get cameraPosition =>
+      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;

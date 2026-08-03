@@ -101,8 +101,6 @@ class TyphoonMapLayer implements MapLayer {
   List<String> _warningNames = const [];
 
   static const String _src = 'typhoon-src';
-  static const String _imgSrc = 'typhoon-img-src';
-  static const String _imgLyr = 'typhoon-img-lyr';
   static const String _wxSrc = 'typhoon-wx-src';
   static const String _wxLyr = 'typhoon-wx-lyr';
   static const String _warnLyr = 'typhoon-warning-areas';
@@ -133,13 +131,6 @@ class TyphoonMapLayer implements MapLayer {
     _fpointLabelLyr,
     _currentLyr,
     _currentLabelLyr,
-  ];
-
-  static const List<List<num>> _imgCoords = [
-    [110, 32],
-    [150, 32],
-    [150, 10],
-    [110, 10],
   ];
 
   @override
@@ -182,7 +173,6 @@ class TyphoonMapLayer implements MapLayer {
     _controller = controller;
     final results = await Future.wait([
       _repository.geojson(),
-      _repository.images(),
       _repository.cyclones(),
       _repository.track(),
       _repository.potential(),
@@ -193,20 +183,18 @@ class TyphoonMapLayer implements MapLayer {
     ]);
 
     final geoResult = results[0] as Result<Map<String, dynamic>>;
-    final imagesResult = results[1] as Result<List<int>>;
-    final indexResult = results[2] as Result<CycloneIndex>;
-    final trackResult = results[3] as Result<TrackPayload>;
-    final potentialResult = results[4] as Result<TyphoonPotential>;
-    final probabilityResult = results[5] as Result<TyphoonProbability>;
-    final warningResult = results[6] as Result<TyphoonWarning>;
-    final radarResult = results[7] as Result<List<String>>;
-    final satResult = results[8] as Result<List<String>>;
+    final indexResult = results[1] as Result<CycloneIndex>;
+    final trackResult = results[2] as Result<TrackPayload>;
+    final potentialResult = results[3] as Result<TyphoonPotential>;
+    final probabilityResult = results[4] as Result<TyphoonProbability>;
+    final warningResult = results[5] as Result<TyphoonWarning>;
+    final radarResult = results[6] as Result<List<String>>;
+    final satResult = results[7] as Result<List<String>>;
 
     final trackPayload = trackResult.valueOrNull;
     final probability = probabilityResult.valueOrNull;
     final warning = warningResult.valueOrNull;
     final index = indexResult.valueOrNull;
-    final images = imagesResult.valueOrNull ?? const <int>[];
     _radarSecs = _ascendingSecs(radarResult.valueOrNull);
     _satSecs = _ascendingSecs(satResult.valueOrNull);
 
@@ -231,17 +219,6 @@ class TyphoonMapLayer implements MapLayer {
     _parsePoints(overlay);
 
     await _removeFromMap(controller);
-    final bulletin = bulletinSecond;
-    final sortedImages = _ascendingImageSecs(images);
-    final imageSec = bulletin == null
-        ? (sortedImages.isEmpty ? null : sortedImages.last)
-        : closestAtOrBefore(sortedImages, bulletin);
-    if (imageSec != null) {
-      await _addImage(controller, imageSec);
-      Log.info('Typhoon satellite image @ $imageSec (bulletin $bulletin)');
-    } else if (images.isNotEmpty) {
-      Log.warning('Typhoon satellite: no image ≤ bulletin $bulletin; skipping');
-    }
     await _addWarningAreas(controller, _warningNames);
     await _addVectorOverlay(controller, overlay);
     await _syncWeatherOverlay(controller);
@@ -295,6 +272,12 @@ class TyphoonMapLayer implements MapLayer {
 
   @override
   void onMapGestureEnd() => suppressCallouts.value = false;
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
 
   /// Active MapLibre controller (for Flutter screen-space callouts).
   MapLibreMapController? get mapController => _controller;
@@ -691,10 +674,7 @@ class TyphoonMapLayer implements MapLayer {
   Future<void> _syncWeatherOverlay(MapLibreMapController controller) async {
     await _removeWeatherRaster(controller);
     final kind = weatherOverlay.value;
-    if (kind == TyphoonWeatherOverlay.none) {
-      await _setLayerVisibility(controller, _imgLyr, true);
-      return;
-    }
+    if (kind == TyphoonWeatherOverlay.none) return;
     final bulletin = _bulletinSecond;
     if (bulletin == null) {
       Log.warning('Typhoon weather overlay: no bulletin time yet');
@@ -709,7 +689,38 @@ class TyphoonMapLayer implements MapLayer {
     final url = kind == TyphoonWeatherOverlay.radar
         ? radar.tileUrl('$frame')
         : satellite.tileUrl('$frame');
-    await _setLayerVisibility(controller, _imgLyr, false);
+    // Warm ambient via ApiClient before MapLibre races its own GETs.
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
+      final args = (
+        frames: ['$frame'],
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+      );
+      if (kind == TyphoonWeatherOverlay.radar) {
+        await radar.prefetchFrameTiles(
+          frames: args.frames,
+          south: args.south,
+          west: args.west,
+          north: args.north,
+          east: args.east,
+          zoom: args.zoom,
+        );
+      } else {
+        await satellite.prefetchFrameTiles(
+          frames: args.frames,
+          south: args.south,
+          west: args.west,
+          north: args.north,
+          east: args.east,
+          zoom: args.zoom,
+        );
+      }
+    } catch (_) {}
     await controller.addSource(
       _wxSrc,
       RasterSourceProperties(tiles: [url], tileSize: 256),
@@ -778,38 +789,6 @@ class TyphoonMapLayer implements MapLayer {
     <Object>['get', 'kind'],
     kind,
   ];
-
-  /// Ascending Unix seconds for typhoon meteor image list alignment.
-  static List<int> _ascendingImageSecs(List<int> images) {
-    if (images.isEmpty) return const [];
-    return List<int>.of(images)..sort();
-  }
-
-  Future<void> _addImage(MapLibreMapController controller, int second) async {
-    try {
-      await controller.removeLayer(_imgLyr);
-    } catch (_) {}
-    try {
-      await controller.removeSource(_imgSrc);
-    } catch (_) {}
-    await controller.addSource(
-      _imgSrc,
-      ImageSourceProperties(
-        url: _repository.imageUrl(second),
-        coordinates: _imgCoords,
-      ),
-    );
-    await controller.addRasterLayer(
-      _imgSrc,
-      _imgLyr,
-      const RasterLayerProperties(rasterOpacity: 0.8),
-      belowLayerId: outlineLayerId,
-    );
-    // Weather raster replaces the meteor PNG visually when active.
-    if (weatherOverlay.value != TyphoonWeatherOverlay.none) {
-      await _setLayerVisibility(controller, _imgLyr, false);
-    }
-  }
 
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
@@ -1063,16 +1042,14 @@ class TyphoonMapLayer implements MapLayer {
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
     await _removeWeatherRaster(controller);
-    for (final layerId in [..._vectorLayers, _imgLyr]) {
+    for (final layerId in _vectorLayers) {
       try {
         await controller.removeLayer(layerId);
       } catch (_) {}
     }
-    for (final sourceId in [_src, _imgSrc]) {
-      try {
-        await controller.removeSource(sourceId);
-      } catch (_) {}
-    }
+    try {
+      await controller.removeSource(_src);
+    } catch (_) {}
   }
 
   void _queue(Future<void> Function() op) {

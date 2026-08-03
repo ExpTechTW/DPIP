@@ -1,16 +1,14 @@
+/// Configures MapLibre's shared **ambient tile cache** — size ceiling + preload
+/// of bytes fetched by the Flutter HTTP stack (ETag / SQLite) under the same
+/// HTTPS URL MapLibre will request.
+library;
+
+import 'dart:io';
+
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/services.dart';
 
-/// Configures MapLibre's shared **ambient tile cache** — the on-disk store the
-/// live map and the home snapshot both read.
-///
-/// `maplibre_gl` 0.25.0 wraps `clearAmbientCache` but not a size bound, and the
-/// native default ceiling is only ~50 MB, so this drives the native
-/// `MLNOfflineStorage` (iOS) / `OfflineManager` (Android)
-/// `setMaximumAmbientCacheSize` directly to raise it — more radar frames stay
-/// cached, so scrubbing the timeline re-fetches far less. Call once the map
-/// exists (MapLibre is then initialised on both platforms). A missing native
-/// handler degrades to a no-op: caching still works at the default size.
+/// Native ambient-cache bridge (iOS `MLNOfflineStorage` / Android `OfflineManager`).
 class MapCache {
   const MapCache();
 
@@ -18,17 +16,51 @@ class MapCache {
     'com.exptech.dpip/map_cache',
   );
 
-  /// Caps the shared ambient cache at [bytes], trimming (LRU) if it is already
-  /// larger. Best-effort — a failure just leaves the default ceiling in place.
+  static final GZipCodec _gzip = GZipCodec();
+
+  /// Caps the shared ambient cache at [bytes], trimming (LRU) if already larger.
   Future<void> setMaximumSize(int bytes) async {
     try {
       await _channel.invokeMethod<void>('setMaximumAmbientCacheSize', {
         'bytes': bytes,
       });
     } on MissingPluginException {
-      // Platform without the handler — cache stays at its native default size.
+      // Platform without the handler.
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'setMaximumAmbientCacheSize');
     }
+  }
+
+  /// Inserts [data] into ambient under [url] — same key MapLibre uses for HTTPS
+  /// tile requests. [data] must be uncompressed (gzip magic is inflated here).
+  Future<void> preload({
+    required String url,
+    required Uint8List data,
+    String? etag,
+    int modified = 0,
+    int expires = 0,
+    bool mustRevalidate = false,
+  }) async {
+    try {
+      await _channel.invokeMethod<void>('preload', {
+        'url': url,
+        'data': _uncompressed(data),
+        'etag': etag,
+        'modified': modified,
+        'expires': expires,
+        'mustRevalidate': mustRevalidate,
+      });
+    } on MissingPluginException {
+      // Platform without the handler.
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'MapCache.preload');
+    }
+  }
+
+  static Uint8List _uncompressed(Uint8List data) {
+    if (data.length >= 2 && data[0] == 0x1f && data[1] == 0x8b) {
+      return Uint8List.fromList(_gzip.decode(data));
+    }
+    return data;
   }
 }

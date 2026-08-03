@@ -47,11 +47,4 @@ abstract interface class MeteorTyphoonRepository {
   /// The overlay GeoJSON `FeatureCollection` (potential + probability), for
   /// direct map rendering.
   Future<Result<Map<String, dynamic>>> geojson();
-
-  /// Available track-image times (Unix seconds); `Ok([])` when none.
-  Future<Result<List<int>>> images();
-
-  /// The concrete URL of the track-image PNG at [second] — fetched directly
-  /// (e.g. by an image widget), not a decoded model.
-  String imageUrl(int second);
 }

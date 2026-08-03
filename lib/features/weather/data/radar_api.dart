@@ -5,12 +5,9 @@ import 'package:dpip/core/network/api_region.dart';
 ///
 /// Everything is keyed by 10-digit Unix **seconds**; a frame id *is* the second.
 /// The frame list is delta-encoded (`[baseSec, Δ, Δ, …]`) and served from
-/// `api.core-tnn1` with ETag/304 — revalidation and gzip-9 storage are handled
-/// transparently by the global ETag cache, so the list costs ~one round trip per
-/// change. Tiles are WebP served from a **different host**, `static.core-tnn1`
-/// ([ApiTier.coreStaticExclusive]), fetched directly by MapLibre ([tileUrl]
-/// hands out a concrete host URL); the server sets `Cache-Control: max-age=300`,
-/// so scrubbing the timeline reuses MapLibre's own tile cache.
+/// `api.core-tnn1` with ETag/304. Tiles are WebP on `static.core-tnn1`
+/// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
+/// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
 class RadarApi {
   const RadarApi(this._client);
 

@@ -114,6 +114,13 @@ abstract interface class MapLayer {
   /// Rebuilds on camera idle so projections stay in sync.
   Widget buildMapOverlay(BuildContext context);
 
+  /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
+  Future<void> onCameraIdle(MapLibreMapController controller);
+
+  /// Ambient cache was wiped (e.g. after radar scrub + background). Layers that
+  /// pin tiles via app HTTP should rehydrate from their ETag store.
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller);
+
   /// Finger/stylus went down on the map — hide ephemeral overlays (callouts).
   void onMapGestureStart();
 

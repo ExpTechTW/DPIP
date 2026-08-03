@@ -13,6 +13,19 @@ class _FakeSatelliteRepository implements SatelliteRepository {
 
   @override
   String tileUrl(String frame) => 'https://host/$frame/{z}/{x}/{y}.webp';
+
+  @override
+  Future<void> prefetchFrameTiles({
+    required List<String> frames,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+  }) async {}
+
+  @override
+  void cancelTilePrefetch() {}
 }
 
 class _RecordingController implements MapLibreMapController {
@@ -32,6 +45,29 @@ class _RecordingController implements MapLibreMapController {
     double? minzoom,
     double? maxzoom,
   }) async => calls.add('addRasterLayer:$layerId');
+
+  @override
+  Future<void> addLineLayer(
+    String sourceId,
+    String layerId,
+    LineLayerProperties properties, {
+    String? belowLayerId,
+    String? sourceLayer,
+    double? minzoom,
+    double? maxzoom,
+    dynamic filter,
+    bool enableInteraction = true,
+  }) async => calls.add('addLineLayer:$layerId');
+
+  @override
+  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
+    southwest: const LatLng(22, 120),
+    northeast: const LatLng(25, 122),
+  );
+
+  @override
+  CameraPosition? get cameraPosition =>
+      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
 
   @override
   Future<void> removeLayer(String layerId) async =>
@@ -91,6 +127,8 @@ void main() {
       'addRasterLayer:satellite-lyr-1700001200000',
       'addSource:satellite-src-1700001800000',
       'addRasterLayer:satellite-lyr-1700001800000',
+      'addLineLayer:satellite-global-outline',
+      'addLineLayer:satellite-county-outline',
     ]);
 
     controller.calls.clear();

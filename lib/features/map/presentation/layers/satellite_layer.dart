@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -68,6 +71,40 @@ class SatelliteMapLayer implements MapLayer {
   @override
   void onMapGestureEnd() {}
 
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {
+    final id = _shownFrameId;
+    if (id == null) return;
+    unawaited(_warmFrames(controller, [id]));
+  }
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {
+    final id = _shownFrameId;
+    if (id == null) return;
+    await _warmFrames(controller, [id]);
+  }
+
+  Future<void> _warmFrames(
+    MapLibreMapController controller,
+    List<String> frames,
+  ) async {
+    try {
+      final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
+      await _repository.prefetchFrameTiles(
+        frames: frames,
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'satellite viewport prefetch');
+    }
+  }
+
   /// Himawari Band-13 brightness temperature — cold white / warm black
   /// (180–300 K), matching the tile renderer.
   @override
@@ -131,6 +168,9 @@ class SatelliteMapLayer implements MapLayer {
     final index = _indexById[frame.id];
     if (index == null) return;
 
+    // Scrub storms: abort any in-flight Dio tile warm immediately.
+    _repository.cancelTilePrefetch();
+
     final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
     final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
@@ -166,6 +206,8 @@ class SatelliteMapLayer implements MapLayer {
     }
     await _ensureBlackOutline(controller);
     _shownFrameId = frame.id;
+    // Current frame only — full-window warm on scrub overwhelmed the cache.
+    unawaited(_warmFrames(controller, [frame.id]));
   }
 
   /// Black land borders above the IR stack — `global` for every country, then
@@ -216,6 +258,7 @@ class SatelliteMapLayer implements MapLayer {
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
+    _repository.cancelTilePrefetch();
     for (final id in _onMap) {
       await _removeFrame(controller, id);
     }

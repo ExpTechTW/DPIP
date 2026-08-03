@@ -66,6 +66,14 @@ const String dpmAedClustersLayerId = 'dpm-aed-clusters';
 const String dpmAedClusterCountLayerId = 'dpm-aed-cluster-count';
 const String dpmAedPointsLayerId = 'dpm-aed-points';
 
+/// Origin basemap XYZ (LB) — MapLibre HTTPS + ambient preload.
+const String basemapOriginTileUrl =
+    'https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf';
+
+/// Origin glyph template — MapLibre HTTPS.
+const String glyphsOriginUrl =
+    'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf';
+
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
 ///
 /// Pass [MapColors.of] for the active brightness — never ad-hoc hexes. The base
@@ -73,10 +81,18 @@ const String dpmAedPointsLayerId = 'dpm-aed-points';
 /// map-assets CDN) so overlay layers can render `text-field` symbols. Overlays
 /// (radar) anchor below [outlineLayerId] so the county borders stay legible.
 ///
+/// [basemapTileUrl] / [glyphsUrl] / [aedTileUrl] are origin HTTPS templates
+/// (MapLibre fetches them; [AmbientPrefetcher] + ambient preload raises hits).
+///
 /// When [aedTileUrl] is set (XYZ MVT template), AED vector tiles are baked into
 /// the style document — same path as the ExpTech basemap source. Runtime
 /// `addSource(VectorSource…)` is avoided; it has been unreliable for this feed.
-String exptechVectorStyle(MapPalette palette, {String? aedTileUrl}) {
+String exptechVectorStyle(
+  MapPalette palette, {
+  required String basemapTileUrl,
+  required String glyphsUrl,
+  String? aedTileUrl,
+}) {
   final background = palette.background;
   final fill = palette.fill;
   final outline = palette.outline;
@@ -135,9 +151,9 @@ String exptechVectorStyle(MapPalette palette, {String? aedTileUrl}) {
   return '''
 {
   "version": 8,
-  "glyphs": "https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf",
+  "glyphs": "$glyphsUrl",
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf"], "maxzoom": 12 }$aedSource
+    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }$aedSource
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },

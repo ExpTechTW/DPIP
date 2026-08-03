@@ -6,9 +6,9 @@ import 'package:dpip/core/network/api_region.dart';
 
 /// Tile templates + JSON detail for `/api/v2/tiles/dpm/…`.
 ///
-/// Both MVT tiles and AED detail live on **static** (`static.core-tnn1`), same
-/// host pattern as radar/satellite tiles. MapLibre fetches [tileUrl] directly;
-/// detail GETs go through [ApiClient] for ETag / gzip / errors.
+/// Detail GETs go through [ApiClient] for ETag / gzip / errors. MVT tiles keep
+/// the HTTPS [tileUrl] template in the style; [ApiClient.getBytes] + ambient
+/// preload (see disaster_map data layer) warms MapLibre's cache.
 class DisasterMapApi {
   const DisasterMapApi(this._client);
 

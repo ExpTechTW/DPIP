@@ -78,14 +78,4 @@ class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
   @override
   Future<Result<Map<String, dynamic>>> geojson() =>
       guardResult(_api.getGeojson);
-
-  @override
-  Future<Result<List<int>>> images() => guardResult(
-    () async => [
-      for (final t in await _api.getImagesList()) (t as num).toInt(),
-    ],
-  );
-
-  @override
-  String imageUrl(int second) => _api.imagesUrl(second);
 }

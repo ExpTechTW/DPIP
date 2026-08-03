@@ -7,11 +7,8 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.offline.OfflineManager
 
 /**
- * Raises MapLibre's shared ambient tile-cache ceiling via [OfflineManager] — the
- * Android counterpart of iOS `MapCachePlugin`. maplibre_gl exposes no size bound
- * and the native default is only ~50 MB, so a bigger ceiling keeps more radar
- * frames cached and scrubbing re-fetches less. Writes to the same shared cache
- * the map view and the home snapshot read.
+ * MapLibre ambient tile-cache bridge — size ceiling + preload (Android
+ * counterpart of iOS `MapCachePlugin`).
  */
 class MapCacheChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {
@@ -37,6 +34,28 @@ class MapCacheChannel(private val context: Context) :
                             result.error("cache_failed", message, null)
                     },
                 )
+            }
+            "preload" -> {
+                val url = call.argument<String>("url")
+                val data = call.argument<ByteArray>("data")
+                if (url.isNullOrEmpty() || data == null) {
+                    result.error("bad_args", "Missing url/data", null)
+                    return
+                }
+                val etag = call.argument<String>("etag")
+                val modified = call.argument<Number>("modified")?.toLong() ?: 0L
+                val expires = call.argument<Number>("expires")?.toLong() ?: 0L
+                val mustRevalidate = call.argument<Boolean>("mustRevalidate") ?: false
+                MapLibre.getInstance(context)
+                OfflineManager.getInstance(context).putResourceWithUrl(
+                    url,
+                    data,
+                    modified,
+                    expires,
+                    etag,
+                    mustRevalidate,
+                )
+                result.success(null)
             }
             else -> result.notImplemented()
         }

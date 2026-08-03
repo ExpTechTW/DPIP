@@ -9,6 +9,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
+import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
@@ -123,8 +124,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
 
   void _onSelectionChanged() => _applySelection();
 
-  void _onMapCreated(MapLibreMapController controller) =>
-      _controller = controller;
+  void _onMapCreated(MapLibreMapController controller) {
+    _controller = controller;
+    unawaited(const MapCache().setMaximumSize(150 * 1024 * 1024));
+  }
 
   void _onStyleLoaded() {
     _styleReady = true;
