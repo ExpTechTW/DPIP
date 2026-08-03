@@ -1,6 +1,5 @@
-/// The 颱風 (typhoon) map layer — the CWA storm track (observed + forecast
-/// paths, the forecast cone, forecast waypoints, and the current centre) plus a
-/// scrubbable satellite-imagery overlay, from the v5 meteor typhoon feed.
+/// The 颱風 (typhoon) map layer — CWA track / potential / probability / warning
+/// plus scrubbable satellite imagery, from the full v5 meteor typhoon surface.
 library;
 
 import 'dart:math' as math;
@@ -10,6 +9,12 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/widgets/typhoon_panel.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_kind.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_overlay.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_potential.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_probability.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -17,13 +22,11 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// A tappable storm waypoint parsed from the geojson (a forecast point or the
-/// current centre).
+/// A tappable storm waypoint parsed from the overlay geojson.
 typedef _StormPoint = ({double lat, double lng, String? label});
 
-/// A sheet-type [MapLayer] for the active typhoon: it renders the track geojson
-/// + a satellite raster on activation, self-frames on the storm once, and drives
-/// a [TyphoonPanel] (storm summary + satellite time selector) via notifiers.
+/// Sheet-type [MapLayer]: renders every typhoon dataset on the map and drives
+/// [TyphoonPanel] (summary, warning, history, satellite) via notifiers.
 class TyphoonMapLayer implements MapLayer {
   TyphoonMapLayer(this._repository);
 
@@ -33,27 +36,34 @@ class TyphoonMapLayer implements MapLayer {
   bool _added = false;
   Future<void> _ops = Future<void>.value();
 
-  /// Satellite-image times (Unix seconds, ascending) and the shown index — read
-  /// by the panel's time selector.
+  /// Satellite-image times (Unix seconds, ascending) and the shown index.
   final ValueNotifier<List<int>> imageFrames = ValueNotifier(const []);
   final ValueNotifier<int> selectedFrame = ValueNotifier(0);
 
-  /// The active cyclone summary (null when none) and the tapped waypoint label.
-  final ValueNotifier<TyphoonCyclone?> summary = ValueNotifier(null);
-  final ValueNotifier<String?> tapped = ValueNotifier(null);
+  /// Dataset history clock (potential/track/probability share the same times).
+  final ValueNotifier<List<int>> historyFrames = ValueNotifier(const []);
 
-  /// Bumped on every tap that hits a waypoint — even the same one — so the panel
-  /// re-pops after the user collapsed it (a same-value [tapped] wouldn't notify).
-  /// Mirrors the station sheet's selectionRevision.
+  /// Selected history second; `null` = live `/geojson` + latest datasets.
+  final ValueNotifier<int?> selectedHistory = ValueNotifier(null);
+
+  final ValueNotifier<TyphoonCyclone?> summary = ValueNotifier(null);
+  final ValueNotifier<TrackPayload?> track = ValueNotifier(null);
+  final ValueNotifier<TyphoonWarning?> warning = ValueNotifier(null);
+  final ValueNotifier<TyphoonProbability?> probability = ValueNotifier(null);
+  final ValueNotifier<String?> tapped = ValueNotifier(null);
   final ValueNotifier<int> tapRevision = ValueNotifier(0);
 
-  /// Tappable waypoints from the latest geojson.
   final List<_StormPoint> _points = [];
+  List<String> _warningNames = const [];
 
   static const String _src = 'typhoon-src';
   static const String _imgSrc = 'typhoon-img-src';
   static const String _imgLyr = 'typhoon-img-lyr';
+  static const String _warnLyr = 'typhoon-warning-areas';
+  static const String _probLyr = 'typhoon-probability';
   static const String _coneLyr = 'typhoon-cone';
+  static const String _c15Lyr = 'typhoon-circle15';
+  static const String _c25Lyr = 'typhoon-circle25';
   static const String _pastLyr = 'typhoon-past';
   static const String _forecastLyr = 'typhoon-forecast';
   static const String _fpointLyr = 'typhoon-fpoint';
@@ -61,7 +71,11 @@ class TyphoonMapLayer implements MapLayer {
   static const String _currentLyr = 'typhoon-current';
 
   static const List<String> _vectorLayers = [
+    _warnLyr,
+    _probLyr,
     _coneLyr,
+    _c15Lyr,
+    _c25Lyr,
     _pastLyr,
     _forecastLyr,
     _fpointLyr,
@@ -69,20 +83,12 @@ class TyphoonMapLayer implements MapLayer {
     _currentLyr,
   ];
 
-  /// The Himawari satellite sector the PNGs project onto — corners as [lng, lat]
-  /// (top-left, top-right, bottom-right, bottom-left), a fixed footprint carried
-  /// over from legacy.
   static const List<List<num>> _imgCoords = [
     [110, 32],
     [150, 32],
     [150, 10],
     [110, 10],
   ];
-
-  static const Map<String, dynamic> _emptyFc = {
-    'type': 'FeatureCollection',
-    'features': <dynamic>[],
-  };
 
   @override
   String get id => 'typhoon';
@@ -112,26 +118,185 @@ class TyphoonMapLayer implements MapLayer {
   @override
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
-    final geo = (await _repository.geojson()).valueOrNull ?? _emptyFc;
-    final images = (await _repository.images()).valueOrNull ?? const <int>[];
-    final index = (await _repository.cyclones()).valueOrNull;
+    final results = await Future.wait([
+      _repository.geojson(),
+      _repository.images(),
+      _repository.cyclones(),
+      _repository.track(),
+      _repository.potential(),
+      _repository.probability(),
+      _repository.warning(),
+      _repository.history(TyphoonKind.potential),
+    ]);
+
+    final geoResult = results[0] as Result<Map<String, dynamic>>;
+    final imagesResult = results[1] as Result<List<int>>;
+    final indexResult = results[2] as Result<CycloneIndex>;
+    final trackResult = results[3] as Result<TrackPayload>;
+    final potentialResult = results[4] as Result<TyphoonPotential>;
+    final probabilityResult = results[5] as Result<TyphoonProbability>;
+    final warningResult = results[6] as Result<TyphoonWarning>;
+    final historyResult = results[7] as Result<List<int>>;
+
+    final trackPayload = trackResult.valueOrNull;
+    final probability = probabilityResult.valueOrNull;
+    final warning = warningResult.valueOrNull;
+    final index = indexResult.valueOrNull;
+    final images = imagesResult.valueOrNull ?? const <int>[];
+    final history = historyResult.valueOrNull ?? const <int>[];
+
     summary.value = (index != null && index.cyclones.isNotEmpty)
         ? index.cyclones.first
         : null;
+    track.value = trackPayload;
+    this.probability.value = probability;
+    this.warning.value = warning;
     imageFrames.value = images;
     selectedFrame.value = images.isEmpty ? 0 : images.length - 1;
+    historyFrames.value = history;
+    selectedHistory.value = null;
+
+    final geo = _liveOverlay(
+      geoResult: geoResult,
+      potential: potentialResult.valueOrNull,
+      probability: probability,
+      track: trackPayload,
+    );
     _parsePoints(geo);
+    _warningNames = [
+      for (final a in warning?.areas ?? const <WarningArea>[]) a.name,
+    ];
 
     await _removeFromMap(controller);
-    // Newest satellite frame, below the borders so they stay legible.
     if (images.isNotEmpty) {
       await _addImage(controller, images.last);
     }
-    // Track vector overlays — one source, one layer per `kind` via a filter.
-    // All are non-interactive so a tap anywhere in the storm routes to
-    // map#onMapClick → onMapTap (our nearest-waypoint math), not the unhandled
-    // native feature#onTap.
+    await _addWarningAreas(controller, _warningNames);
+    await _addVectorOverlay(controller, geo);
+    _added = true;
+  }
+
+  Map<String, dynamic> _liveOverlay({
+    required Result<Map<String, dynamic>> geoResult,
+    required TyphoonPotential? potential,
+    required TyphoonProbability? probability,
+    required TrackPayload? track,
+  }) {
+    final server = geoResult.valueOrNull;
+    if (server != null) {
+      return augmentTyphoonGeojson(server, track: track);
+    }
+    if (potential != null && probability != null) {
+      return typhoonFeatureCollection(
+        potential: potential,
+        probability: probability,
+        track: track,
+      );
+    }
+    return emptyTyphoonFeatureCollection;
+  }
+
+  /// Scrub dataset history — rebuilds the vector overlay from typed snapshots.
+  void selectHistory(int? second) {
+    selectedHistory.value = second;
+    final controller = _controller;
+    if (controller == null || !_added) return;
+    _queue(() => _applyHistory(controller, second));
+  }
+
+  Future<void> _applyHistory(
+    MapLibreMapController controller,
+    int? second,
+  ) async {
+    if (second == null) {
+      // Back to live — re-fetch latest bundle.
+      final geoR = await _repository.geojson();
+      final trackR = await _repository.track();
+      final potR = await _repository.potential();
+      final probR = await _repository.probability();
+      final warnR = await _repository.warning();
+      track.value = trackR.valueOrNull;
+      probability.value = probR.valueOrNull;
+      warning.value = warnR.valueOrNull;
+      _warningNames = [
+        for (final a in warning.value?.areas ?? const <WarningArea>[]) a.name,
+      ];
+      final geo = _liveOverlay(
+        geoResult: geoR,
+        potential: potR.valueOrNull,
+        probability: probR.valueOrNull,
+        track: trackR.valueOrNull,
+      );
+      _parsePoints(geo);
+      await _addWarningAreas(controller, _warningNames);
+      await controller.setGeoJsonSource(_src, geo);
+      return;
+    }
+
+    final results = await Future.wait([
+      _repository.trackAt(second),
+      _repository.potentialAt(second),
+      _repository.probabilityAt(second),
+      _repository.warningAt(second),
+    ]);
+    final trackR = results[0] as Result<TrackPayload>;
+    final potR = results[1] as Result<TyphoonPotential>;
+    final probR = results[2] as Result<TyphoonProbability>;
+    final warnR = results[3] as Result<TyphoonWarning>;
+
+    final pot = potR.valueOrNull;
+    final prob = probR.valueOrNull;
+    if (pot == null || prob == null) {
+      Log.warning('Typhoon history $second incomplete; keeping current overlay');
+      return;
+    }
+    track.value = trackR.valueOrNull;
+    probability.value = prob;
+    warning.value = warnR.valueOrNull;
+    _warningNames = [
+      for (final a in warning.value?.areas ?? const <WarningArea>[]) a.name,
+    ];
+    final geo = typhoonFeatureCollection(
+      potential: pot,
+      probability: prob,
+      track: trackR.valueOrNull,
+    );
+    _parsePoints(geo);
+    await _addWarningAreas(controller, _warningNames);
+    await controller.setGeoJsonSource(_src, geo);
+  }
+
+  Future<void> _addVectorOverlay(
+    MapLibreMapController controller,
+    Map<String, dynamic> geo,
+  ) async {
     await controller.addSource(_src, GeojsonSourceProperties(data: geo));
+    // Probability under the cone so the track cone stays readable.
+    await controller.addFillLayer(
+      _src,
+      _probLyr,
+      const FillLayerProperties(
+        fillColor: [
+          'match',
+          ['get', 'p'],
+          100,
+          'rgba(183, 28, 28, 0.40)',
+          80,
+          'rgba(211, 47, 47, 0.32)',
+          60,
+          'rgba(239, 83, 80, 0.26)',
+          40,
+          'rgba(255, 138, 101, 0.20)',
+          20,
+          'rgba(255, 183, 77, 0.16)',
+          'rgba(255, 183, 77, 0.12)',
+        ],
+        fillOutlineColor: 'rgba(183, 28, 28, 0.55)',
+      ),
+      filter: _kindIs('probability'),
+      belowLayerId: outlineLayerId,
+      enableInteraction: false,
+    );
     await controller.addFillLayer(
       _src,
       _coneLyr,
@@ -140,6 +305,28 @@ class TyphoonMapLayer implements MapLayer {
         fillOutlineColor: 'rgba(255,82,82,0.5)',
       ),
       filter: _kindIs('cone'),
+      belowLayerId: outlineLayerId,
+      enableInteraction: false,
+    );
+    await controller.addFillLayer(
+      _src,
+      _c15Lyr,
+      const FillLayerProperties(
+        fillColor: 'rgba(255, 193, 7, 0.14)',
+        fillOutlineColor: 'rgba(255, 160, 0, 0.75)',
+      ),
+      filter: _kindIs('circle15'),
+      belowLayerId: outlineLayerId,
+      enableInteraction: false,
+    );
+    await controller.addFillLayer(
+      _src,
+      _c25Lyr,
+      const FillLayerProperties(
+        fillColor: 'rgba(156, 39, 176, 0.16)',
+        fillOutlineColor: 'rgba(123, 31, 162, 0.8)',
+      ),
+      filter: _kindIs('circle25'),
       belowLayerId: outlineLayerId,
       enableInteraction: false,
     );
@@ -209,7 +396,37 @@ class TyphoonMapLayer implements MapLayer {
       filter: _kindIs('current'),
       enableInteraction: false,
     );
-    _added = true;
+  }
+
+  /// Highlights warned counties on the base `city` layer (matched by NAME).
+  Future<void> _addWarningAreas(
+    MapLibreMapController controller,
+    List<String> names,
+  ) async {
+    try {
+      await controller.removeLayer(_warnLyr);
+    } catch (_) {
+      // Not present yet.
+    }
+    if (names.isEmpty) return;
+    await controller.addFillLayer(
+      'exptech',
+      _warnLyr,
+      const FillLayerProperties(
+        fillColor: 'rgba(255, 193, 7, 0.22)',
+        fillOutlineColor: 'rgba(255, 143, 0, 0.85)',
+      ),
+      sourceLayer: 'city',
+      filter: <Object>[
+        'match',
+        <Object>['get', 'NAME'],
+        ...names,
+        true,
+        false,
+      ],
+      belowLayerId: outlineLayerId,
+      enableInteraction: false,
+    );
   }
 
   static List<Object> _kindIs(String kind) => <Object>[
@@ -218,7 +435,6 @@ class TyphoonMapLayer implements MapLayer {
     kind,
   ];
 
-  /// Swaps the satellite raster to the frame at [second] (tolerant remove-add).
   void showFrame(int index) {
     final frames = imageFrames.value;
     if (index < 0 || index >= frames.length) return;
@@ -231,14 +447,10 @@ class TyphoonMapLayer implements MapLayer {
   Future<void> _addImage(MapLibreMapController controller, int second) async {
     try {
       await controller.removeLayer(_imgLyr);
-    } catch (_) {
-      // Not on the map yet.
-    }
+    } catch (_) {}
     try {
       await controller.removeSource(_imgSrc);
-    } catch (_) {
-      // Not on the map yet.
-    }
+    } catch (_) {}
     await controller.addSource(
       _imgSrc,
       ImageSourceProperties(
@@ -256,7 +468,6 @@ class TyphoonMapLayer implements MapLayer {
 
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
-    // Nearest waypoint within ~0.5° (lon scaled by latitude).
     const threshold = 0.5 * 0.5;
     final cosLat = math.cos(latLng.latitude * math.pi / 180);
     _StormPoint? best;
@@ -274,11 +485,39 @@ class TyphoonMapLayer implements MapLayer {
     if (best != null) tapRevision.value++;
   }
 
+  /// Nearest [TrackForecast] to a tapped label's coordinates (for sheet detail).
+  TrackForecast? forecastForLabel(String? label) {
+    if (label == null) return null;
+    _StormPoint? point;
+    for (final p in _points) {
+      if (p.label == label) {
+        point = p;
+        break;
+      }
+    }
+    if (point == null) return null;
+    final cyclones = track.value?.cyclones;
+    if (cyclones == null || cyclones.isEmpty) return null;
+    final forecasts = cyclones.first.forecast;
+    if (forecasts.isEmpty) return null;
+    TrackForecast? best;
+    var bestD = double.infinity;
+    for (final f in forecasts) {
+      final dLat = f.latitude - point.lat;
+      final dLng = f.longitude - point.lng;
+      final d = dLat * dLat + dLng * dLng;
+      if (d < bestD) {
+        bestD = d;
+        best = f;
+      }
+    }
+    return best;
+  }
+
   @override
   Widget buildSheet(BuildContext context) =>
       TyphoonPanel(key: const ValueKey('typhoon'), layer: this);
 
-  /// Track / cone / centre key — colours match the vector layers above.
   @override
   Widget buildLegend(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -314,6 +553,54 @@ class TyphoonMapLayer implements MapLayer {
               ),
             ),
             label: l10n.typhoonLegendCone,
+          ),
+          SymbolLegendItem(
+            swatch: Container(
+              width: 16,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFC107).withValues(alpha: 0.35),
+                border: Border.all(color: const Color(0xFFFFA000)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            label: l10n.typhoonLegendCircle15,
+          ),
+          SymbolLegendItem(
+            swatch: Container(
+              width: 16,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFF9C27B0).withValues(alpha: 0.35),
+                border: Border.all(color: const Color(0xFF7B1FA2)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            label: l10n.typhoonLegendCircle25,
+          ),
+          SymbolLegendItem(
+            swatch: Container(
+              width: 16,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFB71C1C).withValues(alpha: 0.4),
+                border: Border.all(color: const Color(0xFFB71C1C)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            label: l10n.typhoonLegendProbability,
+          ),
+          SymbolLegendItem(
+            swatch: Container(
+              width: 16,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFC107).withValues(alpha: 0.35),
+                border: Border.all(color: const Color(0xFFFF8F00)),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            label: l10n.typhoonLegendWarningAreas,
           ),
         ],
       ),
@@ -358,21 +645,15 @@ class TyphoonMapLayer implements MapLayer {
     for (final layerId in [..._vectorLayers, _imgLyr]) {
       try {
         await controller.removeLayer(layerId);
-      } catch (_) {
-        // Not on the map yet.
-      }
+      } catch (_) {}
     }
     for (final sourceId in [_src, _imgSrc]) {
       try {
         await controller.removeSource(sourceId);
-      } catch (_) {
-        // Not on the map yet.
-      }
+      } catch (_) {}
     }
   }
 
-  /// Serialises the satellite-frame swaps (driven by the panel, off the
-  /// scaffold's own op queue) so an add never races a remove.
   void _queue(Future<void> Function() op) {
     _ops = _ops.then((_) => op()).catchError((Object e, StackTrace st) {
       Log.handle(e, st, 'Typhoon layer op failed');
@@ -380,7 +661,6 @@ class TyphoonMapLayer implements MapLayer {
   }
 }
 
-/// A short solid or dashed line mark for the typhoon track legend.
 class _TrackSwatch extends StatelessWidget {
   const _TrackSwatch({required this.color, required this.dashed});
 
@@ -429,7 +709,6 @@ class _TrackPainter extends CustomPainter {
       oldDelegate.color != color || oldDelegate.dashed != dashed;
 }
 
-/// A filled circle mark for forecast / current-centre legend rows.
 class _DotSwatch extends StatelessWidget {
   const _DotSwatch({required this.color, this.size = 8});
 
@@ -450,10 +729,7 @@ class _DotSwatch extends StatelessWidget {
   }
 }
 
-/// The bounding box of every coordinate in a typhoon [geo] `FeatureCollection`
-/// (Points, LineStrings, Polygons), or null when it holds no finite coordinate —
-/// used to frame the map on the whole storm. Pure and top-level so it is
-/// unit-testable without a MapLibre controller.
+/// Bounding box of every coordinate in a typhoon [geo] `FeatureCollection`.
 LatLngBounds? typhoonGeojsonBounds(Map<String, dynamic> geo) {
   final features = geo['features'];
   if (features is! List) return null;
@@ -461,7 +737,6 @@ LatLngBounds? typhoonGeojsonBounds(Map<String, dynamic> geo) {
   double? minLat, maxLat, minLng, maxLng;
   void visit(dynamic node) {
     if (node is! List || node.isEmpty) return;
-    // A coordinate pair is a list whose first two entries are numbers.
     if (node[0] is num && node.length >= 2 && node[1] is num) {
       final lng = (node[0] as num).toDouble();
       final lat = (node[1] as num).toDouble();

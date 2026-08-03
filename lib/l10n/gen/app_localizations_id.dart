@@ -541,4 +541,36 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => 'Sembunyikan legenda';
+
+  @override
+  String get typhoonLegendCircle15 => 'Lingkar angin kencang';
+
+  @override
+  String get typhoonLegendCircle25 => 'Lingkar badai';
+
+  @override
+  String get typhoonLegendProbability => 'Probabilitas serangan';
+
+  @override
+  String get typhoonLegendWarningAreas => 'Area peringatan';
+
+  @override
+  String get typhoonWarningTitle => 'Peringatan topan';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'Wilayah: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'Detail jalur';
+
+  @override
+  String get typhoonHistoryTitle => 'Waktu data';
+
+  @override
+  String get typhoonHistoryLive => 'Langsung';
+
+  @override
+  String get typhoonSatelliteTitle => 'Satelit';
 }

@@ -527,6 +527,38 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => '收合圖例';
+
+  @override
+  String get typhoonLegendCircle15 => '七級風暴風圈';
+
+  @override
+  String get typhoonLegendCircle25 => '十級風暴風圈';
+
+  @override
+  String get typhoonLegendProbability => '侵襲機率';
+
+  @override
+  String get typhoonLegendWarningAreas => '警報區域';
+
+  @override
+  String get typhoonWarningTitle => '颱風警報';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '警戒區域：$areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '路徑詳情';
+
+  @override
+  String get typhoonHistoryTitle => '資料時間';
+
+  @override
+  String get typhoonHistoryLive => '即時';
+
+  @override
+  String get typhoonSatelliteTitle => '衛星雲圖';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1052,6 +1084,38 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLegendCollapse => '收起图例';
+
+  @override
+  String get typhoonLegendCircle15 => '七级风暴风圈';
+
+  @override
+  String get typhoonLegendCircle25 => '十级风暴风圈';
+
+  @override
+  String get typhoonLegendProbability => '侵袭概率';
+
+  @override
+  String get typhoonLegendWarningAreas => '警报区域';
+
+  @override
+  String get typhoonWarningTitle => '台风警报';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '警戒区域：$areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '路径详情';
+
+  @override
+  String get typhoonHistoryTitle => '资料时间';
+
+  @override
+  String get typhoonHistoryLive => '实时';
+
+  @override
+  String get typhoonSatelliteTitle => '卫星云图';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1577,4 +1641,36 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLegendCollapse => '收合圖例';
+
+  @override
+  String get typhoonLegendCircle15 => '七級風暴風圈';
+
+  @override
+  String get typhoonLegendCircle25 => '十級風暴風圈';
+
+  @override
+  String get typhoonLegendProbability => '侵襲機率';
+
+  @override
+  String get typhoonLegendWarningAreas => '警報區域';
+
+  @override
+  String get typhoonWarningTitle => '颱風警報';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '警戒區域：$areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '路徑詳情';
+
+  @override
+  String get typhoonHistoryTitle => '資料時間';
+
+  @override
+  String get typhoonHistoryLive => '即時';
+
+  @override
+  String get typhoonSatelliteTitle => '衛星雲圖';
 }

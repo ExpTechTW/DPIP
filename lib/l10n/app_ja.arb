@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "現在中心",
   "typhoonLegendCone": "予報円",
   "mapLegendExpand": "凡例",
-  "mapLegendCollapse": "凡例を閉じる"
+  "mapLegendCollapse": "凡例を閉じる",
+  "typhoonLegendCircle15": "強風域（30kt）",
+  "typhoonLegendCircle25": "暴風域（50kt）",
+  "typhoonLegendProbability": "接近確率",
+  "typhoonLegendWarningAreas": "警報区域",
+  "typhoonWarningTitle": "台風警報",
+  "typhoonWarningAreas": "対象地域：{areas}",
+  "typhoonTrackDetail": "経路詳細",
+  "typhoonHistoryTitle": "資料時刻",
+  "typhoonHistoryLive": "最新",
+  "typhoonSatelliteTitle": "衛星"
 }

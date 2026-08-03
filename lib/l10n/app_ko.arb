@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "현재 중심",
   "typhoonLegendCone": "예보 원추",
   "mapLegendExpand": "범례",
-  "mapLegendCollapse": "범례 숨기기"
+  "mapLegendCollapse": "범례 숨기기",
+  "typhoonLegendCircle15": "강풍권 (7급)",
+  "typhoonLegendCircle25": "폭풍권 (10급)",
+  "typhoonLegendProbability": "내습 확률",
+  "typhoonLegendWarningAreas": "경보 지역",
+  "typhoonWarningTitle": "태풍 경보",
+  "typhoonWarningAreas": "대상 지역: {areas}",
+  "typhoonTrackDetail": "경로 상세",
+  "typhoonHistoryTitle": "자료 시각",
+  "typhoonHistoryLive": "실시간",
+  "typhoonSatelliteTitle": "위성"
 }

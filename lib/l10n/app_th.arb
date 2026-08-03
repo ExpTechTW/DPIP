@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "ศูนย์กลางปัจจุบัน",
   "typhoonLegendCone": "กรวยพยากรณ์",
   "mapLegendExpand": "คำอธิบาย",
-  "mapLegendCollapse": "ซ่อนคำอธิบาย"
+  "mapLegendCollapse": "ซ่อนคำอธิบาย",
+  "typhoonLegendCircle15": "วงพายุ (แรง)",
+  "typhoonLegendCircle25": "วงพายุ (รุนแรง)",
+  "typhoonLegendProbability": "โอกาสกระทบ",
+  "typhoonLegendWarningAreas": "พื้นที่เตือนภัย",
+  "typhoonWarningTitle": "ประกาศเตือนไต้ฝุ่น",
+  "typhoonWarningAreas": "พื้นที่: {areas}",
+  "typhoonTrackDetail": "รายละเอียดเส้นทาง",
+  "typhoonHistoryTitle": "เวลาข้อมูล",
+  "typhoonHistoryLive": "สด",
+  "typhoonSatelliteTitle": "ดาวเทียม"
 }

@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "Kasalukuyang sentro",
   "typhoonLegendCone": "Kono ng forecast",
   "mapLegendExpand": "Alamat",
-  "mapLegendCollapse": "Itago ang alamat"
+  "mapLegendCollapse": "Itago ang alamat",
+  "typhoonLegendCircle15": "Gale circle (L7)",
+  "typhoonLegendCircle25": "Storm circle (L10)",
+  "typhoonLegendProbability": "Strike probability",
+  "typhoonLegendWarningAreas": "Warning areas",
+  "typhoonWarningTitle": "Typhoon warning",
+  "typhoonWarningAreas": "Areas: {areas}",
+  "typhoonTrackDetail": "Track detail",
+  "typhoonHistoryTitle": "Dataset time",
+  "typhoonHistoryLive": "Live",
+  "typhoonSatelliteTitle": "Satellite"
 }

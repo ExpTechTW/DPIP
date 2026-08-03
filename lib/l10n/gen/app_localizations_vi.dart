@@ -540,4 +540,36 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => 'Ẩn chú giải';
+
+  @override
+  String get typhoonLegendCircle15 => 'Vòng gió mạnh';
+
+  @override
+  String get typhoonLegendCircle25 => 'Vòng bão';
+
+  @override
+  String get typhoonLegendProbability => 'Xác suất đổ bộ';
+
+  @override
+  String get typhoonLegendWarningAreas => 'Vùng cảnh báo';
+
+  @override
+  String get typhoonWarningTitle => 'Cảnh báo bão';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'Khu vực: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'Chi tiết quỹ đạo';
+
+  @override
+  String get typhoonHistoryTitle => 'Thời điểm dữ liệu';
+
+  @override
+  String get typhoonHistoryLive => 'Trực tiếp';
+
+  @override
+  String get typhoonSatelliteTitle => 'Vệ tinh';
 }

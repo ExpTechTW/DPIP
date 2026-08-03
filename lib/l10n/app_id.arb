@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "Pusat saat ini",
   "typhoonLegendCone": "Kerucut prakiraan",
   "mapLegendExpand": "Legenda",
-  "mapLegendCollapse": "Sembunyikan legenda"
+  "mapLegendCollapse": "Sembunyikan legenda",
+  "typhoonLegendCircle15": "Lingkar angin kencang",
+  "typhoonLegendCircle25": "Lingkar badai",
+  "typhoonLegendProbability": "Probabilitas serangan",
+  "typhoonLegendWarningAreas": "Area peringatan",
+  "typhoonWarningTitle": "Peringatan topan",
+  "typhoonWarningAreas": "Wilayah: {areas}",
+  "typhoonTrackDetail": "Detail jalur",
+  "typhoonHistoryTitle": "Waktu data",
+  "typhoonHistoryLive": "Langsung",
+  "typhoonSatelliteTitle": "Satelit"
 }

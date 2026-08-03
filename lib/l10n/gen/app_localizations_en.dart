@@ -539,4 +539,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => 'Hide legend';
+
+  @override
+  String get typhoonLegendCircle15 => 'Gale circle (L7)';
+
+  @override
+  String get typhoonLegendCircle25 => 'Storm circle (L10)';
+
+  @override
+  String get typhoonLegendProbability => 'Strike probability';
+
+  @override
+  String get typhoonLegendWarningAreas => 'Warning areas';
+
+  @override
+  String get typhoonWarningTitle => 'Typhoon warning';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'Areas: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'Track detail';
+
+  @override
+  String get typhoonHistoryTitle => 'Dataset time';
+
+  @override
+  String get typhoonHistoryLive => 'Live';
+
+  @override
+  String get typhoonSatelliteTitle => 'Satellite';
 }

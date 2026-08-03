@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "Tâm hiện tại",
   "typhoonLegendCone": "Nón dự báo",
   "mapLegendExpand": "Chú giải",
-  "mapLegendCollapse": "Ẩn chú giải"
+  "mapLegendCollapse": "Ẩn chú giải",
+  "typhoonLegendCircle15": "Vòng gió mạnh",
+  "typhoonLegendCircle25": "Vòng bão",
+  "typhoonLegendProbability": "Xác suất đổ bộ",
+  "typhoonLegendWarningAreas": "Vùng cảnh báo",
+  "typhoonWarningTitle": "Cảnh báo bão",
+  "typhoonWarningAreas": "Khu vực: {areas}",
+  "typhoonTrackDetail": "Chi tiết quỹ đạo",
+  "typhoonHistoryTitle": "Thời điểm dữ liệu",
+  "typhoonHistoryLive": "Trực tiếp",
+  "typhoonSatelliteTitle": "Vệ tinh"
 }

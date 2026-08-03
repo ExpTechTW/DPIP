@@ -539,4 +539,36 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => 'ซ่อนคำอธิบาย';
+
+  @override
+  String get typhoonLegendCircle15 => 'วงพายุ (แรง)';
+
+  @override
+  String get typhoonLegendCircle25 => 'วงพายุ (รุนแรง)';
+
+  @override
+  String get typhoonLegendProbability => 'โอกาสกระทบ';
+
+  @override
+  String get typhoonLegendWarningAreas => 'พื้นที่เตือนภัย';
+
+  @override
+  String get typhoonWarningTitle => 'ประกาศเตือนไต้ฝุ่น';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'พื้นที่: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'รายละเอียดเส้นทาง';
+
+  @override
+  String get typhoonHistoryTitle => 'เวลาข้อมูล';
+
+  @override
+  String get typhoonHistoryLive => 'สด';
+
+  @override
+  String get typhoonSatelliteTitle => 'ดาวเทียม';
 }

@@ -1123,6 +1123,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hide legend'**
   String get mapLegendCollapse;
+
+  /// Typhoon UI: typhoonLegendCircle15
+  ///
+  /// In en, this message translates to:
+  /// **'Gale circle (L7)'**
+  String get typhoonLegendCircle15;
+
+  /// Typhoon UI: typhoonLegendCircle25
+  ///
+  /// In en, this message translates to:
+  /// **'Storm circle (L10)'**
+  String get typhoonLegendCircle25;
+
+  /// Typhoon UI: typhoonLegendProbability
+  ///
+  /// In en, this message translates to:
+  /// **'Strike probability'**
+  String get typhoonLegendProbability;
+
+  /// Typhoon UI: typhoonLegendWarningAreas
+  ///
+  /// In en, this message translates to:
+  /// **'Warning areas'**
+  String get typhoonLegendWarningAreas;
+
+  /// Typhoon UI: typhoonWarningTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon warning'**
+  String get typhoonWarningTitle;
+
+  /// List of counties under a typhoon warning
+  ///
+  /// In en, this message translates to:
+  /// **'Areas: {areas}'**
+  String typhoonWarningAreas(String areas);
+
+  /// Typhoon UI: typhoonTrackDetail
+  ///
+  /// In en, this message translates to:
+  /// **'Track detail'**
+  String get typhoonTrackDetail;
+
+  /// Typhoon UI: typhoonHistoryTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Dataset time'**
+  String get typhoonHistoryTitle;
+
+  /// Typhoon UI: typhoonHistoryLive
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get typhoonHistoryLive;
+
+  /// Typhoon UI: typhoonSatelliteTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get typhoonSatelliteTitle;
 }
 
 class _AppLocalizationsDelegate

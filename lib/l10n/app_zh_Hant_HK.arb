@@ -167,5 +167,15 @@
   "typhoonLegendCurrent": "目前中心",
   "typhoonLegendCone": "預測圓錐",
   "mapLegendExpand": "圖例",
-  "mapLegendCollapse": "收合圖例"
+  "mapLegendCollapse": "收合圖例",
+  "typhoonLegendCircle15": "七級風暴風圈",
+  "typhoonLegendCircle25": "十級風暴風圈",
+  "typhoonLegendProbability": "侵襲機率",
+  "typhoonLegendWarningAreas": "警報區域",
+  "typhoonWarningTitle": "颱風警報",
+  "typhoonWarningAreas": "警戒區域：{areas}",
+  "typhoonTrackDetail": "路徑詳情",
+  "typhoonHistoryTitle": "資料時間",
+  "typhoonHistoryLive": "即時",
+  "typhoonSatelliteTitle": "衛星雲圖"
 }

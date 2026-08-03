@@ -95,7 +95,7 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// Full legend with a collapse control tucked in the top-right corner.
+/// Full legend with a collapse control in its own row — never overlays content.
 class _Expanded extends StatelessWidget {
   const _Expanded({
     required this.legend,
@@ -110,25 +110,27 @@ class _Expanded extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Stack(
-      clipBehavior: Clip.none,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        legend,
-        Positioned(
-          top: -6,
-          right: -6,
+        Align(
+          alignment: Alignment.centerRight,
           child: Tooltip(
             message: collapseTooltip,
             child: FrostedSurface(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppRadius.small,
               shadow: false,
               child: Material(
                 type: MaterialType.transparency,
                 child: InkWell(
-                  customBorder: const CircleBorder(),
+                  borderRadius: AppRadius.small,
                   onTap: onCollapse,
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xs),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
                     child: Icon(
                       Icons.expand_less,
                       size: 18,
@@ -140,6 +142,8 @@ class _Expanded extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(height: AppSpacing.xs),
+        legend,
       ],
     );
   }

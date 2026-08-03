@@ -531,4 +531,36 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => '범례 숨기기';
+
+  @override
+  String get typhoonLegendCircle15 => '강풍권 (7급)';
+
+  @override
+  String get typhoonLegendCircle25 => '폭풍권 (10급)';
+
+  @override
+  String get typhoonLegendProbability => '내습 확률';
+
+  @override
+  String get typhoonLegendWarningAreas => '경보 지역';
+
+  @override
+  String get typhoonWarningTitle => '태풍 경보';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '대상 지역: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '경로 상세';
+
+  @override
+  String get typhoonHistoryTitle => '자료 시각';
+
+  @override
+  String get typhoonHistoryLive => '실시간';
+
+  @override
+  String get typhoonSatelliteTitle => '위성';
 }

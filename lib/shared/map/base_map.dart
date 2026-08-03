@@ -1,6 +1,13 @@
+import 'dart:math' show Point;
+
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+/// Approx. height of the map's top-right layer chip (padding + icon row).
+/// Used to park the native compass just below it.
+const double _layerChipBand = 48;
 
 /// The app's reusable base map — a MapLibre map centred on Taiwan, rendered from
 /// the ExpTech vector style tinted by [MapColors] for the active brightness.
@@ -11,10 +18,10 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// typically anchoring overlays below [outlineLayerId] so the borders stay on
 /// top.
 ///
-/// [interactive] toggles every user gesture (pan/zoom/rotate/tilt) and the
-/// compass at once — pass `false` for a display-only surface like the home
-/// backdrop, where the map is driven entirely from code and the page's own
-/// gestures (tap to open, swipe to switch) must pass straight through.
+/// [interactive] toggles pan/zoom/rotate and the compass at once — pass
+/// `false` for a display-only surface like the home backdrop, where the map is
+/// driven entirely from code and the page's own gestures (tap to open, swipe
+/// to switch) must pass straight through. Tilt is always off.
 class BaseMap extends StatelessWidget {
   const BaseMap({
     super.key,
@@ -79,6 +86,10 @@ class BaseMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
+    // MapScaffold parks the layer switcher at top-right (SafeArea + lg). Drop
+    // the native compass just under that chip so the two never collide.
+    final compassTop =
+        MediaQuery.paddingOf(context).top + AppSpacing.lg + _layerChipBand;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
@@ -92,10 +103,12 @@ class BaseMap extends StatelessWidget {
       minMaxZoomPreference: zoomRange,
       trackCameraPosition: true,
       compassEnabled: interactive,
+      compassViewPosition: CompassViewPosition.topRight,
+      compassViewMargins: Point(AppSpacing.lg, compassTop),
       scrollGesturesEnabled: interactive,
       zoomGesturesEnabled: interactive,
       rotateGesturesEnabled: interactive,
-      tiltGesturesEnabled: interactive,
+      tiltGesturesEnabled: false,
       dragEnabled: interactive,
       onMapClick: onMapClick,
       onMapCreated: onMapCreated,

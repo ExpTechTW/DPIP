@@ -531,4 +531,36 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLegendCollapse => '凡例を閉じる';
+
+  @override
+  String get typhoonLegendCircle15 => '強風域（30kt）';
+
+  @override
+  String get typhoonLegendCircle25 => '暴風域（50kt）';
+
+  @override
+  String get typhoonLegendProbability => '接近確率';
+
+  @override
+  String get typhoonLegendWarningAreas => '警報区域';
+
+  @override
+  String get typhoonWarningTitle => '台風警報';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '対象地域：$areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '経路詳細';
+
+  @override
+  String get typhoonHistoryTitle => '資料時刻';
+
+  @override
+  String get typhoonHistoryLive => '最新';
+
+  @override
+  String get typhoonSatelliteTitle => '衛星';
 }

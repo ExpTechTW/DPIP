@@ -1,14 +1,13 @@
-/// The typhoon layer's detail sheet (拖盤): an always-present draggable bottom
-/// sheet showing the active storm's summary and the scrubbable satellite
-/// imagery. Bottom-anchored + `expand: false` (like the station sheet) so it
-/// only overlays its own height and the map above stays pannable/tappable — a
-/// full-screen overlay blocks the platform view's taps (Flutter #71608).
+/// The typhoon layer's detail sheet (拖盤): storm summary, warning bulletin,
+/// dataset history scrubber, satellite imagery, and tapped forecast detail.
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,10 +17,8 @@ class TyphoonPanel extends StatelessWidget {
 
   final TyphoonMapLayer layer;
 
-  /// Resting height of the collapsed sheet. Public so the map scaffold can
-  /// subtract it when framing — one number, one source.
-  static const double peekExtent = 0.16;
-  static const double _rest = 0.42;
+  static const double peekExtent = 0.18;
+  static const double _rest = 0.55;
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +27,6 @@ class TyphoonPanel extends StatelessWidget {
       builder: (context, revision, _) => ValueListenableBuilder<String?>(
         valueListenable: layer.tapped,
         builder: (context, tapped, _) {
-          // Pop to rest when a forecast waypoint is tapped, back to peek when
-          // cleared — via a key-swap remount, not controller.animateTo, which is
-          // unreliable with expand:false (it closes instead of stopping, Flutter
-          // #121954). expand:false keeps the map above the sheet tappable
-          // (#71608). The key carries tapRevision so EVERY waypoint tap (even
-          // re-tapping the same one after collapsing) remounts and re-pops —
-          // matching the station sheet's selectionRevision.
           final expanded = tapped != null;
           return Align(
             alignment: Alignment.bottomCenter,
@@ -45,7 +35,7 @@ class TyphoonPanel extends StatelessWidget {
               expand: false,
               initialChildSize: expanded ? _rest : peekExtent,
               minChildSize: peekExtent,
-              maxChildSize: 0.85,
+              maxChildSize: 0.92,
               snap: true,
               snapSizes: const [_rest],
               builder: (context, scrollController) => _Surface(
@@ -57,8 +47,11 @@ class TyphoonPanel extends StatelessWidget {
                   children: [
                     const _Grip(),
                     _Summary(layer: layer),
+                    _WarningBlock(layer: layer),
                     _TappedWaypoint(layer: layer),
+                    _HistorySelector(layer: layer),
                     _TimeSelector(layer: layer),
+                    _TrackNowBlock(layer: layer),
                   ],
                 ),
               ),
@@ -70,7 +63,6 @@ class TyphoonPanel extends StatelessWidget {
   }
 }
 
-/// The frosted, rounded sheet panel.
 class _Surface extends StatelessWidget {
   const _Surface({required this.child});
 
@@ -96,7 +88,6 @@ class _Surface extends StatelessWidget {
   }
 }
 
-/// The sheet's grab handle.
 class _Grip extends StatelessWidget {
   const _Grip();
 
@@ -117,7 +108,6 @@ class _Grip extends StatelessWidget {
   }
 }
 
-/// The active storm's name + intensity, or a "no active typhoon" note.
 class _Summary extends StatelessWidget {
   const _Summary({required this.layer});
 
@@ -167,6 +157,13 @@ class _Summary extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              if (storm.cwaName != null)
+                Text(
+                  storm.name,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.lg,
@@ -198,7 +195,149 @@ class _Summary extends StatelessWidget {
   }
 }
 
-/// A labelled metric (label over value).
+/// CAP warning bulletin + affected counties.
+class _WarningBlock extends StatelessWidget {
+  const _WarningBlock({required this.layer});
+
+  final TyphoonMapLayer layer;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return ValueListenableBuilder<TyphoonWarning?>(
+      valueListenable: layer.warning,
+      builder: (context, warn, _) {
+        if (warn == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.md,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.errorContainer.withValues(alpha: 0.45),
+              borderRadius: AppRadius.small,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.typhoonWarningTitle,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: colors.onErrorContainer,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    warn.headline,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colors.onErrorContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${warn.msgType} · ${warn.severity}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onErrorContainer.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  if (warn.sections.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    for (final s in warn.sections.take(3)) ...[
+                      Text(
+                        s.title,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(s.text, style: theme.textTheme.bodySmall),
+                      const SizedBox(height: AppSpacing.xs),
+                    ],
+                  ],
+                  if (warn.areas.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      l10n.typhoonWarningAreas(
+                        warn.areas.map((a) => a.name).join(', '),
+                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Storm-circle radii from track `now` (c15 / c25).
+class _TrackNowBlock extends StatelessWidget {
+  const _TrackNowBlock({required this.layer});
+
+  final TyphoonMapLayer layer;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return ValueListenableBuilder<TrackPayload?>(
+      valueListenable: layer.track,
+      builder: (context, payload, _) {
+        final now = payload?.cyclones.isNotEmpty == true
+            ? payload!.cyclones.first.now
+            : null;
+        if (now == null) return const SizedBox.shrink();
+        final move = now.move;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.md,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.typhoonTrackDetail, style: theme.textTheme.titleSmall),
+              const SizedBox(height: AppSpacing.sm),
+              if (move != null && move.isNotEmpty)
+                Text(move.first, style: theme.textTheme.bodyMedium),
+              Wrap(
+                spacing: AppSpacing.lg,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  if (now.c15 != null)
+                    _Metric(
+                      l10n.typhoonLegendCircle15,
+                      '${now.c15!.avg.toStringAsFixed(0)} km',
+                    ),
+                  if (now.c25 != null)
+                    _Metric(
+                      l10n.typhoonLegendCircle25,
+                      '${now.c25!.avg.toStringAsFixed(0)} km',
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _Metric extends StatelessWidget {
   const _Metric(this.label, this.value);
 
@@ -230,7 +369,6 @@ class _Metric extends StatelessWidget {
   }
 }
 
-/// The tapped forecast waypoint's label (a server string), dismissable.
 class _TappedWaypoint extends StatelessWidget {
   const _TappedWaypoint({required this.layer});
 
@@ -238,11 +376,13 @@ class _TappedWaypoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return ValueListenableBuilder<String?>(
       valueListenable: layer.tapped,
       builder: (context, label, _) {
         if (label == null) return const SizedBox.shrink();
+        final forecast = layer.forecastForLabel(label);
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -251,6 +391,7 @@ class _TappedWaypoint extends StatelessWidget {
             AppSpacing.md,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
                 Icons.place_outlined,
@@ -258,7 +399,42 @@ class _TappedWaypoint extends StatelessWidget {
                 color: theme.colorScheme.primary,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: theme.textTheme.bodyMedium),
+                    if (forecast != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Wrap(
+                        spacing: AppSpacing.md,
+                        children: [
+                          if (forecast.wind != null)
+                            Text(
+                              '${l10n.typhoonWind} ${forecast.wind!.toStringAsFixed(0)} m/s',
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          if (forecast.pressure != null)
+                            Text(
+                              '${l10n.typhoonPressure} ${forecast.pressure!.toStringAsFixed(0)} hPa',
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          if (forecast.r15 != null)
+                            Text(
+                              'R15 ${forecast.r15!.toStringAsFixed(0)} km',
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          if (forecast.r70 != null)
+                            Text(
+                              'R70 ${forecast.r70!.toStringAsFixed(0)} km',
+                              style: theme.textTheme.labelSmall,
+                            ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.close, size: 18),
                 onPressed: () => layer.tapped.value = null,
@@ -271,7 +447,74 @@ class _TappedWaypoint extends StatelessWidget {
   }
 }
 
-/// The scrubbable satellite-imagery time strip; hidden when there is none.
+/// Scrubs potential/track/probability/warning snapshots.
+class _HistorySelector extends StatelessWidget {
+  const _HistorySelector({required this.layer});
+
+  final TyphoonMapLayer layer;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return ValueListenableBuilder<List<int>>(
+      valueListenable: layer.historyFrames,
+      builder: (context, frames, _) {
+        if (frames.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.xs,
+              ),
+              child: Text(
+                l10n.typhoonHistoryTitle,
+                style: theme.textTheme.titleSmall,
+              ),
+            ),
+            SizedBox(
+              height: 56,
+              child: ValueListenableBuilder<int?>(
+                valueListenable: layer.selectedHistory,
+                builder: (context, selected, _) => ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemCount: frames.length + 1,
+                  itemBuilder: (context, i) {
+                    if (i == frames.length) {
+                      return _TimeChip(
+                        label: l10n.typhoonHistoryLive,
+                        selected: selected == null,
+                        onTap: () => layer.selectHistory(null),
+                      );
+                    }
+                    final sec = frames[i];
+                    final time = DateTime.fromMillisecondsSinceEpoch(
+                      sec * 1000,
+                      isUtc: true,
+                    ).add(const Duration(hours: 8));
+                    return _TimeChip(
+                      time: time,
+                      selected: selected == sec,
+                      onTap: () => layer.selectHistory(sec),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _TimeSelector extends StatefulWidget {
   const _TimeSelector({required this.layer});
 
@@ -302,44 +545,66 @@ class _TimeSelectorState extends State<_TimeSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return ValueListenableBuilder<List<int>>(
       valueListenable: widget.layer.imageFrames,
       builder: (context, frames, _) {
         if (frames.isEmpty) return const SizedBox.shrink();
-        return SizedBox(
-          height: 56,
-          child: ValueListenableBuilder<int>(
-            valueListenable: widget.layer.selectedFrame,
-            builder: (context, selected, _) => ListView.builder(
-              controller: _scroll,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              itemCount: frames.length,
-              itemBuilder: (context, i) => _TimeChip(
-                time: DateTime.fromMillisecondsSinceEpoch(
-                  frames[i] * 1000,
-                  isUtc: true,
-                ).add(const Duration(hours: 8)),
-                selected: i == selected,
-                onTap: () => widget.layer.showFrame(i),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                AppSpacing.xs,
+              ),
+              child: Text(
+                l10n.typhoonSatelliteTitle,
+                style: theme.textTheme.titleSmall,
               ),
             ),
-          ),
+            SizedBox(
+              height: 56,
+              child: ValueListenableBuilder<int>(
+                valueListenable: widget.layer.selectedFrame,
+                builder: (context, selected, _) => ListView.builder(
+                  controller: _scroll,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemCount: frames.length,
+                  itemBuilder: (context, i) => _TimeChip(
+                    time: DateTime.fromMillisecondsSinceEpoch(
+                      frames[i] * 1000,
+                      isUtc: true,
+                    ).add(const Duration(hours: 8)),
+                    selected: i == selected,
+                    onTap: () => widget.layer.showFrame(i),
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
   }
 }
 
-/// One selectable satellite time (HH:mm over MM/dd).
 class _TimeChip extends StatelessWidget {
   const _TimeChip({
-    required this.time,
+    this.time,
+    this.label,
     required this.selected,
     required this.onTap,
-  });
+  }) : assert(time != null || label != null);
 
-  final DateTime time;
+  final DateTime? time;
+  final String? label;
   final bool selected;
   final VoidCallback onTap;
 
@@ -350,7 +615,7 @@ class _TimeChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 58,
+        width: label != null ? 64 : 58,
         margin: const EdgeInsets.symmetric(
           horizontal: 3,
           vertical: AppSpacing.sm,
@@ -362,20 +627,30 @@ class _TimeChip extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              DateFormat('HH:mm').format(time),
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: selected ? colors.onPrimary : colors.onSurface,
-                fontWeight: FontWeight.w600,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            if (label != null)
+              Text(
+                label!,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: selected ? colors.onPrimary : colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            else ...[
+              Text(
+                DateFormat('HH:mm').format(time!),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: selected ? colors.onPrimary : colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
-            ),
-            Text(
-              DateFormat('MM/dd').format(time),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+              Text(
+                DateFormat('MM/dd').format(time!),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

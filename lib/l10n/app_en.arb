@@ -693,5 +693,50 @@
   "mapLegendCollapse": "Hide legend",
   "@mapLegendCollapse": {
     "description": "Tooltip on the control that collapses the map legend"
+  },
+  "typhoonLegendCircle15": "Gale circle (L7)",
+  "typhoonLegendCircle25": "Storm circle (L10)",
+  "typhoonLegendProbability": "Strike probability",
+  "typhoonLegendWarningAreas": "Warning areas",
+  "typhoonWarningTitle": "Typhoon warning",
+  "typhoonWarningAreas": "Areas: {areas}",
+  "typhoonTrackDetail": "Track detail",
+  "typhoonHistoryTitle": "Dataset time",
+  "typhoonHistoryLive": "Live",
+  "typhoonSatelliteTitle": "Satellite",
+  "@typhoonWarningAreas": {
+    "description": "List of counties under a typhoon warning",
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      }
+    }
+  },
+  "@typhoonLegendCircle15": {
+    "description": "Typhoon UI: typhoonLegendCircle15"
+  },
+  "@typhoonLegendCircle25": {
+    "description": "Typhoon UI: typhoonLegendCircle25"
+  },
+  "@typhoonLegendProbability": {
+    "description": "Typhoon UI: typhoonLegendProbability"
+  },
+  "@typhoonLegendWarningAreas": {
+    "description": "Typhoon UI: typhoonLegendWarningAreas"
+  },
+  "@typhoonWarningTitle": {
+    "description": "Typhoon UI: typhoonWarningTitle"
+  },
+  "@typhoonTrackDetail": {
+    "description": "Typhoon UI: typhoonTrackDetail"
+  },
+  "@typhoonHistoryTitle": {
+    "description": "Typhoon UI: typhoonHistoryTitle"
+  },
+  "@typhoonHistoryLive": {
+    "description": "Typhoon UI: typhoonHistoryLive"
+  },
+  "@typhoonSatelliteTitle": {
+    "description": "Typhoon UI: typhoonSatelliteTitle"
   }
 }
