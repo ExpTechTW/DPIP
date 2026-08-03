@@ -560,6 +560,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerWind => '風向';
 
   @override
+  String get mapLayerRain => '雨量';
+
+  @override
+  String get rainIntervalMenu => '累積時段';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10 分';
+
+  @override
+  String get rainInterval1h => '1 時';
+
+  @override
+  String get rainInterval3h => '3 時';
+
+  @override
+  String get rainInterval6h => '6 時';
+
+  @override
+  String get rainInterval12h => '12 時';
+
+  @override
+  String get rainInterval24h => '24 時';
+
+  @override
+  String get rainInterval2d => '2 日';
+
+  @override
+  String get rainInterval3d => '3 日';
+
+  @override
   String get mapLayerTyphoon => '颱風';
 
   @override
@@ -1405,6 +1438,39 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerWind => '风向';
+
+  @override
+  String get mapLayerRain => '雨量';
+
+  @override
+  String get rainIntervalMenu => '累积时段';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10 分';
+
+  @override
+  String get rainInterval1h => '1 时';
+
+  @override
+  String get rainInterval3h => '3 时';
+
+  @override
+  String get rainInterval6h => '6 时';
+
+  @override
+  String get rainInterval12h => '12 时';
+
+  @override
+  String get rainInterval24h => '24 时';
+
+  @override
+  String get rainInterval2d => '2 日';
+
+  @override
+  String get rainInterval3d => '3 日';
 
   @override
   String get mapLayerTyphoon => '台风';
@@ -2254,6 +2320,39 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerWind => '風向';
 
   @override
+  String get mapLayerRain => '雨量';
+
+  @override
+  String get rainIntervalMenu => '累積時段';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10 分';
+
+  @override
+  String get rainInterval1h => '1 時';
+
+  @override
+  String get rainInterval3h => '3 時';
+
+  @override
+  String get rainInterval6h => '6 時';
+
+  @override
+  String get rainInterval12h => '12 時';
+
+  @override
+  String get rainInterval24h => '24 時';
+
+  @override
+  String get rainInterval2d => '2 日';
+
+  @override
+  String get rainInterval3d => '3 日';
+
+  @override
   String get mapLayerTyphoon => '颱風';
 
   @override
@@ -3099,6 +3198,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayerWind => '風向';
+
+  @override
+  String get mapLayerRain => '雨量';
+
+  @override
+  String get rainIntervalMenu => '累積時段';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10 分';
+
+  @override
+  String get rainInterval1h => '1 時';
+
+  @override
+  String get rainInterval3h => '3 時';
+
+  @override
+  String get rainInterval6h => '6 時';
+
+  @override
+  String get rainInterval12h => '12 時';
+
+  @override
+  String get rainInterval24h => '24 時';
+
+  @override
+  String get rainInterval2d => '2 日';
+
+  @override
+  String get rainInterval3d => '3 日';
 
   @override
   String get mapLayerTyphoon => '颱風';

@@ -564,6 +564,39 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerWind => '바람';
 
   @override
+  String get mapLayerRain => '강수량';
+
+  @override
+  String get rainIntervalMenu => '누적 구간';
+
+  @override
+  String get rainIntervalNow => '오늘';
+
+  @override
+  String get rainInterval10m => '10분';
+
+  @override
+  String get rainInterval1h => '1시간';
+
+  @override
+  String get rainInterval3h => '3시간';
+
+  @override
+  String get rainInterval6h => '6시간';
+
+  @override
+  String get rainInterval12h => '12시간';
+
+  @override
+  String get rainInterval24h => '24시간';
+
+  @override
+  String get rainInterval2d => '2일';
+
+  @override
+  String get rainInterval3d => '3일';
+
+  @override
   String get mapLayerTyphoon => '태풍';
 
   @override

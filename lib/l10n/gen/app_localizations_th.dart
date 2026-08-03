@@ -572,6 +572,39 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerWind => 'ลม';
 
   @override
+  String get mapLayerRain => 'ปริมาณฝน';
+
+  @override
+  String get rainIntervalMenu => 'ช่วงสะสม';
+
+  @override
+  String get rainIntervalNow => 'วันนี้';
+
+  @override
+  String get rainInterval10m => '10 นาที';
+
+  @override
+  String get rainInterval1h => '1 ชม.';
+
+  @override
+  String get rainInterval3h => '3 ชม.';
+
+  @override
+  String get rainInterval6h => '6 ชม.';
+
+  @override
+  String get rainInterval12h => '12 ชม.';
+
+  @override
+  String get rainInterval24h => '24 ชม.';
+
+  @override
+  String get rainInterval2d => '2 วัน';
+
+  @override
+  String get rainInterval3d => '3 วัน';
+
+  @override
   String get mapLayerTyphoon => 'ไต้ฝุ่น';
 
   @override

@@ -573,6 +573,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerWind => 'Wind direction';
 
   @override
+  String get mapLayerRain => 'Rainfall';
+
+  @override
+  String get rainIntervalMenu => 'Accumulation window';
+
+  @override
+  String get rainIntervalNow => 'Today';
+
+  @override
+  String get rainInterval10m => '10 min';
+
+  @override
+  String get rainInterval1h => '1 h';
+
+  @override
+  String get rainInterval3h => '3 h';
+
+  @override
+  String get rainInterval6h => '6 h';
+
+  @override
+  String get rainInterval12h => '12 h';
+
+  @override
+  String get rainInterval24h => '24 h';
+
+  @override
+  String get rainInterval2d => '2 d';
+
+  @override
+  String get rainInterval3d => '3 d';
+
+  @override
   String get mapLayerTyphoon => 'Typhoon';
 
   @override

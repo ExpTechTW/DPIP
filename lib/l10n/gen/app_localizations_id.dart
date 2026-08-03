@@ -575,6 +575,39 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerWind => 'Angin';
 
   @override
+  String get mapLayerRain => 'Curah hujan';
+
+  @override
+  String get rainIntervalMenu => 'Jendela akumulasi';
+
+  @override
+  String get rainIntervalNow => 'Hari ini';
+
+  @override
+  String get rainInterval10m => '10 mnt';
+
+  @override
+  String get rainInterval1h => '1 jam';
+
+  @override
+  String get rainInterval3h => '3 jam';
+
+  @override
+  String get rainInterval6h => '6 jam';
+
+  @override
+  String get rainInterval12h => '12 jam';
+
+  @override
+  String get rainInterval24h => '24 jam';
+
+  @override
+  String get rainInterval2d => '2 hr';
+
+  @override
+  String get rainInterval3d => '3 hr';
+
+  @override
   String get mapLayerTyphoon => 'Topan';
 
   @override

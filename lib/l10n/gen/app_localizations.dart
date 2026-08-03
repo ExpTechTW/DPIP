@@ -1179,6 +1179,72 @@ abstract class AppLocalizations {
   /// **'Wind direction'**
   String get mapLayerWind;
 
+  /// Map layer switcher label for the rainfall station layer
+  ///
+  /// In en, this message translates to:
+  /// **'Rainfall'**
+  String get mapLayerRain;
+
+  /// Tooltip for the rainfall accumulation-interval menu
+  ///
+  /// In en, this message translates to:
+  /// **'Accumulation window'**
+  String get rainIntervalMenu;
+
+  /// Rainfall accumulation since local midnight (API now)
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get rainIntervalNow;
+
+  /// No description provided for @rainInterval10m.
+  ///
+  /// In en, this message translates to:
+  /// **'10 min'**
+  String get rainInterval10m;
+
+  /// No description provided for @rainInterval1h.
+  ///
+  /// In en, this message translates to:
+  /// **'1 h'**
+  String get rainInterval1h;
+
+  /// No description provided for @rainInterval3h.
+  ///
+  /// In en, this message translates to:
+  /// **'3 h'**
+  String get rainInterval3h;
+
+  /// No description provided for @rainInterval6h.
+  ///
+  /// In en, this message translates to:
+  /// **'6 h'**
+  String get rainInterval6h;
+
+  /// No description provided for @rainInterval12h.
+  ///
+  /// In en, this message translates to:
+  /// **'12 h'**
+  String get rainInterval12h;
+
+  /// No description provided for @rainInterval24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24 h'**
+  String get rainInterval24h;
+
+  /// No description provided for @rainInterval2d.
+  ///
+  /// In en, this message translates to:
+  /// **'2 d'**
+  String get rainInterval2d;
+
+  /// No description provided for @rainInterval3d.
+  ///
+  /// In en, this message translates to:
+  /// **'3 d'**
+  String get rainInterval3d;
+
   /// Layer-switcher label for the typhoon map layer
   ///
   /// In en, this message translates to:

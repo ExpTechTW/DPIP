@@ -564,6 +564,39 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerWind => '風向';
 
   @override
+  String get mapLayerRain => '降水量';
+
+  @override
+  String get rainIntervalMenu => '累積期間';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10分';
+
+  @override
+  String get rainInterval1h => '1時間';
+
+  @override
+  String get rainInterval3h => '3時間';
+
+  @override
+  String get rainInterval6h => '6時間';
+
+  @override
+  String get rainInterval12h => '12時間';
+
+  @override
+  String get rainInterval24h => '24時間';
+
+  @override
+  String get rainInterval2d => '2日';
+
+  @override
+  String get rainInterval3d => '3日';
+
+  @override
   String get mapLayerTyphoon => '台風';
 
   @override

@@ -128,6 +128,21 @@ class EtagCacheStore {
   static const _touchFlushEvery = 48;
   static const _touchInChunk = 64;
 
+  /// Bound parameters per `IN (…)` — well under SQLite's variable limit.
+  static const _readInChunk = 400;
+
+  /// Rows written between maintenance sweeps (see [_sweep]).
+  static const _sweepEvery = 96;
+
+  /// Compressed bytes above which a batch inflate is worth an isolate hop.
+  static const _isolateThreshold = 64 * 1024;
+
+  /// Running `SUM(LENGTH(body))`, seeded by the first sweep. Replacements are
+  /// counted as pure additions between sweeps, so this only ever over-estimates
+  /// — which triggers a sweep early rather than letting the store overrun.
+  int? _trackedBytes;
+  int _writesSinceSweep = 0;
+
   /// Creates the v2 cache table (idempotent) — call from `onCreate` / migrate.
   static Future<void> createSchema(Database db) async {
     await db.execute(
@@ -215,12 +230,71 @@ class EtagCacheStore {
     }
   }
 
-  /// Parallel binary reads — each SQLite fetch then decode/copy can overlap
-  /// via [Future.wait] (useful when warming a viewport).
-  Future<List<CachedBytes?>> readBytesMany(
+  /// Reads many binary entries in **one** SQLite round-trip, keyed by URL.
+  ///
+  /// This is the tile hot path: a map viewport resolves as a single `IN` query
+  /// plus at most one isolate hop for the whole batch, instead of N queries and
+  /// N isolate spawns. Missing URLs are simply absent from the result. Every
+  /// hit is metered once, exactly as [readBytes] does.
+  Future<Map<String, CachedBytes>> readBytesBatch(
     List<String> urls, {
     bool touch = true,
-  }) => Future.wait([for (final u in urls) readBytes(u, touch: touch)]);
+  }) async {
+    if (urls.isEmpty) return const {};
+    try {
+      final rows = <Map<String, Object?>>[];
+      for (var i = 0; i < urls.length; i += _readInChunk) {
+        final end = i + _readInChunk;
+        final chunk = end < urls.length
+            ? urls.sublist(i, end)
+            : urls.sublist(i);
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        rows.addAll(
+          await _db.query(
+            _table,
+            where: 'key IN ($placeholders)',
+            whereArgs: chunk,
+          ),
+        );
+      }
+      if (rows.isEmpty) return const {};
+
+      // Collect every compressed body first so the whole batch inflates in one
+      // hop — `Isolate.run` per row costs more than the decode it moves off.
+      final compressed = <String, Uint8List>{};
+      var compressedBytes = 0;
+      for (final row in rows) {
+        if ((row['kind'] as int) != kindBinaryGzip) continue;
+        final blob = row['body'] as Uint8List;
+        compressed[row['key'] as String] = blob;
+        compressedBytes += blob.length;
+      }
+      final inflated = await _gunzipAll(compressed, compressedBytes);
+
+      final out = <String, CachedBytes>{};
+      for (final row in rows) {
+        final kind = row['kind'] as int;
+        if (kind != kindBinary && kind != kindBinaryGzip) continue;
+        final key = row['key'] as String;
+        final bytes = kind == kindBinaryGzip
+            ? inflated[key]
+            : Uint8List.fromList(row['body'] as Uint8List);
+        if (bytes == null) continue;
+        if (touch) _scheduleTouch(key);
+        final entry = CachedBytes(
+          etag: row['etag'] as String,
+          bytes: bytes,
+          contentType: row['content_type'] as String?,
+          size: (row['size'] as num).toInt(),
+        );
+        _recordBinaryHit(entry);
+        out[key] = entry;
+      }
+      return out;
+    } catch (_) {
+      return const {};
+    }
+  }
 
   /// Returns just the cached etag for [url], or null on a miss.
   Future<String?> readEtag(String url) async {

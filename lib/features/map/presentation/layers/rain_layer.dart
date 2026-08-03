@@ -253,7 +253,10 @@ class RainMapLayer implements MapLayer, StationSheetSource {
                   controller.open();
                 }
               },
-              icon: Icon(Icons.timelapse_outlined, color: colors.onSecondaryContainer),
+              icon: Icon(
+                Icons.timelapse_outlined,
+                color: colors.onSecondaryContainer,
+              ),
             );
           },
           menuChildren: [
@@ -359,17 +362,13 @@ class RainMapLayer implements MapLayer, StationSheetSource {
     final observation = _observations[id];
     if (observation == null) return null;
     final value = interval.value.valueOf(observation);
-    return value == null
-        ? null
-        : '${value.toStringAsFixed(_decimals)} $unit';
+    return value == null ? null : '${value.toStringAsFixed(_decimals)} $unit';
   }
 
   @override
   Future<Result<TrendSeries>> trend(String id, String range) async {
     final result = await _repository.trend(id, range: range);
-    return result.map(
-      (t) => TrendSeries(times: t.times, values: t.rain),
-    );
+    return result.map((t) => TrendSeries(times: t.times, values: t.rain));
   }
 
   @override
@@ -404,8 +403,7 @@ class RainMapLayer implements MapLayer, StationSheetSource {
         'properties': {
           'id': entry.key,
           'value': value,
-          'label':
-              '${station.name}\n${value.toStringAsFixed(_decimals)} $unit',
+          'label': '${station.name}\n${value.toStringAsFixed(_decimals)} $unit',
         },
       });
     }

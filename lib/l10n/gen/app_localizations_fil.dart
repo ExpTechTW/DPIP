@@ -575,6 +575,39 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerWind => 'Hangin';
 
   @override
+  String get mapLayerRain => 'Ulan';
+
+  @override
+  String get rainIntervalMenu => 'Bintana ng akumulasyon';
+
+  @override
+  String get rainIntervalNow => 'Ngayon';
+
+  @override
+  String get rainInterval10m => '10 min';
+
+  @override
+  String get rainInterval1h => '1 oras';
+
+  @override
+  String get rainInterval3h => '3 oras';
+
+  @override
+  String get rainInterval6h => '6 oras';
+
+  @override
+  String get rainInterval12h => '12 oras';
+
+  @override
+  String get rainInterval24h => '24 oras';
+
+  @override
+  String get rainInterval2d => '2 araw';
+
+  @override
+  String get rainInterval3d => '3 araw';
+
+  @override
   String get mapLayerTyphoon => 'Bagyo';
 
   @override

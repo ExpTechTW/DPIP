@@ -573,6 +573,39 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerWind => 'Gió';
 
   @override
+  String get mapLayerRain => 'Lượng mưa';
+
+  @override
+  String get rainIntervalMenu => 'Khung tích lũy';
+
+  @override
+  String get rainIntervalNow => 'Hôm nay';
+
+  @override
+  String get rainInterval10m => '10 phút';
+
+  @override
+  String get rainInterval1h => '1 giờ';
+
+  @override
+  String get rainInterval3h => '3 giờ';
+
+  @override
+  String get rainInterval6h => '6 giờ';
+
+  @override
+  String get rainInterval12h => '12 giờ';
+
+  @override
+  String get rainInterval24h => '24 giờ';
+
+  @override
+  String get rainInterval2d => '2 ngày';
+
+  @override
+  String get rainInterval3d => '3 ngày';
+
+  @override
   String get mapLayerTyphoon => 'Bão';
 
   @override
