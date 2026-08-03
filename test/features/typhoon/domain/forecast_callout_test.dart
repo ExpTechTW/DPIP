@@ -20,14 +20,10 @@ void main() {
     );
     final d = ForecastCalloutData.from(f);
     expect(d.title, contains('+24'));
-    expect(d.rows.map((r) => r.label), containsAll([
-      '中心氣壓',
-      '最大風速',
-      '瞬間陣風',
-      '移動時速',
-      '移動方向',
-      '七級風半徑',
-    ]));
+    expect(
+      d.rows.map((r) => r.label),
+      containsAll(['中心氣壓', '最大風速', '瞬間陣風', '移動時速', '移動方向', '七級風半徑']),
+    );
     expect(d.rows.map((r) => r.label), isNot(contains('70% 機率圓')));
     expect(d.note, contains('減弱'));
   });
@@ -41,17 +37,17 @@ void main() {
 
   test('pickedForecastIndices starts at first visible', () {
     // Track 0..6; first on-screen is index 2; stride 2 → 2,4,6
-    expect(
-      pickedForecastIndices(count: 7, firstVisible: 2, stride: 2),
-      [2, 4, 6],
-    );
-    expect(
-      pickedForecastIndices(count: 7, firstVisible: 0, stride: 2),
-      [0, 2, 4, 6],
-    );
-    expect(
-      pickedForecastIndices(count: 5, firstVisible: 1, stride: 3),
-      [1, 4],
-    );
+    expect(pickedForecastIndices(count: 7, firstVisible: 2, stride: 2), [
+      2,
+      4,
+      6,
+    ]);
+    expect(pickedForecastIndices(count: 7, firstVisible: 0, stride: 2), [
+      0,
+      2,
+      4,
+      6,
+    ]);
+    expect(pickedForecastIndices(count: 5, firstVisible: 1, stride: 3), [1, 4]);
   });
 }

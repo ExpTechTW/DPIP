@@ -7,6 +7,8 @@ import 'package:sqflite/sqflite.dart';
 /// A cached HTTP response: the server [etag] to revalidate with, the response
 /// [body] (the JSON-encoded payload), its [contentType], and [size] — the wire
 /// bytes the original download cost (so a `304` can report the traffic saved).
+///
+/// For binary payloads (MVT / WebP) use [CachedBytes] / [EtagCacheStore.writeBytes].
 class CachedResponse {
   const CachedResponse({
     required this.etag,
@@ -17,6 +19,22 @@ class CachedResponse {
 
   final String etag;
   final String body;
+  final String? contentType;
+  final int size;
+}
+
+/// A cached binary HTTP response (MVT, WebP, …) — same etag / size semantics as
+/// [CachedResponse], with raw [bytes] instead of a JSON string.
+class CachedBytes {
+  const CachedBytes({
+    required this.etag,
+    required this.bytes,
+    this.contentType,
+    this.size = 0,
+  });
+
+  final String etag;
+  final Uint8List bytes;
   final String? contentType;
   final int size;
 }
@@ -58,11 +76,12 @@ class EtagCacheStore {
     );
   }
 
-  /// Returns the cached entry for [url], or null on a miss / corruption.
+  /// Returns the cached **JSON** entry for [url], or null on a miss /
+  /// corruption / binary entry (those are [readBytes] only).
   Future<CachedResponse?> read(String url) async {
     try {
       final entry = await _decode(url);
-      if (entry == null) return null;
+      if (entry == null || entry['binary'] == true) return null;
       final body = entry['body'] as String;
       return CachedResponse(
         etag: entry['etag'] as String,
@@ -70,6 +89,24 @@ class EtagCacheStore {
         contentType: entry['contentType'] as String?,
         // Pre-`size` entries fall back to the body's length.
         size: (entry['size'] as num?)?.toInt() ?? body.length,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Returns the cached **binary** entry for [url], or null on a miss /
+  /// corruption / JSON entry.
+  Future<CachedBytes?> readBytes(String url) async {
+    try {
+      final entry = await _decode(url);
+      if (entry == null || entry['binary'] != true) return null;
+      final raw = base64Decode(entry['body'] as String);
+      return CachedBytes(
+        etag: entry['etag'] as String,
+        bytes: Uint8List.fromList(raw),
+        contentType: entry['contentType'] as String?,
+        size: (entry['size'] as num?)?.toInt() ?? raw.length,
       );
     } catch (_) {
       return null;
@@ -86,22 +123,57 @@ class EtagCacheStore {
     }
   }
 
-  /// Stores [body] for [url] under [etag], gzip-9, replacing any existing entry;
-  /// then sweeps entries older than [maxAge]. Best-effort — errors are swallowed.
+  /// Stores a JSON [body] for [url] under [etag], gzip-9, replacing any
+  /// existing entry; then sweeps entries older than [maxAge]. Best-effort —
+  /// errors are swallowed.
   Future<void> write(
     String url, {
     required String etag,
     required String body,
     String? contentType,
     int size = 0,
+  }) => _writeEnvelope(
+    url,
+    etag: etag,
+    contentType: contentType,
+    size: size,
+    binary: false,
+    bodyField: body,
+  );
+
+  /// Stores raw [bytes] for [url] under [etag] (base64 inside the gzip-9
+  /// envelope). Same eviction policy as [write]. Best-effort.
+  Future<void> writeBytes(
+    String url, {
+    required String etag,
+    required Uint8List bytes,
+    String? contentType,
+    int size = 0,
+  }) => _writeEnvelope(
+    url,
+    etag: etag,
+    contentType: contentType,
+    size: size,
+    binary: true,
+    bodyField: base64Encode(bytes),
+  );
+
+  Future<void> _writeEnvelope(
+    String url, {
+    required String etag,
+    required String? contentType,
+    required int size,
+    required bool binary,
+    required String bodyField,
   }) async {
     try {
       final payload = utf8.encode(
         jsonEncode({
           'etag': etag,
           'contentType': contentType,
-          'body': body,
+          'body': bodyField,
           'size': size,
+          if (binary) 'binary': true,
         }),
       );
       final now = DateTime.now().millisecondsSinceEpoch;

@@ -32,10 +32,7 @@ class LocaleController extends ChangeNotifier {
       await _prefs.remove(PreferenceKeys.locale);
     } else {
       final canonical = _canonicalize(locale);
-      await _prefs.setString(
-        PreferenceKeys.locale,
-        canonical.toLanguageTag(),
-      );
+      await _prefs.setString(PreferenceKeys.locale, canonical.toLanguageTag());
     }
     notifyListeners();
   }

@@ -83,11 +83,7 @@ void main() {
       final frames = _frames(10);
       final reported = <int>[];
       await tester.pumpWidget(
-        _wrap(
-          frames: frames,
-          selectedIndex: 9,
-          onSelected: reported.add,
-        ),
+        _wrap(frames: frames, selectedIndex: 9, onSelected: reported.add),
       );
       await tester.pumpAndSettle();
 

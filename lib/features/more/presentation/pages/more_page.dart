@@ -41,11 +41,7 @@ class MorePage extends StatelessWidget {
             ],
           ),
           SectionHeader(l10n.moreSectionRegion),
-          _MoreGroup(
-            children: [
-              const _SavedRegionsTile(),
-            ],
-          ),
+          _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
           _MoreGroup(
             children: [
