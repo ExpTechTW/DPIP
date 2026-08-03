@@ -232,52 +232,58 @@ class _StormBandRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          backgroundColor: WidgetStatePropertyAll(
-            selected ? accent.withValues(alpha: 0.14) : Colors.transparent,
-          ),
+        style: const ButtonStyle(
+          // Don't set backgroundColor here — MenuItemButton uses a ListTile
+          // whose ink is painted on the menu Material; a style background
+          // DecoratedBox sits in between and Flutter asserts.
+          padding: WidgetStatePropertyAll(EdgeInsets.zero),
         ),
-        child: SizedBox(
-          width: 228,
-          child: Row(
-            children: [
-              _BandSwatch(accent: accent, selected: selected),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected ? accent.withValues(alpha: 0.14) : null,
+          ),
+          child: SizedBox(
+            width: 228,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
               ),
-              Icon(
-                selected ? Icons.check_circle : Icons.circle_outlined,
-                size: 20,
-                color: selected ? accent : colors.outlineVariant,
+              child: Row(
+                children: [
+                  _BandSwatch(accent: accent, selected: selected),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                        ),
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    selected ? Icons.check_circle : Icons.circle_outlined,
+                    size: 20,
+                    color: selected ? accent : colors.outlineVariant,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -380,59 +386,62 @@ class _WeatherRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          backgroundColor: WidgetStatePropertyAll(
-            selected
-                ? colors.primaryContainer.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
+        style: const ButtonStyle(
+          padding: WidgetStatePropertyAll(EdgeInsets.zero),
         ),
-        child: SizedBox(
-          width: 228,
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 22,
-                color: selected ? colors.primary : colors.onSurfaceVariant,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected
+                ? colors.primaryContainer.withValues(alpha: 0.45)
+                : null,
+          ),
+          child: SizedBox(
+            width: 228,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 22,
+                    color: selected ? colors.primary : colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                        if (subtitle != null)
+                          Text(
+                            subtitle!,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    selected ? Icons.check_circle : Icons.circle_outlined,
+                    size: 20,
+                    color: selected ? colors.primary : colors.outlineVariant,
+                  ),
+                ],
               ),
-              Icon(
-                selected ? Icons.check_circle : Icons.circle_outlined,
-                size: 20,
-                color: selected ? colors.primary : colors.outlineVariant,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -466,59 +475,62 @@ class _ToggleRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          backgroundColor: WidgetStatePropertyAll(
-            selected
-                ? colors.primaryContainer.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
+        style: const ButtonStyle(
+          padding: WidgetStatePropertyAll(EdgeInsets.zero),
         ),
-        child: SizedBox(
-          width: 228,
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 22,
-                color: selected ? colors.primary : colors.onSurfaceVariant,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected
+                ? colors.primaryContainer.withValues(alpha: 0.45)
+                : null,
+          ),
+          child: SizedBox(
+            width: 228,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 22,
+                    color: selected ? colors.primary : colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                        if (subtitle != null)
+                          Text(
+                            subtitle!,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    selected ? Icons.check_box : Icons.check_box_outline_blank,
+                    size: 20,
+                    color: selected ? colors.primary : colors.outlineVariant,
+                  ),
+                ],
               ),
-              Icon(
-                selected ? Icons.check_box : Icons.check_box_outline_blank,
-                size: 20,
-                color: selected ? colors.primary : colors.outlineVariant,
-              ),
-            ],
+            ),
           ),
         ),
       ),

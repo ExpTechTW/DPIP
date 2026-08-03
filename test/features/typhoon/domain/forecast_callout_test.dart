@@ -31,4 +31,27 @@ void main() {
     expect(d.rows.map((r) => r.label), isNot(contains('70% 機率圓')));
     expect(d.note, contains('減弱'));
   });
+
+  test('forecastCalloutStride thins more at lower zoom', () {
+    expect(forecastCalloutStride(8), 1);
+    expect(forecastCalloutStride(6), 2);
+    expect(forecastCalloutStride(5), 3);
+    expect(forecastCalloutStride(4), 4);
+  });
+
+  test('pickedForecastIndices starts at first visible', () {
+    // Track 0..6; first on-screen is index 2; stride 2 → 2,4,6
+    expect(
+      pickedForecastIndices(count: 7, firstVisible: 2, stride: 2),
+      [2, 4, 6],
+    );
+    expect(
+      pickedForecastIndices(count: 7, firstVisible: 0, stride: 2),
+      [0, 2, 4, 6],
+    );
+    expect(
+      pickedForecastIndices(count: 5, firstVisible: 1, stride: 3),
+      [1, 4],
+    );
+  });
 }

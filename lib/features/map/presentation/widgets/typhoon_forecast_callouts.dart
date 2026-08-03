@@ -20,7 +20,55 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Min zoom before forecast Flutter tips appear.
-const double kTyphoonCalloutMinZoom = 6.0;
+const double kTyphoonCalloutMinZoom = 4.0;
+
+/// How many forecast points to skip between shown tips (1 = all).
+///
+/// Lower zoom ⇒ larger stride so cards don't stack. Thinning is anchored at
+/// the first **viewport-visible** fix (see [pickedForecastIndices]).
+int forecastCalloutStride(double zoom) {
+  if (zoom >= 7) return 1;
+  if (zoom >= 5.5) return 2; // every other from first visible
+  if (zoom >= 4.5) return 3;
+  return 4; // near floor: sparsest
+}
+
+/// First forecast index whose screen point lies in [viewport] (with pad).
+///
+/// Returns `-1` when none are visible.
+int indexOfFirstVisibleForecast({
+  required List<math.Point<num>> screens,
+  required Size viewport,
+  double pad = 40,
+}) {
+  for (var i = 0; i < screens.length; i++) {
+    final x = screens[i].x.toDouble();
+    final y = screens[i].y.toDouble();
+    if (x >= -pad &&
+        y >= -pad &&
+        x <= viewport.width + pad &&
+        y <= viewport.height + pad) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/// Indices to show: [firstVisible], then every [stride] along the track.
+List<int> pickedForecastIndices({
+  required int count,
+  required int firstVisible,
+  required int stride,
+}) {
+  if (count <= 0 || firstVisible < 0 || firstVisible >= count) {
+    return const [];
+  }
+  final step = stride < 1 ? 1 : stride;
+  return [
+    for (var i = firstVisible; i < count; i++)
+      if ((i - firstVisible) % step == 0) i,
+  ];
+}
 
 /// Gap between forecast point and card edge (px).
 const double _leaderGap = 36;
@@ -158,10 +206,13 @@ class _TyphoonForecastCalloutOverlayState
       return;
     }
     final ordered = [...forecasts]..sort((a, b) => a.tau.compareTo(b.tau));
+    final stride = forecastCalloutStride(zoom);
+
     late final List<math.Point<num>> screens;
     try {
       screens = await controller.toScreenLocationBatch([
-        for (final f in ordered) LatLng(f.latitude, f.longitude),
+        for (final f in ordered)
+          LatLng(f.latitude, f.longitude),
       ]);
     } catch (_) {
       if (mounted && gen == _gen) setState(() => _placed = const []);
@@ -174,12 +225,28 @@ class _TyphoonForecastCalloutOverlayState
     }
 
     final size = MediaQuery.sizeOf(context);
+    // Thin from the first on-screen fix — not track index 0 (may be off-map).
+    final firstVisible = indexOfFirstVisibleForecast(
+      screens: screens,
+      viewport: size,
+    );
+    if (firstVisible < 0) {
+      setState(() => _placed = const []);
+      return;
+    }
+    final picked = pickedForecastIndices(
+      count: ordered.length,
+      firstVisible: firstVisible,
+      stride: stride,
+    );
+
     final placed = <_PlacedCallout>[];
     final boxes = <Rect>[];
     final tappedTau =
         widget.layer.forecastForLabel(widget.layer.tapped.value)?.tau;
 
-    for (var i = 0; i < ordered.length; i++) {
+    for (var k = 0; k < picked.length; k++) {
+      final i = picked[k];
       final anchor = Offset(
         screens[i].x.toDouble(),
         screens[i].y.toDouble(),
@@ -194,7 +261,7 @@ class _TyphoonForecastCalloutOverlayState
       final chipH = data.estimatedHeight;
       final pick = _pickVerticalTip(
         anchor: anchor,
-        preferAbove: i.isEven,
+        preferAbove: k.isEven,
         chipW: _cardW,
         chipH: chipH,
         occupied: boxes,
