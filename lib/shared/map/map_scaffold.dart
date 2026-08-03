@@ -21,8 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
-/// Basemap XYZ origin — warmed into SQLite + MapLibre ambient via ApiClient.
-/// LB has no ETag; [EtagInterceptor] synthesises one from the URL hash.
+/// Basemap XYZ origin — warmed from the app's tile store into MapLibre's tile
+/// memory on camera idle. LB has no ETag; the store keys these by URL hash.
 const String _basemapTileUrl = basemapOriginTileUrl;
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable

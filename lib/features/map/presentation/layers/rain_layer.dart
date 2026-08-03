@@ -108,6 +108,9 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   @override
   double? get chartMaxY => null;
 
+  @override
+  bool get chartBars => true;
+
   /// Legacy precipitation colour ramp (mm).
   List<(double, String)> get colorStops => const [
     (0, '#c2c2c2'),
@@ -171,6 +174,8 @@ class RainMapLayer implements MapLayer, StationSheetSource {
         circleStrokeWidth: 1,
         circleOpacity: 0.9,
       ),
+      // Dry stations (0 mm) clutter the island at overview; reveal past z8.
+      filter: _visibleFilter,
       enableInteraction: false,
     );
     await controller.addSymbolLayer(
@@ -191,9 +196,25 @@ class RainMapLayer implements MapLayer, StationSheetSource {
         textOptional: true,
       ),
       minzoom: 9,
+      filter: _visibleFilter,
       enableInteraction: false,
     );
   }
+
+  /// Non-zero always; zero-mm only when zoomed in past 8.
+  static const List<Object> _visibleFilter = [
+    'any',
+    <Object>[
+      '>',
+      <Object>['get', 'value'],
+      0,
+    ],
+    <Object>[
+      '>',
+      <Object>['zoom'],
+      8,
+    ],
+  ];
 
   /// Switches the accumulation window and refreshes dots + labels in place.
   Future<void> setInterval(RainInterval next) async {
@@ -214,11 +235,15 @@ class RainMapLayer implements MapLayer, StationSheetSource {
     const threshold = 0.18 * 0.18;
     final cosLat = math.cos(latLng.latitude * math.pi / 180);
     final window = interval.value;
+    final zoom = controller.cameraPosition?.zoom ?? 0;
+    final showZero = zoom > 8;
     String? best;
     var bestDistance = threshold;
     for (final entry in _stations.entries) {
       final observation = _observations[entry.key];
-      if (observation == null || window.valueOf(observation) == null) continue;
+      final value = observation == null ? null : window.valueOf(observation);
+      if (value == null) continue;
+      if (value <= 0 && !showZero) continue;
       final station = entry.value;
       final dLat = station.latitude - latLng.latitude;
       final dLon = (station.longitude - latLng.longitude) * cosLat;

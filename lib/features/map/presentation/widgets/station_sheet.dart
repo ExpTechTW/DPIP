@@ -72,6 +72,10 @@ abstract interface class StationSheetSource {
   /// Fixed Y-axis ceiling for the trend chart, or null to auto-fit the series.
   double? get chartMaxY;
 
+  /// When true, the trend plot is a bar chart (rain accumulation); otherwise a
+  /// line (temperature / humidity / …).
+  bool get chartBars;
+
   /// The trend series for [id] over [range] (`24h` | `7d`).
   Future<Result<TrendSeries>> trend(String id, String range);
 
@@ -473,6 +477,7 @@ class _SheetBodyState extends State<_SheetBody> {
                       accent: widget.source.valueColor(id),
                       fixedMinY: widget.source.chartMinY,
                       fixedMaxY: widget.source.chartMaxY,
+                      bars: widget.source.chartBars,
                     ),
                     err: (failure) =>
                         ErrorView(detail: failure.message, onRetry: _refetch),
@@ -787,11 +792,12 @@ class _RangeChip extends StatelessWidget {
   }
 }
 
-/// The fl_chart line plot of a [TrendSeries] over [range].
+/// The fl_chart plot of a [TrendSeries] over [range].
 ///
-/// Wind series keep direction **off** the curve: each bottom-axis tick is
-/// `arrow` over `time` (X-axis → direction → clock), matching the map's
-/// blow-toward convention. Tooltip still carries the exact ° reading.
+/// Default is a curved line. Rain uses [bars]. Wind series keep direction
+/// **off** the curve: each bottom-axis tick is `arrow` over `time` (X-axis →
+/// direction → clock), matching the map's blow-toward convention. Tooltip still
+/// carries the exact ° reading.
 class _TrendChart extends StatelessWidget {
   const _TrendChart({
     required this.series,
@@ -800,18 +806,23 @@ class _TrendChart extends StatelessWidget {
     this.accent,
     this.fixedMinY,
     this.fixedMaxY,
+    this.bars = false,
   });
 
   final TrendSeries series;
   final String range;
   final String unit;
 
-  /// Station's map colour — tints the curve so the sheet matches the tapped dot.
+  /// Station's map colour — tints the curve / bars so the sheet matches the
+  /// tapped dot.
   final Color? accent;
 
-  /// When set, pins the Y axis (humidity 0–100, wind floor 0, …).
+  /// When set, pins the Y axis (humidity 0–100, wind/rain floor 0, …).
   final double? fixedMinY;
   final double? fixedMaxY;
+
+  /// Rainfall uses bars; everything else uses a line.
+  final bool bars;
 
   @override
   Widget build(BuildContext context) {
@@ -831,7 +842,7 @@ class _TrendChart extends StatelessWidget {
       sampleAt.add(i);
       spots.add(FlSpot(series.times[i].toDouble(), value));
     }
-    if (spots.length < 2) {
+    if (spots.isEmpty || (!bars && spots.length < 2)) {
       return Center(
         child: Text(
           l10n.trendNoData,
@@ -925,6 +936,195 @@ class _TrendChart extends StatelessWidget {
     // Bottom axis: wind needs a second row for arrows above the clock labels.
     final bottomReserved = isWind ? 40.0 : 22.0;
 
+    FlTitlesData titles({
+      required double titleMinX,
+      required double titleMaxX,
+      required double? Function(double value) labelX,
+      double? bottomInterval,
+    }) => FlTitlesData(
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          interval: yInterval,
+          // Wide enough for "1007.5" without soft-wrapping mid-number.
+          reservedSize: 44,
+          getTitlesWidget: (value, meta) {
+            if (value <= minY || value >= maxY) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.xs),
+              child: Text(
+                _axisLabel(value, yInterval),
+                textAlign: TextAlign.right,
+                softWrap: false,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          reservedSize: bottomReserved,
+          interval: bottomInterval ?? labelStep,
+          getTitlesWidget: (value, meta) {
+            final x = labelX(value);
+            if (x == null ||
+                x < titleMinX - 1 ||
+                x > titleMaxX + 1 ||
+                !onLabelStep(x)) {
+              return const SizedBox.shrink();
+            }
+            final time = Text(
+              timeLabel(x),
+              softWrap: false,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            );
+            // fl_chart sizes each title to the tick slot; without
+            // UnconstrainedBox, "20時" wraps to 20 / 時.
+            if (!isWind) {
+              return SideTitleWidget(
+                meta: meta,
+                space: AppSpacing.xs,
+                child: UnconstrainedBox(child: time),
+              );
+            }
+            final from = directionNear(x);
+            return SideTitleWidget(
+              meta: meta,
+              space: 2,
+              child: UnconstrainedBox(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (from != null)
+                      Transform.rotate(
+                        angle: (from + 180) * math.pi / 180,
+                        child: Icon(
+                          Icons.navigation,
+                          size: 12,
+                          color: lineColor,
+                        ),
+                      )
+                    else
+                      const SizedBox(height: 12),
+                    const SizedBox(height: 2),
+                    time,
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    if (bars) {
+      // Index-domain bars — dense 10-min rain series stays readable as thin rods.
+      final barWidth = spots.length > 100
+          ? 1.5
+          : spots.length > 48
+          ? 2.5
+          : spots.length > 24
+          ? 4.0
+          : 6.0;
+      final groups = [
+        for (var i = 0; i < spots.length; i++)
+          BarChartGroupData(
+            x: i,
+            barRods: [
+              BarChartRodData(
+                toY: spots[i].y,
+                width: barWidth,
+                color: lineColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(2),
+                ),
+              ),
+            ],
+          ),
+      ];
+      return BarChart(
+        BarChartData(
+          minY: minY,
+          maxY: maxY,
+          alignment: BarChartAlignment.spaceBetween,
+          groupsSpace: 0,
+          barGroups: groups,
+          gridData: FlGridData(
+            drawVerticalLine: false,
+            horizontalInterval: yInterval,
+            getDrawingHorizontalLine: (_) => FlLine(
+              color: colors.outlineVariant.withValues(alpha: 0.4),
+              strokeWidth: 1,
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          titlesData: titles(
+            titleMinX: minX,
+            titleMaxX: maxX,
+            bottomInterval: 1,
+            labelX: (value) {
+              final i = value.round();
+              if (i < 0 || i >= spots.length) return null;
+              return spots[i].x;
+            },
+          ),
+          barTouchData: BarTouchData(
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipColor: (_) => colors.surfaceContainerHigh,
+              tooltipBorderRadius: AppRadius.small,
+              tooltipPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              tooltipMargin: AppSpacing.sm,
+              maxContentWidth: 168,
+              fitInsideHorizontally: true,
+              fitInsideVertically: true,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                final i = group.x;
+                final x = (i >= 0 && i < spots.length) ? spots[i].x : 0.0;
+                return BarTooltipItem(
+                  '${rod.toY.toStringAsFixed(1)} $unit',
+                  theme.textTheme.titleSmall!.copyWith(
+                    color: lineColor,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                  textAlign: TextAlign.start,
+                  children: [
+                    TextSpan(
+                      text: '\n${timeLabel(x)}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+        duration: Duration.zero,
+      );
+    }
+
     return LineChart(
       LineChartData(
         minX: minX,
@@ -989,100 +1189,10 @@ class _TrendChart extends StatelessWidget {
           },
         ),
         borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          rightTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: yInterval,
-              // Wide enough for "1007.5" without soft-wrapping mid-number.
-              reservedSize: 44,
-              getTitlesWidget: (value, meta) {
-                if (value <= minY || value >= maxY) {
-                  return const SizedBox.shrink();
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.xs),
-                  child: Text(
-                    _axisLabel(value, yInterval),
-                    textAlign: TextAlign.right,
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.visible,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: bottomReserved,
-              interval: labelStep,
-              getTitlesWidget: (value, meta) {
-                if (value < minX - 1 ||
-                    value > maxX + 1 ||
-                    !onLabelStep(value)) {
-                  return const SizedBox.shrink();
-                }
-                final time = Text(
-                  timeLabel(value),
-                  softWrap: false,
-                  maxLines: 1,
-                  overflow: TextOverflow.visible,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                );
-                // fl_chart sizes each title to the tick slot; without
-                // UnconstrainedBox, "20時" wraps to 20 / 時.
-                if (!isWind) {
-                  return SideTitleWidget(
-                    meta: meta,
-                    space: AppSpacing.xs,
-                    child: UnconstrainedBox(child: time),
-                  );
-                }
-                final from = directionNear(value);
-                return SideTitleWidget(
-                  meta: meta,
-                  space: 2,
-                  child: UnconstrainedBox(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Arrow row sits on the X-axis; clock labels underneath.
-                        if (from != null)
-                          Transform.rotate(
-                            // Blow-toward, same as the map layer.
-                            angle: (from + 180) * math.pi / 180,
-                            child: Icon(
-                              Icons.navigation,
-                              size: 12,
-                              color: lineColor,
-                            ),
-                          )
-                        else
-                          const SizedBox(height: 12),
-                        const SizedBox(height: 2),
-                        time,
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+        titlesData: titles(
+          titleMinX: minX,
+          titleMaxX: maxX,
+          labelX: (value) => value,
         ),
         lineTouchData: LineTouchData(
           getTouchedSpotIndicator: (bar, indices) => [

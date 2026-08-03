@@ -66,8 +66,9 @@ const String dpmAedClustersLayerId = 'dpm-aed-clusters';
 const String dpmAedClusterCountLayerId = 'dpm-aed-cluster-count';
 const String dpmAedPointsLayerId = 'dpm-aed-points';
 
-/// Origin basemap XYZ (LB) — MapLibre HTTPS (own ambient). Ambient pin via
-/// [AmbientPrefetcher] is disabled (iOS preload race).
+/// Origin basemap XYZ (LB). Fetched by MapLibre, served from the app's tile
+/// store through the Dart bridge, and warmed by `MapTileWarmer` — the same
+/// three tiers as every other ExpTech tile.
 const String basemapOriginTileUrl =
     'https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf';
 
