@@ -13,7 +13,8 @@ import 'package:dpip/core/network/network_usage_store.dart';
 ///   entry so the server can answer `304 Not Modified` instead of resending.
 /// - **Response 304:** rewrites the empty 304 into a `200` carrying the cached
 ///   body, so callers above never see a 304 and get the data for free.
-/// - **Response 200 + ETag:** stores the body (gzip-9) keyed by URL.
+/// - **Response 200 + ETag:** stores the body keyed by URL (JSON gzip-1;
+///   binary gzip-1 when it shrinks — PBF/MVT yes, WebP no).
 ///
 /// **ETag is the only validator** — `Cache-Control` / `no-store` are ignored.
 /// A `200` without an ETag is not written, **except** ExpTech basemap PBF
@@ -44,9 +45,8 @@ class EtagInterceptor extends Interceptor {
   static bool isUncacheablePath(String path) {
     if (path == '/api/v2/eq/eew' || path == '/api/v2/trem/rts') return true;
     if (path.startsWith('/api/v2/location/')) return true;
-    // getNotify only — setNotify has more segments after the token.
-    final notify = RegExp(r'^/api/v2/notify/[^/]+$');
-    return notify.hasMatch(path);
+    // getNotify + setNotify — token-keyed, must not stick in SQLite.
+    return path.startsWith('/api/v2/notify/');
   }
 
   static bool _isBytes(RequestOptions o) =>

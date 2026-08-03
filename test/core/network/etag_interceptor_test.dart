@@ -130,16 +130,12 @@ void main() {
       'https://api.lb-tpe1.exptech.dev/api/v2/trem/rts',
       'https://api.core-tnn1.exptech.dev/api/v2/location/1/tok/1.0/25,121',
       'https://api.core-tnn1.exptech.dev/api/v2/notify/tok',
+      'https://api.core-tnn1.exptech.dev/api/v2/notify/tok/eew/1',
     ];
     for (final url in urls) {
       await dio.get<dynamic>(url);
       expect(await store.read(url), isNull, reason: url);
       expect(EtagInterceptor.isUncacheablePath(Uri.parse(url).path), isTrue);
     }
-    // setNotify has extra segments — still cacheable by path policy.
-    expect(
-      EtagInterceptor.isUncacheablePath('/api/v2/notify/tok/eew/1'),
-      isFalse,
-    );
   });
 }

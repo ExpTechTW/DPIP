@@ -640,10 +640,11 @@ packages:
   maplibre_gl:
     dependency: "direct main"
     description:
-      name: maplibre_gl
-      sha256: b676f124a2fcf88c4dafedc7b462155e6396d61ce7af46354b4de11b45c9812f
-      url: "https://pub.dev"
-    source: hosted
+      path: maplibre_gl
+      ref: main
+      resolved-ref: "5facad49d80851de4afb241529afeace376345ce"
+      url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
+    source: git
     version: "0.26.2"
   maplibre_gl_platform_interface:
     dependency: transitive

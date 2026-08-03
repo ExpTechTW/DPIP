@@ -1,5 +1,12 @@
 /// Fetches HTTPS resources via [ApiClient] (binary ETag / SQLite) and pins them
 /// into MapLibre ambient under the **same URL** MapLibre will request.
+///
+/// **Currently disabled ([pinAmbient] = false).** Concurrent
+/// `MLNOfflineStorage.preload` + MapLibre's own tile HTTP races the ambient
+/// cache lookup on iOS and crashes (`EXC_BAD_ACCESS` / `objc_retain` on
+/// `com.apple.network.connections`). Until there is a safe pin path (or a
+/// custom tile provider that does not share MapLibre's ambient writer), let
+/// MapLibre own tile fetches; SQLite ETag still covers ApiClient JSON / bytes.
 library;
 
 import 'dart:async';
@@ -26,6 +33,9 @@ class AmbientPrefetcher {
     this.settleDelay = const Duration(milliseconds: 350),
   });
 
+  /// Gate for Dio→ambient pin. Keep false on iOS MapLibre until preload is safe.
+  static const bool pinAmbient = false;
+
   final ApiClient _client;
   final MapCache _cache;
   final int maxTiles;
@@ -51,6 +61,7 @@ class AmbientPrefetcher {
     Iterable<String> paths, {
     String? logLabel,
   }) async {
+    if (!pinAmbient) return;
     final list = paths.toList(growable: false);
     if (list.isEmpty) return;
     final schedule = ++_scheduleId;
@@ -83,6 +94,7 @@ class AmbientPrefetcher {
     Iterable<String> urls, {
     String? logLabel,
   }) async {
+    if (!pinAmbient) return;
     final list = urls.toList(growable: false);
     if (list.isEmpty) return;
     final schedule = ++_scheduleId;
@@ -117,6 +129,7 @@ class AmbientPrefetcher {
     int pad = 1,
     String? logLabel,
   }) async {
+    if (!pinAmbient) return;
     final z = math.min(zoom.floor(), maxZoom);
     var tiles = tilesCovering(
       south: south,
@@ -156,6 +169,7 @@ class AmbientPrefetcher {
     int pad = 1,
     String? logLabel,
   }) async {
+    if (!pinAmbient) return;
     final z = math.min(zoom.floor(), maxZoom);
     var tiles = tilesCovering(
       south: south,

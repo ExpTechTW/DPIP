@@ -66,7 +66,8 @@ const String dpmAedClustersLayerId = 'dpm-aed-clusters';
 const String dpmAedClusterCountLayerId = 'dpm-aed-cluster-count';
 const String dpmAedPointsLayerId = 'dpm-aed-points';
 
-/// Origin basemap XYZ (LB) — MapLibre HTTPS + ambient preload.
+/// Origin basemap XYZ (LB) — MapLibre HTTPS (own ambient). Ambient pin via
+/// [AmbientPrefetcher] is disabled (iOS preload race).
 const String basemapOriginTileUrl =
     'https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf';
 
@@ -82,7 +83,7 @@ const String glyphsOriginUrl =
 /// (radar) anchor below [outlineLayerId] so the county borders stay legible.
 ///
 /// [basemapTileUrl] / [glyphsUrl] / [aedTileUrl] are origin HTTPS templates
-/// (MapLibre fetches them; [AmbientPrefetcher] + ambient preload raises hits).
+/// (MapLibre fetches them into its own ambient cache).
 ///
 /// When [aedTileUrl] is set (XYZ MVT template), AED vector tiles are baked into
 /// the style document — same path as the ExpTech basemap source. Runtime

@@ -48,24 +48,30 @@ public class MapCachePlugin: NSObject, FlutterPlugin {
         ? Date(timeIntervalSince1970: modifiedSec) : nil
       let expires: Date? = expiresSec > 0
         ? Date(timeIntervalSince1970: expiresSec) : nil
-      MLNOfflineStorage.shared.preload(
-        typed.data,
-        for: url,
-        modificationDate: modified,
-        expirationDate: expires,
-        eTag: etag,
-        mustRevalidate: mustRevalidate,
-        completionHandler: { _, error in
-          if let error = error {
-            result(FlutterError(
-              code: "preload_failed",
-              message: error.localizedDescription,
-              details: nil))
-          } else {
-            result(nil)
+      // Copy — FlutterStandardTypedData's buffer can be released once the
+      // platform channel returns; MapLibre may touch the bytes asynchronously
+      // while also doing ambient cache lookup on the network queue.
+      let data = Data(typed.data)
+      DispatchQueue.main.async {
+        MLNOfflineStorage.shared.preload(
+          data,
+          for: url,
+          modificationDate: modified,
+          expirationDate: expires,
+          eTag: etag,
+          mustRevalidate: mustRevalidate,
+          completionHandler: { _, error in
+            if let error = error {
+              result(FlutterError(
+                code: "preload_failed",
+                message: error.localizedDescription,
+                details: nil))
+            } else {
+              result(nil)
+            }
           }
-        }
-      )
+        )
+      }
     default:
       result(FlutterMethodNotImplemented)
     }

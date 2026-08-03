@@ -25,11 +25,14 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # Requires MapLibre 6.27.0 exactly — both its podspec and its Package.swift
-  # pin that version. ios/vendor/maplibre vendors that exact xcframework, so
-  # bump the two together: a mismatch fails `pod install` with a version
-  # conflict (and SPM resolution with the same `exact:` constraint).
-  maplibre_gl: ^0.26.2
+  # ExpTech fork of maplibre/flutter-maplibre-gl (custom tile protocol work).
+  # Requires MapLibre Native 6.27.0 exactly — ios/vendor/maplibre vendors that
+  # xcframework; bump fork + vendor together.
+  maplibre_gl:
+    git:
+      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
+      path: maplibre_gl
+      ref: main
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1

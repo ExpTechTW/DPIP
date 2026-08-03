@@ -9,8 +9,8 @@ import 'package:dpip/core/network/network_usage_store.dart';
 /// resolved from the current region selection. gzip is negotiated by the
 /// platform HTTP stack (`Accept-Encoding: gzip`), so no manual decompression
 /// adapter is required. When an [etagCache] is supplied, an [EtagInterceptor]
-/// adds global HTTP ETag revalidation — cached bodies are stored gzip-9 on disk
-/// and a `304` is served from cache instead of re-downloading.
+/// adds global HTTP ETag revalidation — JSON and compressible binaries (PBF /
+/// MVT / …) are gzip-1 on disk; WebP etc. stay raw. A `304` is served from cache.
 ///
 /// Timeouts are kept tight: the payloads are small JSON snapshots and a realtime
 /// feed polls every second, so a hung request should fail over (or surface as a

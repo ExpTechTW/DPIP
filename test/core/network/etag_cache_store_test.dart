@@ -64,8 +64,14 @@ void main() {
     expect(blob.length, lessThan(body.length));
   });
 
-  test('binary write stores raw bytes (no base64/gzip envelope)', () async {
-    final bytes = Uint8List.fromList(List.generate(64, (i) => i));
+  test('WebP stays raw (already packed)', () async {
+    // RIFF....WEBP magic — entropy-packed; outer gzip must not wrap.
+    final bytes = Uint8List.fromList([
+      0x52, 0x49, 0x46, 0x46, // RIFF
+      0x00, 0x00, 0x00, 0x00,
+      0x57, 0x45, 0x42, 0x50, // WEBP
+      ...List.generate(52, (i) => i),
+    ]);
     await store.writeBytes(
       'https://x/t.webp',
       etag: 'W/"t"',
@@ -84,6 +90,91 @@ void main() {
     final hit = await store.readBytes('https://x/t.webp');
     expect(hit!.bytes, bytes);
     expect(hit.contentType, 'image/webp');
+  });
+
+  test('MVT / basemap PBF are gzip-1 on disk and round-trip', () async {
+    // Compressible vector-tile-ish payload (real PBF shrinks ~40% with gzip-1).
+    final mvt = Uint8List.fromList([
+      0x1a,
+      0x99,
+      0x0b,
+      0x78,
+      0x02,
+      0x0a,
+      0x03,
+      0x62,
+      ...List.filled(800, 0x20),
+    ]);
+    await store.writeBytes(
+      'https://x/a.mvt',
+      etag: '1',
+      bytes: mvt,
+      contentType: 'application/vnd.mapbox-vector-tile',
+    );
+    final mvtRows = await db.query(
+      'http_cache',
+      columns: ['kind', 'body'],
+      where: 'key = ?',
+      whereArgs: ['https://x/a.mvt'],
+    );
+    expect(mvtRows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    expect((mvtRows.first['body'] as Uint8List).length, lessThan(mvt.length));
+
+    // Basemap LB serves application/octet-stream.
+    final pbf = Uint8List.fromList([
+      0x1a,
+      0x9e,
+      0x06,
+      0x78,
+      0x02,
+      0x0a,
+      0x03,
+      0x62,
+      ...List.filled(600, 0x41),
+    ]);
+    await store.writeBytes(
+      'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      etag: 'W/"u1"',
+      bytes: pbf,
+      contentType: 'application/octet-stream',
+    );
+    final pbfRows = await db.query(
+      'http_cache',
+      columns: ['kind', 'body'],
+      where: 'key = ?',
+      whereArgs: ['https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf'],
+    );
+    expect(pbfRows.first['kind'], EtagCacheStore.kindBinaryGzip);
+
+    final cold = EtagCacheStore(db, memoryMaxBytes: 0);
+    expect((await cold.readBytes('https://x/a.mvt'))!.bytes, mvt);
+    expect(
+      (await cold.readBytes(
+        'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      ))!.bytes,
+      pbf,
+    );
+  });
+
+  test('SVG / text binaries are gzip-1 on disk', () async {
+    final svg = Uint8List.fromList(
+      utf8.encode('<svg xmlns="http://www.w3.org/2000/svg">${'x' * 400}</svg>'),
+    );
+    await store.writeBytes(
+      'https://x/i.svg',
+      etag: '1',
+      bytes: svg,
+      contentType: 'image/svg+xml',
+    );
+    final rows = await db.query(
+      'http_cache',
+      columns: ['kind'],
+      where: 'key = ?',
+      whereArgs: ['https://x/i.svg'],
+    );
+    expect(rows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    final cold = EtagCacheStore(db, memoryMaxBytes: 0);
+    expect((await cold.readBytes('https://x/i.svg'))!.bytes, svg);
   });
 
   test(
@@ -192,30 +283,73 @@ void main() {
 
   test('size trim drops least-recently-used rows when over maxBytes', () async {
     final tight = EtagCacheStore(db, maxBytes: 120, memoryMaxBytes: 0);
+    // WebP CT → raw on disk (zeros would otherwise gzip tiny and never trim).
     final fat = Uint8List(100);
-    await tight.writeBytes('https://x/old', etag: '1', bytes: fat);
+    await tight.writeBytes(
+      'https://x/old',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
     await Future<void>.delayed(const Duration(milliseconds: 2));
-    await tight.writeBytes('https://x/new', etag: '2', bytes: fat);
+    await tight.writeBytes(
+      'https://x/new',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
 
-    expect(await tight.readBytes('https://x/old'), isNull, reason: 'LRU trimmed');
+    expect(
+      await tight.readBytes('https://x/old'),
+      isNull,
+      reason: 'LRU trimmed',
+    );
     expect(await tight.readBytes('https://x/new'), isNotNull);
     expect((await tight.stats()).bytes, lessThanOrEqualTo(120));
   });
 
   test('size trim prefers unread rows over recently-read ones', () async {
     final fat = Uint8List(100);
-    await store.writeBytes('https://x/probe1', etag: '1', bytes: fat);
-    await store.writeBytes('https://x/probe2', etag: '2', bytes: fat);
+    await store.writeBytes(
+      'https://x/probe1',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    await store.writeBytes(
+      'https://x/probe2',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
     final two = (await store.stats()).bytes;
     await store.clear();
     final tight = EtagCacheStore(db, maxBytes: two, memoryMaxBytes: 0);
 
-    await tight.writeBytes('https://x/a', etag: '1', bytes: fat);
+    await tight.writeBytes(
+      'https://x/a',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
     await Future<void>.delayed(const Duration(milliseconds: 2));
-    await tight.writeBytes('https://x/b', etag: '2', bytes: fat);
+    await tight.writeBytes(
+      'https://x/b',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
     await tight.readBytes('https://x/a');
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    await tight.writeBytes('https://x/c', etag: '3', bytes: fat);
+    await tight.touch(
+      'https://x/a',
+    ); // await the last-used bump (read's is fire-and-forget)
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await tight.writeBytes(
+      'https://x/c',
+      etag: '3',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
 
     expect(await tight.readBytes('https://x/b'), isNull, reason: 'unread LRU');
     expect(await tight.readBytes('https://x/a'), isNotNull);

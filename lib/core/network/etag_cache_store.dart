@@ -1,13 +1,15 @@
 /// On-disk ETag response cache backed by **SQLite**.
 ///
-/// Schema v2 stores JSON and binary in separate columns (no gzip-of-JSON-of-
-/// base64 envelope). Tile bodies are already compressed (WebP / PBF / MVT), so
-/// an outer gzip was pure CPU tax on every hit.
+/// Schema v2 stores JSON and binary as body blobs (no gzip-of-JSON-of-base64
+/// envelope):
+/// - **JSON** — always gzip-1.
+/// - **Binary** — gzip-1 whenever it shrinks: basemap PBF / MVT / protobuf /
+///   PDF / text / SVG / … Already entropy-packed formats (WebP / JPEG / PNG /
+///   zip / woff / …) stay raw — outer gzip is a no-op or expands them.
 ///
 /// Hot path:
-/// 1. **Memory LRU** (~48 MB decoded binary) — zero I/O.
-/// 2. **SQLite** row → body blob (binary = raw bytes; JSON = utf8).
-/// 3. Optional **isolate** inflate for any leftover v1 envelopes (migration).
+/// 1. **Memory LRU** (~48 MB *decoded* binary) — zero I/O.
+/// 2. **SQLite** row → inflate if [kindBinaryGzip], else raw copy.
 ///
 /// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
 /// [maxBytes]. Touch is async. All ops best-effort.
@@ -87,6 +89,21 @@ class EtagCacheStore {
   static const int kindJson = 0;
   static const int kindBinary = 1;
 
+  /// Binary body stored as gzip-1 of the decoded bytes (PBF / MVT / …).
+  static const int kindBinaryGzip = 2;
+
+  /// Content types that are already entropy-packed — never outer-gzip.
+  /// (Vector tiles / protobuf are NOT here — raw PBF/MVT typically shrink ~40%.)
+  static const _precompressedTypes = <String>{
+    'application/gzip',
+    'application/x-gzip',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/wasm', // already LEB + often brotli on wire; leave raw
+    'font/woff',
+    'font/woff2',
+  };
+
   /// Insertion-ordered LRU of decoded binary tiles.
   final LinkedHashMap<String, CachedBytes> _memory = LinkedHashMap();
   int _memoryBytes = 0;
@@ -146,13 +163,17 @@ class EtagCacheStore {
         return mem;
       }
       final row = await _queryRow(url);
-      if (row == null || (row['kind'] as int) != kindBinary) return null;
+      if (row == null) return null;
+      final kind = row['kind'] as int;
+      if (kind != kindBinary && kind != kindBinaryGzip) return null;
       if (touch) unawaited(_touch(url));
-      final bytes = row['body'] as Uint8List;
+      final blob = row['body'] as Uint8List;
+      final bytes = kind == kindBinaryGzip
+          ? await _gunzip(blob)
+          : Uint8List.fromList(blob);
       final entry = CachedBytes(
         etag: row['etag'] as String,
-        // SQLite may return a view — copy so callers can retain across awaits.
-        bytes: Uint8List.fromList(bytes),
+        bytes: bytes,
         contentType: row['content_type'] as String?,
         size: (row['size'] as num).toInt(),
       );
@@ -222,8 +243,12 @@ class EtagCacheStore {
     } catch (_) {}
   }
 
-  /// Stores raw [bytes] for [url] under [etag] (no re-compress). Best-effort.
-  /// Populates the memory LRU immediately so the next hit skips SQLite.
+  /// Stores [bytes] for [url] under [etag]. Best-effort.
+  ///
+  /// Compressible payloads (PBF / MVT / PDF / text / …) are gzip-1 on disk when
+  /// that shrinks them; entropy-packed formats (WebP / JPEG / …) stay raw. The
+  /// memory LRU always holds the decoded bytes so the next hit skips both
+  /// SQLite and inflate.
   Future<void> writeBytes(
     String url, {
     required String etag,
@@ -239,12 +264,13 @@ class EtagCacheStore {
     );
     _memoryPut(url, entry);
     try {
+      final encoded = await _encodeBinary(bytes, contentType);
       await _insert(
         url,
         etag: etag,
         contentType: contentType,
-        kind: kindBinary,
-        body: bytes,
+        kind: encoded.kind,
+        body: encoded.body,
         size: entry.size,
       );
     } catch (_) {}
@@ -356,6 +382,86 @@ class EtagCacheStore {
     }
     // Uncompressed fallback.
     return utf8.decode(blob);
+  }
+
+  /// Gzip-1 [bytes] when the type is compressible and the result shrinks;
+  /// otherwise leave raw. Kind tells [readBytes] whether to inflate.
+  static Future<({int kind, Uint8List body})> _encodeBinary(
+    Uint8List bytes,
+    String? contentType,
+  ) async {
+    if (!shouldGzipBinary(bytes, contentType)) {
+      return (kind: kindBinary, body: bytes);
+    }
+    final compressed = bytes.length > 16 * 1024
+        ? await Isolate.run(
+            () => Uint8List.fromList(GZipCodec(level: 1).encode(bytes)),
+          )
+        : Uint8List.fromList(GZipCodec(level: 1).encode(bytes));
+    if (compressed.length >= bytes.length) {
+      return (kind: kindBinary, body: bytes);
+    }
+    return (kind: kindBinaryGzip, body: compressed);
+  }
+
+  static Future<Uint8List> _gunzip(Uint8List blob) async {
+    if (blob.length > 16 * 1024) {
+      return Isolate.run(() => Uint8List.fromList(gzip.decode(blob)));
+    }
+    return Uint8List.fromList(gzip.decode(blob));
+  }
+
+  /// Whether to *try* an outer gzip for this binary payload.
+  ///
+  /// Default is **yes** (basemap PBF is `application/octet-stream` and shrinks
+  /// ~40%; MVT ~30%). Skip only when the type/magic is already packed (WebP /
+  /// JPEG / PNG / zip / gzip / woff / video / audio). [_encodeBinary] still
+  /// keeps the raw body if gzip does not shrink.
+  static bool shouldGzipBinary(Uint8List bytes, String? contentType) {
+    if (_looksPrecompressed(bytes)) return false;
+    final ct = (contentType ?? '').split(';').first.trim().toLowerCase();
+    if (ct.isEmpty) return true;
+    if (_precompressedTypes.contains(ct)) return false;
+    if (ct.startsWith('image/') && ct != 'image/svg+xml') return false;
+    if (ct.startsWith('video/') || ct.startsWith('audio/')) return false;
+    if (ct.startsWith('font/')) return false;
+    return true;
+  }
+
+  static bool _looksPrecompressed(Uint8List b) {
+    if (b.length < 3) return false;
+    // gzip / zip / zstd — don't wrap again.
+    if (b[0] == 0x1f && b[1] == 0x8b) return true;
+    if (b[0] == 0x50 && b[1] == 0x4b) return true; // PK zip
+    if (b.length >= 4 &&
+        b[0] == 0x28 &&
+        b[1] == 0xb5 &&
+        b[2] == 0x2f &&
+        b[3] == 0xfd) {
+      return true; // zstd
+    }
+    // JPEG / PNG / GIF / WebP
+    if (b[0] == 0xff && b[1] == 0xd8 && b[2] == 0xff) return true;
+    if (b.length >= 4 &&
+        b[0] == 0x89 &&
+        b[1] == 0x50 &&
+        b[2] == 0x4e &&
+        b[3] == 0x47) {
+      return true;
+    }
+    if (b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return true; // GIF
+    if (b.length >= 12 &&
+        b[0] == 0x52 &&
+        b[1] == 0x49 &&
+        b[2] == 0x46 &&
+        b[3] == 0x46 &&
+        b[8] == 0x57 &&
+        b[9] == 0x45 &&
+        b[10] == 0x42 &&
+        b[11] == 0x50) {
+      return true; // RIFF....WEBP
+    }
+    return false;
   }
 
   CachedBytes? _memoryTake(String url) {
