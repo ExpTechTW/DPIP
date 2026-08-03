@@ -23,12 +23,12 @@ import 'package:dpip/core/network/network_usage_store.dart';
 ///
 /// **Immutable tile URLs** (basemap / radar / satellite / DPM — the frame or
 /// z/x/y is in the path) are served from SQLite on hit with **no**
-/// `If-None-Match` round trip. A `404` on those URLs is also cached (empty body
-/// + [negativeTileEtag]) — ocean / out-of-coverage cells are intentional and
-/// must not be re-fetched every pan. Supports JSON and binary
-/// (`ResponseType.bytes`). Streaming (SSE) is skipped. High-churn / unique-URL
-/// GETs (EEW, RTS, device location, notify) are never cached. Requires Dio
-/// `validateStatus` to accept 304 (set in `createDio`).
+/// `If-None-Match` round trip. A `404` is negatively cached **only** for
+/// basemap PBF (empty body + [negativeTileEtag]) — ocean cells are intentional.
+/// Radar / satellite / DPM 404s are **not** cached (transient / coverage gaps).
+/// Supports JSON and binary (`ResponseType.bytes`). Streaming (SSE) is skipped.
+/// High-churn / unique-URL GETs (EEW, RTS, device location, notify) are never
+/// cached. Requires Dio `validateStatus` to accept 304 (set in `createDio`).
 class EtagInterceptor extends Interceptor {
   EtagInterceptor(this._store, {this._usage});
 
@@ -252,11 +252,11 @@ class EtagInterceptor extends Interceptor {
   ) async {
     final options = err.requestOptions;
     final status = err.response?.statusCode;
-    // Basemap / radar / sat / DPM: missing XYZ is stable — remember the hole.
+    // Basemap PBF only — ocean / uncovered z/x/y is stable. Not radar/sat/DPM.
     if (_cacheable(options) &&
         _isBytes(options) &&
         status == 404 &&
-        isImmutableTile(options.uri)) {
+        isBasemapPbf(options.uri)) {
       final url = options.uri.toString();
       await _store.writeBytes(
         url,
