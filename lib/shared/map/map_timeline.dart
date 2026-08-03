@@ -9,9 +9,11 @@ import 'package:intl/intl.dart';
 ///
 /// A ruler of ticks scrolls under a fixed centre scrubber; whichever frame sits
 /// under the scrubber is the selection. Dragging updates the big time label
-/// live and, on release, snaps to the nearest frame and reports it via
-/// [onSelected] (so the map re-renders only when scrubbing settles, not every
-/// frame). The newest frame is labelled "now".
+/// live and reports each crossed frame via [onSelected] so the map can animate
+/// like a GIF. The scaffold coalesces those reports (one in-flight swap + at
+/// most one pending) and radar/sat remount a **single** raster source with
+/// pending HTTP cancelled, so a fast scrub does not stack abandoned tile
+/// downloads. The newest frame is labelled "now".
 ///
 /// Stateless about the map — it only turns [frames] + [selectedIndex] into a
 /// scrub gesture, so `MapScaffold` can drive any layer's frames through it.
@@ -103,22 +105,23 @@ class _MapTimelineState extends State<MapTimeline> {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
     if (notification is ScrollUpdateNotification) {
-      // Label only during the drag — do **not** tell the map. Every
-      // onSelected → addSource/removeSource → full viewport of tile HTTP;
-      // MapLibre does not cancel those when the source is torn down, so a
-      // fast scrub piles thousands of LocalDataTasks that then time out.
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
+        // Live map updates for the GIF scrub — scaffold coalesces so only the
+        // latest frame mounts while a swap runs; radar/sat use one source +
+        // cancelPendingFetches so abandoned frames don't pile HTTP tasks.
+        //
+        // Compare against [_liveIndex] (before the update), never
+        // [widget.selectedIndex]: the parent keeps that prop stale on purpose
+        // (no setState during scrub). Guarding on the prop stuck the map on
+        // now−1 when sliding back to the initial frame.
+        widget.onSelected(centred);
       }
     } else if (notification is ScrollEndNotification && !_snapping) {
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
+        widget.onSelected(centred);
       }
-      // Settle: snap + one map render for the frame under the scrubber.
-      // Compare against the live index path so sliding back to the parent's
-      // stale selectedIndex (kept stale on purpose — no setState during scrub)
-      // still fires, otherwise the map stays stuck on now−1.
-      widget.onSelected(centred);
       _centreOn(centred, animate: true);
     }
     return false;

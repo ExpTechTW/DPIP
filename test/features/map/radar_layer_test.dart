@@ -117,8 +117,7 @@ void main() {
     },
   );
 
-  test('adds the window lazily and removes frames that leave it', () async {
-    // Four frames, chronological ids f0..f3 (API returns newest-first).
+  test('swaps a single raster source per frame (GIF scrub)', () async {
     final layer = RadarMapLayer(
       _FakeRadarRepository([
         '1700001800000', // f3
@@ -130,34 +129,24 @@ void main() {
     final frames = (await layer.frames()).valueOrNull!; // [f0, f1, f2, f3]
     final controller = _RecordingController();
 
-    // prepare touches nothing — frames are added on demand.
     await layer.prepare(controller, frames);
     expect(controller.calls, isEmpty);
 
-    // Show newest (f3) → window {f2, f3} added lazily; f3 drawn, f2 prefetching.
     await layer.show(controller, frames[3]);
     expect(controller.calls, [
-      'addSource:radar-src-1700001200000',
-      'addRasterLayer:radar-lyr-1700001200000', // f2 prefetch
-      'addSource:radar-src-1700001800000',
-      'addRasterLayer:radar-lyr-1700001800000', // f3 drawn
+      'addSource:radar-src',
+      'addRasterLayer:radar-lyr',
     ]);
 
-    // Scrub to oldest (f0) → {f2,f3} leave (removed), {f0,f1} added.
     controller.calls.clear();
     await layer.show(controller, frames[0]);
     expect(controller.calls, [
-      'removeLayer:radar-lyr-1700001200000', // f2 removed
-      'removeSource:radar-src-1700001200000',
-      'removeLayer:radar-lyr-1700001800000', // f3 removed
-      'removeSource:radar-src-1700001800000',
-      'addSource:radar-src-1700000000000',
-      'addRasterLayer:radar-lyr-1700000000000', // f0 drawn
-      'addSource:radar-src-1700000600000',
-      'addRasterLayer:radar-lyr-1700000600000', // f1 prefetch
+      'removeLayer:radar-lyr',
+      'removeSource:radar-src',
+      'addSource:radar-src',
+      'addRasterLayer:radar-lyr',
     ]);
 
-    // Same frame again → no-op (the map holds at most the window).
     controller.calls.clear();
     await layer.show(controller, frames[0]);
     expect(controller.calls, isEmpty);

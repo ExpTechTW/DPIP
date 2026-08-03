@@ -106,7 +106,7 @@ void main() {
     },
   );
 
-  test('adds the window lazily and removes frames that leave it', () async {
+  test('swaps a single raster source per frame (GIF scrub)', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository([
         '1700001800000',
@@ -123,10 +123,8 @@ void main() {
 
     await layer.show(controller, frames[3]);
     expect(controller.calls, [
-      'addSource:satellite-src-1700001200000',
-      'addRasterLayer:satellite-lyr-1700001200000',
-      'addSource:satellite-src-1700001800000',
-      'addRasterLayer:satellite-lyr-1700001800000',
+      'addSource:satellite-src',
+      'addRasterLayer:satellite-lyr',
       'addLineLayer:satellite-global-outline',
       'addLineLayer:satellite-county-outline',
     ]);
@@ -134,14 +132,10 @@ void main() {
     controller.calls.clear();
     await layer.show(controller, frames[0]);
     expect(controller.calls, [
-      'removeLayer:satellite-lyr-1700001200000',
-      'removeSource:satellite-src-1700001200000',
-      'removeLayer:satellite-lyr-1700001800000',
-      'removeSource:satellite-src-1700001800000',
-      'addSource:satellite-src-1700000000000',
-      'addRasterLayer:satellite-lyr-1700000000000',
-      'addSource:satellite-src-1700000600000',
-      'addRasterLayer:satellite-lyr-1700000600000',
+      'removeLayer:satellite-lyr',
+      'removeSource:satellite-src',
+      'addSource:satellite-src',
+      'addRasterLayer:satellite-lyr',
     ]);
   });
 }

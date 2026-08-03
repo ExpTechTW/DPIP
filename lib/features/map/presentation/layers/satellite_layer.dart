@@ -11,8 +11,8 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same scrub/prefetch
-/// window as [RadarMapLayer], backed by the v2 Himawari XYZ WebP tiles.
+/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same single-source scrub
+/// as [RadarMapLayer], backed by the v2 Himawari XYZ WebP tiles.
 ///
 /// IR tiles already encode clear-sky as transparent (alpha = coldness), so the
 /// drawn opacity is 1.0 — unlike the opaque radar palette.
@@ -123,25 +123,17 @@ class SatelliteMapLayer implements MapLayer {
 
   static const double _opacity = 1;
 
-  /// 0 — neighbour MapLibre sources force full-viewport fetches that scrub discards.
-  static const int _prefetchRadius = 0;
+  static const String _sourceId = 'satellite-src';
+  static const String _layerId = 'satellite-lyr';
 
-  static const RasterLayerProperties _prefetching = RasterLayerProperties(
-    visibility: 'visible',
-    rasterOpacity: 0,
-  );
   static const RasterLayerProperties _shown = RasterLayerProperties(
     visibility: 'visible',
     rasterOpacity: _opacity,
   );
 
-  String _sourceId(String frameId) => 'satellite-src-$frameId';
-  String _layerId(String frameId) => 'satellite-lyr-$frameId';
-
-  List<String> _orderedIds = const [];
   Map<String, int> _indexById = const {};
-  final Set<String> _onMap = <String>{};
   String? _shownFrameId;
+  bool _mounted = false;
   bool _blackOutlineOnMap = false;
 
   @override
@@ -159,58 +151,40 @@ class SatelliteMapLayer implements MapLayer {
     MapLibreMapController controller,
     List<MapFrame> frames,
   ) async {
-    _orderedIds = [for (final frame in frames) frame.id];
     _indexById = {for (var i = 0; i < frames.length; i++) frames[i].id: i};
   }
 
   @override
   Future<void> show(MapLibreMapController controller, MapFrame frame) async {
     if (_shownFrameId == frame.id) return;
-    final index = _indexById[frame.id];
-    if (index == null) return;
+    if (_indexById[frame.id] == null) return;
 
-    // Scrub storms: abort Dio warm + native in-flight tile HTTP before we tear
-    // the old source / mount the new one (removeSource alone does not cancel).
     _repository.cancelTilePrefetch();
-    unawaited(cancelMapLibreTileFetches());
+    await cancelMapLibreTileFetches();
 
-    final lo = (index - _prefetchRadius).clamp(0, _orderedIds.length - 1);
-    final hi = (index + _prefetchRadius).clamp(0, _orderedIds.length - 1);
-    final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
-
-    final leaving = _onMap.difference(window);
-    for (final id in leaving) {
-      await _removeFrame(controller, id);
-      _onMap.remove(id);
+    if (_mounted) {
+      await _removeMounted(controller);
+      _mounted = false;
     }
 
-    for (final id in window) {
-      final properties = id == frame.id ? _shown : _prefetching;
-      if (_onMap.contains(id)) {
-        await controller.setLayerProperties(_layerId(id), properties);
-      } else {
-        await controller.addSource(
-          _sourceId(id),
-          RasterSourceProperties(
-            tiles: [_repository.tileUrl(id)],
-            tileSize: 256,
-          ),
-        );
-        // Below the themed county outline; the black IR outline sits on top
-        // of both (see [_ensureBlackOutline]).
-        await controller.addRasterLayer(
-          _sourceId(id),
-          _layerId(id),
-          properties,
-          belowLayerId: outlineLayerId,
-        );
-        _onMap.add(id);
-      }
-    }
+    await controller.addSource(
+      _sourceId,
+      RasterSourceProperties(
+        tiles: [_repository.tileUrl(frame.id)],
+        tileSize: 256,
+      ),
+    );
+    // Below the themed county outline; the black IR outline sits on top
+    // of both (see [_ensureBlackOutline]).
+    await controller.addRasterLayer(
+      _sourceId,
+      _layerId,
+      _shown,
+      belowLayerId: outlineLayerId,
+    );
+    _mounted = true;
     await _ensureBlackOutline(controller);
     _shownFrameId = frame.id;
-    // Current frame only — full-window warm on scrub overwhelmed the cache.
-    unawaited(_warmFrames(controller, [frame.id]));
   }
 
   /// Black land borders above the IR stack — `global` for every country, then
@@ -262,35 +236,30 @@ class SatelliteMapLayer implements MapLayer {
   @override
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
-    unawaited(cancelMapLibreTileFetches());
-    for (final id in _onMap) {
-      await _removeFrame(controller, id);
+    await cancelMapLibreTileFetches();
+    if (_mounted) {
+      await _removeMounted(controller);
     }
     await _removeBlackOutline(controller);
     _reset();
   }
 
-  Future<void> _removeFrame(MapLibreMapController controller, String id) async {
+  Future<void> _removeMounted(MapLibreMapController controller) async {
     try {
-      await controller.removeLayer(_layerId(id));
-    } catch (_) {
-      // Already gone — fine.
-    }
+      await controller.removeLayer(_layerId);
+    } catch (_) {}
     try {
-      await controller.removeSource(_sourceId(id));
-    } catch (_) {
-      // Already gone — fine.
-    }
+      await controller.removeSource(_sourceId);
+    } catch (_) {}
   }
 
   @override
   void onStyleReset() => _reset();
 
   void _reset() {
-    _onMap.clear();
-    _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
+    _mounted = false;
     _blackOutlineOnMap = false;
   }
 }
