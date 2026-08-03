@@ -172,10 +172,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayers => 'Layers';
 
   @override
-  String get mapLayerRadar => 'Radar';
+  String get mapLayerRadar => 'Composite Radar Reflectivity';
 
   @override
-  String get mapLayerSatellite => 'Satellite';
+  String get mapLayerSatellite => 'Himawari Infrared';
 
   @override
   String get mapTimelineNow => 'Now';

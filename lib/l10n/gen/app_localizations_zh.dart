@@ -171,10 +171,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayers => '圖層';
 
   @override
-  String get mapLayerRadar => '雷達回波';
+  String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => '衛星雲圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
   String get mapTimelineNow => '現在';
@@ -696,10 +696,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayers => '图层';
 
   @override
-  String get mapLayerRadar => '雷达回波';
+  String get mapLayerRadar => '雷达合成回波图';
 
   @override
-  String get mapLayerSatellite => '卫星云图';
+  String get mapLayerSatellite => 'ひまわり 红外线图';
 
   @override
   String get mapTimelineNow => '现在';
@@ -1221,10 +1221,10 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayers => '圖層';
 
   @override
-  String get mapLayerRadar => '雷達回波';
+  String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => '衛星雲圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
   String get mapTimelineNow => '現在';

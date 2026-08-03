@@ -9,6 +9,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
 
 /// One stop on a continuous colour ramp: [at] is the labelled value, [hex] an
@@ -23,17 +24,13 @@ class MapLegendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: colors.surface.withValues(alpha: 0.92),
-        borderRadius: AppRadius.small,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 8),
-        ],
+    return FrostedSurface(
+      borderRadius: AppRadius.small,
+      shadow: true,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: child,
       ),
-      child: child,
     );
   }
 }

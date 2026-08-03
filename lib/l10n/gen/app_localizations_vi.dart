@@ -172,10 +172,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayers => 'Lớp bản đồ';
 
   @override
-  String get mapLayerRadar => 'Radar';
+  String get mapLayerRadar => 'Radar phản xạ tổng hợp';
 
   @override
-  String get mapLayerSatellite => 'Vệ tinh';
+  String get mapLayerSatellite => 'Himawari hồng ngoại';
 
   @override
   String get mapTimelineNow => 'Bây giờ';

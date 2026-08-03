@@ -171,10 +171,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayers => '레이어';
 
   @override
-  String get mapLayerRadar => '레이더';
+  String get mapLayerRadar => '레이더 합성 에코';
 
   @override
-  String get mapLayerSatellite => '위성 영상';
+  String get mapLayerSatellite => '히마와리 적외';
 
   @override
   String get mapTimelineNow => '현재';

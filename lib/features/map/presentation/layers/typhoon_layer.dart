@@ -250,7 +250,7 @@ class TyphoonMapLayer implements MapLayer {
       _imgSrc,
       _imgLyr,
       const RasterLayerProperties(rasterOpacity: 0.8),
-      belowLayerId: townOutlineLayerId,
+      belowLayerId: outlineLayerId,
     );
   }
 

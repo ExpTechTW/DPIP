@@ -229,13 +229,13 @@
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"
   },
-  "mapLayerRadar": "Radar",
+  "mapLayerRadar": "Composite Radar Reflectivity",
   "@mapLayerRadar": {
-    "description": "Name of the radar echo map layer in the layer picker"
+    "description": "Name of the composite radar reflectivity layer in the layer picker"
   },
-  "mapLayerSatellite": "Satellite",
+  "mapLayerSatellite": "Himawari Infrared",
   "@mapLayerSatellite": {
-    "description": "Name of the satellite IR cloud map layer in the layer picker"
+    "description": "Name of the Himawari infrared layer in the layer picker"
   },
   "mapTimelineNow": "Now",
   "@mapTimelineNow": {
@@ -568,7 +568,12 @@
   "sponsorPerMonth": "{price} / month",
   "@sponsorPerMonth": {
     "description": "Monthly price label for a subscription; price is the store-localized amount",
-    "placeholders": { "price": { "type": "String", "example": "NT$75" } }
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "NT$75"
+      }
+    }
   },
   "sponsorRestore": "Restore purchases",
   "@sponsorRestore": {

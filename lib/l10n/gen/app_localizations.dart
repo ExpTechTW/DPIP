@@ -428,16 +428,16 @@ abstract class AppLocalizations {
   /// **'Layers'**
   String get mapLayers;
 
-  /// Name of the radar echo map layer in the layer picker
+  /// Name of the composite radar reflectivity layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'Radar'**
+  /// **'Composite Radar Reflectivity'**
   String get mapLayerRadar;
 
-  /// Name of the satellite IR cloud map layer in the layer picker
+  /// Name of the Himawari infrared layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'Satellite'**
+  /// **'Himawari Infrared'**
   String get mapLayerSatellite;
 
   /// Label on the map timeline when the newest (latest) frame is selected

@@ -172,10 +172,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override
-  String get mapLayerRadar => 'เรดาร์';
+  String get mapLayerRadar => 'เรดาร์สะท้อนสังเคราะห์';
 
   @override
-  String get mapLayerSatellite => 'ภาพถ่ายดาวเทียม';
+  String get mapLayerSatellite => 'ฮิมาวาริ อินฟราเรด';
 
   @override
   String get mapTimelineNow => 'ตอนนี้';

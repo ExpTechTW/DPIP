@@ -172,10 +172,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayers => 'Lapisan';
 
   @override
-  String get mapLayerRadar => 'Radar';
+  String get mapLayerRadar => 'Radar Komposit';
 
   @override
-  String get mapLayerSatellite => 'Satelit';
+  String get mapLayerSatellite => 'Himawari Inframerah';
 
   @override
   String get mapTimelineNow => 'Sekarang';

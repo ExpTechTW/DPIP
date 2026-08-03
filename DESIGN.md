@@ -30,9 +30,9 @@ logging and localization — is covered at the end.
 - Translucency via `color.withValues(alpha: …)` (not the deprecated
   `withOpacity`). Convert a colour to a MapLibre hex with `Color.toHexRgb()`
   (`lib/shared/color_hex.dart`).
-- The map backdrop mirrors the theme: sea = `surface`, land = `surfaceContainer`,
-  county/town = `surfaceContainerHigh`, borders = `outline`.
-- Literal colours are allowed **only** where no theme role applies: shader
+- The base map uses a fixed palette (`MapColors` in `map_style.dart`), not
+  `ColorScheme`: background `#1f2025`, fill `#3F4045`, outline `#a9b4bc`.
+- Literal colours are also allowed where no theme role applies: shader
   fallback/mood colours (`weather_sky.frag` / `weather_sky_background.dart`) and
   the one sheet shadow.
 

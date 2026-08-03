@@ -171,10 +171,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayers => 'レイヤー';
 
   @override
-  String get mapLayerRadar => 'レーダー';
+  String get mapLayerRadar => 'レーダー合成エコー図';
 
   @override
-  String get mapLayerSatellite => '衛星雲';
+  String get mapLayerSatellite => 'ひまわり 赤外線図';
 
   @override
   String get mapTimelineNow => '現在';

@@ -1,10 +1,9 @@
-import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The app's reusable base map — a MapLibre map centred on Taiwan, rendered from
-/// the theme-driven ExpTech vector style (same base as the home snapshot).
+/// the fixed ExpTech vector style (same base as the home snapshot).
 ///
 /// This is the shared foundation every map surface builds on (home backdrop,
 /// map tab, radar preview, event viewers). It is layer-agnostic: callers add
@@ -79,7 +78,6 @@ class BaseMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
@@ -87,13 +85,7 @@ class BaseMap extends StatelessWidget {
         target: taiwanCenter,
         zoom: minZoom,
       ),
-      styleString: exptechVectorStyle(
-        sea: colors.surface.toHexRgb(),
-        land: colors.surfaceContainer.toHexRgb(),
-        countyTown: colors.surfaceContainerHigh.toHexRgb(),
-        outline: colors.outline.toHexRgb(),
-        townOutline: colors.outlineVariant.toHexRgb(),
-      ),
+      styleString: exptechVectorStyle(),
       minMaxZoomPreference: zoomRange,
       trackCameraPosition: true,
       compassEnabled: interactive,

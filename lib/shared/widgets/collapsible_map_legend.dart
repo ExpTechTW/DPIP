@@ -6,6 +6,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
 
 /// Wraps a layer's [legend] body. Remount with a new [Key] (e.g. layer id) to
@@ -56,36 +57,36 @@ class _Chip extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: colors.surface.withValues(alpha: 0.92),
-        elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.18),
+      child: FrostedSurface(
         borderRadius: AppRadius.small,
-        child: InkWell(
-          borderRadius: AppRadius.small,
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.legend_toggle,
-                  size: 18,
-                  color: colors.onSurfaceVariant,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  tooltip,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: AppRadius.small,
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.legend_toggle,
+                    size: 18,
                     color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
                   ),
-                ),
-              ],
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    tooltip,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -118,20 +119,21 @@ class _Expanded extends StatelessWidget {
           right: -6,
           child: Tooltip(
             message: collapseTooltip,
-            child: Material(
-              color: colors.surface,
-              elevation: 2,
-              shadowColor: Colors.black.withValues(alpha: 0.18),
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: onCollapse,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xs),
-                  child: Icon(
-                    Icons.expand_less,
-                    size: 18,
-                    color: colors.onSurfaceVariant,
+            child: FrostedSurface(
+              borderRadius: BorderRadius.circular(999),
+              shadow: false,
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onCollapse,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xs),
+                    child: Icon(
+                      Icons.expand_less,
+                      size: 18,
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
