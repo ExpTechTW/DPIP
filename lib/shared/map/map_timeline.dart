@@ -107,10 +107,19 @@ class _MapTimelineState extends State<MapTimeline> {
         setState(() => _liveIndex = centred);
         // Report every frame the scrubber crosses, not just the final one, so
         // the map animates through the loop as you drag.
-        if (widget.selectedIndex != centred) widget.onSelected(centred);
+        //
+        // Compare against [_liveIndex] (before the update), never
+        // [widget.selectedIndex]: the parent keeps that prop stale on purpose
+        // (no setState during scrub, so the platform-view map isn't rebuilt).
+        // Guarding on the prop meant sliding back to the initial "now" frame
+        // looked like a no-op and the map stayed stuck on now−1.
+        widget.onSelected(centred);
       }
     } else if (notification is ScrollEndNotification && !_snapping) {
-      if (widget.selectedIndex != centred) widget.onSelected(centred);
+      if (centred != _liveIndex) {
+        setState(() => _liveIndex = centred);
+        widget.onSelected(centred);
+      }
       _centreOn(centred, animate: true);
     }
     return false;

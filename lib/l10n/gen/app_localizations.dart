@@ -1052,6 +1052,126 @@ abstract class AppLocalizations {
   /// **'Moving'**
   String get typhoonMotion;
 
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Centre location'**
+  String get typhoonLabelPosition;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Past movement direction'**
+  String get typhoonLabelDirection;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Past movement speed'**
+  String get typhoonLabelSpeed;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Central pressure'**
+  String get typhoonLabelPressure;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Max. sustained wind near centre'**
+  String get typhoonLabelWind;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Peak gust'**
+  String get typhoonLabelGust;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Avg. radius of Beaufort 7 winds'**
+  String get typhoonLabelGaleAvg;
+
+  /// Bulletin table row label
+  ///
+  /// In en, this message translates to:
+  /// **'Avg. radius of Beaufort 10 winds'**
+  String get typhoonLabelStormAvg;
+
+  /// Forecast point: radius of the 70% track probability circle
+  ///
+  /// In en, this message translates to:
+  /// **'70% probability circle'**
+  String get typhoonLabelProbCircle;
+
+  /// Forecast lead time for a tapped track point
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast +{hours} h'**
+  String typhoonForecastLead(String hours);
+
+  /// No description provided for @typhoonLabelNw.
+  ///
+  /// In en, this message translates to:
+  /// **'NW'**
+  String get typhoonLabelNw;
+
+  /// No description provided for @typhoonLabelNe.
+  ///
+  /// In en, this message translates to:
+  /// **'NE'**
+  String get typhoonLabelNe;
+
+  /// No description provided for @typhoonLabelSw.
+  ///
+  /// In en, this message translates to:
+  /// **'SW'**
+  String get typhoonLabelSw;
+
+  /// No description provided for @typhoonLabelSe.
+  ///
+  /// In en, this message translates to:
+  /// **'SE'**
+  String get typhoonLabelSe;
+
+  /// No description provided for @typhoonValueLat.
+  ///
+  /// In en, this message translates to:
+  /// **'{lat}°N'**
+  String typhoonValueLat(String lat);
+
+  /// No description provided for @typhoonValueLon.
+  ///
+  /// In en, this message translates to:
+  /// **'{lon}°E'**
+  String typhoonValueLon(String lon);
+
+  /// No description provided for @typhoonValueKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} km'**
+  String typhoonValueKm(String n);
+
+  /// No description provided for @typhoonValueHpa.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} hPa'**
+  String typhoonValueHpa(String n);
+
+  /// No description provided for @typhoonValueMs.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} m/s'**
+  String typhoonValueMs(String n);
+
+  /// Bulletin data time under the intensity chip (Taipei wall clock)
+  ///
+  /// In en, this message translates to:
+  /// **'Data time\n{time}'**
+  String typhoonDataTime(String time);
+
   /// Map layer switcher label for the real-time seismic monitor (RTS)
   ///
   /// In en, this message translates to:
@@ -1087,6 +1207,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Observed track'**
   String get typhoonLegendPast;
+
+  /// CWA class: tropical depression (past-track colour)
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical depression'**
+  String get typhoonIntensityTd;
+
+  /// CWA class: mild typhoon (past-track colour)
+  ///
+  /// In en, this message translates to:
+  /// **'Mild typhoon'**
+  String get typhoonIntensityMild;
+
+  /// CWA class: moderate typhoon (past-track colour)
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate typhoon'**
+  String get typhoonIntensityModerate;
+
+  /// CWA class: intense typhoon (past-track colour)
+  ///
+  /// In en, this message translates to:
+  /// **'Intense typhoon'**
+  String get typhoonIntensityIntense;
 
   /// Typhoon map legend: forecast path
   ///
@@ -1130,11 +1274,29 @@ abstract class AppLocalizations {
   /// **'Gale circle (L7)'**
   String get typhoonLegendCircle15;
 
+  /// Legend for the purple dashed mean-radius storm circle
+  ///
+  /// In en, this message translates to:
+  /// **'Average circle'**
+  String get typhoonLegendCircleAvg;
+
   /// Typhoon UI: typhoonLegendCircle25
   ///
   /// In en, this message translates to:
   /// **'Storm circle (L10)'**
   String get typhoonLegendCircle25;
+
+  /// Per-quadrant storm-wind radii (km) for a typhoon circle
+  ///
+  /// In en, this message translates to:
+  /// **'NE {ne} · SE {se} · SW {sw} · NW {nw} km'**
+  String typhoonStormRadii(String ne, String se, String sw, String nw);
+
+  /// Compact typhoon time chip / map label shape (day + hour, no month)
+  ///
+  /// In en, this message translates to:
+  /// **'{day}日{hour}時'**
+  String typhoonTimeChip(String day, String hour);
 
   /// Typhoon UI: typhoonLegendProbability
   ///
@@ -1147,6 +1309,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Warning areas'**
   String get typhoonLegendWarningAreas;
+
+  /// Tooltip for the typhoon overlay-toggle chip beside the layer switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon overlay options'**
+  String get typhoonOverlayMenuTooltip;
+
+  /// Section header for L7/L10 storm-band choices in the overlay menu
+  ///
+  /// In en, this message translates to:
+  /// **'Storm wind'**
+  String get typhoonOverlaySectionStorm;
+
+  /// Section header for optional typhoon overlays (probability, warning)
+  ///
+  /// In en, this message translates to:
+  /// **'Overlays'**
+  String get typhoonOverlaySectionExtra;
+
+  /// Subtitle under each storm-band option (fill + dashed avg)
+  ///
+  /// In en, this message translates to:
+  /// **'With average circle'**
+  String get typhoonOverlayStormBandSubtitle;
+
+  /// Short hint under the strike-probability toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Hides the forecast cone'**
+  String get typhoonOverlayProbabilityHint;
+
+  /// Tooltip for the strike-probability toggle; notes mutual exclusion with the cone
+  ///
+  /// In en, this message translates to:
+  /// **'Show strike probability (hides the forecast cone)'**
+  String get typhoonOverlayProbabilityTooltip;
+
+  /// Tooltip for the warning-areas overlay toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight counties under a typhoon warning'**
+  String get typhoonOverlayWarningTooltip;
+
+  /// Tooltip for the L7 storm-band radio option
+  ///
+  /// In en, this message translates to:
+  /// **'Level-7 wind field + average circle (purple)'**
+  String get typhoonOverlayStormL7Tooltip;
+
+  /// Tooltip for the L10 storm-band radio row
+  ///
+  /// In en, this message translates to:
+  /// **'Level-10 wind field + average circle (yellow)'**
+  String get typhoonOverlayStormL10Tooltip;
+
+  /// Overlay-menu section for radar / IR under the typhoon vectors
+  ///
+  /// In en, this message translates to:
+  /// **'Weather underlay'**
+  String get typhoonOverlaySectionWeather;
+
+  /// No radar or satellite underlay
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get typhoonOverlayWeatherNone;
+
+  /// Subtitle: weather tile matches typhoon report time
+  ///
+  /// In en, this message translates to:
+  /// **'Aligned to bulletin time'**
+  String get typhoonOverlayWeatherHint;
+
+  /// Tooltip for clearing the weather underlay
+  ///
+  /// In en, this message translates to:
+  /// **'No radar or infrared underlay'**
+  String get typhoonOverlayWeatherNoneTooltip;
+
+  /// Tooltip for radar underlay (mutex with IR)
+  ///
+  /// In en, this message translates to:
+  /// **'Radar echo closest to the typhoon bulletin time'**
+  String get typhoonOverlayWeatherRadarTooltip;
+
+  /// Tooltip for Himawari IR underlay (mutex with radar)
+  ///
+  /// In en, this message translates to:
+  /// **'Infrared closest to the typhoon bulletin time'**
+  String get typhoonOverlayWeatherSatelliteTooltip;
 
   /// Typhoon UI: typhoonWarningTitle
   ///
@@ -1183,6 +1435,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Satellite'**
   String get typhoonSatelliteTitle;
+
+  /// Overlay menu: toggle forecast-point Flutter callout cards
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast tooltips'**
+  String get typhoonOverlayForecastCallouts;
+
+  /// Tooltip for the forecast callouts overlay toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Show forecast-point detail cards when zoomed in'**
+  String get typhoonOverlayForecastCalloutsTooltip;
 }
 
 class _AppLocalizationsDelegate

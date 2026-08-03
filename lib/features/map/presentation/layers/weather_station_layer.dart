@@ -88,6 +88,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   double get bottomChromeFraction => StationSheet.peekExtent;
 
   @override
+  double get mapMinZoom => 4;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
@@ -172,6 +175,19 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
       _selectionRevision.value++;
     }
   }
+
+  @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
 
   @override
   Widget buildSheet(BuildContext context) =>

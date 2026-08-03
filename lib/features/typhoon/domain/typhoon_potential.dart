@@ -13,7 +13,8 @@ part 'typhoon_potential.g.dart';
 @freezed
 abstract class ForecastPoint with _$ForecastPoint {
   const factory ForecastPoint({
-    /// Human label (e.g. `07月14日14時`).
+    /// Human label from the wire (e.g. `07月14日14時`); display shortens via
+    /// [shortenTyphoonTimeLabel] to `14日14時`.
     required String label,
     @JsonKey(name: 'lat') required double latitude,
     @JsonKey(name: 'lng') required double longitude,

@@ -41,6 +41,9 @@ class RadarMapLayer implements MapLayer {
   double get bottomChromeFraction => 0;
 
   @override
+  double get mapMinZoom => 4;
+
+  @override
   Future<void> render(MapLibreMapController controller) async {}
 
   @override
@@ -51,6 +54,19 @@ class RadarMapLayer implements MapLayer {
 
   @override
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
 
   /// CWA radar reflectivity (dBZ) — same stops as legacy's radar ColorLegend.
   @override

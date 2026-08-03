@@ -67,6 +67,10 @@ abstract interface class MapLayer {
   /// its real height instead of taking a declared number.
   double get bottomChromeFraction;
 
+  /// Per-surface MapLibre zoom floor. Default matches [BaseMap.defaultMinZoom]
+  /// (radar tiles); typhoon may go lower so the whole basin fits.
+  double get mapMinZoom;
+
   /// Draws this sheet layer's static overlay when it becomes active. Called once
   /// per activation (behind the serial op queue). No-op for timeline layers.
   Future<void> render(MapLibreMapController controller);
@@ -85,6 +89,26 @@ abstract interface class MapLayer {
   /// Return [SizedBox.shrink] when the layer has nothing to key (rare). Keep it
   /// compact — the map must stay readable beside the layer switcher.
   Widget buildLegend(BuildContext context);
+
+  /// Optional chrome to the left of the layer switcher (top-right).
+  ///
+  /// Use for layer-specific toggles (e.g. typhoon overlay menu). Default is
+  /// empty — most layers only need the shared switcher.
+  Widget buildTopTrailingChrome(BuildContext context);
+
+  /// Flutter widgets painted over the map (screen-space callouts, etc.).
+  ///
+  /// Prefer this for readable text — MapLibre symbol glyphs can't mix CJK and
+  /// Latin cleanly. Keep the subtree [IgnorePointer]-friendly (scaffold wraps
+  /// it) so pan/zoom still hit the map. Return [SizedBox.shrink] when unused.
+  /// Rebuilds on camera idle so projections stay in sync.
+  Widget buildMapOverlay(BuildContext context);
+
+  /// Finger/stylus went down on the map — hide ephemeral overlays (callouts).
+  void onMapGestureStart();
+
+  /// Gesture finished (pointer up with no camera motion, or camera idle).
+  void onMapGestureEnd();
 
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.

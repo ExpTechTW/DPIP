@@ -35,7 +35,11 @@ class _MapPageState extends State<MapPage> {
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
     SatelliteMapLayer(context.read<SatelliteRepository>()),
-    TyphoonMapLayer(context.read<MeteorTyphoonRepository>()),
+    TyphoonMapLayer(
+      context.read<MeteorTyphoonRepository>(),
+      radar: context.read<RadarRepository>(),
+      satellite: context.read<SatelliteRepository>(),
+    ),
     RtsMapLayer(
       context.read<RealtimeNotifier<Rts>>(),
       context.read<TremStationRepository>(),

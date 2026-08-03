@@ -34,6 +34,10 @@ class SatelliteMapLayer implements MapLayer {
   double get bottomChromeFraction => 0;
 
   @override
+  double get mapMinZoom => 4;
+
+
+  @override
   Future<void> render(MapLibreMapController controller) async {}
 
   @override
@@ -44,6 +48,19 @@ class SatelliteMapLayer implements MapLayer {
 
   @override
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
 
   /// Himawari Band-13 brightness temperature — cold white / warm black
   /// (180–300 K), matching the tile renderer.

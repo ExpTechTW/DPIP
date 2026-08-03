@@ -633,6 +633,62 @@
   "typhoonGust": "Gust",
   "typhoonPressure": "Pressure",
   "typhoonMotion": "Moving",
+  "typhoonLabelPosition": "Centre location",
+  "@typhoonLabelPosition": { "description": "Bulletin table row label" },
+  "typhoonLabelDirection": "Past movement direction",
+  "@typhoonLabelDirection": { "description": "Bulletin table row label" },
+  "typhoonLabelSpeed": "Past movement speed",
+  "@typhoonLabelSpeed": { "description": "Bulletin table row label" },
+  "typhoonLabelPressure": "Central pressure",
+  "@typhoonLabelPressure": { "description": "Bulletin table row label" },
+  "typhoonLabelWind": "Max. sustained wind near centre",
+  "@typhoonLabelWind": { "description": "Bulletin table row label" },
+  "typhoonLabelGust": "Peak gust",
+  "@typhoonLabelGust": { "description": "Bulletin table row label" },
+  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
+  "@typhoonLabelGaleAvg": { "description": "Bulletin table row label" },
+  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
+  "@typhoonLabelStormAvg": { "description": "Bulletin table row label" },
+  "typhoonLabelProbCircle": "70% probability circle",
+  "@typhoonLabelProbCircle": {
+    "description": "Forecast point: radius of the 70% track probability circle"
+  },
+  "typhoonForecastLead": "Forecast +{hours} h",
+  "@typhoonForecastLead": {
+    "description": "Forecast lead time for a tapped track point",
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+  "typhoonLabelNw": "NW",
+  "typhoonLabelNe": "NE",
+  "typhoonLabelSw": "SW",
+  "typhoonLabelSe": "SE",
+  "typhoonValueLat": "{lat}°N",
+  "@typhoonValueLat": {
+    "placeholders": { "lat": { "type": "String" } }
+  },
+  "typhoonValueLon": "{lon}°E",
+  "@typhoonValueLon": {
+    "placeholders": { "lon": { "type": "String" } }
+  },
+  "typhoonValueKm": "{n} km",
+  "@typhoonValueKm": {
+    "placeholders": { "n": { "type": "String" } }
+  },
+  "typhoonValueHpa": "{n} hPa",
+  "@typhoonValueHpa": {
+    "placeholders": { "n": { "type": "String" } }
+  },
+  "typhoonValueMs": "{n} m/s",
+  "@typhoonValueMs": {
+    "placeholders": { "n": { "type": "String" } }
+  },
+  "typhoonDataTime": "Data time\n{time}",
+  "@typhoonDataTime": {
+    "description": "Bulletin data time under the intensity chip (Taipei wall clock)",
+    "placeholders": { "time": { "type": "String" } }
+  },
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind-direction layer"
   },
@@ -670,6 +726,22 @@
   "@typhoonLegendPast": {
     "description": "Typhoon map legend: past/observed path"
   },
+  "typhoonIntensityTd": "Tropical depression",
+  "@typhoonIntensityTd": {
+    "description": "CWA class: tropical depression (past-track colour)"
+  },
+  "typhoonIntensityMild": "Mild typhoon",
+  "@typhoonIntensityMild": {
+    "description": "CWA class: mild typhoon (past-track colour)"
+  },
+  "typhoonIntensityModerate": "Moderate typhoon",
+  "@typhoonIntensityModerate": {
+    "description": "CWA class: moderate typhoon (past-track colour)"
+  },
+  "typhoonIntensityIntense": "Intense typhoon",
+  "@typhoonIntensityIntense": {
+    "description": "CWA class: intense typhoon (past-track colour)"
+  },
   "typhoonLegendForecast": "Forecast track",
   "@typhoonLegendForecast": {
     "description": "Typhoon map legend: forecast path"
@@ -695,9 +767,91 @@
     "description": "Tooltip on the control that collapses the map legend"
   },
   "typhoonLegendCircle15": "Gale circle (L7)",
+  "typhoonLegendCircleAvg": "Average circle",
+  "@typhoonLegendCircleAvg": {
+    "description": "Legend for the purple dashed mean-radius storm circle"
+  },
   "typhoonLegendCircle25": "Storm circle (L10)",
+  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
+  "@typhoonStormRadii": {
+    "description": "Per-quadrant storm-wind radii (km) for a typhoon circle",
+    "placeholders": {
+      "ne": {"type": "String"},
+      "se": {"type": "String"},
+      "sw": {"type": "String"},
+      "nw": {"type": "String"}
+    }
+  },
+  "typhoonTimeChip": "{day}日{hour}時",
+  "@typhoonTimeChip": {
+    "description": "Compact typhoon time chip / map label shape (day + hour, no month)",
+    "placeholders": {
+      "day": {"type": "String"},
+      "hour": {"type": "String"}
+    }
+  },
   "typhoonLegendProbability": "Strike probability",
   "typhoonLegendWarningAreas": "Warning areas",
+  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
+  "@typhoonOverlayMenuTooltip": {
+    "description": "Tooltip for the typhoon overlay-toggle chip beside the layer switcher"
+  },
+  "typhoonOverlaySectionStorm": "Storm wind",
+  "@typhoonOverlaySectionStorm": {
+    "description": "Section header for L7/L10 storm-band choices in the overlay menu"
+  },
+  "typhoonOverlaySectionExtra": "Overlays",
+  "@typhoonOverlaySectionExtra": {
+    "description": "Section header for optional typhoon overlays (probability, warning)"
+  },
+  "typhoonOverlayStormBandSubtitle": "With average circle",
+  "@typhoonOverlayStormBandSubtitle": {
+    "description": "Subtitle under each storm-band option (fill + dashed avg)"
+  },
+  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
+  "@typhoonOverlayProbabilityHint": {
+    "description": "Short hint under the strike-probability toggle"
+  },
+  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
+  "@typhoonOverlayProbabilityTooltip": {
+    "description": "Tooltip for the strike-probability toggle; notes mutual exclusion with the cone"
+  },
+  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
+  "@typhoonOverlayWarningTooltip": {
+    "description": "Tooltip for the warning-areas overlay toggle"
+  },
+  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
+  "@typhoonOverlayStormL7Tooltip": {
+    "description": "Tooltip for the L7 storm-band radio option"
+  },
+  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
+  "@typhoonOverlayStormL10Tooltip": {
+    "description": "Tooltip for the L10 storm-band radio row"
+  },
+  "typhoonOverlaySectionWeather": "Weather underlay",
+  "@typhoonOverlaySectionWeather": {
+    "description": "Overlay-menu section for radar / IR under the typhoon vectors"
+  },
+  "typhoonOverlayWeatherNone": "None",
+  "@typhoonOverlayWeatherNone": {
+    "description": "No radar or satellite underlay"
+  },
+  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
+  "@typhoonOverlayWeatherHint": {
+    "description": "Subtitle: weather tile matches typhoon report time"
+  },
+  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
+  "@typhoonOverlayWeatherNoneTooltip": {
+    "description": "Tooltip for clearing the weather underlay"
+  },
+  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
+  "@typhoonOverlayWeatherRadarTooltip": {
+    "description": "Tooltip for radar underlay (mutex with IR)"
+  },
+  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
+  "@typhoonOverlayWeatherSatelliteTooltip": {
+    "description": "Tooltip for Himawari IR underlay (mutex with radar)"
+  },
   "typhoonWarningTitle": "Typhoon warning",
   "typhoonWarningAreas": "Areas: {areas}",
   "typhoonTrackDetail": "Track detail",
@@ -738,5 +892,13 @@
   },
   "@typhoonSatelliteTitle": {
     "description": "Typhoon UI: typhoonSatelliteTitle"
+  },
+  "typhoonOverlayForecastCallouts": "Forecast tooltips",
+  "@typhoonOverlayForecastCallouts": {
+    "description": "Overlay menu: toggle forecast-point Flutter callout cards"
+  },
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "@typhoonOverlayForecastCalloutsTooltip": {
+    "description": "Tooltip for the forecast callouts overlay toggle"
   }
 }

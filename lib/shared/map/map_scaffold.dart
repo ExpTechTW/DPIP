@@ -68,6 +68,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Serialises controller mutations so an add never races a remove.
   Future<void> _mapOps = Future<void>.value();
 
+  /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
+  int _cameraEpoch = 0;
+
   /// Whether tiles have been cached since the last clear — so backgrounding only
   /// clears the shared cache when there's actually something to clear.
   bool _cacheDirty = false;
@@ -368,10 +371,42 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     return Stack(
       children: [
         Positioned.fill(
-          child: BaseMap(
-            onMapCreated: _onMapCreated,
-            onStyleLoaded: _onStyleLoaded,
-            onMapClick: (_, latLng) => _onMapClick(latLng),
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => _active.onMapGestureStart(),
+            onPointerUp: (_) {
+              // Tap with no pan: camera idle won't re-fire — restore overlays.
+              final c = _controller;
+              if (c == null || !c.isCameraMoving) {
+                _active.onMapGestureEnd();
+                if (mounted) setState(() => _cameraEpoch++);
+              }
+            },
+            onPointerCancel: (_) {
+              _active.onMapGestureEnd();
+              if (mounted) setState(() => _cameraEpoch++);
+            },
+            child: BaseMap(
+              minZoomPreference: _active.mapMinZoom,
+              onMapCreated: _onMapCreated,
+              onStyleLoaded: _onStyleLoaded,
+              onMapClick: (_, latLng) => _onMapClick(latLng),
+              onCameraIdle: () {
+                _active.onMapGestureEnd();
+                if (!mounted) return;
+                setState(() => _cameraEpoch++);
+              },
+            ),
+          ),
+        ),
+        // Screen-space Flutter overlays (e.g. typhoon forecast tips) — under
+        // chrome/sheet so they don't steal taps; IgnorePointer keeps pan/zoom.
+        Positioned.fill(
+          child: IgnorePointer(
+            child: KeyedSubtree(
+              key: ValueKey<Object>('${_active.id}-$_cameraEpoch'),
+              child: _active.buildMapOverlay(context),
+            ),
           ),
         ),
         // Colour / key legend — top-left. Under the sheet so a dragged-up
@@ -389,17 +424,33 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             ),
           ),
         ),
-        // Layer switcher — top-right; same z-order rule as the legend.
+        // Layer switcher (+ optional layer chrome) — top-right.
         Positioned(
           top: 0,
           right: 0,
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: MapLayerSwitcher(
-                layers: widget.layers,
-                active: _active,
-                onSelected: _onLayerSelected,
+              child: Builder(
+                builder: (context) {
+                  // Non-typhoon layers return [SizedBox.shrink] — skip the gap.
+                  final chrome = _active.buildTopTrailingChrome(context);
+                  final hasChrome = chrome is! SizedBox;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (hasChrome) ...[
+                        chrome,
+                        const SizedBox(width: AppSpacing.sm),
+                      ],
+                      MapLayerSwitcher(
+                        layers: widget.layers,
+                        active: _active,
+                        onSelected: _onLayerSelected,
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

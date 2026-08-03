@@ -493,6 +493,80 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonMotion => '이동';
 
   @override
+  String get typhoonLabelPosition => 'Centre location';
+
+  @override
+  String get typhoonLabelDirection => 'Past movement direction';
+
+  @override
+  String get typhoonLabelSpeed => 'Past movement speed';
+
+  @override
+  String get typhoonLabelPressure => 'Central pressure';
+
+  @override
+  String get typhoonLabelWind => 'Max. sustained wind near centre';
+
+  @override
+  String get typhoonLabelGust => 'Peak gust';
+
+  @override
+  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+
+  @override
+  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+
+  @override
+  String get typhoonLabelProbCircle => '70% probability circle';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return 'Forecast +$hours h';
+  }
+
+  @override
+  String get typhoonLabelNw => 'NW';
+
+  @override
+  String get typhoonLabelNe => 'NE';
+
+  @override
+  String get typhoonLabelSw => 'SW';
+
+  @override
+  String get typhoonLabelSe => 'SE';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '$lat°N';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '$lon°E';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '$n m/s';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return 'Data time\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
@@ -513,6 +587,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get typhoonLegendPast => '실황 경로';
+
+  @override
+  String get typhoonIntensityTd => 'Tropical depression';
+
+  @override
+  String get typhoonIntensityMild => 'Mild typhoon';
+
+  @override
+  String get typhoonIntensityModerate => 'Moderate typhoon';
+
+  @override
+  String get typhoonIntensityIntense => 'Intense typhoon';
 
   @override
   String get typhoonLegendForecast => '예보 경로';
@@ -536,13 +622,78 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonLegendCircle15 => '강풍권 (7급)';
 
   @override
+  String get typhoonLegendCircleAvg => 'Average circle';
+
+  @override
   String get typhoonLegendCircle25 => '폭풍권 (10급)';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
 
   @override
   String get typhoonLegendProbability => '내습 확률';
 
   @override
   String get typhoonLegendWarningAreas => '경보 지역';
+
+  @override
+  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+
+  @override
+  String get typhoonOverlaySectionStorm => 'Storm wind';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'Overlays';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+
+  @override
+  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip =>
+      'Show strike probability (hides the forecast cone)';
+
+  @override
+  String get typhoonOverlayWarningTooltip =>
+      'Highlight counties under a typhoon warning';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip =>
+      'Level-7 wind field + average circle (purple)';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip =>
+      'Level-10 wind field + average circle (yellow)';
+
+  @override
+  String get typhoonOverlaySectionWeather => 'Weather underlay';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'None';
+
+  @override
+  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip =>
+      'No radar or infrared underlay';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip =>
+      'Radar echo closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip =>
+      'Infrared closest to the typhoon bulletin time';
 
   @override
   String get typhoonWarningTitle => '태풍 경보';
@@ -563,4 +714,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get typhoonSatelliteTitle => '위성';
+
+  @override
+  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip =>
+      'Show forecast-point detail cards when zoomed in';
 }

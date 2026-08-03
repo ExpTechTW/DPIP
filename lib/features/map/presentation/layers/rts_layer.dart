@@ -70,6 +70,10 @@ class RtsMapLayer implements MapLayer {
   double get bottomChromeFraction => RtsMonitorPanel.bottomStripFraction;
 
   @override
+  double get mapMinZoom => 4;
+
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
@@ -179,6 +183,19 @@ class RtsMapLayer implements MapLayer {
 
   @override
   Widget buildSheet(BuildContext context) => RtsMonitorPanel(feed: _feed);
+
+  @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
 
   @override
   Widget buildLegend(BuildContext context) => const MapLegendCard(

@@ -489,6 +489,80 @@ class AppLocalizationsZh extends AppLocalizations {
   String get typhoonMotion => '移動';
 
   @override
+  String get typhoonLabelPosition => '中心位置';
+
+  @override
+  String get typhoonLabelDirection => '過去移動方向';
+
+  @override
+  String get typhoonLabelSpeed => '過去移動時速';
+
+  @override
+  String get typhoonLabelPressure => '中心氣壓';
+
+  @override
+  String get typhoonLabelWind => '近中心最大風速';
+
+  @override
+  String get typhoonLabelGust => '瞬間最大陣風';
+
+  @override
+  String get typhoonLabelGaleAvg => '七級風平均暴風半徑';
+
+  @override
+  String get typhoonLabelStormAvg => '十級風平均暴風半徑';
+
+  @override
+  String get typhoonLabelProbCircle => '70%機率圓';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return '預測 +$hours 小時';
+  }
+
+  @override
+  String get typhoonLabelNw => '西北側';
+
+  @override
+  String get typhoonLabelNe => '東北側';
+
+  @override
+  String get typhoonLabelSw => '西南側';
+
+  @override
+  String get typhoonLabelSe => '東南側';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '北緯 $lat 度';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '東經 $lon 度';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n 公里';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n 百帕';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '每秒 $n 公尺';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return '資料時間\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -509,6 +583,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get typhoonLegendPast => '實際路徑';
+
+  @override
+  String get typhoonIntensityTd => '熱帶性低氣壓';
+
+  @override
+  String get typhoonIntensityMild => '輕度颱風';
+
+  @override
+  String get typhoonIntensityModerate => '中度颱風';
+
+  @override
+  String get typhoonIntensityIntense => '強烈颱風';
 
   @override
   String get typhoonLegendForecast => '預測路徑';
@@ -532,13 +618,71 @@ class AppLocalizationsZh extends AppLocalizations {
   String get typhoonLegendCircle15 => '七級風暴風圈';
 
   @override
+  String get typhoonLegendCircleAvg => '平均圓';
+
+  @override
   String get typhoonLegendCircle25 => '十級風暴風圈';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return '東北 $ne · 東南 $se · 西南 $sw · 西北 $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
 
   @override
   String get typhoonLegendProbability => '侵襲機率';
 
   @override
   String get typhoonLegendWarningAreas => '警報區域';
+
+  @override
+  String get typhoonOverlayMenuTooltip => '颱風圖層選項';
+
+  @override
+  String get typhoonOverlaySectionStorm => '暴風圈';
+
+  @override
+  String get typhoonOverlaySectionExtra => '覆蓋層';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => '含平均圓';
+
+  @override
+  String get typhoonOverlayProbabilityHint => '會隱藏預測圓錐';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip => '顯示侵襲機率（會隱藏預測圓錐）';
+
+  @override
+  String get typhoonOverlayWarningTooltip => '標示警報區域縣市';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip => '七級暴風圈＋平均圓（紫色）';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip => '十級暴風圈＋平均圓（黃色）';
+
+  @override
+  String get typhoonOverlaySectionWeather => '天氣底圖';
+
+  @override
+  String get typhoonOverlayWeatherNone => '無';
+
+  @override
+  String get typhoonOverlayWeatherHint => '對齊報文時間';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip => '不疊雷達或紅外線';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip => '雷達回波（對齊颱風報文時間）';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip => '紅外線（對齊颱風報文時間）';
 
   @override
   String get typhoonWarningTitle => '颱風警報';
@@ -559,6 +703,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get typhoonSatelliteTitle => '衛星雲圖';
+
+  @override
+  String get typhoonOverlayForecastCallouts => '預測點資訊';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1046,6 +1196,80 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get typhoonMotion => '移动';
 
   @override
+  String get typhoonLabelPosition => '中心位置';
+
+  @override
+  String get typhoonLabelDirection => '过去移动方向';
+
+  @override
+  String get typhoonLabelSpeed => '过去移动时速';
+
+  @override
+  String get typhoonLabelPressure => '中心气压';
+
+  @override
+  String get typhoonLabelWind => '近中心最大风速';
+
+  @override
+  String get typhoonLabelGust => '瞬间最大阵风';
+
+  @override
+  String get typhoonLabelGaleAvg => '七级风平均暴风半径';
+
+  @override
+  String get typhoonLabelStormAvg => '十级风平均暴风半径';
+
+  @override
+  String get typhoonLabelProbCircle => '70%概率圆';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return '预测 +$hours 小时';
+  }
+
+  @override
+  String get typhoonLabelNw => '西北侧';
+
+  @override
+  String get typhoonLabelNe => '东北侧';
+
+  @override
+  String get typhoonLabelSw => '西南侧';
+
+  @override
+  String get typhoonLabelSe => '东南侧';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '北纬 $lat 度';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '东经 $lon 度';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n 公里';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n 百帕';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '每秒 $n 公尺';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return '资料时间\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '强震监视器';
 
   @override
@@ -1066,6 +1290,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonLegendPast => '实际路径';
+
+  @override
+  String get typhoonIntensityTd => '热带性低气压';
+
+  @override
+  String get typhoonIntensityMild => '轻度台风';
+
+  @override
+  String get typhoonIntensityModerate => '中度台风';
+
+  @override
+  String get typhoonIntensityIntense => '强烈台风';
 
   @override
   String get typhoonLegendForecast => '预测路径';
@@ -1089,13 +1325,71 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get typhoonLegendCircle15 => '七级风暴风圈';
 
   @override
+  String get typhoonLegendCircleAvg => '平均圆';
+
+  @override
   String get typhoonLegendCircle25 => '十级风暴风圈';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
 
   @override
   String get typhoonLegendProbability => '侵袭概率';
 
   @override
   String get typhoonLegendWarningAreas => '警报区域';
+
+  @override
+  String get typhoonOverlayMenuTooltip => '台风图层选项';
+
+  @override
+  String get typhoonOverlaySectionStorm => '暴风圈';
+
+  @override
+  String get typhoonOverlaySectionExtra => '叠加层';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => '含平均圆';
+
+  @override
+  String get typhoonOverlayProbabilityHint => '会隐藏预测圆锥';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip => '显示侵袭概率（隐藏预测圆锥）';
+
+  @override
+  String get typhoonOverlayWarningTooltip => '标示发布台风警报的县市';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip => '七级风风场 + 平均圆（紫）';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip => '十级风风场 + 平均圆（黄）';
+
+  @override
+  String get typhoonOverlaySectionWeather => '天气底图';
+
+  @override
+  String get typhoonOverlayWeatherNone => '无';
+
+  @override
+  String get typhoonOverlayWeatherHint => '对齐报文时间';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip => '不显示雷达或红外线底图';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip => '最接近台风报文时间的雷达回波';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip => '最接近台风报文时间的红外线';
 
   @override
   String get typhoonWarningTitle => '台风警报';
@@ -1116,6 +1410,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonSatelliteTitle => '卫星云图';
+
+  @override
+  String get typhoonOverlayForecastCallouts => '预测点信息';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip => '放大时显示预测点详细卡片';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1603,6 +1903,80 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get typhoonMotion => '移動';
 
   @override
+  String get typhoonLabelPosition => '中心位置';
+
+  @override
+  String get typhoonLabelDirection => '過去移動方向';
+
+  @override
+  String get typhoonLabelSpeed => '過去移動時速';
+
+  @override
+  String get typhoonLabelPressure => '中心氣壓';
+
+  @override
+  String get typhoonLabelWind => '近中心最大風速';
+
+  @override
+  String get typhoonLabelGust => '瞬間最大陣風';
+
+  @override
+  String get typhoonLabelGaleAvg => '七級風平均暴風半徑';
+
+  @override
+  String get typhoonLabelStormAvg => '十級風平均暴風半徑';
+
+  @override
+  String get typhoonLabelProbCircle => '70%機率圓';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return '預測 +$hours 小時';
+  }
+
+  @override
+  String get typhoonLabelNw => '西北側';
+
+  @override
+  String get typhoonLabelNe => '東北側';
+
+  @override
+  String get typhoonLabelSw => '西南側';
+
+  @override
+  String get typhoonLabelSe => '東南側';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '北緯 $lat 度';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '東經 $lon 度';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n 公里';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n 百帕';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '每秒 $n 公尺';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return '資料時間\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -1623,6 +1997,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get typhoonLegendPast => '實際路徑';
+
+  @override
+  String get typhoonIntensityTd => '熱帶性低氣壓';
+
+  @override
+  String get typhoonIntensityMild => '輕度颱風';
+
+  @override
+  String get typhoonIntensityModerate => '中度颱風';
+
+  @override
+  String get typhoonIntensityIntense => '強烈颱風';
 
   @override
   String get typhoonLegendForecast => '預測路徑';
@@ -1646,13 +2032,71 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get typhoonLegendCircle15 => '七級風暴風圈';
 
   @override
+  String get typhoonLegendCircleAvg => '平均圓';
+
+  @override
   String get typhoonLegendCircle25 => '十級風暴風圈';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return '東北 $ne · 東南 $se · 西南 $sw · 西北 $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
 
   @override
   String get typhoonLegendProbability => '侵襲機率';
 
   @override
   String get typhoonLegendWarningAreas => '警報區域';
+
+  @override
+  String get typhoonOverlayMenuTooltip => '颱風圖層選項';
+
+  @override
+  String get typhoonOverlaySectionStorm => '暴風圈';
+
+  @override
+  String get typhoonOverlaySectionExtra => '覆蓋層';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => '含平均圓';
+
+  @override
+  String get typhoonOverlayProbabilityHint => '會隱藏預測圓錐';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip => '顯示侵襲機率（會隱藏預測圓錐）';
+
+  @override
+  String get typhoonOverlayWarningTooltip => '標示警報區域縣市';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip => '七級暴風圈＋平均圓（紫色）';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip => '十級暴風圈＋平均圓（黃色）';
+
+  @override
+  String get typhoonOverlaySectionWeather => '天氣底圖';
+
+  @override
+  String get typhoonOverlayWeatherNone => '無';
+
+  @override
+  String get typhoonOverlayWeatherHint => '對齊報文時間';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip => '不疊雷達或紅外線';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip => '雷達回波（對齊颱風報文時間）';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip => '紅外線（對齊颱風報文時間）';
 
   @override
   String get typhoonWarningTitle => '颱風警報';
@@ -1673,4 +2117,10 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get typhoonSatelliteTitle => '衛星雲圖';
+
+  @override
+  String get typhoonOverlayForecastCallouts => '預測點資訊';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
 }

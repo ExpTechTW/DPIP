@@ -5,9 +5,11 @@ import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// Approx. height of the map's top-right layer chip (padding + icon row).
-/// Used to park the native compass just below it.
-const double _layerChipBand = 48;
+/// Layer-chip band under the safe-area top: outer pad ([AppSpacing.lg]) + chip
+/// height (~36) + a tight gap. iOS MapLibre already anchors ornaments to the
+/// safe top, so this is the full Y margin there; Android still needs safe-area
+/// padding added on top (see [BaseMap.build]).
+const double _layerChipBand = AppSpacing.lg + 36 + AppSpacing.xs;
 
 /// The app's reusable base map — a MapLibre map centred on Taiwan, rendered from
 /// the ExpTech vector style tinted by [MapColors] for the active brightness.
@@ -28,7 +30,9 @@ class BaseMap extends StatelessWidget {
     this.onMapCreated,
     this.onStyleLoaded,
     this.onMapClick,
+    this.onCameraIdle,
     this.interactive = true,
+    this.minZoomPreference = defaultMinZoom,
   });
 
   /// Bounding box for the nationwide (全國) framing — the Taiwan main island
@@ -61,13 +65,13 @@ class BaseMap extends StatelessWidget {
     (taiwanBounds.southwest.longitude + taiwanBounds.northeast.longitude) / 2,
   );
 
-  /// Fixed 4–11 zoom range — the radar echo tiles require it.
-  static const double minZoom = 4;
+  /// Default floor for most map surfaces (radar tiles need it).
+  static const double defaultMinZoom = 4;
+
+  /// Alias for call sites / framing that still reference [BaseMap.minZoom].
+  static const double minZoom = defaultMinZoom;
+
   static const double maxZoom = 11;
-  static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(
-    minZoom,
-    maxZoom,
-  );
 
   /// Called with the controller once the map is ready — add overlay layers here.
   final void Function(MapLibreMapController controller)? onMapCreated;
@@ -79,28 +83,41 @@ class BaseMap extends StatelessWidget {
   /// layers (e.g. selecting the nearest weather station).
   final OnMapClickCallback? onMapClick;
 
+  /// Fires when the camera stops moving — for screen-space Flutter overlays
+  /// that need a fresh `toScreenLocation` projection.
+  final OnCameraIdleCallback? onCameraIdle;
+
   /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
+
+  /// Per-surface zoom floor (typhoon may go lower so the whole basin fits).
+  /// Other layers keep [defaultMinZoom].
+  final double minZoomPreference;
 
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
     // MapScaffold parks the layer switcher at top-right (SafeArea + lg). Drop
-    // the native compass just under that chip so the two never collide.
-    final compassTop =
-        MediaQuery.paddingOf(context).top + AppSpacing.lg + _layerChipBand;
+    // the native compass just under that chip. iOS ornaments are already
+    // constrained to the safe-area top — adding MediaQuery.padding again left
+    // a huge gap under the chip. Android margins are from the view edge.
+    final safeTop = Theme.of(context).platform == TargetPlatform.iOS
+        ? 0.0
+        : MediaQuery.paddingOf(context).top;
+    final compassTop = safeTop + _layerChipBand;
+    final floor = minZoomPreference;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
       initialCameraPosition: CameraPosition(
         target: taiwanCenter,
-        zoom: minZoom,
+        zoom: floor,
       ),
       // Brightness flip changes this string → MapLibre reloads style; layers
       // re-attach via [onStyleLoaded] (see [MapScaffold]).
       styleString: exptechVectorStyle(palette),
-      minMaxZoomPreference: zoomRange,
+      minMaxZoomPreference: MinMaxZoomPreference(floor, maxZoom),
       trackCameraPosition: true,
       compassEnabled: interactive,
       compassViewPosition: CompassViewPosition.topRight,
@@ -113,6 +130,7 @@ class BaseMap extends StatelessWidget {
       onMapClick: onMapClick,
       onMapCreated: onMapCreated,
       onStyleLoadedCallback: onStyleLoaded,
+      onCameraIdle: onCameraIdle,
     );
   }
 }

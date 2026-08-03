@@ -493,6 +493,80 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonMotion => '進行';
 
   @override
+  String get typhoonLabelPosition => '中心位置';
+
+  @override
+  String get typhoonLabelDirection => 'これまでの進行方向';
+
+  @override
+  String get typhoonLabelSpeed => 'これまでの移動速度';
+
+  @override
+  String get typhoonLabelPressure => '中心気圧';
+
+  @override
+  String get typhoonLabelWind => '中心付近の最大風速';
+
+  @override
+  String get typhoonLabelGust => '最大瞬間風速';
+
+  @override
+  String get typhoonLabelGaleAvg => '強風域の平均半径';
+
+  @override
+  String get typhoonLabelStormAvg => '暴風域の平均半径';
+
+  @override
+  String get typhoonLabelProbCircle => '70%確率円';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return '予報 +$hours 時間';
+  }
+
+  @override
+  String get typhoonLabelNw => '北西';
+
+  @override
+  String get typhoonLabelNe => '北東';
+
+  @override
+  String get typhoonLabelSw => '南西';
+
+  @override
+  String get typhoonLabelSe => '南東';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '北緯 $lat 度';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '東経 $lon 度';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '毎秒 $n m';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return '資料時刻\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '強震モニタ';
 
   @override
@@ -513,6 +587,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get typhoonLegendPast => '実況経路';
+
+  @override
+  String get typhoonIntensityTd => '熱帯低気圧';
+
+  @override
+  String get typhoonIntensityMild => '弱い台風';
+
+  @override
+  String get typhoonIntensityModerate => '並の台風';
+
+  @override
+  String get typhoonIntensityIntense => '強い台風';
 
   @override
   String get typhoonLegendForecast => '予報経路';
@@ -536,13 +622,71 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonLegendCircle15 => '強風域（30kt）';
 
   @override
+  String get typhoonLegendCircleAvg => '平均円';
+
+  @override
   String get typhoonLegendCircle25 => '暴風域（50kt）';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
 
   @override
   String get typhoonLegendProbability => '接近確率';
 
   @override
   String get typhoonLegendWarningAreas => '警報区域';
+
+  @override
+  String get typhoonOverlayMenuTooltip => '台風オーバーレイ設定';
+
+  @override
+  String get typhoonOverlaySectionStorm => '暴風域';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'オーバーレイ';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => '平均円付き';
+
+  @override
+  String get typhoonOverlayProbabilityHint => '予報円を隠します';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip => '接近確率を表示（予報円を隠す）';
+
+  @override
+  String get typhoonOverlayWarningTooltip => '台風警報対象の県を強調';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip => '強風域 + 平均円（紫）';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip => '暴風域 + 平均円（黄）';
+
+  @override
+  String get typhoonOverlaySectionWeather => '天気下敷き';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'なし';
+
+  @override
+  String get typhoonOverlayWeatherHint => '通報時刻に合わせる';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip => 'レーダー／赤外線なし';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip => '通報時刻に最も近いレーダー';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip => '通報時刻に最も近い赤外線';
 
   @override
   String get typhoonWarningTitle => '台風警報';
@@ -563,4 +707,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get typhoonSatelliteTitle => '衛星';
+
+  @override
+  String get typhoonOverlayForecastCallouts => '予報点の情報';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip => '拡大時に予報点の詳細カードを表示';
 }
