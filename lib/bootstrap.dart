@@ -207,8 +207,13 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
     final base = await getApplicationCacheDirectory();
     final db = await openDatabase(
       '${base.path}/http_etag_cache.db',
-      version: 1,
+      version: 2,
       onCreate: (db, _) => EtagCacheStore.createSchema(db),
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // v1 was a gzip+json+base64 envelope — drop and rebuild for the fast
+        // columnar schema (one-time cold miss on upgrade).
+        if (oldVersion < 2) await EtagCacheStore.migrateToV2(db);
+      },
     );
     await NetworkUsageStore.createSchema(db);
     return (etag: EtagCacheStore(db), usage: NetworkUsageStore(db));

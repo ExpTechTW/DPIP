@@ -201,7 +201,6 @@ void main() {
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 10),
       onMoved: (fix) async {
         fail('should not upload');
-        return true;
       },
     );
     final seen = <GpsFix>[];

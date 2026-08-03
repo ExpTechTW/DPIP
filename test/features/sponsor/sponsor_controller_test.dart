@@ -45,7 +45,10 @@ class _FakeSponsorRepository implements SponsorRepository {
   Stream<SponsorPurchase> purchases() => _updates.stream;
 
   @override
-  Future<void> buy(SponsorProduct product) async => bought.add(product.id);
+  Future<bool> buy(SponsorProduct product) async {
+    bought.add(product.id);
+    return true;
+  }
 
   @override
   Future<bool> restore() async => restoreAvailable;
@@ -58,6 +61,8 @@ class _FakeSponsorRepository implements SponsorRepository {
 Future<void> _settle() => Future<void>.delayed(Duration.zero);
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('load splits products into subscriptions and one-time, ready', () async {
     final repo = _FakeSponsorRepository(const Ok([_sub, _oneTime]));
     final controller = SponsorController(repo);

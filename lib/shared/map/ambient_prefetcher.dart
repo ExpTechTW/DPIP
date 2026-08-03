@@ -22,7 +22,7 @@ class AmbientPrefetcher {
     this._client, {
     this._cache = const MapCache(),
     this.maxTiles = 48,
-    this.concurrency = 4,
+    this.concurrency = 6,
     this.settleDelay = const Duration(milliseconds: 350),
   });
 

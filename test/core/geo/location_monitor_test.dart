@@ -45,11 +45,13 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    regions = RegionStore(Prefs(await SharedPreferences.getInstance()));
+    final prefs = Prefs(await SharedPreferences.getInstance());
+    regions = RegionStore(prefs);
     positions = StreamController<GpsFix>();
     reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      onMoved: (fix) async {},
+      prefs: prefs,
+      onMoved: (fix) async => true,
     );
     location = LocationService(
       _directory(),
