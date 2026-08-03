@@ -41,6 +41,41 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get reportListEnd => 'สิ้นสุดรายการ';
+
+  @override
+  String get reportFilterTitle => 'ตัวกรอง';
+
+  @override
+  String get reportFilterMinIntensity => 'ความเข้มขั้นต่ำ';
+
+  @override
+  String get reportFilterMinMagnitude => 'ขนาดขั้นต่ำ';
+
+  @override
+  String get reportFilterMaxDepth => 'ความลึกสูงสุด';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterLocation => 'สถานที่';
+
+  @override
+  String get reportFilterLocationHint => 'เช่น ฮวาเหลียน';
+
+  @override
+  String get reportFilterAny => 'ทั้งหมด';
+
+  @override
+  String get reportFilterApply => 'ใช้';
+
+  @override
+  String get reportFilterReset => 'รีเซ็ต';
+
+  @override
   String get navMore => 'เพิ่มเติม';
 
   @override

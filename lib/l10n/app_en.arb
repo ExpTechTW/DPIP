@@ -44,6 +44,53 @@
       "depth": {"type": "String"}
     }
   },
+  "reportListEnd": "End of list",
+  "@reportListEnd": {
+    "description": "Footer when the report catalogue has no further pages"
+  },
+  "reportFilterTitle": "Filters",
+  "@reportFilterTitle": {
+    "description": "Title of the earthquake report filter sheet"
+  },
+  "reportFilterMinIntensity": "Minimum intensity",
+  "@reportFilterMinIntensity": {
+    "description": "Label for the minimum felt-intensity filter"
+  },
+  "reportFilterMinMagnitude": "Minimum magnitude",
+  "@reportFilterMinMagnitude": {
+    "description": "Label for the minimum magnitude filter"
+  },
+  "reportFilterMaxDepth": "Maximum depth",
+  "@reportFilterMaxDepth": {
+    "description": "Label for the maximum hypocentral-depth filter"
+  },
+  "reportFilterDepthKm": "{depth} km",
+  "@reportFilterDepthKm": {
+    "description": "Depth value with unit in the filter sheet",
+    "placeholders": {
+      "depth": {"type": "String"}
+    }
+  },
+  "reportFilterLocation": "Location",
+  "@reportFilterLocation": {
+    "description": "Label for the location keyword filter field"
+  },
+  "reportFilterLocationHint": "e.g. Hualien, offshore",
+  "@reportFilterLocationHint": {
+    "description": "Hint for the location keyword filter field"
+  },
+  "reportFilterAny": "Any",
+  "@reportFilterAny": {
+    "description": "Chip / slider label meaning no filter applied"
+  },
+  "reportFilterApply": "Apply",
+  "@reportFilterApply": {
+    "description": "Primary button on the report filter sheet"
+  },
+  "reportFilterReset": "Reset",
+  "@reportFilterReset": {
+    "description": "Clears all filters in the report filter sheet"
+  },
   "navMore": "More",
   "@navMore": {
     "description": "Bottom-nav label and page title for the More tab"

@@ -176,6 +176,72 @@ abstract class AppLocalizations {
   /// **'M{magnitude} · {depth} km'**
   String reportListMeta(String magnitude, String depth);
 
+  /// Footer when the report catalogue has no further pages
+  ///
+  /// In en, this message translates to:
+  /// **'End of list'**
+  String get reportListEnd;
+
+  /// Title of the earthquake report filter sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get reportFilterTitle;
+
+  /// Label for the minimum felt-intensity filter
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum intensity'**
+  String get reportFilterMinIntensity;
+
+  /// Label for the minimum magnitude filter
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum magnitude'**
+  String get reportFilterMinMagnitude;
+
+  /// Label for the maximum hypocentral-depth filter
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum depth'**
+  String get reportFilterMaxDepth;
+
+  /// Depth value with unit in the filter sheet
+  ///
+  /// In en, this message translates to:
+  /// **'{depth} km'**
+  String reportFilterDepthKm(String depth);
+
+  /// Label for the location keyword filter field
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get reportFilterLocation;
+
+  /// Hint for the location keyword filter field
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Hualien, offshore'**
+  String get reportFilterLocationHint;
+
+  /// Chip / slider label meaning no filter applied
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get reportFilterAny;
+
+  /// Primary button on the report filter sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get reportFilterApply;
+
+  /// Clears all filters in the report filter sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reportFilterReset;
+
   /// Bottom-nav label and page title for the More tab
   ///
   /// In en, this message translates to:

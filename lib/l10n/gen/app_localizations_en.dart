@@ -41,6 +41,41 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get reportListEnd => 'End of list';
+
+  @override
+  String get reportFilterTitle => 'Filters';
+
+  @override
+  String get reportFilterMinIntensity => 'Minimum intensity';
+
+  @override
+  String get reportFilterMinMagnitude => 'Minimum magnitude';
+
+  @override
+  String get reportFilterMaxDepth => 'Maximum depth';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterLocation => 'Location';
+
+  @override
+  String get reportFilterLocationHint => 'e.g. Hualien, offshore';
+
+  @override
+  String get reportFilterAny => 'Any';
+
+  @override
+  String get reportFilterApply => 'Apply';
+
+  @override
+  String get reportFilterReset => 'Reset';
+
+  @override
   String get navMore => 'More';
 
   @override

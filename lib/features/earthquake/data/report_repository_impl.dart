@@ -5,6 +5,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 
 /// Maps transport/decode errors via [guardResult]; owns JSON → model.
@@ -15,10 +16,24 @@ class ReportRepositoryImpl implements ReportRepository {
 
   @override
   Future<Result<List<PartialEarthquakeReport>>> list({
-    int limit = 50,
+    int limit = 30,
     int page = 1,
+    ReportListQuery query = ReportListQuery.empty,
   }) => guardResult(() async {
-    final raw = await _api.getReportList(limit: limit, page: page);
+    final raw = await _api.getReportList(
+      limit: limit,
+      page: page,
+      minIntensity: query.minIntensity,
+      maxIntensity: query.maxIntensity,
+      minMagnitude: query.minMagnitude,
+      maxMagnitude: query.maxMagnitude,
+      minDepth: query.minDepth,
+      maxDepth: query.maxDepth,
+      loc: query.loc,
+      city: query.city,
+      cityMinInt: query.cityMinInt,
+      cityMaxInt: query.cityMaxInt,
+    );
     return parseReportList(raw);
   });
 

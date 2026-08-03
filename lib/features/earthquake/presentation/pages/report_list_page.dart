@@ -6,16 +6,19 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/report_list_controller.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/report_filter_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
-import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
+import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-/// Scrollable report list under the Data tab. Re-fetches on tab reappear.
+/// Scrollable report list under the Data tab — infinite scroll + filter sheet.
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
 
@@ -27,44 +30,146 @@ class ReportListPage extends StatefulWidget {
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  final RefreshSignal _refresh = RefreshSignal();
+  late final ReportListController _controller;
+  final ScrollController _scroll = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ReportListController(context.read<ReportRepository>());
+    _scroll.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.reload();
+    });
+  }
 
   @override
   void dispose() {
-    _refresh.dispose();
+    _scroll
+      ..removeListener(_onScroll)
+      ..dispose();
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scroll.hasClients) return;
+    final pos = _scroll.position;
+    if (pos.pixels >= pos.maxScrollExtent - 480) {
+      _controller.loadMore();
+    }
+  }
+
+  Future<void> _openFilter() async {
+    final next = await showReportFilterSheet(
+      context,
+      initial: _controller.query,
+    );
+    if (next == null || !mounted) return;
+    if (next == _controller.query) return;
+    await _controller.reload(query: next);
+    if (_scroll.hasClients) {
+      _scroll.jumpTo(0);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final repository = context.read<ReportRepository>();
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navEarthquake)),
+      appBar: AppBar(
+        title: Text(l10n.navEarthquake),
+        actions: [
+          ListenableBuilder(
+            listenable: _controller,
+            builder: (context, _) {
+              final active = !_controller.query.isEmpty;
+              return IconButton(
+                tooltip: l10n.reportFilterTitle,
+                onPressed: _openFilter,
+                icon: Badge(
+                  isLabelVisible: active,
+                  child: Icon(
+                    active ? Icons.filter_alt : Icons.filter_alt_outlined,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: RefreshOnAppear(
         tabIndex: ReportListPage.tabIndex,
-        onAppear: _refresh.fire,
-        child: AsyncView<List<PartialEarthquakeReport>>(
-          future: () => repository.list(limit: 50, page: 1),
-          isEmpty: (reports) => reports.isEmpty,
-          empty: (_) => EmptyView(
-            icon: Icons.monitor_heart_outlined,
-            message: l10n.reportListEmpty,
-          ),
-          refreshSignal: _refresh,
-          builder: (context, reports) => ListView.separated(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
-            ),
-            itemCount: reports.length,
-            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-            itemBuilder: (context, index) =>
-                _ReportTile(report: reports[index]),
-          ),
+        onAppear: () => _controller.reload(),
+        child: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) => _body(context),
         ),
+      ),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final c = _controller;
+
+    if (c.loading && c.items.isEmpty) {
+      return const LoadingView();
+    }
+    if (c.failure != null && c.items.isEmpty) {
+      return ErrorView(detail: c.failure!.message, onRetry: c.reload);
+    }
+    if (c.isEmpty) {
+      return EmptyView(
+        icon: Icons.monitor_heart_outlined,
+        message: l10n.reportListEmpty,
+      );
+    }
+
+    final bottomPad = AppSpacing.xl + MediaQuery.paddingOf(context).bottom;
+    final extra = c.loadingMore || !c.hasMore ? 1 : 0;
+
+    return RefreshIndicator(
+      onRefresh: () => c.reload(),
+      child: ListView.separated(
+        controller: _scroll,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          bottomPad,
+        ),
+        itemCount: c.items.length + extra,
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          if (index >= c.items.length) {
+            if (c.loadingMore) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              child: Center(
+                child: Text(
+                  l10n.reportListEnd,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            );
+          }
+          return _ReportTile(report: c.items[index]);
+        },
       ),
     );
   }

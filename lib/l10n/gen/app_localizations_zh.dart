@@ -41,6 +41,41 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get reportListEnd => '已到最後一頁';
+
+  @override
+  String get reportFilterTitle => '篩選';
+
+  @override
+  String get reportFilterMinIntensity => '最小震度';
+
+  @override
+  String get reportFilterMinMagnitude => '最小規模';
+
+  @override
+  String get reportFilterMaxDepth => '最大深度';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterLocation => '地點';
+
+  @override
+  String get reportFilterLocationHint => '例如：花蓮、東部海域';
+
+  @override
+  String get reportFilterAny => '不限';
+
+  @override
+  String get reportFilterApply => '套用';
+
+  @override
+  String get reportFilterReset => '重設';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -765,6 +800,41 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get reportListEnd => '已到最后一页';
+
+  @override
+  String get reportFilterTitle => '筛选';
+
+  @override
+  String get reportFilterMinIntensity => '最小震度';
+
+  @override
+  String get reportFilterMinMagnitude => '最小规模';
+
+  @override
+  String get reportFilterMaxDepth => '最大深度';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterLocation => '地点';
+
+  @override
+  String get reportFilterLocationHint => '例如：花莲、东部海域';
+
+  @override
+  String get reportFilterAny => '不限';
+
+  @override
+  String get reportFilterApply => '应用';
+
+  @override
+  String get reportFilterReset => '重置';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -1487,6 +1557,41 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
   }
+
+  @override
+  String get reportListEnd => '已到最後一頁';
+
+  @override
+  String get reportFilterTitle => '篩選';
+
+  @override
+  String get reportFilterMinIntensity => '最小震度';
+
+  @override
+  String get reportFilterMinMagnitude => '最小規模';
+
+  @override
+  String get reportFilterMaxDepth => '最大深度';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterLocation => '地點';
+
+  @override
+  String get reportFilterLocationHint => '例如：花蓮、東部海域';
+
+  @override
+  String get reportFilterAny => '不限';
+
+  @override
+  String get reportFilterApply => '套用';
+
+  @override
+  String get reportFilterReset => '重設';
 
   @override
   String get navMore => '更多';

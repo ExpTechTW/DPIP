@@ -41,6 +41,41 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get reportListEnd => '마지막입니다';
+
+  @override
+  String get reportFilterTitle => '필터';
+
+  @override
+  String get reportFilterMinIntensity => '최소 진도';
+
+  @override
+  String get reportFilterMinMagnitude => '최소 규모';
+
+  @override
+  String get reportFilterMaxDepth => '최대 깊이';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterLocation => '위치';
+
+  @override
+  String get reportFilterLocationHint => '예: 화롄, 해역';
+
+  @override
+  String get reportFilterAny => '전체';
+
+  @override
+  String get reportFilterApply => '적용';
+
+  @override
+  String get reportFilterReset => '초기화';
+
+  @override
   String get navMore => '더보기';
 
   @override

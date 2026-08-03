@@ -41,6 +41,41 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get reportListEnd => 'Hết danh sách';
+
+  @override
+  String get reportFilterTitle => 'Bộ lọc';
+
+  @override
+  String get reportFilterMinIntensity => 'Cường độ tối thiểu';
+
+  @override
+  String get reportFilterMinMagnitude => 'Độ lớn tối thiểu';
+
+  @override
+  String get reportFilterMaxDepth => 'Độ sâu tối đa';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterLocation => 'Địa điểm';
+
+  @override
+  String get reportFilterLocationHint => 'vd: Hoa Liên, ngoài khơi';
+
+  @override
+  String get reportFilterAny => 'Tất cả';
+
+  @override
+  String get reportFilterApply => 'Áp dụng';
+
+  @override
+  String get reportFilterReset => 'Đặt lại';
+
+  @override
   String get navMore => 'Thêm';
 
   @override
