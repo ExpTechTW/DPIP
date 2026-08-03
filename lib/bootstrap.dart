@@ -84,7 +84,7 @@ Future<void> bootstrap() async {
   final theme = ThemeController(prefs);
   final cache = await _openCache();
   if (cache != null) {
-    await installMapLibreTileCache(store: cache.etag);
+    await installMapLibreTileCache(store: cache.etag, usage: cache.usage);
   }
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);

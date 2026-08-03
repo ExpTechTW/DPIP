@@ -16,19 +16,17 @@ import 'package:dpip/core/network/network_usage_store.dart';
 /// - **Response 200 + ETag:** stores the body keyed by URL (JSON gzip-1;
 ///   binary gzip-1 when it shrinks — PBF/MVT yes, WebP no).
 ///
-/// **ETag is the only validator** — `Cache-Control` / `no-store` are ignored.
-/// A `200` without an ETag is not written, **except** ExpTech basemap PBF
-/// (`lb.exptech.dev/…/map/tiles/…`), which gets a synthetic ETag = FNV hash of
-/// the URL (LB has no ETag; the tile is content-addressed by z/x/y).
+/// **Immutable tiles** (basemap PBF / radar / satellite / DPM — frame or z/x/y
+/// in the path) are **URL-addressed**: local hit → serve, no `If-None-Match`.
+/// A `200` is always stored under a synthetic [etagFromUrl] (server ETag is
+/// ignored — the URL already pins the content). Basemap `404` is negatively
+/// cached (empty + [negativeTileEtag]); radar/sat/DPM 404s are not.
 ///
-/// **Immutable tile URLs** (basemap / radar / satellite / DPM — the frame or
-/// z/x/y is in the path) are served from SQLite on hit with **no**
-/// `If-None-Match` round trip. A `404` is negatively cached **only** for
-/// basemap PBF (empty body + [negativeTileEtag]) — ocean cells are intentional.
-/// Radar / satellite / DPM 404s are **not** cached (transient / coverage gaps).
-/// Supports JSON and binary (`ResponseType.bytes`). Streaming (SSE) is skipped.
-/// High-churn / unique-URL GETs (EEW, RTS, device location, notify) are never
-/// cached. Requires Dio `validateStatus` to accept 304 (set in `createDio`).
+/// For everything else, **ETag is the only validator** — `Cache-Control` /
+/// `no-store` are ignored; a `200` without an ETag is not written. Streaming
+/// (SSE) is skipped. High-churn / unique-URL GETs (EEW, RTS, device location,
+/// notify) are never cached. Requires Dio `validateStatus` to accept 304 (set
+/// in `createDio`).
 class EtagInterceptor extends Interceptor {
   EtagInterceptor(this._store, {this._usage});
 
@@ -119,13 +117,12 @@ class EtagInterceptor extends Interceptor {
     }
     final url = options.uri.toString();
 
-    // Immutable tiles (basemap / radar / sat / DPM): URL is the key — serve
-    // SQLite hits locally. Never send If-None-Match (would force a RTT every
-    // pan even when the body is already on disk).
+    // Immutable tiles: URL is the key — serve SQLite hits locally. Never send
+    // If-None-Match (content is pinned by the URL; revalidation is pointless).
     if (_isBytes(options) && isImmutableTile(options.uri)) {
       final cached = await _store.readBytes(url);
       if (cached != null) {
-        // Hit metering lives in [EtagCacheStore.readBytes] (memory + SQLite).
+        // Hit metering lives in [EtagCacheStore.readBytes].
         handler.resolve(
           Response<dynamic>(
             requestOptions: options,
@@ -203,15 +200,15 @@ class EtagInterceptor extends Interceptor {
         return;
       } else if (response.statusCode == 200) {
         final down = _downBytes(response);
+        final immutable =
+            binary && response.data != null && isImmutableTile(options.uri);
         var etag = response.headers.value('etag');
-        if (binary &&
-            etag == null &&
-            response.data != null &&
-            isBasemapPbf(options.uri)) {
+        if (immutable) {
+          // URL pins content — ignore server ETag, always store under URL hash.
           etag = etagFromUrl(options.uri);
           response.headers.set('etag', etag);
         }
-        // ETag only — no ETag ⇒ no store (Cache-Control is irrelevant).
+        // Non-immutable: ETag only — no ETag ⇒ no store.
         if (etag != null && response.data != null) {
           if (binary) {
             final bytes = _asBytes(response.data);

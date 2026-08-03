@@ -107,19 +107,33 @@ void main() {
     expect(second.headers.value('etag'), 'v1');
   });
 
-  test('bytes 200 without ETag is not cached (non-basemap)', () async {
+  test('immutable radar tile stores under URL-hash even without server ETag', () async {
     final payload = Uint8List.fromList([0x52, 0x49, 0x46, 0x46]);
     final adapter = _BinaryAdapter(bytes: payload); // no etag
     final dio = createDio(etagCache: store)..httpClientAdapter = adapter;
     const url =
         'https://static.core-tnn1.exptech.dev/api/v2/tiles/radar/1/7/1/1.webp';
+    final expectedEtag = EtagInterceptor.etagFromUrl(Uri.parse(url));
 
     await dio.get<List<int>>(
       url,
       options: Options(responseType: ResponseType.bytes),
     );
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect(await store.readBytes(url), isNull);
+    CachedBytes? entry;
+    for (var i = 0; i < 50 && entry == null; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      entry = await store.readBytes(url);
+    }
+    expect(entry, isNotNull);
+    expect(entry!.etag, expectedEtag);
+    expect(entry.bytes, payload);
+
+    final second = await dio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    expect(adapter.calls, 1, reason: 'local URL hit, no revalidation');
+    expect(second.data, payload);
   });
 
   test('basemap PBF uses URL-hash ETag and hits locally on repeat', () async {

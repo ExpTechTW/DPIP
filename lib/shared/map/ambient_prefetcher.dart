@@ -1,9 +1,10 @@
-/// Warms Dart's [EtagCacheStore] (SQLite) for viewport tiles via
-/// [ApiClient.getBytes]. MapLibre then **only** serves those URLs from Dart get
-/// — native never downloads ExpTech tiles (see [installMapLibreTileCache]).
+/// Warms Dart's [EtagCacheStore] via Dio — **off by default**.
 ///
-/// Does **not** call `MLNOfflineStorage.preload` / ambient pin — that races
-/// MapLibre's own cache lookup on iOS.
+/// MapLibre owns ExpTech tile network (miss → fetch → Dart put). Prefetch here
+/// would race the same URLs and double traffic. Keep the class for optional
+/// warm-ahead experiments; do not enable alongside native fetch.
+///
+/// Does **not** call `MLNOfflineStorage.preload` / ambient pin.
 library;
 
 import 'dart:async';
@@ -28,9 +29,9 @@ class AmbientPrefetcher {
     this.settleDelay = const Duration(milliseconds: 350),
   });
 
-  /// When false, prefetch is a no-op (MapLibre still fills Dart cache on miss
-  /// via the native→Dart put path).
-  static const bool enabled = true;
+  /// When false, prefetch is a no-op. Off so MapLibre is the sole ExpTech tile
+  /// network path (hit cache / miss fetch+put) — no Dio double traffic.
+  static const bool enabled = false;
 
   final ApiClient _client;
   final int maxTiles;
