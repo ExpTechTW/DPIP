@@ -166,7 +166,11 @@ class TyphoonMapLayer implements MapLayer {
   Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
 
   @override
-  Future<void> show(MapLibreMapController c, MapFrame frame) async {}
+  Future<void> show(
+    MapLibreMapController c,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {

@@ -106,36 +106,31 @@ void main() {
     },
   );
 
-  test('swaps a single raster source per frame (GIF scrub)', () async {
-    final layer = SatelliteMapLayer(
-      _FakeSatelliteRepository([
-        '1700001800000',
-        '1700001200000',
-        '1700000600000',
-        '1700000000000',
-      ]),
-    );
+  test('settle mounts window; scrub skips cold frames outside it', () async {
+    // 20 frames so settle radius 8 leaves older ones cold.
+    final ids = [
+      for (var i = 19; i >= 0; i--) '${1700000000000 + i * 600000}',
+    ];
+    final layer = SatelliteMapLayer(_FakeSatelliteRepository(ids));
     final frames = (await layer.frames()).valueOrNull!;
     final controller = _RecordingController();
 
     await layer.prepare(controller, frames);
-    expect(controller.calls, isEmpty);
-
-    await layer.show(controller, frames[3]);
-    expect(controller.calls, [
-      'addSource:satellite-src',
-      'addRasterLayer:satellite-lyr',
-      'addLineLayer:satellite-global-outline',
-      'addLineLayer:satellite-county-outline',
-    ]);
+    await layer.show(controller, frames.last); // newest
+    expect(
+      controller.calls.where((c) => c.startsWith('addSource:')),
+      hasLength(9), // index 19 → [11..19]
+    );
 
     controller.calls.clear();
-    await layer.show(controller, frames[0]);
+    await layer.show(controller, frames.first, scrubbing: true);
+    expect(controller.calls, isEmpty);
+
+    controller.calls.clear();
+    await layer.show(controller, frames[18], scrubbing: true);
     expect(controller.calls, [
-      'removeLayer:satellite-lyr',
-      'removeSource:satellite-src',
-      'addSource:satellite-src',
-      'addRasterLayer:satellite-lyr',
+      'set:satellite-lyr-${frames.last.id}:visible:0',
+      'set:satellite-lyr-${frames[18].id}:visible:1.0',
     ]);
   });
 }

@@ -137,8 +137,15 @@ abstract interface class MapLayer {
   Future<void> prepare(MapLibreMapController controller, List<MapFrame> frames);
 
   /// Instantly reveals the already-[prepare]d [frame] (hiding the previous one).
-  /// Cheap enough to call on every scrub tick, so the timeline can animate.
-  Future<void> show(MapLibreMapController controller, MapFrame frame);
+  ///
+  /// [scrubbing] is true while the timeline finger is down / flinging. Raster
+  /// layers must not mount cold frames then (tile HTTP storms); they only
+  /// opacity-switch among residents and load on settle (`scrubbing: false`).
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  });
 
   /// Removes this layer's sources/layers from [controller].
   Future<void> clear(MapLibreMapController controller);

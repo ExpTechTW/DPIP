@@ -75,7 +75,11 @@ class DisasterMapLayer implements MapLayer {
   Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
 
   @override
-  Future<void> show(MapLibreMapController c, MapFrame frame) async {}
+  Future<void> show(
+    MapLibreMapController c,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
 
   /// Toggle AED overlay; clears selection when turned off.
   void setShowAed(bool value) {

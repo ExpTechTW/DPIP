@@ -83,12 +83,12 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   /// Whether a frame-show op is already queued and hasn't started running yet.
   ///
-  /// The timeline reports every frame the scrubber crosses (GIF scrub). Each
-  /// show remounts a raster source and would otherwise backlog every intermediate
-  /// frame. While an op is pending, further selections only move
-  /// [_selectedIndex]; the pending op renders whatever is current *when it
-  /// runs*. At most one op waits behind the running one.
+  /// Timeline reports every crossed frame; settle mounts (~3 sources) are the
+  /// expensive path. Coalesce so at most one op waits behind the running one.
   bool _showQueued = false;
+
+  /// Finger down / fling in flight — raster layers skip cold mounts.
+  bool _scrubbing = false;
 
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
@@ -304,10 +304,21 @@ class _MapScaffoldState extends State<MapScaffold> {
       if (_frames.isEmpty || !identical(layer, _active)) {
         return Future<void>.value();
       }
-      // Read the target at execution time so the render is the newest frame, not
-      // the one that was current when this op was queued.
-      return layer.show(controller, _frames[_selectedIndex]);
+      // Read index + scrubbing at execution time so a settle that landed while
+      // this op was queued still mounts (pending scrub ops must not cold-skip).
+      return layer.show(
+        controller,
+        _frames[_selectedIndex],
+        scrubbing: _scrubbing,
+      );
     });
+  }
+
+  void _onScrubbing(bool scrubbing) {
+    final was = _scrubbing;
+    _scrubbing = scrubbing;
+    // Finger up: force a settle mount for the current index (may be cold).
+    if (was && !scrubbing) _showSelected();
   }
 
   void _onFrameSelected(int index) {
@@ -316,6 +327,20 @@ class _MapScaffoldState extends State<MapScaffold> {
     // never rebuilds the (expensive) platform-view map. The timeline drives its
     // own display; _selectedIndex is just the source of truth for show().
     _selectedIndex = index;
+    if (_scrubbing) {
+      // Opacity GIF must keep up with the finger — the serial [_queue] +
+      // [_showQueued] coalesce drops intermediate frames and feels stuttery.
+      final controller = _controller;
+      if (controller == null || _frames.isEmpty) return;
+      unawaited(
+        _active
+            .show(controller, _frames[index], scrubbing: true)
+            .catchError((Object e, StackTrace st) {
+              Log.handle(e, st, 'Map scrub reveal (${_active.id})');
+            }),
+      );
+      return;
+    }
     _showSelected();
   }
 
@@ -534,6 +559,7 @@ class _MapScaffoldState extends State<MapScaffold> {
           frames: _frames,
           selectedIndex: _selectedIndex,
           onSelected: _onFrameSelected,
+          onScrubbing: _onScrubbing,
         ),
       ),
     );

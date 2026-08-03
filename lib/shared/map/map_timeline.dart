@@ -9,11 +9,10 @@ import 'package:intl/intl.dart';
 ///
 /// A ruler of ticks scrolls under a fixed centre scrubber; whichever frame sits
 /// under the scrubber is the selection. Dragging updates the big time label
-/// live and reports each crossed frame via [onSelected] so the map can animate
-/// like a GIF. The scaffold coalesces those reports (one in-flight swap + at
-/// most one pending) and radar/sat remount a **single** raster source with
-/// pending HTTP cancelled, so a fast scrub does not stack abandoned tile
-/// downloads. The newest frame is labelled "now".
+/// live and reports each crossed frame via [onSelected]. [onScrubbing] is true
+/// while the finger is down / the fling is in flight and false on settle — raster
+/// layers use that to opacity-GIF among residents without mounting cold frames.
+/// The newest frame is labelled "now".
 ///
 /// Stateless about the map — it only turns [frames] + [selectedIndex] into a
 /// scrub gesture, so `MapScaffold` can drive any layer's frames through it.
@@ -23,6 +22,7 @@ class MapTimeline extends StatefulWidget {
     required this.frames,
     required this.selectedIndex,
     required this.onSelected,
+    this.onScrubbing,
   });
 
   /// Frames in chronological order (oldest first); must be non-empty.
@@ -31,8 +31,11 @@ class MapTimeline extends StatefulWidget {
   /// Index into [frames] currently under the scrubber.
   final int selectedIndex;
 
-  /// Called with the newly-centred index when a scrub settles.
+  /// Called with the newly-centred index when the scrubber crosses a frame.
   final ValueChanged<int> onSelected;
+
+  /// `true` on scrub start / during drag; `false` when the scrub settles.
+  final ValueChanged<bool>? onScrubbing;
 
   @override
   State<MapTimeline> createState() => _MapTimelineState();
@@ -58,6 +61,13 @@ class _MapTimelineState extends State<MapTimeline> {
   /// label tracks the drag before it settles.
   late int _liveIndex = widget.selectedIndex;
   bool _snapping = false;
+  bool _scrubbing = false;
+
+  void _setScrubbing(bool value) {
+    if (_scrubbing == value) return;
+    _scrubbing = value;
+    widget.onScrubbing?.call(value);
+  }
 
   @override
   void didUpdateWidget(covariant MapTimeline oldWidget) {
@@ -104,13 +114,12 @@ class _MapTimelineState extends State<MapTimeline> {
   bool _onScroll(ScrollNotification notification) {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
-    if (notification is ScrollUpdateNotification) {
+    if (notification is ScrollStartNotification) {
+      _setScrubbing(true);
+    } else if (notification is ScrollUpdateNotification) {
+      _setScrubbing(true);
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
-        // Live map updates for the GIF scrub — scaffold coalesces so only the
-        // latest frame mounts while a swap runs; radar/sat use one source +
-        // cancelPendingFetches so abandoned frames don't pile HTTP tasks.
-        //
         // Compare against [_liveIndex] (before the update), never
         // [widget.selectedIndex]: the parent keeps that prop stale on purpose
         // (no setState during scrub). Guarding on the prop stuck the map on
@@ -123,6 +132,7 @@ class _MapTimelineState extends State<MapTimeline> {
         widget.onSelected(centred);
       }
       _centreOn(centred, animate: true);
+      _setScrubbing(false);
     }
     return false;
   }

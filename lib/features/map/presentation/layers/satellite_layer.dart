@@ -11,11 +11,8 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same single-source scrub
-/// as [RadarMapLayer], backed by the v2 Himawari XYZ WebP tiles.
-///
-/// IR tiles already encode clear-sky as transparent (alpha = coldness), so the
-/// drawn opacity is 1.0 — unlike the opaque radar palette.
+/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same settle-window /
+/// scrub-opacity strategy as [RadarMapLayer].
 class SatelliteMapLayer implements MapLayer {
   SatelliteMapLayer(this._repository);
 
@@ -105,8 +102,6 @@ class SatelliteMapLayer implements MapLayer {
     }
   }
 
-  /// Himawari Band-13 brightness temperature — cold white / warm black
-  /// (180–300 K), matching the tile renderer.
   @override
   Widget buildLegend(BuildContext context) => const MapLegendCard(
     child: ColorScaleLegend(
@@ -122,18 +117,24 @@ class SatelliteMapLayer implements MapLayer {
   );
 
   static const double _opacity = 1;
+  static const int _settleRadius = 8;
 
-  static const String _sourceId = 'satellite-src';
-  static const String _layerId = 'satellite-lyr';
-
+  static const RasterLayerProperties _hidden = RasterLayerProperties(
+    visibility: 'visible',
+    rasterOpacity: 0,
+  );
   static const RasterLayerProperties _shown = RasterLayerProperties(
     visibility: 'visible',
     rasterOpacity: _opacity,
   );
 
+  String _sourceId(String frameId) => 'satellite-src-$frameId';
+  String _layerId(String frameId) => 'satellite-lyr-$frameId';
+
+  List<String> _orderedIds = const [];
   Map<String, int> _indexById = const {};
+  final Set<String> _resident = <String>{};
   String? _shownFrameId;
-  bool _mounted = false;
   bool _blackOutlineOnMap = false;
 
   @override
@@ -151,44 +152,74 @@ class SatelliteMapLayer implements MapLayer {
     MapLibreMapController controller,
     List<MapFrame> frames,
   ) async {
+    _orderedIds = [for (final frame in frames) frame.id];
     _indexById = {for (var i = 0; i < frames.length; i++) frames[i].id: i};
   }
 
   @override
-  Future<void> show(MapLibreMapController controller, MapFrame frame) async {
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {
     if (_shownFrameId == frame.id) return;
-    if (_indexById[frame.id] == null) return;
+    final index = _indexById[frame.id];
+    if (index == null) return;
+
+    if (_resident.contains(frame.id)) {
+      await _reveal(controller, frame.id);
+      return;
+    }
+
+    if (scrubbing) return;
 
     _repository.cancelTilePrefetch();
     await cancelMapLibreTileFetches();
 
-    if (_mounted) {
-      await _removeMounted(controller);
-      _mounted = false;
+    final lo = (index - _settleRadius).clamp(0, _orderedIds.length - 1);
+    final hi = (index + _settleRadius).clamp(0, _orderedIds.length - 1);
+    final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
+
+    for (final id in _resident.difference(window)) {
+      await _removeFrame(controller, id);
+      _resident.remove(id);
     }
 
-    await controller.addSource(
-      _sourceId,
-      RasterSourceProperties(
-        tiles: [_repository.tileUrl(frame.id)],
-        tileSize: 256,
-      ),
-    );
-    // Below the themed county outline; the black IR outline sits on top
-    // of both (see [_ensureBlackOutline]).
-    await controller.addRasterLayer(
-      _sourceId,
-      _layerId,
-      _shown,
-      belowLayerId: outlineLayerId,
-    );
-    _mounted = true;
+    for (final id in window) {
+      final properties = id == frame.id ? _shown : _hidden;
+      if (_resident.contains(id)) {
+        await controller.setLayerProperties(_layerId(id), properties);
+      } else {
+        await controller.addSource(
+          _sourceId(id),
+          RasterSourceProperties(
+            tiles: [_repository.tileUrl(id)],
+            tileSize: 256,
+          ),
+        );
+        await controller.addRasterLayer(
+          _sourceId(id),
+          _layerId(id),
+          properties,
+          belowLayerId: outlineLayerId,
+        );
+        _resident.add(id);
+      }
+    }
     await _ensureBlackOutline(controller);
     _shownFrameId = frame.id;
   }
 
-  /// Black land borders above the IR stack — `global` for every country, then
-  /// `city` for Taiwan counties. Greyscale tiles wash out the themed outline.
+  Future<void> _reveal(MapLibreMapController controller, String frameId) async {
+    final prev = _shownFrameId;
+    _shownFrameId = frameId;
+    if (prev != null && prev != frameId && _resident.contains(prev)) {
+      await controller.setLayerProperties(_layerId(prev), _hidden);
+    }
+    if (_shownFrameId != frameId) return;
+    await controller.setLayerProperties(_layerId(frameId), _shown);
+  }
+
   Future<void> _ensureBlackOutline(MapLibreMapController controller) async {
     if (_blackOutlineOnMap) return;
     try {
@@ -214,7 +245,6 @@ class SatelliteMapLayer implements MapLayer {
       );
       _blackOutlineOnMap = true;
     } catch (_) {
-      // Style mid-reload — next show() retries. Drop a partial add.
       await _removeBlackOutline(controller);
     }
   }
@@ -226,9 +256,7 @@ class SatelliteMapLayer implements MapLayer {
     ]) {
       try {
         await controller.removeLayer(id);
-      } catch (_) {
-        // Already gone with the style.
-      }
+      } catch (_) {}
     }
     _blackOutlineOnMap = false;
   }
@@ -237,19 +265,19 @@ class SatelliteMapLayer implements MapLayer {
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
     await cancelMapLibreTileFetches();
-    if (_mounted) {
-      await _removeMounted(controller);
+    for (final id in _resident) {
+      await _removeFrame(controller, id);
     }
     await _removeBlackOutline(controller);
     _reset();
   }
 
-  Future<void> _removeMounted(MapLibreMapController controller) async {
+  Future<void> _removeFrame(MapLibreMapController controller, String id) async {
     try {
-      await controller.removeLayer(_layerId);
+      await controller.removeLayer(_layerId(id));
     } catch (_) {}
     try {
-      await controller.removeSource(_sourceId);
+      await controller.removeSource(_sourceId(id));
     } catch (_) {}
   }
 
@@ -257,15 +285,14 @@ class SatelliteMapLayer implements MapLayer {
   void onStyleReset() => _reset();
 
   void _reset() {
+    _resident.clear();
+    _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
-    _mounted = false;
     _blackOutlineOnMap = false;
   }
 }
 
-/// Decodes a satellite frame id — an ExpTech Unix timestamp — into wall-clock
-/// time. Accepts milliseconds (13-digit) or seconds (10-digit) by magnitude.
 DateTime _parseFrameTime(String id) {
   final epoch = int.tryParse(id);
   if (epoch != null) {

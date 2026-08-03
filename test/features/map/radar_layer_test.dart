@@ -117,7 +117,7 @@ void main() {
     },
   );
 
-  test('swaps a single raster source per frame (GIF scrub)', () async {
+  test('settle mounts ±radius window; scrub opacity-flips residents', () async {
     final layer = RadarMapLayer(
       _FakeRadarRepository([
         '1700001800000', // f3
@@ -132,23 +132,24 @@ void main() {
     await layer.prepare(controller, frames);
     expect(controller.calls, isEmpty);
 
+    // Settle on newest — radius 8 covers the whole 4-frame list.
     await layer.show(controller, frames[3]);
+    expect(
+      controller.calls.where((c) => c.startsWith('addSource:')),
+      hasLength(4),
+    );
+
+    // Scrub to resident neighbour → only prev hide + curr show.
+    controller.calls.clear();
+    await layer.show(controller, frames[2], scrubbing: true);
     expect(controller.calls, [
-      'addSource:radar-src',
-      'addRasterLayer:radar-lyr',
+      'set:radar-lyr-1700001800000:visible:0',
+      'set:radar-lyr-1700001200000:visible:0.85',
     ]);
 
+    // Same frame again → no-op.
     controller.calls.clear();
-    await layer.show(controller, frames[0]);
-    expect(controller.calls, [
-      'removeLayer:radar-lyr',
-      'removeSource:radar-src',
-      'addSource:radar-src',
-      'addRasterLayer:radar-lyr',
-    ]);
-
-    controller.calls.clear();
-    await layer.show(controller, frames[0]);
+    await layer.show(controller, frames[2], scrubbing: true);
     expect(controller.calls, isEmpty);
   });
 

@@ -11,14 +11,14 @@ import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// The radar echo (雷達回波) raster [MapLayer] — the first concrete layer on the
-/// shared map.
+/// The radar echo (雷達回波) raster [MapLayer].
 ///
-/// The whole history the API serves (~a week of 10-min frames) is scrubbable.
-/// The map holds **one** raster source: each [show] cancels in-flight tile HTTP,
-/// swaps that source's URL, then remounts. Scrub therefore animates like a GIF
-/// (scaffold coalesces to the latest frame while a swap runs) without stacking
-/// thousands of LocalDataTasks from abandoned frames.
+/// Scrub strategy (GIF without tile storms):
+/// - **Settle** mounts a small window (current ±[_settleRadius]) as MapLibre
+///   sources — neighbours sit at opacity 0 so a scrub onto them is instant.
+/// - **During scrub**, only opacity-switch among already-resident frames; a
+///   cold frame is ignored until the next settle (label still moves). That
+///   way a fast drag never addSources abandoned viewports into URLSession.
 class RadarMapLayer implements MapLayer {
   RadarMapLayer(this._repository);
 
@@ -37,8 +37,6 @@ class RadarMapLayer implements MapLayer {
   @override
   bool get usesTimeline => true;
 
-  // The scaffold owns the timeline panel and measures its real height, so this
-  // layer declares nothing of its own.
   @override
   double get bottomChromeFraction => 0;
 
@@ -110,7 +108,6 @@ class RadarMapLayer implements MapLayer {
     }
   }
 
-  /// CWA radar reflectivity (dBZ) — same stops as legacy's radar ColorLegend.
   @override
   Widget buildLegend(BuildContext context) => const MapLegendCard(
     child: ColorScaleLegend(
@@ -136,19 +133,26 @@ class RadarMapLayer implements MapLayer {
 
   static const double _opacity = 0.85;
 
-  /// Fixed ids — one source on the map; frame changes rewrite its tile URL.
-  static const String _sourceId = 'radar-src';
-  static const String _layerId = 'radar-lyr';
+  /// Neighbours mounted on settle so scrubbing across them is an opacity flip.
+  /// Wider = smoother GIF; each frame is one MapLibre source (~viewport tiles).
+  static const int _settleRadius = 8;
 
+  static const RasterLayerProperties _hidden = RasterLayerProperties(
+    visibility: 'visible',
+    rasterOpacity: 0,
+  );
   static const RasterLayerProperties _shown = RasterLayerProperties(
     visibility: 'visible',
     rasterOpacity: _opacity,
   );
 
-  Map<String, int> _indexById = const {};
+  String _sourceId(String frameId) => 'radar-src-$frameId';
+  String _layerId(String frameId) => 'radar-lyr-$frameId';
 
+  List<String> _orderedIds = const [];
+  Map<String, int> _indexById = const {};
+  final Set<String> _resident = <String>{};
   String? _shownFrameId;
-  bool _mounted = false;
 
   @override
   Future<Result<List<MapFrame>>> frames() async {
@@ -165,57 +169,94 @@ class RadarMapLayer implements MapLayer {
     MapLibreMapController controller,
     List<MapFrame> frames,
   ) async {
+    _orderedIds = [for (final frame in frames) frame.id];
     _indexById = {for (var i = 0; i < frames.length; i++) frames[i].id: i};
   }
 
   @override
-  Future<void> show(MapLibreMapController controller, MapFrame frame) async {
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {
     if (_shownFrameId == frame.id) return;
-    if (_indexById[frame.id] == null) return;
+    final index = _indexById[frame.id];
+    if (index == null) return;
 
-    // Drop abandoned-frame HTTP before remount — removeSource alone does not.
+    // Already on the map → GIF via opacity only (no HTTP).
+    if (_resident.contains(frame.id)) {
+      await _reveal(controller, frame.id);
+      return;
+    }
+
+    // Cold frame while dragging — keep the last resident painted. Settle loads.
+    if (scrubbing) return;
+
     _repository.cancelTilePrefetch();
     await cancelMapLibreTileFetches();
 
-    if (_mounted) {
-      await _removeMounted(controller);
-      _mounted = false;
+    final lo = (index - _settleRadius).clamp(0, _orderedIds.length - 1);
+    final hi = (index + _settleRadius).clamp(0, _orderedIds.length - 1);
+    final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
+
+    for (final id in _resident.difference(window)) {
+      await _removeFrame(controller, id);
+      _resident.remove(id);
     }
 
-    await controller.addSource(
-      _sourceId,
-      RasterSourceProperties(
-        tiles: [_repository.tileUrl(frame.id)],
-        tileSize: 256,
-      ),
-    );
-    await controller.addRasterLayer(
-      _sourceId,
-      _layerId,
-      _shown,
-      belowLayerId: outlineLayerId,
-    );
-    _mounted = true;
+    for (final id in window) {
+      final properties = id == frame.id ? _shown : _hidden;
+      if (_resident.contains(id)) {
+        await controller.setLayerProperties(_layerId(id), properties);
+      } else {
+        await controller.addSource(
+          _sourceId(id),
+          RasterSourceProperties(
+            tiles: [_repository.tileUrl(id)],
+            tileSize: 256,
+          ),
+        );
+        await controller.addRasterLayer(
+          _sourceId(id),
+          _layerId(id),
+          properties,
+          belowLayerId: outlineLayerId,
+        );
+        _resident.add(id);
+      }
+    }
     _shownFrameId = frame.id;
-    // Warm only after camera settles — scrub show is already the network path.
+  }
+
+  Future<void> _reveal(MapLibreMapController controller, String frameId) async {
+    final prev = _shownFrameId;
+    // Flip immediately so a superseded scrub tick can early-return on the new id.
+    _shownFrameId = frameId;
+    // Only touch the two layers that change — N awaits over the whole resident
+    // set was the scrub stutter (each setLayerProperties is a platform hop).
+    if (prev != null && prev != frameId && _resident.contains(prev)) {
+      await controller.setLayerProperties(_layerId(prev), _hidden);
+    }
+    if (_shownFrameId != frameId) return; // superseded mid-await
+    await controller.setLayerProperties(_layerId(frameId), _shown);
   }
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
     await cancelMapLibreTileFetches();
-    if (_mounted) {
-      await _removeMounted(controller);
+    for (final id in _resident) {
+      await _removeFrame(controller, id);
     }
     _reset();
   }
 
-  Future<void> _removeMounted(MapLibreMapController controller) async {
+  Future<void> _removeFrame(MapLibreMapController controller, String id) async {
     try {
-      await controller.removeLayer(_layerId);
+      await controller.removeLayer(_layerId(id));
     } catch (_) {}
     try {
-      await controller.removeSource(_sourceId);
+      await controller.removeSource(_sourceId(id));
     } catch (_) {}
   }
 
@@ -223,16 +264,13 @@ class RadarMapLayer implements MapLayer {
   void onStyleReset() => _reset();
 
   void _reset() {
+    _resident.clear();
+    _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
-    _mounted = false;
   }
 }
 
-/// Decodes a radar frame id — an ExpTech Unix timestamp — into a wall-clock time
-/// for the timeline label. Accepts milliseconds (13-digit) or seconds (10-digit)
-/// by magnitude, and falls back to an ISO string; an unparseable id maps to the
-/// epoch — the frame still renders, only its label is off.
 DateTime _parseFrameTime(String id) {
   final epoch = int.tryParse(id);
   if (epoch != null) {
