@@ -195,8 +195,6 @@ class MorePage extends StatelessWidget {
   }
 }
 
-/// A rounded tonal card grouping a section's rows, with hairline dividers
-/// inset to the row text — the app's grouped-list surface.
 class _MoreGroup extends StatelessWidget {
   const _MoreGroup({required this.children});
 
@@ -212,7 +210,6 @@ class _MoreGroup extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            indent: AppSpacing.xxl + AppSpacing.xl,
             color: theme.colorScheme.outlineVariant,
           ),
         );
