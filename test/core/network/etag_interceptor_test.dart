@@ -67,7 +67,7 @@ void main() {
 
   tearDown(() async => db.close());
 
-  Dio dioWith(_FakeAdapter adapter) =>
+  Dio dioWith(HttpClientAdapter adapter) =>
       createDio(etagCache: store)..httpClientAdapter = adapter;
 
   test('a 304 is served from cache as a 200 with the cached body', () async {
@@ -138,4 +138,52 @@ void main() {
       expect(EtagInterceptor.isUncacheablePath(Uri.parse(url).path), isTrue);
     }
   });
+
+  test('immutable-tile 404 is cached as empty and served locally', () async {
+    const url = 'https://lb.exptech.dev/api/v1/map/tiles/7/114/56.pbf';
+    final adapter = _StatusAdapter(404);
+    final dio = dioWith(adapter);
+
+    await expectLater(
+      dio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      ),
+      throwsA(isA<DioException>()),
+    );
+    final cached = await store.readBytes(url);
+    expect(cached, isNotNull);
+    expect(cached!.bytes, isEmpty);
+    expect(cached.etag, EtagInterceptor.negativeTileEtag);
+
+    // Second get is a local hit (200 empty) — no second network call.
+    final again = await dio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    expect(again.statusCode, 200);
+    expect(again.data, isEmpty);
+    expect(adapter.calls, 1);
+  });
+}
+
+/// Adapter that always returns [status] with an empty body.
+class _StatusAdapter implements HttpClientAdapter {
+  _StatusAdapter(this.status);
+
+  final int status;
+  int calls = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    return ResponseBody.fromBytes(Uint8List(0), status, headers: {});
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

@@ -11,6 +11,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/shared/map/map_tile_cache_binding.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -82,6 +83,9 @@ Future<void> bootstrap() async {
   final locale = LocaleController(prefs);
   final theme = ThemeController(prefs);
   final cache = await _openCache();
+  if (cache != null) {
+    await installMapLibreTileCache(store: cache.etag, usage: cache.usage);
+  }
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
 
@@ -216,7 +220,8 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
       },
     );
     await NetworkUsageStore.createSchema(db);
-    return (etag: EtagCacheStore(db), usage: NetworkUsageStore(db));
+    final usage = NetworkUsageStore(db);
+    return (etag: EtagCacheStore(db, usage: usage), usage: usage);
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;

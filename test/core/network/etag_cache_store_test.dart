@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -15,6 +15,7 @@ void main() {
   setUp(() async {
     db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
     await EtagCacheStore.createSchema(db);
+    await NetworkUsageStore.createSchema(db);
     store = EtagCacheStore(db);
   });
 
@@ -187,6 +188,46 @@ void main() {
       expect(identical(first!.bytes, second!.bytes), isTrue);
     },
   );
+
+  test(
+    'cold SQLite→memory readBytes records one hit and saved bytes',
+    () async {
+      final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+      // Writer fills disk (+ its own memory LRU); cold reader has empty memory.
+      await store.writeBytes(
+        'https://x/tile.pbf',
+        etag: 'W/"t"',
+        bytes: bytes,
+        contentType: 'application/octet-stream',
+        size: 4096,
+      );
+      final usage = NetworkUsageStore(db);
+      final cold = EtagCacheStore(db, usage: usage);
+
+      final hit = await cold.readBytes('https://x/tile.pbf');
+      expect(hit, isNotNull);
+      expect(hit!.bytes, bytes);
+
+      final stats = await usage.stats();
+      expect(stats.hits, 1);
+      expect(stats.misses, 0);
+      expect(stats.savedBytes, 4096);
+    },
+  );
+
+  test('memory LRU readBytes also meters a hit once', () async {
+    final usage = NetworkUsageStore(db);
+    final metered = EtagCacheStore(db, usage: usage);
+    final bytes = Uint8List.fromList([9, 8, 7]);
+    await metered.writeBytes('https://x/m', etag: '1', bytes: bytes, size: 128);
+
+    await metered.readBytes('https://x/m'); // memory hit
+    await metered.readBytes('https://x/m'); // second memory hit
+
+    final stats = await usage.stats();
+    expect(stats.hits, 2);
+    expect(stats.savedBytes, 256);
+  });
 
   test('readBytesMany returns parallel hits', () async {
     await store.writeBytes(

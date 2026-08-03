@@ -25,14 +25,10 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # ExpTech fork of maplibre/flutter-maplibre-gl (custom tile protocol work).
-  # Requires MapLibre Native 6.27.0 exactly — ios/vendor/maplibre vendors that
-  # xcframework; bump fork + vendor together.
+  # ExpTech fork — local path while iterating tile-cache bridge; CI/release can
+  # switch back to git. Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   maplibre_gl:
-    git:
-      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
-      path: maplibre_gl
-      ref: main
+    path: ../flutter-maplibre-gl/maplibre_gl
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1

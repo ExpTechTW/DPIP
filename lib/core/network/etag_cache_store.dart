@@ -12,7 +12,13 @@
 /// 2. **SQLite** row → inflate if [kindBinaryGzip], else raw copy.
 ///
 /// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
-/// [maxBytes]. Touch is async. All ops best-effort.
+/// [maxBytes]. Last-used bumps are **buffered** and flushed in batches (same
+/// idea as [NetworkUsageStore]) so tile storms don't UPDATE one row per hit.
+/// All ops best-effort.
+///
+/// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
+/// (memory LRU **or** SQLite→memory) records one hit + saved wire bytes —
+/// callers must not also meter those serves.
 library;
 
 import 'dart:async';
@@ -22,6 +28,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// A cached HTTP response: the server [etag] to revalidate with, the response
@@ -66,9 +73,15 @@ class EtagCacheStore {
     this.maxAge = const Duration(days: 7),
     this.maxBytes = defaultMaxBytes,
     this.memoryMaxBytes = defaultMemoryMaxBytes,
+    this._usage,
   });
 
   final Database _db;
+
+  /// Optional traffic accounting for binary [readBytes] hits (memory LRU **and**
+  /// SQLite→memory). Callers must not also [NetworkUsageStore.record] those
+  /// serves — misses / JSON `304`s stay at the interceptor / MapLibre put path.
+  final NetworkUsageStore? _usage;
 
   /// Entries whose **last-used** is older than this are swept on the next write.
   final Duration maxAge;
@@ -108,6 +121,15 @@ class EtagCacheStore {
   final LinkedHashMap<String, CachedBytes> _memory = LinkedHashMap();
   int _memoryBytes = 0;
 
+  /// Pending last-used bumps — coalesced into batched `UPDATE … IN (…)`.
+  final Set<String> _pendingTouch = {};
+  Timer? _touchTimer;
+  Future<void>? _touchFlushing;
+
+  static const _touchFlushInterval = Duration(milliseconds: 500);
+  static const _touchFlushEvery = 48;
+  static const _touchInChunk = 64;
+
   /// Creates the v2 cache table (idempotent) — call from `onCreate` / migrate.
   static Future<void> createSchema(Database db) async {
     await db.execute(
@@ -138,7 +160,7 @@ class EtagCacheStore {
     try {
       final row = await _queryRow(url);
       if (row == null || (row['kind'] as int) != kindJson) return null;
-      unawaited(_touch(url));
+      _scheduleTouch(url);
       final bodyBlob = row['body'] as Uint8List;
       final body = await _decodeJsonBody(bodyBlob);
       return CachedResponse(
@@ -154,19 +176,22 @@ class EtagCacheStore {
 
   /// Returns the cached **binary** entry for [url], or null on a miss.
   ///
-  /// Hits the memory LRU first. [touch] schedules an async last-used bump.
+  /// Hits the memory LRU first, else SQLite (inflate + [_memoryPut]). Every
+  /// successful serve is metered once via [_usage] when wired.
+  /// [touch] schedules an async last-used bump.
   Future<CachedBytes?> readBytes(String url, {bool touch = true}) async {
     try {
       final mem = _memoryTake(url);
       if (mem != null) {
-        if (touch) unawaited(_touch(url));
+        if (touch) _scheduleTouch(url);
+        _recordBinaryHit(mem);
         return mem;
       }
       final row = await _queryRow(url);
       if (row == null) return null;
       final kind = row['kind'] as int;
       if (kind != kindBinary && kind != kindBinaryGzip) return null;
-      if (touch) unawaited(_touch(url));
+      if (touch) _scheduleTouch(url);
       final blob = row['body'] as Uint8List;
       final bytes = kind == kindBinaryGzip
           ? await _gunzip(blob)
@@ -178,6 +203,7 @@ class EtagCacheStore {
         size: (row['size'] as num).toInt(),
       );
       _memoryPut(url, entry);
+      _recordBinaryHit(entry);
       return entry;
     } catch (_) {
       return null;
@@ -196,7 +222,7 @@ class EtagCacheStore {
     try {
       final mem = _memory[url];
       if (mem != null) {
-        unawaited(_touch(url));
+        _scheduleTouch(url);
         return mem.etag;
       }
       final rows = await _db.query(
@@ -207,15 +233,19 @@ class EtagCacheStore {
         limit: 1,
       );
       if (rows.isEmpty) return null;
-      unawaited(_touch(url));
+      _scheduleTouch(url);
       return rows.first['etag'] as String?;
     } catch (_) {
       return null;
     }
   }
 
-  /// Bumps last-used for [url] without reading the body.
-  Future<void> touch(String url) => _touch(url);
+  /// Bumps last-used for [url] without reading the body (awaits the flush so
+  /// callers that trim by LRU see the updated `time`).
+  Future<void> touch(String url) {
+    _pendingTouch.add(url);
+    return _flushTouches();
+  }
 
   /// Stores a JSON [body] for [url] under [etag]. Best-effort.
   Future<void> write(
@@ -284,6 +314,8 @@ class EtagCacheStore {
     required Uint8List body,
     required int size,
   }) async {
+    // LRU / age sweeps read `time` — land buffered touches first.
+    await _flushTouches();
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.insert(_table, {
       'key': url,
@@ -464,6 +496,12 @@ class EtagCacheStore {
     return false;
   }
 
+  void _recordBinaryHit(CachedBytes entry) {
+    final usage = _usage;
+    if (usage == null) return;
+    unawaited(usage.record(down: 0, hit: true, saved: entry.size));
+  }
+
   CachedBytes? _memoryTake(String url) {
     final hit = _memory.remove(url);
     if (hit == null) return null;
@@ -482,14 +520,56 @@ class EtagCacheStore {
     }
   }
 
-  Future<void> _touch(String url) async {
+  void _scheduleTouch(String url) {
+    _pendingTouch.add(url);
+    if (_pendingTouch.length >= _touchFlushEvery) {
+      unawaited(_flushTouches());
+      return;
+    }
+    _touchTimer ??= Timer(_touchFlushInterval, () {
+      _touchTimer = null;
+      unawaited(_flushTouches());
+    });
+  }
+
+  Future<void> _flushTouches() async {
+    while (true) {
+      final inFlight = _touchFlushing;
+      if (inFlight != null) {
+        await inFlight;
+        if (_pendingTouch.isEmpty) return;
+        continue;
+      }
+      if (_pendingTouch.isEmpty) return;
+      final done = _flushTouchesBody();
+      _touchFlushing = done.whenComplete(() => _touchFlushing = null);
+      await done;
+      if (_pendingTouch.isEmpty) return;
+    }
+  }
+
+  Future<void> _flushTouchesBody() async {
+    _touchTimer?.cancel();
+    _touchTimer = null;
+    if (_pendingTouch.isEmpty) return;
+
+    final urls = _pendingTouch.toList(growable: false);
+    _pendingTouch.clear();
+    final now = DateTime.now().millisecondsSinceEpoch;
     try {
-      await _db.update(
-        _table,
-        {'time': DateTime.now().millisecondsSinceEpoch},
-        where: 'key = ?',
-        whereArgs: [url],
-      );
+      await _db.transaction((txn) async {
+        for (var i = 0; i < urls.length; i += _touchInChunk) {
+          final end = i + _touchInChunk;
+          final chunk = end < urls.length
+              ? urls.sublist(i, end)
+              : urls.sublist(i);
+          final placeholders = List.filled(chunk.length, '?').join(',');
+          await txn.rawUpdate(
+            'UPDATE $_table SET time = ? WHERE key IN ($placeholders)',
+            [now, ...chunk],
+          );
+        }
+      });
     } catch (_) {}
   }
 }

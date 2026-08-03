@@ -1,12 +1,9 @@
-/// Fetches HTTPS resources via [ApiClient] (binary ETag / SQLite) and pins them
-/// into MapLibre ambient under the **same URL** MapLibre will request.
+/// Warms Dart's [EtagCacheStore] (memory LRU + SQLite) for viewport tiles via
+/// [ApiClient.getBytes]. MapLibre then hits the same URLs through the native
+/// HTTPS intercept → Dart get (see [installMapLibreTileCache]).
 ///
-/// **Currently disabled ([pinAmbient] = false).** Concurrent
-/// `MLNOfflineStorage.preload` + MapLibre's own tile HTTP races the ambient
-/// cache lookup on iOS and crashes (`EXC_BAD_ACCESS` / `objc_retain` on
-/// `com.apple.network.connections`). Until there is a safe pin path (or a
-/// custom tile provider that does not share MapLibre's ambient writer), let
-/// MapLibre own tile fetches; SQLite ETag still covers ApiClient JSON / bytes.
+/// Does **not** call `MLNOfflineStorage.preload` / ambient pin — that races
+/// MapLibre's own cache lookup on iOS.
 library;
 
 import 'dart:async';
@@ -16,7 +13,6 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
-import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/xyz_tiles.dart';
 
 /// Shared spine for radar / satellite / DPM / basemap warm-up.
@@ -27,17 +23,16 @@ import 'package:dpip/shared/map/xyz_tiles.dart';
 class AmbientPrefetcher {
   AmbientPrefetcher(
     this._client, {
-    this._cache = const MapCache(),
     this.maxTiles = 48,
     this.concurrency = 6,
     this.settleDelay = const Duration(milliseconds: 350),
   });
 
-  /// Gate for Dio→ambient pin. Keep false on iOS MapLibre until preload is safe.
-  static const bool pinAmbient = false;
+  /// When false, prefetch is a no-op (MapLibre still fills Dart cache on miss
+  /// via the native→Dart put path).
+  static const bool enabled = true;
 
   final ApiClient _client;
-  final MapCache _cache;
   final int maxTiles;
   final int concurrency;
   final Duration settleDelay;
@@ -61,11 +56,10 @@ class AmbientPrefetcher {
     Iterable<String> paths, {
     String? logLabel,
   }) async {
-    if (!pinAmbient) return;
+    if (!enabled) return;
     final list = paths.toList(growable: false);
     if (list.isEmpty) return;
     final schedule = ++_scheduleId;
-    // Cancel the previous generation *now* — don't wait for settle.
     _token?.cancel('ambient-prefetch-superseded');
     _token = null;
     await Future<void>.delayed(settleDelay);
@@ -94,7 +88,7 @@ class AmbientPrefetcher {
     Iterable<String> urls, {
     String? logLabel,
   }) async {
-    if (!pinAmbient) return;
+    if (!enabled) return;
     final list = urls.toList(growable: false);
     if (list.isEmpty) return;
     final schedule = ++_scheduleId;
@@ -129,7 +123,7 @@ class AmbientPrefetcher {
     int pad = 1,
     String? logLabel,
   }) async {
-    if (!pinAmbient) return;
+    if (!enabled) return;
     final z = math.min(zoom.floor(), maxZoom);
     var tiles = tilesCovering(
       south: south,
@@ -169,7 +163,7 @@ class AmbientPrefetcher {
     int pad = 1,
     String? logLabel,
   }) async {
-    if (!pinAmbient) return;
+    if (!enabled) return;
     final z = math.min(zoom.floor(), maxZoom);
     var tiles = tilesCovering(
       south: south,
@@ -209,23 +203,17 @@ class AmbientPrefetcher {
         if (pending.isEmpty) return;
         final job = pending.removeLast();
         try {
-          final payload = job.tier != null
-              ? await _client.getBytes(
-                  job.tier!,
-                  job.pathOrUrl,
-                  cancelToken: token,
-                )
-              : await _client.getBytesAbsolute(
-                  job.pathOrUrl,
-                  cancelToken: token,
-                );
-          if (gen != _generation || token.isCancelled) return;
-          await _cache.preload(
-            url: job.url,
-            data: payload.bytes,
-            etag: payload.etag,
-            mustRevalidate: true,
-          );
+          // EtagInterceptor writes SQLite + memory LRU on 200; MapLibre's next
+          // request for [job.url] hits via native → Dart get.
+          if (job.tier != null) {
+            await _client.getBytes(
+              job.tier!,
+              job.pathOrUrl,
+              cancelToken: token,
+            );
+          } else {
+            await _client.getBytesAbsolute(job.pathOrUrl, cancelToken: token);
+          }
         } on DioException catch (e) {
           if (e.type == DioExceptionType.cancel) return;
           Log.debug(

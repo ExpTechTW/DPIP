@@ -23,18 +23,24 @@ import 'package:dpip/core/network/network_usage_store.dart';
 ///
 /// **Immutable tile URLs** (basemap / radar / satellite / DPM — the frame or
 /// z/x/y is in the path) are served from SQLite on hit with **no**
-/// `If-None-Match` round trip. Supports JSON and binary (`ResponseType.bytes`).
-/// Streaming (SSE) is skipped. High-churn / unique-URL GETs (EEW, RTS, device
-/// location, notify) are never cached. Requires Dio `validateStatus` to accept
-/// 304 (set in `createDio`).
+/// `If-None-Match` round trip. A `404` on those URLs is also cached (empty body
+/// + [negativeTileEtag]) — ocean / out-of-coverage cells are intentional and
+/// must not be re-fetched every pan. Supports JSON and binary
+/// (`ResponseType.bytes`). Streaming (SSE) is skipped. High-churn / unique-URL
+/// GETs (EEW, RTS, device location, notify) are never cached. Requires Dio
+/// `validateStatus` to accept 304 (set in `createDio`).
 class EtagInterceptor extends Interceptor {
   EtagInterceptor(this._store, {this._usage});
 
   final EtagCacheStore _store;
 
-  /// Optional traffic accounting: records downloaded bytes, cache hits/misses,
-  /// and the bytes a `304` / local tile hit saved.
+  /// Optional traffic accounting: records downloaded bytes, cache misses, and
+  /// JSON `304` hits. Binary serves (immutable tile / binary `304`) are metered
+  /// inside [EtagCacheStore.readBytes] so memory + SQLite→memory count once.
   final NetworkUsageStore? _usage;
+
+  /// Synthetic ETag for a cached immutable-tile `404` (empty body).
+  static const String negativeTileEtag = 'W/"404"';
 
   static bool _cacheable(RequestOptions o) =>
       o.method.toUpperCase() == 'GET' &&
@@ -119,10 +125,7 @@ class EtagInterceptor extends Interceptor {
     if (_isBytes(options) && isImmutableTile(options.uri)) {
       final cached = await _store.readBytes(url);
       if (cached != null) {
-        final usage = _usage;
-        if (usage != null) {
-          unawaited(usage.record(down: 0, hit: true, saved: cached.size));
-        }
+        // Hit metering lives in [EtagCacheStore.readBytes] (memory + SQLite).
         handler.resolve(
           Response<dynamic>(
             requestOptions: options,
@@ -165,10 +168,7 @@ class EtagInterceptor extends Interceptor {
             response.statusCode = 200;
             response.data = cached.bytes;
             response.headers.set('etag', cached.etag);
-            final usage = _usage;
-            if (usage != null) {
-              unawaited(usage.record(down: 0, hit: true, saved: cached.size));
-            }
+            // Hit metering lives in [EtagCacheStore.readBytes].
             handler.next(response);
             return;
           }
@@ -243,6 +243,34 @@ class EtagInterceptor extends Interceptor {
       }
     }
     handler.next(response);
+  }
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    final options = err.requestOptions;
+    final status = err.response?.statusCode;
+    // Basemap / radar / sat / DPM: missing XYZ is stable — remember the hole.
+    if (_cacheable(options) &&
+        _isBytes(options) &&
+        status == 404 &&
+        isImmutableTile(options.uri)) {
+      final url = options.uri.toString();
+      await _store.writeBytes(
+        url,
+        etag: negativeTileEtag,
+        bytes: Uint8List(0),
+        contentType: 'application/octet-stream',
+        size: 0,
+      );
+      final usage = _usage;
+      if (usage != null) {
+        unawaited(usage.record(down: 0, hit: false, saved: 0));
+      }
+    }
+    handler.next(err);
   }
 }
 

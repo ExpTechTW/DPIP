@@ -73,4 +73,24 @@ void main() {
       expect(stats.misses, 2);
     },
   );
+
+  test('coalesces many records into one SQLite flush', () async {
+    final s = NetworkUsageStore(
+      db,
+      now: () => now,
+      flushInterval: const Duration(days: 1), // never timer-flush in this test
+      flushEvery: 1000,
+    );
+    for (var i = 0; i < 50; i++) {
+      await s.record(down: 10, hit: true, saved: 5);
+    }
+    // Still buffered — totals table empty until flush/stats.
+    final rows = await db.query('net_total');
+    expect(rows, isEmpty);
+
+    final stats = await s.stats();
+    expect(stats.hits, 50);
+    expect(stats.savedBytes, 250);
+    expect(stats.last24h, 500);
+  });
 }
