@@ -659,6 +659,45 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'I-tap ang AED marker para sa detalye';
+
+  @override
+  String get aedAddress => 'Address';
+
+  @override
+  String get aedRegion => 'Rehiyon';
+
+  @override
+  String get aedCategory => 'Kategorya';
+
+  @override
+  String get aedType => 'Uri';
+
+  @override
+  String get aedPlaceDesc => 'Lokasyon ng paglagay';
+
+  @override
+  String get aedDescription => 'Tala';
+
+  @override
+  String get aedHoursWeekday => 'Oras sa weekday';
+
+  @override
+  String get aedHoursSaturday => 'Oras sa Sabado';
+
+  @override
+  String get aedHoursSunday => 'Oras sa Linggo';
+
+  @override
+  String get aedOpenRemark => 'Tala sa oras';
+
+  @override
+  String get aedEmergencyPhone => 'Emergency phone';
+
+  @override
   String get stationSheetEmpty => 'I-tap ang istasyon para makita ang datos';
 
   @override

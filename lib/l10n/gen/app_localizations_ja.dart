@@ -648,6 +648,45 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerMonitor => '強震モニタ';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'AEDマーカーをタップして詳細を表示';
+
+  @override
+  String get aedAddress => '住所';
+
+  @override
+  String get aedRegion => '地域';
+
+  @override
+  String get aedCategory => '分類';
+
+  @override
+  String get aedType => '種類';
+
+  @override
+  String get aedPlaceDesc => '設置場所';
+
+  @override
+  String get aedDescription => '備考';
+
+  @override
+  String get aedHoursWeekday => '平日の開館時間';
+
+  @override
+  String get aedHoursSaturday => '土曜の開館時間';
+
+  @override
+  String get aedHoursSunday => '日曜の開館時間';
+
+  @override
+  String get aedOpenRemark => '開館時間メモ';
+
+  @override
+  String get aedEmergencyPhone => '緊急連絡先';
+
+  @override
   String get stationSheetEmpty => '観測点をタップして値を表示';
 
   @override

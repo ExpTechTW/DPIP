@@ -1323,6 +1323,84 @@ abstract class AppLocalizations {
   /// **'Seismic Monitor'**
   String get mapLayerMonitor;
 
+  /// Map layer switcher label for AED (defibrillator) points
+  ///
+  /// In en, this message translates to:
+  /// **'AED'**
+  String get mapLayerAed;
+
+  /// Hint in the AED sheet when nothing is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an AED marker for details'**
+  String get aedSheetEmpty;
+
+  /// AED detail row label
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get aedAddress;
+
+  /// AED city / district row label
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get aedRegion;
+
+  /// AED venue category row label
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get aedCategory;
+
+  /// AED venue type row label
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get aedType;
+
+  /// AED placement description row label
+  ///
+  /// In en, this message translates to:
+  /// **'Placement'**
+  String get aedPlaceDesc;
+
+  /// AED free-text description row label
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get aedDescription;
+
+  /// AED weekday opening hours row label
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday hours'**
+  String get aedHoursWeekday;
+
+  /// AED Saturday opening hours row label
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday hours'**
+  String get aedHoursSaturday;
+
+  /// AED Sunday opening hours row label
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday hours'**
+  String get aedHoursSunday;
+
+  /// AED opening-hours remark row label
+  ///
+  /// In en, this message translates to:
+  /// **'Hours note'**
+  String get aedOpenRemark;
+
+  /// AED emergency contact phone row label
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency phone'**
+  String get aedEmergencyPhone;
+
   /// Empty-state hint in the map station-value sheet, shown before any station is selected
   ///
   /// In en, this message translates to:

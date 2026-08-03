@@ -657,6 +657,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'Tap an AED marker for details';
+
+  @override
+  String get aedAddress => 'Address';
+
+  @override
+  String get aedRegion => 'Region';
+
+  @override
+  String get aedCategory => 'Category';
+
+  @override
+  String get aedType => 'Type';
+
+  @override
+  String get aedPlaceDesc => 'Placement';
+
+  @override
+  String get aedDescription => 'Notes';
+
+  @override
+  String get aedHoursWeekday => 'Weekday hours';
+
+  @override
+  String get aedHoursSaturday => 'Saturday hours';
+
+  @override
+  String get aedHoursSunday => 'Sunday hours';
+
+  @override
+  String get aedOpenRemark => 'Hours note';
+
+  @override
+  String get aedEmergencyPhone => 'Emergency phone';
+
+  @override
   String get stationSheetEmpty => 'Tap a station to see its reading';
 
   @override

@@ -657,6 +657,45 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'Chạm điểm AED để xem chi tiết';
+
+  @override
+  String get aedAddress => 'Địa chỉ';
+
+  @override
+  String get aedRegion => 'Khu vực';
+
+  @override
+  String get aedCategory => 'Phân loại';
+
+  @override
+  String get aedType => 'Loại';
+
+  @override
+  String get aedPlaceDesc => 'Vị trí đặt';
+
+  @override
+  String get aedDescription => 'Ghi chú';
+
+  @override
+  String get aedHoursWeekday => 'Giờ ngày thường';
+
+  @override
+  String get aedHoursSaturday => 'Giờ thứ Bảy';
+
+  @override
+  String get aedHoursSunday => 'Giờ Chủ nhật';
+
+  @override
+  String get aedOpenRemark => 'Ghi chú giờ mở';
+
+  @override
+  String get aedEmergencyPhone => 'Điện thoại khẩn cấp';
+
+  @override
   String get stationSheetEmpty => 'Chạm vào một trạm để xem số liệu';
 
   @override

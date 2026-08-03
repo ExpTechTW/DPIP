@@ -656,6 +656,45 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'แตะเครื่องหมาย AED เพื่อดูรายละเอียด';
+
+  @override
+  String get aedAddress => 'ที่อยู่';
+
+  @override
+  String get aedRegion => 'พื้นที่';
+
+  @override
+  String get aedCategory => 'หมวดหมู่';
+
+  @override
+  String get aedType => 'ประเภท';
+
+  @override
+  String get aedPlaceDesc => 'ตำแหน่งติดตั้ง';
+
+  @override
+  String get aedDescription => 'หมายเหตุ';
+
+  @override
+  String get aedHoursWeekday => 'เวลาวันธรรมดา';
+
+  @override
+  String get aedHoursSaturday => 'เวลาวันเสาร์';
+
+  @override
+  String get aedHoursSunday => 'เวลาวันอาทิตย์';
+
+  @override
+  String get aedOpenRemark => 'หมายเหตุเวลาเปิด';
+
+  @override
+  String get aedEmergencyPhone => 'โทรศัพท์ฉุกเฉิน';
+
+  @override
   String get stationSheetEmpty => 'แตะสถานีเพื่อดูค่าที่วัดได้';
 
   @override

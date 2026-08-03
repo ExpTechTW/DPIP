@@ -648,6 +648,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'AED 마커를 눌러 상세 보기';
+
+  @override
+  String get aedAddress => '주소';
+
+  @override
+  String get aedRegion => '지역';
+
+  @override
+  String get aedCategory => '분류';
+
+  @override
+  String get aedType => '유형';
+
+  @override
+  String get aedPlaceDesc => '설치 위치';
+
+  @override
+  String get aedDescription => '비고';
+
+  @override
+  String get aedHoursWeekday => '평일 운영시간';
+
+  @override
+  String get aedHoursSaturday => '토요일 운영시간';
+
+  @override
+  String get aedHoursSunday => '일요일 운영시간';
+
+  @override
+  String get aedOpenRemark => '운영시간 비고';
+
+  @override
+  String get aedEmergencyPhone => '비상 연락처';
+
+  @override
   String get stationSheetEmpty => '관측소를 눌러 관측값 보기';
 
   @override

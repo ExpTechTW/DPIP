@@ -803,6 +803,58 @@
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
   },
+  "mapLayerAed": "AED",
+  "@mapLayerAed": {
+    "description": "Map layer switcher label for AED (defibrillator) points"
+  },
+  "aedSheetEmpty": "Tap an AED marker for details",
+  "@aedSheetEmpty": {
+    "description": "Hint in the AED sheet when nothing is selected"
+  },
+  "aedAddress": "Address",
+  "@aedAddress": {
+    "description": "AED detail row label"
+  },
+  "aedRegion": "Region",
+  "@aedRegion": {
+    "description": "AED city / district row label"
+  },
+  "aedCategory": "Category",
+  "@aedCategory": {
+    "description": "AED venue category row label"
+  },
+  "aedType": "Type",
+  "@aedType": {
+    "description": "AED venue type row label"
+  },
+  "aedPlaceDesc": "Placement",
+  "@aedPlaceDesc": {
+    "description": "AED placement description row label"
+  },
+  "aedDescription": "Notes",
+  "@aedDescription": {
+    "description": "AED free-text description row label"
+  },
+  "aedHoursWeekday": "Weekday hours",
+  "@aedHoursWeekday": {
+    "description": "AED weekday opening hours row label"
+  },
+  "aedHoursSaturday": "Saturday hours",
+  "@aedHoursSaturday": {
+    "description": "AED Saturday opening hours row label"
+  },
+  "aedHoursSunday": "Sunday hours",
+  "@aedHoursSunday": {
+    "description": "AED Sunday opening hours row label"
+  },
+  "aedOpenRemark": "Hours note",
+  "@aedOpenRemark": {
+    "description": "AED opening-hours remark row label"
+  },
+  "aedEmergencyPhone": "Emergency phone",
+  "@aedEmergencyPhone": {
+    "description": "AED emergency contact phone row label"
+  },
   "stationSheetEmpty": "Tap a station to see its reading",
   "@stationSheetEmpty": {
     "description": "Empty-state hint in the map station-value sheet, shown before any station is selected"

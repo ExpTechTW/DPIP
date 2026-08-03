@@ -644,6 +644,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => '點選 AED 標記查看詳情';
+
+  @override
+  String get aedAddress => '地址';
+
+  @override
+  String get aedRegion => '縣市區域';
+
+  @override
+  String get aedCategory => '場所分類';
+
+  @override
+  String get aedType => '場所類型';
+
+  @override
+  String get aedPlaceDesc => '放置位置說明';
+
+  @override
+  String get aedDescription => '備註';
+
+  @override
+  String get aedHoursWeekday => '平日開放時間';
+
+  @override
+  String get aedHoursSaturday => '週六開放時間';
+
+  @override
+  String get aedHoursSunday => '週日開放時間';
+
+  @override
+  String get aedOpenRemark => '開放時間備註';
+
+  @override
+  String get aedEmergencyPhone => '緊急聯絡電話';
+
+  @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';
 
   @override
@@ -1427,6 +1466,45 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerMonitor => '强震监视器';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => '点选 AED 标记查看详情';
+
+  @override
+  String get aedAddress => '地址';
+
+  @override
+  String get aedRegion => '县市区域';
+
+  @override
+  String get aedCategory => '场所分类';
+
+  @override
+  String get aedType => '场所类型';
+
+  @override
+  String get aedPlaceDesc => '放置位置说明';
+
+  @override
+  String get aedDescription => '备注';
+
+  @override
+  String get aedHoursWeekday => '平日开放时间';
+
+  @override
+  String get aedHoursSaturday => '周六开放时间';
+
+  @override
+  String get aedHoursSunday => '周日开放时间';
+
+  @override
+  String get aedOpenRemark => '开放时间备注';
+
+  @override
+  String get aedEmergencyPhone => '紧急联络电话';
 
   @override
   String get stationSheetEmpty => '点选任一测站查看观测值';
@@ -2214,6 +2292,45 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => '點選 AED 標記查看詳情';
+
+  @override
+  String get aedAddress => '地址';
+
+  @override
+  String get aedRegion => '縣市區域';
+
+  @override
+  String get aedCategory => '場所分類';
+
+  @override
+  String get aedType => '場所類型';
+
+  @override
+  String get aedPlaceDesc => '放置位置說明';
+
+  @override
+  String get aedDescription => '備註';
+
+  @override
+  String get aedHoursWeekday => '平日開放時間';
+
+  @override
+  String get aedHoursSaturday => '週六開放時間';
+
+  @override
+  String get aedHoursSunday => '週日開放時間';
+
+  @override
+  String get aedOpenRemark => '開放時間備註';
+
+  @override
+  String get aedEmergencyPhone => '緊急聯絡電話';
+
+  @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';
 
   @override
@@ -2997,6 +3114,45 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayerMonitor => '強震監視器';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => '點選 AED 標記查看詳情';
+
+  @override
+  String get aedAddress => '地址';
+
+  @override
+  String get aedRegion => '縣市區域';
+
+  @override
+  String get aedCategory => '場所分類';
+
+  @override
+  String get aedType => '場所類型';
+
+  @override
+  String get aedPlaceDesc => '放置位置說明';
+
+  @override
+  String get aedDescription => '備註';
+
+  @override
+  String get aedHoursWeekday => '平日開放時間';
+
+  @override
+  String get aedHoursSaturday => '週六開放時間';
+
+  @override
+  String get aedHoursSunday => '週日開放時間';
+
+  @override
+  String get aedOpenRemark => '開放時間備註';
+
+  @override
+  String get aedEmergencyPhone => '緊急聯絡電話';
 
   @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';

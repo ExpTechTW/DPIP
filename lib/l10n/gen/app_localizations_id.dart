@@ -659,6 +659,45 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get aedSheetEmpty => 'Ketuk penanda AED untuk detail';
+
+  @override
+  String get aedAddress => 'Alamat';
+
+  @override
+  String get aedRegion => 'Wilayah';
+
+  @override
+  String get aedCategory => 'Kategori';
+
+  @override
+  String get aedType => 'Jenis';
+
+  @override
+  String get aedPlaceDesc => 'Lokasi peletakan';
+
+  @override
+  String get aedDescription => 'Catatan';
+
+  @override
+  String get aedHoursWeekday => 'Jam hari kerja';
+
+  @override
+  String get aedHoursSaturday => 'Jam Sabtu';
+
+  @override
+  String get aedHoursSunday => 'Jam Minggu';
+
+  @override
+  String get aedOpenRemark => 'Catatan jam buka';
+
+  @override
+  String get aedEmergencyPhone => 'Telepon darurat';
+
+  @override
   String get stationSheetEmpty => 'Ketuk stasiun untuk melihat bacaannya';
 
   @override
