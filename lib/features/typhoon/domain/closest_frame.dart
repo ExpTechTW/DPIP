@@ -5,7 +5,7 @@ library;
 /// every frame is newer than the bulletin (or the list is empty).
 ///
 /// Used so radar / Himawari IR under a typhoon overlay match the report time
-/// (`selectedHistory` / `track.updated`) instead of "now".
+/// (`track.updated` / cyclone time) instead of "now".
 int? closestAtOrBefore(List<int> seconds, int bulletin) {
   if (seconds.isEmpty) return null;
   var lo = 0;

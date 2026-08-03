@@ -1,5 +1,5 @@
 /// The typhoon layer's detail sheet (拖盤): CWA-style bulletin, warning,
-/// dataset history scrubber, satellite imagery, and tapped forecast detail.
+/// and tapped forecast detail (latest bulletin; satellite aligned on the map).
 ///
 /// Mechanics match [StationSheet]: drag to full height (`1.0`), flush with the
 /// status bar, grip hides at top. The storm name is the hero typography.
@@ -90,8 +90,6 @@ class _TyphoonPanelState extends State<TyphoonPanel> {
                       _Bulletin(layer: layer, extent: _extent),
                       _WarningBlock(layer: layer),
                       _TappedWaypoint(layer: layer),
-                      _HistorySelector(layer: layer),
-                      _TimeSelector(layer: layer),
                     ],
                   );
                   return ValueListenableBuilder<double>(
@@ -241,7 +239,6 @@ class _Bulletin extends StatelessWidget {
       listenable: Listenable.merge([
         layer.summary,
         layer.track,
-        layer.selectedHistory,
         layer.selectedCycloneKey,
         extent,
       ]),
@@ -835,8 +832,7 @@ class _TappedWaypoint extends StatelessWidget {
       builder: (context, label, _) {
         if (label == null) return const SizedBox.shrink();
         final forecast = layer.forecastForLabel(label);
-        final useZh =
-            Localizations.localeOf(context).languageCode == 'zh';
+        final useZh = Localizations.localeOf(context).languageCode == 'zh';
         final compass = compassDirection(forecast?.direction);
         final dirLabel = compass == null
             ? forecast?.direction
@@ -891,9 +887,7 @@ class _TappedWaypoint extends StatelessWidget {
                         if (forecast != null) ...[
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            l10n.typhoonForecastLead(
-                              forecast.tau.toString(),
-                            ),
+                            l10n.typhoonForecastLead(forecast.tau.toString()),
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
@@ -940,10 +934,7 @@ class _TappedWaypoint extends StatelessWidget {
                               style: theme.textTheme.bodySmall,
                             ),
                           if (stateNote != null && stateNote.isNotEmpty)
-                            Text(
-                              stateNote,
-                              style: theme.textTheme.bodySmall,
-                            ),
+                            Text(stateNote, style: theme.textTheme.bodySmall),
                         ],
                       ],
                     ),
@@ -958,217 +949,6 @@ class _TappedWaypoint extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-/// Scrubs potential/track/probability/warning snapshots.
-class _HistorySelector extends StatelessWidget {
-  const _HistorySelector({required this.layer});
-
-  final TyphoonMapLayer layer;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return ValueListenableBuilder<List<int>>(
-      valueListenable: layer.historyFrames,
-      builder: (context, frames, _) {
-        if (frames.isEmpty) return const SizedBox.shrink();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.xs,
-              ),
-              child: Text(
-                l10n.typhoonHistoryTitle,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 56,
-              child: ValueListenableBuilder<int?>(
-                valueListenable: layer.selectedHistory,
-                builder: (context, selected, _) => ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  itemCount: frames.length + 1,
-                  itemBuilder: (context, i) {
-                    if (i == frames.length) {
-                      return _TimeChip(
-                        label: l10n.typhoonHistoryLive,
-                        selected: selected == null,
-                        onTap: () => layer.selectHistory(null),
-                      );
-                    }
-                    final sec = frames[i];
-                    final time = DateTime.fromMillisecondsSinceEpoch(
-                      sec * 1000,
-                      isUtc: true,
-                    ).add(const Duration(hours: 8));
-                    return _TimeChip(
-                      time: time,
-                      selected: selected == sec,
-                      onTap: () => layer.selectHistory(sec),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _TimeSelector extends StatefulWidget {
-  const _TimeSelector({required this.layer});
-
-  final TyphoonMapLayer layer;
-
-  @override
-  State<_TimeSelector> createState() => _TimeSelectorState();
-}
-
-class _TimeSelectorState extends State<_TimeSelector> {
-  final ScrollController _scroll = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scroll.hasClients) {
-        _scroll.jumpTo(_scroll.position.maxScrollExtent);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scroll.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return ValueListenableBuilder<List<int>>(
-      valueListenable: widget.layer.imageFrames,
-      builder: (context, frames, _) {
-        if (frames.isEmpty) return const SizedBox.shrink();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.xs,
-              ),
-              child: Text(
-                l10n.typhoonSatelliteTitle,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 56,
-              child: ValueListenableBuilder<int>(
-                valueListenable: widget.layer.selectedFrame,
-                builder: (context, selected, _) => ListView.builder(
-                  controller: _scroll,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  itemCount: frames.length,
-                  itemBuilder: (context, i) => _TimeChip(
-                    time: DateTime.fromMillisecondsSinceEpoch(
-                      frames[i] * 1000,
-                      isUtc: true,
-                    ).add(const Duration(hours: 8)),
-                    selected: i == selected,
-                    onTap: () => widget.layer.showFrame(i),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _TimeChip extends StatelessWidget {
-  const _TimeChip({
-    this.time,
-    this.label,
-    required this.selected,
-    required this.onTap,
-  }) : assert(time != null || label != null);
-
-  final DateTime? time;
-  final String? label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: label != null ? 64 : 72,
-        margin: const EdgeInsets.symmetric(
-          horizontal: 3,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: selected ? colors.primary : colors.surfaceContainerHighest,
-          borderRadius: AppRadius.small,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (label != null)
-              Text(
-                label!,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: selected ? colors.onPrimary : colors.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            else
-              Text(
-                AppLocalizations.of(context).typhoonTimeChip(
-                  '${time!.day}',
-                  time!.hour.toString().padLeft(2, '0'),
-                ),
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: selected ? colors.onPrimary : colors.onSurface,
-                  fontWeight: FontWeight.w600,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

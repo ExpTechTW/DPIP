@@ -214,19 +214,21 @@ class _MoreGroup extends StatelessWidget {
       }
       rows.add(children[i]);
     }
-    return Container(
-      margin: const EdgeInsets.fromLTRB(
+    // Material (not DecoratedBox) so ListTile ink paints on this ancestor —
+    // a colored DecoratedBox between tile and Material asserts in debug.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,
         AppSpacing.lg,
         AppSpacing.sm,
       ),
-      decoration: BoxDecoration(
+      child: Material(
         color: theme.colorScheme.surfaceContainer,
         borderRadius: AppRadius.medium,
+        clipBehavior: Clip.antiAlias,
+        child: Column(children: rows),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: rows),
     );
   }
 }

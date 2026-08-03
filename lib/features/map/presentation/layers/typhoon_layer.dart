@@ -17,7 +17,6 @@ import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
-import 'package:dpip/features/typhoon/domain/typhoon_kind.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_overlay.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_potential.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_probability.dart';
@@ -42,7 +41,8 @@ typedef _StormPoint = ({
 });
 
 /// Sheet-type [MapLayer]: renders every typhoon dataset on the map and drives
-/// [TyphoonPanel] (summary, warning, history, satellite) via notifiers.
+/// [TyphoonPanel] (summary, warning) via notifiers. Meteor satellite PNG and
+/// optional radar/IR underlays are aligned to the live bulletin time.
 class TyphoonMapLayer implements MapLayer {
   TyphoonMapLayer(
     this._repository, {
@@ -57,16 +57,6 @@ class TyphoonMapLayer implements MapLayer {
   MapLibreMapController? _controller;
   bool _added = false;
   Future<void> _ops = Future<void>.value();
-
-  /// Satellite-image times (Unix seconds, ascending) and the shown index.
-  final ValueNotifier<List<int>> imageFrames = ValueNotifier(const []);
-  final ValueNotifier<int> selectedFrame = ValueNotifier(0);
-
-  /// Dataset history clock (potential/track/probability share the same times).
-  final ValueNotifier<List<int>> historyFrames = ValueNotifier(const []);
-
-  /// Selected history second; `null` = live `/geojson` + latest datasets.
-  final ValueNotifier<int?> selectedHistory = ValueNotifier(null);
 
   final ValueNotifier<TyphoonCyclone?> summary = ValueNotifier(null);
   final ValueNotifier<TrackPayload?> track = ValueNotifier(null);
@@ -191,7 +181,6 @@ class TyphoonMapLayer implements MapLayer {
       _repository.potential(),
       _repository.probability(),
       _repository.warning(),
-      _repository.history(TyphoonKind.potential),
       radar.frames(),
       satellite.frames(),
     ]);
@@ -203,16 +192,14 @@ class TyphoonMapLayer implements MapLayer {
     final potentialResult = results[4] as Result<TyphoonPotential>;
     final probabilityResult = results[5] as Result<TyphoonProbability>;
     final warningResult = results[6] as Result<TyphoonWarning>;
-    final historyResult = results[7] as Result<List<int>>;
-    final radarResult = results[8] as Result<List<String>>;
-    final satResult = results[9] as Result<List<String>>;
+    final radarResult = results[7] as Result<List<String>>;
+    final satResult = results[8] as Result<List<String>>;
 
     final trackPayload = trackResult.valueOrNull;
     final probability = probabilityResult.valueOrNull;
     final warning = warningResult.valueOrNull;
     final index = indexResult.valueOrNull;
     final images = imagesResult.valueOrNull ?? const <int>[];
-    final history = historyResult.valueOrNull ?? const <int>[];
     _radarSecs = _ascendingSecs(radarResult.valueOrNull);
     _satSecs = _ascendingSecs(satResult.valueOrNull);
 
@@ -233,17 +220,20 @@ class TyphoonMapLayer implements MapLayer {
     selectedCycloneKey.value = key;
     _applySelection(key);
 
-    imageFrames.value = images;
-    selectedFrame.value = images.isEmpty ? 0 : images.length - 1;
-    historyFrames.value = history;
-    selectedHistory.value = null;
-
     final overlay = _buildLiveGeo();
     _parsePoints(overlay);
 
     await _removeFromMap(controller);
-    if (images.isNotEmpty) {
-      await _addImage(controller, images.last);
+    final bulletin = bulletinSecond;
+    final sortedImages = _ascendingImageSecs(images);
+    final imageSec = bulletin == null
+        ? (sortedImages.isEmpty ? null : sortedImages.last)
+        : closestAtOrBefore(sortedImages, bulletin);
+    if (imageSec != null) {
+      await _addImage(controller, imageSec);
+      Log.info('Typhoon satellite image @ $imageSec (bulletin $bulletin)');
+    } else if (images.isNotEmpty) {
+      Log.warning('Typhoon satellite: no image ≤ bulletin $bulletin; skipping');
     }
     await _addWarningAreas(controller, _warningNames);
     await _addVectorOverlay(controller, overlay);
@@ -251,9 +241,8 @@ class TyphoonMapLayer implements MapLayer {
     _added = true;
   }
 
-  /// Bulletin clock for weather-tile alignment / sheet "資料時間".
-  int? get bulletinSecond =>
-      selectedHistory.value ?? track.value?.updated ?? summary.value?.time;
+  /// Bulletin clock for weather-tile alignment (always the live report).
+  int? get bulletinSecond => track.value?.updated ?? summary.value?.time;
 
   int? get _bulletinSecond => bulletinSecond;
 
@@ -277,11 +266,6 @@ class TyphoonMapLayer implements MapLayer {
     tapRevision.value++;
     final controller = _controller;
     if (controller == null || !_added) return;
-    final hist = selectedHistory.value;
-    if (hist != null) {
-      _queue(() => _applyHistory(controller, hist));
-      return;
-    }
     _queue(() async {
       final geo = _buildLiveGeo();
       _parsePoints(geo);
@@ -335,19 +319,16 @@ class TyphoonMapLayer implements MapLayer {
             direction: t.now?.direction,
           );
         }();
-    // Live warning only — history path sets warning from warningAt.
-    if (selectedHistory.value == null) {
-      final w = _rawWarning;
-      final s = summary.value;
-      if (w != null &&
-          s != null &&
-          warningAppliesTo(w, name: s.name, cwaName: s.cwaName)) {
-        warning.value = w;
-        _warningNames = [for (final a in w.areas) a.name];
-      } else {
-        warning.value = null;
-        _warningNames = const [];
-      }
+    final w = _rawWarning;
+    final s = summary.value;
+    if (w != null &&
+        s != null &&
+        warningAppliesTo(w, name: s.name, cwaName: s.cwaName)) {
+      warning.value = w;
+      _warningNames = [for (final a in w.areas) a.name];
+    } else {
+      warning.value = null;
+      _warningNames = const [];
     }
   }
 
@@ -396,86 +377,6 @@ class TyphoonMapLayer implements MapLayer {
       );
     }
     return emptyTyphoonFeatureCollection;
-  }
-
-  /// Scrub dataset history — rebuilds the vector overlay from typed snapshots.
-  void selectHistory(int? second) {
-    selectedHistory.value = second;
-    clearForecastSelection();
-    final controller = _controller;
-    if (controller == null || !_added) return;
-    _queue(() => _applyHistory(controller, second));
-  }
-
-  Future<void> _applyHistory(
-    MapLibreMapController controller,
-    int? second,
-  ) async {
-    if (second == null) {
-      // Back to live — re-fetch latest bundle.
-      final geoR = await _repository.geojson();
-      final trackR = await _repository.track();
-      final potR = await _repository.potential();
-      final probR = await _repository.probability();
-      final warnR = await _repository.warning();
-      _geoResult = geoR;
-      _potential = potR.valueOrNull;
-      _rawWarning = warnR.valueOrNull;
-      track.value = trackR.valueOrNull;
-      probability.value = probR.valueOrNull;
-      _applySelection(selectedCycloneKey.value);
-      final geo = _buildLiveGeo();
-      _parsePoints(geo);
-      await _addWarningAreas(controller, _warningNames);
-      await controller.setGeoJsonSource(_src, geo);
-      await _syncWeatherOverlay(controller);
-      return;
-    }
-
-    final results = await Future.wait([
-      _repository.trackAt(second),
-      _repository.potentialAt(second),
-      _repository.probabilityAt(second),
-      _repository.warningAt(second),
-    ]);
-    final trackR = results[0] as Result<TrackPayload>;
-    final potR = results[1] as Result<TyphoonPotential>;
-    final probR = results[2] as Result<TyphoonProbability>;
-    final warnR = results[3] as Result<TyphoonWarning>;
-
-    final pot = potR.valueOrNull;
-    final prob = probR.valueOrNull;
-    if (pot == null || prob == null) {
-      Log.warning(
-        'Typhoon history $second incomplete; keeping current overlay',
-      );
-      return;
-    }
-    track.value = trackR.valueOrNull;
-    probability.value = prob;
-    // Keep selection; rebuild summary fields from history track if needed.
-    _applySelection(selectedCycloneKey.value);
-    final s = summary.value;
-    final histWarn = warnR.valueOrNull;
-    if (histWarn != null &&
-        s != null &&
-        warningAppliesTo(histWarn, name: s.name, cwaName: s.cwaName)) {
-      warning.value = histWarn;
-      _warningNames = [for (final a in histWarn.areas) a.name];
-    } else {
-      warning.value = null;
-      _warningNames = const [];
-    }
-    final geo = typhoonFeatureCollection(
-      potential: pot,
-      probability: prob,
-      selected: _selectedTrack,
-      cyclones: _cyclones,
-    );
-    _parsePoints(geo);
-    await _addWarningAreas(controller, _warningNames);
-    await controller.setGeoJsonSource(_src, geo);
-    await _syncWeatherOverlay(controller);
   }
 
   Future<void> _addVectorOverlay(
@@ -871,13 +772,10 @@ class TyphoonMapLayer implements MapLayer {
     kind,
   ];
 
-  void showFrame(int index) {
-    final frames = imageFrames.value;
-    if (index < 0 || index >= frames.length) return;
-    selectedFrame.value = index;
-    final controller = _controller;
-    if (controller == null || !_added) return;
-    _queue(() => _addImage(controller, frames[index]));
+  /// Ascending Unix seconds for typhoon meteor image list alignment.
+  static List<int> _ascendingImageSecs(List<int> images) {
+    if (images.isEmpty) return const [];
+    return List<int>.of(images)..sort();
   }
 
   Future<void> _addImage(MapLibreMapController controller, int second) async {

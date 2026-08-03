@@ -98,7 +98,6 @@ class _TyphoonForecastCalloutOverlayState
     super.initState();
     widget.layer.track.addListener(_schedule);
     widget.layer.selectedCycloneKey.addListener(_schedule);
-    widget.layer.selectedHistory.addListener(_schedule);
     widget.layer.tapped.addListener(_schedule);
     widget.layer.suppressCallouts.addListener(_onSuppress);
     widget.layer.showForecastCallouts.addListener(_onToggleCallouts);
@@ -122,7 +121,6 @@ class _TyphoonForecastCalloutOverlayState
     _boundController?.removeListener(_onController);
     widget.layer.track.removeListener(_schedule);
     widget.layer.selectedCycloneKey.removeListener(_schedule);
-    widget.layer.selectedHistory.removeListener(_schedule);
     widget.layer.tapped.removeListener(_schedule);
     widget.layer.suppressCallouts.removeListener(_onSuppress);
     widget.layer.showForecastCallouts.removeListener(_onToggleCallouts);
@@ -211,8 +209,7 @@ class _TyphoonForecastCalloutOverlayState
     late final List<math.Point<num>> screens;
     try {
       screens = await controller.toScreenLocationBatch([
-        for (final f in ordered)
-          LatLng(f.latitude, f.longitude),
+        for (final f in ordered) LatLng(f.latitude, f.longitude),
       ]);
     } catch (_) {
       if (mounted && gen == _gen) setState(() => _placed = const []);
@@ -242,15 +239,13 @@ class _TyphoonForecastCalloutOverlayState
 
     final placed = <_PlacedCallout>[];
     final boxes = <Rect>[];
-    final tappedTau =
-        widget.layer.forecastForLabel(widget.layer.tapped.value)?.tau;
+    final tappedTau = widget.layer
+        .forecastForLabel(widget.layer.tapped.value)
+        ?.tau;
 
     for (var k = 0; k < picked.length; k++) {
       final i = picked[k];
-      final anchor = Offset(
-        screens[i].x.toDouble(),
-        screens[i].y.toDouble(),
-      );
+      final anchor = Offset(screens[i].x.toDouble(), screens[i].y.toDouble());
       if (anchor.dx < -40 ||
           anchor.dy < -40 ||
           anchor.dx > size.width + 40 ||
@@ -321,28 +316,16 @@ class ForecastCalloutData {
   factory ForecastCalloutData.from(TrackForecast f) {
     final rows = <({String label, String value})>[];
     if (f.pressure != null) {
-      rows.add((
-        label: '中心氣壓',
-        value: '${f.pressure!.toStringAsFixed(0)} 百帕',
-      ));
+      rows.add((label: '中心氣壓', value: '${f.pressure!.toStringAsFixed(0)} 百帕'));
     }
     if (f.wind != null) {
-      rows.add((
-        label: '最大風速',
-        value: '每秒 ${f.wind!.toStringAsFixed(0)} 公尺',
-      ));
+      rows.add((label: '最大風速', value: '每秒 ${f.wind!.toStringAsFixed(0)} 公尺'));
     }
     if (f.gust != null) {
-      rows.add((
-        label: '瞬間陣風',
-        value: '每秒 ${f.gust!.toStringAsFixed(0)} 公尺',
-      ));
+      rows.add((label: '瞬間陣風', value: '每秒 ${f.gust!.toStringAsFixed(0)} 公尺'));
     }
     if (f.speed != null) {
-      rows.add((
-        label: '移動時速',
-        value: '${f.speed!.toStringAsFixed(0)} 公里／時',
-      ));
+      rows.add((label: '移動時速', value: '${f.speed!.toStringAsFixed(0)} 公里／時'));
     }
     final dir = compassDirection(f.direction);
     if (dir != null) {
@@ -351,10 +334,7 @@ class ForecastCalloutData {
       rows.add((label: '移動方向', value: f.direction!));
     }
     if (f.r15 != null) {
-      rows.add((
-        label: '七級風半徑',
-        value: '${f.r15!.toStringAsFixed(0)} 公里',
-      ));
+      rows.add((label: '七級風半徑', value: '${f.r15!.toStringAsFixed(0)} 公里'));
     }
     String? note;
     final state = f.state;
@@ -407,8 +387,10 @@ String compactForecastCalloutText(TrackForecast forecast) {
       viewport.width - chipW - 4,
     );
     final y = above
-        ? (anchor.dy - chipH - _leaderGap)
-              .clamp(4.0, viewport.height - chipH - 4)
+        ? (anchor.dy - chipH - _leaderGap).clamp(
+            4.0,
+            viewport.height - chipH - 4,
+          )
         : (anchor.dy + _leaderGap).clamp(4.0, viewport.height - chipH - 4);
     return Offset(x, y);
   }
