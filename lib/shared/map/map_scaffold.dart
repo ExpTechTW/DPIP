@@ -433,7 +433,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return FrostedSurface(
-      borderRadius: AppRadius.topSheet,
+      borderRadius: AppRadius.large,
       child: Material(
         type: MaterialType.transparency,
         child: Padding(
@@ -469,7 +469,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   Widget _timelinePanel(BuildContext context) {
     return FrostedSurface(
-      borderRadius: AppRadius.topSheet,
+      borderRadius: AppRadius.large,
       child: Padding(
         // The bottom-nav clearance is the SafeArea wrapper's job (see build);
         // adding MediaQuery's bottom inset here too made the panel very tall.

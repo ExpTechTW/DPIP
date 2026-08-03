@@ -103,35 +103,45 @@ class MapLayerSwitcher extends StatelessWidget {
           builder: (context, scrollController) {
             return FrostedSurface(
               borderRadius: AppRadius.topSheet,
-              child: ListView(
-                controller: scrollController,
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  0,
-                  AppSpacing.md,
-                  AppSpacing.md + bottomInset,
-                ),
+              child: Column(
                 children: [
                   const _Grip(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.sm,
+                      AppSpacing.md,
                       0,
-                      AppSpacing.sm,
+                      AppSpacing.md,
                       AppSpacing.md,
                     ),
-                    child: Text(
-                      l10n.mapLayers,
-                      style: theme.textTheme.titleMedium,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        l10n.mapLayers,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium,
+                      ),
                     ),
                   ),
-                  for (final layer in layers)
-                    _LayerTile(
-                      layer: layer,
-                      selected: layer.id == active.id,
-                      colors: colors,
-                      onTap: () => Navigator.of(sheetContext).pop(layer),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      padding: EdgeInsets.fromLTRB(
+                        AppSpacing.md,
+                        0,
+                        AppSpacing.md,
+                        AppSpacing.md + bottomInset,
+                      ),
+                      children: [
+                        for (final layer in layers)
+                          _LayerTile(
+                            layer: layer,
+                            selected: layer.id == active.id,
+                            colors: colors,
+                            onTap: () => Navigator.of(sheetContext).pop(layer),
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             );
