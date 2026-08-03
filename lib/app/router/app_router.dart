@@ -115,13 +115,19 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.regionSelectPath,
       name: AppRoutes.regionSelect,
-      builder: (_, _) => const RegionSelectPage(),
+      builder: (_, state) => RegionSelectPage(
+        replaceCode: state.uri.queryParameters['replace'],
+        returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+      ),
       routes: [
         GoRoute(
           path: AppRoutes.regionSelectCityPath,
           name: AppRoutes.regionSelectCity,
-          builder: (_, state) =>
-              RegionCityPage(city: state.pathParameters['city']!),
+          builder: (_, state) => RegionCityPage(
+            city: state.pathParameters['city']!,
+            replaceCode: state.uri.queryParameters['replace'],
+            returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+          ),
         ),
       ],
     ),

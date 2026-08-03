@@ -1,11 +1,14 @@
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// "More" menu — external ExpTech resources plus advanced tools, grouped into
@@ -40,11 +43,7 @@ class MorePage extends StatelessWidget {
           SectionHeader(l10n.moreSectionGeneral),
           _MoreGroup(
             children: [
-              _MoreTile(
-                icon: Icons.pin_drop_outlined,
-                title: l10n.regionManageTitle,
-                onTap: () => context.pushNamed(AppRoutes.regionManage),
-              ),
+              const _SavedRegionsTile(),
               _MoreTile(
                 icon: Icons.translate_outlined,
                 title: l10n.languageSettings,
@@ -212,7 +211,7 @@ class _MoreGroup extends StatelessWidget {
           ),
         );
       }
-      rows.add(children[i]);
+      rows.add(Material(type: MaterialType.transparency, child: children[i]));
     }
     // Material (not DecoratedBox) so ListTile ink paints on this ancestor —
     // a colored DecoratedBox between tile and Material asserts in debug.
@@ -252,6 +251,197 @@ class _MoreTile extends StatelessWidget {
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
+    );
+  }
+}
+
+class _SavedRegionsTile extends StatefulWidget {
+  const _SavedRegionsTile();
+
+  @override
+  State<_SavedRegionsTile> createState() => _SavedRegionsTileState();
+}
+
+class _SavedRegionsTileState extends State<_SavedRegionsTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final store = context.watch<RegionStore>();
+    final saved = store.savedCodes;
+    final canAdd = saved.length < RegionStore.maxSaved;
+
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.pin_drop_outlined),
+          title: Text(l10n.regionManageTitle),
+          trailing: Icon(
+            _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+          ),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.medium),
+          onTap: () => setState(() => _expanded = !_expanded),
+        ),
+        AnimatedCrossFade(
+          firstChild: const SizedBox(width: double.infinity),
+          secondChild: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
+            child: Column(
+              children: [
+                if (saved.isEmpty)
+                  _SavedRegionEmpty(message: l10n.regionEmpty)
+                else
+                  for (final code in saved)
+                    _SavedRegionRow(
+                      code: code,
+                      onTap: () => _showRegionActions(context, code),
+                    ),
+                if (canAdd) ...[
+                  if (saved.isNotEmpty) const SizedBox(height: AppSpacing.xs),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => context.pushNamed(
+                        AppRoutes.regionSelect,
+                        queryParameters: const {'returnToMore': '1'},
+                      ),
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.regionAddButton),
+                    ),
+                  ),
+                ] else
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        l10n.regionSelectCount(
+                          saved.length,
+                          RegionStore.maxSaved,
+                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          crossFadeState: _expanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 180),
+          sizeCurve: Curves.easeOut,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showRegionActions(BuildContext context, String code) async {
+    final directory = context.read<TownDirectory>();
+    final town = directory.byCode(code);
+    final title = town == null ? code : '${town.cityName} ${town.townName}';
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: Text(title)),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('修改'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                context.pushNamed(
+                  AppRoutes.regionSelect,
+                  queryParameters: {'replace': code, 'returnToMore': '1'},
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: Text(
+                MaterialLocalizations.of(context).deleteButtonTooltip,
+              ),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                context.read<RegionStore>().removeSaved(code);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              onTap: () => Navigator.of(sheetContext).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  }
+}
+
+class _SavedRegionRow extends StatelessWidget {
+  const _SavedRegionRow({required this.code, required this.onTap});
+
+  final String code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final directory = context.read<TownDirectory>();
+    final town = directory.byCode(code);
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.small),
+      leading: const Icon(Icons.location_on_outlined),
+      title: Text(town?.townName ?? code),
+      subtitle: Text(town?.cityName ?? ''),
+      trailing: const Icon(Icons.more_horiz),
+      onTap: onTap,
+    );
+  }
+}
+
+class _SavedRegionEmpty extends StatelessWidget {
+  const _SavedRegionEmpty({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 18,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

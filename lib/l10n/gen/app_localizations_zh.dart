@@ -12,7 +12,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageName => '繁體中文(臺灣)';
 
   @override
-  String get navHome => '首頁';
+  String get navHome => '主頁';
 
   @override
   String get navEvents => '事件';
@@ -117,7 +117,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherDynamicState => '天氣動態狀態';
 
   @override
-  String get weatherDynamicStateSubtitle => '覆寫首頁背景天氣';
+  String get weatherDynamicStateSubtitle => '覆寫主頁背景天氣';
 
   @override
   String get weatherModeAuto => '自動';

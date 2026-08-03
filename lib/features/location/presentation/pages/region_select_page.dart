@@ -15,7 +15,13 @@ import 'package:provider/provider.dart';
 /// a star, and the header shows how many of the [RegionStore.maxSaved] slots are
 /// used — so the whole selection is legible from the top level.
 class RegionSelectPage extends StatelessWidget {
-  const RegionSelectPage({super.key});
+  const RegionSelectPage({super.key, this.replaceCode, this.returnToMore});
+
+  /// 選擇一個區域會替換掉之前的
+  final String? replaceCode;
+
+  /// 是否成功選擇後返回頁面
+  final bool? returnToMore;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +29,10 @@ class RegionSelectPage extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final directory = context.read<TownDirectory>();
     final store = context.watch<RegionStore>();
+    final query = GoRouterState.of(context).uri.queryParameters;
+    final effectiveReplaceCode = replaceCode ?? query['replace'];
+    final effectiveReturnToMore =
+        returnToMore == true || query['returnToMore'] == '1';
 
     final cities = directory.cities;
     // Cities that contain at least one saved township, for the star marker.
@@ -55,6 +65,12 @@ class RegionSelectPage extends StatelessWidget {
               onTap: () => context.pushNamed(
                 AppRoutes.regionSelectCity,
                 pathParameters: {'city': city},
+                queryParameters: {
+                  ...?(effectiveReplaceCode == null
+                      ? null
+                      : {'replace': effectiveReplaceCode}),
+                  if (effectiveReturnToMore) 'returnToMore': '1',
+                },
               ),
             ),
         ],
