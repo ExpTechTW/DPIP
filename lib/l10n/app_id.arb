@@ -53,6 +53,7 @@
   "weatherHumidity": "Kelembapan",
   "mapLayers": "Lapisan",
   "mapLayerRadar": "Radar",
+  "mapLayerSatellite": "Satelit",
   "mapTimelineNow": "Sekarang",
   "mapTimelineObserved": "Diamati",
   "notifySettingsMenu": "Pengaturan notifikasi",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "Monitor Seismik",
   "stationSheetEmpty": "Ketuk stasiun untuk melihat bacaannya",
   "monitorDelay": "Latensi {value} s",
-  "monitorWaiting": "Menunggu data…"
+  "monitorWaiting": "Menunggu data…",
+  "mapLegendUnit": "Satuan: {unit}",
+  "typhoonLegendPast": "Jalur aktual",
+  "typhoonLegendForecast": "Jalur prakiraan",
+  "typhoonLegendForecastPoint": "Titik prakiraan",
+  "typhoonLegendCurrent": "Pusat saat ini",
+  "typhoonLegendCone": "Kerucut prakiraan",
+  "mapLegendExpand": "Legenda",
+  "mapLegendCollapse": "Sembunyikan legenda"
 }

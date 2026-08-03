@@ -233,6 +233,10 @@
   "@mapLayerRadar": {
     "description": "Name of the radar echo map layer in the layer picker"
   },
+  "mapLayerSatellite": "Satellite",
+  "@mapLayerSatellite": {
+    "description": "Name of the satellite IR cloud map layer in the layer picker"
+  },
   "mapTimelineNow": "Now",
   "@mapTimelineNow": {
     "description": "Label on the map timeline when the newest (latest) frame is selected"
@@ -614,7 +618,7 @@
   "@mapLayerPressure": {
     "description": "Map layer switcher label for the air-pressure layer"
   },
-  "mapLayerWind": "Wind",
+  "mapLayerWind": "Wind direction",
   "mapLayerTyphoon": "Typhoon",
   "@mapLayerTyphoon": {
     "description": "Layer-switcher label for the typhoon map layer"
@@ -625,7 +629,7 @@
   "typhoonPressure": "Pressure",
   "typhoonMotion": "Moving",
   "@mapLayerWind": {
-    "description": "Map layer switcher label for the wind layer"
+    "description": "Map layer switcher label for the wind-direction layer"
   },
   "mapLayerMonitor": "Seismic Monitor",
   "@mapLayerMonitor": {
@@ -647,5 +651,42 @@
   "monitorWaiting": "Waiting for data…",
   "@monitorWaiting": {
     "description": "Shown in the monitor panel before the first RTS snapshot arrives"
+  },
+  "mapLegendUnit": "Unit: {unit}",
+  "@mapLegendUnit": {
+    "description": "Unit footer under a map colour legend (e.g. Unit: dBZ)",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonLegendPast": "Observed track",
+  "@typhoonLegendPast": {
+    "description": "Typhoon map legend: past/observed path"
+  },
+  "typhoonLegendForecast": "Forecast track",
+  "@typhoonLegendForecast": {
+    "description": "Typhoon map legend: forecast path"
+  },
+  "typhoonLegendForecastPoint": "Forecast point",
+  "@typhoonLegendForecastPoint": {
+    "description": "Typhoon map legend: forecast waypoint"
+  },
+  "typhoonLegendCurrent": "Current centre",
+  "@typhoonLegendCurrent": {
+    "description": "Typhoon map legend: current storm centre"
+  },
+  "typhoonLegendCone": "Forecast cone",
+  "@typhoonLegendCone": {
+    "description": "Typhoon map legend: uncertainty cone"
+  },
+  "mapLegendExpand": "Legend",
+  "@mapLegendExpand": {
+    "description": "Collapsed map-legend chip label / tooltip — tap to expand"
+  },
+  "mapLegendCollapse": "Hide legend",
+  "@mapLegendCollapse": {
+    "description": "Tooltip on the control that collapses the map legend"
   }
 }

@@ -174,6 +174,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerRadar => '雷達回波';
 
   @override
+  String get mapLayerSatellite => '衛星雲圖';
+
+  @override
   String get mapTimelineNow => '現在';
 
   @override
@@ -465,7 +468,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerPressure => '氣壓';
 
   @override
-  String get mapLayerWind => '風';
+  String get mapLayerWind => '風向';
 
   @override
   String get mapLayerTyphoon => '颱風';
@@ -498,6 +501,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get monitorWaiting => '等待資料…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '單位：$unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '實際路徑';
+
+  @override
+  String get typhoonLegendForecast => '預測路徑';
+
+  @override
+  String get typhoonLegendForecastPoint => '預測點';
+
+  @override
+  String get typhoonLegendCurrent => '目前中心';
+
+  @override
+  String get typhoonLegendCone => '預測圓錐';
+
+  @override
+  String get mapLegendExpand => '圖例';
+
+  @override
+  String get mapLegendCollapse => '收合圖例';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -668,6 +697,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerRadar => '雷达回波';
+
+  @override
+  String get mapLayerSatellite => '卫星云图';
 
   @override
   String get mapTimelineNow => '现在';
@@ -961,7 +993,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerPressure => '气压';
 
   @override
-  String get mapLayerWind => '风';
+  String get mapLayerWind => '风向';
 
   @override
   String get mapLayerTyphoon => '台风';
@@ -994,6 +1026,32 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get monitorWaiting => '等待数据…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '单位：$unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '实际路径';
+
+  @override
+  String get typhoonLegendForecast => '预测路径';
+
+  @override
+  String get typhoonLegendForecastPoint => '预测点';
+
+  @override
+  String get typhoonLegendCurrent => '目前中心';
+
+  @override
+  String get typhoonLegendCone => '预测圆锥';
+
+  @override
+  String get mapLegendExpand => '图例';
+
+  @override
+  String get mapLegendCollapse => '收起图例';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1164,6 +1222,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLayerRadar => '雷達回波';
+
+  @override
+  String get mapLayerSatellite => '衛星雲圖';
 
   @override
   String get mapTimelineNow => '現在';
@@ -1457,7 +1518,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerPressure => '氣壓';
 
   @override
-  String get mapLayerWind => '風';
+  String get mapLayerWind => '風向';
 
   @override
   String get mapLayerTyphoon => '颱風';
@@ -1490,4 +1551,30 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get monitorWaiting => '等待資料…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '單位：$unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '實際路徑';
+
+  @override
+  String get typhoonLegendForecast => '預測路徑';
+
+  @override
+  String get typhoonLegendForecastPoint => '預測點';
+
+  @override
+  String get typhoonLegendCurrent => '目前中心';
+
+  @override
+  String get typhoonLegendCone => '預測圓錐';
+
+  @override
+  String get mapLegendExpand => '圖例';
+
+  @override
+  String get mapLegendCollapse => '收合圖例';
 }

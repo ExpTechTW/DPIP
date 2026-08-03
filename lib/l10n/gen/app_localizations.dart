@@ -434,6 +434,12 @@ abstract class AppLocalizations {
   /// **'Radar'**
   String get mapLayerRadar;
 
+  /// Name of the satellite IR cloud map layer in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get mapLayerSatellite;
+
   /// Label on the map timeline when the newest (latest) frame is selected
   ///
   /// In en, this message translates to:
@@ -1004,10 +1010,10 @@ abstract class AppLocalizations {
   /// **'Pressure'**
   String get mapLayerPressure;
 
-  /// Map layer switcher label for the wind layer
+  /// Map layer switcher label for the wind-direction layer
   ///
   /// In en, this message translates to:
-  /// **'Wind'**
+  /// **'Wind direction'**
   String get mapLayerWind;
 
   /// Layer-switcher label for the typhoon map layer
@@ -1069,6 +1075,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waiting for data…'**
   String get monitorWaiting;
+
+  /// Unit footer under a map colour legend (e.g. Unit: dBZ)
+  ///
+  /// In en, this message translates to:
+  /// **'Unit: {unit}'**
+  String mapLegendUnit(String unit);
+
+  /// Typhoon map legend: past/observed path
+  ///
+  /// In en, this message translates to:
+  /// **'Observed track'**
+  String get typhoonLegendPast;
+
+  /// Typhoon map legend: forecast path
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast track'**
+  String get typhoonLegendForecast;
+
+  /// Typhoon map legend: forecast waypoint
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast point'**
+  String get typhoonLegendForecastPoint;
+
+  /// Typhoon map legend: current storm centre
+  ///
+  /// In en, this message translates to:
+  /// **'Current centre'**
+  String get typhoonLegendCurrent;
+
+  /// Typhoon map legend: uncertainty cone
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast cone'**
+  String get typhoonLegendCone;
+
+  /// Collapsed map-legend chip label / tooltip — tap to expand
+  ///
+  /// In en, this message translates to:
+  /// **'Legend'**
+  String get mapLegendExpand;
+
+  /// Tooltip on the control that collapses the map legend
+  ///
+  /// In en, this message translates to:
+  /// **'Hide legend'**
+  String get mapLegendCollapse;
 }
 
 class _AppLocalizationsDelegate

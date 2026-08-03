@@ -7,9 +7,12 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
+import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -46,6 +49,15 @@ class WindMapLayer extends WeatherStationLayer {
   @override
   List<double?> trendOf(WeatherTrend trend) => trend.windSpeed;
 
+  /// Speed curve + parallel direction series so the sheet chart can draw
+  /// wind-barbs on the line (plain speed-only charts hide the whole point).
+  @override
+  TrendSeries seriesOf(WeatherTrend trend) => TrendSeries(
+    times: trend.times,
+    values: trend.windSpeed,
+    directions: trend.windDirection,
+  );
+
   // Arrows replace the dots (legacy) — the direction is the whole point.
   @override
   bool get drawCircle => false;
@@ -81,6 +93,8 @@ class WindMapLayer extends WeatherStationLayer {
         // Size scales with wind speed (bigger = stronger) and with zoom. Zoom
         // must be the OUTERMOST interpolate input (MapLibre only allows [zoom]
         // at the top level), with the speed interpolate nested per zoom stop.
+        // Tuned for the 96 px glyph: ~32–80 px on screen at Taiwan overview
+        // zooms. The previous 48 px glyph + 0.18 floors made calm arrows ~9 px.
         iconSize: <Object>[
           'interpolate',
           <Object>['linear'],
@@ -91,15 +105,15 @@ class WindMapLayer extends WeatherStationLayer {
             <Object>['linear'],
             <Object>['get', 'value'],
             0.0,
-            0.18,
+            0.35,
             3.4,
-            0.22,
+            0.42,
             8.0,
-            0.28,
+            0.52,
             13.9,
-            0.34,
+            0.65,
             32.7,
-            0.48,
+            0.85,
           ],
           11,
           <Object>[
@@ -107,15 +121,15 @@ class WindMapLayer extends WeatherStationLayer {
             <Object>['linear'],
             <Object>['get', 'value'],
             0.0,
-            0.45,
+            0.70,
             3.4,
-            0.55,
+            0.85,
             8.0,
-            0.68,
+            1.05,
             13.9,
-            0.82,
+            1.30,
             32.7,
-            1.20,
+            1.70,
           ],
         ],
         iconAllowOverlap: true,
@@ -151,14 +165,16 @@ class WindMapLayer extends WeatherStationLayer {
   /// an SDF icon: MapLibre tints it via `iconColor` and spins it via
   /// `iconRotate`, so one image serves every speed and bearing.
   Future<Uint8List> _renderArrow() async {
-    const size = 48;
+    // 96 px base so iconSize ≈ 0.5–1.5 reads as a clear arrow (48 px + the
+    // old 0.18 floors was sub-10 px on calm stations).
+    const size = 96;
     const icon = Icons.navigation;
     final painter = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(
         text: String.fromCharCode(icon.codePoint),
         style: TextStyle(
-          fontSize: 40,
+          fontSize: 80,
           fontFamily: icon.fontFamily,
           package: icon.fontPackage,
           color: const Color(0xFFFFFFFF),
@@ -207,4 +223,45 @@ class WindMapLayer extends WeatherStationLayer {
     (13.9, '#8000FF'),
     (32.7, '#FF006B'),
   ];
+
+  /// Discrete speed buckets (strongest first) — same thresholds / colours as
+  /// the arrow `step`, with a navigation glyph so the legend matches the map.
+  @override
+  Widget buildLegend(BuildContext context) {
+    const rows = <(String, String)>[
+      ('≥ 32.7', '#FF006B'),
+      ('13.9 – 32.6', '#8000FF'),
+      ('8.0 – 13.8', '#0085FF'),
+      ('3.4 – 7.9', '#00FFF0'),
+      ('0.1 – 3.3', '#FFFFFF'),
+    ];
+    final outline = Theme.of(context).colorScheme.outline;
+    return MapLegendCard(
+      child: SymbolLegend(
+        unit: unit,
+        items: [
+          for (final (label, hex) in rows)
+            SymbolLegendItem(
+              // Dark disc behind pale / white glyphs so they stay readable on
+              // the frosted card (map arrows sit on tiles, not surface).
+              swatch: Container(
+                width: 18,
+                height: 18,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: outline.withValues(alpha: 0.35),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.navigation,
+                  size: 14,
+                  color: colorFromHexRgb(hex) ?? Colors.white,
+                ),
+              ),
+              label: label,
+            ),
+        ],
+      ),
+    );
+  }
 }

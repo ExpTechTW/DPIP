@@ -12,6 +12,7 @@ import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -176,6 +177,13 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   Widget buildSheet(BuildContext context) =>
       StationSheet(key: ValueKey(id), source: this);
 
+  /// Colour scale from [colorStops] + [unit] — one legend for every station
+  /// value layer (temperature / humidity / pressure); wind overrides.
+  @override
+  Widget buildLegend(BuildContext context) => MapLegendCard(
+    child: ColorScaleLegend(stops: colorStops, unit: unit, appendUnit: true),
+  );
+
   @override
   Future<void> clear(MapLibreMapController controller) async {
     await _removeFromMap(controller);
@@ -250,8 +258,14 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   @override
   Future<Result<TrendSeries>> trend(String id, String range) async {
     final result = await _repository.trend(id, range: range);
-    return result.map((t) => TrendSeries(times: t.times, values: trendOf(t)));
+    return result.map(seriesOf);
   }
+
+  /// Builds the sheet's trend payload from a decoded [WeatherTrend]. Wind
+  /// overrides to attach the parallel direction series.
+  @protected
+  TrendSeries seriesOf(WeatherTrend trend) =>
+      TrendSeries(times: trend.times, values: trendOf(trend));
 
   @override
   void close() => _selected.value = null;

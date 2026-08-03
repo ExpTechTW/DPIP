@@ -53,6 +53,7 @@
   "weatherHumidity": "濕度",
   "mapLayers": "圖層",
   "mapLayerRadar": "雷達回波",
+  "mapLayerSatellite": "衛星雲圖",
   "mapTimelineNow": "現在",
   "mapTimelineObserved": "觀測",
   "notifySettingsMenu": "通知設定",
@@ -148,7 +149,7 @@
   "trendNoData": "沒有趨勢資料",
   "mapLayerHumidity": "濕度",
   "mapLayerPressure": "氣壓",
-  "mapLayerWind": "風",
+  "mapLayerWind": "風向",
   "mapLayerTyphoon": "颱風",
   "typhoonNoActive": "目前無颱風",
   "typhoonWind": "風速",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "強震監視器",
   "stationSheetEmpty": "點選任一測站查看觀測值",
   "monitorDelay": "延遲 {value} s",
-  "monitorWaiting": "等待資料…"
+  "monitorWaiting": "等待資料…",
+  "mapLegendUnit": "單位：{unit}",
+  "typhoonLegendPast": "實際路徑",
+  "typhoonLegendForecast": "預測路徑",
+  "typhoonLegendForecastPoint": "預測點",
+  "typhoonLegendCurrent": "目前中心",
+  "typhoonLegendCone": "預測圓錐",
+  "mapLegendExpand": "圖例",
+  "mapLegendCollapse": "收合圖例"
 }

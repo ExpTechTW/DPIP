@@ -175,6 +175,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerRadar => 'Radar';
 
   @override
+  String get mapLayerSatellite => 'Vệ tinh';
+
+  @override
   String get mapTimelineNow => 'Bây giờ';
 
   @override
@@ -511,4 +514,30 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Đang chờ dữ liệu…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Đơn vị: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Quỹ đạo thực tế';
+
+  @override
+  String get typhoonLegendForecast => 'Quỹ đạo dự báo';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Điểm dự báo';
+
+  @override
+  String get typhoonLegendCurrent => 'Tâm hiện tại';
+
+  @override
+  String get typhoonLegendCone => 'Nón dự báo';
+
+  @override
+  String get mapLegendExpand => 'Chú giải';
+
+  @override
+  String get mapLegendCollapse => 'Ẩn chú giải';
 }

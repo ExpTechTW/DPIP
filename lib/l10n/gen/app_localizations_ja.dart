@@ -174,6 +174,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerRadar => 'レーダー';
 
   @override
+  String get mapLayerSatellite => '衛星雲';
+
+  @override
   String get mapTimelineNow => '現在';
 
   @override
@@ -469,7 +472,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerPressure => '気圧';
 
   @override
-  String get mapLayerWind => '風';
+  String get mapLayerWind => '風向';
 
   @override
   String get mapLayerTyphoon => '台風';
@@ -502,4 +505,30 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'データ待機中…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '単位：$unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '実況経路';
+
+  @override
+  String get typhoonLegendForecast => '予報経路';
+
+  @override
+  String get typhoonLegendForecastPoint => '予報点';
+
+  @override
+  String get typhoonLegendCurrent => '現在中心';
+
+  @override
+  String get typhoonLegendCone => '予報円';
+
+  @override
+  String get mapLegendExpand => '凡例';
+
+  @override
+  String get mapLegendCollapse => '凡例を閉じる';
 }

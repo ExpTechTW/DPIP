@@ -175,6 +175,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerRadar => 'Radar';
 
   @override
+  String get mapLayerSatellite => 'Satelit';
+
+  @override
   String get mapTimelineNow => 'Sekarang';
 
   @override
@@ -512,4 +515,30 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Menunggu data…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Satuan: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Jalur aktual';
+
+  @override
+  String get typhoonLegendForecast => 'Jalur prakiraan';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Titik prakiraan';
+
+  @override
+  String get typhoonLegendCurrent => 'Pusat saat ini';
+
+  @override
+  String get typhoonLegendCone => 'Kerucut prakiraan';
+
+  @override
+  String get mapLegendExpand => 'Legenda';
+
+  @override
+  String get mapLegendCollapse => 'Sembunyikan legenda';
 }

@@ -13,6 +13,7 @@ import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -277,6 +278,48 @@ class TyphoonMapLayer implements MapLayer {
   Widget buildSheet(BuildContext context) =>
       TyphoonPanel(key: const ValueKey('typhoon'), layer: this);
 
+  /// Track / cone / centre key — colours match the vector layers above.
+  @override
+  Widget buildLegend(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MapLegendCard(
+      child: SymbolLegend(
+        items: [
+          SymbolLegendItem(
+            swatch: const _TrackSwatch(color: Color(0xFFB0BEC5), dashed: false),
+            label: l10n.typhoonLegendPast,
+          ),
+          SymbolLegendItem(
+            swatch: const _TrackSwatch(color: Color(0xFFEF5350), dashed: true),
+            label: l10n.typhoonLegendForecast,
+          ),
+          SymbolLegendItem(
+            swatch: const _DotSwatch(color: Color(0xFFFF7043)),
+            label: l10n.typhoonLegendForecastPoint,
+          ),
+          SymbolLegendItem(
+            swatch: const _DotSwatch(color: Color(0xFFD32F2F), size: 10),
+            label: l10n.typhoonLegendCurrent,
+          ),
+          SymbolLegendItem(
+            swatch: Container(
+              width: 16,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF5252).withValues(alpha: 0.25),
+                border: Border.all(
+                  color: const Color(0xFFFF5252).withValues(alpha: 0.7),
+                ),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            label: l10n.typhoonLegendCone,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Future<void> clear(MapLibreMapController controller) async {
     await _removeFromMap(controller);
@@ -334,6 +377,76 @@ class TyphoonMapLayer implements MapLayer {
     _ops = _ops.then((_) => op()).catchError((Object e, StackTrace st) {
       Log.handle(e, st, 'Typhoon layer op failed');
     });
+  }
+}
+
+/// A short solid or dashed line mark for the typhoon track legend.
+class _TrackSwatch extends StatelessWidget {
+  const _TrackSwatch({required this.color, required this.dashed});
+
+  final Color color;
+  final bool dashed;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(16, 10),
+      painter: _TrackPainter(color: color, dashed: dashed),
+    );
+  }
+}
+
+class _TrackPainter extends CustomPainter {
+  _TrackPainter({required this.color, required this.dashed});
+
+  final Color color;
+  final bool dashed;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final y = size.height / 2;
+    if (!dashed) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+      return;
+    }
+    const dash = 3.0;
+    const gap = 2.0;
+    var x = 0.0;
+    while (x < size.width) {
+      final end = math.min(x + dash, size.width);
+      canvas.drawLine(Offset(x, y), Offset(end, y), paint);
+      x += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TrackPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.dashed != dashed;
+}
+
+/// A filled circle mark for forecast / current-centre legend rows.
+class _DotSwatch extends StatelessWidget {
+  const _DotSwatch({required this.color, this.size = 8});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 1),
+      ),
+    );
   }
 }
 

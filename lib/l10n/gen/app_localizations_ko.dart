@@ -174,6 +174,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerRadar => '레이더';
 
   @override
+  String get mapLayerSatellite => '위성 영상';
+
+  @override
   String get mapTimelineNow => '현재';
 
   @override
@@ -502,4 +505,30 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get monitorWaiting => '데이터 대기 중…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '단위: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '실황 경로';
+
+  @override
+  String get typhoonLegendForecast => '예보 경로';
+
+  @override
+  String get typhoonLegendForecastPoint => '예보 지점';
+
+  @override
+  String get typhoonLegendCurrent => '현재 중심';
+
+  @override
+  String get typhoonLegendCone => '예보 원추';
+
+  @override
+  String get mapLegendExpand => '범례';
+
+  @override
+  String get mapLegendCollapse => '범례 숨기기';
 }

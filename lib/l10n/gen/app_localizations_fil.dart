@@ -176,6 +176,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerRadar => 'Radar';
 
   @override
+  String get mapLayerSatellite => 'Satellite';
+
+  @override
   String get mapTimelineNow => 'Ngayon';
 
   @override
@@ -512,4 +515,30 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Naghihintay ng data…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Yunit: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Aktwal na landas';
+
+  @override
+  String get typhoonLegendForecast => 'Tinatayang landas';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Punto ng forecast';
+
+  @override
+  String get typhoonLegendCurrent => 'Kasalukuyang sentro';
+
+  @override
+  String get typhoonLegendCone => 'Kono ng forecast';
+
+  @override
+  String get mapLegendExpand => 'Alamat';
+
+  @override
+  String get mapLegendCollapse => 'Itago ang alamat';
 }

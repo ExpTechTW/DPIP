@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
@@ -12,9 +13,14 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
+
+/// Matches the home sheet's rest frosted chrome (`HomeSheet` blur / alpha).
+const double _timelineBlurSigma = 24;
+const double _timelineSurfaceAlpha = 0.85;
 
 /// Ambient tile-cache ceiling for the live map — well above MapLibre's ~50 MB
 /// native default so a week of small WebP radar frames (plus base tiles) stays
@@ -372,11 +378,39 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             onMapClick: (_, latLng) => _onMapClick(latLng),
           ),
         ),
-        // A sheet layer's own collapsible detail sheet (empty until a tap).
+        // Colour / key legend — top-left. Under the sheet so a dragged-up
+        // sheet covers it instead of sitting behind a floating chip.
+        Positioned(
+          top: 0,
+          left: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: CollapsibleMapLegend(
+                key: ValueKey(_active.id),
+                legend: _active.buildLegend(context),
+              ),
+            ),
+          ),
+        ),
+        // Layer switcher — top-right; same z-order rule as the legend.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MapLayerSwitcher(
+                layers: widget.layers,
+                active: _active,
+                onSelected: _onLayerSelected,
+              ),
+            ),
+          ),
+        ),
+        // Sheet / timeline last so they paint above the chrome when expanded.
         if (!_active.usesTimeline)
           Positioned.fill(child: _active.buildSheet(context)),
-        // A timeline layer's bottom scrubber / error strip. Keyed so its real
-        // height can be measured and subtracted when framing.
         if (_active.usesTimeline)
           Positioned(
             left: 0,
@@ -392,21 +426,6 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
                   : const SizedBox.shrink(),
             ),
           ),
-        // Layer switcher — top-right, always above the sheet / timeline.
-        Positioned(
-          top: 0,
-          right: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: MapLayerSwitcher(
-                layers: widget.layers,
-                active: _active,
-                onSelected: _onLayerSelected,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -417,9 +436,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Material(
-      color: colors.surface.withValues(alpha: 0.92),
-      borderRadius: AppRadius.topSheet,
+    return _frostedBottomPanel(
+      context: context,
       child: Padding(
         // The bottom-nav clearance is the SafeArea wrapper's job (see build);
         // adding MediaQuery's bottom inset here too double-counted it.
@@ -451,10 +469,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   Widget _timelinePanel(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Material(
-      color: colors.surface.withValues(alpha: 0.92),
-      borderRadius: AppRadius.topSheet,
+    return _frostedBottomPanel(
+      context: context,
       child: Padding(
         // The bottom-nav clearance is the SafeArea wrapper's job (see build);
         // adding MediaQuery's bottom inset here too made the panel very tall.
@@ -463,6 +479,40 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           frames: _frames,
           selectedIndex: _selectedIndex,
           onSelected: _onFrameSelected,
+        ),
+      ),
+    );
+  }
+
+  /// Frosted chrome over the map — same BackdropFilter recipe as the home
+  /// sheet at rest (sigma 24, surface @ 0.85).
+  Widget _frostedBottomPanel({
+    required BuildContext context,
+    required Widget child,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: AppRadius.topSheet,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: AppRadius.topSheet,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: _timelineBlurSigma,
+            sigmaY: _timelineBlurSigma,
+          ),
+          child: Material(
+            color: colors.surface.withValues(alpha: _timelineSurfaceAlpha),
+            child: child,
+          ),
         ),
       ),
     );

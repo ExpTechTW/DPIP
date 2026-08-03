@@ -53,6 +53,7 @@
   "weatherHumidity": "ความชื้น",
   "mapLayers": "ชั้นข้อมูล",
   "mapLayerRadar": "เรดาร์",
+  "mapLayerSatellite": "ภาพถ่ายดาวเทียม",
   "mapTimelineNow": "ตอนนี้",
   "mapTimelineObserved": "เวลาตรวจวัด",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "เครื่องตรวจแผ่นดินไหว",
   "stationSheetEmpty": "แตะสถานีเพื่อดูค่าที่วัดได้",
   "monitorDelay": "หน่วงเวลา {value} s",
-  "monitorWaiting": "กำลังรอข้อมูล…"
+  "monitorWaiting": "กำลังรอข้อมูล…",
+  "mapLegendUnit": "หน่วย: {unit}",
+  "typhoonLegendPast": "เส้นทางจริง",
+  "typhoonLegendForecast": "เส้นทางพยากรณ์",
+  "typhoonLegendForecastPoint": "จุดพยากรณ์",
+  "typhoonLegendCurrent": "ศูนย์กลางปัจจุบัน",
+  "typhoonLegendCone": "กรวยพยากรณ์",
+  "mapLegendExpand": "คำอธิบาย",
+  "mapLegendCollapse": "ซ่อนคำอธิบาย"
 }

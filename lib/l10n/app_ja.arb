@@ -53,6 +53,7 @@
   "weatherHumidity": "湿度",
   "mapLayers": "レイヤー",
   "mapLayerRadar": "レーダー",
+  "mapLayerSatellite": "衛星雲",
   "mapTimelineNow": "現在",
   "mapTimelineObserved": "観測",
   "notifySettingsMenu": "通知設定",
@@ -148,7 +149,7 @@
   "trendNoData": "トレンドデータがありません",
   "mapLayerHumidity": "湿度",
   "mapLayerPressure": "気圧",
-  "mapLayerWind": "風",
+  "mapLayerWind": "風向",
   "mapLayerTyphoon": "台風",
   "typhoonNoActive": "発生中の台風なし",
   "typhoonWind": "風速",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "強震モニタ",
   "stationSheetEmpty": "観測点をタップして値を表示",
   "monitorDelay": "遅延 {value} s",
-  "monitorWaiting": "データ待機中…"
+  "monitorWaiting": "データ待機中…",
+  "mapLegendUnit": "単位：{unit}",
+  "typhoonLegendPast": "実況経路",
+  "typhoonLegendForecast": "予報経路",
+  "typhoonLegendForecastPoint": "予報点",
+  "typhoonLegendCurrent": "現在中心",
+  "typhoonLegendCone": "予報円",
+  "mapLegendExpand": "凡例",
+  "mapLegendCollapse": "凡例を閉じる"
 }

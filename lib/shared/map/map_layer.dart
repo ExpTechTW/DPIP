@@ -80,6 +80,12 @@ abstract interface class MapLayer {
   /// layers (the scaffold shows the timeline for those instead).
   Widget buildSheet(BuildContext context);
 
+  /// Optional colour / key legend for the scaffold's top-left overlay.
+  ///
+  /// Return [SizedBox.shrink] when the layer has nothing to key (rare). Keep it
+  /// compact — the map must stay readable beside the layer switcher.
+  Widget buildLegend(BuildContext context);
+
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();

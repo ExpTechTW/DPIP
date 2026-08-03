@@ -124,11 +124,12 @@ typedef _Weights = ({double cloud, double rain, double wind, double fog});
 
 /// Maps a [WeatherMode] onto the shader's cloud/rain/wind/fog weights.
 ///
-/// Until a realtime feed drives [WeatherMode.auto], it renders a calm, lightly
-/// clouded sky.
+/// [WeatherMode.clear] keeps `cloud` below the shader's coverage gate so the
+/// deck/overcast wash stay off. Until a realtime feed drives
+/// [WeatherMode.auto], it renders a calm, lightly clouded sky.
 _Weights _weightsFor(WeatherMode mode) => switch (mode) {
-  WeatherMode.auto => (cloud: 0.30, rain: 0.0, wind: 0.4, fog: 0.0),
-  WeatherMode.clear => (cloud: 0.10, rain: 0.0, wind: 0.25, fog: 0.0),
+  WeatherMode.auto => (cloud: 0.28, rain: 0.0, wind: 0.35, fog: 0.0),
+  WeatherMode.clear => (cloud: 0.0, rain: 0.0, wind: 0.2, fog: 0.0),
   WeatherMode.rain => (cloud: 0.85, rain: 0.7, wind: 0.6, fog: 0.1),
   WeatherMode.fog => (cloud: 0.45, rain: 0.0, wind: 0.15, fog: 0.9),
   WeatherMode.thunderstorm => (cloud: 0.9, rain: 0.85, wind: 0.8, fog: 0.15),
@@ -172,13 +173,16 @@ double _sunPhase(DateTime now) {
 }
 
 /// Solid colour shown before the shader loads (and as a permanent fallback).
+///
+/// Matched to the clear-sky mid band so the hand-off from fallback to GPU sky
+/// is a soft crossfade, not a colour jump.
 Color _fallbackColor(int scene, double light) {
-  if (scene == 0 && light > 0.5) return const Color(0xFFAFD4F0);
+  if (scene == 0 && light > 0.5) return const Color(0xFF7AB8F0);
   return switch (scene) {
-    1 => const Color(0xFF0A1220),
-    2 => const Color(0xFF5E2455),
-    3 => const Color(0xFFA0331E),
-    _ => const Color(0xFF1E6FC4),
+    1 => const Color(0xFF0A1024),
+    2 => const Color(0xFF735284),
+    3 => const Color(0xFF8C4D66),
+    _ => const Color(0xFF387AC7),
   };
 }
 

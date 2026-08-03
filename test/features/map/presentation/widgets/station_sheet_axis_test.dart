@@ -16,6 +16,38 @@ List<double> _ticks(double lo, double hi) {
 }
 
 void main() {
+  group('niceTimeLabelStepSec', () {
+    test('24h span → 4h labels (~6 ticks), not every hour', () {
+      const day = 24 * 3600.0;
+      final step = niceTimeLabelStepSec(day, targetTicks: 6);
+      expect(step, 4 * 3600);
+      expect((day / step).round(), 6);
+    });
+
+    test('wind 24h aims for fewer labels (6h)', () {
+      const day = 24 * 3600.0;
+      final step = niceTimeLabelStepSec(day, targetTicks: 5);
+      expect(step, 6 * 3600);
+    });
+
+    test('7d span → daily labels', () {
+      const week = 7 * 24 * 3600.0;
+      final step = niceTimeLabelStepSec(week, targetTicks: 7);
+      expect(step, 24 * 3600);
+    });
+
+    test('steps are always a nice clock hour', () {
+      for (final spanH in [6.0, 12.0, 24.0, 48.0, 168.0]) {
+        final stepH = niceTimeLabelStepSec(spanH * 3600) / 3600;
+        expect(
+          [1, 2, 3, 4, 6, 8, 12, 24, 48, 72],
+          contains(stepH.toInt()),
+          reason: 'span ${spanH}h → ${stepH}h',
+        );
+      }
+    });
+  });
+
   group('niceAxisStep', () {
     test('picks a 1/2/5 × 10ⁿ step', () {
       for (final span in [0.4, 1.5, 3.0, 7.0, 15.0, 35.0, 90.0, 400.0]) {

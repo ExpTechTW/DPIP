@@ -53,6 +53,7 @@
   "weatherHumidity": "Halumigmig",
   "mapLayers": "Mga Layer",
   "mapLayerRadar": "Radar",
+  "mapLayerSatellite": "Satellite",
   "mapTimelineNow": "Ngayon",
   "mapTimelineObserved": "Naobserbahan",
   "notifySettingsMenu": "Mga setting ng notipikasyon",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "Seismic Monitor",
   "stationSheetEmpty": "I-tap ang istasyon para makita ang datos",
   "monitorDelay": "Pagkaantala {value} s",
-  "monitorWaiting": "Naghihintay ng data…"
+  "monitorWaiting": "Naghihintay ng data…",
+  "mapLegendUnit": "Yunit: {unit}",
+  "typhoonLegendPast": "Aktwal na landas",
+  "typhoonLegendForecast": "Tinatayang landas",
+  "typhoonLegendForecastPoint": "Punto ng forecast",
+  "typhoonLegendCurrent": "Kasalukuyang sentro",
+  "typhoonLegendCone": "Kono ng forecast",
+  "mapLegendExpand": "Alamat",
+  "mapLegendCollapse": "Itago ang alamat"
 }

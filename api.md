@@ -54,6 +54,17 @@ max-age=300`）。`{sec}` 就是解出清單後的 10 位數秒，直接使用�
 | `getFrames` | `/api/v2/tiles/radar/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
 | `tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
+### 衛星雲圖（v2）—— `core-tnn1`
+
+Himawari Band-13 IR XYZ WebP。時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），
+在 API 主機上帶 ETag/304；tile 在 **static** 主機。`{sec}` 就是解出清單後的
+10 位數秒，直接使用。
+
+| 方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `getFrames` | `/api/v2/tiles/satellite/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+
 ### 氣象家族（**v5**）—— `core-tnn1`
 
 **已自 `api-1` 的 v2/v3 遷移完成。** 四個家族（weather / rain / lightning /

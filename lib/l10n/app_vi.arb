@@ -53,6 +53,7 @@
   "weatherHumidity": "Độ ẩm",
   "mapLayers": "Lớp bản đồ",
   "mapLayerRadar": "Radar",
+  "mapLayerSatellite": "Vệ tinh",
   "mapTimelineNow": "Bây giờ",
   "mapTimelineObserved": "Quan trắc",
   "notifySettingsMenu": "Cài đặt thông báo",
@@ -158,5 +159,13 @@
   "mapLayerMonitor": "Giám sát địa chấn",
   "stationSheetEmpty": "Chạm vào một trạm để xem số liệu",
   "monitorDelay": "Độ trễ {value} s",
-  "monitorWaiting": "Đang chờ dữ liệu…"
+  "monitorWaiting": "Đang chờ dữ liệu…",
+  "mapLegendUnit": "Đơn vị: {unit}",
+  "typhoonLegendPast": "Quỹ đạo thực tế",
+  "typhoonLegendForecast": "Quỹ đạo dự báo",
+  "typhoonLegendForecastPoint": "Điểm dự báo",
+  "typhoonLegendCurrent": "Tâm hiện tại",
+  "typhoonLegendCone": "Nón dự báo",
+  "mapLegendExpand": "Chú giải",
+  "mapLegendCollapse": "Ẩn chú giải"
 }

@@ -13,6 +13,8 @@ import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/intensity_legend.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -20,7 +22,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// A realtime [MapLayer]: subscribes to the live RTS feed and repaints the
 /// station dots (coloured by raw intensity `i`) on every ~1 Hz snapshot. Not
 /// tap- or timeline-driven; its "sheet" is a compact monitor panel showing the
-/// feed's freshness and the intensity legend.
+/// feed's freshness, and [buildLegend] shows the intensity scale.
 class RtsMapLayer implements MapLayer {
   RtsMapLayer(this._feed, this._stationRepository);
 
@@ -177,6 +179,11 @@ class RtsMapLayer implements MapLayer {
 
   @override
   Widget buildSheet(BuildContext context) => RtsMonitorPanel(feed: _feed);
+
+  @override
+  Widget buildLegend(BuildContext context) => const MapLegendCard(
+    child: IntensityLegend(mode: IntensityLegendMode.rts),
+  );
 
   @override
   Future<void> clear(MapLibreMapController controller) async {

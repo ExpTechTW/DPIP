@@ -175,6 +175,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerRadar => 'เรดาร์';
 
   @override
+  String get mapLayerSatellite => 'ภาพถ่ายดาวเทียม';
+
+  @override
   String get mapTimelineNow => 'ตอนนี้';
 
   @override
@@ -510,4 +513,30 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'กำลังรอข้อมูล…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'หน่วย: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'เส้นทางจริง';
+
+  @override
+  String get typhoonLegendForecast => 'เส้นทางพยากรณ์';
+
+  @override
+  String get typhoonLegendForecastPoint => 'จุดพยากรณ์';
+
+  @override
+  String get typhoonLegendCurrent => 'ศูนย์กลางปัจจุบัน';
+
+  @override
+  String get typhoonLegendCone => 'กรวยพยากรณ์';
+
+  @override
+  String get mapLegendExpand => 'คำอธิบาย';
+
+  @override
+  String get mapLegendCollapse => 'ซ่อนคำอธิบาย';
 }

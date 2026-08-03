@@ -175,6 +175,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerRadar => 'Radar';
 
   @override
+  String get mapLayerSatellite => 'Satellite';
+
+  @override
   String get mapTimelineNow => 'Now';
 
   @override
@@ -477,7 +480,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerPressure => 'Pressure';
 
   @override
-  String get mapLayerWind => 'Wind';
+  String get mapLayerWind => 'Wind direction';
 
   @override
   String get mapLayerTyphoon => 'Typhoon';
@@ -510,4 +513,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Waiting for data…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Unit: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Observed track';
+
+  @override
+  String get typhoonLegendForecast => 'Forecast track';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Forecast point';
+
+  @override
+  String get typhoonLegendCurrent => 'Current centre';
+
+  @override
+  String get typhoonLegendCone => 'Forecast cone';
+
+  @override
+  String get mapLegendExpand => 'Legend';
+
+  @override
+  String get mapLegendCollapse => 'Hide legend';
 }
