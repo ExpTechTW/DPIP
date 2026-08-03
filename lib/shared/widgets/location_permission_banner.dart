@@ -26,32 +26,38 @@ class LocationPermissionBanner extends StatelessWidget {
         ? l10n.locationBannerServiceOff
         : l10n.locationBannerPermission;
 
+    // SafeArea only while visible — wrapping the empty shell would leave a
+    // status-bar-sized blank above full-bleed tabs (map). Nested SafeAreas
+    // collapse: a banner below this one sees top padding already consumed.
     return Material(
       color: colors.errorContainer,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.sm,
-          AppSpacing.sm,
-          AppSpacing.sm,
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.location_off_outlined, color: colors.onErrorContainer),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                message,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: colors.onErrorContainer),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.sm,
+            AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.location_off_outlined, color: colors.onErrorContainer),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  message,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.onErrorContainer,
+                  ),
+                ),
               ),
-            ),
-            TextButton(
-              onPressed: monitor.openSettings,
-              child: Text(l10n.locationBannerFix),
-            ),
-          ],
+              TextButton(
+                onPressed: monitor.openSettings,
+                child: Text(l10n.locationBannerFix),
+              ),
+            ],
+          ),
         ),
       ),
     );

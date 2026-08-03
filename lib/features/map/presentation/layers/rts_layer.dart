@@ -11,6 +11,7 @@ import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
@@ -72,6 +73,11 @@ class RtsMapLayer implements MapLayer {
   @override
   double get mapMinZoom => 4;
 
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
+  String? get bakedAedTileUrl => null;
 
   @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);

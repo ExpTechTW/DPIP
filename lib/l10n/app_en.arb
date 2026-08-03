@@ -135,9 +135,17 @@
   "@mapPlaceholderDisabled": {
     "description": "Placeholder shown in place of the map while MapLibre is disabled"
   },
-  "moreSectionGeneral": "General",
-  "@moreSectionGeneral": {
-    "description": "Section header on the More page grouping general settings entries"
+  "moreSectionRegion": "Region",
+  "@moreSectionRegion": {
+    "description": "Section header on the More page for saved regions"
+  },
+  "moreSectionNotify": "Notifications",
+  "@moreSectionNotify": {
+    "description": "Section header on the More page for notification settings"
+  },
+  "moreSectionDisplay": "Display",
+  "@moreSectionDisplay": {
+    "description": "Section header on the More page for language and theme"
   },
   "regionManageTitle": "Saved regions",
   "regionAddButton": "Add a region",
@@ -803,9 +811,25 @@
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
   },
+  "mapLayerDisasterMap": "Disaster Map",
+  "@mapLayerDisasterMap": {
+    "description": "Map layer switcher label for the disaster-prevention map (DPM)"
+  },
   "mapLayerAed": "AED",
   "@mapLayerAed": {
-    "description": "Map layer switcher label for AED (defibrillator) points"
+    "description": "Disaster-map overlay menu toggle for AED (defibrillator) points"
+  },
+  "disasterMapOverlayMenuTooltip": "Disaster map layers",
+  "@disasterMapOverlayMenuTooltip": {
+    "description": "Tooltip on the disaster-map overlay tune button"
+  },
+  "disasterMapOverlaySectionLayers": "Layers",
+  "@disasterMapOverlaySectionLayers": {
+    "description": "Section header for DPM sub-layer toggles in the overlay menu"
+  },
+  "disasterMapOverlayAedTooltip": "Show AED locations",
+  "@disasterMapOverlayAedTooltip": {
+    "description": "Tooltip for the AED toggle in the disaster-map overlay menu"
   },
   "aedSheetEmpty": "Tap an AED marker for details",
   "@aedSheetEmpty": {

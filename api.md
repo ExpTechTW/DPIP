@@ -75,15 +75,15 @@ Himawari Band-13 IR XYZ WebP。時間清單是差量編碼的 Unix 秒（`[baseS
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
 MapLibre **vector tiles**（gzip MVT）+ 點位詳情 JSON。目前僅 **AED**；未來其他
-類型走同一路徑形狀 `/api/v2/tiles/dpm/{layer}/…`。Tile 由 MapLibre 直接抓
-（`Cache-Control: max-age=60, must-revalidate` + ETag）；詳情經 `ApiClient`。
-Source-layer 名 = `{layer}`（AED 為 `aed`）。單點有 `id`（內部 PK，打詳情用，
-非 `aed_id`）；低 zoom 的 cluster 帶 `point_count`。
+類型走同一路徑形狀 `/api/v2/tiles/dpm/{layer}/…`。Tile 與詳情都在 **static**
+主機（`Cache-Control: max-age=60, must-revalidate` + ETag）；tile 由 MapLibre
+直接抓，詳情經 `ApiClient`。Source-layer 名 = `{layer}`（AED 為 `aed`）。單點有
+`id`（內部 PK，打詳情用，非 `aed_id`）；低 zoom 的 cluster 帶 `point_count`。
 
 | 方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 氣象家族（**v5**）—— `core-tnn1`
 

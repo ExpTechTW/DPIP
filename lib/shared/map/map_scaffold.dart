@@ -388,6 +388,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             },
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
+              maxZoomPreference: _active.mapMaxZoom,
+              aedTileUrl: _active.bakedAedTileUrl,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),

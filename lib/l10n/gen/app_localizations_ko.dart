@@ -108,7 +108,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapPlaceholderDisabled => '지도 (일시 사용 중지)';
 
   @override
-  String get moreSectionGeneral => '일반';
+  String get moreSectionRegion => '지역';
+
+  @override
+  String get moreSectionNotify => '알림';
+
+  @override
+  String get moreSectionDisplay => '표시';
 
   @override
   String get regionManageTitle => '저장한 지역';
@@ -648,7 +654,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
+  String get mapLayerDisasterMap => '방재 지도';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '방재 지도 레이어';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '레이어';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'AED 위치 표시';
 
   @override
   String get aedSheetEmpty => 'AED 마커를 눌러 상세 보기';

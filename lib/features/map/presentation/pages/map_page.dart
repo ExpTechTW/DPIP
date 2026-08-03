@@ -2,7 +2,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
-import 'package:dpip/features/map/presentation/layers/aed_layer.dart';
+import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
@@ -50,7 +50,7 @@ class _MapPageState extends State<MapPage> {
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),
     PressureMapLayer(context.read<MeteorWeatherRepository>()),
     WindMapLayer(context.read<MeteorWeatherRepository>()),
-    AedMapLayer(context.read<DisasterMapRepository>()),
+    DisasterMapLayer(context.read<DisasterMapRepository>()),
   ];
 
   @override

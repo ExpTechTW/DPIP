@@ -1,4 +1,4 @@
-/// Disaster-prevention map (DPM) HTTP surface on `api.core-tnn1`.
+/// Disaster-prevention map (DPM) HTTP surface on `static.core-tnn1`.
 library;
 
 import 'package:dpip/core/network/api_client.dart';
@@ -6,16 +6,17 @@ import 'package:dpip/core/network/api_region.dart';
 
 /// Tile templates + JSON detail for `/api/v2/tiles/dpm/…`.
 ///
-/// MVT tiles are fetched by MapLibre via [tileUrl]; detail GETs go through
-/// [ApiClient] so ETag / gzip / errors stay consistent with the rest of the app.
+/// Both MVT tiles and AED detail live on **static** (`static.core-tnn1`), same
+/// host pattern as radar/satellite tiles. MapLibre fetches [tileUrl] directly;
+/// detail GETs go through [ApiClient] for ETag / gzip / errors.
 class DisasterMapApi {
   const DisasterMapApi(this._client);
 
   final ApiClient _client;
 
-  static const ApiTier _tier = ApiTier.coreExclusiveApi;
+  static const ApiTier _tier = ApiTier.coreStaticExclusive;
 
-  /// `https://api.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
+  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
   String tileUrl(String layer) =>
       '${_client.hostsFor(_tier).first}'
       '/api/v2/tiles/dpm/$layer/{z}/{x}/{y}.mvt';

@@ -25,6 +25,7 @@ import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -160,6 +161,12 @@ class TyphoonMapLayer implements MapLayer {
   /// Basin-wide framing — lower than radar's floor so distant storms fit.
   @override
   double get mapMinZoom => 3;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
+  String? get bakedAedTileUrl => null;
 
   @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);

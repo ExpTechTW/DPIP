@@ -303,11 +303,23 @@ abstract class AppLocalizations {
   /// **'Map (temporarily disabled)'**
   String get mapPlaceholderDisabled;
 
-  /// Section header on the More page grouping general settings entries
+  /// Section header on the More page for saved regions
   ///
   /// In en, this message translates to:
-  /// **'General'**
-  String get moreSectionGeneral;
+  /// **'Region'**
+  String get moreSectionRegion;
+
+  /// Section header on the More page for notification settings
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get moreSectionNotify;
+
+  /// Section header on the More page for language and theme
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get moreSectionDisplay;
 
   /// More-menu entry that opens the region picker
   ///
@@ -1323,11 +1335,35 @@ abstract class AppLocalizations {
   /// **'Seismic Monitor'**
   String get mapLayerMonitor;
 
-  /// Map layer switcher label for AED (defibrillator) points
+  /// Map layer switcher label for the disaster-prevention map (DPM)
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster Map'**
+  String get mapLayerDisasterMap;
+
+  /// Disaster-map overlay menu toggle for AED (defibrillator) points
   ///
   /// In en, this message translates to:
   /// **'AED'**
   String get mapLayerAed;
+
+  /// Tooltip on the disaster-map overlay tune button
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster map layers'**
+  String get disasterMapOverlayMenuTooltip;
+
+  /// Section header for DPM sub-layer toggles in the overlay menu
+  ///
+  /// In en, this message translates to:
+  /// **'Layers'**
+  String get disasterMapOverlaySectionLayers;
+
+  /// Tooltip for the AED toggle in the disaster-map overlay menu
+  ///
+  /// In en, this message translates to:
+  /// **'Show AED locations'**
+  String get disasterMapOverlayAedTooltip;
 
   /// Hint in the AED sheet when nothing is selected
   ///

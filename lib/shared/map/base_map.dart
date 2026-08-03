@@ -33,6 +33,8 @@ class BaseMap extends StatelessWidget {
     this.onCameraIdle,
     this.interactive = true,
     this.minZoomPreference = defaultMinZoom,
+    this.maxZoomPreference = maxZoom,
+    this.aedTileUrl,
   });
 
   /// Bounding box for the nationwide (全國) framing — the Taiwan main island
@@ -95,6 +97,12 @@ class BaseMap extends StatelessWidget {
   /// Other layers keep [defaultMinZoom].
   final double minZoomPreference;
 
+  /// Per-surface zoom ceiling (DPM AED may go to 16).
+  final double maxZoomPreference;
+
+  /// When set, bake DPM AED MVT into the style JSON (see [exptechVectorStyle]).
+  final String? aedTileUrl;
+
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
@@ -107,17 +115,15 @@ class BaseMap extends StatelessWidget {
         : MediaQuery.paddingOf(context).top;
     final compassTop = safeTop + _layerChipBand;
     final floor = minZoomPreference;
+    final ceiling = maxZoomPreference;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
-      initialCameraPosition: CameraPosition(
-        target: taiwanCenter,
-        zoom: floor,
-      ),
-      // Brightness flip changes this string → MapLibre reloads style; layers
-      // re-attach via [onStyleLoaded] (see [MapScaffold]).
-      styleString: exptechVectorStyle(palette),
-      minMaxZoomPreference: MinMaxZoomPreference(floor, maxZoom),
+      initialCameraPosition: CameraPosition(target: taiwanCenter, zoom: floor),
+      // Brightness flip / AED overlay changes this string → MapLibre reloads
+      // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
+      styleString: exptechVectorStyle(palette, aedTileUrl: aedTileUrl),
+      minMaxZoomPreference: MinMaxZoomPreference(floor, ceiling),
       trackCameraPosition: true,
       compassEnabled: interactive,
       compassViewPosition: CompassViewPosition.topRight,

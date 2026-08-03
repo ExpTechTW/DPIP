@@ -1,30 +1,39 @@
-/// AED (automated external defibrillator) disaster-prevention map layer —
-/// MapLibre vector tiles from `/api/v2/tiles/dpm/aed/…`, tap → detail sheet.
+/// Disaster-prevention map layer — MVT overlays (AED today) baked into the
+/// base style while active, with a typhoon-style tune menu; tap → detail sheet.
 library;
 
 import 'dart:math' show Point;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/map/presentation/widgets/aed_sheet.dart';
+import 'package:dpip/features/map/presentation/widgets/disaster_map_overlay_menu.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// Sheet-driven [MapLayer] for AED points (MVT + cluster circles).
+/// Sheet-driven [MapLayer] for the disaster-prevention map (DPM).
 ///
-/// Tiles are loaded by MapLibre from [DisasterMapRepository.tileUrl]; detail is
-/// fetched on tap via [DisasterMapRepository.aedDetail]. Future DPM layers
-/// (shelters, …) can copy this class with a different [id] / source-layer.
-class AedMapLayer implements MapLayer {
-  AedMapLayer(this._repository);
+/// Switcher entry is 「防災地圖」; [DisasterMapOverlayMenu] toggles sub-layers
+/// (AED for now). AED MVT is **baked into the style JSON** via
+/// [bakedAedTileUrl] (same path as the ExpTech basemap) — runtime
+/// `VectorSource` addSource was not painting on device. Detail on tap via
+/// [DisasterMapRepository.aedDetail].
+class DisasterMapLayer implements MapLayer {
+  DisasterMapLayer(this._repository);
 
   final DisasterMapRepository _repository;
 
-  static const String _layerKey = 'aed';
-  static const String _sourceLayer = 'aed';
+  MapLibreMapController? _controller;
+  bool _styleHasAed = false;
+  Future<void> _ops = Future<void>.value();
+
+  /// AED points / clusters — on by default.
+  final ValueNotifier<bool> showAed = ValueNotifier(true);
 
   final ValueNotifier<int?> _selectedId = ValueNotifier<int?>(null);
   final ValueNotifier<int> _selectionRevision = ValueNotifier<int>(0);
@@ -32,22 +41,15 @@ class AedMapLayer implements MapLayer {
   final ValueNotifier<String?> _previewName = ValueNotifier<String?>(null);
   final ValueNotifier<String?> _previewPlace = ValueNotifier<String?>(null);
 
-  bool _onMap = false;
-
-  String get _src => 'dpm-$_layerKey-src';
-  String get _clustersId => 'dpm-$_layerKey-clusters';
-  String get _clusterCountId => 'dpm-$_layerKey-cluster-count';
-  String get _pointsId => 'dpm-$_layerKey-points';
-
   @override
-  String get id => 'dpm-aed';
+  String get id => 'dpm';
 
   @override
   String label(BuildContext context) =>
-      AppLocalizations.of(context).mapLayerAed;
+      AppLocalizations.of(context).mapLayerDisasterMap;
 
   @override
-  IconData get icon => Icons.medical_services_outlined;
+  IconData get icon => Icons.health_and_safety_outlined;
 
   @override
   bool get usesTimeline => false;
@@ -59,6 +61,12 @@ class AedMapLayer implements MapLayer {
   double get mapMinZoom => 4;
 
   @override
+  double get mapMaxZoom => 16;
+
+  @override
+  String? get bakedAedTileUrl => _repository.tileUrl('aed');
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
@@ -67,94 +75,37 @@ class AedMapLayer implements MapLayer {
   @override
   Future<void> show(MapLibreMapController c, MapFrame frame) async {}
 
+  /// Toggle AED overlay; clears selection when turned off.
+  void setShowAed(bool value) {
+    if (showAed.value == value) return;
+    showAed.value = value;
+    if (!value) close();
+    _applyOverlayVisibility();
+  }
+
   @override
   Future<void> render(MapLibreMapController controller) async {
-    await _removeFromMap(controller);
-    await controller.addSource(
-      _src,
-      VectorSourceProperties(
-        tiles: [_repository.tileUrl(_layerKey)],
-        minzoom: 0,
-        maxzoom: 16,
-      ),
-    );
-    await controller.addCircleLayer(
-      _src,
-      _clustersId,
-      const CircleLayerProperties(
-        circleColor: '#c0392b',
-        circleOpacity: 0.75,
-        circleRadius: [
-          'step',
-          ['get', 'point_count'],
-          12,
-          10,
-          16,
-          50,
-          22,
-          200,
-          28,
-        ],
-      ),
-      sourceLayer: _sourceLayer,
-      filter: const ['has', 'point_count'],
-      enableInteraction: false,
-    );
-    await controller.addSymbolLayer(
-      _src,
-      _clusterCountId,
-      const SymbolLayerProperties(
-        textField: [
-          'to-string',
-          ['get', 'point_count'],
-        ],
-        textSize: 11,
-        textColor: '#FFFFFF',
-        textAllowOverlap: true,
-      ),
-      sourceLayer: _sourceLayer,
-      filter: const ['has', 'point_count'],
-      enableInteraction: false,
-    );
-    await controller.addCircleLayer(
-      _src,
-      _pointsId,
-      const CircleLayerProperties(
-        circleColor: '#e74c3c',
-        circleRadius: 5,
-        circleStrokeWidth: 1.5,
-        circleStrokeColor: '#FFFFFF',
-      ),
-      sourceLayer: _sourceLayer,
-      filter: const [
-        '!',
-        ['has', 'point_count'],
-      ],
-      enableInteraction: false,
-    );
-    _onMap = true;
+    _controller = controller;
+    _styleHasAed = true;
+    Log.info('DPM AED style tiles: $bakedAedTileUrl');
+    await _applyOverlayVisibilityAsync(controller);
   }
 
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
-    if (!_onMap) return;
+    if (!_styleHasAed || !showAed.value) return;
     final screen = await controller.toScreenLocation(latLng);
-    // Prefer a single AED point; otherwise zoom into a cluster.
     final hit = Point<double>(screen.x.toDouble(), screen.y.toDouble());
-    final points = await controller.queryRenderedFeatures(
-      hit,
-      [_pointsId],
-      null,
-    );
+    final points = await controller.queryRenderedFeatures(hit, [
+      dpmAedPointsLayerId,
+    ], null);
     if (points.isNotEmpty) {
       await _selectFeature(points.first);
       return;
     }
-    final clusters = await controller.queryRenderedFeatures(
-      hit,
-      [_clustersId],
-      null,
-    );
+    final clusters = await controller.queryRenderedFeatures(hit, [
+      dpmAedClustersLayerId,
+    ], null);
     if (clusters.isEmpty) return;
     final zoom = controller.cameraPosition?.zoom ?? 10;
     await controller.animateCamera(
@@ -191,6 +142,33 @@ class AedMapLayer implements MapLayer {
     return null;
   }
 
+  void _applyOverlayVisibility() {
+    final controller = _controller;
+    if (controller == null || !_styleHasAed) return;
+    _queue(() => _applyOverlayVisibilityAsync(controller));
+  }
+
+  Future<void> _applyOverlayVisibilityAsync(
+    MapLibreMapController controller,
+  ) async {
+    final visible = showAed.value;
+    for (final layerId in [
+      dpmAedClustersLayerId,
+      dpmAedClusterCountLayerId,
+      dpmAedPointsLayerId,
+    ]) {
+      try {
+        await controller.setLayerVisibility(layerId, visible);
+      } catch (_) {
+        // Style may not have finished applying yet.
+      }
+    }
+  }
+
+  void _queue(Future<void> Function() op) {
+    _ops = _ops.then((_) => op()).catchError((_) {});
+  }
+
   @override
   Widget buildSheet(BuildContext context) => AedSheet(
     selectionId: _selectedId,
@@ -206,7 +184,7 @@ class AedMapLayer implements MapLayer {
 
   @override
   Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+      DisasterMapOverlayMenu(layer: this);
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
@@ -219,13 +197,17 @@ class AedMapLayer implements MapLayer {
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
-    await _removeFromMap(controller);
+    // AED lives in the style JSON; leaving this layer drops [bakedAedTileUrl]
+    // so MapScaffold rebuilds the style without it.
+    _controller = null;
+    _styleHasAed = false;
     close();
   }
 
   @override
   void onStyleReset() {
-    _onMap = false;
+    // Style reload drops baked layers; [render] re-marks when we are active.
+    _styleHasAed = false;
   }
 
   void close() {
@@ -233,21 +215,5 @@ class AedMapLayer implements MapLayer {
     _detail.value = null;
     _previewName.value = null;
     _previewPlace.value = null;
-  }
-
-  Future<void> _removeFromMap(MapLibreMapController controller) async {
-    for (final layerId in [_clusterCountId, _clustersId, _pointsId]) {
-      try {
-        await controller.removeLayer(layerId);
-      } catch (_) {
-        // Already gone.
-      }
-    }
-    try {
-      await controller.removeSource(_src);
-    } catch (_) {
-      // Already gone.
-    }
-    _onMap = false;
   }
 }

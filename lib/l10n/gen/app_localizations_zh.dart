@@ -108,7 +108,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
-  String get moreSectionGeneral => '一般';
+  String get moreSectionRegion => '地區';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '顯示';
 
   @override
   String get regionManageTitle => '常用地區';
@@ -644,7 +650,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String get mapLayerDisasterMap => '防災地圖';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防災地圖圖層';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '圖層';
+
+  @override
+  String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
   String get aedSheetEmpty => '點選 AED 標記查看詳情';
@@ -932,7 +950,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapPlaceholderDisabled => '地图（暂时禁用）';
 
   @override
-  String get moreSectionGeneral => '通用';
+  String get moreSectionRegion => '地区';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '显示';
 
   @override
   String get regionManageTitle => '常用地区';
@@ -1468,7 +1492,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerMonitor => '强震监视器';
 
   @override
+  String get mapLayerDisasterMap => '防灾地图';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防灾地图图层';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '图层';
+
+  @override
+  String get disasterMapOverlayAedTooltip => '显示 AED 位置';
 
   @override
   String get aedSheetEmpty => '点选 AED 标记查看详情';
@@ -1756,7 +1792,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
-  String get moreSectionGeneral => '一般';
+  String get moreSectionRegion => '地區';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '顯示';
 
   @override
   String get regionManageTitle => '常用地區';
@@ -2292,7 +2334,19 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String get mapLayerDisasterMap => '防災地圖';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防災地圖圖層';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '圖層';
+
+  @override
+  String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
   String get aedSheetEmpty => '點選 AED 標記查看詳情';
@@ -2580,7 +2634,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
-  String get moreSectionGeneral => '一般';
+  String get moreSectionRegion => '地區';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '顯示';
 
   @override
   String get regionManageTitle => '常用地區';
@@ -3116,7 +3176,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerMonitor => '強震監視器';
 
   @override
+  String get mapLayerDisasterMap => '防災地圖';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防災地圖圖層';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '圖層';
+
+  @override
+  String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
   String get aedSheetEmpty => '點選 AED 標記查看詳情';

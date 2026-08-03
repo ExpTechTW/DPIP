@@ -108,7 +108,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapPlaceholderDisabled => 'Bản đồ (tạm thời vô hiệu hóa)';
 
   @override
-  String get moreSectionGeneral => 'Chung';
+  String get moreSectionRegion => 'Khu vực';
+
+  @override
+  String get moreSectionNotify => 'Thông báo';
+
+  @override
+  String get moreSectionDisplay => 'Hiển thị';
 
   @override
   String get regionManageTitle => 'Khu vực đã lưu';
@@ -657,7 +663,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override
+  String get mapLayerDisasterMap => 'Bản đồ phòng chống';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Lớp bản đồ phòng chống';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Lớp';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Hiện vị trí AED';
 
   @override
   String get aedSheetEmpty => 'Chạm điểm AED để xem chi tiết';

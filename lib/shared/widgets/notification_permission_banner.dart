@@ -59,35 +59,39 @@ class _NotificationPermissionBannerState
 
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    // SafeArea only while visible (see LocationPermissionBanner).
     return Material(
       color: colors.errorContainer,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.sm,
-          AppSpacing.sm,
-          AppSpacing.sm,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.notifications_off_outlined,
-              color: colors.onErrorContainer,
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                l10n.notifyBannerDisabled,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: colors.onErrorContainer),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.sm,
+            AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.notifications_off_outlined,
+                color: colors.onErrorContainer,
               ),
-            ),
-            TextButton(
-              onPressed: openAppSettings,
-              child: Text(l10n.locationBannerFix),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  l10n.notifyBannerDisabled,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.onErrorContainer,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: openAppSettings,
+                child: Text(l10n.locationBannerFix),
+              ),
+            ],
+          ),
         ),
       ),
     );

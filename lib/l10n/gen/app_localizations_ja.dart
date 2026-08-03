@@ -108,7 +108,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapPlaceholderDisabled => '地図(一時的に無効)';
 
   @override
-  String get moreSectionGeneral => '一般';
+  String get moreSectionRegion => '地域';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '表示';
 
   @override
   String get regionManageTitle => '登録地域';
@@ -648,7 +654,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerMonitor => '強震モニタ';
 
   @override
+  String get mapLayerDisasterMap => '防災マップ';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防災マップのレイヤー';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'レイヤー';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'AEDの位置を表示';
 
   @override
   String get aedSheetEmpty => 'AEDマーカーをタップして詳細を表示';

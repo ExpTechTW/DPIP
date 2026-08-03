@@ -108,7 +108,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapPlaceholderDisabled => 'แผนที่ (ปิดใช้งานชั่วคราว)';
 
   @override
-  String get moreSectionGeneral => 'ทั่วไป';
+  String get moreSectionRegion => 'พื้นที่';
+
+  @override
+  String get moreSectionNotify => 'การแจ้งเตือน';
+
+  @override
+  String get moreSectionDisplay => 'การแสดงผล';
 
   @override
   String get regionManageTitle => 'พื้นที่ที่ใช้บ่อย';
@@ -656,7 +662,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override
+  String get mapLayerDisasterMap => 'แผนที่ป้องกันภัย';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'ชั้นแผนที่ป้องกันภัย';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'ชั้น';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'แสดงตำแหน่ง AED';
 
   @override
   String get aedSheetEmpty => 'แตะเครื่องหมาย AED เพื่อดูรายละเอียด';

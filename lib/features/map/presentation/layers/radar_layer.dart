@@ -1,5 +1,6 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -42,6 +43,12 @@ class RadarMapLayer implements MapLayer {
 
   @override
   double get mapMinZoom => 4;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
+  String? get bakedAedTileUrl => null;
 
   @override
   Future<void> render(MapLibreMapController controller) async {}

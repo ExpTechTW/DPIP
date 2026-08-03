@@ -40,10 +40,25 @@ class MorePage extends StatelessWidget {
               ),
             ],
           ),
-          SectionHeader(l10n.moreSectionGeneral),
+          SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(
             children: [
               const _SavedRegionsTile(),
+            ],
+          ),
+          SectionHeader(l10n.moreSectionNotify),
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.notifications_outlined,
+                title: l10n.notifySettingsMenu,
+                onTap: () => context.pushNamed(AppRoutes.notifySettings),
+              ),
+            ],
+          ),
+          SectionHeader(l10n.moreSectionDisplay),
+          _MoreGroup(
+            children: [
               _MoreTile(
                 icon: Icons.translate_outlined,
                 title: l10n.languageSettings,
@@ -53,11 +68,6 @@ class MorePage extends StatelessWidget {
                 icon: Icons.brightness_6_outlined,
                 title: l10n.displaySettings,
                 onTap: () => context.pushNamed(AppRoutes.display),
-              ),
-              _MoreTile(
-                icon: Icons.notifications_outlined,
-                title: l10n.notifySettingsMenu,
-                onTap: () => context.pushNamed(AppRoutes.notifySettings),
               ),
             ],
           ),

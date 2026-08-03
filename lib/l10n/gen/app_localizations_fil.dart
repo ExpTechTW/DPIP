@@ -109,7 +109,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapPlaceholderDisabled => 'Mapa (pansamantalang naka-disable)';
 
   @override
-  String get moreSectionGeneral => 'Pangkalahatan';
+  String get moreSectionRegion => 'Rehiyon';
+
+  @override
+  String get moreSectionNotify => 'Mga Abiso';
+
+  @override
+  String get moreSectionDisplay => 'Display';
 
   @override
   String get regionManageTitle => 'Mga naka-save na rehiyon';
@@ -659,7 +665,19 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get mapLayerDisasterMap => 'Disaster Map';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Disaster map layers';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Layers';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Show AED locations';
 
   @override
   String get aedSheetEmpty => 'I-tap ang AED marker para sa detalye';

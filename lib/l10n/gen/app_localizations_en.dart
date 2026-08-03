@@ -109,7 +109,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapPlaceholderDisabled => 'Map (temporarily disabled)';
 
   @override
-  String get moreSectionGeneral => 'General';
+  String get moreSectionRegion => 'Region';
+
+  @override
+  String get moreSectionNotify => 'Notifications';
+
+  @override
+  String get moreSectionDisplay => 'Display';
 
   @override
   String get regionManageTitle => 'Saved regions';
@@ -657,7 +663,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
+  String get mapLayerDisasterMap => 'Disaster Map';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Disaster map layers';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Layers';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Show AED locations';
 
   @override
   String get aedSheetEmpty => 'Tap an AED marker for details';

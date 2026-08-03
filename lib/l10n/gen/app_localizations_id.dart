@@ -109,7 +109,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapPlaceholderDisabled => 'Peta (dinonaktifkan sementara)';
 
   @override
-  String get moreSectionGeneral => 'Umum';
+  String get moreSectionRegion => 'Wilayah';
+
+  @override
+  String get moreSectionNotify => 'Notifikasi';
+
+  @override
+  String get moreSectionDisplay => 'Tampilan';
 
   @override
   String get regionManageTitle => 'Wilayah tersimpan';
@@ -659,7 +665,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
+  String get mapLayerDisasterMap => 'Peta Bencana';
+
+  @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Lapisan peta bencana';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Lapisan';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Tampilkan lokasi AED';
 
   @override
   String get aedSheetEmpty => 'Ketuk penanda AED untuk detail';
