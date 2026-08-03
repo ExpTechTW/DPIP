@@ -561,6 +561,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get trendNoData => 'Tidak ada data tren';
 
   @override
+  String chartHourLabel(int hour) {
+    return '${hour}j';
+  }
+
+  @override
   String get mapLayerHumidity => 'Kelembapan';
 
   @override

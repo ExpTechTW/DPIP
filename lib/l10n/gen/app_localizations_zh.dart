@@ -546,6 +546,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trendNoData => '沒有趨勢資料';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hour時';
+  }
+
+  @override
   String get mapLayerHumidity => '濕度';
 
   @override
@@ -1386,6 +1391,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '没有趋势数据';
+
+  @override
+  String chartHourLabel(int hour) {
+    return '$hour时';
+  }
 
   @override
   String get mapLayerHumidity => '湿度';
@@ -2230,6 +2240,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get trendNoData => '沒有趨勢資料';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hour時';
+  }
+
+  @override
   String get mapLayerHumidity => '濕度';
 
   @override
@@ -3070,6 +3085,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String chartHourLabel(int hour) {
+    return '$hour時';
+  }
 
   @override
   String get mapLayerHumidity => '濕度';

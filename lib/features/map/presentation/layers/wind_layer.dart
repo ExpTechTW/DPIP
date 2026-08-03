@@ -41,6 +41,9 @@ class WindMapLayer extends WeatherStationLayer {
   String get unit => 'm/s';
 
   @override
+  double? get chartMinY => 0;
+
+  @override
   int get decimals => 1;
 
   @override

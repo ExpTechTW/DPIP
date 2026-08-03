@@ -559,6 +559,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get trendNoData => 'Không có dữ liệu xu hướng';
 
   @override
+  String chartHourLabel(int hour) {
+    return '${hour}h';
+  }
+
+  @override
   String get mapLayerHumidity => 'Độ ẩm';
 
   @override

@@ -66,6 +66,12 @@ abstract interface class StationSheetSource {
   /// The value unit (e.g. "°C"), labelling the chart's Y axis.
   String get unit;
 
+  /// Fixed Y-axis floor for the trend chart, or null to auto-fit the series.
+  double? get chartMinY;
+
+  /// Fixed Y-axis ceiling for the trend chart, or null to auto-fit the series.
+  double? get chartMaxY;
+
   /// The trend series for [id] over [range] (`24h` | `7d`).
   Future<Result<TrendSeries>> trend(String id, String range);
 
@@ -465,6 +471,8 @@ class _SheetBodyState extends State<_SheetBody> {
                       range: _range,
                       unit: widget.source.unit,
                       accent: widget.source.valueColor(id),
+                      fixedMinY: widget.source.chartMinY,
+                      fixedMaxY: widget.source.chartMaxY,
                     ),
                     err: (failure) =>
                         ErrorView(detail: failure.message, onRetry: _refetch),
@@ -790,6 +798,8 @@ class _TrendChart extends StatelessWidget {
     required this.range,
     required this.unit,
     this.accent,
+    this.fixedMinY,
+    this.fixedMaxY,
   });
 
   final TrendSeries series;
@@ -798,6 +808,10 @@ class _TrendChart extends StatelessWidget {
 
   /// Station's map colour — tints the curve so the sheet matches the tapped dot.
   final Color? accent;
+
+  /// When set, pins the Y axis (humidity 0–100, wind floor 0, …).
+  final double? fixedMinY;
+  final double? fixedMaxY;
 
   @override
   Widget build(BuildContext context) {
@@ -828,51 +842,59 @@ class _TrendChart extends StatelessWidget {
       );
     }
 
-    // Hourly feed → snap domain onto a clock-friendly label step (1/2/3/4/6…
-    // h). Aim ~5–7 labels on a phone width; every-hour ticks were unreadable.
-    // Grid stays finer than labels when the step is small, coarser on 7d.
+    // Hourly feed → snap labels onto a clock-friendly step (1/2/3/4/6… h).
+    // Compact "{hour}時" ticks fit denser than "HH:00"; wind arrows need a
+    // little more room. Grid stays finer than labels when the step is small.
     const hourSec = 3600.0;
     final spanSec = (spots.last.x - spots.first.x).abs();
-    // 7d → ~7 daily ticks; 24h → ~6 (4h); wind arrows need more room → ~5.
     final labelStep = niceTimeLabelStepSec(
       spanSec,
-      targetTicks: range == '7d' ? 7 : (isWind ? 5 : 6),
+      targetTicks: range == '7d' ? 8 : (isWind ? 8 : 12),
     );
     final gridStep = labelStep <= 4 * hourSec ? hourSec : labelStep / 2;
-    var minX = _floorToStep(spots.first.x, labelStep);
-    var maxX = _ceilToStep(spots.last.x, labelStep);
-    if (maxX <= minX) maxX = minX + labelStep;
+    // Domain = first→last sample so the curve spans the plot (no empty gutters
+    // from snapping minX/maxX out past the data onto clock labels).
+    final minX = spots.first.x;
+    final maxX = spots.last.x == minX ? minX + labelStep : spots.last.x;
+    // Label grid still snaps to clock hours; anchor independently of minX.
+    final labelAnchor = _floorToStep(spots.first.x, labelStep);
 
-    var minY = spots.first.y, maxY = spots.first.y;
+    var dataMinY = spots.first.y, dataMaxY = spots.first.y;
     for (final s in spots) {
-      if (s.y < minY) minY = s.y;
-      if (s.y > maxY) maxY = s.y;
+      if (s.y < dataMinY) dataMinY = s.y;
+      if (s.y > dataMaxY) dataMaxY = s.y;
     }
     // Round the value axis onto a "nice" step and snap the bounds to it, so the
     // ticks land on 30 / 32 / 34 rather than wherever the data happened to stop.
-    final yInterval = niceAxisStep((maxY - minY).abs(), 4);
+    final axisLo = fixedMinY ?? dataMinY;
+    final axisHi = fixedMaxY ?? dataMaxY;
+    final yInterval = niceAxisStep((axisHi - axisLo).abs(), 8);
     final headroom = yInterval / 2;
-    minY = ((minY - headroom) / yInterval).floorToDouble() * yInterval;
-    maxY = ((maxY + headroom) / yInterval).ceilToDouble() * yInterval;
+    final minY =
+        fixedMinY ??
+        ((dataMinY - headroom) / yInterval).floorToDouble() * yInterval;
+    var maxY =
+        fixedMaxY ??
+        ((dataMaxY + headroom) / yInterval).ceilToDouble() * yInterval;
+    if (maxY <= minY) maxY = minY + yInterval;
 
     String timeLabel(double x) {
       final t = DateTime.fromMillisecondsSinceEpoch(
         x.toInt() * 1000,
         isUtc: true,
       ).add(const Duration(hours: 8));
-      final hh = t.hour.toString().padLeft(2, '0');
-      // Daily-or-wider: date only. Sub-daily 7d: date + hour. 24h: HH:00 when
-      // sparse enough to afford the colon (step ≥ 3 h).
+      final hourMark = l10n.chartHourLabel(t.hour);
+      // Daily-or-wider: date only. Sub-daily 7d: date + hour. 24h: compact hour.
       if (labelStep >= 24 * hourSec) return DateFormat('M/d').format(t);
       if (range == '7d') {
         return t.hour == 0
             ? DateFormat('M/d').format(t)
-            : '${DateFormat('M/d').format(t)} $hh';
+            : '${DateFormat('M/d').format(t)} $hourMark';
       }
-      return labelStep >= 3 * hourSec ? '$hh:00' : hh;
+      return hourMark;
     }
 
-    bool onLabelStep(double value) => _isOnStep(value, minX, labelStep);
+    bool onLabelStep(double value) => _isOnStep(value, labelAnchor, labelStep);
 
     int? directionForSpot(int spotIndex) {
       final directions = series.directions;
@@ -1150,9 +1172,6 @@ String _compassLabel(int fromDegrees) {
 /// Floors [x] onto a multiple of [step] (Unix-second axis helpers).
 double _floorToStep(double x, double step) => (x / step).floorToDouble() * step;
 
-/// Ceils [x] onto a multiple of [step].
-double _ceilToStep(double x, double step) => (x / step).ceilToDouble() * step;
-
 /// Whether [value] sits on `origin + n·step` within 1 s (float-safe).
 bool _isOnStep(double value, double origin, double step) {
   final n = ((value - origin) / step).round();
@@ -1164,9 +1183,9 @@ const _niceTimeHours = [1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0, 24.0, 48.0, 72.0];
 
 /// A label interval in **seconds** for a time axis spanning [spanSec], aiming
 /// for about [targetTicks] labels. Picks the smallest hour step in
-/// [_niceTimeHours] that is ≥ the rough spacing — so a 24 h series lands on
-/// 4 h ticks (~6 labels), not every hour.
-double niceTimeLabelStepSec(double spanSec, {int targetTicks = 6}) {
+/// [_niceTimeHours] that is ≥ the rough spacing — so a 24 h series with
+/// target 12 lands on 2 h ticks, not every hour.
+double niceTimeLabelStepSec(double spanSec, {int targetTicks = 12}) {
   if (!spanSec.isFinite || spanSec <= 0) return 3600;
   final roughHours = (spanSec / 3600) / math.max(targetTicks, 1);
   for (final hours in _niceTimeHours) {

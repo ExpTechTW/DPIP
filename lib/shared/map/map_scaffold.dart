@@ -328,8 +328,8 @@ class _MapScaffoldState extends State<MapScaffold> {
     // own display; _selectedIndex is just the source of truth for show().
     _selectedIndex = index;
     if (_scrubbing) {
-      // Opacity GIF must keep up with the finger — the serial [_queue] +
-      // [_showQueued] coalesce drops intermediate frames and feels stuttery.
+      // Resident visibility flip only — must not go through [_queue] coalesce
+      // (that drops intermediate frames). See RadarMapLayer hot-path docs.
       final controller = _controller;
       if (controller == null || _frames.isEmpty) return;
       unawaited(

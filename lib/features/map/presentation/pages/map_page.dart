@@ -6,12 +6,14 @@ import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
+import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
+import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
@@ -50,6 +52,7 @@ class _MapPageState extends State<MapPage> {
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),
     PressureMapLayer(context.read<MeteorWeatherRepository>()),
     WindMapLayer(context.read<MeteorWeatherRepository>()),
+    RainMapLayer(context.read<MeteorRainRepository>()),
     DisasterMapLayer(context.read<DisasterMapRepository>()),
   ];
 

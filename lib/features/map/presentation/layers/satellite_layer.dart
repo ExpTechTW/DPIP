@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -11,8 +12,8 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same settle-window /
-/// scrub-opacity strategy as [RadarMapLayer].
+/// The satellite IR cloud (衛星雲圖) raster [MapLayer] — same resident /
+/// visibility hot path as [RadarMapLayer] (see that class for the analysis).
 class SatelliteMapLayer implements MapLayer {
   SatelliteMapLayer(this._repository);
 
@@ -117,10 +118,11 @@ class SatelliteMapLayer implements MapLayer {
   );
 
   static const double _opacity = 1;
-  static const int _settleRadius = 8;
+  static const int _settleRadius = 1;
+  static const int _maxResident = 17;
 
   static const RasterLayerProperties _hidden = RasterLayerProperties(
-    visibility: 'visible',
+    visibility: 'none',
     rasterOpacity: 0,
   );
   static const RasterLayerProperties _shown = RasterLayerProperties(
@@ -134,8 +136,10 @@ class SatelliteMapLayer implements MapLayer {
   List<String> _orderedIds = const [];
   Map<String, int> _indexById = const {};
   final Set<String> _resident = <String>{};
+  final Queue<String> _lru = Queue<String>();
   String? _shownFrameId;
   bool _blackOutlineOnMap = false;
+  int _revealGen = 0;
 
   @override
   Future<Result<List<MapFrame>>> frames() async {
@@ -173,51 +177,93 @@ class SatelliteMapLayer implements MapLayer {
 
     if (scrubbing) return;
 
-    _repository.cancelTilePrefetch();
-    await cancelMapLibreTileFetches();
-
     final lo = (index - _settleRadius).clamp(0, _orderedIds.length - 1);
     final hi = (index + _settleRadius).clamp(0, _orderedIds.length - 1);
-    final window = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
+    final must = <String>{for (var j = lo; j <= hi; j++) _orderedIds[j]};
 
-    for (final id in _resident.difference(window)) {
-      await _removeFrame(controller, id);
-      _resident.remove(id);
+    await _ensureMounted(controller, frame.id, visible: true);
+    for (final id in must) {
+      if (id == frame.id) continue;
+      await _ensureMounted(controller, id, visible: false);
     }
-
-    for (final id in window) {
-      final properties = id == frame.id ? _shown : _hidden;
-      if (_resident.contains(id)) {
-        await controller.setLayerProperties(_layerId(id), properties);
-      } else {
-        await controller.addSource(
-          _sourceId(id),
-          RasterSourceProperties(
-            tiles: [_repository.tileUrl(id)],
-            tileSize: 256,
-          ),
-        );
-        await controller.addRasterLayer(
-          _sourceId(id),
-          _layerId(id),
-          properties,
-          belowLayerId: outlineLayerId,
-        );
-        _resident.add(id);
-      }
-    }
+    await _hideAllExcept(controller, frame.id);
     await _ensureBlackOutline(controller);
     _shownFrameId = frame.id;
+    await _evictOverflow(controller, keep: must);
   }
 
   Future<void> _reveal(MapLibreMapController controller, String frameId) async {
+    final gen = ++_revealGen;
     final prev = _shownFrameId;
     _shownFrameId = frameId;
+    _touch(frameId);
+
     if (prev != null && prev != frameId && _resident.contains(prev)) {
       await controller.setLayerProperties(_layerId(prev), _hidden);
     }
-    if (_shownFrameId != frameId) return;
+    if (gen != _revealGen) return;
     await controller.setLayerProperties(_layerId(frameId), _shown);
+  }
+
+  Future<void> _ensureMounted(
+    MapLibreMapController controller,
+    String id, {
+    required bool visible,
+  }) async {
+    final properties = visible ? _shown : _hidden;
+    if (_resident.contains(id)) {
+      await controller.setLayerProperties(_layerId(id), properties);
+      _touch(id);
+      return;
+    }
+    await controller.addSource(
+      _sourceId(id),
+      RasterSourceProperties(
+        tiles: [_repository.tileUrl(id)],
+        tileSize: 256,
+      ),
+    );
+    await controller.addRasterLayer(
+      _sourceId(id),
+      _layerId(id),
+      properties,
+      belowLayerId: outlineLayerId,
+    );
+    _resident.add(id);
+    _touch(id);
+  }
+
+  Future<void> _hideAllExcept(
+    MapLibreMapController controller,
+    String keepId,
+  ) async {
+    final ops = <Future<void>>[
+      for (final id in _resident)
+        if (id != keepId)
+          controller.setLayerProperties(_layerId(id), _hidden),
+    ];
+    if (ops.isNotEmpty) await Future.wait(ops);
+  }
+
+  Future<void> _evictOverflow(
+    MapLibreMapController controller, {
+    required Set<String> keep,
+  }) async {
+    while (_lru.length > _maxResident) {
+      final evict = _lru.firstWhere(
+        (id) => !keep.contains(id),
+        orElse: () => '',
+      );
+      if (evict.isEmpty) break;
+      _lru.remove(evict);
+      _resident.remove(evict);
+      await _removeFrame(controller, evict);
+    }
+  }
+
+  void _touch(String id) {
+    _lru.remove(id);
+    _lru.addLast(id);
   }
 
   Future<void> _ensureBlackOutline(MapLibreMapController controller) async {
@@ -265,7 +311,7 @@ class SatelliteMapLayer implements MapLayer {
   Future<void> clear(MapLibreMapController controller) async {
     _repository.cancelTilePrefetch();
     await cancelMapLibreTileFetches();
-    for (final id in _resident) {
+    for (final id in List<String>.of(_resident)) {
       await _removeFrame(controller, id);
     }
     await _removeBlackOutline(controller);
@@ -286,10 +332,12 @@ class SatelliteMapLayer implements MapLayer {
 
   void _reset() {
     _resident.clear();
+    _lru.clear();
     _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
     _blackOutlineOnMap = false;
+    _revealGen = 0;
   }
 }
 

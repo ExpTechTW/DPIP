@@ -289,6 +289,12 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  double? get chartMinY => null;
+
+  @override
+  double? get chartMaxY => null;
+
+  @override
   Future<Result<TrendSeries>> trend(String id, String range) async {
     final result = await _repository.trend(id, range: range);
     return result.map(seriesOf);

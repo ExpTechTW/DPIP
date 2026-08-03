@@ -561,6 +561,11 @@ class AppLocalizationsFil extends AppLocalizations {
   String get trendNoData => 'Walang trend data';
 
   @override
+  String chartHourLabel(int hour) {
+    return '${hour}h';
+  }
+
+  @override
   String get mapLayerHumidity => 'Halumigmig';
 
   @override

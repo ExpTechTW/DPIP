@@ -550,6 +550,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trendNoData => '추세 데이터 없음';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hour시';
+  }
+
+  @override
   String get mapLayerHumidity => '습도';
 
   @override

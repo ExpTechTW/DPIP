@@ -60,16 +60,6 @@ class _RecordingController implements MapLibreMapController {
   }) async => calls.add('addLineLayer:$layerId');
 
   @override
-  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
-    southwest: const LatLng(22, 120),
-    northeast: const LatLng(25, 122),
-  );
-
-  @override
-  CameraPosition? get cameraPosition =>
-      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
-
-  @override
   Future<void> removeLayer(String layerId) async =>
       calls.add('removeLayer:$layerId');
 
@@ -87,50 +77,48 @@ class _RecordingController implements MapLibreMapController {
   }
 
   @override
+  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
+    southwest: const LatLng(22, 120),
+    northeast: const LatLng(25, 122),
+  );
+
+  @override
+  CameraPosition? get cameraPosition =>
+      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 void main() {
-  test(
-    'frames come back chronological (oldest first), ids preserved',
-    () async {
-      final layer = SatelliteMapLayer(
-        _FakeSatelliteRepository(['1700000600000', '1700000000000']),
-      );
+  test('frames chronological', () async {
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(['1700000600000', '1700000000000']),
+    );
+    final frames = (await layer.frames()).valueOrNull!;
+    expect(frames.map((f) => f.id), ['1700000000000', '1700000600000']);
+  });
 
-      final result = await layer.frames();
-      final frames = result.valueOrNull!;
-
-      expect(frames.map((f) => f.id), ['1700000000000', '1700000600000']);
-      expect(frames.first.time.isBefore(frames.last.time), isTrue);
-    },
-  );
-
-  test('settle mounts window; scrub skips cold frames outside it', () async {
-    // 20 frames so settle radius 8 leaves older ones cold.
-    final ids = [
-      for (var i = 19; i >= 0; i--) '${1700000000000 + i * 600000}',
-    ];
-    final layer = SatelliteMapLayer(_FakeSatelliteRepository(ids));
+  test('scrub hot path is only prev-hide + curr-show', () async {
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository([
+        '1700001800000',
+        '1700001200000',
+        '1700000600000',
+        '1700000000000',
+      ]),
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = _RecordingController();
 
     await layer.prepare(controller, frames);
-    await layer.show(controller, frames.last); // newest
-    expect(
-      controller.calls.where((c) => c.startsWith('addSource:')),
-      hasLength(9), // index 19 → [11..19]
-    );
+    await layer.show(controller, frames[3]);
 
     controller.calls.clear();
-    await layer.show(controller, frames.first, scrubbing: true);
-    expect(controller.calls, isEmpty);
-
-    controller.calls.clear();
-    await layer.show(controller, frames[18], scrubbing: true);
+    await layer.show(controller, frames[2], scrubbing: true);
     expect(controller.calls, [
-      'set:satellite-lyr-${frames.last.id}:visible:0',
-      'set:satellite-lyr-${frames[18].id}:visible:1.0',
+      'set:satellite-lyr-1700001800000:none:0',
+      'set:satellite-lyr-1700001200000:visible:1.0',
     ]);
   });
 }

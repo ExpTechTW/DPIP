@@ -730,6 +730,15 @@
   "@trendNoData": {
     "description": "Shown in the station trend chart when there is no data to plot"
   },
+  "chartHourLabel": "{hour}h",
+  "@chartHourLabel": {
+    "description": "Compact chart X-axis hour tick (e.g. 20h / 20時)",
+    "placeholders": {
+      "hour": {
+        "type": "int"
+      }
+    }
+  },
   "mapLayerHumidity": "Humidity",
   "@mapLayerHumidity": {
     "description": "Map layer switcher label for the humidity layer"
@@ -739,6 +748,26 @@
     "description": "Map layer switcher label for the air-pressure layer"
   },
   "mapLayerWind": "Wind direction",
+  "mapLayerRain": "Rainfall",
+  "@mapLayerRain": {
+    "description": "Map layer switcher label for the rainfall station layer"
+  },
+  "rainIntervalMenu": "Accumulation window",
+  "@rainIntervalMenu": {
+    "description": "Tooltip for the rainfall accumulation-interval menu"
+  },
+  "rainIntervalNow": "Today",
+  "@rainIntervalNow": {
+    "description": "Rainfall accumulation since local midnight (API now)"
+  },
+  "rainInterval10m": "10 min",
+  "rainInterval1h": "1 h",
+  "rainInterval3h": "3 h",
+  "rainInterval6h": "6 h",
+  "rainInterval12h": "12 h",
+  "rainInterval24h": "24 h",
+  "rainInterval2d": "2 d",
+  "rainInterval3d": "3 d",
   "mapLayerTyphoon": "Typhoon",
   "@mapLayerTyphoon": {
     "description": "Layer-switcher label for the typhoon map layer"

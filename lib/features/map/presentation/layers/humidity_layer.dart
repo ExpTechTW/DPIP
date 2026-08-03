@@ -27,6 +27,12 @@ class HumidityMapLayer extends WeatherStationLayer {
   int get decimals => 0;
 
   @override
+  double? get chartMinY => 0;
+
+  @override
+  double? get chartMaxY => 100;
+
+  @override
   double? valueOf(WeatherObservation observation) =>
       observation.humidity?.toDouble();
 

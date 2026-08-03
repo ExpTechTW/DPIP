@@ -10,10 +10,18 @@
 /// Hot path is SQLite only — no Dart-side decoded LRU. Repeated reads rely on
 /// SQLite's pager / page cache (see [configureConnection], ~25 MiB).
 ///
+/// **Tile storms are the design constraint.** A map viewport asks for dozens of
+/// tiles at once, so the batch forms — [readBytesBatch] / [writeBytesBatch] —
+/// are the real API: one `IN` query and one transaction per burst, with any
+/// gzip work for the whole batch done in a single isolate hop rather than one
+/// per row.
+///
 /// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
-/// [maxBytes]. Last-used bumps are **buffered** and flushed in batches (same
-/// idea as [NetworkUsageStore]) so tile storms don't UPDATE one row per hit.
-/// All ops best-effort.
+/// [maxBytes]. Both run in an **amortized sweep**, not per write — costing a
+/// `SUM(LENGTH(body))` scan of the whole table on every tile written made a
+/// scrub quadratic on the UI isolate. Last-used bumps are likewise **buffered**
+/// and flushed in batches (same idea as [NetworkUsageStore]). All ops
+/// best-effort.
 ///
 /// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
 /// records one hit + saved wire bytes — callers must not also meter those

@@ -558,6 +558,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String get trendNoData => 'ไม่มีข้อมูลแนวโน้ม';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hourน.';
+  }
+
+  @override
   String get mapLayerHumidity => 'ความชื้น';
 
   @override

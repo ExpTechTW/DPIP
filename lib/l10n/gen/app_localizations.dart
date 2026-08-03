@@ -1155,6 +1155,12 @@ abstract class AppLocalizations {
   /// **'No trend data'**
   String get trendNoData;
 
+  /// Compact chart X-axis hour tick (e.g. 20h / 20時)
+  ///
+  /// In en, this message translates to:
+  /// **'{hour}h'**
+  String chartHourLabel(int hour);
+
   /// Map layer switcher label for the humidity layer
   ///
   /// In en, this message translates to:

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// The ticks an axis would show for a data range, using the same snapping the
 /// chart applies (half a step of headroom, bounds rounded onto the step).
 List<double> _ticks(double lo, double hi) {
-  final step = niceAxisStep((hi - lo).abs(), 4);
+  final step = niceAxisStep((hi - lo).abs(), 8);
   final head = step / 2;
   final min = ((lo - head) / step).floorToDouble() * step;
   final max = ((hi + head) / step).ceilToDouble() * step;
@@ -17,22 +17,22 @@ List<double> _ticks(double lo, double hi) {
 
 void main() {
   group('niceTimeLabelStepSec', () {
-    test('24h span → 4h labels (~6 ticks), not every hour', () {
+    test('24h span → 2h labels (~12 ticks)', () {
       const day = 24 * 3600.0;
-      final step = niceTimeLabelStepSec(day, targetTicks: 6);
-      expect(step, 4 * 3600);
-      expect((day / step).round(), 6);
+      final step = niceTimeLabelStepSec(day, targetTicks: 12);
+      expect(step, 2 * 3600);
+      expect((day / step).round(), 12);
     });
 
-    test('wind 24h aims for fewer labels (6h)', () {
+    test('wind 24h aims for fewer labels (3h)', () {
       const day = 24 * 3600.0;
-      final step = niceTimeLabelStepSec(day, targetTicks: 5);
-      expect(step, 6 * 3600);
+      final step = niceTimeLabelStepSec(day, targetTicks: 8);
+      expect(step, 3 * 3600);
     });
 
     test('7d span → daily labels', () {
       const week = 7 * 24 * 3600.0;
-      final step = niceTimeLabelStepSec(week, targetTicks: 7);
+      final step = niceTimeLabelStepSec(week, targetTicks: 8);
       expect(step, 24 * 3600);
     });
 
@@ -51,7 +51,7 @@ void main() {
   group('niceAxisStep', () {
     test('picks a 1/2/5 × 10ⁿ step', () {
       for (final span in [0.4, 1.5, 3.0, 7.0, 15.0, 35.0, 90.0, 400.0]) {
-        final step = niceAxisStep(span, 4);
+        final step = niceAxisStep(span, 8);
         final mantissa = step / _magnitude(step);
         expect(
           [1.0, 2.0, 5.0, 10.0],
@@ -93,9 +93,13 @@ void main() {
 
     test('a flat series still yields a usable axis', () {
       // Every reading identical — span 0 must not divide by zero or collapse.
-      final step = niceAxisStep(0, 4);
+      final step = niceAxisStep(0, 8);
       expect(step, greaterThan(0));
       expect(_ticks(20.0, 20.0).length, greaterThanOrEqualTo(2));
+    });
+
+    test('0–100 humidity span yields a 20 step (~5 intervals)', () {
+      expect(niceAxisStep(100, 8), 20);
     });
   });
 }
