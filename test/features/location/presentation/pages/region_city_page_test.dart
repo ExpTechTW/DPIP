@@ -29,7 +29,7 @@ final _directory = TownDirectory({
 Widget _wrap(RegionStore store) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
-  locale: const Locale('zh'),
+  locale: const Locale('zh', 'TW'),
   home: MultiProvider(
     providers: [
       ChangeNotifierProvider<RegionStore>.value(value: store),

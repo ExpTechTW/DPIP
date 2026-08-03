@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'No earthquake reports'**
   String get reportListEmpty;
 
+  /// Empty state when active filters yield no report rows
+  ///
+  /// In en, this message translates to:
+  /// **'No earthquake reports match these filters'**
+  String get reportListEmptyFiltered;
+
   /// Magnitude and depth line on a report list row
   ///
   /// In en, this message translates to:
@@ -260,7 +266,7 @@ abstract class AppLocalizations {
   /// **'Any'**
   String get reportFilterAny;
 
-  /// Primary button on the report filter sheet
+  /// Primary button on the report filter sheet — saves draft and searches
   ///
   /// In en, this message translates to:
   /// **'Apply'**
@@ -271,6 +277,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get reportFilterReset;
+
+  /// Fetches the report list with the current draft filters
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get reportListSearch;
 
   /// Bottom-nav label and page title for the More tab
   ///

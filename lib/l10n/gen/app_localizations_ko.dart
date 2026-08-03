@@ -36,6 +36,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportListEmpty => '지진 보고서가 없습니다';
 
   @override
+  String get reportListEmptyFiltered => '조건에 맞는 지진 보고서가 없습니다';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +90,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterAny => '전체';
 
   @override
-  String get reportFilterApply => '적용';
+  String get reportFilterApply => '완료';
 
   @override
   String get reportFilterReset => '초기화';
+
+  @override
+  String get reportListSearch => '조회';
 
   @override
   String get navMore => '더보기';

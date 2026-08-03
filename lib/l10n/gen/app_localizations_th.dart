@@ -36,6 +36,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportListEmpty => 'ไม่มีรายงานแผ่นดินไหว';
 
   @override
+  String get reportListEmptyFiltered => 'ไม่มีรายงานที่ตรงกับเงื่อนไข';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +90,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterAny => 'ทั้งหมด';
 
   @override
-  String get reportFilterApply => 'ใช้';
+  String get reportFilterApply => 'เสร็จ';
 
   @override
   String get reportFilterReset => 'รีเซ็ต';
+
+  @override
+  String get reportListSearch => 'ค้นหา';
 
   @override
   String get navMore => 'เพิ่มเติม';

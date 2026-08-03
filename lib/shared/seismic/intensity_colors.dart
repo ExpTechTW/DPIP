@@ -47,6 +47,10 @@ abstract final class InstrumentalIntensityColors {
 
 /// Discrete felt-intensity colours, keyed by the scale index 0 → 9 (0 grey, then
 /// 1, 2, 3, 4, 5⁻, 5⁺, 6⁻, 6⁺, 7).
+///
+/// For **pre-2020 舊制** report intensities (wire 5/6/7 = 5級/6級/7級), resolve
+/// label + colour index via `Intensity.displayForReport` first — do not pass the
+/// raw wire value here or 5/6/7 will be coloured as 5⁻/5⁺/6⁻.
 abstract final class IntensityColors {
   /// The colour for scale index [level] (0 → 9); out-of-range clamps to the ends.
   static Color discrete(int level) => _colors[level.clamp(0, 9)];

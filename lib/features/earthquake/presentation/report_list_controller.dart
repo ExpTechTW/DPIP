@@ -1,4 +1,4 @@
-/// Paged report catalogue — scroll load-more + filter-driven reload.
+/// Paged report catalogue — scroll load-more + explicit search.
 library;
 
 import 'package:dpip/core/error/failure.dart';
@@ -8,7 +8,11 @@ import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:flutter/foundation.dart';
 
-/// Owns the report list's page cursor, active [ReportListQuery], and load state.
+/// Owns the report list's page cursor, draft/applied filters, and load state.
+///
+/// [draft] is edited in the filter sheet and remembered for the lifetime of the
+/// hosting page; [query] is whatever the last [search] / initial load used.
+/// Leaving the page disposes this controller and clears both.
 class ReportListController extends ChangeNotifier {
   ReportListController(this._repository);
 
@@ -17,7 +21,12 @@ class ReportListController extends ChangeNotifier {
   static const int pageSize = 30;
 
   final List<PartialEarthquakeReport> items = [];
+
+  /// Last filters sent to the API.
   ReportListQuery query = ReportListQuery.empty;
+
+  /// In-progress filters from the sheet — not fetched until [search].
+  ReportListQuery draft = ReportListQuery.empty;
 
   int _page = 0;
   bool _hasMore = true;
@@ -31,10 +40,26 @@ class ReportListController extends ChangeNotifier {
   Failure? get failure => _failure;
   bool get isEmpty => !_loading && _failure == null && items.isEmpty;
 
-  /// First page (or filter change). Keeps previous rows until the new page
-  /// arrives so a filter apply doesn't flash an empty list.
+  /// Draft differs from the last successful / in-flight query.
+  bool get hasPendingSearch => draft != query;
+
+  /// Persist sheet edits without hitting the network.
+  void setDraft(ReportListQuery value) {
+    if (value == draft) return;
+    draft = value;
+    notifyListeners();
+  }
+
+  /// Apply [draft] and fetch page 1.
+  Future<void> search() => reload(query: draft);
+
+  /// First page (or re-query). Keeps previous rows until the new page arrives
+  /// so a search doesn't flash an empty list.
   Future<void> reload({ReportListQuery? query}) async {
-    if (query != null) this.query = query;
+    if (query != null) {
+      this.query = query;
+      draft = query;
+    }
     if (_loading) return;
     _loading = true;
     _failure = null;

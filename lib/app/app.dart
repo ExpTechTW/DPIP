@@ -60,6 +60,7 @@ class DpipApp extends StatelessWidget {
                 darkTheme: AppTheme.dark,
                 themeMode: themeController.mode,
                 locale: localeController.locale,
+                localeListResolutionCallback: resolveAppLocale,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 // Home locale first, so an unmatched device language falls back to
                 // Traditional Chinese (Taiwan), not the English template.

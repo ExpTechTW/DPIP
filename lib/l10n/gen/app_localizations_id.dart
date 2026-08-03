@@ -36,6 +36,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportListEmpty => 'Tidak ada laporan gempa';
 
   @override
+  String get reportListEmptyFiltered =>
+      'Tidak ada laporan yang cocok dengan filter';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +91,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterAny => 'Semua';
 
   @override
-  String get reportFilterApply => 'Terapkan';
+  String get reportFilterApply => 'Selesai';
 
   @override
   String get reportFilterReset => 'Reset';
+
+  @override
+  String get reportListSearch => 'Cari';
 
   @override
   String get navMore => 'Lainnya';

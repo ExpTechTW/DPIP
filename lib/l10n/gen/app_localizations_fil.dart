@@ -36,6 +36,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportListEmpty => 'Walang ulat ng lindol';
 
   @override
+  String get reportListEmptyFiltered =>
+      'Walang ulat na tumutugma sa mga filter';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +91,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportFilterAny => 'Lahat';
 
   @override
-  String get reportFilterApply => 'I-apply';
+  String get reportFilterApply => 'Tapos';
 
   @override
   String get reportFilterReset => 'I-reset';
+
+  @override
+  String get reportListSearch => 'Maghanap';
 
   @override
   String get navMore => 'Higit Pa';

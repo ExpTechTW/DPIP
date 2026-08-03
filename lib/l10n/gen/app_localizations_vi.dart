@@ -36,6 +36,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportListEmpty => 'Không có báo cáo động đất';
 
   @override
+  String get reportListEmptyFiltered => 'Không có báo cáo khớp bộ lọc';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +90,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportFilterAny => 'Tất cả';
 
   @override
-  String get reportFilterApply => 'Áp dụng';
+  String get reportFilterApply => 'Xong';
 
   @override
   String get reportFilterReset => 'Đặt lại';
+
+  @override
+  String get reportListSearch => 'Tìm';
 
   @override
   String get navMore => 'Thêm';

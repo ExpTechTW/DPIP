@@ -36,6 +36,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportListEmpty => '目前沒有地震報告';
 
   @override
+  String get reportListEmptyFiltered => '沒有符合條件的地震報告';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
   }
@@ -91,6 +94,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reportFilterReset => '重設';
+
+  @override
+  String get reportListSearch => '查詢';
 
   @override
   String get navMore => '更多';
@@ -812,6 +818,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportListEmpty => '当前没有地震报告';
 
   @override
+  String get reportListEmptyFiltered => '没有符合条件的地震报告';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
   }
@@ -863,10 +872,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportFilterAny => '不限';
 
   @override
-  String get reportFilterApply => '应用';
+  String get reportFilterApply => '完成';
 
   @override
   String get reportFilterReset => '重置';
+
+  @override
+  String get reportListSearch => '查询';
 
   @override
   String get navMore => '更多';
@@ -1588,6 +1600,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportListEmpty => '目前沒有地震報告';
 
   @override
+  String get reportListEmptyFiltered => '沒有符合條件的地震報告';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
   }
@@ -1643,6 +1658,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get reportFilterReset => '重設';
+
+  @override
+  String get reportListSearch => '查詢';
 
   @override
   String get navMore => '更多';

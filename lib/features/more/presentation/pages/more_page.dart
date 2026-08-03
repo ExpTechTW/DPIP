@@ -359,7 +359,7 @@ class _SavedRegionsTileState extends State<_SavedRegionsTile> {
             ListTile(title: Text(title)),
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('修改'),
+              title: Text(AppLocalizations.of(context).regionEdit),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.pushNamed(

@@ -36,6 +36,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportListEmpty => '地震報告はありません';
 
   @override
+  String get reportListEmptyFiltered => '条件に一致する地震報告はありません';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -87,10 +90,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterAny => '指定なし';
 
   @override
-  String get reportFilterApply => '適用';
+  String get reportFilterApply => '完了';
 
   @override
   String get reportFilterReset => 'リセット';
+
+  @override
+  String get reportListSearch => '検索';
 
   @override
   String get navMore => 'その他';

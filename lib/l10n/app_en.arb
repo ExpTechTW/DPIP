@@ -36,6 +36,10 @@
   "@reportListEmpty": {
     "description": "Empty state when the report catalogue has no rows"
   },
+  "reportListEmptyFiltered": "No earthquake reports match these filters",
+  "@reportListEmptyFiltered": {
+    "description": "Empty state when active filters yield no report rows"
+  },
   "reportListMeta": "M{magnitude} · {depth} km",
   "@reportListMeta": {
     "description": "Magnitude and depth line on a report list row",
@@ -109,11 +113,15 @@
   },
   "reportFilterApply": "Apply",
   "@reportFilterApply": {
-    "description": "Primary button on the report filter sheet"
+    "description": "Primary button on the report filter sheet — saves draft and searches"
   },
   "reportFilterReset": "Reset",
   "@reportFilterReset": {
     "description": "Clears all filters in the report filter sheet"
+  },
+  "reportListSearch": "Search",
+  "@reportListSearch": {
+    "description": "Fetches the report list with the current draft filters"
   },
   "navMore": "More",
   "@navMore": {
@@ -167,6 +175,10 @@
         "type": "int"
       }
     }
+  },
+  "regionEdit": "Edit",
+  "@regionEdit": {
+    "description": "Edit action on a saved-region bottom sheet"
   },
   "moreSectionAdvanced": "Advanced",
   "@moreSectionAdvanced": {

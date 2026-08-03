@@ -9,7 +9,6 @@ import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/presentation/report_list_controller.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_filter_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
@@ -19,6 +18,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 /// Scrollable report list under the Data tab — infinite scroll + filter sheet.
+///
+/// Filter edits are remembered in [ReportListController.draft] until this page
+/// is popped. Opening the filter does not hit the API — only the sheet's
+/// search button (and pull-to-refresh / first load) does.
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
 
@@ -61,13 +64,16 @@ class _ReportListPageState extends State<ReportListPage> {
   }
 
   Future<void> _openFilter() async {
-    final next = await showReportFilterSheet(
+    final result = await showReportFilterSheet(
       context,
-      initial: _controller.query,
+      initial: _controller.draft,
     );
-    if (next == null || !mounted) return;
-    if (next == _controller.query) return;
-    await _controller.reload(query: next);
+    if (result == null || !mounted) return;
+    // Always keep edits — dismiss without 查詢 must not wipe dates/sliders.
+    _controller.setDraft(result.query);
+    if (!result.search) return;
+    await _controller.search();
+    if (!mounted) return;
     if (_scroll.hasClients) {
       _scroll.jumpTo(0);
     }
@@ -83,14 +89,14 @@ class _ReportListPageState extends State<ReportListPage> {
           ListenableBuilder(
             listenable: _controller,
             builder: (context, _) {
-              final active = !_controller.query.isEmpty;
+              final draftActive = !_controller.draft.isEmpty;
               return IconButton(
                 tooltip: l10n.reportFilterTitle,
                 onPressed: _openFilter,
                 icon: Badge(
-                  isLabelVisible: active,
+                  isLabelVisible: draftActive,
                   child: Icon(
-                    active ? Icons.filter_alt : Icons.filter_alt_outlined,
+                    draftActive ? Icons.filter_alt : Icons.filter_alt_outlined,
                   ),
                 ),
               );
@@ -98,13 +104,9 @@ class _ReportListPageState extends State<ReportListPage> {
           ),
         ],
       ),
-      body: RefreshOnAppear(
-        tabIndex: ReportListPage.tabIndex,
-        onAppear: () => _controller.reload(),
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) => _body(context),
-        ),
+      body: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) => _body(context),
       ),
     );
   }
@@ -122,7 +124,9 @@ class _ReportListPageState extends State<ReportListPage> {
     if (c.isEmpty) {
       return EmptyView(
         icon: Icons.monitor_heart_outlined,
-        message: l10n.reportListEmpty,
+        message: c.query.isEmpty
+            ? l10n.reportListEmpty
+            : l10n.reportListEmptyFiltered,
       );
     }
 
@@ -187,7 +191,11 @@ class _ReportTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final local = report.originTimeUtc.toLocal();
     final stamp = DateFormat('yyyy/MM/dd HH:mm').format(local);
-    final intensityColor = IntensityColors.discrete(report.intensity);
+    final intensity = Intensity.displayForReport(
+      report.intensity,
+      report.originTimeUtc,
+    );
+    final intensityColor = IntensityColors.discrete(intensity.colorLevel);
 
     return Material(
       color: colors.surfaceContainer,
@@ -199,7 +207,7 @@ class _ReportTile extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              _IntensityBadge(level: report.intensity, color: intensityColor),
+              _IntensityBadge(label: intensity.label, color: intensityColor),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -249,9 +257,9 @@ class _ReportTile extends StatelessWidget {
 }
 
 class _IntensityBadge extends StatelessWidget {
-  const _IntensityBadge({required this.level, required this.color});
+  const _IntensityBadge({required this.label, required this.color});
 
-  final int level;
+  final String label;
   final Color color;
 
   @override
@@ -267,7 +275,7 @@ class _IntensityBadge extends StatelessWidget {
         height: 44,
         child: Center(
           child: Text(
-            Intensity.label(level),
+            label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: onBadge,
               fontWeight: FontWeight.w700,

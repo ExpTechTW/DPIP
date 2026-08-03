@@ -36,6 +36,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportListEmpty => 'No earthquake reports';
 
   @override
+  String get reportListEmptyFiltered =>
+      'No earthquake reports match these filters';
+
+  @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth km';
   }
@@ -91,6 +95,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportFilterReset => 'Reset';
+
+  @override
+  String get reportListSearch => 'Search';
 
   @override
   String get navMore => 'More';
