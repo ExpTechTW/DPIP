@@ -47,17 +47,28 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterTitle => 'Filter';
 
   @override
-  String get reportFilterMinIntensity => 'Intensitas minimum';
+  String get reportFilterIntensity => 'Intensitas';
 
   @override
-  String get reportFilterMinMagnitude => 'Magnitudo minimum';
+  String get reportFilterMagnitude => 'Magnitudo';
 
   @override
-  String get reportFilterMaxDepth => 'Kedalaman maksimum';
+  String get reportFilterDepth => 'Kedalaman';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => 'Tanggal';
+
+  @override
+  String get reportFilterDatePick => 'Pilih tanggal';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override

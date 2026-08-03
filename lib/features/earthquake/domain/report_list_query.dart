@@ -3,6 +3,9 @@ library;
 
 /// Immutable filter bag for the report catalogue. `null` fields are omitted
 /// from the wire query (server defaults apply).
+///
+/// Dates are calendar days in **Asia/Taipei** as `YYYY-MM-DD` (see report-server
+/// `startTime` / `endTime`). `loc` / lat-lon filters were removed server-side.
 final class ReportListQuery {
   const ReportListQuery({
     this.minIntensity,
@@ -11,7 +14,10 @@ final class ReportListQuery {
     this.maxMagnitude,
     this.minDepth,
     this.maxDepth,
-    this.loc,
+    this.startTime,
+    this.endTime,
+    this.sort,
+    this.order,
     this.city,
     this.cityMinInt,
     this.cityMaxInt,
@@ -26,8 +32,19 @@ final class ReportListQuery {
   final double? minDepth;
   final double? maxDepth;
 
-  /// Fuzzy match on the report `location` string.
-  final String? loc;
+  /// Inclusive start day (`YYYY-MM-DD`, Taipei).
+  final String? startTime;
+
+  /// Inclusive end day (`YYYY-MM-DD`, Taipei).
+  final String? endTime;
+
+  /// `time` / `intensity` / `magnitude` / `depth` — omit for server default
+  /// (`time`).
+  final String? sort;
+
+  /// `asc` / `desc` — omit for server default (`desc`).
+  final String? order;
+
   final String? city;
   final int? cityMinInt;
   final int? cityMaxInt;
@@ -39,54 +56,13 @@ final class ReportListQuery {
       maxMagnitude == null &&
       minDepth == null &&
       maxDepth == null &&
-      (loc == null || loc!.trim().isEmpty) &&
+      startTime == null &&
+      endTime == null &&
+      sort == null &&
+      order == null &&
       (city == null || city!.trim().isEmpty) &&
       cityMinInt == null &&
       cityMaxInt == null;
-
-  ReportListQuery copyWith({
-    int? minIntensity,
-    int? maxIntensity,
-    double? minMagnitude,
-    double? maxMagnitude,
-    double? minDepth,
-    double? maxDepth,
-    String? loc,
-    String? city,
-    int? cityMinInt,
-    int? cityMaxInt,
-    bool clearMinIntensity = false,
-    bool clearMaxIntensity = false,
-    bool clearMinMagnitude = false,
-    bool clearMaxMagnitude = false,
-    bool clearMinDepth = false,
-    bool clearMaxDepth = false,
-    bool clearLoc = false,
-    bool clearCity = false,
-    bool clearCityMinInt = false,
-    bool clearCityMaxInt = false,
-  }) {
-    return ReportListQuery(
-      minIntensity: clearMinIntensity
-          ? null
-          : (minIntensity ?? this.minIntensity),
-      maxIntensity: clearMaxIntensity
-          ? null
-          : (maxIntensity ?? this.maxIntensity),
-      minMagnitude: clearMinMagnitude
-          ? null
-          : (minMagnitude ?? this.minMagnitude),
-      maxMagnitude: clearMaxMagnitude
-          ? null
-          : (maxMagnitude ?? this.maxMagnitude),
-      minDepth: clearMinDepth ? null : (minDepth ?? this.minDepth),
-      maxDepth: clearMaxDepth ? null : (maxDepth ?? this.maxDepth),
-      loc: clearLoc ? null : (loc ?? this.loc),
-      city: clearCity ? null : (city ?? this.city),
-      cityMinInt: clearCityMinInt ? null : (cityMinInt ?? this.cityMinInt),
-      cityMaxInt: clearCityMaxInt ? null : (cityMaxInt ?? this.cityMaxInt),
-    );
-  }
 
   @override
   bool operator ==(Object other) =>
@@ -98,7 +74,10 @@ final class ReportListQuery {
           maxMagnitude == other.maxMagnitude &&
           minDepth == other.minDepth &&
           maxDepth == other.maxDepth &&
-          loc == other.loc &&
+          startTime == other.startTime &&
+          endTime == other.endTime &&
+          sort == other.sort &&
+          order == other.order &&
           city == other.city &&
           cityMinInt == other.cityMinInt &&
           cityMaxInt == other.cityMaxInt;
@@ -111,7 +90,10 @@ final class ReportListQuery {
     maxMagnitude,
     minDepth,
     maxDepth,
-    loc,
+    startTime,
+    endTime,
+    sort,
+    order,
     city,
     cityMinInt,
     cityMaxInt,

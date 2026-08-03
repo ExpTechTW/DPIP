@@ -47,17 +47,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterTitle => '필터';
 
   @override
-  String get reportFilterMinIntensity => '최소 진도';
+  String get reportFilterIntensity => '진도';
 
   @override
-  String get reportFilterMinMagnitude => '최소 규모';
+  String get reportFilterMagnitude => '규모';
 
   @override
-  String get reportFilterMaxDepth => '최대 깊이';
+  String get reportFilterDepth => '깊이';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => '날짜';
+
+  @override
+  String get reportFilterDatePick => '날짜 선택';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override

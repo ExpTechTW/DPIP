@@ -32,6 +32,12 @@
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
+> **地震報告 list（v2）query：** `limit`/`page`、`sort`/`order`
+> （`time`\|`intensity`\|`magnitude`\|`depth` × `asc`\|`desc`）、震度／規模／深度
+> 區間、`startTime`/`endTime` 為 **`YYYY-MM-DD`（Asia/Taipei 當日）**、可選
+> `city`/`cityMinInt`/`cityMaxInt`。`loc` 與經緯度篩選已移除。伺服器會把非正規
+> query **302** 到 canonical（參數字母序、去掉預設值）以利 ETag／快取。
+
 > **即時串流走 SSE（gzip 壓縮），不是輪詢。** `?sse=1` 把端點切換成
 > `text/event-stream`；再加 `&compress=1`，payload 會以 `event: g` 事件送出，其
 > `data:` 是 **base64 的 gzip**（解開後就是純 GET 的同一份 JSON，模型不變），由**應用層**

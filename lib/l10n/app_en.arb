@@ -52,23 +52,39 @@
   "@reportFilterTitle": {
     "description": "Title of the earthquake report filter sheet"
   },
-  "reportFilterMinIntensity": "Minimum intensity",
-  "@reportFilterMinIntensity": {
-    "description": "Label for the minimum felt-intensity filter"
+  "reportFilterIntensity": "Intensity",
+  "@reportFilterIntensity": {
+    "description": "Label for the felt-intensity range filter"
   },
-  "reportFilterMinMagnitude": "Minimum magnitude",
-  "@reportFilterMinMagnitude": {
-    "description": "Label for the minimum magnitude filter"
+  "reportFilterMagnitude": "Magnitude",
+  "@reportFilterMagnitude": {
+    "description": "Label for the magnitude range filter"
   },
-  "reportFilterMaxDepth": "Maximum depth",
-  "@reportFilterMaxDepth": {
-    "description": "Label for the maximum hypocentral-depth filter"
+  "reportFilterDepth": "Depth",
+  "@reportFilterDepth": {
+    "description": "Label for the hypocentral-depth range filter"
   },
   "reportFilterDepthKm": "{depth} km",
   "@reportFilterDepthKm": {
     "description": "Depth value with unit in the filter sheet",
     "placeholders": {
       "depth": {"type": "String"}
+    }
+  },
+  "reportFilterDate": "Date",
+  "@reportFilterDate": {
+    "description": "Label for the origin-time date-range filter"
+  },
+  "reportFilterDatePick": "Pick dates",
+  "@reportFilterDatePick": {
+    "description": "Button to open the date-range picker when none selected"
+  },
+  "reportFilterRange": "{start} – {end}",
+  "@reportFilterRange": {
+    "description": "Displays a selected filter range (intensity, magnitude, depth, or dates)",
+    "placeholders": {
+      "start": {"type": "String"},
+      "end": {"type": "String"}
     }
   },
   "reportFilterLocation": "Location",

@@ -188,29 +188,47 @@ abstract class AppLocalizations {
   /// **'Filters'**
   String get reportFilterTitle;
 
-  /// Label for the minimum felt-intensity filter
+  /// Label for the felt-intensity range filter
   ///
   /// In en, this message translates to:
-  /// **'Minimum intensity'**
-  String get reportFilterMinIntensity;
+  /// **'Intensity'**
+  String get reportFilterIntensity;
 
-  /// Label for the minimum magnitude filter
+  /// Label for the magnitude range filter
   ///
   /// In en, this message translates to:
-  /// **'Minimum magnitude'**
-  String get reportFilterMinMagnitude;
+  /// **'Magnitude'**
+  String get reportFilterMagnitude;
 
-  /// Label for the maximum hypocentral-depth filter
+  /// Label for the hypocentral-depth range filter
   ///
   /// In en, this message translates to:
-  /// **'Maximum depth'**
-  String get reportFilterMaxDepth;
+  /// **'Depth'**
+  String get reportFilterDepth;
 
   /// Depth value with unit in the filter sheet
   ///
   /// In en, this message translates to:
   /// **'{depth} km'**
   String reportFilterDepthKm(String depth);
+
+  /// Label for the origin-time date-range filter
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get reportFilterDate;
+
+  /// Button to open the date-range picker when none selected
+  ///
+  /// In en, this message translates to:
+  /// **'Pick dates'**
+  String get reportFilterDatePick;
+
+  /// Displays a selected filter range (intensity, magnitude, depth, or dates)
+  ///
+  /// In en, this message translates to:
+  /// **'{start} – {end}'**
+  String reportFilterRange(String start, String end);
 
   /// Label for the location keyword filter field
   ///

@@ -68,7 +68,10 @@ class EarthquakeApi {
 
   /// Paginated earthquake report list (no area `list`; includes `md5` / `int`).
   ///
-  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report?limit=&page=`
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report`
+  ///
+  /// [startTime] / [endTime] are `YYYY-MM-DD` (Asia/Taipei). Defaults and
+  /// unknown keys are stripped server-side (302 to a canonical query).
   Future<List<dynamic>> getReportList({
     int limit = 50,
     int page = 1,
@@ -78,16 +81,19 @@ class EarthquakeApi {
     double? maxMagnitude,
     double? minDepth,
     double? maxDepth,
-    int? startTime,
-    int? endTime,
-    String? loc,
+    String? startTime,
+    String? endTime,
+    String? sort,
+    String? order,
     String? city,
     int? cityMinInt,
     int? cityMaxInt,
   }) async {
     final query = <String, dynamic>{
+      // Omit page=1 / sort=time / order=desc so the URL matches the server's
+      // canonical form and ETag/cache hit more often.
       'limit': limit,
-      'page': page,
+      if (page != 1) 'page': page,
       'minIntensity': ?minIntensity,
       'maxIntensity': ?maxIntensity,
       'minMagnitude': ?minMagnitude,
@@ -96,7 +102,8 @@ class EarthquakeApi {
       'maxDepth': ?maxDepth,
       'startTime': ?startTime,
       'endTime': ?endTime,
-      'loc': ?loc,
+      if (sort != null && sort != 'time') 'sort': sort,
+      if (order != null && order != 'desc') 'order': order,
       'city': ?city,
       'cityMinInt': ?cityMinInt,
       'cityMaxInt': ?cityMaxInt,

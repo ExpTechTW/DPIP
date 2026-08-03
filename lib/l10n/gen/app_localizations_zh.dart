@@ -47,17 +47,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportFilterTitle => '篩選';
 
   @override
-  String get reportFilterMinIntensity => '最小震度';
+  String get reportFilterIntensity => '震度';
 
   @override
-  String get reportFilterMinMagnitude => '最小規模';
+  String get reportFilterMagnitude => '規模';
 
   @override
-  String get reportFilterMaxDepth => '最大深度';
+  String get reportFilterDepth => '深度';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterDate => '日期';
+
+  @override
+  String get reportFilterDatePick => '選擇日期';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override
@@ -806,17 +817,28 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportFilterTitle => '筛选';
 
   @override
-  String get reportFilterMinIntensity => '最小震度';
+  String get reportFilterIntensity => '震度';
 
   @override
-  String get reportFilterMinMagnitude => '最小规模';
+  String get reportFilterMagnitude => '规模';
 
   @override
-  String get reportFilterMaxDepth => '最大深度';
+  String get reportFilterDepth => '深度';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterDate => '日期';
+
+  @override
+  String get reportFilterDatePick => '选择日期';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override
@@ -1565,17 +1587,28 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportFilterTitle => '篩選';
 
   @override
-  String get reportFilterMinIntensity => '最小震度';
+  String get reportFilterIntensity => '震度';
 
   @override
-  String get reportFilterMinMagnitude => '最小規模';
+  String get reportFilterMagnitude => '規模';
 
   @override
-  String get reportFilterMaxDepth => '最大深度';
+  String get reportFilterDepth => '深度';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth 公里';
+  }
+
+  @override
+  String get reportFilterDate => '日期';
+
+  @override
+  String get reportFilterDatePick => '選擇日期';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override

@@ -47,17 +47,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterTitle => '絞り込み';
 
   @override
-  String get reportFilterMinIntensity => '最小震度';
+  String get reportFilterIntensity => '震度';
 
   @override
-  String get reportFilterMinMagnitude => '最小マグニチュード';
+  String get reportFilterMagnitude => 'マグニチュード';
 
   @override
-  String get reportFilterMaxDepth => '最大深さ';
+  String get reportFilterDepth => '深さ';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => '日付';
+
+  @override
+  String get reportFilterDatePick => '日付を選択';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override

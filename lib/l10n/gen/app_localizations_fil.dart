@@ -47,17 +47,28 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportFilterTitle => 'Mga filter';
 
   @override
-  String get reportFilterMinIntensity => 'Minimum intensity';
+  String get reportFilterIntensity => 'Intensity';
 
   @override
-  String get reportFilterMinMagnitude => 'Minimum magnitude';
+  String get reportFilterMagnitude => 'Magnitude';
 
   @override
-  String get reportFilterMaxDepth => 'Maximum depth';
+  String get reportFilterDepth => 'Depth';
 
   @override
   String reportFilterDepthKm(String depth) {
     return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => 'Petsa';
+
+  @override
+  String get reportFilterDatePick => 'Pumili ng petsa';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
   }
 
   @override
