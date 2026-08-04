@@ -640,11 +640,9 @@ packages:
   maplibre_gl:
     dependency: "direct main"
     description:
-      path: maplibre_gl
-      ref: main
-      resolved-ref: "7b1a613fa286bef1adb76a963b026bc2d0c10eb1"
-      url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
-    source: git
+      path: "/Users/yuyu1015/Documents/GitHub/flutter-maplibre-gl/maplibre_gl"
+      relative: false
+    source: path
     version: "0.26.2"
   maplibre_gl_platform_interface:
     dependency: transitive

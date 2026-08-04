@@ -7,8 +7,11 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.offline.OfflineManager
 
 /**
- * MapLibre ambient tile-cache bridge — size ceiling + preload (Android
- * counterpart of iOS `MapCachePlugin`).
+ * MapLibre ambient tile-cache bridge — size ceiling only (Android counterpart
+ * of iOS `MapCachePlugin`).
+ *
+ * The app disables ambient caching (`MapCache.disabledBytes`) and serves those
+ * bytes from its own store through the MapLibre tile bridge.
  */
 class MapCacheChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {
@@ -34,28 +37,6 @@ class MapCacheChannel(private val context: Context) :
                             result.error("cache_failed", message, null)
                     },
                 )
-            }
-            "preload" -> {
-                val url = call.argument<String>("url")
-                val data = call.argument<ByteArray>("data")
-                if (url.isNullOrEmpty() || data == null) {
-                    result.error("bad_args", "Missing url/data", null)
-                    return
-                }
-                val etag = call.argument<String>("etag")
-                val modified = call.argument<Number>("modified")?.toLong() ?: 0L
-                val expires = call.argument<Number>("expires")?.toLong() ?: 0L
-                val mustRevalidate = call.argument<Boolean>("mustRevalidate") ?: false
-                MapLibre.getInstance(context)
-                OfflineManager.getInstance(context).putResourceWithUrl(
-                    url,
-                    data,
-                    modified,
-                    expires,
-                    etag,
-                    mustRevalidate,
-                )
-                result.success(null)
             }
             else -> result.notImplemented()
         }

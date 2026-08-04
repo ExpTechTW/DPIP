@@ -48,6 +48,11 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
 /// Records the MapLibre calls a layer makes, and the last state of each layer.
 class RecordingMapController implements MapLibreMapController {
   final List<String> calls = [];
+
+  /// Property keys of each `setLayerProperties` call, in order — what actually
+  /// went over the platform channel.
+  final List<Set<String>> sentKeys = [];
+
   final Map<String, ({String? visibility, String? opacity})> _state = {};
 
   String? visibilityOf(String layerId) => _state[layerId]?.visibility;
@@ -56,6 +61,9 @@ class RecordingMapController implements MapLibreMapController {
   @override
   Future<void> addSource(String sourceId, SourceProperties properties) async =>
       calls.add('addSource:$sourceId');
+
+  /// `raster-opacity-transition` each layer was mounted with, by layer id.
+  final Map<String, Object?> mountTransitions = {};
 
   @override
   Future<void> addRasterLayer(
@@ -68,6 +76,8 @@ class RecordingMapController implements MapLibreMapController {
     double? maxzoom,
   }) async {
     calls.add('addRasterLayer:$layerId');
+    mountTransitions[layerId] = properties
+        .toJson()['raster-opacity-transition'];
     _record(layerId, properties);
   }
 
@@ -95,18 +105,23 @@ class RecordingMapController implements MapLibreMapController {
   @override
   Future<void> setLayerProperties(
     String layerId,
-    LayerProperties properties,
-  ) async {
+    LayerProperties properties, {
+    bool skipNulls = false,
+  }) async {
     final json = properties.toJson();
-    calls.add('set:$layerId:${json['visibility']}:${json['raster-opacity']}');
+    calls.add('set:$layerId:${json['raster-opacity']}');
+    sentKeys.add(json.keys.toSet());
     _record(layerId, properties);
   }
 
+  /// Merges into the layer's state: the layer keeps whatever a call omits,
+  /// which is exactly what `skipNulls` means on the wire.
   void _record(String layerId, LayerProperties properties) {
     final json = properties.toJson();
+    final previous = _state[layerId];
     _state[layerId] = (
-      visibility: json['visibility']?.toString(),
-      opacity: json['raster-opacity']?.toString(),
+      visibility: json['visibility']?.toString() ?? previous?.visibility,
+      opacity: json['raster-opacity']?.toString() ?? previous?.opacity,
     );
   }
 

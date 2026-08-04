@@ -21,26 +21,30 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// frame issued a fresh viewport of tile requests for every frame the finger
 /// swept past, and abandoned them a moment later.
 ///
-/// ## The preload ring
-/// The frames within [ringRadius] of the current one are all mounted
-/// **visible**, with only the current one at full [opacity] and its neighbours
-/// at zero. Their tiles are therefore already loaded and resident on the GPU,
-/// and scrubbing across the ring is a pure opacity flip — two property sets,
-/// **zero** tile requests, no `addSource`, no cancels. That is the only thing
-/// that keeps up with a finger.
+/// ## Three tiers
+/// - **The ring** — frames within [ringRadius] are mounted **visible**, only
+///   the current one at full [opacity] and its neighbours at zero. Their tiles
+///   are already loaded and on the GPU, so scrubbing across them is a pure
+///   opacity flip: two property sets, **zero** tile requests, no `addSource`,
+///   no cancels. That is the only thing that keeps up with a finger.
+/// - **The warm band** — frames within [warmRadius] have their tiles pushed
+///   into MapLibre's memory but are not mounted. Revealing one costs a mount,
+///   but no disk and no network.
+/// - **Cold** — anything further out. Revealing it mounts and loads normally.
 ///
-/// Outside the ring, residents drop to `visibility: none`, which stops them
-/// both drawing and loading. A cold frame reached mid-drag is simply not shown
-/// (the painted frame stays, the timeline label still moves); the next settle
-/// re-centres the ring on wherever the finger stopped.
+/// A drag reveals whichever tier the frame is in; only the ring is free, but
+/// none of them stall. (Cold frames used to be skipped outright while the
+/// finger was down, which froze the map until release — see [_revealBeyondRing]
+/// for why that is no longer necessary.) Frames outside the ring sit at
+/// `visibility: none`, which stops them both drawing and loading.
 ///
 /// ## Settling
 /// A settle reveals the target first (it is what the user is waiting for), then
 /// retires everything outside the new ring — abandoning those frames' in-flight
 /// HTTP through [RasterFrameSource.abandonFrames], scoped so the basemap and the
-/// target keep loading. Only then does it warm the new neighbours out of the
-/// app's tile store into MapLibre's memory and mount them transparent, so the
-/// next scrub across them touches neither disk nor network.
+/// target keep loading. Only then does it re-warm the band and mount the new
+/// neighbours transparent, so the next drag across them touches neither disk
+/// nor network.
 abstract class RasterTimelineLayer implements MapLayer {
   RasterTimelineLayer(this.source);
 
@@ -52,12 +56,22 @@ abstract class RasterTimelineLayer implements MapLayer {
   @protected
   double get opacity;
 
-  /// How many frames either side of the current one are kept preloaded.
+  /// How many frames either side of the current one are kept **mounted and
+  /// drawn** (transparent), so scrubbing onto them is a pure opacity flip.
   ///
-  /// Wider = more of a scrub is a free opacity flip, at one raster draw call and
-  /// one viewport of tiles per extra frame.
+  /// Each extra frame costs a raster draw call every rendered frame plus a
+  /// viewport of loaded tiles, so this stays small — [warmRadius] is the cheap
+  /// way to widen the range a drag handles smoothly.
   @protected
   int get ringRadius => 2;
+
+  /// How many frames either side have their tiles pushed into MapLibre's
+  /// memory ahead of demand.
+  ///
+  /// Costs nothing to draw — it only decides how far a drag can go before a
+  /// reveal has to reach disk or the network.
+  @protected
+  int get warmRadius => 8;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast
@@ -134,14 +148,32 @@ abstract class RasterTimelineLayer implements MapLayer {
   String? _shownFrameId;
   bool _attached = false;
 
-  /// Guards the scrub hot path: a flip that lost the race must not repaint.
-  int _flipGeneration = 0;
-
   String _sourceId(String frameId) => '$id-src-$frameId';
   String _layerId(String frameId) => '$id-lyr-$frameId';
 
-  RasterLayerProperties _visibleAt(double value) =>
-      RasterLayerProperties(visibility: 'visible', rasterOpacity: value);
+  /// Paint a frame is mounted with.
+  ///
+  /// The zero transition is what makes a scrub read as a loop rather than a
+  /// smear: `raster-opacity` is an animated paint property whose style-spec
+  /// default is a **300 ms** cross-fade, so every swap used to blend two frames
+  /// for longer than the finger takes to cross the next one — the map could
+  /// never catch up, however fast the tiles resolved. Declared once at mount, it
+  /// governs every later opacity change for free.
+  static RasterLayerProperties _mountPaint(double value) =>
+      RasterLayerProperties(
+        visibility: 'visible',
+        rasterOpacity: value,
+        rasterOpacityTransition: const {'duration': 0, 'delay': 0},
+      );
+
+  /// Scrub-path paint: opacity only.
+  ///
+  /// Sent with `skipNulls` so the platform call carries this one property
+  /// instead of every raster property the layer type has — the full form makes
+  /// the platform side re-assign eight values that did not change, on a path
+  /// that runs for every frame the finger crosses.
+  static RasterLayerProperties _opacity(double value) =>
+      RasterLayerProperties(rasterOpacity: value);
 
   static const RasterLayerProperties _hidden = RasterLayerProperties(
     visibility: 'none',
@@ -183,26 +215,73 @@ abstract class RasterTimelineLayer implements MapLayer {
       await _flip(controller, frame.id);
       return;
     }
-    // Cold mid-drag — keep the painted frame rather than starting a tile load
-    // the finger is about to abandon. The settle below picks it up.
-    if (scrubbing) return;
+    // Past the ring, still dragging: reveal it anyway. Re-centring the ring
+    // here would cost a retire + warm + a mount per neighbour, so that waits
+    // for the settle.
+    if (scrubbing) {
+      await _revealBeyondRing(controller, frame.id);
+      return;
+    }
     await _settle(controller, index, frame.id);
   }
 
+  /// Reveals a frame the preload ring does not cover, mid-drag.
+  ///
+  /// Dragging past the ring used to do **nothing** until the finger came up:
+  /// mounting costs two platform calls plus a tile pass, and back when the
+  /// scaffold fired one unawaited reveal per frame crossed, doing that mid-drag
+  /// meant a request storm. It no longer does — reveals are driven latest-wins
+  /// with a single op in flight, so the cost is bounded to the frames the drag
+  /// actually lands on rather than every frame it sweeps over, and the warm band
+  /// ([warmRadius]) usually has their tiles in MapLibre's memory already.
+  Future<void> _revealBeyondRing(
+    MapLibreMapController controller,
+    String frameId,
+  ) async {
+    final previous = _shownFrameId;
+    _shownFrameId = frameId;
+
+    await Future.wait([
+      if (previous != null && previous != frameId)
+        controller.setLayerProperties(
+          _layerId(previous),
+          // A ring member only fades out — it keeps its tiles for the next
+          // flip. Anything else stops drawing *and* loading outright, so a long
+          // drag can't leave a trail of live sources behind it.
+          _ring.contains(previous) ? _opacity(0) : _hidden,
+          skipNulls: true,
+        ),
+      _mount(controller, frameId, opacity),
+    ]);
+    await _evictOverflow(controller, keep: {..._ring, frameId});
+  }
+
   /// Scrub hot path — never mounts, never cancels, never touches `visibility`.
+  ///
+  /// The two writes go out **together**. Awaiting the hide before sending the
+  /// show cost two serial platform round-trips per frame, which is the budget
+  /// for the whole frame; pipelined they cost one, and MapLibre applies them in
+  /// order within a single render pass, so no in-between state is ever drawn.
   Future<void> _flip(MapLibreMapController controller, String frameId) async {
-    final generation = ++_flipGeneration;
     final previous = _shownFrameId;
     _shownFrameId = frameId;
     _touch(frameId);
 
-    if (previous != null && previous != frameId && _ring.contains(previous)) {
-      // Stays `visible` at zero opacity: dropping it to `none` would evict its
-      // tiles and make scrubbing back a reload.
-      await controller.setLayerProperties(_layerId(previous), _visibleAt(0));
-    }
-    if (generation != _flipGeneration) return;
-    await controller.setLayerProperties(_layerId(frameId), _visibleAt(opacity));
+    await Future.wait([
+      if (previous != null && previous != frameId && _ring.contains(previous))
+        // Stays `visible` at zero opacity: dropping it to `none` would evict
+        // its tiles and make scrubbing back a reload.
+        controller.setLayerProperties(
+          _layerId(previous),
+          _opacity(0),
+          skipNulls: true,
+        ),
+      controller.setLayerProperties(
+        _layerId(frameId),
+        _opacity(opacity),
+        skipNulls: true,
+      ),
+    ]);
   }
 
   /// Re-centres the preload ring on [frameId] and reveals it.
@@ -217,34 +296,43 @@ abstract class RasterTimelineLayer implements MapLayer {
 
     // The target first — it is what the user stopped on.
     await _mount(controller, frameId, opacity);
+    _ring.add(frameId);
     _shownFrameId = frameId;
-    _flipGeneration++;
     if (!_attached) {
       _attached = true;
       await onAttached(controller);
     }
 
     await _retireOutside(controller, ring);
-    await _warmRing(controller, ring);
+    await _warmBand(controller, index);
 
     for (final id in ring) {
       if (id == frameId) continue;
       await _mount(controller, id, 0);
+      _ring.add(id);
     }
     await _evictOverflow(controller, keep: ring);
   }
 
-  /// Mounts [id] if cold, then sets its opacity. Always leaves it `visible`, so
-  /// MapLibre keeps its tiles loaded.
+  /// Mounts [id] if cold, then draws it at [value]. Always leaves it `visible`,
+  /// so MapLibre keeps its tiles loaded.
+  ///
+  /// Ring membership is the caller's call: a settle mounts its neighbours *into*
+  /// the ring, a mid-drag reveal deliberately does not, so the ring stays the
+  /// size [ringRadius] says and a long drag doesn't accumulate live sources.
   Future<void> _mount(
     MapLibreMapController controller,
     String id,
     double value,
   ) async {
     _touch(id);
-    _ring.add(id);
     if (_resident.contains(id)) {
-      await controller.setLayerProperties(_layerId(id), _visibleAt(value));
+      // Back into the ring from `none`: restore visibility *and* the opacity.
+      await controller.setLayerProperties(
+        _layerId(id),
+        RasterLayerProperties(visibility: 'visible', rasterOpacity: value),
+        skipNulls: true,
+      );
       return;
     }
     await controller.addSource(
@@ -254,7 +342,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     await controller.addRasterLayer(
       _sourceId(id),
       _layerId(id),
-      _visibleAt(value),
+      _mountPaint(value),
       belowLayerId: outlineLayerId,
     );
     _resident.add(id);
@@ -274,21 +362,26 @@ abstract class RasterTimelineLayer implements MapLayer {
     _ring.removeAll(retired);
     await Future.wait([
       for (final id in retired)
-        controller.setLayerProperties(_layerId(id), _hidden),
+        controller.setLayerProperties(_layerId(id), _hidden, skipNulls: true),
     ]);
     await source.abandonFrames(retired);
   }
 
-  /// Reads the ring's viewport tiles out of the app's store and injects them
-  /// into MapLibre's memory, so mounting them next is I/O-free.
-  Future<void> _warmRing(
-    MapLibreMapController controller,
-    Set<String> ring,
-  ) async {
+  /// Pushes the viewport tiles of every frame within [warmRadius] of [centre]
+  /// out of the app's store and into MapLibre's memory.
+  ///
+  /// Deliberately wider than the mounted ring: warming costs one local read and
+  /// a memory push — no draw call, no tile pass, no network — so the band that
+  /// a drag can cross **without touching disk** is far cheaper to widen than the
+  /// band kept mounted.
+  Future<void> _warmBand(MapLibreMapController controller, int centre) async {
+    if (_orderedIds.isEmpty) return;
+    final low = (centre - warmRadius).clamp(0, _orderedIds.length - 1);
+    final high = (centre + warmRadius).clamp(0, _orderedIds.length - 1);
     try {
       final bounds = await controller.getVisibleRegion();
       await source.warmFrameTiles(
-        frames: ring.toList(growable: false),
+        frames: [for (var i = low; i <= high; i++) _orderedIds[i]],
         south: bounds.southwest.latitude,
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
@@ -296,7 +389,7 @@ abstract class RasterTimelineLayer implements MapLayer {
         zoom: controller.cameraPosition?.zoom ?? 8,
       );
     } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, '$id ring warm');
+      Log.handle(error, stackTrace, '$id band warm');
     }
   }
 
@@ -324,16 +417,23 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   Future<void> onCameraIdle(MapLibreMapController controller) async {
-    if (_ring.isEmpty) return;
-    // The viewport moved, so the ring's warmed tiles are the wrong ones —
-    // re-warm for where the camera actually is.
-    unawaited(_warmRing(controller, Set<String>.of(_ring)));
+    final centre = _shownIndex;
+    if (centre == null) return;
+    // The viewport moved, so the warmed tiles are the wrong ones — re-warm for
+    // where the camera actually is.
+    unawaited(_warmBand(controller, centre));
   }
 
   @override
   Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {
-    if (_ring.isEmpty) return;
-    await _warmRing(controller, Set<String>.of(_ring));
+    final centre = _shownIndex;
+    if (centre == null) return;
+    await _warmBand(controller, centre);
+  }
+
+  int? get _shownIndex {
+    final id = _shownFrameId;
+    return id == null ? null : _indexById[id];
   }
 
   @override
@@ -365,7 +465,6 @@ abstract class RasterTimelineLayer implements MapLayer {
     _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
-    _flipGeneration = 0;
     _attached = false;
   }
 }

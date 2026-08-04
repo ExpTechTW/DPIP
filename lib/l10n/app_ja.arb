@@ -11,6 +11,12 @@
   "reportListEmpty": "地震報告はありません",
   "reportListEmptyFiltered": "条件に一致する地震報告はありません",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "局地有感",
+  "reportListToday": "今日",
+  "reportListYesterday": "昨日",
+  "reportListDayCount": "{count}",
   "reportListEnd": "これ以上ありません",
   "reportFilterTitle": "絞り込み",
   "reportFilterIntensity": "震度",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "東経 {lon} 度",
   "typhoonValueMs": "毎秒 {n} m",
   "typhoonOverlayForecastCallouts": "予報点の情報",
-  "typhoonOverlayForecastCalloutsTooltip": "拡大時に予報点の詳細カードを表示"
+  "typhoonOverlayForecastCalloutsTooltip": "拡大時に予報点の詳細カードを表示",
+  "commonCancel": "キャンセル",
+  "developerClearCache": "キャッシュを消去",
+  "developerClearCacheSubtitle": "保存されたタイルと API 応答を削除します",
+  "developerClearCacheConfirm": "保存された地図タイルと API 応答が削除され、次に必要になったときに再ダウンロードされます。",
+  "developerCacheCleared": "キャッシュを消去しました"
 }

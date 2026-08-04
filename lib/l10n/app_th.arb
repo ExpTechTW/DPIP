@@ -11,6 +11,12 @@
   "reportListEmpty": "ไม่มีรายงานแผ่นดินไหว",
   "reportListEmptyFiltered": "ไม่มีรายงานที่ตรงกับเงื่อนไข",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "รู้สึกในพื้นที่",
+  "reportListToday": "วันนี้",
+  "reportListYesterday": "เมื่อวาน",
+  "reportListDayCount": "{count}",
   "reportListEnd": "สิ้นสุดรายการ",
   "reportFilterTitle": "ตัวกรอง",
   "reportFilterIntensity": "ความเข้ม",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "{lon}°E",
   "typhoonValueMs": "{n} m/s",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in"
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "commonCancel": "ยกเลิก",
+  "developerClearCache": "ล้างแคช",
+  "developerClearCacheSubtitle": "ลบไทล์และการตอบกลับ API ที่จัดเก็บไว้",
+  "developerClearCacheConfirm": "ไทล์แผนที่และการตอบกลับ API ที่จัดเก็บไว้จะถูกลบ และจะดาวน์โหลดใหม่เมื่อจำเป็นในครั้งถัดไป",
+  "developerCacheCleared": "ล้างแคชแล้ว"
 }

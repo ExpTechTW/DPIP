@@ -11,6 +11,12 @@
   "reportListEmpty": "Không có báo cáo động đất",
   "reportListEmptyFiltered": "Không có báo cáo khớp bộ lọc",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "Cảm nhận cục bộ",
+  "reportListToday": "Hôm nay",
+  "reportListYesterday": "Hôm qua",
+  "reportListDayCount": "{count}",
   "reportListEnd": "Hết danh sách",
   "reportFilterTitle": "Bộ lọc",
   "reportFilterIntensity": "Cường độ",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "{lon}°E",
   "typhoonValueMs": "{n} m/s",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in"
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "commonCancel": "Huỷ",
+  "developerClearCache": "Xoá bộ nhớ đệm",
+  "developerClearCacheSubtitle": "Xoá các ô bản đồ và phản hồi API đã lưu",
+  "developerClearCacheConfirm": "Các ô bản đồ và phản hồi API đã lưu sẽ bị xoá và được tải lại khi cần vào lần sau.",
+  "developerCacheCleared": "Đã xoá bộ nhớ đệm"
 }

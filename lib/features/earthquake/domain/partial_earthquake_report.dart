@@ -31,12 +31,14 @@ abstract class PartialEarthquakeReport with _$PartialEarthquakeReport {
   factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) =>
       _$PartialEarthquakeReportFromJson(json);
 
-  /// CWA serial when the id is not a `…000-` placeholder (e.g. `115053`).
-  String? get number {
-    final n = id.split('-').first;
-    if (n.endsWith('000')) return null;
-    return n;
-  }
+  /// Leading CWA serial segment (e.g. `115032` or `115000`).
+  String get serial => id.split('-').first;
+
+  /// `…000` serials are 小區域有感 — no numbered CWA report.
+  bool get isLocalFelt => serial.endsWith('000');
+
+  /// Numbered CWA report id, or null when [isLocalFelt].
+  String? get number => isLocalFelt ? null : serial;
 
   bool get hasNumber => number != null;
 

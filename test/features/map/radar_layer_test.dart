@@ -58,28 +58,83 @@ void main() {
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
       controller.calls.clear();
+      controller.sentKeys.clear();
 
       await layer.show(controller, frames[5], scrubbing: true);
 
       expect(controller.calls, [
-        'set:radar-lyr-${frames[4].id}:visible:0.0',
-        'set:radar-lyr-${frames[5].id}:visible:0.85',
+        'set:radar-lyr-${frames[4].id}:0.0',
+        'set:radar-lyr-${frames[5].id}:0.85',
       ]);
+      expect(
+        controller.sentKeys,
+        everyElement(equals({'raster-opacity'})),
+        reason:
+            'the scrub path must not re-send visibility or the seven other '
+            'raster properties the layer type has',
+      );
     },
   );
 
-  test('a cold frame mid-drag is skipped, not mounted', () async {
+  test('frames mount with no opacity transition', () async {
     final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]);
+
+    expect(controller.mountTransitions, isNotEmpty);
+    expect(
+      controller.mountTransitions.values,
+      everyElement(equals({'duration': 0, 'delay': 0})),
+      reason:
+          "raster-opacity's style-spec default is a 300 ms cross-fade, which "
+          'makes every scrub step lag the finger and blend two frames',
+    );
+  });
+
+  test('dragging past the ring still reveals the frame', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
     controller.calls.clear();
 
     await layer.show(controller, frames[0], scrubbing: true);
 
-    expect(controller.calls, isEmpty);
+    expect(
+      controller.opacityOf('radar-lyr-${frames[0].id}'),
+      '0.85',
+      reason:
+          'skipping this froze the map on the old frame until the finger '
+          'came up — the whole drag showed nothing',
+    );
+    expect(controller.calls, contains('addSource:radar-src-${frames[0].id}'));
+  });
+
+  test('a mid-drag reveal does not widen the ring', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    await layer.show(controller, frames[0], scrubbing: true);
+    controller.calls.clear();
+
+    await layer.show(controller, frames[8], scrubbing: true);
+
+    // frames[0] joined nothing: it stops drawing and loading outright, so a
+    // long drag can't leave a trail of live sources behind it.
+    expect(controller.visibilityOf('radar-lyr-${frames[0].id}'), 'none');
+    expect(
+      controller.visibilityOf('radar-lyr-${frames[3].id}'),
+      'visible',
+      reason: 'a real ring member only fades out, keeping its tiles',
+    );
   });
 
   test('a settle abandons the frames the scrub swept past', () async {
@@ -100,20 +155,23 @@ void main() {
     );
   });
 
-  test('a settle warms the new ring before mounting it', () async {
-    final source = _FakeRadarRepository(_ids(9));
+  test('a settle warms well beyond the mounted ring', () async {
+    // 25 frames so the ±8 warm band is a strict subset, not the whole list.
+    final source = _FakeRadarRepository(_ids(25));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
-    await layer.show(controller, frames[4]);
+    await layer.show(controller, frames[12]);
 
     expect(
       source.warmed.last,
-      unorderedEquals([
-        for (final i in [2, 3, 4, 5, 6]) frames[i].id,
-      ]),
+      unorderedEquals([for (var i = 4; i <= 20; i++) frames[i].id]),
+      reason:
+          'warming is a local read plus a memory push, so the band a drag '
+          'can cross without touching disk is far cheaper to widen than the '
+          'band kept mounted',
     );
   });
 

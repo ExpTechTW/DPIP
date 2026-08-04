@@ -7,8 +7,9 @@ import 'package:dpip/core/network/api_region.dart';
 /// Tile templates + JSON detail for `/api/v2/tiles/dpm/…`.
 ///
 /// Detail GETs go through [ApiClient] for ETag / gzip / errors. MVT tiles keep
-/// the HTTPS [tileUrl] template in the style; [ApiClient.getBytes] + ambient
-/// preload (see disaster_map data layer) warms MapLibre's cache.
+/// the HTTPS [tileUrl] template in the style and are fetched by MapLibre
+/// itself, served from the app's tile store through the Dart bridge;
+/// `DpmTilePrefetcher` warms the viewport ahead of that.
 class DisasterMapApi {
   const DisasterMapApi(this._client);
 

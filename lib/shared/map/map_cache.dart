@@ -1,5 +1,5 @@
 /// Sizes MapLibre's own **ambient tile database** (iOS `MLNOfflineStorage` /
-/// Android `OfflineManager`).
+/// Android `OfflineManager`) — which this app keeps switched off.
 library;
 
 import 'package:dpip/core/logging/log.dart';
@@ -7,17 +7,16 @@ import 'package:flutter/services.dart';
 
 /// Native ambient-cache bridge.
 ///
-/// This is the *hot* tier and it is MapLibre's, not the app's: responses it has
-/// already downloaded are answered from here without a request ever reaching
-/// the app. Tiles are served with an immutable `Cache-Control` (their URLs are
-/// content-addressed), so this tier does real work — before that they were
-/// treated as expired and re-requested on every reveal.
+/// MapLibre keeps its own on-disk cache of everything it downloads. This app
+/// **disables it** ([disabledBytes]) and serves those bytes from
+/// [EtagCacheStore] through the Dart bridge instead, because two disk caches of
+/// the same tiles meant ~214 MB for one copy's worth of content and only one of
+/// them was visible to the app's eviction policy and traffic accounting. The
+/// native default (~50 MB) applies if this is never called, so it must be.
 ///
-/// The durable tier is the app's own [EtagCacheStore] (~150 MB, metered, swept
-/// on the app's policy), which is what [MapTileCache] warms from. So this one
-/// is deliberately smaller: it only has to hold the frames of the session in
-/// progress, and sizing both at 150 MB just spent 300 MB storing each tile
-/// twice.
+/// Nothing is lost by turning it off: glyphs are in the app's store too, and
+/// the in-process mirror in front of the bridge is what actually keeps IPC off
+/// the hot path — the ambient database was only ever a second copy behind it.
 class MapCache {
   const MapCache();
 
@@ -25,12 +24,11 @@ class MapCache {
     'com.exptech.dpip/map_cache',
   );
 
-  /// Ambient ceiling shared by every map surface. Native's own default (~50 MB)
-  /// is too small to hold a scrubbed radar loop.
-  static const int defaultAmbientBytes = 64 * 1024 * 1024;
+  /// A zero ceiling disables ambient caching outright on both platforms.
+  static const int disabledBytes = 0;
 
   /// Caps the shared ambient cache at [bytes], trimming (LRU) if already larger.
-  Future<void> setMaximumSize([int bytes = defaultAmbientBytes]) async {
+  Future<void> setMaximumSize([int bytes = disabledBytes]) async {
     try {
       await _channel.invokeMethod<void>('setMaximumAmbientCacheSize', {
         'bytes': bytes,

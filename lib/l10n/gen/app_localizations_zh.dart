@@ -44,6 +44,28 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => '公里';
+
+  @override
+  String get reportListLocalFelt => '小區域有感';
+
+  @override
+  String get reportListToday => '今天';
+
+  @override
+  String get reportListYesterday => '昨天';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => '已到最後一頁';
 
   @override
@@ -895,6 +917,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get developerClearCache => '清除快取';
+
+  @override
+  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
+
+  @override
+  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
+
+  @override
+  String get developerCacheCleared => '已清除快取';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -934,6 +971,28 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => '公里';
+
+  @override
+  String get reportListLocalFelt => '小区域有感';
+
+  @override
+  String get reportListToday => '今天';
+
+  @override
+  String get reportListYesterday => '昨天';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
   }
 
   @override
@@ -1788,6 +1847,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大时显示预测点详细卡片';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get developerClearCache => '清除缓存';
+
+  @override
+  String get developerClearCacheSubtitle => '移除已存储的图块与 API 响应';
+
+  @override
+  String get developerClearCacheConfirm => '已存储的地图图块与 API 响应将被删除，下次需要时会重新下载。';
+
+  @override
+  String get developerCacheCleared => '已清除缓存';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1827,6 +1901,28 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => '公里';
+
+  @override
+  String get reportListLocalFelt => '小區域有感';
+
+  @override
+  String get reportListToday => '今天';
+
+  @override
+  String get reportListYesterday => '昨天';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
   }
 
   @override
@@ -2681,6 +2777,21 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get developerClearCache => '清除快取';
+
+  @override
+  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
+
+  @override
+  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
+
+  @override
+  String get developerCacheCleared => '已清除快取';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -2720,6 +2831,28 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String reportListMeta(String magnitude, String depth) {
     return 'M$magnitude · $depth 公里';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => '公里';
+
+  @override
+  String get reportListLocalFelt => '小區域有感';
+
+  @override
+  String get reportListToday => '今天';
+
+  @override
+  String get reportListYesterday => '昨天';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
   }
 
   @override
@@ -3574,4 +3707,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get developerClearCache => '清除快取';
+
+  @override
+  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
+
+  @override
+  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
+
+  @override
+  String get developerCacheCleared => '已清除快取';
 }

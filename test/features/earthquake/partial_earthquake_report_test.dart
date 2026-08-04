@@ -22,10 +22,23 @@ void main() {
       expect(report.id, '115053-2026-0731-005836');
       expect(report.magnitude, 4.7);
       expect(report.intensity, 4);
+      expect(report.isLocalFelt, isFalse);
       expect(report.hasNumber, isTrue);
       expect(report.number, '115053');
+      expect(report.serial, '115053');
       expect(report.shortLocation, '臺東縣成功鎮');
       expect(PartialEarthquakeReport.fromJson(report.toJson()), report);
+    });
+
+    test('…000 serial is local-felt, not a numbered report', () {
+      final report = PartialEarthquakeReport.fromJson({
+        ...json,
+        'id': '115000-2026-0731-005836',
+      });
+      expect(report.serial, '115000');
+      expect(report.isLocalFelt, isTrue);
+      expect(report.hasNumber, isFalse);
+      expect(report.number, isNull);
     });
 
     test('parseReportList skips junk rows', () {

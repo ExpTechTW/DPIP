@@ -3,6 +3,7 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -21,7 +22,11 @@ import 'package:provider/provider.dart';
 ///
 /// Filter edits are remembered in [ReportListController.draft] until this page
 /// is popped. Opening the filter does not hit the API — only the sheet's
-/// search button (and pull-to-refresh / first load) does.
+/// search button (and enter / resume reload) does. Pull-to-refresh is disabled;
+/// the catalogue refreshes on every entry and when the app returns from
+/// background.
+///
+/// Rows are grouped by Taipei calendar day into section cards.
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});
 
@@ -35,24 +40,30 @@ class ReportListPage extends StatefulWidget {
 class _ReportListPageState extends State<ReportListPage> {
   late final ReportListController _controller;
   final ScrollController _scroll = ScrollController();
+  late final AppLifecycleListener _lifecycle;
 
   @override
   void initState() {
     super.initState();
     _controller = ReportListController(context.read<ReportRepository>());
     _scroll.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.reload();
-    });
+    _lifecycle = AppLifecycleListener(onResume: _refresh);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
   }
 
   @override
   void dispose() {
+    _lifecycle.dispose();
     _scroll
       ..removeListener(_onScroll)
       ..dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _refresh() {
+    if (!mounted) return;
+    _controller.reload();
   }
 
   void _onScroll() {
@@ -131,51 +142,172 @@ class _ReportListPageState extends State<ReportListPage> {
     }
 
     final bottomPad = AppSpacing.xl + MediaQuery.paddingOf(context).bottom;
+    final sections = groupReportsByTaipeiDay(c.items);
     final extra = c.loadingMore || !c.hasMore ? 1 : 0;
 
-    return RefreshIndicator(
-      onRefresh: () => c.reload(),
-      child: ListView.separated(
-        controller: _scroll,
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          bottomPad,
-        ),
-        itemCount: c.items.length + extra,
-        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, index) {
-          if (index >= c.items.length) {
-            if (c.loadingMore) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                child: Center(
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              );
-            }
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+    return ListView.builder(
+      controller: _scroll,
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        bottomPad,
+      ),
+      itemCount: sections.length + extra,
+      itemBuilder: (context, index) {
+        if (index >= sections.length) {
+          if (c.loadingMore) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
               child: Center(
-                child: Text(
-                  l10n.reportListEnd,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),
             );
           }
-          return _ReportTile(report: c.items[index]);
-        },
-      ),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Center(
+              child: Text(
+                l10n.reportListEnd,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          );
+        }
+        final section = sections[index];
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index == sections.length - 1 && extra == 0
+                ? 0
+                : AppSpacing.lg,
+          ),
+          child: _DaySection(day: section.day, reports: section.reports),
+        );
+      },
     );
+  }
+}
+
+/// One Taipei calendar day and its reports (newest-first within the day).
+@visibleForTesting
+class ReportDaySection {
+  const ReportDaySection({required this.day, required this.reports});
+
+  /// Calendar day at midnight Taipei (date components only).
+  final DateTime day;
+  final List<PartialEarthquakeReport> reports;
+}
+
+/// Groups [items] into consecutive Taipei-day buckets (list order preserved).
+@visibleForTesting
+List<ReportDaySection> groupReportsByTaipeiDay(
+  List<PartialEarthquakeReport> items,
+) {
+  final sections = <ReportDaySection>[];
+  for (final report in items) {
+    final day = taipeiCalendarDay(report.originTimeUtc);
+    if (sections.isEmpty || sections.last.day != day) {
+      sections.add(ReportDaySection(day: day, reports: [report]));
+    } else {
+      sections.last.reports.add(report);
+    }
+  }
+  return sections;
+}
+
+/// Taipei calendar date of a UTC instant (date-only, comparable with `==`).
+@visibleForTesting
+DateTime taipeiCalendarDay(DateTime utc) {
+  final t = utc.toUtc().add(const Duration(hours: 8));
+  return DateTime(t.year, t.month, t.day);
+}
+
+class _DaySection extends StatelessWidget {
+  const _DaySection({required this.day, required this.reports});
+
+  final DateTime day;
+  final List<PartialEarthquakeReport> reports;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppSpacing.xs,
+            bottom: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Text(
+                _dayLabel(day, l10n, locale),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: colors.outlineVariant.withValues(alpha: 0.55),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                l10n.reportListDayCount(reports.length),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Material(
+          color: colors.surfaceContainer,
+          borderRadius: AppRadius.medium,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              for (var i = 0; i < reports.length; i++) ...[
+                if (i > 0)
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    indent: AppSpacing.md + 48 + AppSpacing.md,
+                    color: colors.outlineVariant.withValues(alpha: 0.4),
+                  ),
+                _ReportTile(report: reports[i]),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _dayLabel(DateTime day, AppLocalizations l10n, String locale) {
+    final today = taipeiCalendarDay(AppTime.utc);
+    if (day == today) return l10n.reportListToday;
+    if (day == today.subtract(const Duration(days: 1))) {
+      return l10n.reportListYesterday;
+    }
+    return DateFormat.yMMMEd(locale).format(day);
   }
 }
 
@@ -184,72 +316,67 @@ class _ReportTile extends StatelessWidget {
 
   final PartialEarthquakeReport report;
 
+  /// Numbered CWA reports — magnitude in gold to mark the official serial set.
+  static const Color _numberedMagGold = Color(0xFFE8C547);
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
-    final local = report.originTimeUtc.toLocal();
-    final stamp = DateFormat('yyyy/MM/dd HH:mm').format(local);
+    final taipei = report.originTimeUtc.toUtc().add(const Duration(hours: 8));
+    final stamp = DateFormat('HH:mm:ss').format(taipei);
     final intensity = Intensity.displayForReport(
       report.intensity,
       report.originTimeUtc,
     );
     final intensityColor = IntensityColors.discrete(intensity.colorLevel);
+    final mag = report.magnitude.toStringAsFixed(1);
 
-    return Material(
-      color: colors.surfaceContainer,
-      borderRadius: AppRadius.medium,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: null, // Detail route lands next.
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
-            children: [
-              _IntensityBadge(label: intensity.label, color: intensityColor),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      report.shortLocation,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+    return InkWell(
+      onTap: null, // Detail route lands next.
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            _IntensityBadge(label: intensity.label, color: intensityColor),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    report.shortLocation,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      stamp,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      l10n.reportListMeta(
-                        report.magnitude.toStringAsFixed(1),
-                        report.depth.toStringAsFixed(1),
-                      ),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (report.hasNumber)
-                Text(
-                  report.number!,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colors.outline,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-            ],
-          ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    stamp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              l10n.reportListMagnitude(mag),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: report.hasNumber ? _numberedMagGold : colors.onSurface,
+                fontWeight: FontWeight.w800,
+                height: 1,
+                letterSpacing: -0.5,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -271,14 +398,15 @@ class _IntensityBadge extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(color: color, borderRadius: AppRadius.small),
       child: SizedBox(
-        width: 44,
-        height: 44,
+        width: 48,
+        height: 48,
         child: Center(
           child: Text(
             label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: onBadge,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w900,
+              height: 1,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),

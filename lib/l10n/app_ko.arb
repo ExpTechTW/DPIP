@@ -11,6 +11,12 @@
   "reportListEmpty": "지진 보고서가 없습니다",
   "reportListEmptyFiltered": "조건에 맞는 지진 보고서가 없습니다",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "소규모 유감",
+  "reportListToday": "오늘",
+  "reportListYesterday": "어제",
+  "reportListDayCount": "{count}",
   "reportListEnd": "마지막입니다",
   "reportFilterTitle": "필터",
   "reportFilterIntensity": "진도",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "{lon}°E",
   "typhoonValueMs": "{n} m/s",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in"
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "commonCancel": "취소",
+  "developerClearCache": "캐시 지우기",
+  "developerClearCacheSubtitle": "저장된 타일과 API 응답을 삭제합니다",
+  "developerClearCacheConfirm": "저장된 지도 타일과 API 응답이 삭제되며, 다음에 필요할 때 다시 다운로드됩니다.",
+  "developerCacheCleared": "캐시를 지웠습니다"
 }

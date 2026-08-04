@@ -44,6 +44,28 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Cảm nhận cục bộ';
+
+  @override
+  String get reportListToday => 'Hôm nay';
+
+  @override
+  String get reportListYesterday => 'Hôm qua';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => 'Hết danh sách';
 
   @override
@@ -916,4 +938,21 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get commonCancel => 'Huỷ';
+
+  @override
+  String get developerClearCache => 'Xoá bộ nhớ đệm';
+
+  @override
+  String get developerClearCacheSubtitle =>
+      'Xoá các ô bản đồ và phản hồi API đã lưu';
+
+  @override
+  String get developerClearCacheConfirm =>
+      'Các ô bản đồ và phản hồi API đã lưu sẽ bị xoá và được tải lại khi cần vào lần sau.';
+
+  @override
+  String get developerCacheCleared => 'Đã xoá bộ nhớ đệm';
 }

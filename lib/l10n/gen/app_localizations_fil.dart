@@ -45,6 +45,28 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Lokal na naramdaman';
+
+  @override
+  String get reportListToday => 'Ngayon';
+
+  @override
+  String get reportListYesterday => 'Kahapon';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => 'Dulo ng listahan';
 
   @override
@@ -918,4 +940,21 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get commonCancel => 'Kanselahin';
+
+  @override
+  String get developerClearCache => 'I-clear ang cache';
+
+  @override
+  String get developerClearCacheSubtitle =>
+      'Aalisin ang naka-imbak na mga tile at tugon ng API';
+
+  @override
+  String get developerClearCacheConfirm =>
+      'Buburahin ang naka-imbak na mga map tile at tugon ng API, at muling ida-download kapag kailangan sa susunod.';
+
+  @override
+  String get developerCacheCleared => 'Na-clear ang cache';
 }

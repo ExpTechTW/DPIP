@@ -11,6 +11,12 @@
   "reportListEmpty": "当前没有地震报告",
   "reportListEmptyFiltered": "没有符合条件的地震报告",
   "reportListMeta": "M{magnitude} · {depth} 公里",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "公里",
+  "reportListLocalFelt": "小区域有感",
+  "reportListToday": "今天",
+  "reportListYesterday": "昨天",
+  "reportListDayCount": "{count}",
   "reportListEnd": "已到最后一页",
   "reportFilterTitle": "筛选",
   "reportFilterIntensity": "震度",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "东经 {lon} 度",
   "typhoonValueMs": "每秒 {n} 公尺",
   "typhoonOverlayForecastCallouts": "预测点信息",
-  "typhoonOverlayForecastCalloutsTooltip": "放大时显示预测点详细卡片"
+  "typhoonOverlayForecastCalloutsTooltip": "放大时显示预测点详细卡片",
+  "commonCancel": "取消",
+  "developerClearCache": "清除缓存",
+  "developerClearCacheSubtitle": "移除已存储的图块与 API 响应",
+  "developerClearCacheConfirm": "已存储的地图图块与 API 响应将被删除，下次需要时会重新下载。",
+  "developerCacheCleared": "已清除缓存"
 }

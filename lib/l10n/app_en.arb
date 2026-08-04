@@ -44,8 +44,46 @@
   "@reportListMeta": {
     "description": "Magnitude and depth line on a report list row",
     "placeholders": {
-      "magnitude": {"type": "String"},
-      "depth": {"type": "String"}
+      "magnitude": {
+        "type": "String"
+      },
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
+  "reportListMagnitude": "M{magnitude}",
+  "@reportListMagnitude": {
+    "description": "Emphasized magnitude on a report list row",
+    "placeholders": {
+      "magnitude": {
+        "type": "String"
+      }
+    }
+  },
+  "reportListDepthUnit": "km",
+  "@reportListDepthUnit": {
+    "description": "Depth unit label beside the depth value on a report list row"
+  },
+  "reportListLocalFelt": "Local felt",
+  "@reportListLocalFelt": {
+    "description": "Label for …000 serial reports (small-area felt quake, no CWA number)"
+  },
+  "reportListToday": "Today",
+  "@reportListToday": {
+    "description": "Date section header for reports that originated today (Taipei)"
+  },
+  "reportListYesterday": "Yesterday",
+  "@reportListYesterday": {
+    "description": "Date section header for reports that originated yesterday (Taipei)"
+  },
+  "reportListDayCount": "{count}",
+  "@reportListDayCount": {
+    "description": "Number of reports in a day section",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
     }
   },
   "reportListEnd": "End of list",
@@ -72,7 +110,9 @@
   "@reportFilterDepthKm": {
     "description": "Depth value with unit in the filter sheet",
     "placeholders": {
-      "depth": {"type": "String"}
+      "depth": {
+        "type": "String"
+      }
     }
   },
   "reportFilterDate": "Date",
@@ -95,8 +135,12 @@
   "@reportFilterRange": {
     "description": "Displays a selected filter range (intensity, magnitude, depth, or dates)",
     "placeholders": {
-      "start": {"type": "String"},
-      "end": {"type": "String"}
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
     }
   },
   "reportFilterLocation": "Location",
@@ -800,21 +844,37 @@
   "typhoonPressure": "Pressure",
   "typhoonMotion": "Moving",
   "typhoonLabelPosition": "Centre location",
-  "@typhoonLabelPosition": { "description": "Bulletin table row label" },
+  "@typhoonLabelPosition": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelDirection": "Past movement direction",
-  "@typhoonLabelDirection": { "description": "Bulletin table row label" },
+  "@typhoonLabelDirection": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelSpeed": "Past movement speed",
-  "@typhoonLabelSpeed": { "description": "Bulletin table row label" },
+  "@typhoonLabelSpeed": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelPressure": "Central pressure",
-  "@typhoonLabelPressure": { "description": "Bulletin table row label" },
+  "@typhoonLabelPressure": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelWind": "Max. sustained wind near centre",
-  "@typhoonLabelWind": { "description": "Bulletin table row label" },
+  "@typhoonLabelWind": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelGust": "Peak gust",
-  "@typhoonLabelGust": { "description": "Bulletin table row label" },
+  "@typhoonLabelGust": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
-  "@typhoonLabelGaleAvg": { "description": "Bulletin table row label" },
+  "@typhoonLabelGaleAvg": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
-  "@typhoonLabelStormAvg": { "description": "Bulletin table row label" },
+  "@typhoonLabelStormAvg": {
+    "description": "Bulletin table row label"
+  },
   "typhoonLabelProbCircle": "70% probability circle",
   "@typhoonLabelProbCircle": {
     "description": "Forecast point: radius of the 70% track probability circle"
@@ -823,7 +883,9 @@
   "@typhoonForecastLead": {
     "description": "Forecast lead time for a tapped track point",
     "placeholders": {
-      "hours": { "type": "String" }
+      "hours": {
+        "type": "String"
+      }
     }
   },
   "typhoonLabelNw": "NW",
@@ -832,28 +894,52 @@
   "typhoonLabelSe": "SE",
   "typhoonValueLat": "{lat}°N",
   "@typhoonValueLat": {
-    "placeholders": { "lat": { "type": "String" } }
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      }
+    }
   },
   "typhoonValueLon": "{lon}°E",
   "@typhoonValueLon": {
-    "placeholders": { "lon": { "type": "String" } }
+    "placeholders": {
+      "lon": {
+        "type": "String"
+      }
+    }
   },
   "typhoonValueKm": "{n} km",
   "@typhoonValueKm": {
-    "placeholders": { "n": { "type": "String" } }
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
   },
   "typhoonValueHpa": "{n} hPa",
   "@typhoonValueHpa": {
-    "placeholders": { "n": { "type": "String" } }
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
   },
   "typhoonValueMs": "{n} m/s",
   "@typhoonValueMs": {
-    "placeholders": { "n": { "type": "String" } }
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
   },
   "typhoonDataTime": "Data time\n{time}",
   "@typhoonDataTime": {
     "description": "Bulletin data time under the intensity chip (Taipei wall clock)",
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind-direction layer"
@@ -1010,18 +1096,30 @@
   "@typhoonStormRadii": {
     "description": "Per-quadrant storm-wind radii (km) for a typhoon circle",
     "placeholders": {
-      "ne": {"type": "String"},
-      "se": {"type": "String"},
-      "sw": {"type": "String"},
-      "nw": {"type": "String"}
+      "ne": {
+        "type": "String"
+      },
+      "se": {
+        "type": "String"
+      },
+      "sw": {
+        "type": "String"
+      },
+      "nw": {
+        "type": "String"
+      }
     }
   },
   "typhoonTimeChip": "{day}日{hour}時",
   "@typhoonTimeChip": {
     "description": "Compact typhoon time chip / map label shape (day + hour, no month)",
     "placeholders": {
-      "day": {"type": "String"},
-      "hour": {"type": "String"}
+      "day": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
     }
   },
   "typhoonLegendProbability": "Strike probability",
@@ -1134,5 +1232,25 @@
   "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
   "@typhoonOverlayForecastCalloutsTooltip": {
     "description": "Tooltip for the forecast callouts overlay toggle"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Generic cancel action in a dialog"
+  },
+  "developerClearCache": "Clear cache",
+  "@developerClearCache": {
+    "description": "Developer-page action that empties the app HTTP/tile cache"
+  },
+  "developerClearCacheSubtitle": "Removes stored tiles and API responses",
+  "@developerClearCacheSubtitle": {
+    "description": "Explains what the clear-cache action removes"
+  },
+  "developerClearCacheConfirm": "Stored map tiles and API responses will be deleted and downloaded again next time they are needed.",
+  "@developerClearCacheConfirm": {
+    "description": "Confirmation dialog body for clearing the cache"
+  },
+  "developerCacheCleared": "Cache cleared",
+  "@developerCacheCleared": {
+    "description": "Snackbar shown after the cache has been cleared"
   }
 }

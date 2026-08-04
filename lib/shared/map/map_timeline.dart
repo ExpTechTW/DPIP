@@ -42,14 +42,34 @@ class MapTimeline extends StatefulWidget {
 }
 
 class _MapTimelineState extends State<MapTimeline> {
-  final DateFormat _time = DateFormat('HH:mm');
+  static final DateFormat _time = DateFormat('HH:mm');
   // Numeric so no locale symbol data is needed (as with [_time]).
-  final DateFormat _date = DateFormat('yyyy/MM/dd');
+  static final DateFormat _date = DateFormat('yyyy/MM/dd');
 
   /// Slot width per frame — the scroll offset that centres frame `i` is
   /// `i * _slotWidth` (the leading/trailing pads are symmetric).
   static const double _slotWidth = 14;
   static const double _rulerHeight = 48;
+
+  /// Formatted labels per frame, built once per frame set.
+  ///
+  /// A scrub rebuilds this widget for every frame the finger crosses, and each
+  /// rebuild lays out the whole visible ruler. Formatting dates in `build`
+  /// re-ran `DateFormat` for every on-screen tick on every one of those frames —
+  /// pure repeat work, since a frame's label never changes.
+  List<String> _times = const [];
+  List<String> _dates = const [];
+
+  void _cacheLabels() {
+    _times = [for (final frame in widget.frames) _time.format(frame.time)];
+    _dates = [for (final frame in widget.frames) _date.format(frame.time)];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cacheLabels();
+  }
 
   /// Seeded so the first paint already sits on the selected frame (no flash),
   /// since `i * _slotWidth` centres frame `i`.
@@ -75,6 +95,7 @@ class _MapTimelineState extends State<MapTimeline> {
     // Re-centre on an external change (a new layer's frames, or a jump-to-now)
     // but not on the echo of our own onSelected, which already matches.
     final framesChanged = !identical(oldWidget.frames, widget.frames);
+    if (framesChanged) _cacheLabels();
     if (framesChanged || (widget.selectedIndex != _liveIndex && !_snapping)) {
       _liveIndex = widget.selectedIndex.clamp(0, widget.frames.length - 1);
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -168,7 +189,7 @@ class _MapTimelineState extends State<MapTimeline> {
                     ),
                   ),
                   Text(
-                    _date.format(widget.frames[_liveIndex].time),
+                    _dates[_liveIndex],
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colors.onSurfaceVariant,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -192,7 +213,7 @@ class _MapTimelineState extends State<MapTimeline> {
                     const SizedBox(width: AppSpacing.sm),
                   ],
                   Text(
-                    _time.format(widget.frames[_liveIndex].time),
+                    _times[_liveIndex],
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: colors.primary,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -226,9 +247,7 @@ class _MapTimelineState extends State<MapTimeline> {
                       itemCount: widget.frames.length,
                       itemBuilder: (context, i) => _Tick(
                         width: _slotWidth,
-                        label: i % labelStep == 0
-                            ? _time.format(widget.frames[i].time)
-                            : null,
+                        label: i % labelStep == 0 ? _times[i] : null,
                         emphasised: i == _liveIndex,
                         colors: colors,
                         textStyle: theme.textTheme.labelSmall,

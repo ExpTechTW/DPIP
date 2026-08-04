@@ -11,6 +11,12 @@
   "reportListEmpty": "Walang ulat ng lindol",
   "reportListEmptyFiltered": "Walang ulat na tumutugma sa mga filter",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "Lokal na naramdaman",
+  "reportListToday": "Ngayon",
+  "reportListYesterday": "Kahapon",
+  "reportListDayCount": "{count}",
   "reportListEnd": "Dulo ng listahan",
   "reportFilterTitle": "Mga filter",
   "reportFilterIntensity": "Intensity",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "{lon}°E",
   "typhoonValueMs": "{n} m/s",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in"
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "commonCancel": "Kanselahin",
+  "developerClearCache": "I-clear ang cache",
+  "developerClearCacheSubtitle": "Aalisin ang naka-imbak na mga tile at tugon ng API",
+  "developerClearCacheConfirm": "Buburahin ang naka-imbak na mga map tile at tugon ng API, at muling ida-download kapag kailangan sa susunod.",
+  "developerCacheCleared": "Na-clear ang cache"
 }

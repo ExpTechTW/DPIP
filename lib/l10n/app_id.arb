@@ -11,6 +11,12 @@
   "reportListEmpty": "Tidak ada laporan gempa",
   "reportListEmptyFiltered": "Tidak ada laporan yang cocok dengan filter",
   "reportListMeta": "M{magnitude} · {depth} km",
+  "reportListMagnitude": "M{magnitude}",
+  "reportListDepthUnit": "km",
+  "reportListLocalFelt": "Terasa lokal",
+  "reportListToday": "Hari ini",
+  "reportListYesterday": "Kemarin",
+  "reportListDayCount": "{count}",
   "reportListEnd": "Akhir daftar",
   "reportFilterTitle": "Filter",
   "reportFilterIntensity": "Intensitas",
@@ -279,5 +285,10 @@
   "typhoonValueLon": "{lon}°E",
   "typhoonValueMs": "{n} m/s",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in"
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "commonCancel": "Batal",
+  "developerClearCache": "Hapus cache",
+  "developerClearCacheSubtitle": "Menghapus tile dan respons API yang tersimpan",
+  "developerClearCacheConfirm": "Tile peta dan respons API yang tersimpan akan dihapus dan diunduh ulang saat dibutuhkan berikutnya.",
+  "developerCacheCleared": "Cache dihapus"
 }

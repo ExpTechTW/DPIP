@@ -45,6 +45,28 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Terasa lokal';
+
+  @override
+  String get reportListToday => 'Hari ini';
+
+  @override
+  String get reportListYesterday => 'Kemarin';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => 'Akhir daftar';
 
   @override
@@ -918,4 +940,21 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get commonCancel => 'Batal';
+
+  @override
+  String get developerClearCache => 'Hapus cache';
+
+  @override
+  String get developerClearCacheSubtitle =>
+      'Menghapus tile dan respons API yang tersimpan';
+
+  @override
+  String get developerClearCacheConfirm =>
+      'Tile peta dan respons API yang tersimpan akan dihapus dan diunduh ulang saat dibutuhkan berikutnya.';
+
+  @override
+  String get developerCacheCleared => 'Cache dihapus';
 }

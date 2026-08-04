@@ -2,9 +2,11 @@ import Flutter
 import MapLibre
 import UIKit
 
-/// MethodChannel plugin for MapLibre's shared **ambient tile-cache**:
-/// raise the size ceiling and preload resources fetched by the Flutter HTTP
-/// stack (ETag-aware) so MapLibre tile requests hit ambient at the same URL.
+/// MethodChannel plugin for MapLibre's shared **ambient tile-cache**.
+///
+/// Only sizes it. The app disables ambient caching (`MapCache.disabledBytes`)
+/// and serves those bytes from its own store through the MapLibre tile bridge,
+/// so there is nothing to preload here.
 public class MapCachePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(
@@ -29,48 +31,6 @@ public class MapCachePlugin: NSObject, FlutterPlugin {
         } else {
           result(nil)
         }
-      }
-    case "preload":
-      guard
-        let args = call.arguments as? [String: Any],
-        let urlString = args["url"] as? String,
-        let url = URL(string: urlString),
-        let typed = args["data"] as? FlutterStandardTypedData
-      else {
-        result(FlutterError(code: "bad_args", message: "Missing url/data", details: nil))
-        return
-      }
-      let etag = args["etag"] as? String
-      let modifiedSec = (args["modified"] as? NSNumber)?.doubleValue ?? 0
-      let expiresSec = (args["expires"] as? NSNumber)?.doubleValue ?? 0
-      let mustRevalidate = args["mustRevalidate"] as? Bool ?? false
-      let modified: Date? = modifiedSec > 0
-        ? Date(timeIntervalSince1970: modifiedSec) : nil
-      let expires: Date? = expiresSec > 0
-        ? Date(timeIntervalSince1970: expiresSec) : nil
-      // Copy — FlutterStandardTypedData's buffer can be released once the
-      // platform channel returns; MapLibre may touch the bytes asynchronously
-      // while also doing ambient cache lookup on the network queue.
-      let data = Data(typed.data)
-      DispatchQueue.main.async {
-        MLNOfflineStorage.shared.preload(
-          data,
-          for: url,
-          modificationDate: modified,
-          expirationDate: expires,
-          eTag: etag,
-          mustRevalidate: mustRevalidate,
-          completionHandler: { _, error in
-            if let error = error {
-              result(FlutterError(
-                code: "preload_failed",
-                message: error.localizedDescription,
-                details: nil))
-            } else {
-              result(nil)
-            }
-          }
-        )
       }
     default:
       result(FlutterMethodNotImplemented)

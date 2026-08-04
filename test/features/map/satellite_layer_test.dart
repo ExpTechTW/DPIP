@@ -44,13 +44,21 @@ void main() {
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
       controller.calls.clear();
+      controller.sentKeys.clear();
 
       await layer.show(controller, frames[3], scrubbing: true);
 
       expect(controller.calls, [
-        'set:satellite-lyr-${frames[4].id}:visible:0.0',
-        'set:satellite-lyr-${frames[3].id}:visible:1.0',
+        'set:satellite-lyr-${frames[4].id}:0.0',
+        'set:satellite-lyr-${frames[3].id}:1.0',
       ]);
+      expect(
+        controller.sentKeys,
+        everyElement(equals({'raster-opacity'})),
+        reason:
+            'the scrub path must not re-send visibility or the seven other '
+            'raster properties the layer type has',
+      );
     },
   );
 

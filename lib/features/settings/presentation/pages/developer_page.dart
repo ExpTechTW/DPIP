@@ -11,6 +11,7 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -46,6 +47,7 @@ class DeveloperPage extends StatefulWidget {
 
 class _DeveloperPageState extends State<DeveloperPage> {
   List<({String title, List<_Field> fields})>? _sections;
+  bool _clearing = false;
 
   @override
   void initState() {
@@ -125,10 +127,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
                 : '${(usage.hitRate * 100).toStringAsFixed(0)}% '
                       '(${usage.hits}/${usage.total})',
           ),
-          (
-            label: 'Traffic saved (total)',
-            value: usage == null ? '—' : _formatBytes(usage.savedBytes),
-          ),
         ],
       ),
       (
@@ -141,6 +139,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
           (
             label: 'Downloaded · last 7d',
             value: usage == null ? '—' : _formatBytes(usage.last7d),
+          ),
+          // Same windows as the downloads above, so the two read as a pair.
+          (
+            label: 'Traffic saved · last 24h',
+            value: usage == null ? '—' : _formatBytes(usage.saved24h),
+          ),
+          (
+            label: 'Traffic saved · last 7d',
+            value: usage == null ? '—' : _formatBytes(usage.saved7d),
           ),
         ],
       ),
@@ -176,6 +183,51 @@ class _DeveloperPageState extends State<DeveloperPage> {
       Log.handle(error, stackTrace, 'dev: APNs token');
       return null;
     }
+  }
+
+  /// Empties the app's tile/HTTP store and MapLibre's in-process mirror.
+  ///
+  /// Confirmed first: nothing is lost permanently, but everything the map shows
+  /// has to be downloaded again, and that is the user's data allowance.
+  Future<void> _confirmClearCache() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.developerClearCache),
+        content: Text(l10n.developerClearCacheConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.developerClearCache),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final etagCache = context.read<EtagCacheStore?>();
+    final tiles = context.read<MapTileCache?>();
+    setState(() => _clearing = true);
+    try {
+      await etagCache?.clear();
+      // The mirror would otherwise keep serving bytes the store no longer has,
+      // so "cleared" would not look cleared until the app restarted.
+      await tiles?.evict(const []);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'dev: clear cache');
+    }
+    if (!mounted) return;
+    setState(() => _clearing = false);
+    await _load();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l10n.developerCacheCleared)));
   }
 
   Future<void> _copy(String value) async {
@@ -226,6 +278,27 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   for (final field in section.fields)
                     _DiagRow(field: field, onCopy: _copy),
                 ],
+                const SectionHeader('Maintenance'),
+                ListTile(
+                  leading: Icon(
+                    Icons.delete_sweep_outlined,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    l10n.developerClearCache,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  subtitle: Text(l10n.developerClearCacheSubtitle),
+                  trailing: _clearing
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : null,
+                  onTap: _clearing ? null : _confirmClearCache,
+                ),
               ],
             ),
     );

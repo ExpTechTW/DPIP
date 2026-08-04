@@ -183,6 +183,42 @@ abstract class AppLocalizations {
   /// **'M{magnitude} · {depth} km'**
   String reportListMeta(String magnitude, String depth);
 
+  /// Emphasized magnitude on a report list row
+  ///
+  /// In en, this message translates to:
+  /// **'M{magnitude}'**
+  String reportListMagnitude(String magnitude);
+
+  /// Depth unit label beside the depth value on a report list row
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get reportListDepthUnit;
+
+  /// Label for …000 serial reports (small-area felt quake, no CWA number)
+  ///
+  /// In en, this message translates to:
+  /// **'Local felt'**
+  String get reportListLocalFelt;
+
+  /// Date section header for reports that originated today (Taipei)
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get reportListToday;
+
+  /// Date section header for reports that originated yesterday (Taipei)
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get reportListYesterday;
+
+  /// Number of reports in a day section
+  ///
+  /// In en, this message translates to:
+  /// **'{count}'**
+  String reportListDayCount(int count);
+
   /// Footer when the report catalogue has no further pages
   ///
   /// In en, this message translates to:
@@ -1796,6 +1832,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show forecast-point detail cards when zoomed in'**
   String get typhoonOverlayForecastCalloutsTooltip;
+
+  /// Generic cancel action in a dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// Developer-page action that empties the app HTTP/tile cache
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cache'**
+  String get developerClearCache;
+
+  /// Explains what the clear-cache action removes
+  ///
+  /// In en, this message translates to:
+  /// **'Removes stored tiles and API responses'**
+  String get developerClearCacheSubtitle;
+
+  /// Confirmation dialog body for clearing the cache
+  ///
+  /// In en, this message translates to:
+  /// **'Stored map tiles and API responses will be deleted and downloaded again next time they are needed.'**
+  String get developerClearCacheConfirm;
+
+  /// Snackbar shown after the cache has been cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Cache cleared'**
+  String get developerCacheCleared;
 }
 
 class _AppLocalizationsDelegate

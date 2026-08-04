@@ -45,6 +45,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Local felt';
+
+  @override
+  String get reportListToday => 'Today';
+
+  @override
+  String get reportListYesterday => 'Yesterday';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => 'End of list';
 
   @override
@@ -916,4 +938,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get developerClearCache => 'Clear cache';
+
+  @override
+  String get developerClearCacheSubtitle =>
+      'Removes stored tiles and API responses';
+
+  @override
+  String get developerClearCacheConfirm =>
+      'Stored map tiles and API responses will be deleted and downloaded again next time they are needed.';
+
+  @override
+  String get developerCacheCleared => 'Cache cleared';
 }

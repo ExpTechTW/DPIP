@@ -206,7 +206,7 @@ void main() {
     final stats = await usage.stats();
     expect(stats.hits, 1);
     expect(stats.misses, 0);
-    expect(stats.savedBytes, 4096);
+    expect(stats.saved24h, 4096);
   });
 
   test('repeated readBytes meters each serve', () async {
@@ -220,7 +220,7 @@ void main() {
 
     final stats = await usage.stats();
     expect(stats.hits, 2);
-    expect(stats.savedBytes, 256);
+    expect(stats.saved24h, 256);
   });
 
   test('readBytesBatch returns hits keyed by URL, misses absent', () async {

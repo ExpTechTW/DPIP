@@ -21,9 +21,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 ///
 /// Switcher entry is 「防災地圖」; [DisasterMapOverlayMenu] toggles sub-layers
 /// (AED for now). AED MVT is **baked into the style JSON** via
-/// [bakedAedTileUrl]. Viewport tiles are app-fetched (`getBytes` + binary
-/// ETag) and pinned into MapLibre ambient (`MapCache.preload`) so native
-/// cache-control is not the only policy. Detail on tap via
+/// [bakedAedTileUrl]. MapLibre fetches the tiles; they are served from the
+/// app's tile store through the Dart bridge, and the viewport is warmed into
+/// MapLibre's tile memory ahead of demand. Detail on tap via
 /// [DisasterMapRepository.aedDetail].
 class DisasterMapLayer implements MapLayer {
   DisasterMapLayer(this._repository);

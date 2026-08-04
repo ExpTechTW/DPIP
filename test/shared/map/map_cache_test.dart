@@ -27,7 +27,7 @@ void main() {
     },
   );
 
-  test('defaults to the shared ambient ceiling', () async {
+  test('defaults to disabling the ambient cache', () async {
     MethodCall? received;
     messenger.setMockMethodCallHandler(channel, (call) async {
       received = call;
@@ -36,7 +36,14 @@ void main() {
 
     await const MapCache().setMaximumSize();
 
-    expect((received!.arguments as Map)['bytes'], MapCache.defaultAmbientBytes);
+    expect(
+      (received!.arguments as Map)['bytes'],
+      0,
+      reason:
+          'the app store is the only disk cache — a second native copy of '
+          'the same tiles is invisible to its eviction policy and its traffic '
+          'accounting',
+    );
   });
 
   test('a missing native handler degrades to a no-op (never throws)', () async {

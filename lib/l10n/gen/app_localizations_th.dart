@@ -44,6 +44,28 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'รู้สึกในพื้นที่';
+
+  @override
+  String get reportListToday => 'วันนี้';
+
+  @override
+  String get reportListYesterday => 'เมื่อวาน';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
   String get reportListEnd => 'สิ้นสุดรายการ';
 
   @override
@@ -915,4 +937,21 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get commonCancel => 'ยกเลิก';
+
+  @override
+  String get developerClearCache => 'ล้างแคช';
+
+  @override
+  String get developerClearCacheSubtitle =>
+      'ลบไทล์และการตอบกลับ API ที่จัดเก็บไว้';
+
+  @override
+  String get developerClearCacheConfirm =>
+      'ไทล์แผนที่และการตอบกลับ API ที่จัดเก็บไว้จะถูกลบ และจะดาวน์โหลดใหม่เมื่อจำเป็นในครั้งถัดไป';
+
+  @override
+  String get developerCacheCleared => 'ล้างแคชแล้ว';
 }

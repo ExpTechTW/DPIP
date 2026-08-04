@@ -45,13 +45,26 @@ class MapTileCache {
   final EtagCacheStore _store;
   final NetworkUsageStore? _usage;
 
-  /// Native's in-process mirror budget. Comfortably holds several radar frames
-  /// of viewport tiles, which is what a scrub needs resident.
-  static const int defaultMemoryBytes = 64 * 1024 * 1024;
+  /// Native's in-process mirror budget.
+  ///
+  /// Sized to the working set, not to the store: a warm band is ~17 frames of a
+  /// viewport each, which for radar WebP is single-digit megabytes even with
+  /// the basemap's larger vector tiles alongside. This tier exists to keep IPC
+  /// off the drag path, not to be a second copy of [EtagCacheStore] — anything
+  /// beyond the band is better read back from disk than held in RAM.
+  static const int defaultMemoryBytes = 16 * 1024 * 1024;
+
+  /// Tiles per `injectTiles` message — roughly one frame's viewport.
+  static const int _injectChunk = 24;
 
   /// Binds this store as the tile authority and sizes the native mirror.
+  ///
+  /// The patterns come from [EtagInterceptor.immutableAssetMarkers] — the same
+  /// list [_isTile] gates on — so native can never end up asking about a URL
+  /// this store would refuse to keep.
   Future<void> install({int memoryBytes = defaultMemoryBytes}) async {
     await bindMapLibreTileCache(getBatch: _onGetBatch, putBatch: _onPutBatch);
+    await setMapLibreCacheablePatterns(EtagInterceptor.immutableAssetMarkers);
     await setMapLibreTileMemoryLimit(memoryBytes);
   }
 
@@ -80,6 +93,11 @@ class MapTileCache {
     for (final tile in tiles) {
       final uri = Uri.tryParse(tile.url);
       if (uri == null || !EtagInterceptor.isImmutableTile(uri)) continue;
+      // A 404 arrives as an empty body. For the basemap that is a deliberate
+      // hole worth keeping (ocean / uncovered z-x-y is stable). For anything
+      // else — a glyph range that momentarily failed, say — persisting
+      // emptiness would serve a blank asset for the next seven days.
+      if (tile.data.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
       writes.add((
         url: tile.url,
         // The URL is content-addressed, so the synthetic tag is the right key —
@@ -112,7 +130,7 @@ class MapTileCache {
       // past must not outrank one they actually looked at.
       final hits = await _store.readBytesBatch(missing, touch: false);
       if (hits.isEmpty) return 0;
-      await injectMapLibreTiles([
+      final tiles = [
         for (final entry in hits.entries)
           MapLibreTile(
             url: entry.key,
@@ -120,7 +138,16 @@ class MapTileCache {
             contentType: entry.value.contentType,
             etag: entry.value.etag,
           ),
-      ]);
+      ];
+      // Chunked: warming a wide band of frames is megabytes of image data, and
+      // one giant message would occupy the platform channel long enough to be
+      // felt by whatever gesture is in progress.
+      for (var i = 0; i < tiles.length; i += _injectChunk) {
+        final end = i + _injectChunk;
+        await injectMapLibreTiles(
+          end < tiles.length ? tiles.sublist(i, end) : tiles.sublist(i),
+        );
+      }
       return hits.length;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'MapTileCache.warm');

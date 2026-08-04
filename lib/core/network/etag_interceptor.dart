@@ -62,14 +62,35 @@ class EtagInterceptor extends Interceptor {
       uri.path.contains('/api/v1/map/tiles/') &&
       uri.path.endsWith('.pbf');
 
-  /// XYZ / frame-keyed tiles — URL is content-addressed; never revalidate on
-  /// the hot path (a new frame = a new URL).
+  /// URL fragments marking a **content-addressed** asset: the URL fully
+  /// determines the bytes, so a local hit is served without revalidating (a new
+  /// radar frame, or a new glyph range, is a new URL).
+  ///
+  /// The single source of truth for what this app caches. [isImmutableTile]
+  /// gates the Dio path with it, and [MapTileCache] hands the same list to
+  /// MapLibre's native intercept — one list, so the two can never drift into a
+  /// URL that native keeps asking about and Dart never stores.
+  ///
+  /// Glyphs are here so **every** byte the map costs lands in one store with one
+  /// eviction policy and one traffic total. They used to be cached only by
+  /// MapLibre's own ambient database, which meant they were invisible to the
+  /// app's usage accounting.
+  static const List<String> immutableAssetMarkers = [
+    '/api/v1/map/tiles/', // basemap vector tiles
+    '/api/v2/tiles/radar/',
+    '/api/v2/tiles/satellite/',
+    '/api/v2/tiles/dpm/',
+    '/gh/exptechtw/map-assets/', // glyph PBFs (jsDelivr)
+  ];
+
+  /// Whether [uri] names a content-addressed asset — see
+  /// [immutableAssetMarkers].
   static bool isImmutableTile(Uri uri) {
-    if (isBasemapPbf(uri)) return true;
-    final p = uri.path;
-    return p.contains('/api/v2/tiles/radar/') ||
-        p.contains('/api/v2/tiles/satellite/') ||
-        p.contains('/api/v2/tiles/dpm/');
+    final url = uri.toString();
+    for (final marker in immutableAssetMarkers) {
+      if (url.contains(marker)) return true;
+    }
+    return false;
   }
 
   /// Stable weak ETag derived from the request URL (FNV-1a 64-bit).
