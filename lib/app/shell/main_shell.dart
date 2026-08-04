@@ -146,11 +146,15 @@ class _MainShellState extends State<MainShell> {
     // Re-entering Home (including re-tapping it while active) snaps its sheet
     // back to rest; the build-time guard above covers programmatic entry.
     if (index == 0) context.read<HomeResetSignal>().fire();
-    // Opening the map from the nav bar frames the nationwide view (matching
-    // Home's 全國); a tap on the Home backdrop hands off its own view instead
-    // (that path is a programmatic route, so it doesn't come through here).
+    // Opening / re-tapping the map tab: nationwide framing + the user's
+    // configured default overlay (nav icon). Without the layerId, a session that
+    // switched to radar (etc.) would stay there while the bar still shows 衛星.
     if (index == 2) {
-      context.read<MapCameraHandoff>().request(BaseMap.taiwanBounds);
+      final layerId = context.read<DefaultMapLayerController>().layer.id;
+      context.read<MapCameraHandoff>().request(
+        BaseMap.taiwanBounds,
+        layerId: layerId,
+      );
     }
     widget.navigationShell.goBranch(
       index,

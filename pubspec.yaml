@@ -17,6 +17,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_markdown_plus: ^1.0.5
   flutter_ntp: ^0.1.0
   freezed_annotation: ^3.1.0
   geolocator: ^14.0.3
@@ -35,7 +36,7 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 0e484adacbfa18b7cce9faad079ba6a424743408
+      ref: 2576a07b8818669533bb9a0084aa0b05bdbdbcf9
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1

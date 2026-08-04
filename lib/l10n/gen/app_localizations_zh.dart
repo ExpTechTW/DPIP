@@ -246,6 +246,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appLogs => 'App 日誌';
 
   @override
+  String get changelogTitle => '更新日誌';
+
+  @override
+  String get changelogEmpty => '目前沒有更新日誌';
+
+  @override
+  String get changelogTypePrerelease => '公測';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '目前版本';
+
+  @override
+  String get changelogVersionDetails => '版本資訊';
+
+  @override
+  String get changelogBodyEmpty => '此版本沒有說明。';
+
+  @override
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
@@ -1311,6 +1332,27 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get appLogs => '应用日志';
+
+  @override
+  String get changelogTitle => '更新日志';
+
+  @override
+  String get changelogEmpty => '目前没有更新日志';
+
+  @override
+  String get changelogTypePrerelease => '公测';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '当前版本';
+
+  @override
+  String get changelogVersionDetails => '版本信息';
+
+  @override
+  String get changelogBodyEmpty => '此版本没有说明。';
 
   @override
   String get mapPlaceholderDisabled => '地图（暂时禁用）';
@@ -2380,6 +2422,27 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get appLogs => 'App 日誌';
 
   @override
+  String get changelogTitle => '更新日誌';
+
+  @override
+  String get changelogEmpty => '目前沒有更新日誌';
+
+  @override
+  String get changelogTypePrerelease => '公測';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '目前版本';
+
+  @override
+  String get changelogVersionDetails => '版本資訊';
+
+  @override
+  String get changelogBodyEmpty => '此版本沒有說明。';
+
+  @override
   String get mapPlaceholderDisabled => '地圖(暫時停用)';
 
   @override
@@ -3445,6 +3508,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get appLogs => 'App 日誌';
+
+  @override
+  String get changelogTitle => '更新日誌';
+
+  @override
+  String get changelogEmpty => '目前沒有更新日誌';
+
+  @override
+  String get changelogTypePrerelease => '公測';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '目前版本';
+
+  @override
+  String get changelogVersionDetails => '版本資訊';
+
+  @override
+  String get changelogBodyEmpty => '此版本沒有說明。';
 
   @override
   String get mapPlaceholderDisabled => '地圖(暫時停用)';

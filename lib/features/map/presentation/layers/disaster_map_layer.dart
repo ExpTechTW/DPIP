@@ -173,8 +173,12 @@ class DisasterMapLayer implements MapLayer {
     ]) {
       try {
         await controller.setLayerVisibility(layerId, visible);
-      } catch (_) {
-        // Style may not have finished applying yet.
+      } catch (error, stackTrace) {
+        Log.handle(
+          error,
+          stackTrace,
+          'DPM setLayerVisibility($layerId → $visible)',
+        );
       }
     }
   }

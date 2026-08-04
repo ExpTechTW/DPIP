@@ -248,6 +248,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appLogs => 'App logs';
 
   @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get changelogEmpty => 'No release notes yet';
+
+  @override
+  String get changelogTypePrerelease => 'Beta';
+
+  @override
+  String get changelogTypeStable => 'Stable';
+
+  @override
+  String get changelogCurrentVersion => 'Current';
+
+  @override
+  String get changelogVersionDetails => 'Release details';
+
+  @override
+  String get changelogBodyEmpty => 'No notes for this release.';
+
+  @override
   String get mapPlaceholderDisabled => 'Map (temporarily disabled)';
 
   @override

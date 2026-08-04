@@ -153,8 +153,7 @@ class _MapScaffoldState extends State<MapScaffold> {
     // map onstage, so re-entry reframes reliably.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final bounds = _handoff?.takePending();
-      if (bounds != null) _frameBounds(bounds);
+      unawaited(_applyCameraHandoff());
     });
   }
 
@@ -167,25 +166,39 @@ class _MapScaffoldState extends State<MapScaffold> {
     });
   }
 
-  Future<void> _applyStationHandoff() async {
-    final pending = _stationHandoff?.takePending();
+  /// Applies a pending camera (+ optional layer) hand-off from Home / nav.
+  Future<void> _applyCameraHandoff() async {
+    final pending = _handoff?.takePending();
     if (pending == null || !mounted) return;
+    await _switchToLayerId(pending.layerId);
+    if (!mounted) return;
+    _frameBounds(pending.bounds);
+  }
 
+  /// Switches the active overlay when [layerId] is set and known.
+  Future<void> _switchToLayerId(String? layerId) async {
+    if (layerId == null || layerId == _active.id) return;
     MapLayer? layer;
     for (final candidate in widget.layers) {
-      if (candidate.id == pending.layerId) {
+      if (candidate.id == layerId) {
         layer = candidate;
         break;
       }
     }
     if (layer == null) {
-      Log.warning('Map station handoff: unknown layer ${pending.layerId}');
+      Log.warning('Map camera handoff: unknown layer $layerId');
       return;
     }
+    _onLayerSelected(layer);
+    await _mapOps;
+  }
 
-    if (layer.id != _active.id) {
-      _onLayerSelected(layer);
-    }
+  Future<void> _applyStationHandoff() async {
+    final pending = _stationHandoff?.takePending();
+    if (pending == null || !mounted) return;
+
+    await _switchToLayerId(pending.layerId);
+    if (!mounted) return;
     _frameBounds(pending.bounds);
 
     // Wait for clear+render so station catalogue is loaded before select.
@@ -254,8 +267,30 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
+    final tiles = context.read<MapTileCache?>();
+    _basemapWarmer ??= MapTileWarmer(tiles);
+    // Bootstrap calls [MapTileCache.install] before the MapLibre plugin is
+    // attached, so `setCacheablePatterns` is a silent no-op. Re-bind here once
+    // the platform view exists so the Dart tile bridge actually owns DPM URLs.
+    unawaited(_ensureTileCacheBound(tiles));
     unawaited(const MapCache().setMaximumSize());
+  }
+
+  static bool _ambientClearedForGzip = false;
+
+  Future<void> _ensureTileCacheBound(MapTileCache? tiles) async {
+    if (tiles == null) return;
+    try {
+      await tiles.install();
+      // Poisoned MapLibre ambient entries (immutable restamp + bad CE) survive
+      // the protocol fix; clear once per process so AED tiles re-fetch clean.
+      if (!_ambientClearedForGzip) {
+        _ambientClearedForGzip = true;
+        await clearAmbientCache();
+      }
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'MapTileCache re-bind on map create');
+    }
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {
@@ -294,11 +329,23 @@ class _MapScaffoldState extends State<MapScaffold> {
     // the island. A reload keeps whatever the user has panned/zoomed to.
     if (!_framed) {
       _framed = true;
-      _frameBounds(_handoff?.takePending() ?? BaseMap.taiwanBounds);
+      final pending = _handoff?.takePending();
+      // Home may force radar before the user's default overlay loads.
+      if (pending?.layerId != null) {
+        for (final layer in widget.layers) {
+          if (layer.id == pending!.layerId) {
+            _active = layer;
+            break;
+          }
+        }
+      }
+      _frameBounds(pending?.bounds ?? BaseMap.taiwanBounds);
     }
     _loadActive();
     // Ranking may have queued a station focus before the style was ready.
     unawaited(_applyStationHandoff());
+    // Home/nav camera handoff that arrived before the style was ready.
+    unawaited(_applyCameraHandoff());
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest

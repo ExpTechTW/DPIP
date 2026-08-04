@@ -23,6 +23,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
@@ -245,6 +246,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
       // The mirror would otherwise keep serving bytes the store no longer has,
       // so "cleared" would not look cleared until the app restarted.
       await tiles?.evict(const []);
+      // MapLibre's own ambient DB is separate — poisoned immutable tiles
+      // (e.g. bad Content-Encoding) survive SQLite clears otherwise.
+      await clearAmbientCache();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'dev: clear cache');
     }

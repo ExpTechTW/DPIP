@@ -115,9 +115,9 @@ class _HomePageState extends State<HomePage> {
                       _ => false,
                     };
                     if (framesTownship && handoff.homeBounds != null) {
-                      handoff.requestHomeView();
+                      handoff.requestHomeView(layerId: 'radar');
                     } else {
-                      handoff.request(BaseMap.taiwanBounds);
+                      handoff.request(BaseMap.taiwanBounds, layerId: 'radar');
                     }
                     context.goNamed(AppRoutes.map);
                   },

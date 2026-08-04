@@ -85,6 +85,11 @@ class MorePage extends StatelessWidget {
                 onTap: () => context.pushNamed(AppRoutes.experimental),
               ),
               _MoreTile(
+                icon: Icons.history_outlined,
+                title: l10n.changelogTitle,
+                onTap: () => context.pushNamed(AppRoutes.changelog),
+              ),
+              _MoreTile(
                 icon: Icons.article_outlined,
                 title: l10n.appLogs,
                 onTap: () => context.pushNamed(AppRoutes.log),

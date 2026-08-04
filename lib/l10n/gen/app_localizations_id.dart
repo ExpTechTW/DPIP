@@ -248,6 +248,27 @@ class AppLocalizationsId extends AppLocalizations {
   String get appLogs => 'Log aplikasi';
 
   @override
+  String get changelogTitle => 'Catatan pembaruan';
+
+  @override
+  String get changelogEmpty => 'Belum ada catatan rilis';
+
+  @override
+  String get changelogTypePrerelease => 'Beta';
+
+  @override
+  String get changelogTypeStable => 'Stabil';
+
+  @override
+  String get changelogCurrentVersion => 'Saat ini';
+
+  @override
+  String get changelogVersionDetails => 'Detail rilis';
+
+  @override
+  String get changelogBodyEmpty => 'Tidak ada catatan untuk rilis ini.';
+
+  @override
   String get mapPlaceholderDisabled => 'Peta (dinonaktifkan sementara)';
 
   @override

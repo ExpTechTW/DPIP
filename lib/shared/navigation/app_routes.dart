@@ -65,6 +65,10 @@ abstract final class AppRoutes {
   static const String log = 'log';
   static const String logPath = '/log';
 
+  /// App release notes (GitHub releases).
+  static const String changelog = 'changelog';
+  static const String changelogPath = '/changelog';
+
   // Saved-region management: the manage page (view/remove saved townships)
   // opens the picker to add. Saved townships feed the Home region bar.
   static const String regionManage = 'regionManage';

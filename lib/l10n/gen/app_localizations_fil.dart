@@ -249,6 +249,27 @@ class AppLocalizationsFil extends AppLocalizations {
   String get appLogs => 'Mga log ng app';
 
   @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get changelogEmpty => 'Wala pang release notes';
+
+  @override
+  String get changelogTypePrerelease => 'Beta';
+
+  @override
+  String get changelogTypeStable => 'Stable';
+
+  @override
+  String get changelogCurrentVersion => 'Kasalukuyan';
+
+  @override
+  String get changelogVersionDetails => 'Detalye ng release';
+
+  @override
+  String get changelogBodyEmpty => 'Walang tala para sa release na ito.';
+
+  @override
   String get mapPlaceholderDisabled => 'Mapa (pansamantalang naka-disable)';
 
   @override

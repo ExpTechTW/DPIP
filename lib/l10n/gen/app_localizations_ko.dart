@@ -247,6 +247,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appLogs => '앱 로그';
 
   @override
+  String get changelogTitle => '변경 로그';
+
+  @override
+  String get changelogEmpty => '아직 릴리스 노트가 없습니다';
+
+  @override
+  String get changelogTypePrerelease => '베타';
+
+  @override
+  String get changelogTypeStable => '정식';
+
+  @override
+  String get changelogCurrentVersion => '현재';
+
+  @override
+  String get changelogVersionDetails => '릴리스 상세';
+
+  @override
+  String get changelogBodyEmpty => '이 릴리스에 대한 설명이 없습니다.';
+
+  @override
   String get mapPlaceholderDisabled => '지도 (일시 사용 중지)';
 
   @override

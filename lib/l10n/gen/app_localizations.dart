@@ -543,6 +543,48 @@ abstract class AppLocalizations {
   /// **'App logs'**
   String get appLogs;
 
+  /// More-menu entry and page title for GitHub release notes
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelogTitle;
+
+  /// Empty state when the releases API returns nothing
+  ///
+  /// In en, this message translates to:
+  /// **'No release notes yet'**
+  String get changelogEmpty;
+
+  /// Chip label for a pre-release
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get changelogTypePrerelease;
+
+  /// Chip label for a stable release
+  ///
+  /// In en, this message translates to:
+  /// **'Stable'**
+  String get changelogTypeStable;
+
+  /// Chip/badge when a release matches the installed app version
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get changelogCurrentVersion;
+
+  /// App bar title on a single release's detail page
+  ///
+  /// In en, this message translates to:
+  /// **'Release details'**
+  String get changelogVersionDetails;
+
+  /// Placeholder when a GitHub release has an empty markdown body
+  ///
+  /// In en, this message translates to:
+  /// **'No notes for this release.'**
+  String get changelogBodyEmpty;
+
   /// Placeholder shown in place of the map while MapLibre is disabled
   ///
   /// In en, this message translates to:

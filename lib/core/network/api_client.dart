@@ -86,6 +86,25 @@ class ApiClient {
     return _bytePayload(response);
   }
 
+  /// Absolute-URL GET with JSON decode + ETag (no region failover).
+  ///
+  /// For third-party hosts (e.g. GitHub releases) that still go through Dio so
+  /// [EtagInterceptor] can revalidate. Prefer [get] for region-pinned ExpTech.
+  Future<dynamic> getAbsolute(
+    String url, {
+    Map<String, dynamic>? query,
+    Map<String, dynamic>? headers,
+    CancelToken? cancelToken,
+  }) async {
+    final response = await _dio.request<dynamic>(
+      url,
+      queryParameters: query,
+      cancelToken: cancelToken,
+      options: Options(method: 'GET', headers: headers),
+    );
+    return response.data;
+  }
+
   static BytePayload _bytePayload(Response<dynamic> response) {
     final data = response.data;
     final Uint8List bytes = switch (data) {

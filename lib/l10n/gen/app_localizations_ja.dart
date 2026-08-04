@@ -247,6 +247,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appLogs => 'アプリログ';
 
   @override
+  String get changelogTitle => '更新履歴';
+
+  @override
+  String get changelogEmpty => 'リリースノートはまだありません';
+
+  @override
+  String get changelogTypePrerelease => 'ベータ';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '現行';
+
+  @override
+  String get changelogVersionDetails => 'リリース詳細';
+
+  @override
+  String get changelogBodyEmpty => 'このリリースの説明はありません。';
+
+  @override
   String get mapPlaceholderDisabled => '地図(一時的に無効)';
 
   @override

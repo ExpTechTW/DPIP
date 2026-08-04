@@ -247,6 +247,27 @@ class AppLocalizationsTh extends AppLocalizations {
   String get appLogs => 'บันทึกแอป';
 
   @override
+  String get changelogTitle => 'บันทึกการอัปเดต';
+
+  @override
+  String get changelogEmpty => 'ยังไม่มีบันทึกการเผยแพร่';
+
+  @override
+  String get changelogTypePrerelease => 'เบต้า';
+
+  @override
+  String get changelogTypeStable => 'ทางการ';
+
+  @override
+  String get changelogCurrentVersion => 'ปัจจุบัน';
+
+  @override
+  String get changelogVersionDetails => 'รายละเอียดเวอร์ชัน';
+
+  @override
+  String get changelogBodyEmpty => 'ไม่มีคำอธิบายสำหรับรุ่นนี้';
+
+  @override
   String get mapPlaceholderDisabled => 'แผนที่ (ปิดใช้งานชั่วคราว)';
 
   @override

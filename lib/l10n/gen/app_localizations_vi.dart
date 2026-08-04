@@ -247,6 +247,27 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appLogs => 'Nhật ký ứng dụng';
 
   @override
+  String get changelogTitle => 'Nhật ký cập nhật';
+
+  @override
+  String get changelogEmpty => 'Chưa có ghi chú phát hành';
+
+  @override
+  String get changelogTypePrerelease => 'Thử nghiệm';
+
+  @override
+  String get changelogTypeStable => 'Chính thức';
+
+  @override
+  String get changelogCurrentVersion => 'Hiện tại';
+
+  @override
+  String get changelogVersionDetails => 'Chi tiết phiên bản';
+
+  @override
+  String get changelogBodyEmpty => 'Không có ghi chú cho bản phát hành này.';
+
+  @override
   String get mapPlaceholderDisabled => 'Bản đồ (tạm thời vô hiệu hóa)';
 
   @override

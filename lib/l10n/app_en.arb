@@ -336,6 +336,34 @@
   "@appLogs": {
     "description": "Title of the in-app log viewer and its entry in the More menu"
   },
+  "changelogTitle": "Changelog",
+  "@changelogTitle": {
+    "description": "More-menu entry and page title for GitHub release notes"
+  },
+  "changelogEmpty": "No release notes yet",
+  "@changelogEmpty": {
+    "description": "Empty state when the releases API returns nothing"
+  },
+  "changelogTypePrerelease": "Beta",
+  "@changelogTypePrerelease": {
+    "description": "Chip label for a pre-release"
+  },
+  "changelogTypeStable": "Stable",
+  "@changelogTypeStable": {
+    "description": "Chip label for a stable release"
+  },
+  "changelogCurrentVersion": "Current",
+  "@changelogCurrentVersion": {
+    "description": "Chip/badge when a release matches the installed app version"
+  },
+  "changelogVersionDetails": "Release details",
+  "@changelogVersionDetails": {
+    "description": "App bar title on a single release's detail page"
+  },
+  "changelogBodyEmpty": "No notes for this release.",
+  "@changelogBodyEmpty": {
+    "description": "Placeholder when a GitHub release has an empty markdown body"
+  },
   "mapPlaceholderDisabled": "Map (temporarily disabled)",
   "@mapPlaceholderDisabled": {
     "description": "Placeholder shown in place of the map while MapLibre is disabled"

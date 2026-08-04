@@ -167,7 +167,7 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | 方法 | URL |
 |---|---|
 | `getLocalizationProgress` | `https://exptech.dev/api/v1/dpip/locale` |
-| `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP-Pocket/releases` |
+| `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
 
 ## curl 可用性（2026-08-02，HTTP 狀態碼）
 

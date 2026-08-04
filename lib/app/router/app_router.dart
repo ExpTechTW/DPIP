@@ -8,6 +8,7 @@ import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
+import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
@@ -102,6 +103,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.changelogPath,
+      name: AppRoutes.changelog,
+      builder: (_, _) => const ChangelogPage(),
     ),
     GoRoute(
       path: AppRoutes.developerPath,
