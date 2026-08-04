@@ -908,6 +908,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
+  String get aedLegendCluster => 'クラスター';
+
+  @override
   String get disasterMapOverlayMenuTooltip => '防災マップのレイヤー';
 
   @override

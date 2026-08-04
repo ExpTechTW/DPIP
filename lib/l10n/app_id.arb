@@ -258,6 +258,7 @@
   "typhoonMotion": "Bergerak",
   "mapLayerMonitor": "Monitor Seismik",
   "mapLayerAed": "AED",
+  "aedLegendCluster": "Klaster",
   "mapLayerDisasterMap": "Peta Bencana",
   "disasterMapOverlayMenuTooltip": "Lapisan peta bencana",
   "disasterMapOverlaySectionLayers": "Lapisan",

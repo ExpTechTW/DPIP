@@ -1,5 +1,5 @@
-/// Disaster-prevention map layer — MVT overlays (AED today) baked into the
-/// base style while active, with a typhoon-style tune menu; tap → detail sheet.
+/// Disaster-prevention map layer — MVT overlays (AED today) added at runtime,
+/// with a typhoon-style tune menu; tap → detail sheet.
 library;
 
 import 'dart:async';
@@ -14,25 +14,27 @@ import 'package:dpip/features/map/presentation/widgets/disaster_map_overlay_menu
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Sheet-driven [MapLayer] for the disaster-prevention map (DPM).
 ///
 /// Switcher entry is 「防災地圖」; [DisasterMapOverlayMenu] toggles sub-layers
-/// (AED for now). AED MVT is **baked into the style JSON** via
-/// [bakedAedTileUrl]. MapLibre fetches the tiles; they are served from the
-/// app's tile store through the Dart bridge, and the viewport is warmed into
-/// MapLibre's tile memory ahead of demand. Detail on tap via
-/// [DisasterMapRepository.aedDetail].
+/// (AED for now). AED MVT is added with [addSource] / [addCircleLayer] on
+/// [render] (baking into the base style JSON was a silent no-op / race on
+/// style reload). Detail on tap via [DisasterMapRepository.aedDetail].
 class DisasterMapLayer implements MapLayer {
-  DisasterMapLayer(this._repository);
+  DisasterMapLayer(this._repository, {this.tileCache});
 
   final DisasterMapRepository _repository;
+  final MapTileCache? tileCache;
 
   MapLibreMapController? _controller;
   bool _styleHasAed = false;
   Future<void> _ops = Future<void>.value();
+  static bool _purgedBadDpmTiles = false;
 
   /// AED points / clusters — on by default.
   final ValueNotifier<bool> showAed = ValueNotifier(true);
@@ -42,6 +44,9 @@ class DisasterMapLayer implements MapLayer {
   final ValueNotifier<AedDetail?> _detail = ValueNotifier<AedDetail?>(null);
   final ValueNotifier<String?> _previewName = ValueNotifier<String?>(null);
   final ValueNotifier<String?> _previewPlace = ValueNotifier<String?>(null);
+
+  static const _pointColor = '#e74c3c';
+  static const _clusterColor = '#c0392b';
 
   @override
   String get id => 'dpm';
@@ -65,8 +70,9 @@ class DisasterMapLayer implements MapLayer {
   @override
   double get mapMaxZoom => 16;
 
+  /// AED is added at runtime — never bake into the base style JSON.
   @override
-  String? get bakedAedTileUrl => _repository.tileUrl('aed');
+  String? get bakedAedTileUrl => null;
 
   @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
@@ -98,16 +104,116 @@ class DisasterMapLayer implements MapLayer {
   @override
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
+    await _purgePoisonedDpmTilesOnce();
+    await _ensureAedLayers(controller);
     _styleHasAed = true;
-    Log.info('DPM AED style tiles: $bakedAedTileUrl');
-    // Style JSON already shows AED layers; only push visibility when hiding.
-    // Calling setLayerVisibility(true) before the baked style finishes loading
-    // throws layerNotFound and spams the log.
-    if (!showAed.value) {
-      await _applyOverlayVisibilityAsync(controller);
-    }
-    // Warm ambient before MapLibre's own fetches race past us.
+    Log.info('DPM AED runtime tiles: ${_repository.tileUrl('aed')}');
+    await _applyOverlayVisibilityAsync(controller);
     unawaited(_prefetchViewport(controller));
+  }
+
+  /// Drop SQLite / mirror copies that may still be double-gzip garbage from
+  /// before the Content-Encoding strip — warm would otherwise inject blanks.
+  Future<void> _purgePoisonedDpmTilesOnce() async {
+    if (_purgedBadDpmTiles) return;
+    _purgedBadDpmTiles = true;
+    const needle = '/api/v2/tiles/dpm/';
+    try {
+      await tileCache?.purgeUrlContains(needle);
+      await tileCache?.evict(const [needle]);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'DPM purge cached tiles');
+    }
+  }
+
+  Future<void> _ensureAedLayers(MapLibreMapController controller) async {
+    final ids = await controller.getLayerIds();
+    final idSet = {for (final id in ids) id.toString()};
+    if (idSet.contains(dpmAedPointsLayerId)) return;
+
+    final tileUrl = _repository.tileUrl('aed');
+    try {
+      await controller.removeSource(dpmAedSourceId);
+    } catch (_) {
+      // Source absent — fine.
+    }
+
+    await controller.addSource(
+      dpmAedSourceId,
+      VectorSourceProperties(tiles: [tileUrl], minzoom: 0, maxzoom: 16),
+    );
+
+    // Clusters (tippecanoe `point_count`) — larger red discs.
+    await controller.addCircleLayer(
+      dpmAedSourceId,
+      dpmAedClustersLayerId,
+      const CircleLayerProperties(
+        circleColor: _clusterColor,
+        circleOpacity: 0.75,
+        circleRadius: [
+          'step',
+          ['get', 'point_count'],
+          12,
+          10,
+          16,
+          50,
+          22,
+          200,
+          28,
+        ],
+      ),
+      sourceLayer: 'aed',
+      filter: ['has', 'point_count'],
+      enableInteraction: true,
+    );
+    await controller.addSymbolLayer(
+      dpmAedSourceId,
+      dpmAedClusterCountLayerId,
+      const SymbolLayerProperties(
+        textField: [
+          'to-string',
+          ['get', 'point_count'],
+        ],
+        textSize: 11,
+        textColor: '#ffffff',
+        textAllowOverlap: true,
+      ),
+      sourceLayer: 'aed',
+      filter: ['has', 'point_count'],
+      enableInteraction: false,
+    );
+    // Unclustered AED points.
+    await controller.addCircleLayer(
+      dpmAedSourceId,
+      dpmAedPointsLayerId,
+      const CircleLayerProperties(
+        circleColor: _pointColor,
+        circleRadius: 6,
+        circleStrokeWidth: 1.5,
+        circleStrokeColor: '#ffffff',
+      ),
+      sourceLayer: 'aed',
+      filter: [
+        '!',
+        ['has', 'point_count'],
+      ],
+      enableInteraction: true,
+    );
+  }
+
+  Future<void> _removeAedLayers(MapLibreMapController controller) async {
+    for (final layerId in [
+      dpmAedClusterCountLayerId,
+      dpmAedClustersLayerId,
+      dpmAedPointsLayerId,
+    ]) {
+      try {
+        await controller.removeLayer(layerId);
+      } catch (_) {}
+    }
+    try {
+      await controller.removeSource(dpmAedSourceId);
+    } catch (_) {}
   }
 
   @override
@@ -203,7 +309,23 @@ class DisasterMapLayer implements MapLayer {
   );
 
   @override
-  Widget buildLegend(BuildContext context) => const SizedBox.shrink();
+  Widget buildLegend(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MapLegendCard(
+      child: SymbolLegend(
+        items: [
+          SymbolLegendItem(
+            swatch: const _AedSwatch(color: Color(0xFFE74C3C), size: 10),
+            label: l10n.mapLayerAed,
+          ),
+          SymbolLegendItem(
+            swatch: const _AedSwatch(color: Color(0xFFC0392B), size: 16),
+            label: l10n.aedLegendCluster,
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget buildTopTrailingChrome(BuildContext context) =>
@@ -245,9 +367,8 @@ class DisasterMapLayer implements MapLayer {
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
-    // AED lives in the style JSON; leaving this layer drops [bakedAedTileUrl]
-    // so MapScaffold rebuilds the style without it.
     _repository.cancelTilePrefetch();
+    await _removeAedLayers(controller);
     _controller = null;
     _styleHasAed = false;
     close();
@@ -258,7 +379,7 @@ class DisasterMapLayer implements MapLayer {
 
   @override
   void onStyleReset() {
-    // Style reload drops baked layers; [render] re-marks when we are active.
+    // Style reload drops runtime layers; [render] re-adds when active.
     _styleHasAed = false;
   }
 
@@ -267,5 +388,25 @@ class DisasterMapLayer implements MapLayer {
     _detail.value = null;
     _previewName.value = null;
     _previewPlace.value = null;
+  }
+}
+
+class _AedSwatch extends StatelessWidget {
+  const _AedSwatch({required this.color, required this.size});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+    );
   }
 }

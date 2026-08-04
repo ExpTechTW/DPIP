@@ -258,6 +258,7 @@
   "typhoonMotion": "Di chuyển",
   "mapLayerMonitor": "Giám sát địa chấn",
   "mapLayerAed": "AED",
+  "aedLegendCluster": "Cụm",
   "mapLayerDisasterMap": "Bản đồ phòng chống",
   "disasterMapOverlayMenuTooltip": "Lớp bản đồ phòng chống",
   "disasterMapOverlaySectionLayers": "Lớp",

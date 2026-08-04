@@ -919,6 +919,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
+  String get aedLegendCluster => 'Klaster';
+
+  @override
   String get disasterMapOverlayMenuTooltip => 'Lapisan peta bencana';
 
   @override

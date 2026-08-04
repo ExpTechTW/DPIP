@@ -917,6 +917,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
+  String get aedLegendCluster => 'Cụm';
+
+  @override
   String get disasterMapOverlayMenuTooltip => 'Lớp bản đồ phòng chống';
 
   @override

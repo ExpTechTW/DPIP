@@ -1,5 +1,6 @@
 /// Developer diagnostics: platform, device, app, and push-token details for
-/// support and debugging. Every value is copyable.
+/// support and debugging. The app-bar copies a redacted dump (no device
+/// identifier / push tokens); on-screen values stay visible for inspection.
 ///
 /// **Deliberately English-only.** This page exists to be screenshotted into a
 /// bug report or pasted to a maintainer, so a fixed vocabulary is worth more
@@ -261,6 +262,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
       ..showSnackBar(const SnackBar(content: Text('Cache cleared')));
   }
 
+  /// Labels omitted from the clipboard dump (still shown on screen).
+  static const _redactedCopyLabels = {'Identifier', 'FCM token', 'APNs token'};
+
   Future<void> _copy(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
     if (!mounted) return;
@@ -274,8 +278,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
     if (sections == null) return;
     final buffer = StringBuffer('DPIP diagnostics');
     for (final section in sections) {
+      final fields = [
+        for (final field in section.fields)
+          if (!_redactedCopyLabels.contains(field.label)) field,
+      ];
+      if (fields.isEmpty) continue;
       buffer.writeln('\n[${section.title}]');
-      for (final field in section.fields) {
+      for (final field in fields) {
         buffer.writeln('${field.label}: ${field.value ?? '—'}');
       }
     }
@@ -304,8 +313,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
               children: [
                 for (final section in sections) ...[
                   SectionHeader(section.title),
-                  for (final field in section.fields)
-                    _DiagRow(field: field, onCopy: _copy),
+                  for (final field in section.fields) _DiagRow(field: field),
                 ],
                 const SectionHeader('Maintenance'),
                 ListTile(
@@ -336,12 +344,11 @@ class _DeveloperPageState extends State<DeveloperPage> {
   }
 }
 
-/// A diagnostic row: label + value; tap (or the copy icon) copies the value.
+/// A diagnostic row: label + value (read-only; copy is app-bar only).
 class _DiagRow extends StatelessWidget {
-  const _DiagRow({required this.field, required this.onCopy});
+  const _DiagRow({required this.field});
 
   final _Field field;
-  final Future<void> Function(String value) onCopy;
 
   @override
   Widget build(BuildContext context) {
@@ -359,14 +366,6 @@ class _DiagRow extends StatelessWidget {
               : theme.colorScheme.outline,
         ),
       ),
-      trailing: hasValue
-          ? Icon(
-              Icons.copy_outlined,
-              size: 18,
-              color: theme.colorScheme.primary,
-            )
-          : null,
-      onTap: hasValue ? () => onCopy(value) : null,
     );
   }
 }

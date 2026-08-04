@@ -258,6 +258,7 @@
   "typhoonMotion": "Gumagalaw",
   "mapLayerMonitor": "Seismic Monitor",
   "mapLayerAed": "AED",
+  "aedLegendCluster": "Cluster",
   "mapLayerDisasterMap": "Disaster Map",
   "disasterMapOverlayMenuTooltip": "Disaster map layers",
   "disasterMapOverlaySectionLayers": "Layers",

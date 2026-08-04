@@ -1189,6 +1189,10 @@
   "@mapLayerAed": {
     "description": "Disaster-map overlay menu toggle for AED (defibrillator) points"
   },
+  "aedLegendCluster": "Cluster",
+  "@aedLegendCluster": {
+    "description": "Map legend label for clustered AED markers"
+  },
   "disasterMapOverlayMenuTooltip": "Disaster map layers",
   "@disasterMapOverlayMenuTooltip": {
     "description": "Tooltip on the disaster-map overlay tune button"

@@ -278,6 +278,7 @@
   "typhoonDataTime": "資料時間\n{time}",
   "mapLayerMonitor": "強震監視器",
   "mapLayerAed": "AED",
+  "aedLegendCluster": "群聚",
   "mapLayerDisasterMap": "防災地圖",
   "disasterMapOverlayMenuTooltip": "防災地圖圖層",
   "disasterMapOverlaySectionLayers": "圖層",

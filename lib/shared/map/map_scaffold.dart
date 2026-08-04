@@ -267,30 +267,8 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    final tiles = context.read<MapTileCache?>();
-    _basemapWarmer ??= MapTileWarmer(tiles);
-    // Bootstrap calls [MapTileCache.install] before the MapLibre plugin is
-    // attached, so `setCacheablePatterns` is a silent no-op. Re-bind here once
-    // the platform view exists so the Dart tile bridge actually owns DPM URLs.
-    unawaited(_ensureTileCacheBound(tiles));
+    _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
     unawaited(const MapCache().setMaximumSize());
-  }
-
-  static bool _ambientClearedForGzip = false;
-
-  Future<void> _ensureTileCacheBound(MapTileCache? tiles) async {
-    if (tiles == null) return;
-    try {
-      await tiles.install();
-      // Poisoned MapLibre ambient entries (immutable restamp + bad CE) survive
-      // the protocol fix; clear once per process so AED tiles re-fetch clean.
-      if (!_ambientClearedForGzip) {
-        _ambientClearedForGzip = true;
-        await clearAmbientCache();
-      }
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'MapTileCache re-bind on map create');
-    }
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {

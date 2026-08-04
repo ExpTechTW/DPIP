@@ -68,8 +68,11 @@ class MapTileCache {
   /// list [_isTile] gates on — so native can never end up asking about a URL
   /// this store would refuse to keep.
   Future<void> install({int memoryBytes = defaultMemoryBytes}) async {
-    await bindMapLibreTileCache(getBatch: _onGetBatch, putBatch: _onPutBatch);
-    await setMapLibreCacheablePatterns(EtagInterceptor.immutableAssetMarkers);
+    await bindMapLibreTileCache(
+      cacheablePatterns: EtagInterceptor.immutableAssetMarkers,
+      getBatch: _onGetBatch,
+      putBatch: _onPutBatch,
+    );
     await setMapLibreTileMemoryLimit(memoryBytes);
   }
 
@@ -187,6 +190,14 @@ class MapTileCache {
   /// SQLite — this only reclaims memory).
   Future<void> evict(List<String> urlContains) =>
       evictMapLibreTiles(urlContains);
+
+  /// Deletes SQLite rows whose URL contains any of [needles], then evicts the
+  /// matching native mirror entries. Used to discard poison tiles (e.g. DPM
+  /// MVT stored before the Content-Encoding strip).
+  Future<void> purgeUrlContains(String needle) async {
+    await _store.deleteKeysContaining(needle);
+    await evict([needle]);
+  }
 
   static bool _isTile(String url) {
     final uri = Uri.tryParse(url);

@@ -902,6 +902,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
+  String get aedLegendCluster => '群聚';
+
+  @override
   String get disasterMapOverlayMenuTooltip => '防災地圖圖層';
 
   @override
@@ -1988,6 +1991,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get aedLegendCluster => '群集';
 
   @override
   String get disasterMapOverlayMenuTooltip => '防灾地图图层';
@@ -3078,6 +3084,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerAed => 'AED';
 
   @override
+  String get aedLegendCluster => '群聚';
+
+  @override
   String get disasterMapOverlayMenuTooltip => '防災地圖圖層';
 
   @override
@@ -4164,6 +4173,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayerAed => 'AED';
+
+  @override
+  String get aedLegendCluster => '群聚';
 
   @override
   String get disasterMapOverlayMenuTooltip => '防災地圖圖層';

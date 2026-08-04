@@ -70,6 +70,22 @@ void main() {
     );
   });
 
+  test('native can pull the patterns after binding', () async {
+    await cache.install();
+
+    // What the plugin does on attach. Binding happens during bootstrap, before
+    // any map widget exists and therefore before the plugin is registered, so
+    // the push above can land on a channel with no handler — this pull is what
+    // makes the cache work regardless of which side came up first.
+    expect(
+      await fromNative('cacheablePatterns', null),
+      EtagInterceptor.immutableAssetMarkers,
+      reason:
+          'without an answer here native matches no URL at all, and the store '
+          'is silently bypassed rather than merely slow',
+    );
+  });
+
   test('glyphs are cached by the app store, not just by MapLibre', () async {
     expect(
       EtagInterceptor.isImmutableTile(
