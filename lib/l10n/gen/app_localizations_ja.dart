@@ -631,6 +631,39 @@ class AppLocalizationsJa extends AppLocalizations {
       '地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。';
 
   @override
+  String get mapNavRadar => 'レーダー';
+
+  @override
+  String get mapNavSatellite => '衛星';
+
+  @override
+  String get mapNavLightning => '稲妻';
+
+  @override
+  String get mapNavTyphoon => '台風';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '気温';
+
+  @override
+  String get mapNavHumidity => '湿度';
+
+  @override
+  String get mapNavPressure => '気圧';
+
+  @override
+  String get mapNavWind => '風向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防災';
+
+  @override
   String get displayTheme => 'テーマ';
 
   @override

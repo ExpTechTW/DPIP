@@ -639,6 +639,39 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.';
 
   @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Vệ tinh';
+
+  @override
+  String get mapNavLightning => 'Sét';
+
+  @override
+  String get mapNavTyphoon => 'Bão';
+
+  @override
+  String get mapNavEarthquake => 'Động đất';
+
+  @override
+  String get mapNavTemperature => 'Nhiệt độ';
+
+  @override
+  String get mapNavHumidity => 'Độ ẩm';
+
+  @override
+  String get mapNavPressure => 'Khí áp';
+
+  @override
+  String get mapNavWind => 'Gió';
+
+  @override
+  String get mapNavRain => 'Mưa';
+
+  @override
+  String get mapNavDisaster => 'Phòng thảm';
+
+  @override
   String get displayTheme => 'Giao diện';
 
   @override

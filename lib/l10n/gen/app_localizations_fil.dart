@@ -642,6 +642,39 @@ class AppLocalizationsFil extends AppLocalizations {
       'Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.';
 
   @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Satellite';
+
+  @override
+  String get mapNavLightning => 'Kidlat';
+
+  @override
+  String get mapNavTyphoon => 'Bagyo';
+
+  @override
+  String get mapNavEarthquake => 'Lindol';
+
+  @override
+  String get mapNavTemperature => 'Temperatura';
+
+  @override
+  String get mapNavHumidity => 'Halumigmig';
+
+  @override
+  String get mapNavPressure => 'Presyon';
+
+  @override
+  String get mapNavWind => 'Hangin';
+
+  @override
+  String get mapNavRain => 'Ulan';
+
+  @override
+  String get mapNavDisaster => 'Sakuna';
+
+  @override
   String get displayTheme => 'Tema';
 
   @override

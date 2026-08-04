@@ -638,6 +638,39 @@ class AppLocalizationsTh extends AppLocalizations {
       'แท็บแผนที่จะเปิดชั้นนี้ ไอคอนและป้ายนำทางด้านล่างจะเปลี่ยนตาม';
 
   @override
+  String get mapNavRadar => 'เรดาร์';
+
+  @override
+  String get mapNavSatellite => 'ดาวเทียม';
+
+  @override
+  String get mapNavLightning => 'ฟ้าผ่า';
+
+  @override
+  String get mapNavTyphoon => 'ไต้ฝุ่น';
+
+  @override
+  String get mapNavEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get mapNavTemperature => 'อุณหภูมิ';
+
+  @override
+  String get mapNavHumidity => 'ความชื้น';
+
+  @override
+  String get mapNavPressure => 'ความกดอากาศ';
+
+  @override
+  String get mapNavWind => 'ทิศลม';
+
+  @override
+  String get mapNavRain => 'ฝน';
+
+  @override
+  String get mapNavDisaster => 'ป้องกันภัย';
+
+  @override
   String get displayTheme => 'ธีม';
 
   @override

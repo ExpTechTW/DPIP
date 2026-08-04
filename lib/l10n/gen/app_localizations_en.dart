@@ -639,6 +639,39 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.';
 
   @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Satellite';
+
+  @override
+  String get mapNavLightning => 'Lightning';
+
+  @override
+  String get mapNavTyphoon => 'Typhoon';
+
+  @override
+  String get mapNavEarthquake => 'Earthquake';
+
+  @override
+  String get mapNavTemperature => 'Temperature';
+
+  @override
+  String get mapNavHumidity => 'Humidity';
+
+  @override
+  String get mapNavPressure => 'Pressure';
+
+  @override
+  String get mapNavWind => 'Wind';
+
+  @override
+  String get mapNavRain => 'Rain';
+
+  @override
+  String get mapNavDisaster => 'Disaster';
+
+  @override
   String get displayTheme => 'Theme';
 
   @override

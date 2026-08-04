@@ -31,6 +31,10 @@ jobs:
       - name: Prefs gate
         run: bash tool/check_prefs.sh
 
+      # Lockfile must not embed a machine-local path (pubspec_overrides leak).
+      - name: pubspec.lock path gate
+        run: bash tool/check_pubspec_lock.sh
+
       # Flutter/Dart come from mise.toml, so CI uses the exact pinned version
       # developers run locally — one source of truth. v4 = Node 24 runtime
       # (Node 20 actions are forced onto 24 and emit deprecation warnings).
@@ -50,7 +54,9 @@ jobs:
         run: |
           mise exec -- dart run build_runner build --delete-conflicting-outputs
           git diff --exit-code || {
-            echo "::error::Generated code is stale. Run: dart run build_runner build --delete-conflicting-outputs"
+            echo "::error::Working tree dirty after build_runner (stale codegen, or pubspec.lock rewritten — e.g. a path override leaked into the lockfile). Run: dart run build_runner build && flutter pub get (without pubspec_overrides.yaml) and commit."
+            git --no-pager diff --stat
+            git --no-pager diff
             exit 1
           }
 

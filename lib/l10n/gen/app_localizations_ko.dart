@@ -631,6 +631,39 @@ class AppLocalizationsKo extends AppLocalizations {
       '지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.';
 
   @override
+  String get mapNavRadar => '레이더';
+
+  @override
+  String get mapNavSatellite => '위성';
+
+  @override
+  String get mapNavLightning => '번개';
+
+  @override
+  String get mapNavTyphoon => '태풍';
+
+  @override
+  String get mapNavEarthquake => '지진';
+
+  @override
+  String get mapNavTemperature => '온도';
+
+  @override
+  String get mapNavHumidity => '습도';
+
+  @override
+  String get mapNavPressure => '기압';
+
+  @override
+  String get mapNavWind => '풍향';
+
+  @override
+  String get mapNavRain => '강우';
+
+  @override
+  String get mapNavDisaster => '방재';
+
+  @override
   String get displayTheme => '테마';
 
   @override

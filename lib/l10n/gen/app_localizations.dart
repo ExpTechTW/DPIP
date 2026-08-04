@@ -1275,6 +1275,72 @@ abstract class AppLocalizations {
   /// **'The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.'**
   String get defaultMapLayerSubtitle;
 
+  /// Short Map-tab bottom-nav / default-layer picker label for radar
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get mapNavRadar;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for satellite
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get mapNavSatellite;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for lightning
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning'**
+  String get mapNavLightning;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for typhoon
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get mapNavTyphoon;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for RTS seismic monitor
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get mapNavEarthquake;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for temperature
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get mapNavTemperature;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for humidity
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get mapNavHumidity;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for pressure
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get mapNavPressure;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for wind
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get mapNavWind;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for rain
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get mapNavRain;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for disaster-prevention map
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster'**
+  String get mapNavDisaster;
+
   /// Section header for the theme-mode chooser on the Display settings page
   ///
   /// In en, this message translates to:

@@ -625,6 +625,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
 
   @override
+  String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavSatellite => '衛星';
+
+  @override
+  String get mapNavLightning => '閃電';
+
+  @override
+  String get mapNavTyphoon => '颱風';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '溫度';
+
+  @override
+  String get mapNavHumidity => '濕度';
+
+  @override
+  String get mapNavPressure => '氣壓';
+
+  @override
+  String get mapNavWind => '風向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防災';
+
+  @override
   String get displayTheme => '主題';
 
   @override
@@ -1657,6 +1690,39 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get defaultMapLayerSubtitle => '打开地图标签页时显示此图层，底部导航栏图标与文字会一并更新。';
+
+  @override
+  String get mapNavRadar => '雷达';
+
+  @override
+  String get mapNavSatellite => '卫星';
+
+  @override
+  String get mapNavLightning => '闪电';
+
+  @override
+  String get mapNavTyphoon => '台风';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '温度';
+
+  @override
+  String get mapNavHumidity => '湿度';
+
+  @override
+  String get mapNavPressure => '气压';
+
+  @override
+  String get mapNavWind => '风向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防灾';
 
   @override
   String get displayTheme => '主题';
@@ -2693,6 +2759,39 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
 
   @override
+  String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavSatellite => '衛星';
+
+  @override
+  String get mapNavLightning => '閃電';
+
+  @override
+  String get mapNavTyphoon => '颱風';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '溫度';
+
+  @override
+  String get mapNavHumidity => '濕度';
+
+  @override
+  String get mapNavPressure => '氣壓';
+
+  @override
+  String get mapNavWind => '風向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防災';
+
+  @override
   String get displayTheme => '主題';
 
   @override
@@ -3725,6 +3824,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
+
+  @override
+  String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavSatellite => '衛星';
+
+  @override
+  String get mapNavLightning => '閃電';
+
+  @override
+  String get mapNavTyphoon => '颱風';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '溫度';
+
+  @override
+  String get mapNavHumidity => '濕度';
+
+  @override
+  String get mapNavPressure => '氣壓';
+
+  @override
+  String get mapNavWind => '風向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防災';
 
   @override
   String get displayTheme => '主題';

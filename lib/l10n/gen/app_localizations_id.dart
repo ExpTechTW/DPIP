@@ -641,6 +641,39 @@ class AppLocalizationsId extends AppLocalizations {
       'Tab Peta membuka lapisan ini. Ikon dan label navigasi bawah ikut pilihan ini.';
 
   @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Satelit';
+
+  @override
+  String get mapNavLightning => 'Petir';
+
+  @override
+  String get mapNavTyphoon => 'Topan';
+
+  @override
+  String get mapNavEarthquake => 'Gempa';
+
+  @override
+  String get mapNavTemperature => 'Suhu';
+
+  @override
+  String get mapNavHumidity => 'Kelembapan';
+
+  @override
+  String get mapNavPressure => 'Tekanan';
+
+  @override
+  String get mapNavWind => 'Angin';
+
+  @override
+  String get mapNavRain => 'Hujan';
+
+  @override
+  String get mapNavDisaster => 'Bencana';
+
+  @override
   String get displayTheme => 'Tema';
 
   @override

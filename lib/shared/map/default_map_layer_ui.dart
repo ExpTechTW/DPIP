@@ -40,18 +40,18 @@ extension DefaultMapLayerUi on DefaultMapLayer {
     DefaultMapLayer.dpm => Icons.health_and_safety,
   };
 
-  /// Bottom-nav label + settings row title (reuses map-layer l10n).
+  /// Short bottom-nav / settings-picker label (not the long layer-switcher name).
   String label(AppLocalizations l10n) => switch (this) {
-    DefaultMapLayer.radar => l10n.mapLayerRadar,
-    DefaultMapLayer.satellite => l10n.mapLayerSatellite,
-    DefaultMapLayer.lightning => l10n.mapLayerLightning,
-    DefaultMapLayer.typhoon => l10n.mapLayerTyphoon,
-    DefaultMapLayer.monitor => l10n.mapLayerMonitor,
-    DefaultMapLayer.temperature => l10n.mapLayerTemperature,
-    DefaultMapLayer.humidity => l10n.mapLayerHumidity,
-    DefaultMapLayer.pressure => l10n.mapLayerPressure,
-    DefaultMapLayer.wind => l10n.mapLayerWind,
-    DefaultMapLayer.rain => l10n.mapLayerRain,
-    DefaultMapLayer.dpm => l10n.mapLayerDisasterMap,
+    DefaultMapLayer.radar => l10n.mapNavRadar,
+    DefaultMapLayer.satellite => l10n.mapNavSatellite,
+    DefaultMapLayer.lightning => l10n.mapNavLightning,
+    DefaultMapLayer.typhoon => l10n.mapNavTyphoon,
+    DefaultMapLayer.monitor => l10n.mapNavEarthquake,
+    DefaultMapLayer.temperature => l10n.mapNavTemperature,
+    DefaultMapLayer.humidity => l10n.mapNavHumidity,
+    DefaultMapLayer.pressure => l10n.mapNavPressure,
+    DefaultMapLayer.wind => l10n.mapNavWind,
+    DefaultMapLayer.rain => l10n.mapNavRain,
+    DefaultMapLayer.dpm => l10n.mapNavDisaster,
   };
 }

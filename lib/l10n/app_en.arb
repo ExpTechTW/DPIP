@@ -855,6 +855,50 @@
   "@defaultMapLayerSubtitle": {
     "description": "Explanatory subtitle on the default-map-layer settings page"
   },
+  "mapNavRadar": "Radar",
+  "@mapNavRadar": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for radar"
+  },
+  "mapNavSatellite": "Satellite",
+  "@mapNavSatellite": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for satellite"
+  },
+  "mapNavLightning": "Lightning",
+  "@mapNavLightning": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for lightning"
+  },
+  "mapNavTyphoon": "Typhoon",
+  "@mapNavTyphoon": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for typhoon"
+  },
+  "mapNavEarthquake": "Earthquake",
+  "@mapNavEarthquake": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for RTS seismic monitor"
+  },
+  "mapNavTemperature": "Temperature",
+  "@mapNavTemperature": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for temperature"
+  },
+  "mapNavHumidity": "Humidity",
+  "@mapNavHumidity": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for humidity"
+  },
+  "mapNavPressure": "Pressure",
+  "@mapNavPressure": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for pressure"
+  },
+  "mapNavWind": "Wind",
+  "@mapNavWind": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for wind"
+  },
+  "mapNavRain": "Rain",
+  "@mapNavRain": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for rain"
+  },
+  "mapNavDisaster": "Disaster",
+  "@mapNavDisaster": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for disaster-prevention map"
+  },
   "displayTheme": "Theme",
   "@displayTheme": {
     "description": "Section header for the theme-mode chooser on the Display settings page"
