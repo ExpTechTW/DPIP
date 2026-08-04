@@ -70,6 +70,7 @@ Map<String, dynamic> _$WarningAreaToJson(_WarningArea instance) =>
 
 _TyphoonWarning _$TyphoonWarningFromJson(Map<String, dynamic> json) =>
     _TyphoonWarning(
+      tdNo: json['tdNo'] as String?,
       active: json['active'] as bool,
       id: json['id'] as String,
       sent: (json['sent'] as num).toInt(),
@@ -98,6 +99,7 @@ _TyphoonWarning _$TyphoonWarningFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$TyphoonWarningToJson(_TyphoonWarning instance) =>
     <String, dynamic>{
+      'tdNo': instance.tdNo,
       'active': instance.active,
       'id': instance.id,
       'sent': instance.sent,

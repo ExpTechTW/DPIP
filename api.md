@@ -117,9 +117,13 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | `getTyphoonPotential` | `/api/v5/meteor/typhoon/potential` | `coreExclusiveApi` |
 | `getTyphoonProbability` | `/api/v5/meteor/typhoon/probability` | `coreExclusiveApi` |
 | `getTyphoonWarning` | `/api/v5/meteor/typhoon/warning` | `coreExclusiveApi` |
-| `getTyphoonGeojson` | `/api/v5/meteor/typhoon/geojson` | `coreExclusiveApi` |
 | `getTyphoonKindList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreExclusiveApi` |
 | `getTyphoonKindAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStaticExclusive` |
+
+> **颱風多颱**：`/`、`/track`、`/potential`、`/probability`、`/warning` 一律
+> `{ updated, cyclones: [...] }`；唯一識別是 **`tdNo`**（CWA `CwaTdNo`，未命名
+> TD 也有）。地圖 overlay 由 client 從 typed payloads 組出（不抓 `/geojson`）。
+> `/warning` 的 CAP 通常一報（`cyclones` 長度 0–1）。
 
 > ⚠️ **`?range` 目前被伺服器忽略。** 對 weather 與 rain 的 `trend/{id}` 實測
 > （2026-08-02，多個測站）：`range=7d`、`7D`、`week`、`168h`、改用其他參數名、

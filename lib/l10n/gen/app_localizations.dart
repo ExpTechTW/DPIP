@@ -1983,6 +1983,18 @@ abstract class AppLocalizations {
   /// **'Tropical depression'**
   String get typhoonIntensityTd;
 
+  /// Sheet picker: named typhoon (CWA name + TY tyNo)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} TY {no}'**
+  String typhoonPickerNamed(String no, String name);
+
+  /// Sheet picker: unnamed tropical depression (CWA tdNo)
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical depression TD {no}'**
+  String typhoonPickerTd(String no);
+
   /// CWA class: mild typhoon (past-track colour)
   ///
   /// In en, this message translates to:

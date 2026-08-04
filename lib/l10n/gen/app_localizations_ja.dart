@@ -1018,6 +1018,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonIntensityTd => '熱帯低気圧';
 
   @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '熱帯低気圧 TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '弱い台風';
 
   @override

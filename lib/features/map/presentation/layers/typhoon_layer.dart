@@ -2,6 +2,7 @@
 /// plus scrubbable satellite imagery, from the full v5 meteor typhoon surface.
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:dpip/core/error/result.dart';
@@ -26,6 +27,7 @@ import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -84,8 +86,9 @@ class TyphoonMapLayer implements MapLayer {
   );
 
   /// Radar XOR Himawari IR under the vectors — frame ≤ bulletin time.
+  /// Defaults to radar so the first open already shows echo under the track.
   final ValueNotifier<TyphoonWeatherOverlay> weatherOverlay = ValueNotifier(
-    TyphoonWeatherOverlay.none,
+    TyphoonWeatherOverlay.radar,
   );
 
   /// Radar / IR tile ids (Unix seconds), ascending — for bulletin alignment.
@@ -93,9 +96,16 @@ class TyphoonMapLayer implements MapLayer {
   List<int> _satSecs = const [];
 
   CycloneIndex? _index;
-  TyphoonPotential? _potential;
-  Result<Map<String, dynamic>>? _geoResult;
-  TyphoonWarning? _rawWarning;
+  PotentialPayload? _potential;
+  WarningPayload? _rawWarning;
+
+  /// Last known viewport for [frameSelection] (set from the sheet).
+  Size? _frameViewport;
+  double _frameTopInset = 0;
+  double _frameBottomInset = 0;
+
+  /// Set by [render] / [selectCyclone]; cleared once [frameSelection] succeeds.
+  bool _wantFrame = false;
 
   final List<_StormPoint> _points = [];
   List<String> _warningNames = const [];
@@ -173,7 +183,6 @@ class TyphoonMapLayer implements MapLayer {
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
     final results = await Future.wait([
-      _repository.geojson(),
       _repository.cyclones(),
       _repository.track(),
       _repository.potential(),
@@ -183,14 +192,13 @@ class TyphoonMapLayer implements MapLayer {
       satellite.frames(),
     ]);
 
-    final geoResult = results[0] as Result<Map<String, dynamic>>;
-    final indexResult = results[1] as Result<CycloneIndex>;
-    final trackResult = results[2] as Result<TrackPayload>;
-    final potentialResult = results[3] as Result<TyphoonPotential>;
-    final probabilityResult = results[4] as Result<TyphoonProbability>;
-    final warningResult = results[5] as Result<TyphoonWarning>;
-    final radarResult = results[6] as Result<List<String>>;
-    final satResult = results[7] as Result<List<String>>;
+    final indexResult = results[0] as Result<CycloneIndex>;
+    final trackResult = results[1] as Result<TrackPayload>;
+    final potentialResult = results[2] as Result<PotentialPayload>;
+    final probabilityResult = results[3] as Result<TyphoonProbability>;
+    final warningResult = results[4] as Result<WarningPayload>;
+    final radarResult = results[5] as Result<List<String>>;
+    final satResult = results[6] as Result<List<String>>;
 
     final trackPayload = trackResult.valueOrNull;
     final probability = probabilityResult.valueOrNull;
@@ -201,20 +209,13 @@ class TyphoonMapLayer implements MapLayer {
 
     _index = index;
     _potential = potentialResult.valueOrNull;
-    _geoResult = geoResult;
     _rawWarning = warning;
     track.value = trackPayload;
     this.probability.value = probability;
 
-    final nearest = index == null || index.cyclones.isEmpty
-        ? -1
-        : indexOfNearestCyclone(
-            index.cyclones,
-            origin: const geo.LatLng(23.7, 121.0),
-          );
-    final key = nearest >= 0 ? cycloneKey(index!.cyclones[nearest]) : null;
-    selectedCycloneKey.value = key;
+    final key = _keyOfNearestToTaiwan();
     _applySelection(key);
+    selectedCycloneKey.value = key;
 
     final overlay = _buildLiveGeo();
     _parsePoints(overlay);
@@ -224,6 +225,8 @@ class TyphoonMapLayer implements MapLayer {
     await _addVectorOverlay(controller, overlay);
     await _syncWeatherOverlay(controller);
     _added = true;
+    _wantFrame = true;
+    frameSelection();
   }
 
   /// Bulletin clock for weather-tile alignment (always the live report).
@@ -231,12 +234,17 @@ class TyphoonMapLayer implements MapLayer {
 
   int? get _bulletinSecond => bulletinSecond;
 
-  /// Warning only when CAP typhoon name matches the focused storm.
+  /// Warning only when CAP typhoon matches the focused storm (`tdNo` / name).
   TyphoonWarning? get matchedWarning {
-    final w = warning.value;
+    final payload = _rawWarning;
     final s = summary.value;
-    if (w == null || s == null) return null;
-    return warningAppliesTo(w, name: s.name, cwaName: s.cwaName) ? w : null;
+    if (payload == null || s == null) return null;
+    for (final w in payload.cyclones) {
+      if (warningAppliesTo(w, name: s.name, cwaName: s.cwaName, tdNo: s.tdNo)) {
+        return w;
+      }
+    }
+    return null;
   }
 
   /// Focus another active cyclone (map tap on its centre).
@@ -245,10 +253,15 @@ class TyphoonMapLayer implements MapLayer {
       tapRevision.value++;
       return;
     }
-    selectedCycloneKey.value = key;
+    // Apply summary/warning *before* flipping the key — ValueNotifier notifies
+    // synchronously, and the sheet must never paint a mixed A-name / B-track
+    // frame.
     _applySelection(key);
+    selectedCycloneKey.value = key;
     clearForecastSelection();
     tapRevision.value++;
+    _wantFrame = true;
+    frameSelection();
     final controller = _controller;
     if (controller == null || !_added) return;
     _queue(() async {
@@ -258,6 +271,109 @@ class TyphoonMapLayer implements MapLayer {
       await controller.setGeoJsonSource(_src, geo);
       await _syncWeatherOverlay(controller);
     });
+  }
+
+  /// Cache the map's visible band so [frameSelection] works from map taps too.
+  void rememberFrameMetrics({
+    required Size viewport,
+    required double topInset,
+    required double bottomInset,
+  }) {
+    _frameViewport = viewport;
+    _frameTopInset = topInset;
+    _frameBottomInset = bottomInset;
+    if (_wantFrame && _added) frameSelection();
+  }
+
+  /// Fit the camera to Taiwan (+Kinmen) ∪ selected centre ∪ forecast cone.
+  void frameSelection() {
+    final controller = _controller;
+    final viewport = _frameViewport;
+    final bounds = selectedFocusBounds();
+    if (controller == null || viewport == null || bounds == null) return;
+    final safe = safeFitBounds(bounds);
+    if (safe == null) return;
+    final fit = boundsFitCamera(
+      safe,
+      viewport: viewport,
+      topInset: _frameTopInset,
+      bottomInset: _frameBottomInset,
+      minZoom: mapMinZoom,
+      maxZoom: mapMaxZoom,
+    );
+    if (fit == null) return;
+    _wantFrame = false;
+    unawaited(
+      controller.animateCamera(
+        CameraUpdate.newLatLngZoom(fit.target, fit.zoom),
+      ),
+    );
+  }
+
+  /// Stable key of the cyclone nearest Taiwan (index first, else track).
+  String? _keyOfNearestToTaiwan() {
+    const origin = geo.LatLng(23.7, 121.0);
+    final index = _index;
+    if (index != null && index.cyclones.isNotEmpty) {
+      final i = indexOfNearestCyclone(index.cyclones, origin: origin);
+      if (i >= 0) return cycloneKey(index.cyclones[i]);
+    }
+    final tracks = track.value?.cyclones;
+    if (tracks == null || tracks.isEmpty) return null;
+    var bestI = -1;
+    var bestD = double.infinity;
+    for (var i = 0; i < tracks.length; i++) {
+      final t = tracks[i];
+      if (t.analysis.isEmpty) continue;
+      final last = t.analysis.last;
+      final d = origin.distanceTo(geo.LatLng(last.latitude, last.longitude));
+      if (d < bestD) {
+        bestD = d;
+        bestI = i;
+      }
+    }
+    if (bestI < 0) return null;
+    final t = tracks[bestI];
+    return cycloneKeyOf(name: t.name, cwaName: t.cwaName, tdNo: t.tdNo);
+  }
+
+  /// Bounds for framing the focused storm: island box + centre + cone ring.
+  LatLngBounds? selectedFocusBounds() {
+    final points = <LatLng>[
+      BaseMap.taiwanBounds.southwest,
+      BaseMap.taiwanBounds.northeast,
+    ];
+
+    final track = selectedTrack;
+    final summary = this.summary.value;
+    if (track != null && track.analysis.isNotEmpty) {
+      final last = track.analysis.last;
+      points.add(LatLng(last.latitude, last.longitude));
+    } else if (summary != null) {
+      points.add(LatLng(summary.latitude, summary.longitude));
+    }
+
+    if (track != null) {
+      final td = presentText(track.tdNo);
+      TyphoonPotential? pot;
+      if (td != null) {
+        for (final p in _potential?.cyclones ?? const <TyphoonPotential>[]) {
+          if (presentText(p.tdNo) == td) {
+            pot = p;
+            break;
+          }
+        }
+      }
+      final official = pot?.cone;
+      final cone = (official != null && official.length >= 3)
+          ? official
+          : forecastConeRing(track);
+      for (final p in cone) {
+        points.add(LatLng(p.latitude, p.longitude));
+      }
+    }
+
+    return boundsFromPoints(points);
   }
 
   /// Clears the sheet's tapped-forecast highlight.
@@ -283,12 +399,13 @@ class TyphoonMapLayer implements MapLayer {
   /// Active MapLibre controller (for Flutter screen-space callouts).
   MapLibreMapController? get mapController => _controller;
 
-  /// Forecast fixes for every active cyclone (Flutter callout source).
-  List<TrackForecast> get selectedForecasts {
-    final payload = track.value;
-    if (payload == null) return const [];
-    return [for (final c in payload.cyclones) ...c.forecast];
-  }
+  /// Forecast fixes for the focused cyclone (Flutter callout source).
+  List<TrackForecast> get selectedForecasts =>
+      selectedTrack?.forecast ?? const [];
+
+  /// Track entry for the focused cyclone — sheet / callout SoT.
+  TyphoonTrack? get selectedTrack =>
+      trackForKey(track.value, selectedCycloneKey.value);
 
   void _applySelection(String? key) {
     summary.value =
@@ -313,66 +430,51 @@ class TyphoonMapLayer implements MapLayer {
             direction: t.now?.direction,
           );
         }();
-    final w = _rawWarning;
+    final payload = _rawWarning;
     final s = summary.value;
-    if (w != null &&
-        s != null &&
-        warningAppliesTo(w, name: s.name, cwaName: s.cwaName)) {
-      warning.value = w;
-      _warningNames = [for (final a in w.areas) a.name];
+    TyphoonWarning? matched;
+    if (payload != null && s != null) {
+      for (final w in payload.cyclones) {
+        if (warningAppliesTo(
+          w,
+          name: s.name,
+          cwaName: s.cwaName,
+          tdNo: s.tdNo,
+        )) {
+          matched = w;
+          break;
+        }
+      }
+    }
+    if (matched != null) {
+      warning.value = matched;
+      _warningNames = [for (final a in matched.areas) a.name];
     } else {
       warning.value = null;
       _warningNames = const [];
     }
   }
 
-  TyphoonTrack? get _selectedTrack =>
-      trackForKey(track.value, selectedCycloneKey.value);
+  TyphoonTrack? get _selectedTrack => selectedTrack;
 
   List<TyphoonCyclone> get _cyclones =>
       _index?.cyclones ?? const <TyphoonCyclone>[];
 
-  Map<String, dynamic> _buildLiveGeo() {
-    return _liveOverlay(
-      geoResult:
-          _geoResult ??
-          const Ok(<String, dynamic>{
-            'type': 'FeatureCollection',
-            'features': <dynamic>[],
-          }),
-      potential: _potential,
-      probability: probability.value,
-      selected: _selectedTrack,
-      cyclones: _cyclones,
-    );
-  }
+  /// Active cyclones from the index (picker fallback when track is empty).
+  List<TyphoonCyclone> get activeCyclones => _cyclones;
 
-  Map<String, dynamic> _liveOverlay({
-    required Result<Map<String, dynamic>> geoResult,
-    required TyphoonPotential? potential,
-    required TyphoonProbability? probability,
-    required TyphoonTrack? selected,
-    required List<TyphoonCyclone> cyclones,
-  }) {
-    final server = geoResult.valueOrNull;
-    if (server != null && server['features'] is List) {
-      return augmentTyphoonGeojson(
-        server,
-        selected: selected,
-        tracks: track.value?.cyclones ?? const <TyphoonTrack>[],
-        cyclones: cyclones,
-      );
+  Map<String, dynamic> _buildLiveGeo() {
+    final tracks = track.value?.cyclones;
+    if (tracks == null || tracks.isEmpty) {
+      return emptyTyphoonFeatureCollection;
     }
-    if (potential != null && probability != null) {
-      return typhoonFeatureCollection(
-        potential: potential,
-        probability: probability,
-        selected: selected,
-        tracks: track.value?.cyclones ?? const <TyphoonTrack>[],
-        cyclones: cyclones,
-      );
-    }
-    return emptyTyphoonFeatureCollection;
+    return buildTyphoonOverlay(
+      tracks: tracks,
+      potentials: _potential?.cyclones ?? const [],
+      probability: probability.value,
+      cyclones: _cyclones,
+      selectedKey: selectedCycloneKey.value,
+    );
   }
 
   Future<void> _addVectorOverlay(
@@ -1142,6 +1244,25 @@ class _DotSwatch extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Axis-aligned bounds of [points], or `null` when empty / non-finite.
+LatLngBounds? boundsFromPoints(Iterable<LatLng> points) {
+  double? minLat, maxLat, minLng, maxLng;
+  for (final p in points) {
+    final lat = p.latitude;
+    final lng = p.longitude;
+    if (!lat.isFinite || !lng.isFinite) continue;
+    minLat = minLat == null ? lat : math.min(minLat, lat);
+    maxLat = maxLat == null ? lat : math.max(maxLat, lat);
+    minLng = minLng == null ? lng : math.min(minLng, lng);
+    maxLng = maxLng == null ? lng : math.max(maxLng, lng);
+  }
+  if (minLat == null) return null;
+  return LatLngBounds(
+    southwest: LatLng(minLat, minLng!),
+    northeast: LatLng(maxLat!, maxLng!),
+  );
 }
 
 /// Bounding box of every coordinate in a typhoon [geo] `FeatureCollection`.

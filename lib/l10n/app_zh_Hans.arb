@@ -313,6 +313,8 @@
   "typhoonIntensityMild": "轻度台风",
   "typhoonIntensityModerate": "中度台风",
   "typhoonIntensityTd": "热带性低气压",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "typhoonPickerTd": "热带性低气压 TD {no}",
   "typhoonLabelDirection": "过去移动方向",
   "typhoonLabelGaleAvg": "七级风平均暴风半径",
   "typhoonLabelGust": "瞬间最大阵风",

@@ -311,6 +311,8 @@
   "mapLegendUnit": "單位：{unit}",
   "typhoonLegendPast": "實際路徑",
   "typhoonIntensityTd": "熱帶性低氣壓",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "typhoonPickerTd": "熱帶性低氣壓 TD {no}",
   "typhoonIntensityMild": "輕度颱風",
   "typhoonIntensityModerate": "中度颱風",
   "typhoonIntensityIntense": "強烈颱風",

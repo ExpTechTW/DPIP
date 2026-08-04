@@ -1,5 +1,6 @@
 /// Storm-wind-circle strike probability — v5
 /// `GET /api/v5/meteor/typhoon/probability` (dataset 003).
+/// Multi-storm: `{ updated, cyclones: [{ tdNo, levels }] }`.
 library;
 
 import 'package:dpip/core/models/lat_lng.dart';
@@ -28,24 +29,53 @@ abstract class ProbabilityLevel with _$ProbabilityLevel {
       );
 }
 
-/// The `GET /probability` payload: the update time and the probability contours.
-/// `levels` is empty when no strike probability is active.
+/// One cyclone's strike-probability contours.
 @freezed
-abstract class TyphoonProbability with _$TyphoonProbability {
-  const factory TyphoonProbability({
-    required int updated,
+abstract class CycloneProbability with _$CycloneProbability {
+  const factory CycloneProbability({
+    /// CWA tropical-depression number; may be blank when upstream can't match.
+    String? tdNo,
     required List<ProbabilityLevel> levels,
-  }) = _TyphoonProbability;
+  }) = _CycloneProbability;
 
-  /// Decodes `{ updated, levels: [{ p, coords }, …] }`.
-  factory TyphoonProbability.decode(Map<String, dynamic> json) =>
-      TyphoonProbability(
-        updated: (json['updated'] as num).toInt(),
+  factory CycloneProbability.decode(Map<String, dynamic> json) =>
+      CycloneProbability(
+        tdNo: _blankToNull(json['tdNo'] as String?),
         levels: [
           for (final level in (json['levels'] as List? ?? const []))
             ProbabilityLevel.decode(level as Map<String, dynamic>),
         ],
       );
+}
+
+/// The `GET /probability` payload: update time + per-cyclone contours.
+@freezed
+abstract class TyphoonProbability with _$TyphoonProbability {
+  const factory TyphoonProbability({
+    required int updated,
+    required List<CycloneProbability> cyclones,
+  }) = _TyphoonProbability;
+
+  /// Decodes `{ updated, cyclones: [{ tdNo, levels }] }`.
+  factory TyphoonProbability.decode(Map<String, dynamic> json) {
+    final updated = (json['updated'] as num?)?.toInt() ?? 0;
+    final raw = json['cyclones'];
+    if (raw is! List) {
+      return TyphoonProbability(updated: updated, cyclones: const []);
+    }
+    return TyphoonProbability(
+      updated: updated,
+      cyclones: [
+        for (final c in raw)
+          if (c is Map<String, dynamic>) CycloneProbability.decode(c),
+      ],
+    );
+  }
+}
+
+String? _blankToNull(String? value) {
+  final t = value?.trim();
+  return (t == null || t.isEmpty) ? null : t;
 }
 
 /// Maps a list of `[lng, lat]` pairs to [LatLng]s (mind the GeoJSON axis order);

@@ -83,5 +83,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>MLNIdeographicFontFamilyName</key>
+	<string>PingFang TC</string>
 </dict>
 </plist>

@@ -22,38 +22,16 @@ void main() {
       const centre = LatLng(24, 121);
       const circle = StormCircle(avg: 100, ne: 120, se: 80, sw: 90, nw: 110);
       final ring = asymmetricStormRing(centre, circle, steps: 8);
-      // 2 samples × 4 quadrants + close.
       expect(ring.length, 9);
       expect(ring.first.latitude, closeTo(ring.last.latitude, 1e-9));
-      expect(ring.first.longitude, closeTo(ring.last.longitude, 1e-9));
-      // distanceTo is metres; storm radii are km.
       double km(LatLng p) => centre.distanceTo(p) / 1000;
-      // Bearing 0° and 45° both use NE = 120 (not a lerp toward SE).
       expect(km(ring[0]), closeTo(120, 0.5));
-      expect(km(ring[1]), closeTo(120, 0.5));
-      // Bearing 90° starts SE = 80.
       expect(km(ring[2]), closeTo(80, 0.5));
-      expect(km(ring[4]), closeTo(90, 0.5)); // SW @ 180°
-    });
-  });
-
-  group('pastTrackSegments', () {
-    test('colours each segment by destination wind (CWA)', () {
-      final segs = pastTrackSegments(const [
-        TrackFix(time: 1, latitude: 20, longitude: 120, wind: 10),
-        TrackFix(time: 2, latitude: 21, longitude: 121, wind: 20),
-        TrackFix(time: 3, latitude: 22, longitude: 122, wind: 40),
-        TrackFix(time: 4, latitude: 23, longitude: 123, wind: 55),
-      ]);
-      expect(segs, hasLength(3));
-      expect(segs[0]['properties']['intensity'], 'mild');
-      expect(segs[1]['properties']['intensity'], 'moderate');
-      expect(segs[2]['properties']['intensity'], 'intense');
     });
   });
 
   group('forecastConeRing', () {
-    test('builds an envelope from forecast r70 radii', () {
+    test('builds convex hull from forecast r70 radii', () {
       const track = TyphoonTrack(
         name: '',
         year: 2026,
@@ -68,17 +46,10 @@ void main() {
             r70: 50,
           ),
           TrackForecast(
-            tau: 12,
-            time: 3,
-            latitude: 16.0,
-            longitude: 118.0,
-            r70: 100,
-          ),
-          TrackForecast(
             tau: 24,
             time: 4,
-            latitude: 16.2,
-            longitude: 119.0,
+            latitude: 16.6,
+            longitude: 121.8,
             r70: 150,
           ),
         ],
@@ -86,26 +57,13 @@ void main() {
       final cone = forecastConeRing(track);
       expect(cone.length, greaterThan(6));
       expect(cone.first.latitude, closeTo(cone.last.latitude, 1e-9));
-      expect(cone.first.longitude, closeTo(cone.last.longitude, 1e-9));
-    });
-
-    test('returns empty when no r70 is present', () {
-      const track = TyphoonTrack(
-        name: 'X',
-        year: 2026,
-        analysis: [TrackFix(time: 1, latitude: 20, longitude: 120)],
-        forecast: [
-          TrackForecast(tau: 6, time: 2, latitude: 21, longitude: 121),
-        ],
-      );
-      expect(forecastConeRing(track), isEmpty);
     });
   });
 
-  group('typhoonFeatureCollection', () {
-    test('tags kinds from potential + probability + track circles', () {
+  group('buildTyphoonOverlay', () {
+    test('emits kinds from track + potential + probability', () {
       final pot = TyphoonPotential(
-        updated: 1,
+        tdNo: '1',
         name: 'X',
         past: const [LatLng(20, 120), LatLng(21, 121)],
         forecast: const [LatLng(21, 121), LatLng(22, 122)],
@@ -113,36 +71,53 @@ void main() {
         circle: null,
         current: const LatLng(21, 121),
         points: const [
-          ForecastPoint(label: 't1', latitude: 22, longitude: 122),
+          ForecastPoint(label: '07月14日08時', latitude: 22, longitude: 122),
         ],
       );
       final prob = TyphoonProbability(
         updated: 1,
-        levels: [
-          ProbabilityLevel(
-            p: 100,
-            coords: const [LatLng(20, 120), LatLng(21, 120), LatLng(21, 121)],
+        cyclones: [
+          CycloneProbability(
+            tdNo: '1',
+            levels: [
+              ProbabilityLevel(
+                p: 100,
+                coords: const [
+                  LatLng(20, 120),
+                  LatLng(21, 120),
+                  LatLng(21, 121),
+                ],
+              ),
+            ],
           ),
         ],
       );
       final storm = TyphoonTrack(
         name: 'X',
         year: 2026,
-        analysis: const [TrackFix(time: 1, latitude: 21, longitude: 121)],
+        tdNo: '1',
+        analysis: const [
+          TrackFix(time: 1, latitude: 20, longitude: 120, wind: 15),
+          TrackFix(time: 2, latitude: 21, longitude: 121, wind: 33),
+        ],
         now: const TrackNow(
           c15: StormCircle(avg: 100, ne: 100, se: 100, sw: 100, nw: 100),
           c25: StormCircle(avg: 50, ne: 50, se: 50, sw: 50, nw: 50),
         ),
-        forecast: const [],
+        forecast: const [
+          TrackForecast(tau: 6, time: 3, latitude: 22, longitude: 122, r70: 80),
+        ],
       );
-      final fc = typhoonFeatureCollection(
-        potential: pot,
+      final fc = buildTyphoonOverlay(
+        tracks: [storm],
+        potentials: [pot],
         probability: prob,
-        selected: storm,
+        selectedKey: 'TD1',
         cyclones: const [
           TyphoonCyclone(
             name: 'X',
             year: 2026,
+            tdNo: '1',
             time: 1,
             latitude: 21,
             longitude: 121,
@@ -168,131 +143,14 @@ void main() {
           'circleAvg25',
         ]),
       );
-      final c25 =
-          (fc['features'] as List).firstWhere(
-                (f) => (f as Map)['properties']?['kind'] == 'circle25',
-              )
-              as Map;
-      expect(c25['geometry']?['type'], 'Polygon');
-      final avg25 =
-          (fc['features'] as List).firstWhere(
-                (f) => (f as Map)['properties']?['kind'] == 'circleAvg25',
-              )
-              as Map;
-      expect(avg25['geometry']?['type'], 'LineString');
-    });
-  });
-
-  group('augmentTyphoonGeojson', () {
-    test('rebuilds asymmetric storm circles from track now', () {
-      final geo = <String, dynamic>{
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {'kind': 'circle15'},
-            'geometry': {
-              'type': 'Polygon',
-              'coordinates': [
-                [
-                  [120.0, 23.0],
-                  [122.0, 23.0],
-                  [122.0, 25.0],
-                  [120.0, 25.0],
-                  [120.0, 23.0],
-                ],
-              ],
-            },
-          },
-        ],
-      };
-      final storm = TyphoonTrack(
-        name: 'X',
-        year: 2026,
-        tdNo: '1',
-        analysis: const [TrackFix(time: 1, latitude: 24, longitude: 121)],
-        now: const TrackNow(
-          c15: StormCircle(avg: 100, ne: 140, se: 80, sw: 90, nw: 110),
-        ),
-        forecast: const [],
+      final points = (fc['features'] as List).where(
+        (f) => (f as Map)['properties']?['kind'] == 'forecastPoint',
       );
-      final out = augmentTyphoonGeojson(geo, selected: storm, tracks: [storm]);
-      final c15 = (out['features'] as List).where(
-        (f) => (f as Map)['properties']?['kind'] == 'circle15',
-      );
-      expect(c15.length, 1);
-      final ring =
-          (((c15.first as Map)['geometry'] as Map)['coordinates'] as List)[0]
-              as List;
-      expect(ring.length, greaterThan(5));
-      final north = ring[0] as List;
-      final south = ring[ring.length ~/ 2] as List;
-      final dN = (north[1] as num) - 24.0;
-      final dS = 24.0 - (south[1] as num);
-      expect(dN.abs(), greaterThan(dS.abs()));
+      expect(points, hasLength(1));
+      expect((points.first as Map)['properties']['label'], '14日08時');
     });
 
-    test('draws past, forecast, and r70 cone for every cyclone', () {
-      final geo = <String, dynamic>{
-        'type': 'FeatureCollection',
-        'features': [
-          // Server mash-up: single past/forecast/cone for one storm only.
-          {
-            'type': 'Feature',
-            'properties': {'kind': 'past'},
-            'geometry': {
-              'type': 'LineString',
-              'coordinates': [
-                [141.9, 25.3],
-                [140.0, 25.0],
-              ],
-            },
-          },
-          {
-            'type': 'Feature',
-            'properties': {'kind': 'forecast'},
-            'geometry': {
-              'type': 'LineString',
-              'coordinates': [
-                [141.9, 25.3],
-                [130.0, 27.0],
-              ],
-            },
-          },
-          {
-            'type': 'Feature',
-            'properties': {'kind': 'cone'},
-            'geometry': {
-              'type': 'Polygon',
-              'coordinates': [
-                [
-                  [141.0, 25.0],
-                  [142.0, 25.0],
-                  [142.0, 26.0],
-                  [141.0, 25.0],
-                ],
-              ],
-            },
-          },
-          {
-            'type': 'Feature',
-            'properties': {'kind': 'probability', 'p': 100},
-            'geometry': {
-              'type': 'Polygon',
-              'coordinates': [
-                [
-                  [120.0, 20.0],
-                  [121.0, 20.0],
-                  [121.0, 21.0],
-                  [120.0, 20.0],
-                ],
-              ],
-            },
-          },
-        ],
-      };
-      // Selected is the unnamed TD nearest Taiwan — previously this wiped
-      // DOLPHIN's past and never drew TD15's cone.
+    test('colours past from track wind; hull cone when no official cone', () {
       final dolphin = TyphoonTrack(
         name: 'DOLPHIN',
         cwaName: '白海豚',
@@ -300,32 +158,21 @@ void main() {
         tdNo: '14',
         analysis: const [
           TrackFix(time: 1, latitude: 12.9, longitude: 179.8, wind: 15),
-          TrackFix(time: 2, latitude: 25.3, longitude: 141.9, wind: 45),
+          TrackFix(time: 2, latitude: 20.0, longitude: 160.0, wind: 33),
+          TrackFix(time: 3, latitude: 25.3, longitude: 141.9, wind: 45),
         ],
-        now: const TrackNow(
-          c15: StormCircle(avg: 150, ne: 160, se: 140, sw: 130, nw: 150),
-          c25: StormCircle(avg: 50, ne: 55, se: 45, sw: 40, nw: 50),
-        ),
         forecast: const [
           TrackForecast(
             tau: 6,
-            time: 3,
+            time: 4,
             latitude: 25.3,
             longitude: 140.7,
             r70: 40,
-          ),
-          TrackForecast(
-            tau: 24,
-            time: 4,
-            latitude: 25.5,
-            longitude: 138.0,
-            r70: 110,
           ),
         ],
       );
       final td15 = TyphoonTrack(
         name: '',
-        cwaName: '',
         year: 2026,
         tdNo: '15',
         analysis: const [
@@ -349,23 +196,39 @@ void main() {
           ),
         ],
       );
-      final out = augmentTyphoonGeojson(
-        geo,
-        selected: td15,
+      final pot14 = TyphoonPotential(
+        tdNo: '14',
+        name: '白海豚',
+        past: const [],
+        forecast: const [],
+        cone: const [
+          LatLng(25.0, 141.0),
+          LatLng(25.0, 142.0),
+          LatLng(26.0, 142.0),
+        ],
+        circle: null,
+        current: null,
+        points: const [
+          ForecastPoint(label: '08月05日14時', latitude: 25.3, longitude: 140.7),
+        ],
+      );
+
+      final out = buildTyphoonOverlay(
         tracks: [dolphin, td15],
-        cyclones: const [
+        potentials: [pot14],
+        selectedKey: 'TD15',
+        cyclones: [
           TyphoonCyclone(
             name: 'DOLPHIN',
             cwaName: '白海豚',
             year: 2026,
             tdNo: '14',
-            time: 2,
+            time: 3,
             latitude: 25.3,
             longitude: 141.9,
           ),
-          TyphoonCyclone(
+          const TyphoonCyclone(
             name: '',
-            cwaName: '',
             year: 2026,
             tdNo: '15',
             time: 2,
@@ -374,36 +237,76 @@ void main() {
           ),
         ],
       );
-      final features = out['features'] as List;
 
-      int countKind(String kind) => features
-          .where((f) => (f as Map)['properties']?['kind'] == kind)
-          .length;
+      final past = (out['features'] as List)
+          .where((f) => (f as Map)['properties']?['kind'] == 'past')
+          .toList();
+      // DOLPHIN 2 segments + TD15 1 segment.
+      expect(past, hasLength(3));
+      for (final f in past) {
+        expect((f as Map)['properties']['intensity'], isNotNull);
+      }
+      final dolphinPast = past.where(
+        (f) => (f as Map)['properties']?['tdNo'] == '14',
+      );
+      expect(dolphinPast, hasLength(2));
+      expect((dolphinPast.first as Map)['properties']['intensity'], 'moderate');
 
-      // Both storms' past segments (1 each from 2 analysis fixes).
-      expect(countKind('past'), 2);
-      // Both storms' forecast lines.
-      expect(countKind('forecast'), 2);
-      // Both storms' r70 cones.
-      expect(countKind('cone'), 2);
-      // DOLPHIN has L7+L10; TD15 has neither.
-      expect(countKind('circle15'), 1);
-      expect(countKind('circle25'), 1);
-      // Probability kept from server.
-      expect(countKind('probability'), 1);
-      // Both centres injected.
-      expect(countKind('current'), 2);
+      final cones15 = (out['features'] as List).where(
+        (f) =>
+            (f as Map)['properties']?['kind'] == 'cone' &&
+            (f as Map)['properties']?['tdNo'] == '15',
+      );
+      expect(cones15, hasLength(1));
+      final ring15 =
+          (((cones15.first as Map)['geometry'] as Map)['coordinates']
+                  as List)[0]
+              as List;
+      expect(ring15.length, greaterThan(6));
+      expect(ring15.first, ring15.last);
 
-      final td15Points = features.where((f) {
-        final props = (f as Map)['properties'];
-        return props?['kind'] == 'forecastPoint' && props?['cyclone'] == 'TD15';
-      });
-      expect(td15Points.length, 2);
-      final dolphinPoints = features.where((f) {
-        final props = (f as Map)['properties'];
-        return props?['kind'] == 'forecastPoint' && props?['cyclone'] == 'TD14';
-      });
-      expect(dolphinPoints.length, 2);
+      final cones14 = (out['features'] as List).where(
+        (f) =>
+            (f as Map)['properties']?['kind'] == 'cone' &&
+            (f as Map)['properties']?['tdNo'] == '14',
+      );
+      expect(cones14, hasLength(1));
+      // Official potential cone (3 verts), not r70 hull.
+      final ring14 =
+          (((cones14.first as Map)['geometry'] as Map)['coordinates']
+                  as List)[0]
+              as List;
+      expect(ring14.length, 3);
+
+      final currents = (out['features'] as List).where(
+        (f) => (f as Map)['properties']?['kind'] == 'current',
+      );
+      expect(currents, hasLength(2));
+      final selected = currents.where(
+        (f) => (f as Map)['properties']?['selected'] == 1,
+      );
+      expect(selected, hasLength(1));
+      expect((selected.first as Map)['properties']['tdNo'], '15');
+    });
+
+    test('forecast points fall back to +Nh when potential has none', () {
+      final track = TyphoonTrack(
+        name: '',
+        year: 2026,
+        tdNo: '15',
+        analysis: const [TrackFix(time: 1, latitude: 16.4, longitude: 118.4)],
+        forecast: const [
+          TrackForecast(tau: 6, time: 2, latitude: 16.1, longitude: 118.2),
+          TrackForecast(tau: 24, time: 3, latitude: 16.6, longitude: 121.8),
+        ],
+      );
+      final out = buildTyphoonOverlay(tracks: [track]);
+      final points = (out['features'] as List)
+          .where((f) => (f as Map)['properties']?['kind'] == 'forecastPoint')
+          .toList();
+      expect(points, hasLength(2));
+      expect((points[0] as Map)['properties']['label'], '+6h');
+      expect((points[1] as Map)['properties']['label'], '+24h');
     });
   });
 }

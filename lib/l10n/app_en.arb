@@ -1358,6 +1358,21 @@
   "@typhoonIntensityTd": {
     "description": "CWA class: tropical depression (past-track colour)"
   },
+  "typhoonPickerNamed": "{name} TY {no}",
+  "@typhoonPickerNamed": {
+    "description": "Sheet picker: named typhoon (CWA name + TY tyNo)",
+    "placeholders": {
+      "no": { "type": "String" },
+      "name": { "type": "String" }
+    }
+  },
+  "typhoonPickerTd": "Tropical depression TD {no}",
+  "@typhoonPickerTd": {
+    "description": "Sheet picker: unnamed tropical depression (CWA tdNo)",
+    "placeholders": {
+      "no": { "type": "String" }
+    }
+  },
   "typhoonIntensityMild": "Mild typhoon",
   "@typhoonIntensityMild": {
     "description": "CWA class: mild typhoon (past-track colour)"

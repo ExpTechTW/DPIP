@@ -47,7 +47,11 @@ SymbolLayerProperties stationLabelProps({
   textColor: textColor,
   textHaloColor: haloColor,
   textHaloWidth: haloWidth,
-  textLineHeight: 1.15,
+  // CJK ideographs occupy a taller, lower ink band than Latin digits (measured
+  // from the glyph PBFs: 臺 is 21 px tall at a 24 px em vs 18 px for a digit,
+  // and sits 5 px lower). MapLibre's 1.2 default — and the 1.1 this used to
+  // carry — lets a CJK line's descent crowd the reading underneath it.
+  textLineHeight: 1.35,
   textAnchor: 'top',
   textOffset: const <double>[0, stationLabelOffsetEm],
   textAllowOverlap: false,

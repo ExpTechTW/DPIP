@@ -85,8 +85,41 @@ bool cycloneMatchesKey({
 String? cycloneDisplayName({String? cwaName, String? name}) =>
     presentText(cwaName) ?? presentText(name);
 
+/// Strip leading zeros from a CWA `tdNo` / `tyNo` for display (`"014"` → `"14"`).
+String? cycloneNumberLabel(String? raw) {
+  final t = presentText(raw);
+  if (t == null) return null;
+  final n = int.tryParse(t);
+  return n == null ? t : '$n';
+}
+
+/// Sheet / picker title parts.
+///
+/// - Named typhoon (`tyNo` + display name) → `isTyphoon: true`, use
+///   「{name} TY {n}」.
+/// - Otherwise with `tdNo` → `isTyphoon: false`, use 「熱帶性低氣壓 TD {n}」.
+/// - Else fall back to [displayName] alone (caller localizes TD wording).
+({bool isTyphoon, String? number, String? displayName}) cycloneTitleSpec({
+  String? name,
+  String? cwaName,
+  String? tyNo,
+  String? tdNo,
+}) {
+  final display = cycloneDisplayName(cwaName: cwaName, name: name);
+  final ty = cycloneNumberLabel(tyNo);
+  if (ty != null && display != null) {
+    return (isTyphoon: true, number: ty, displayName: display);
+  }
+  final td = cycloneNumberLabel(tdNo);
+  if (td != null) {
+    return (isTyphoon: false, number: td, displayName: display);
+  }
+  return (isTyphoon: false, number: null, displayName: display);
+}
+
 /// Warning applies only when the CAP typhoon block names the selected storm
-/// and the bulletin is not a lift (`Cancel`) / inactive leftover.
+/// (or shares its `tdNo`) and the bulletin is not a lift (`Cancel`) / inactive
+/// leftover.
 ///
 /// Off-season `/warning` often returns the previous storm's `Cancel` — without
 /// this check the UI would paint the wrong name's alert on the active cyclone.
@@ -94,9 +127,15 @@ bool warningAppliesTo(
   TyphoonWarning warning, {
   required String? name,
   String? cwaName,
+  String? tdNo,
 }) {
   if (!warning.active) return false;
   if (warning.msgType.toLowerCase() == 'cancel') return false;
+  final warningTd = presentText(warning.tdNo);
+  final selectedTd = presentText(tdNo);
+  if (warningTd != null && selectedTd != null) {
+    return warningTd == selectedTd;
+  }
   final t = warning.typhoon;
   if (t == null) return false;
   return sameCyclone(

@@ -1,5 +1,5 @@
 /// Track-potential forecast — v5 `GET /api/v5/meteor/typhoon/potential`
-/// (dataset 002).
+/// (dataset 002). Multi-storm: `{ updated, cyclones: [...] }`.
 library;
 
 import 'package:dpip/core/models/lat_lng.dart';
@@ -24,16 +24,17 @@ abstract class ForecastPoint with _$ForecastPoint {
       _$ForecastPointFromJson(json);
 }
 
-/// The `GET /potential` payload. Its geometry arrays are `[lng, lat]` (GeoJSON
-/// axis order) and are custom-decoded to [LatLng]; each is empty and
-/// [circle]/[current] null when no cyclone is active. [cone] — the uncertainty
-/// cone — is unique to dataset 002.
+/// One cyclone's track-potential geometry from dataset 002.
+///
+/// Geometry arrays are `[lng, lat]` (GeoJSON axis order). [cone] is unique to
+/// 002. [circle] is a symmetric L7 ring (illustrative); null when too weak.
 @freezed
 abstract class TyphoonPotential with _$TyphoonPotential {
   const factory TyphoonPotential({
-    required int updated,
+    /// CWA tropical-depression number — unique within a snapshot.
+    String? tdNo,
 
-    /// Cyclone code (e.g. `TD11`); null when none active.
+    /// KML folder name (CWA Chinese name, or `TD15` for unnamed).
     String? name,
 
     /// Observed past track.
@@ -48,18 +49,18 @@ abstract class TyphoonPotential with _$TyphoonPotential {
     /// Symmetric level-7 wind circle (illustrative); null when too weak.
     List<LatLng>? circle,
 
-    /// Current centre; null when none active.
+    /// Current centre; null when none.
     LatLng? current,
 
     /// Labelled forecast waypoints.
     required List<ForecastPoint> points,
   }) = _TyphoonPotential;
 
-  /// Decodes the raw payload, mapping every `[lng, lat]` pair to a [LatLng].
+  /// Decodes one cyclone object, mapping every `[lng, lat]` pair to a [LatLng].
   factory TyphoonPotential.decode(Map<String, dynamic> json) =>
       TyphoonPotential(
-        updated: (json['updated'] as num).toInt(),
-        name: json['name'] as String?,
+        tdNo: _blankToNull(json['tdNo'] as String?),
+        name: _blankToNull(json['name'] as String?),
         past: _coords(json['past']),
         forecast: _coords(json['forecast']),
         cone: _coords(json['cone']),
@@ -72,6 +73,36 @@ abstract class TyphoonPotential with _$TyphoonPotential {
             ForecastPoint.fromJson(p as Map<String, dynamic>),
         ],
       );
+}
+
+/// The `GET /potential` payload: update time + one entry per active cyclone.
+@freezed
+abstract class PotentialPayload with _$PotentialPayload {
+  const factory PotentialPayload({
+    required int updated,
+    required List<TyphoonPotential> cyclones,
+  }) = _PotentialPayload;
+
+  /// Decodes `{ updated, cyclones: [...] }`. Missing/empty `cyclones` → [].
+  factory PotentialPayload.decode(Map<String, dynamic> json) {
+    final updated = (json['updated'] as num?)?.toInt() ?? 0;
+    final raw = json['cyclones'];
+    if (raw is! List) {
+      return PotentialPayload(updated: updated, cyclones: const []);
+    }
+    return PotentialPayload(
+      updated: updated,
+      cyclones: [
+        for (final c in raw)
+          if (c is Map<String, dynamic>) TyphoonPotential.decode(c),
+      ],
+    );
+  }
+}
+
+String? _blankToNull(String? value) {
+  final t = value?.trim();
+  return (t == null || t.isEmpty) ? null : t;
 }
 
 /// Maps a single `[lng, lat]` pair to a [LatLng] (mind the GeoJSON axis order).

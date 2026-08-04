@@ -1012,6 +1012,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get typhoonIntensityTd => '熱帶性低氣壓';
 
   @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '熱帶性低氣壓 TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '輕度颱風';
 
   @override
@@ -2144,6 +2154,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonIntensityTd => '热带性低气压';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '热带性低气压 TD $no';
+  }
 
   @override
   String get typhoonIntensityMild => '轻度台风';
@@ -3280,6 +3300,16 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get typhoonIntensityTd => '熱帶性低氣壓';
 
   @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '熱帶性低氣壓 TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '輕度颱風';
 
   @override
@@ -4412,6 +4442,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get typhoonIntensityTd => '熱帶性低氣壓';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '熱帶性低氣壓 TD $no';
+  }
 
   @override
   String get typhoonIntensityMild => '輕度颱風';

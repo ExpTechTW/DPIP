@@ -287,12 +287,13 @@ as double,
 /// @nodoc
 mixin _$TyphoonPotential {
 
- int get updated;/// Cyclone code (e.g. `TD11`); null when none active.
+/// CWA tropical-depression number — unique within a snapshot.
+ String? get tdNo;/// KML folder name (CWA Chinese name, or `TD15` for unnamed).
  String? get name;/// Observed past track.
  List<LatLng> get past;/// Predicted track.
  List<LatLng> get forecast;/// Track-potential (uncertainty) cone outline.
  List<LatLng> get cone;/// Symmetric level-7 wind circle (illustrative); null when too weak.
- List<LatLng>? get circle;/// Current centre; null when none active.
+ List<LatLng>? get circle;/// Current centre; null when none.
  LatLng? get current;/// Labelled forecast waypoints.
  List<ForecastPoint> get points;
 /// Create a copy of TyphoonPotential
@@ -305,16 +306,16 @@ $TyphoonPotentialCopyWith<TyphoonPotential> get copyWith => _$TyphoonPotentialCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonPotential&&(identical(other.updated, updated) || other.updated == updated)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.past, past)&&const DeepCollectionEquality().equals(other.forecast, forecast)&&const DeepCollectionEquality().equals(other.cone, cone)&&const DeepCollectionEquality().equals(other.circle, circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other.points, points));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonPotential&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.past, past)&&const DeepCollectionEquality().equals(other.forecast, forecast)&&const DeepCollectionEquality().equals(other.cone, cone)&&const DeepCollectionEquality().equals(other.circle, circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other.points, points));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,name,const DeepCollectionEquality().hash(past),const DeepCollectionEquality().hash(forecast),const DeepCollectionEquality().hash(cone),const DeepCollectionEquality().hash(circle),current,const DeepCollectionEquality().hash(points));
+int get hashCode => Object.hash(runtimeType,tdNo,name,const DeepCollectionEquality().hash(past),const DeepCollectionEquality().hash(forecast),const DeepCollectionEquality().hash(cone),const DeepCollectionEquality().hash(circle),current,const DeepCollectionEquality().hash(points));
 
 @override
 String toString() {
-  return 'TyphoonPotential(updated: $updated, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
+  return 'TyphoonPotential(tdNo: $tdNo, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
 }
 
 
@@ -325,7 +326,7 @@ abstract mixin class $TyphoonPotentialCopyWith<$Res>  {
   factory $TyphoonPotentialCopyWith(TyphoonPotential value, $Res Function(TyphoonPotential) _then) = _$TyphoonPotentialCopyWithImpl;
 @useResult
 $Res call({
- int updated, String? name, List<LatLng> past, List<LatLng> forecast, List<LatLng> cone, List<LatLng>? circle, LatLng? current, List<ForecastPoint> points
+ String? tdNo, String? name, List<LatLng> past, List<LatLng> forecast, List<LatLng> cone, List<LatLng>? circle, LatLng? current, List<ForecastPoint> points
 });
 
 
@@ -342,10 +343,10 @@ class _$TyphoonPotentialCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonPotential
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? name = freezed,Object? past = null,Object? forecast = null,Object? cone = null,Object? circle = freezed,Object? current = freezed,Object? points = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? name = freezed,Object? past = null,Object? forecast = null,Object? cone = null,Object? circle = freezed,Object? current = freezed,Object? points = null,}) {
   return _then(_self.copyWith(
-updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
-as int,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,past: null == past ? _self.past : past // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,forecast: null == forecast ? _self.forecast : forecast // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,cone: null == cone ? _self.cone : cone // ignore: cast_nullable_to_non_nullable
@@ -437,10 +438,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int updated,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? tdNo,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TyphoonPotential() when $default != null:
-return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
+return $default(_that.tdNo,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
   return orElse();
 
 }
@@ -458,10 +459,10 @@ return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int updated,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? tdNo,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonPotential():
-return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
+return $default(_that.tdNo,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -478,10 +479,10 @@ return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int updated,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? tdNo,  String? name,  List<LatLng> past,  List<LatLng> forecast,  List<LatLng> cone,  List<LatLng>? circle,  LatLng? current,  List<ForecastPoint> points)?  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonPotential() when $default != null:
-return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
+return $default(_that.tdNo,_that.name,_that.past,_that.forecast,_that.cone,_that.circle,_that.current,_that.points);case _:
   return null;
 
 }
@@ -493,11 +494,12 @@ return $default(_that.updated,_that.name,_that.past,_that.forecast,_that.cone,_t
 
 
 class _TyphoonPotential implements TyphoonPotential {
-  const _TyphoonPotential({required this.updated, this.name, required final  List<LatLng> past, required final  List<LatLng> forecast, required final  List<LatLng> cone, final  List<LatLng>? circle, this.current, required final  List<ForecastPoint> points}): _past = past,_forecast = forecast,_cone = cone,_circle = circle,_points = points;
+  const _TyphoonPotential({this.tdNo, this.name, required final  List<LatLng> past, required final  List<LatLng> forecast, required final  List<LatLng> cone, final  List<LatLng>? circle, this.current, required final  List<ForecastPoint> points}): _past = past,_forecast = forecast,_cone = cone,_circle = circle,_points = points;
   
 
-@override final  int updated;
-/// Cyclone code (e.g. `TD11`); null when none active.
+/// CWA tropical-depression number — unique within a snapshot.
+@override final  String? tdNo;
+/// KML folder name (CWA Chinese name, or `TD15` for unnamed).
 @override final  String? name;
 /// Observed past track.
  final  List<LatLng> _past;
@@ -537,7 +539,7 @@ class _TyphoonPotential implements TyphoonPotential {
   return EqualUnmodifiableListView(value);
 }
 
-/// Current centre; null when none active.
+/// Current centre; null when none.
 @override final  LatLng? current;
 /// Labelled forecast waypoints.
  final  List<ForecastPoint> _points;
@@ -559,16 +561,16 @@ _$TyphoonPotentialCopyWith<_TyphoonPotential> get copyWith => __$TyphoonPotentia
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonPotential&&(identical(other.updated, updated) || other.updated == updated)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._past, _past)&&const DeepCollectionEquality().equals(other._forecast, _forecast)&&const DeepCollectionEquality().equals(other._cone, _cone)&&const DeepCollectionEquality().equals(other._circle, _circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other._points, _points));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonPotential&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._past, _past)&&const DeepCollectionEquality().equals(other._forecast, _forecast)&&const DeepCollectionEquality().equals(other._cone, _cone)&&const DeepCollectionEquality().equals(other._circle, _circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other._points, _points));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,name,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_forecast),const DeepCollectionEquality().hash(_cone),const DeepCollectionEquality().hash(_circle),current,const DeepCollectionEquality().hash(_points));
+int get hashCode => Object.hash(runtimeType,tdNo,name,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_forecast),const DeepCollectionEquality().hash(_cone),const DeepCollectionEquality().hash(_circle),current,const DeepCollectionEquality().hash(_points));
 
 @override
 String toString() {
-  return 'TyphoonPotential(updated: $updated, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
+  return 'TyphoonPotential(tdNo: $tdNo, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
 }
 
 
@@ -579,7 +581,7 @@ abstract mixin class _$TyphoonPotentialCopyWith<$Res> implements $TyphoonPotenti
   factory _$TyphoonPotentialCopyWith(_TyphoonPotential value, $Res Function(_TyphoonPotential) _then) = __$TyphoonPotentialCopyWithImpl;
 @override @useResult
 $Res call({
- int updated, String? name, List<LatLng> past, List<LatLng> forecast, List<LatLng> cone, List<LatLng>? circle, LatLng? current, List<ForecastPoint> points
+ String? tdNo, String? name, List<LatLng> past, List<LatLng> forecast, List<LatLng> cone, List<LatLng>? circle, LatLng? current, List<ForecastPoint> points
 });
 
 
@@ -596,10 +598,10 @@ class __$TyphoonPotentialCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonPotential
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? updated = null,Object? name = freezed,Object? past = null,Object? forecast = null,Object? cone = null,Object? circle = freezed,Object? current = freezed,Object? points = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tdNo = freezed,Object? name = freezed,Object? past = null,Object? forecast = null,Object? cone = null,Object? circle = freezed,Object? current = freezed,Object? points = null,}) {
   return _then(_TyphoonPotential(
-updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
-as int,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,past: null == past ? _self._past : past // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,forecast: null == forecast ? _self._forecast : forecast // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,cone: null == cone ? _self._cone : cone // ignore: cast_nullable_to_non_nullable
@@ -607,6 +609,272 @@ as List<LatLng>,circle: freezed == circle ? _self._circle : circle // ignore: ca
 as List<LatLng>?,current: freezed == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
 as LatLng?,points: null == points ? _self._points : points // ignore: cast_nullable_to_non_nullable
 as List<ForecastPoint>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+mixin _$PotentialPayload {
+
+ int get updated; List<TyphoonPotential> get cyclones;
+/// Create a copy of PotentialPayload
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PotentialPayloadCopyWith<PotentialPayload> get copyWith => _$PotentialPayloadCopyWithImpl<PotentialPayload>(this as PotentialPayload, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PotentialPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+
+@override
+String toString() {
+  return 'PotentialPayload(updated: $updated, cyclones: $cyclones)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PotentialPayloadCopyWith<$Res>  {
+  factory $PotentialPayloadCopyWith(PotentialPayload value, $Res Function(PotentialPayload) _then) = _$PotentialPayloadCopyWithImpl;
+@useResult
+$Res call({
+ int updated, List<TyphoonPotential> cyclones
+});
+
+
+
+
+}
+/// @nodoc
+class _$PotentialPayloadCopyWithImpl<$Res>
+    implements $PotentialPayloadCopyWith<$Res> {
+  _$PotentialPayloadCopyWithImpl(this._self, this._then);
+
+  final PotentialPayload _self;
+  final $Res Function(PotentialPayload) _then;
+
+/// Create a copy of PotentialPayload
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
+  return _then(_self.copyWith(
+updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
+as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<TyphoonPotential>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PotentialPayload].
+extension PotentialPayloadPatterns on PotentialPayload {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PotentialPayload value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PotentialPayload() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PotentialPayload value)  $default,){
+final _that = this;
+switch (_that) {
+case _PotentialPayload():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PotentialPayload value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PotentialPayload() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int updated,  List<TyphoonPotential> cyclones)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PotentialPayload() when $default != null:
+return $default(_that.updated,_that.cyclones);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int updated,  List<TyphoonPotential> cyclones)  $default,) {final _that = this;
+switch (_that) {
+case _PotentialPayload():
+return $default(_that.updated,_that.cyclones);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int updated,  List<TyphoonPotential> cyclones)?  $default,) {final _that = this;
+switch (_that) {
+case _PotentialPayload() when $default != null:
+return $default(_that.updated,_that.cyclones);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _PotentialPayload implements PotentialPayload {
+  const _PotentialPayload({required this.updated, required final  List<TyphoonPotential> cyclones}): _cyclones = cyclones;
+  
+
+@override final  int updated;
+ final  List<TyphoonPotential> _cyclones;
+@override List<TyphoonPotential> get cyclones {
+  if (_cyclones is EqualUnmodifiableListView) return _cyclones;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cyclones);
+}
+
+
+/// Create a copy of PotentialPayload
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PotentialPayloadCopyWith<_PotentialPayload> get copyWith => __$PotentialPayloadCopyWithImpl<_PotentialPayload>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PotentialPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+
+@override
+String toString() {
+  return 'PotentialPayload(updated: $updated, cyclones: $cyclones)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PotentialPayloadCopyWith<$Res> implements $PotentialPayloadCopyWith<$Res> {
+  factory _$PotentialPayloadCopyWith(_PotentialPayload value, $Res Function(_PotentialPayload) _then) = __$PotentialPayloadCopyWithImpl;
+@override @useResult
+$Res call({
+ int updated, List<TyphoonPotential> cyclones
+});
+
+
+
+
+}
+/// @nodoc
+class __$PotentialPayloadCopyWithImpl<$Res>
+    implements _$PotentialPayloadCopyWith<$Res> {
+  __$PotentialPayloadCopyWithImpl(this._self, this._then);
+
+  final _PotentialPayload _self;
+  final $Res Function(_PotentialPayload) _then;
+
+/// Create a copy of PotentialPayload
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? updated = null,Object? cyclones = null,}) {
+  return _then(_PotentialPayload(
+updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
+as int,cyclones: null == cyclones ? _self._cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<TyphoonPotential>,
   ));
 }
 

@@ -12,6 +12,7 @@ import 'package:dpip/features/typhoon/domain/compass_direction.dart';
 import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
 import 'package:dpip/features/typhoon/domain/storm_circle.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -223,6 +224,29 @@ class _GripState extends State<_Grip> {
 }
 
 /// Header + CWA-worded fact sheet (position / motion / intensity / radii).
+/// Formats the sheet hero / picker title for one cyclone.
+String cycloneSheetTitle(
+  AppLocalizations l10n, {
+  String? name,
+  String? cwaName,
+  String? tyNo,
+  String? tdNo,
+}) {
+  final spec = cycloneTitleSpec(
+    name: name,
+    cwaName: cwaName,
+    tyNo: tyNo,
+    tdNo: tdNo,
+  );
+  if (spec.isTyphoon && spec.number != null && spec.displayName != null) {
+    return l10n.typhoonPickerNamed(spec.number!, spec.displayName!);
+  }
+  if (spec.number != null) {
+    return l10n.typhoonPickerTd(spec.number!);
+  }
+  return spec.displayName ?? l10n.typhoonIntensityTd;
+}
+
 class _Bulletin extends StatelessWidget {
   const _Bulletin({required this.layer, required this.extent});
 
@@ -235,6 +259,15 @@ class _Bulletin extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final useZh = Localizations.localeOf(context).languageCode == 'zh';
+    final size = MediaQuery.sizeOf(context);
+    final topInset = MediaQuery.paddingOf(context).top;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      layer.rememberFrameMetrics(
+        viewport: size,
+        topInset: topInset,
+        bottomInset: size.height * TyphoonPanel.peekExtent,
+      );
+    });
 
     return ListenableBuilder(
       listenable: Listenable.merge([
@@ -244,17 +277,18 @@ class _Bulletin extends StatelessWidget {
         extent,
       ]),
       builder: (context, _) {
-        final summary = layer.summary.value;
-        final cyclone = layer.track.value?.cyclones.isNotEmpty == true
-            ? layer.track.value!.cyclones.first
+        // Sheet SoT = selected track. Index summary is only a fallback when
+        // `/track` has no entry for the focused key — never mix fields across
+        // two storms (summary name + track metrics used to cross-wire).
+        final track = layer.selectedTrack;
+        final summary = track == null ? layer.summary.value : null;
+        final fix = track != null && track.analysis.isNotEmpty
+            ? track.analysis.last
             : null;
-        final fix = cyclone != null && cyclone.analysis.isNotEmpty
-            ? cyclone.analysis.last
-            : null;
-        final now = cyclone?.now;
+        final now = track?.now;
         final atTop = TyphoonPanel._isAtTop(extent.value);
 
-        if (summary == null && cyclone == null) {
+        if (track == null && summary == null) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.lg,
@@ -271,16 +305,24 @@ class _Bulletin extends StatelessWidget {
           );
         }
 
-        // `??` alone is not enough — CWA sends "" (not null) for an unnamed
-        // system, so an empty name would win the chain and the hero row would
-        // render blank. Fall back to the localized "tropical depression".
-        final name =
+        final title = cycloneSheetTitle(
+          l10n,
+          name: track?.name ?? summary?.name,
+          cwaName: track?.cwaName ?? summary?.cwaName,
+          tyNo: track?.tyNo ?? summary?.tyNo,
+          tdNo: track?.tdNo ?? summary?.tdNo,
+        );
+        final engName = presentText(track?.name ?? summary?.name);
+        // Hide the English line when the hero already embeds that name, or when
+        // the picker title is the TD form (no separate international name).
+        final showEng =
+            engName != null &&
+            !title.contains(engName) &&
             cycloneDisplayName(
-              cwaName: summary?.cwaName ?? cyclone?.cwaName,
-              name: summary?.name ?? cyclone?.name,
-            ) ??
-            l10n.typhoonIntensityTd;
-        final engName = presentText(summary?.name ?? cyclone?.name);
+                  cwaName: track?.cwaName ?? summary?.cwaName,
+                  name: track?.name ?? summary?.name,
+                ) !=
+                null;
         final lat = fix?.latitude ?? summary?.latitude;
         final lon = fix?.longitude ?? summary?.longitude;
         final wind = fix?.wind ?? summary?.wind;
@@ -312,6 +354,36 @@ class _Bulletin extends StatelessWidget {
                 isUtc: true,
               ).add(const Duration(hours: 8));
 
+        final options = <({String key, String title})>[
+          for (final t in layer.track.value?.cyclones ?? const <TyphoonTrack>[])
+            (
+              key: cycloneKeyOf(name: t.name, cwaName: t.cwaName, tdNo: t.tdNo),
+              title: cycloneSheetTitle(
+                l10n,
+                name: t.name,
+                cwaName: t.cwaName,
+                tyNo: t.tyNo,
+                tdNo: t.tdNo,
+              ),
+            ),
+        ];
+        if (options.isEmpty) {
+          for (final c in layer.activeCyclones) {
+            options.add((
+              key: cycloneKey(c),
+              title: cycloneSheetTitle(
+                l10n,
+                name: c.name,
+                cwaName: c.cwaName,
+                tyNo: c.tyNo,
+                tdNo: c.tdNo,
+              ),
+            ));
+          }
+        }
+        final selectedKey = layer.selectedCycloneKey.value;
+        final multi = options.length > 1;
+
         return Padding(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -329,8 +401,47 @@ class _Bulletin extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(name, style: nameStyle),
-                        if (engName != null && engName != name)
+                        if (multi)
+                          PopupMenuButton<String>(
+                            initialValue: selectedKey,
+                            tooltip: title,
+                            padding: EdgeInsets.zero,
+                            onSelected: layer.selectCyclone,
+                            itemBuilder: (context) => [
+                              for (final o in options)
+                                PopupMenuItem(
+                                  value: o.key,
+                                  child: Text(
+                                    o.title,
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: o.key == selectedKey
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                        ),
+                                  ),
+                                ),
+                            ],
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: Text(title, style: nameStyle)),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: AppSpacing.sm,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: colors.onSurface,
+                                    size: atTop ? 36 : 32,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Text(title, style: nameStyle),
+                        if (showEng)
                           Padding(
                             padding: const EdgeInsets.only(top: AppSpacing.xs),
                             child: Text(
@@ -745,7 +856,11 @@ class _WarningBlock extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return ListenableBuilder(
-      listenable: Listenable.merge([layer.warning, layer.summary]),
+      listenable: Listenable.merge([
+        layer.warning,
+        layer.summary,
+        layer.selectedCycloneKey,
+      ]),
       builder: (context, _) {
         final warn = layer.matchedWarning;
         if (warn == null) return const SizedBox.shrink();

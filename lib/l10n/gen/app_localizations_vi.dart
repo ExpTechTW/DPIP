@@ -1027,6 +1027,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get typhoonIntensityTd => 'Tropical depression';
 
   @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return 'Tropical depression TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => 'Mild typhoon';
 
   @override

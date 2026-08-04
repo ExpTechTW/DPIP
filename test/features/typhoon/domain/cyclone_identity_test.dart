@@ -168,6 +168,28 @@ void main() {
       expect(cycloneDisplayName(cwaName: '  ', name: 'DOLPHIN'), 'DOLPHIN');
     });
 
+    test('title spec: named typhoon vs T.D.', () {
+      final ty = cycloneTitleSpec(
+        name: 'DOLPHIN',
+        cwaName: '白海豚',
+        tyNo: '13',
+        tdNo: '14',
+      );
+      expect(ty.isTyphoon, isTrue);
+      expect(ty.number, '13');
+      expect(ty.displayName, '白海豚');
+
+      final td = cycloneTitleSpec(
+        name: '',
+        cwaName: '',
+        tyNo: null,
+        tdNo: '015',
+      );
+      expect(td.isTyphoon, isFalse);
+      expect(td.number, '15');
+      expect(cycloneNumberLabel('014'), '14');
+    });
+
     test('an empty key still selects nothing', () {
       const index = CycloneIndex(updated: 1, cyclones: [named]);
       expect(cycloneForKey(index, ''), isNull);

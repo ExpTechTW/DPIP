@@ -313,6 +313,8 @@
   "typhoonIntensityMild": "Mild typhoon",
   "typhoonIntensityModerate": "Moderate typhoon",
   "typhoonIntensityTd": "Tropical depression",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "typhoonPickerTd": "Tropical depression TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
