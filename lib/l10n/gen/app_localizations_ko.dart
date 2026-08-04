@@ -951,9 +951,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
-  String get aedLegendCluster => '클러스터';
-
-  @override
   String get disasterMapOverlayMenuTooltip => '방재 지도 레이어';
 
   @override

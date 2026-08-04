@@ -106,9 +106,6 @@ abstract class RasterTimelineLayer implements MapLayer {
   double get mapMaxZoom => BaseMap.maxZoom;
 
   @override
-  String? get bakedAedTileUrl => null;
-
-  @override
   Future<void> render(MapLibreMapController controller) async {}
 
   @override

@@ -573,37 +573,51 @@
   "@homeForecastHighLow": {
     "description": "24h forecast series high and low air temperatures",
     "placeholders": {
-      "high": {"type": "String"},
-      "low": {"type": "String"}
+      "high": {
+        "type": "String"
+      },
+      "low": {
+        "type": "String"
+      }
     }
   },
   "homeForecastPop": "{pop}%",
   "@homeForecastPop": {
     "description": "Probability of precipitation percent on a forecast hour chip",
     "placeholders": {
-      "pop": {"type": "String"}
+      "pop": {
+        "type": "String"
+      }
     }
   },
   "homeForecastFeelsLike": "Feels like {temp}°",
   "@homeForecastFeelsLike": {
     "description": "Apparent temperature for the selected forecast hour",
     "placeholders": {
-      "temp": {"type": "String"}
+      "temp": {
+        "type": "String"
+      }
     }
   },
   "homeForecastHumidity": "Humidity {value}%",
   "@homeForecastHumidity": {
     "description": "Relative humidity for the selected forecast hour",
     "placeholders": {
-      "value": {"type": "String"}
+      "value": {
+        "type": "String"
+      }
     }
   },
   "homeForecastWind": "{direction} · Force {level}",
   "@homeForecastWind": {
     "description": "Wind direction string and Beaufort force for the selected hour",
     "placeholders": {
-      "direction": {"type": "String"},
-      "level": {"type": "String"}
+      "direction": {
+        "type": "String"
+      },
+      "level": {
+        "type": "String"
+      }
     }
   },
   "homeForecastUnavailable": "Select a township to see the forecast",
@@ -1249,10 +1263,6 @@
   "mapLayerAed": "AED",
   "@mapLayerAed": {
     "description": "Disaster-map overlay menu toggle for AED (defibrillator) points"
-  },
-  "aedLegendCluster": "Cluster",
-  "@aedLegendCluster": {
-    "description": "Map legend label for clustered AED markers"
   },
   "disasterMapOverlayMenuTooltip": "Disaster map layers",
   "@disasterMapOverlayMenuTooltip": {

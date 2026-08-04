@@ -516,16 +516,6 @@ class EtagCacheStore {
     } catch (_) {}
   }
 
-  /// Deletes rows whose key contains [needle] (e.g. a path prefix).
-  Future<void> deleteKeysContaining(String needle) async {
-    if (needle.isEmpty) return;
-    try {
-      await _db.delete(_table, where: 'key LIKE ?', whereArgs: ['%$needle%']);
-      _trackedBytes = null;
-      _writesSinceSweep = _sweepEvery;
-    } catch (_) {}
-  }
-
   /// Row count and total stored body bytes — for the Debug page.
   Future<EtagCacheStats> stats() async {
     try {

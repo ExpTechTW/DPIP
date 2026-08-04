@@ -25,7 +25,6 @@ import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
-import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -64,10 +63,7 @@ class _MapPageState extends State<MapPage> {
     PressureMapLayer(context.read<MeteorWeatherRepository>()),
     WindMapLayer(context.read<MeteorWeatherRepository>()),
     RainMapLayer(context.read<MeteorRainRepository>()),
-    DisasterMapLayer(
-      context.read<DisasterMapRepository>(),
-      tileCache: context.read<MapTileCache?>(),
-    ),
+    DisasterMapLayer(context.read<DisasterMapRepository>()),
   ];
 
   @override

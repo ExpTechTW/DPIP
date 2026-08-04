@@ -191,14 +191,6 @@ class MapTileCache {
   Future<void> evict(List<String> urlContains) =>
       evictMapLibreTiles(urlContains);
 
-  /// Deletes SQLite rows whose URL contains any of [needles], then evicts the
-  /// matching native mirror entries. Used to discard poison tiles (e.g. DPM
-  /// MVT stored before the Content-Encoding strip).
-  Future<void> purgeUrlContains(String needle) async {
-    await _store.deleteKeysContaining(needle);
-    await evict([needle]);
-  }
-
   static bool _isTile(String url) {
     final uri = Uri.tryParse(url);
     return uri != null && EtagInterceptor.isImmutableTile(uri);

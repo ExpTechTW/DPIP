@@ -269,7 +269,6 @@
   "typhoonMotion": "이동",
   "mapLayerMonitor": "실시간 지진 모니터",
   "mapLayerAed": "AED",
-  "aedLegendCluster": "클러스터",
   "mapLayerDisasterMap": "방재 지도",
   "disasterMapOverlayMenuTooltip": "방재 지도 레이어",
   "disasterMapOverlaySectionLayers": "레이어",

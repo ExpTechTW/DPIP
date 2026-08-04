@@ -14,7 +14,6 @@ import 'package:dpip/features/map/presentation/widgets/disaster_map_overlay_menu
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -26,17 +25,15 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// [render] (baking into the base style JSON was a silent no-op / race on
 /// style reload). Detail on tap via [DisasterMapRepository.aedDetail].
 class DisasterMapLayer implements MapLayer {
-  DisasterMapLayer(this._repository, {this.tileCache});
+  DisasterMapLayer(this._repository);
 
   final DisasterMapRepository _repository;
-  final MapTileCache? tileCache;
 
   MapLibreMapController? _controller;
   bool _styleHasAed = false;
   Future<void> _ops = Future<void>.value();
-  static bool _purgedBadDpmTiles = false;
 
-  /// AED points / clusters — on by default.
+  /// AED points — on by default.
   final ValueNotifier<bool> showAed = ValueNotifier(true);
 
   final ValueNotifier<int?> _selectedId = ValueNotifier<int?>(null);
@@ -46,7 +43,6 @@ class DisasterMapLayer implements MapLayer {
   final ValueNotifier<String?> _previewPlace = ValueNotifier<String?>(null);
 
   static const _pointColor = '#e74c3c';
-  static const _clusterColor = '#c0392b';
 
   @override
   String get id => 'dpm';
@@ -71,8 +67,6 @@ class DisasterMapLayer implements MapLayer {
   double get mapMaxZoom => 16;
 
   /// AED is added at runtime — never bake into the base style JSON.
-  @override
-  String? get bakedAedTileUrl => null;
 
   @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
@@ -104,26 +98,11 @@ class DisasterMapLayer implements MapLayer {
   @override
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
-    await _purgePoisonedDpmTilesOnce();
     await _ensureAedLayers(controller);
     _styleHasAed = true;
     Log.info('DPM AED runtime tiles: ${_repository.tileUrl('aed')}');
     await _applyOverlayVisibilityAsync(controller);
     unawaited(_prefetchViewport(controller));
-  }
-
-  /// Drop SQLite / mirror copies that may still be double-gzip garbage from
-  /// before the Content-Encoding strip — warm would otherwise inject blanks.
-  Future<void> _purgePoisonedDpmTilesOnce() async {
-    if (_purgedBadDpmTiles) return;
-    _purgedBadDpmTiles = true;
-    const needle = '/api/v2/tiles/dpm/';
-    try {
-      await tileCache?.purgeUrlContains(needle);
-      await tileCache?.evict(const [needle]);
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'DPM purge cached tiles');
-    }
   }
 
   Future<void> _ensureAedLayers(MapLibreMapController controller) async {
@@ -143,54 +122,8 @@ class DisasterMapLayer implements MapLayer {
       VectorSourceProperties(tiles: [tileUrl], minzoom: 0, maxzoom: 16),
     );
 
-    // Clusters (tippecanoe `point_count`) — larger red discs.
-    await controller.addCircleLayer(
-      dpmAedSourceId,
-      dpmAedClustersLayerId,
-      const CircleLayerProperties(
-        circleColor: _clusterColor,
-        circleOpacity: 0.75,
-        circleRadius: [
-          'step',
-          ['get', 'point_count'],
-          12,
-          10,
-          16,
-          50,
-          22,
-          200,
-          28,
-        ],
-      ),
-      sourceLayer: 'aed',
-      filter: ['has', 'point_count'],
-      enableInteraction: true,
-    );
-    await controller.addSymbolLayer(
-      dpmAedSourceId,
-      dpmAedClusterCountLayerId,
-      const SymbolLayerProperties(
-        textField: [
-          'to-string',
-          ['get', 'point_count'],
-        ],
-        // Must name a fontstack the glyph endpoint actually serves. Leaving it
-        // unset makes MapLibre ask for its default
-        // "Open Sans Regular,Arial Unicode MS Regular", which 404s — and a
-        // symbol layer that cannot get glyphs holds up the **whole tile**, so
-        // the AED circles beside it never drew either. That is why AED only
-        // appeared from z15 up: z>=15 is the one band the server emits without
-        // clusters, so this layer has no features and demands no glyphs.
-        textFont: ['Noto Sans TC Regular'],
-        textSize: 11,
-        textColor: '#ffffff',
-        textAllowOverlap: true,
-      ),
-      sourceLayer: 'aed',
-      filter: ['has', 'point_count'],
-      enableInteraction: false,
-    );
-    // Unclustered AED points.
+    // One layer, no filter: the tileset is downsampled server-side, so every
+    // feature is a real AED and they are all drawn the same way.
     await controller.addCircleLayer(
       dpmAedSourceId,
       dpmAedPointsLayerId,
@@ -201,20 +134,12 @@ class DisasterMapLayer implements MapLayer {
         circleStrokeColor: '#ffffff',
       ),
       sourceLayer: 'aed',
-      filter: [
-        '!',
-        ['has', 'point_count'],
-      ],
       enableInteraction: true,
     );
   }
 
   Future<void> _removeAedLayers(MapLibreMapController controller) async {
-    for (final layerId in [
-      dpmAedClusterCountLayerId,
-      dpmAedClustersLayerId,
-      dpmAedPointsLayerId,
-    ]) {
+    for (final layerId in [dpmAedPointsLayerId]) {
       try {
         await controller.removeLayer(layerId);
       } catch (_) {}
@@ -232,18 +157,7 @@ class DisasterMapLayer implements MapLayer {
     final points = await controller.queryRenderedFeatures(hit, [
       dpmAedPointsLayerId,
     ], null);
-    if (points.isNotEmpty) {
-      await _selectFeature(points.first);
-      return;
-    }
-    final clusters = await controller.queryRenderedFeatures(hit, [
-      dpmAedClustersLayerId,
-    ], null);
-    if (clusters.isEmpty) return;
-    final zoom = controller.cameraPosition?.zoom ?? 10;
-    await controller.animateCamera(
-      CameraUpdate.newLatLngZoom(latLng, (zoom + 2).clamp(4, 16).toDouble()),
-    );
+    if (points.isNotEmpty) await _selectFeature(points.first);
   }
 
   Future<void> _selectFeature(dynamic feature) async {
@@ -285,11 +199,7 @@ class DisasterMapLayer implements MapLayer {
     MapLibreMapController controller,
   ) async {
     final visible = showAed.value;
-    for (final layerId in [
-      dpmAedClustersLayerId,
-      dpmAedClusterCountLayerId,
-      dpmAedPointsLayerId,
-    ]) {
+    for (final layerId in [dpmAedPointsLayerId]) {
       try {
         await controller.setLayerVisibility(layerId, visible);
       } catch (error, stackTrace) {
@@ -325,10 +235,6 @@ class DisasterMapLayer implements MapLayer {
           SymbolLegendItem(
             swatch: const _AedSwatch(color: Color(0xFFE74C3C), size: 10),
             label: l10n.mapLayerAed,
-          ),
-          SymbolLegendItem(
-            swatch: const _AedSwatch(color: Color(0xFFC0392B), size: 16),
-            label: l10n.aedLegendCluster,
           ),
         ],
       ),

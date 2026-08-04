@@ -95,9 +95,6 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   double get mapMaxZoom => BaseMap.maxZoom;
 
   @override
-  String? get bakedAedTileUrl => null;
-
-  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override

@@ -453,10 +453,6 @@ class _MapScaffoldState extends State<MapScaffold> {
     final previous = _active;
     // Invalidate in-flight loads/renders of the previous layer.
     _generation++;
-    // Baking AED into / out of the style JSON changes [BaseMap.styleString] and
-    // triggers a MapLibre style reload. Calling render before that finishes
-    // hits missing layer ids (dpm-aed-*). Defer to [_onStyleLoaded].
-    final styleWillReload = previous.bakedAedTileUrl != layer.bakedAedTileUrl;
     setState(() {
       _active = layer;
       _frames = const [];
@@ -464,14 +460,13 @@ class _MapScaffoldState extends State<MapScaffold> {
       // The old layer's chrome is gone; the new one measures itself (a timeline
       // layer re-measures in build, a sheet layer declares its own share).
       _timelineHeight = 0;
-      if (styleWillReload) _styleLoaded = false;
     });
     if (controller != null) _queue(() => previous.clear(controller));
     // Re-frame the same target into the new layer's band — switching to radar
     // after picking a township keeps the township framed, and each layer's
     // different chrome height is accounted for instead of reusing the old one.
     _applyFraming();
-    if (!styleWillReload) _loadActive();
+    _loadActive();
   }
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
@@ -520,7 +515,6 @@ class _MapScaffoldState extends State<MapScaffold> {
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _active.mapMaxZoom,
-              aedTileUrl: _active.bakedAedTileUrl,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),

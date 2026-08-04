@@ -959,9 +959,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
-  String get aedLegendCluster => 'กลุ่ม';
-
-  @override
   String get disasterMapOverlayMenuTooltip => 'ชั้นแผนที่ป้องกันภัย';
 
   @override

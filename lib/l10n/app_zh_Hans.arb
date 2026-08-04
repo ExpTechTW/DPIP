@@ -269,7 +269,6 @@
   "typhoonMotion": "移动",
   "mapLayerMonitor": "强震监视器",
   "mapLayerAed": "AED",
-  "aedLegendCluster": "群集",
   "mapLayerDisasterMap": "防灾地图",
   "disasterMapOverlayMenuTooltip": "防灾地图图层",
   "disasterMapOverlaySectionLayers": "图层",

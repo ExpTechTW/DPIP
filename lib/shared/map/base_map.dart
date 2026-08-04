@@ -34,7 +34,6 @@ class BaseMap extends StatelessWidget {
     this.interactive = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
-    this.aedTileUrl,
   });
 
   /// Bounding box for the nationwide (全國) framing — the Taiwan main island
@@ -100,9 +99,6 @@ class BaseMap extends StatelessWidget {
   /// Per-surface zoom ceiling (DPM AED may go to 16).
   final double maxZoomPreference;
 
-  /// When set, bake DPM AED MVT into the style JSON (see [exptechVectorStyle]).
-  final String? aedTileUrl;
-
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
@@ -126,7 +122,6 @@ class BaseMap extends StatelessWidget {
         palette,
         basemapTileUrl: basemapOriginTileUrl,
         glyphsUrl: glyphsOriginUrl,
-        aedTileUrl: aedTileUrl,
       ),
       minMaxZoomPreference: MinMaxZoomPreference(floor, ceiling),
       trackCameraPosition: true,

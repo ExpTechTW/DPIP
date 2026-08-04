@@ -157,9 +157,6 @@ class TyphoonMapLayer implements MapLayer {
   double get mapMaxZoom => BaseMap.maxZoom;
 
   @override
-  String? get bakedAedTileUrl => null;
-
-  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override

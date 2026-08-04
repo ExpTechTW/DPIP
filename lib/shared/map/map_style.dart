@@ -62,8 +62,6 @@ const String townOutlineLayerId = 'town-outline';
 
 /// Baked DPM AED source / layer ids — must match [DisasterMapLayer].
 const String dpmAedSourceId = 'dpm-aed-src';
-const String dpmAedClustersLayerId = 'dpm-aed-clusters';
-const String dpmAedClusterCountLayerId = 'dpm-aed-cluster-count';
 const String dpmAedPointsLayerId = 'dpm-aed-points';
 
 /// Origin basemap XYZ (LB). Fetched by MapLibre, served from the app's tile
@@ -83,80 +81,23 @@ const String glyphsOriginUrl =
 /// map-assets CDN) so overlay layers can render `text-field` symbols. Overlays
 /// (radar) anchor below [outlineLayerId] so the county borders stay legible.
 ///
-/// [basemapTileUrl] / [glyphsUrl] / [aedTileUrl] are origin HTTPS templates
-/// (MapLibre fetches them into its own ambient cache).
-///
-/// When [aedTileUrl] is set (XYZ MVT template), AED vector tiles are baked into
-/// the style document — same path as the ExpTech basemap source. Runtime
-/// `addSource(VectorSource…)` is avoided; it has been unreliable for this feed.
+/// [basemapTileUrl] / [glyphsUrl] are origin HTTPS templates fetched by
+/// MapLibre and served from the app's tile store through the Dart bridge.
 String exptechVectorStyle(
   MapPalette palette, {
   required String basemapTileUrl,
   required String glyphsUrl,
-  String? aedTileUrl,
 }) {
   final background = palette.background;
   final fill = palette.fill;
   final outline = palette.outline;
   final townOutline = palette.townOutline;
-  final aedSource = aedTileUrl == null
-      ? ''
-      : '''
-    , "$dpmAedSourceId": {
-      "type": "vector",
-      "tiles": ["$aedTileUrl"],
-      "minzoom": 0,
-      "maxzoom": 16
-    }''';
-  // AED layers sit *above* county outlines so markers stay readable.
-  final aedLayers = aedTileUrl == null
-      ? ''
-      : '''
-    , {
-      "id": "$dpmAedClustersLayerId",
-      "type": "circle",
-      "source": "$dpmAedSourceId",
-      "source-layer": "aed",
-      "filter": ["has", "point_count"],
-      "paint": {
-        "circle-color": "#c0392b",
-        "circle-opacity": 0.75,
-        "circle-radius": ["step", ["get", "point_count"], 12, 10, 16, 50, 22, 200, 28]
-      }
-    }
-    , {
-      "id": "$dpmAedClusterCountLayerId",
-      "type": "symbol",
-      "source": "$dpmAedSourceId",
-      "source-layer": "aed",
-      "filter": ["has", "point_count"],
-      "layout": {
-        "text-field": ["to-string", ["get", "point_count"]],
-        "text-font": ["Noto Sans TC Regular"],
-        "text-size": 11,
-        "text-allow-overlap": true
-      },
-      "paint": { "text-color": "#ffffff" }
-    }
-    , {
-      "id": "$dpmAedPointsLayerId",
-      "type": "circle",
-      "source": "$dpmAedSourceId",
-      "source-layer": "aed",
-      "filter": ["!", ["has", "point_count"]],
-      "paint": {
-        "circle-color": "#e74c3c",
-        "circle-radius": 5,
-        "circle-stroke-width": 1.5,
-        "circle-stroke-color": "#ffffff"
-      }
-    }''';
   return '''
 {
   "version": 8,
   "glyphs": "$glyphsUrl",
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }$aedSource
+    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },
@@ -164,7 +105,7 @@ String exptechVectorStyle(
     { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$fill" } },
     { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } },
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },
-    { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } }$aedLayers
+    { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } }
   ]
 }''';
 }

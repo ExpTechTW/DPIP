@@ -1857,12 +1857,6 @@ abstract class AppLocalizations {
   /// **'AED'**
   String get mapLayerAed;
 
-  /// Map legend label for clustered AED markers
-  ///
-  /// In en, this message translates to:
-  /// **'Cluster'**
-  String get aedLegendCluster;
-
   /// Tooltip on the disaster-map overlay tune button
   ///
   /// In en, this message translates to:

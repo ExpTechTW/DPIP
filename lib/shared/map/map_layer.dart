@@ -75,12 +75,6 @@ abstract interface class MapLayer {
   /// Disaster-prevention MVT goes to 16 so AED points can un-cluster.
   double get mapMaxZoom;
 
-  /// Optional XYZ MVT template to bake into the base style JSON while this
-  /// layer is active (e.g. DPM AED). Prefer this over runtime
-  /// [MapLibreMapController.addSource] for vector tiles — style-document
-  /// sources match the working ExpTech basemap path. `null` = none.
-  String? get bakedAedTileUrl;
-
   /// Draws this sheet layer's static overlay when it becomes active. Called once
   /// per activation (behind the serial op queue). No-op for timeline layers.
   Future<void> render(MapLibreMapController controller);
