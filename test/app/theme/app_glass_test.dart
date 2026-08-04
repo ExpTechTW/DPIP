@@ -18,14 +18,8 @@ void main() {
   });
 
   test('inkOverWeather at reveal 0 keeps theme onSurface', () {
-    expect(
-      inkOverWeather(dark, 0, skyIsLight: true),
-      dark.onSurface,
-    );
-    expect(
-      inkOverWeather(light, 0, skyIsLight: false),
-      light.onSurface,
-    );
+    expect(inkOverWeather(dark, 0, skyIsLight: true), dark.onSurface);
+    expect(inkOverWeather(light, 0, skyIsLight: false), light.onSurface);
   });
 
   test('weatherSkyIsLight matches mode', () {

@@ -110,45 +110,6 @@ class DisasterMapLayer implements MapLayer {
     Log.info('DPM AED runtime tiles: ${_repository.tileUrl('aed')}');
     await _applyOverlayVisibilityAsync(controller);
     unawaited(_prefetchViewport(controller));
-    unawaited(logAedDiagnostics(controller));
-  }
-
-  /// TEMP DIAGNOSTIC — delete once the blank-AED cause is settled.
-  ///
-  /// `querySourceFeatures` reports features **being rendered**, not merely
-  /// loaded — the control query proves the probe works (the basemap source
-  /// answers 616 while AED answers 0 in the same call), but a zero here is
-  /// still consistent with either "tiles never loaded" or "loaded but nothing
-  /// drawn". Re-fires on every camera idle, so panning re-prints.
-  Future<void> logAedDiagnostics(MapLibreMapController controller) async {
-    try {
-      final layers = (await controller.getLayerIds())
-          .map((e) => e.toString())
-          .where((e) => e.startsWith('dpm-aed'))
-          .toList();
-      final sources = (await controller.getSourceIds())
-          .where((e) => e.startsWith('dpm-aed'))
-          .toList();
-      Log.info(
-        'AED-DIAG zoom=${controller.cameraPosition?.zoom} '
-        'layers=$layers sources=$sources',
-      );
-      final aed = await controller.querySourceFeatures(
-        dpmAedSourceId,
-        'aed',
-        null,
-      );
-      final control = await controller.querySourceFeatures(
-        'exptech',
-        'town',
-        null,
-      );
-      Log.info(
-        'AED-DIAG aed=${aed.length} control(exptech/town)=${control.length}',
-      );
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'AED-DIAG');
-    }
   }
 
   /// Drop SQLite / mirror copies that may still be double-gzip garbage from
@@ -189,7 +150,17 @@ class DisasterMapLayer implements MapLayer {
       const CircleLayerProperties(
         circleColor: _clusterColor,
         circleOpacity: 0.75,
-        circleRadius: 18, // TEMP-DIAG constant instead of step()
+        circleRadius: [
+          'step',
+          ['get', 'point_count'],
+          12,
+          10,
+          16,
+          50,
+          22,
+          200,
+          28,
+        ],
       ),
       sourceLayer: 'aed',
       filter: ['has', 'point_count'],
@@ -203,6 +174,14 @@ class DisasterMapLayer implements MapLayer {
           'to-string',
           ['get', 'point_count'],
         ],
+        // Must name a fontstack the glyph endpoint actually serves. Leaving it
+        // unset makes MapLibre ask for its default
+        // "Open Sans Regular,Arial Unicode MS Regular", which 404s — and a
+        // symbol layer that cannot get glyphs holds up the **whole tile**, so
+        // the AED circles beside it never drew either. That is why AED only
+        // appeared from z15 up: z>=15 is the one band the server emits without
+        // clusters, so this layer has no features and demands no glyphs.
+        textFont: ['Noto Sans TC Regular'],
         textSize: 11,
         textColor: '#ffffff',
         textAllowOverlap: true,
@@ -370,11 +349,8 @@ class DisasterMapLayer implements MapLayer {
   void onMapGestureEnd() {}
 
   @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {
-    await _prefetchViewport(controller);
-    // TEMP DIAGNOSTIC — see logAedDiagnostics.
-    if (_styleHasAed) await logAedDiagnostics(controller);
-  }
+  Future<void> onCameraIdle(MapLibreMapController controller) =>
+      _prefetchViewport(controller);
 
   @override
   Future<void> onAmbientCacheCleared(MapLibreMapController controller) =>

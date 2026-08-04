@@ -47,11 +47,7 @@ class HomeSheetHeader extends StatelessWidget {
     final skyIsLight = weatherSkyIsLight(weatherMode);
     // Directly on the weather sky — not inside a glass card. Dark theme's
     // onSurface is white; on clear/fog daylight that must go dark with reveal.
-    final foreground = inkOverWeather(
-      colors,
-      reveal,
-      skyIsLight: skyIsLight,
-    );
+    final foreground = inkOverWeather(colors, reveal, skyIsLight: skyIsLight);
     final secondary = inkOverWeatherVariant(
       colors,
       reveal,

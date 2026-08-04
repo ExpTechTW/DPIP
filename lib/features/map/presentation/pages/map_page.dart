@@ -72,8 +72,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final initialId = 'dpm'; // TEMP-DIAG
-    context.watch<DefaultMapLayerController>();
+    final initialId = context.watch<DefaultMapLayerController>().layer.id;
     return MapScaffold(
       key: ValueKey(initialId),
       layers: _layers,

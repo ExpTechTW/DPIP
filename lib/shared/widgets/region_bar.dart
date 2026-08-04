@@ -134,11 +134,7 @@ class _RegionBadge extends StatelessWidget {
     // Unfilled neighbours sit on the (possibly transparent) bar — sky-aware
     // ink. The centre fill keeps [onPrimaryContainer] on [primaryContainer].
     final badgeBase = colors.primaryContainer;
-    final restText = inkOverWeather(
-      colors,
-      blend,
-      skyIsLight: skyIsLight,
-    );
+    final restText = inkOverWeather(colors, blend, skyIsLight: skyIsLight);
     final centreText = colors.onPrimaryContainer;
 
     return GestureDetector(

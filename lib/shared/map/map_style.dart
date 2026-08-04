@@ -132,6 +132,7 @@ String exptechVectorStyle(
       "filter": ["has", "point_count"],
       "layout": {
         "text-field": ["to-string", ["get", "point_count"]],
+        "text-font": ["Noto Sans TC Regular"],
         "text-size": 11,
         "text-allow-overlap": true
       },
