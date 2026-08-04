@@ -229,6 +229,9 @@ class RtsMapLayer implements MapLayer {
   }
 
   @override
+  void selectFeature(String id) {}
+
+  @override
   void onStyleReset() => _added = false;
 
   /// Loads the station directory, retrying (bounded) on failure — a transient

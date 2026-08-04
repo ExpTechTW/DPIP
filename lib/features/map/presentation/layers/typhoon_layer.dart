@@ -1016,6 +1016,9 @@ class TyphoonMapLayer implements MapLayer {
   }
 
   @override
+  void selectFeature(String id) {}
+
+  @override
   void onStyleReset() => _added = false;
 
   void _parsePoints(Map<String, dynamic> geo) {

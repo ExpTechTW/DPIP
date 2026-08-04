@@ -11,6 +11,7 @@ import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -37,11 +38,16 @@ const String _basemapTileUrl = basemapOriginTileUrl;
 /// calls never overlap, and a generation counter drops results from a superseded
 /// layer load so a slow fetch can't render onto the wrong layer.
 class MapScaffold extends StatefulWidget {
-  const MapScaffold({super.key, required this.layers})
+  const MapScaffold({super.key, required this.layers, this.initialLayerId})
     : assert(layers.length > 0, 'MapScaffold needs at least one layer');
 
-  /// The layers this surface offers; the first is shown initially.
+  /// The layers this surface offers; [initialLayerId] (or the first entry) is
+  /// shown initially.
   final List<MapLayer> layers;
+
+  /// Preferred overlay id (`MapLayer.id`) when the surface mounts. Unknown /
+  /// missing → [layers].first.
+  final String? initialLayerId;
 
   @override
   State<MapScaffold> createState() => _MapScaffoldState();
@@ -59,7 +65,21 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// tap, or the nav bar). A one-shot request per open; null keeps the view.
   MapCameraHandoff? _handoff;
 
-  late MapLayer _active = widget.layers.first;
+  /// Ranking → map: switch layer, frame station, open sheet.
+  MapStationHandoff? _stationHandoff;
+
+  late MapLayer _active = _resolveInitial(widget);
+
+  static MapLayer _resolveInitial(MapScaffold widget) {
+    final id = widget.initialLayerId;
+    if (id != null) {
+      for (final layer in widget.layers) {
+        if (layer.id == id) return layer;
+      }
+    }
+    return widget.layers.first;
+  }
+
   List<MapFrame> _frames = const [];
   int _selectedIndex = 0;
   Failure? _error;
@@ -107,12 +127,18 @@ class _MapScaffoldState extends State<MapScaffold> {
       _handoff?.removeListener(_onHandoff);
       _handoff = handoff..addListener(_onHandoff);
     }
+    final station = context.read<MapStationHandoff>();
+    if (station != _stationHandoff) {
+      _stationHandoff?.removeListener(_onStationHandoff);
+      _stationHandoff = station..addListener(_onStationHandoff);
+    }
   }
 
   @override
   void dispose() {
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
+    _stationHandoff?.removeListener(_onStationHandoff);
     super.dispose();
   }
 
@@ -130,6 +156,43 @@ class _MapScaffoldState extends State<MapScaffold> {
       final bounds = _handoff?.takePending();
       if (bounds != null) _frameBounds(bounds);
     });
+  }
+
+  /// Station focus from ranking (or similar): layer + camera + sheet.
+  void _onStationHandoff() {
+    if (!_styleLoaded) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_applyStationHandoff());
+    });
+  }
+
+  Future<void> _applyStationHandoff() async {
+    final pending = _stationHandoff?.takePending();
+    if (pending == null || !mounted) return;
+
+    MapLayer? layer;
+    for (final candidate in widget.layers) {
+      if (candidate.id == pending.layerId) {
+        layer = candidate;
+        break;
+      }
+    }
+    if (layer == null) {
+      Log.warning('Map station handoff: unknown layer ${pending.layerId}');
+      return;
+    }
+
+    if (layer.id != _active.id) {
+      _onLayerSelected(layer);
+    }
+    _frameBounds(pending.bounds);
+
+    // Wait for clear+render so station catalogue is loaded before select.
+    await _mapOps;
+    if (!mounted) return;
+    if (_active.id != pending.layerId) return;
+    _active.selectFeature(pending.stationId);
   }
 
   /// Adopts [bounds] as the framing target and applies it.
@@ -234,6 +297,8 @@ class _MapScaffoldState extends State<MapScaffold> {
       _frameBounds(_handoff?.takePending() ?? BaseMap.taiwanBounds);
     }
     _loadActive();
+    // Ranking may have queued a station focus before the style was ready.
+    unawaited(_applyStationHandoff());
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest

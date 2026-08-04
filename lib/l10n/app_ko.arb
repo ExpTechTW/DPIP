@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "화면",
+  "defaultMapLayerSettings": "지도 기본 레이어",
+  "defaultMapLayerSubtitle": "지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.",
   "displayTheme": "테마",
   "themeSystem": "시스템",
   "themeLight": "라이트",

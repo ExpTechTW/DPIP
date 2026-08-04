@@ -48,6 +48,12 @@ abstract final class PreferenceKeys {
   /// `ThemeController`.
   static const PrefKey<String> themeMode = PrefKey<String>._('app.themeMode');
 
+  /// Default map overlay when opening the Map tab. See
+  /// `DefaultMapLayerController` (`radar` / `satellite` / … / `dpm`).
+  static const PrefKey<String> defaultMapLayer = PrefKey<String>._(
+    'map.defaultLayer',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const PrefKey<List<String>> savedRegionCodes = PrefKey<List<String>>._(
     'home.savedRegionCodes',

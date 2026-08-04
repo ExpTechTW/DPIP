@@ -5,6 +5,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -16,6 +17,7 @@ List<SingleChildWidget> homeProviders() => [
   ChangeNotifierProvider(create: (_) => HomeSheetExtent()),
   ChangeNotifierProvider(create: (_) => HomeResetSignal()),
   ChangeNotifierProvider(create: (_) => MapCameraHandoff()),
+  ChangeNotifierProvider(create: (_) => MapStationHandoff()),
   ChangeNotifierProvider<HomeWeatherController>(
     create: (context) => HomeWeatherController(
       context.read<MeteorWeatherRepository>(),

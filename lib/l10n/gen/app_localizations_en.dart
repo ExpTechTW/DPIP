@@ -632,6 +632,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displaySettings => 'Display';
 
   @override
+  String get defaultMapLayerSettings => 'Default map layer';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.';
+
+  @override
   String get displayTheme => 'Theme';
 
   @override

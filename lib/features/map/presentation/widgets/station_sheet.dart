@@ -79,6 +79,11 @@ abstract interface class StationSheetSource {
   /// The trend series for [id] over [range] (`24h` | `7d`).
   Future<Result<TrendSeries>> trend(String id, String range);
 
+  /// Programmatically select [id] and bump [selectionRevision] so the sheet
+  /// opens (e.g. a ranking-list handoff). No-op when the id is unknown after
+  /// data has loaded; callers should wait for the layer's [render] first.
+  void select(String id);
+
   /// Deselects — collapses the sheet fully.
   void close();
 }

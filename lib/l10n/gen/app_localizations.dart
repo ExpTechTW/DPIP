@@ -1263,6 +1263,18 @@ abstract class AppLocalizations {
   /// **'Display'**
   String get displaySettings;
 
+  /// More-menu entry and page title for choosing the Map tab's default overlay
+  ///
+  /// In en, this message translates to:
+  /// **'Default map layer'**
+  String get defaultMapLayerSettings;
+
+  /// Explanatory subtitle on the default-map-layer settings page
+  ///
+  /// In en, this message translates to:
+  /// **'The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.'**
+  String get defaultMapLayerSubtitle;
+
   /// Section header for the theme-mode chooser on the Display settings page
   ///
   /// In en, this message translates to:

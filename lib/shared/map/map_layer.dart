@@ -89,6 +89,10 @@ abstract interface class MapLayer {
   /// (opening [buildSheet]); no-op for timeline layers.
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller);
 
+  /// Programmatically open a feature sheet for [id] (e.g. ranking → map
+  /// handoff). No-op for layers without a selectable station/feature sheet.
+  void selectFeature(String id);
+
   /// The bottom sheet for a sheet layer — a self-contained, collapsible panel
   /// that shows the tapped feature's detail. `SizedBox.shrink()` for timeline
   /// layers (the scaffold shows the timeline for those instead).

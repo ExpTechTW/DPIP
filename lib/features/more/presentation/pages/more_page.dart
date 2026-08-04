@@ -2,8 +2,10 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final mapLayer = context.watch<DefaultMapLayerController>().layer;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
@@ -64,6 +67,12 @@ class MorePage extends StatelessWidget {
                 icon: Icons.brightness_6_outlined,
                 title: l10n.displaySettings,
                 onTap: () => context.pushNamed(AppRoutes.display),
+              ),
+              _MoreTile(
+                icon: mapLayer.icon,
+                title: l10n.defaultMapLayerSettings,
+                subtitle: mapLayer.label(l10n),
+                onTap: () => context.pushNamed(AppRoutes.defaultMapLayer),
               ),
             ],
           ),
@@ -240,11 +249,13 @@ class _MoreTile extends StatelessWidget {
   const _MoreTile({
     required this.icon,
     required this.title,
+    this.subtitle,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
+  final String? subtitle;
   final VoidCallback onTap;
 
   @override
@@ -252,6 +263,7 @@ class _MoreTile extends StatelessWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );

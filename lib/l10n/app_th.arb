@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "การแสดงผล",
+  "defaultMapLayerSettings": "ชั้นแผนที่เริ่มต้น",
+  "defaultMapLayerSubtitle": "แท็บแผนที่จะเปิดชั้นนี้ ไอคอนและป้ายนำทางด้านล่างจะเปลี่ยนตาม",
   "displayTheme": "ธีม",
   "themeSystem": "ระบบ",
   "themeLight": "สว่าง",

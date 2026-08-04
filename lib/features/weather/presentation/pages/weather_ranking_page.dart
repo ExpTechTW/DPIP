@@ -14,10 +14,13 @@ import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/presentation/widgets/weather_ranking_row.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -73,6 +76,17 @@ enum WeatherRankingTab {
     WeatherRankingTab.gust => Icons.storm_outlined,
     WeatherRankingTab.humidity => Icons.water_drop_outlined,
     WeatherRankingTab.pressure => Icons.speed_outlined,
+  };
+
+  /// Map layer to open when a ranked station is tapped (`MapLayer.id`).
+  /// Gust has no dedicated layer — land on wind.
+  String get mapLayerId => switch (this) {
+    WeatherRankingTab.rain => 'rain',
+    WeatherRankingTab.temperature ||
+    WeatherRankingTab.tempExtremes => 'temperature',
+    WeatherRankingTab.wind || WeatherRankingTab.gust => 'wind',
+    WeatherRankingTab.humidity => 'humidity',
+    WeatherRankingTab.pressure => 'pressure',
   };
 }
 
@@ -193,6 +207,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     WeatherRankingTab.rain => _RainRankingPanel(
       stations: value.rainStations,
       snapshot: value.rain,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.temperature => _WeatherMetricPanel(
@@ -202,11 +217,13 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       unit: '°C',
       fractionDigits: 1,
       highLowSort: true,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.tempExtremes => _TempExtremePanel(
       stations: value.weatherStations,
       snapshot: value.weather,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.wind => _WeatherMetricPanel(
@@ -217,6 +234,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       unit: 'm/s',
       fractionDigits: 1,
       requirePositive: true,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.gust => _WeatherMetricPanel(
@@ -228,6 +246,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       unit: 'm/s',
       fractionDigits: 1,
       requirePositive: true,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.humidity => _WeatherMetricPanel(
@@ -236,6 +255,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       valueOf: (o) => o.humidity?.toDouble(),
       unit: '%',
       fractionDigits: 0,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
     WeatherRankingTab.pressure => _WeatherMetricPanel(
@@ -244,6 +264,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       valueOf: (o) => o.pressure,
       unit: 'hPa',
       fractionDigits: 1,
+      mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
   };
@@ -310,24 +331,19 @@ String _formatClock(int unixSeconds) {
   return DateFormat('HH:mm').format(taipei);
 }
 
-String? _eventTimeLabel(AppLocalizations l10n, int? unixSeconds) {
-  if (unixSeconds == null) return null;
-  return l10n.weatherRankingRecordedAt(_formatClock(unixSeconds));
-}
-
-String _tempExtremeAnalysis(AppLocalizations l10n, TempExtremeDetail d) {
-  String at(int? t) => t == null ? '' : ' (${_formatClock(t)})';
-  final current = d.current == null
-      ? null
-      : l10n.weatherRankingAnalysisCurrent(d.current!.toStringAsFixed(1));
-  final high = l10n.weatherRankingAnalysisHigh(
-    '${d.high.toStringAsFixed(1)}${at(d.highTime)}',
+/// Ranking list → map tab: focus camera + open station sheet.
+void _openStationOnMap(
+  BuildContext context, {
+  required String layerId,
+  required RankedObservation item,
+}) {
+  context.read<MapStationHandoff>().request(
+    layerId: layerId,
+    stationId: item.id,
+    latitude: item.station.latitude,
+    longitude: item.station.longitude,
   );
-  final low = l10n.weatherRankingAnalysisLow(
-    '${d.low.toStringAsFixed(1)}${at(d.lowTime)}',
-  );
-  final range = l10n.weatherRankingAnalysisRange(d.range.toStringAsFixed(1));
-  return [?current, high, low, range].join(' · ');
+  context.goNamed(AppRoutes.map);
 }
 
 double _fillFraction({
@@ -349,11 +365,13 @@ class _RainRankingPanel extends StatefulWidget {
   const _RainRankingPanel({
     required this.stations,
     required this.snapshot,
+    required this.mapLayerId,
     required this.onRefresh,
   });
 
   final Map<String, WeatherStation> stations;
   final RainSnapshot snapshot;
+  final String mapLayerId;
   final Future<void> Function() onRefresh;
 
   @override
@@ -439,6 +457,11 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
                         fraction: ranked.first.value == 0
                             ? 0
                             : item.value / ranked.first.value,
+                        onTap: () => _openStationOnMap(
+                          context,
+                          layerId: widget.mapLayerId,
+                          item: item,
+                        ),
                       );
                     },
                   ),
@@ -457,6 +480,7 @@ class _WeatherMetricPanel extends StatefulWidget {
     required this.valueOf,
     required this.unit,
     required this.fractionDigits,
+    required this.mapLayerId,
     required this.onRefresh,
     this.windDirectionOf,
     this.eventTimeOf,
@@ -471,6 +495,7 @@ class _WeatherMetricPanel extends StatefulWidget {
   final int? Function(WeatherObservation o)? eventTimeOf;
   final String unit;
   final int fractionDigits;
+  final String mapLayerId;
   final Future<void> Function() onRefresh;
   final bool highLowSort;
   final bool requirePositive;
@@ -645,7 +670,14 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                           ascending: _ascending,
                         ),
                         leadingExtra: windArrow,
-                        eventTimeLabel: _eventTimeLabel(l10n, item.eventTime),
+                        eventTimeLabel: item.eventTime == null
+                            ? null
+                            : _formatClock(item.eventTime!),
+                        onTap: () => _openStationOnMap(
+                          context,
+                          layerId: widget.mapLayerId,
+                          item: item,
+                        ),
                       );
                     },
                   ),
@@ -661,11 +693,13 @@ class _TempExtremePanel extends StatefulWidget {
   const _TempExtremePanel({
     required this.stations,
     required this.snapshot,
+    required this.mapLayerId,
     required this.onRefresh,
   });
 
   final Map<String, WeatherStation> stations;
   final WeatherSnapshot snapshot;
+  final String mapLayerId;
   final Future<void> Function() onRefresh;
 
   @override
@@ -814,7 +848,6 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
                     itemCount: ranked.length,
                     itemBuilder: (context, index) {
                       final item = ranked[index];
-                      final detail = item.tempExtreme;
                       return WeatherRankingRow(
                         rank: index + 1,
                         item: item,
@@ -825,10 +858,15 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
                           index: index,
                           ascending: _ascending,
                         ),
-                        eventTimeLabel: _eventTimeLabel(l10n, item.eventTime),
-                        analysisLabel: detail == null
+                        // Clock only — no "當下/最高/最低/溫差" dump.
+                        eventTimeLabel: item.eventTime == null
                             ? null
-                            : _tempExtremeAnalysis(l10n, detail),
+                            : _formatClock(item.eventTime!),
+                        onTap: () => _openStationOnMap(
+                          context,
+                          layerId: widget.mapLayerId,
+                          item: item,
+                        ),
                       );
                     },
                   ),

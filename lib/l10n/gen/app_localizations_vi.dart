@@ -632,6 +632,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get displaySettings => 'Hiển thị';
 
   @override
+  String get defaultMapLayerSettings => 'Lớp bản đồ mặc định';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.';
+
+  @override
   String get displayTheme => 'Giao diện';
 
   @override

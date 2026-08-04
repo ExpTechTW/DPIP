@@ -224,6 +224,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  void selectFeature(String id) => select(id);
+
+  @override
   void onStyleReset() {}
 
   // --- StationSheetSource ---
@@ -311,6 +314,12 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
 
   @override
   void close() => _selected.value = null;
+
+  @override
+  void select(String id) {
+    _selected.value = id;
+    _selectionRevision.value++;
+  }
 
   // --- internals ---
 

@@ -619,6 +619,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get displaySettings => '顯示設定';
 
   @override
+  String get defaultMapLayerSettings => '地圖預設圖層';
+
+  @override
+  String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
+
+  @override
   String get displayTheme => '主題';
 
   @override
@@ -1645,6 +1651,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get displaySettings => '显示设置';
+
+  @override
+  String get defaultMapLayerSettings => '地图默认图层';
+
+  @override
+  String get defaultMapLayerSubtitle => '打开地图标签页时显示此图层，底部导航栏图标与文字会一并更新。';
 
   @override
   String get displayTheme => '主题';
@@ -2675,6 +2687,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get displaySettings => '顯示設定';
 
   @override
+  String get defaultMapLayerSettings => '地圖預設圖層';
+
+  @override
+  String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
+
+  @override
   String get displayTheme => '主題';
 
   @override
@@ -3701,6 +3719,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get displaySettings => '顯示設定';
+
+  @override
+  String get defaultMapLayerSettings => '地圖預設圖層';
+
+  @override
+  String get defaultMapLayerSubtitle => '開啟地圖分頁時顯示此圖層，底部導覽列圖示與文字會一併更新。';
 
   @override
   String get displayTheme => '主題';

@@ -1,4 +1,8 @@
+/// Full-screen map tab — assembles overlay layers for [MapScaffold].
+library;
+
 import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -29,6 +33,9 @@ import 'package:provider/provider.dart';
 /// Just business logic now: it names the layers this surface offers and hands
 /// them to [MapScaffold], which owns the map, the layer switcher, and the
 /// timeline. Adding radar/rain/lightning/… later is one more entry in [_layers].
+///
+/// The initial overlay comes from [DefaultMapLayerController]; a [ValueKey] on
+/// the scaffold remounts when that preference changes so the new default wins.
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -60,5 +67,12 @@ class _MapPageState extends State<MapPage> {
   ];
 
   @override
-  Widget build(BuildContext context) => MapScaffold(layers: _layers);
+  Widget build(BuildContext context) {
+    final initialId = context.watch<DefaultMapLayerController>().layer.id;
+    return MapScaffold(
+      key: ValueKey(initialId),
+      layers: _layers,
+      initialLayerId: initialId,
+    );
+  }
 }

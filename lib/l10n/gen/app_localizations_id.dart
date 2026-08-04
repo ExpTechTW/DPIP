@@ -634,6 +634,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get displaySettings => 'Tampilan';
 
   @override
+  String get defaultMapLayerSettings => 'Lapisan peta bawaan';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'Tab Peta membuka lapisan ini. Ikon dan label navigasi bawah ikut pilihan ini.';
+
+  @override
   String get displayTheme => 'Tema';
 
   @override

@@ -624,6 +624,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get displaySettings => '表示';
 
   @override
+  String get defaultMapLayerSettings => '地図の初期レイヤー';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      '地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。';
+
+  @override
   String get displayTheme => 'テーマ';
 
   @override

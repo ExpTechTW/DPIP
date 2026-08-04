@@ -9,6 +9,7 @@ import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
@@ -29,6 +30,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
   ChangeNotifierProvider<ThemeController>.value(value: deps.theme),
+  ChangeNotifierProvider<DefaultMapLayerController>.value(
+    value: deps.defaultMapLayer,
+  ),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),

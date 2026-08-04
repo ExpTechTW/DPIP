@@ -624,6 +624,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get displaySettings => '화면';
 
   @override
+  String get defaultMapLayerSettings => '지도 기본 레이어';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      '지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.';
+
+  @override
   String get displayTheme => '테마';
 
   @override

@@ -217,6 +217,9 @@ class LightningMapLayer implements MapLayer {
   }
 
   @override
+  void selectFeature(String id) {}
+
+  @override
   void onStyleReset() {
     _mounted = false;
     _imagesReady = false;

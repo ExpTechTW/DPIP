@@ -631,6 +631,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get displaySettings => 'การแสดงผล';
 
   @override
+  String get defaultMapLayerSettings => 'ชั้นแผนที่เริ่มต้น';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'แท็บแผนที่จะเปิดชั้นนี้ ไอคอนและป้ายนำทางด้านล่างจะเปลี่ยนตาม';
+
+  @override
   String get displayTheme => 'ธีม';
 
   @override

@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "Tampilan",
+  "defaultMapLayerSettings": "Lapisan peta bawaan",
+  "defaultMapLayerSubtitle": "Tab Peta membuka lapisan ini. Ikon dan label navigasi bawah ikut pilihan ini.",
   "displayTheme": "Tema",
   "themeSystem": "Sistem",
   "themeLight": "Terang",

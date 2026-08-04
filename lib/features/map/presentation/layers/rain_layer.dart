@@ -316,6 +316,9 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  void selectFeature(String id) => select(id);
+
+  @override
   void onStyleReset() {}
 
   @override
@@ -364,6 +367,12 @@ class RainMapLayer implements MapLayer, StationSheetSource {
 
   @override
   void close() => _selected.value = null;
+
+  @override
+  void select(String id) {
+    _selected.value = id;
+    _selectionRevision.value++;
+  }
 
   Future<void> _ensureData() async {
     if (_loaded) return;

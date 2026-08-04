@@ -635,6 +635,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get displaySettings => 'Pagpapakita';
 
   @override
+  String get defaultMapLayerSettings => 'Default na layer ng mapa';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.';
+
+  @override
   String get displayTheme => 'Tema';
 
   @override

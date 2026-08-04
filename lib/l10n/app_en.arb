@@ -847,6 +847,14 @@
   "@displaySettings": {
     "description": "Display-settings menu entry and page title (theme mode)"
   },
+  "defaultMapLayerSettings": "Default map layer",
+  "@defaultMapLayerSettings": {
+    "description": "More-menu entry and page title for choosing the Map tab's default overlay"
+  },
+  "defaultMapLayerSubtitle": "The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.",
+  "@defaultMapLayerSubtitle": {
+    "description": "Explanatory subtitle on the default-map-layer settings page"
+  },
   "displayTheme": "Theme",
   "@displayTheme": {
     "description": "Section header for the theme-mode chooser on the Display settings page"

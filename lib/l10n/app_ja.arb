@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "表示",
+  "defaultMapLayerSettings": "地図の初期レイヤー",
+  "defaultMapLayerSubtitle": "地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。",
   "displayTheme": "テーマ",
   "themeSystem": "システム",
   "themeLight": "ライト",

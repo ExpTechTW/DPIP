@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "显示设置",
+  "defaultMapLayerSettings": "地图默认图层",
+  "defaultMapLayerSubtitle": "打开地图标签页时显示此图层，底部导航栏图标与文字会一并更新。",
   "displayTheme": "主题",
   "themeSystem": "跟随系统",
   "themeLight": "浅色",

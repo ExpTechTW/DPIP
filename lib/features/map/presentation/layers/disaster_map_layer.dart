@@ -245,6 +245,9 @@ class DisasterMapLayer implements MapLayer {
   }
 
   @override
+  void selectFeature(String id) {}
+
+  @override
   void onStyleReset() {
     // Style reload drops baked layers; [render] re-marks when we are active.
     _styleHasAed = false;

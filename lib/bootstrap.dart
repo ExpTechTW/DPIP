@@ -29,6 +29,7 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
@@ -82,6 +83,7 @@ Future<void> bootstrap() async {
   final onboarding = OnboardingStore(prefs);
   final locale = LocaleController(prefs);
   final theme = ThemeController(prefs);
+  final defaultMapLayer = DefaultMapLayerController(prefs);
   final cache = await _openCache();
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
@@ -180,6 +182,7 @@ Future<void> bootstrap() async {
     onboarding: onboarding,
     locale: locale,
     theme: theme,
+    defaultMapLayer: defaultMapLayer,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,

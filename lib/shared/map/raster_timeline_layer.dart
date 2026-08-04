@@ -459,6 +459,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   }
 
   @override
+  void selectFeature(String id) {}
+
+  @override
   void onStyleReset() => _reset();
 
   void _reset() {

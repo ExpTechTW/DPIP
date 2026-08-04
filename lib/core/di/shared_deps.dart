@@ -11,6 +11,7 @@ import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
@@ -46,6 +47,7 @@ class SharedDeps {
     required this.onboarding,
     required this.locale,
     required this.theme,
+    required this.defaultMapLayer,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
@@ -107,6 +109,9 @@ class SharedDeps {
 
   /// The selected theme mode (also provided; drives `MaterialApp.themeMode`).
   final ThemeController theme;
+
+  /// Default Map-tab overlay (also provided; drives nav chrome + map open).
+  final DefaultMapLayerController defaultMapLayer;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

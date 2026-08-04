@@ -1,8 +1,10 @@
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/permission_banners.dart';
@@ -47,6 +49,7 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final index = widget.navigationShell.currentIndex;
+    final mapLayer = context.watch<DefaultMapLayerController>().layer;
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a
@@ -80,9 +83,9 @@ class _MainShellState extends State<MainShell> {
         label: l10n.navEvents,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.map_outlined),
-        selectedIcon: const Icon(Icons.map),
-        label: l10n.navMap,
+        icon: Icon(mapLayer.icon),
+        selectedIcon: Icon(mapLayer.selectedIcon),
+        label: mapLayer.label(l10n),
       ),
       NavigationDestination(
         icon: const Icon(Icons.folder_outlined),

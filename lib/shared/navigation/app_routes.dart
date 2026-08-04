@@ -58,6 +58,10 @@ abstract final class AppRoutes {
   static const String language = 'language';
   static const String languagePath = '/language';
 
+  /// Default Map-tab overlay (also drives bottom-nav icon/label).
+  static const String defaultMapLayer = 'defaultMapLayer';
+  static const String defaultMapLayerPath = '/default-map-layer';
+
   static const String log = 'log';
   static const String logPath = '/log';
 

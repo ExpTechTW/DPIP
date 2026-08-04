@@ -16,6 +16,7 @@ import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart
 import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
+import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
@@ -116,6 +117,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.languagePath,
       name: AppRoutes.language,
       builder: (_, _) => const LanguagePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.defaultMapLayerPath,
+      name: AppRoutes.defaultMapLayer,
+      builder: (_, _) => const DefaultMapLayerPage(),
     ),
     GoRoute(
       path: AppRoutes.regionManagePath,

@@ -191,6 +191,8 @@
   "moreGooglePlay": "Google Play",
   "moreAppStore": "App Store",
   "displaySettings": "Pagpapakita",
+  "defaultMapLayerSettings": "Default na layer ng mapa",
+  "defaultMapLayerSubtitle": "Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.",
   "displayTheme": "Tema",
   "themeSystem": "Sistema",
   "themeLight": "Maliwanag",
