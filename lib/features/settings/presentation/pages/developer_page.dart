@@ -1,5 +1,10 @@
 /// Developer diagnostics: platform, device, app, and push-token details for
 /// support and debugging. Every value is copyable.
+///
+/// **Deliberately English-only.** This page exists to be screenshotted into a
+/// bug report or pasted to a maintainer, so a fixed vocabulary is worth more
+/// than a localized one — and the values beside the labels (`arm64`, `release`,
+/// an APNs token) never translate anyway.
 library;
 
 import 'dart:io';
@@ -12,7 +17,6 @@ import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
-import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,6 +28,9 @@ import 'package:provider/provider.dart';
 
 /// One labelled diagnostic value.
 typedef _Field = ({String label, String? value});
+
+/// Shared by the row, the dialog title, and its confirm button.
+const String _clearCacheTitle = 'Clear cache';
 
 /// Formats a byte count as a compact human string (B / KB / MB / GB).
 String _formatBytes(int bytes) {
@@ -37,6 +44,11 @@ String _formatBytes(int bytes) {
   }
   return '${value.toStringAsFixed(value < 10 ? 1 : 0)} ${units[unit]}';
 }
+
+/// Formats a cache hit rate as `NN% (hits/total)`, or a dash when the window
+/// saw no cacheable request at all — 0% would read as "the cache is failing".
+String _formatRate(double rate, int hits, int total) =>
+    total == 0 ? '—' : '${(rate * 100).toStringAsFixed(0)}% ($hits/$total)';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -120,15 +132,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
             label: 'Size on disk',
             value: cacheStats == null ? '—' : _formatBytes(cacheStats.bytes),
           ),
-          (
-            label: 'Hit rate',
-            value: usage == null
-                ? '—'
-                : '${(usage.hitRate * 100).toStringAsFixed(0)}% '
-                      '(${usage.hits}/${usage.total})',
-          ),
         ],
       ),
+      // Every figure here is the same pair of trailing windows, so they can be
+      // read against each other.
       (
         title: 'Network usage',
         fields: [
@@ -140,7 +147,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
             label: 'Downloaded · last 7d',
             value: usage == null ? '—' : _formatBytes(usage.last7d),
           ),
-          // Same windows as the downloads above, so the two read as a pair.
           (
             label: 'Traffic saved · last 24h',
             value: usage == null ? '—' : _formatBytes(usage.saved24h),
@@ -148,6 +154,18 @@ class _DeveloperPageState extends State<DeveloperPage> {
           (
             label: 'Traffic saved · last 7d',
             value: usage == null ? '—' : _formatBytes(usage.saved7d),
+          ),
+          (
+            label: 'Hit rate · last 24h',
+            value: usage == null
+                ? '—'
+                : _formatRate(usage.hitRate24h, usage.hits24h, usage.total24h),
+          ),
+          (
+            label: 'Hit rate · last 7d',
+            value: usage == null
+                ? '—'
+                : _formatRate(usage.hitRate7d, usage.hits7d, usage.total7d),
           ),
         ],
       ),
@@ -185,25 +203,32 @@ class _DeveloperPageState extends State<DeveloperPage> {
     }
   }
 
-  /// Empties the app's tile/HTTP store and MapLibre's in-process mirror.
+  /// Empties the cache **and** the accounting that describes it.
   ///
-  /// Confirmed first: nothing is lost permanently, but everything the map shows
-  /// has to be downloaded again, and that is the user's data allowance.
+  /// Both, always: leaving a 92% hit rate next to an empty store would describe
+  /// a cache that no longer exists, and the numbers are the reason to press
+  /// this in the first place.
+  ///
+  /// Confirmed first — nothing is lost permanently, but everything the map
+  /// shows has to be downloaded again, and that is the user's data allowance.
   Future<void> _confirmClearCache() async {
-    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.developerClearCache),
-        content: Text(l10n.developerClearCacheConfirm),
+        title: const Text(_clearCacheTitle),
+        content: const Text(
+          'Stored map tiles and API responses will be deleted and downloaded '
+          'again next time they are needed. Traffic and hit-rate figures reset '
+          'to zero.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.commonCancel),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.developerClearCache),
+            child: const Text(_clearCacheTitle),
           ),
         ],
       ),
@@ -211,10 +236,12 @@ class _DeveloperPageState extends State<DeveloperPage> {
     if (confirmed != true || !mounted) return;
 
     final etagCache = context.read<EtagCacheStore?>();
+    final networkUsage = context.read<NetworkUsageStore?>();
     final tiles = context.read<MapTileCache?>();
     setState(() => _clearing = true);
     try {
       await etagCache?.clear();
+      await networkUsage?.clear();
       // The mirror would otherwise keep serving bytes the store no longer has,
       // so "cleared" would not look cleared until the app restarted.
       await tiles?.evict(const []);
@@ -227,16 +254,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.developerCacheCleared)));
+      ..showSnackBar(const SnackBar(content: Text('Cache cleared')));
   }
 
   Future<void> _copy(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
     if (!mounted) return;
-    final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.developerCopied)));
+      ..showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
   }
 
   void _copyAll() {
@@ -254,16 +280,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final sections = _sections;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.moreDeveloper),
+        title: const Text('Developer'),
         actions: [
           if (sections != null)
             IconButton(
               icon: const Icon(Icons.copy_all_outlined),
-              tooltip: l10n.developerCopyAll,
+              tooltip: 'Copy all',
               onPressed: _copyAll,
             ),
         ],
@@ -285,12 +310,14 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     color: Theme.of(context).colorScheme.error,
                   ),
                   title: Text(
-                    l10n.developerClearCache,
+                    _clearCacheTitle,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
-                  subtitle: Text(l10n.developerClearCacheSubtitle),
+                  subtitle: const Text(
+                    'Removes stored tiles, API responses, and usage stats',
+                  ),
                   trailing: _clearing
                       ? const SizedBox.square(
                           dimension: 18,

@@ -165,6 +165,138 @@ abstract class AppLocalizations {
   /// **'Earthquake reports'**
   String get dataEarthquakeSubtitle;
 
+  /// Section header on the Data hub for weather observation rankings
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get dataSectionWeather;
+
+  /// Subtitle under weather ranking tiles on the Data hub
+  ///
+  /// In en, this message translates to:
+  /// **'Live station rankings'**
+  String get dataWeatherRankingSubtitle;
+
+  /// App bar title for the weather station ranking page
+  ///
+  /// In en, this message translates to:
+  /// **'Observation rankings'**
+  String get weatherRankingTitle;
+
+  /// Snapshot time and station count above a ranking list
+  ///
+  /// In en, this message translates to:
+  /// **'Data time: {time}\n{count} stations'**
+  String weatherRankingMeta(String time, int count);
+
+  /// Empty state when a ranking list has no rows after filters
+  ///
+  /// In en, this message translates to:
+  /// **'No observations to rank'**
+  String get weatherRankingEmpty;
+
+  /// Label before highest/lowest (or desc/asc) chips on ranking
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get weatherRankingBy;
+
+  /// Chip to rank temperature descending
+  ///
+  /// In en, this message translates to:
+  /// **'Highest'**
+  String get weatherRankingHighest;
+
+  /// Chip to rank temperature ascending
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest'**
+  String get weatherRankingLowest;
+
+  /// Label before township/county merge chips on ranking
+  ///
+  /// In en, this message translates to:
+  /// **'Merge to'**
+  String get weatherRankingMergeTo;
+
+  /// Chip to keep one extreme station per township
+  ///
+  /// In en, this message translates to:
+  /// **'Township'**
+  String get weatherRankingMergeTown;
+
+  /// Chip to keep one extreme station per county
+  ///
+  /// In en, this message translates to:
+  /// **'County'**
+  String get weatherRankingMergeCounty;
+
+  /// Ranking tab/tile for sustained wind speed
+  ///
+  /// In en, this message translates to:
+  /// **'Wind speed'**
+  String get weatherRankingWind;
+
+  /// Ranking tab/tile for peak gust speed
+  ///
+  /// In en, this message translates to:
+  /// **'Gust'**
+  String get weatherRankingGust;
+
+  /// Ranking tab for recorded daily high/low/range (not current temp)
+  ///
+  /// In en, this message translates to:
+  /// **'Daily extremes'**
+  String get weatherRankingTempExtremes;
+
+  /// Chip to rank by recorded daily maximum temperature
+  ///
+  /// In en, this message translates to:
+  /// **'Daily high'**
+  String get weatherRankingExtremeHigh;
+
+  /// Chip to rank by recorded daily minimum temperature
+  ///
+  /// In en, this message translates to:
+  /// **'Daily low'**
+  String get weatherRankingExtremeLow;
+
+  /// Chip to rank by daily high minus low
+  ///
+  /// In en, this message translates to:
+  /// **'Diurnal range'**
+  String get weatherRankingExtremeRange;
+
+  /// Occurrence time for a gust or daily extreme
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded at {time}'**
+  String weatherRankingRecordedAt(String time);
+
+  /// Current temperature fragment in an extremes analysis line
+  ///
+  /// In en, this message translates to:
+  /// **'Now {value}°C'**
+  String weatherRankingAnalysisCurrent(String value);
+
+  /// Daily high fragment; value may include clock time
+  ///
+  /// In en, this message translates to:
+  /// **'High {value}'**
+  String weatherRankingAnalysisHigh(String value);
+
+  /// Daily low fragment; value may include clock time
+  ///
+  /// In en, this message translates to:
+  /// **'Low {value}'**
+  String weatherRankingAnalysisLow(String value);
+
+  /// Diurnal range fragment in an extremes analysis line
+  ///
+  /// In en, this message translates to:
+  /// **'Range {value}°C'**
+  String weatherRankingAnalysisRange(String value);
+
   /// Empty state when the report catalogue has no rows
   ///
   /// In en, this message translates to:
@@ -231,11 +363,89 @@ abstract class AppLocalizations {
   /// **'Filters'**
   String get reportFilterTitle;
 
+  /// Section title for report list sort field + order
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get reportFilterSort;
+
+  /// Sort reports by origin time
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get reportFilterSortTime;
+
+  /// Sort reports by max intensity
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity'**
+  String get reportFilterSortIntensity;
+
+  /// Sort reports by magnitude
+  ///
+  /// In en, this message translates to:
+  /// **'Magnitude'**
+  String get reportFilterSortMagnitude;
+
+  /// Sort reports by hypocentral depth
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get reportFilterSortDepth;
+
+  /// Sort order: newest / largest first
+  ///
+  /// In en, this message translates to:
+  /// **'Descending'**
+  String get reportFilterOrderDesc;
+
+  /// Sort order: oldest / smallest first
+  ///
+  /// In en, this message translates to:
+  /// **'Ascending'**
+  String get reportFilterOrderAsc;
+
   /// Label for the felt-intensity range filter
   ///
   /// In en, this message translates to:
   /// **'Intensity'**
   String get reportFilterIntensity;
+
+  /// Title of the dialog explaining CWA 新制 vs 舊制 intensity
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity scales'**
+  String get reportFilterIntensityInfoTitle;
+
+  /// Intro paragraph for the intensity-scale info dialog
+  ///
+  /// In en, this message translates to:
+  /// **'CWA changed the felt-intensity scale on 1 Jan 2020 (Taipei time).'**
+  String get reportFilterIntensityInfoIntro;
+
+  /// No description provided for @reportFilterIntensityInfoLegacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy (before 2020)'**
+  String get reportFilterIntensityInfoLegacyTitle;
+
+  /// No description provided for @reportFilterIntensityInfoLegacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only levels 0–7. No 5− / 5+ / 6− / 6+ split.'**
+  String get reportFilterIntensityInfoLegacyBody;
+
+  /// No description provided for @reportFilterIntensityInfoModernTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current (from 2020)'**
+  String get reportFilterIntensityInfoModernTitle;
+
+  /// No description provided for @reportFilterIntensityInfoModernBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.'**
+  String get reportFilterIntensityInfoModernBody;
 
   /// Label for the magnitude range filter
   ///
@@ -410,18 +620,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Debug info'**
   String get moreDeveloper;
-
-  /// Snackbar shown after copying a diagnostic value
-  ///
-  /// In en, this message translates to:
-  /// **'Copied to clipboard'**
-  String get developerCopied;
-
-  /// Tooltip for the copy-all action on the developer page
-  ///
-  /// In en, this message translates to:
-  /// **'Copy all'**
-  String get developerCopyAll;
 
   /// Title of the experimental-features settings page and its More-menu entry
   ///
@@ -1832,36 +2030,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show forecast-point detail cards when zoomed in'**
   String get typhoonOverlayForecastCalloutsTooltip;
-
-  /// Generic cancel action in a dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get commonCancel;
-
-  /// Developer-page action that empties the app HTTP/tile cache
-  ///
-  /// In en, this message translates to:
-  /// **'Clear cache'**
-  String get developerClearCache;
-
-  /// Explains what the clear-cache action removes
-  ///
-  /// In en, this message translates to:
-  /// **'Removes stored tiles and API responses'**
-  String get developerClearCacheSubtitle;
-
-  /// Confirmation dialog body for clearing the cache
-  ///
-  /// In en, this message translates to:
-  /// **'Stored map tiles and API responses will be deleted and downloaded again next time they are needed.'**
-  String get developerClearCacheConfirm;
-
-  /// Snackbar shown after the cache has been cleared
-  ///
-  /// In en, this message translates to:
-  /// **'Cache cleared'**
-  String get developerCacheCleared;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
-/// Bottom-nav "資料" hub — links into catalogue pages (earthquake reports, …).
+/// Bottom-nav "資料" hub — links into catalogue pages (earthquake reports,
+/// weather observation rankings, …).
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -16,6 +17,29 @@ class DataPage extends StatelessWidget {
 
   /// This page's branch index in the shell.
   static const int tabIndex = 3;
+
+  /// Every sortable weather/rain metric — keep in sync with
+  /// `WeatherRankingTab` (`?tab=` query values).
+  static const _weatherRankingEntries = <(String tab, IconData icon)>[
+    ('rain', Icons.umbrella_outlined),
+    ('temperature', Icons.thermostat_outlined),
+    ('tempExtremes', Icons.thermostat_auto_outlined),
+    ('wind', Icons.air_outlined),
+    ('gust', Icons.storm_outlined),
+    ('humidity', Icons.water_drop_outlined),
+    ('pressure', Icons.speed_outlined),
+  ];
+
+  static String _weatherRankingLabel(AppLocalizations l10n, String tab) =>
+      switch (tab) {
+        'temperature' => l10n.mapLayerTemperature,
+        'tempExtremes' => l10n.weatherRankingTempExtremes,
+        'wind' => l10n.weatherRankingWind,
+        'gust' => l10n.weatherRankingGust,
+        'humidity' => l10n.mapLayerHumidity,
+        'pressure' => l10n.mapLayerPressure,
+        _ => l10n.mapLayerRain,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +61,21 @@ class DataPage extends StatelessWidget {
                 subtitle: l10n.dataEarthquakeSubtitle,
                 onTap: () => context.pushNamed(AppRoutes.earthquake),
               ),
+            ],
+          ),
+          SectionHeader(l10n.dataSectionWeather),
+          _DataGroup(
+            children: [
+              for (final (tab, icon) in _weatherRankingEntries)
+                _DataTile(
+                  icon: icon,
+                  title: _weatherRankingLabel(l10n, tab),
+                  subtitle: l10n.dataWeatherRankingSubtitle,
+                  onTap: () => context.pushNamed(
+                    AppRoutes.weatherRanking,
+                    queryParameters: {'tab': tab},
+                  ),
+                ),
             ],
           ),
         ],

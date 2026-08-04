@@ -100,6 +100,30 @@ void main() {
     expect(((served as Map)[url] as Map)['data'], bytes);
   });
 
+  test('clearing drops the store and the native mirror together', () async {
+    await cache.install();
+    await store.writeBytes(
+      'https://static.exptech.dev/api/v2/tiles/radar/1/2/3/4.webp',
+      etag: 'W/"t"',
+      bytes: Uint8List.fromList([1, 2, 3]),
+      contentType: 'image/webp',
+    );
+
+    await store.clear();
+    await cache.evict(const []);
+
+    expect((await store.stats()).rows, 0);
+    final evict = nativeCalls.lastWhere((c) => c.method == 'evictTiles');
+    expect(
+      (evict.arguments as Map)['contains'],
+      isEmpty,
+      reason:
+          'an empty match list drops everything — otherwise the mirror '
+          'keeps serving bytes the store no longer has, and "cleared" would '
+          'not look cleared until the app restarted',
+    );
+  });
+
   test('an empty body is kept for the basemap but dropped elsewhere', () async {
     await cache.install();
     const hole = 'https://lb.exptech.dev/api/v1/map/tiles/7/1/2.pbf';

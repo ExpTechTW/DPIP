@@ -33,6 +33,84 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dataEarthquakeSubtitle => '地震報告';
 
   @override
+  String get dataSectionWeather => '気象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即時観測ランキング';
+
+  @override
+  String get weatherRankingTitle => '観測ランキング';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'データ時刻：$time\n観測点 $count';
+  }
+
+  @override
+  String get weatherRankingEmpty => '並べ替え可能な観測がありません';
+
+  @override
+  String get weatherRankingBy => '並び';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '統合';
+
+  @override
+  String get weatherRankingMergeTown => '町村';
+
+  @override
+  String get weatherRankingMergeCounty => '県市';
+
+  @override
+  String get weatherRankingWind => '風速';
+
+  @override
+  String get weatherRankingGust => '突風';
+
+  @override
+  String get weatherRankingTempExtremes => '気温極値';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日の最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日の最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日較差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '記録時刻 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '現在 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '較差 $value°C';
+  }
+
+  @override
   String get reportListEmpty => '地震報告はありません';
 
   @override
@@ -72,7 +150,49 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterTitle => '絞り込み';
 
   @override
+  String get reportFilterSort => '並び替え';
+
+  @override
+  String get reportFilterSortTime => '時間';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '規模';
+
+  @override
+  String get reportFilterSortDepth => '深さ';
+
+  @override
+  String get reportFilterOrderDesc => '降順';
+
+  @override
+  String get reportFilterOrderAsc => '昇順';
+
+  @override
   String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度の新制と旧制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '気象署は 2020 年 1 月 1 日（台北時間）から新制震度を採用しています。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '旧制（2020 年より前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      '震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 年以降）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度は 0–4、5弱、5強、6弱、6強、7。フィルタは新制に準拠し、それ以前の地震はリストで旧制表記になります。';
 
   @override
   String get reportFilterMagnitude => 'マグニチュード';
@@ -168,12 +288,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'デバッグ情報';
-
-  @override
-  String get developerCopied => 'クリップボードにコピーしました';
-
-  @override
-  String get developerCopyAll => 'すべてコピー';
 
   @override
   String get experimentalFeatures => '実験的機能';
@@ -921,20 +1035,4 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '拡大時に予報点の詳細カードを表示';
-
-  @override
-  String get commonCancel => 'キャンセル';
-
-  @override
-  String get developerClearCache => 'キャッシュを消去';
-
-  @override
-  String get developerClearCacheSubtitle => '保存されたタイルと API 応答を削除します';
-
-  @override
-  String get developerClearCacheConfirm =>
-      '保存された地図タイルと API 応答が削除され、次に必要になったときに再ダウンロードされます。';
-
-  @override
-  String get developerCacheCleared => 'キャッシュを消去しました';
 }

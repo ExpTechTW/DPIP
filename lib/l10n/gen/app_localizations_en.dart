@@ -33,6 +33,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataEarthquakeSubtitle => 'Earthquake reports';
 
   @override
+  String get dataSectionWeather => 'Weather';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Live station rankings';
+
+  @override
+  String get weatherRankingTitle => 'Observation rankings';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Data time: $time\n$count stations';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'No observations to rank';
+
+  @override
+  String get weatherRankingBy => 'Sort by';
+
+  @override
+  String get weatherRankingHighest => 'Highest';
+
+  @override
+  String get weatherRankingLowest => 'Lowest';
+
+  @override
+  String get weatherRankingMergeTo => 'Merge to';
+
+  @override
+  String get weatherRankingMergeTown => 'Township';
+
+  @override
+  String get weatherRankingMergeCounty => 'County';
+
+  @override
+  String get weatherRankingWind => 'Wind speed';
+
+  @override
+  String get weatherRankingGust => 'Gust';
+
+  @override
+  String get weatherRankingTempExtremes => 'Daily extremes';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Daily high';
+
+  @override
+  String get weatherRankingExtremeLow => 'Daily low';
+
+  @override
+  String get weatherRankingExtremeRange => 'Diurnal range';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Recorded at $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Now $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'High $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Low $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Range $value°C';
+  }
+
+  @override
   String get reportListEmpty => 'No earthquake reports';
 
   @override
@@ -73,7 +151,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportFilterTitle => 'Filters';
 
   @override
+  String get reportFilterSort => 'Sort';
+
+  @override
+  String get reportFilterSortTime => 'Time';
+
+  @override
+  String get reportFilterSortIntensity => 'Intensity';
+
+  @override
+  String get reportFilterSortMagnitude => 'Magnitude';
+
+  @override
+  String get reportFilterSortDepth => 'Depth';
+
+  @override
+  String get reportFilterOrderDesc => 'Descending';
+
+  @override
+  String get reportFilterOrderAsc => 'Ascending';
+
+  @override
   String get reportFilterIntensity => 'Intensity';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'Intensity scales';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA changed the felt-intensity scale on 1 Jan 2020 (Taipei time).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Legacy (before 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Only levels 0–7. No 5− / 5+ / 6− / 6+ split.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Current (from 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.';
 
   @override
   String get reportFilterMagnitude => 'Magnitude';
@@ -169,12 +289,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'Debug info';
-
-  @override
-  String get developerCopied => 'Copied to clipboard';
-
-  @override
-  String get developerCopyAll => 'Copy all';
 
   @override
   String get experimentalFeatures => 'Experimental features';
@@ -938,21 +1052,4 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => 'Cancel';
-
-  @override
-  String get developerClearCache => 'Clear cache';
-
-  @override
-  String get developerClearCacheSubtitle =>
-      'Removes stored tiles and API responses';
-
-  @override
-  String get developerClearCacheConfirm =>
-      'Stored map tiles and API responses will be deleted and downloaded again next time they are needed.';
-
-  @override
-  String get developerCacheCleared => 'Cache cleared';
 }

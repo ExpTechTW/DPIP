@@ -33,6 +33,84 @@ class AppLocalizationsFil extends AppLocalizations {
   String get dataEarthquakeSubtitle => 'Mga ulat ng lindol';
 
   @override
+  String get dataSectionWeather => 'Panahon';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Live na ranggo ng istasyon';
+
+  @override
+  String get weatherRankingTitle => 'Mga ranggo ng obserbasyon';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Oras ng datos: $time\n$count istasyon';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'Walang obserbasyon na iraranggo';
+
+  @override
+  String get weatherRankingBy => 'Ayon sa';
+
+  @override
+  String get weatherRankingHighest => 'Pinakamataas';
+
+  @override
+  String get weatherRankingLowest => 'Pinakamababa';
+
+  @override
+  String get weatherRankingMergeTo => 'Pagsamahin';
+
+  @override
+  String get weatherRankingMergeTown => 'Bayan';
+
+  @override
+  String get weatherRankingMergeCounty => 'Lalawigan';
+
+  @override
+  String get weatherRankingWind => 'Bilis ng hangin';
+
+  @override
+  String get weatherRankingGust => 'Bugso';
+
+  @override
+  String get weatherRankingTempExtremes => 'Mga sukdulan ng temperatura';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Pinakamataas ngayong araw';
+
+  @override
+  String get weatherRankingExtremeLow => 'Pinakamababa ngayong araw';
+
+  @override
+  String get weatherRankingExtremeRange => 'Saklaw sa araw';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Naitala noong $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Ngayon $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'Mataas $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Mababa $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Saklaw $value°C';
+  }
+
+  @override
   String get reportListEmpty => 'Walang ulat ng lindol';
 
   @override
@@ -73,7 +151,50 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportFilterTitle => 'Mga filter';
 
   @override
+  String get reportFilterSort => 'Pagkakasunud-sunod';
+
+  @override
+  String get reportFilterSortTime => 'Oras';
+
+  @override
+  String get reportFilterSortIntensity => 'Intensity';
+
+  @override
+  String get reportFilterSortMagnitude => 'Magnitude';
+
+  @override
+  String get reportFilterSortDepth => 'Lalim';
+
+  @override
+  String get reportFilterOrderDesc => 'Pababa';
+
+  @override
+  String get reportFilterOrderAsc => 'Pataas';
+
+  @override
   String get reportFilterIntensity => 'Intensity';
+
+  @override
+  String get reportFilterIntensityInfoTitle =>
+      'Bagong at lumang intensity scale';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'Pinalitan ng CWA ang intensity scale noong 1 Ene 2020 (oras ng Taipei).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Luma (bago ang 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Antas 0–7 lang; walang 5−/5+/6−/6+.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Bago (mula 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Antas 0–4, 5−, 5+, 6−, 6+, 7. Gamit ng filter ang bagong scale; ang mga lumang event ay may legacy label sa listahan.';
 
   @override
   String get reportFilterMagnitude => 'Magnitude';
@@ -169,12 +290,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'Impormasyon sa debug';
-
-  @override
-  String get developerCopied => 'Nakopya sa clipboard';
-
-  @override
-  String get developerCopyAll => 'Kopyahin lahat';
 
   @override
   String get experimentalFeatures => 'Mga experimental na feature';
@@ -940,21 +1055,4 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => 'Kanselahin';
-
-  @override
-  String get developerClearCache => 'I-clear ang cache';
-
-  @override
-  String get developerClearCacheSubtitle =>
-      'Aalisin ang naka-imbak na mga tile at tugon ng API';
-
-  @override
-  String get developerClearCacheConfirm =>
-      'Buburahin ang naka-imbak na mga map tile at tugon ng API, at muling ida-download kapag kailangan sa susunod.';
-
-  @override
-  String get developerCacheCleared => 'Na-clear ang cache';
 }

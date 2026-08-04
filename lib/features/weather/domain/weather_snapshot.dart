@@ -25,8 +25,21 @@ abstract class WeatherObservation with _$WeatherObservation {
     double? windSpeed,
     double? gustSpeed,
     int? gustDirection,
+
+    /// Gust occurrence time, Unix seconds (`gt`; missing → null).
+    int? gustTime,
+
+    /// Today's recorded maximum temperature (`hi`).
     double? high,
+
+    /// When [high] was recorded, Unix seconds (`hit`; missing → null).
+    int? highTime,
+
+    /// Today's recorded minimum temperature (`lo`).
     double? low,
+
+    /// When [low] was recorded, Unix seconds (`lot`; missing → null).
+    int? lowTime,
   }) = _WeatherObservation;
 }
 
@@ -52,8 +65,11 @@ abstract class WeatherSnapshot with _$WeatherSnapshot {
     final wspd = column('wspd');
     final gspd = column('gspd');
     final gdir = column('gdir');
+    final gt = column('gt');
     final hi = column('hi');
     final lo = column('lo');
+    final hit = column('hit');
+    final lot = column('lot');
     return WeatherSnapshot(
       time: (json['time'] as num).toInt(),
       stations: [
@@ -68,8 +84,11 @@ abstract class WeatherSnapshot with _$WeatherSnapshot {
             windSpeed: MeteorDecode.real(wspd.elementAtOrNull(i)),
             gustSpeed: MeteorDecode.real(gspd.elementAtOrNull(i)),
             gustDirection: MeteorDecode.integer(gdir.elementAtOrNull(i)),
+            gustTime: MeteorDecode.unixSeconds(gt.elementAtOrNull(i)),
             high: MeteorDecode.real(hi.elementAtOrNull(i)),
+            highTime: MeteorDecode.unixSeconds(hit.elementAtOrNull(i)),
             low: MeteorDecode.real(lo.elementAtOrNull(i)),
+            lowTime: MeteorDecode.unixSeconds(lot.elementAtOrNull(i)),
           ),
       ],
     );

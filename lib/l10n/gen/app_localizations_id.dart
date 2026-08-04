@@ -33,6 +33,84 @@ class AppLocalizationsId extends AppLocalizations {
   String get dataEarthquakeSubtitle => 'Laporan gempa';
 
   @override
+  String get dataSectionWeather => 'Cuaca';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Peringkat stasiun langsung';
+
+  @override
+  String get weatherRankingTitle => 'Peringkat observasi';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Waktu data: $time\n$count stasiun';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'Tidak ada observasi untuk diurutkan';
+
+  @override
+  String get weatherRankingBy => 'Urut';
+
+  @override
+  String get weatherRankingHighest => 'Tertinggi';
+
+  @override
+  String get weatherRankingLowest => 'Terendah';
+
+  @override
+  String get weatherRankingMergeTo => 'Gabung';
+
+  @override
+  String get weatherRankingMergeTown => 'Kecamatan';
+
+  @override
+  String get weatherRankingMergeCounty => 'Kabupaten';
+
+  @override
+  String get weatherRankingWind => 'Kecepatan angin';
+
+  @override
+  String get weatherRankingGust => 'Hembusan';
+
+  @override
+  String get weatherRankingTempExtremes => 'Ekstrem suhu';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Maksimum hari ini';
+
+  @override
+  String get weatherRankingExtremeLow => 'Minimum hari ini';
+
+  @override
+  String get weatherRankingExtremeRange => 'Rentang harian';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Tercatat pukul $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Sekarang $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'Maks $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Min $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Rentang $value°C';
+  }
+
+  @override
   String get reportListEmpty => 'Tidak ada laporan gempa';
 
   @override
@@ -73,7 +151,49 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterTitle => 'Filter';
 
   @override
+  String get reportFilterSort => 'Urutan';
+
+  @override
+  String get reportFilterSortTime => 'Waktu';
+
+  @override
+  String get reportFilterSortIntensity => 'Intensitas';
+
+  @override
+  String get reportFilterSortMagnitude => 'Magnitudo';
+
+  @override
+  String get reportFilterSortDepth => 'Kedalaman';
+
+  @override
+  String get reportFilterOrderDesc => 'Menurun';
+
+  @override
+  String get reportFilterOrderAsc => 'Menaik';
+
+  @override
   String get reportFilterIntensity => 'Intensitas';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'Skala intensitas baru & lama';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA mengganti skala intensitas pada 1 Jan 2020 (waktu Taipei).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Lama (sebelum 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Hanya tingkat 0–7, tanpa pemisahan 5−/5+/6−/6+.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Baru (sejak 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Tingkat 0–4, 5−, 5+, 6−, 6+, 7. Slider filter memakai skala baru; peristiwa lama tetap memakai label lama di daftar.';
 
   @override
   String get reportFilterMagnitude => 'Magnitudo';
@@ -169,12 +289,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'Info debug';
-
-  @override
-  String get developerCopied => 'Disalin ke papan klip';
-
-  @override
-  String get developerCopyAll => 'Salin semua';
 
   @override
   String get experimentalFeatures => 'Fitur eksperimental';
@@ -940,21 +1054,4 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => 'Batal';
-
-  @override
-  String get developerClearCache => 'Hapus cache';
-
-  @override
-  String get developerClearCacheSubtitle =>
-      'Menghapus tile dan respons API yang tersimpan';
-
-  @override
-  String get developerClearCacheConfirm =>
-      'Tile peta dan respons API yang tersimpan akan dihapus dan diunduh ulang saat dibutuhkan berikutnya.';
-
-  @override
-  String get developerCacheCleared => 'Cache dihapus';
 }

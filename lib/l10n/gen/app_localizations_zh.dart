@@ -33,6 +33,84 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataEarthquakeSubtitle => '地震報告';
 
   @override
+  String get dataSectionWeather => '氣象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即時觀測排行';
+
+  @override
+  String get weatherRankingTitle => '觀測排行';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '資料時間：$time\n共 $count 觀測點';
+  }
+
+  @override
+  String get weatherRankingEmpty => '目前沒有可排序的觀測';
+
+  @override
+  String get weatherRankingBy => '依';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '合併至';
+
+  @override
+  String get weatherRankingMergeTown => '鄉鎮';
+
+  @override
+  String get weatherRankingMergeCounty => '縣市';
+
+  @override
+  String get weatherRankingWind => '風速';
+
+  @override
+  String get weatherRankingGust => '陣風';
+
+  @override
+  String get weatherRankingTempExtremes => '溫度極值';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日溫差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '記錄於 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '當下 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '溫差 $value°C';
+  }
+
+  @override
   String get reportListEmpty => '目前沒有地震報告';
 
   @override
@@ -72,7 +150,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportFilterTitle => '篩選';
 
   @override
+  String get reportFilterSort => '排序方式';
+
+  @override
+  String get reportFilterSortTime => '時間';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '規模';
+
+  @override
+  String get reportFilterSortDepth => '深度';
+
+  @override
+  String get reportFilterOrderDesc => '降序';
+
+  @override
+  String get reportFilterOrderAsc => '升序';
+
+  @override
   String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度新制與舊制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '中央氣象署自 2020 年 1 月 1 日（臺北時間）起改用新制震度。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '舊制（2020 以前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度為 0–4、5弱、5強、6弱、6強、7。篩選滑桿依新制；列表中較早的地震會以舊制標示顯示。';
 
   @override
   String get reportFilterMagnitude => '規模';
@@ -168,12 +287,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moreDeveloper => '除錯資訊';
-
-  @override
-  String get developerCopied => '已複製到剪貼簿';
-
-  @override
-  String get developerCopyAll => '全部複製';
 
   @override
   String get experimentalFeatures => '實驗性功能';
@@ -917,21 +1030,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
-
-  @override
-  String get commonCancel => '取消';
-
-  @override
-  String get developerClearCache => '清除快取';
-
-  @override
-  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
-
-  @override
-  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
-
-  @override
-  String get developerCacheCleared => '已清除快取';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -961,6 +1059,84 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get dataEarthquakeSubtitle => '地震报告';
+
+  @override
+  String get dataSectionWeather => '气象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即时观测排行';
+
+  @override
+  String get weatherRankingTitle => '观测排行';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '资料时间：$time\n共 $count 观测点';
+  }
+
+  @override
+  String get weatherRankingEmpty => '目前没有可排序的观测';
+
+  @override
+  String get weatherRankingBy => '依';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '合并至';
+
+  @override
+  String get weatherRankingMergeTown => '乡镇';
+
+  @override
+  String get weatherRankingMergeCounty => '县市';
+
+  @override
+  String get weatherRankingWind => '风速';
+
+  @override
+  String get weatherRankingGust => '阵风';
+
+  @override
+  String get weatherRankingTempExtremes => '温度极值';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日温差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '记录于 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '当下 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '温差 $value°C';
+  }
 
   @override
   String get reportListEmpty => '当前没有地震报告';
@@ -1002,7 +1178,48 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportFilterTitle => '筛选';
 
   @override
+  String get reportFilterSort => '排序方式';
+
+  @override
+  String get reportFilterSortTime => '时间';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '规模';
+
+  @override
+  String get reportFilterSortDepth => '深度';
+
+  @override
+  String get reportFilterOrderDesc => '降序';
+
+  @override
+  String get reportFilterOrderAsc => '升序';
+
+  @override
   String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度新制与旧制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '中央气象署自 2020 年 1 月 1 日（台北时间）起改用新制震度。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '旧制（2020 以前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody => '震度仅 0–7，没有 5弱／5强／6弱／6强。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度为 0–4、5弱、5强、6弱、6强、7。筛选滑杆依新制；列表中较早的地震会以旧制标示显示。';
 
   @override
   String get reportFilterMagnitude => '规模';
@@ -1098,12 +1315,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreDeveloper => '调试信息';
-
-  @override
-  String get developerCopied => '已复制到剪贴板';
-
-  @override
-  String get developerCopyAll => '全部复制';
 
   @override
   String get experimentalFeatures => '实验性功能';
@@ -1847,21 +2058,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大时显示预测点详细卡片';
-
-  @override
-  String get commonCancel => '取消';
-
-  @override
-  String get developerClearCache => '清除缓存';
-
-  @override
-  String get developerClearCacheSubtitle => '移除已存储的图块与 API 响应';
-
-  @override
-  String get developerClearCacheConfirm => '已存储的地图图块与 API 响应将被删除，下次需要时会重新下载。';
-
-  @override
-  String get developerCacheCleared => '已清除缓存';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -1891,6 +2087,84 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get dataSectionWeather => '氣象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即時觀測排行';
+
+  @override
+  String get weatherRankingTitle => '觀測排行';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '資料時間：$time\n共 $count 觀測點';
+  }
+
+  @override
+  String get weatherRankingEmpty => '目前沒有可排序的觀測';
+
+  @override
+  String get weatherRankingBy => '依';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '合併至';
+
+  @override
+  String get weatherRankingMergeTown => '鄉鎮';
+
+  @override
+  String get weatherRankingMergeCounty => '縣市';
+
+  @override
+  String get weatherRankingWind => '風速';
+
+  @override
+  String get weatherRankingGust => '陣風';
+
+  @override
+  String get weatherRankingTempExtremes => '溫度極值';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日溫差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '記錄於 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '當下 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '溫差 $value°C';
+  }
 
   @override
   String get reportListEmpty => '目前沒有地震報告';
@@ -1932,7 +2206,48 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportFilterTitle => '篩選';
 
   @override
+  String get reportFilterSort => '排序方式';
+
+  @override
+  String get reportFilterSortTime => '時間';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '規模';
+
+  @override
+  String get reportFilterSortDepth => '深度';
+
+  @override
+  String get reportFilterOrderDesc => '降序';
+
+  @override
+  String get reportFilterOrderAsc => '升序';
+
+  @override
   String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度新制與舊制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '中央氣象署自 2020 年 1 月 1 日（臺北時間）起改用新制震度。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '舊制（2020 以前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度為 0–4、5弱、5強、6弱、6強、7。篩選滑桿依新制；列表中較早的地震會以舊制標示顯示。';
 
   @override
   String get reportFilterMagnitude => '規模';
@@ -2028,12 +2343,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moreDeveloper => '偵錯資訊';
-
-  @override
-  String get developerCopied => '已複製到剪貼簿';
-
-  @override
-  String get developerCopyAll => '全部複製';
 
   @override
   String get experimentalFeatures => '實驗性功能';
@@ -2777,21 +3086,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
-
-  @override
-  String get commonCancel => '取消';
-
-  @override
-  String get developerClearCache => '清除快取';
-
-  @override
-  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
-
-  @override
-  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
-
-  @override
-  String get developerCacheCleared => '已清除快取';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -2821,6 +3115,84 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get dataSectionWeather => '氣象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即時觀測排行';
+
+  @override
+  String get weatherRankingTitle => '觀測排行';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '資料時間：$time\n共 $count 觀測點';
+  }
+
+  @override
+  String get weatherRankingEmpty => '目前沒有可排序的觀測';
+
+  @override
+  String get weatherRankingBy => '依';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '合併至';
+
+  @override
+  String get weatherRankingMergeTown => '鄉鎮';
+
+  @override
+  String get weatherRankingMergeCounty => '縣市';
+
+  @override
+  String get weatherRankingWind => '風速';
+
+  @override
+  String get weatherRankingGust => '陣風';
+
+  @override
+  String get weatherRankingTempExtremes => '溫度極值';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日溫差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '記錄於 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '當下 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '溫差 $value°C';
+  }
 
   @override
   String get reportListEmpty => '目前沒有地震報告';
@@ -2862,7 +3234,48 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get reportFilterTitle => '篩選';
 
   @override
+  String get reportFilterSort => '排序方式';
+
+  @override
+  String get reportFilterSortTime => '時間';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '規模';
+
+  @override
+  String get reportFilterSortDepth => '深度';
+
+  @override
+  String get reportFilterOrderDesc => '降序';
+
+  @override
+  String get reportFilterOrderAsc => '升序';
+
+  @override
   String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度新制與舊制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '中央氣象署自 2020 年 1 月 1 日（臺北時間）起改用新制震度。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '舊制（2020 以前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度為 0–4、5弱、5強、6弱、6強、7。篩選滑桿依新制；列表中較早的地震會以舊制標示顯示。';
 
   @override
   String get reportFilterMagnitude => '規模';
@@ -2958,12 +3371,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreDeveloper => '除錯資訊';
-
-  @override
-  String get developerCopied => '已複製到剪貼簿';
-
-  @override
-  String get developerCopyAll => '全部複製';
 
   @override
   String get experimentalFeatures => '實驗性功能';
@@ -3707,19 +4114,4 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
-
-  @override
-  String get commonCancel => '取消';
-
-  @override
-  String get developerClearCache => '清除快取';
-
-  @override
-  String get developerClearCacheSubtitle => '移除已儲存的圖磚與 API 回應';
-
-  @override
-  String get developerClearCacheConfirm => '已儲存的地圖圖磚與 API 回應將被刪除，下次需要時會重新下載。';
-
-  @override
-  String get developerCacheCleared => '已清除快取';
 }

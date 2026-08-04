@@ -33,6 +33,84 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dataEarthquakeSubtitle => '지진 보고서';
 
   @override
+  String get dataSectionWeather => '기상';
+
+  @override
+  String get dataWeatherRankingSubtitle => '실시간 관측 순위';
+
+  @override
+  String get weatherRankingTitle => '관측 순위';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '자료 시각: $time\n관측점 $count';
+  }
+
+  @override
+  String get weatherRankingEmpty => '정렬할 관측이 없습니다';
+
+  @override
+  String get weatherRankingBy => '정렬';
+
+  @override
+  String get weatherRankingHighest => '최고';
+
+  @override
+  String get weatherRankingLowest => '최저';
+
+  @override
+  String get weatherRankingMergeTo => '병합';
+
+  @override
+  String get weatherRankingMergeTown => '향진';
+
+  @override
+  String get weatherRankingMergeCounty => '현시';
+
+  @override
+  String get weatherRankingWind => '풍속';
+
+  @override
+  String get weatherRankingGust => '돌풍';
+
+  @override
+  String get weatherRankingTempExtremes => '기온 극값';
+
+  @override
+  String get weatherRankingExtremeHigh => '오늘 최고';
+
+  @override
+  String get weatherRankingExtremeLow => '오늘 최저';
+
+  @override
+  String get weatherRankingExtremeRange => '일교차';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '기록 시각 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '현재 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '최고 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '최저 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '일교차 $value°C';
+  }
+
+  @override
   String get reportListEmpty => '지진 보고서가 없습니다';
 
   @override
@@ -72,7 +150,49 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterTitle => '필터';
 
   @override
+  String get reportFilterSort => '정렬';
+
+  @override
+  String get reportFilterSortTime => '시간';
+
+  @override
+  String get reportFilterSortIntensity => '진도';
+
+  @override
+  String get reportFilterSortMagnitude => '규모';
+
+  @override
+  String get reportFilterSortDepth => '깊이';
+
+  @override
+  String get reportFilterOrderDesc => '내림차순';
+
+  @override
+  String get reportFilterOrderAsc => '오름차순';
+
+  @override
   String get reportFilterIntensity => '진도';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '진도 신제·구제';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '기상서는 2020년 1월 1일(타이베이 시간)부터 신제 진도를 사용합니다.';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '구제(2020년 이전)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      '진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '신제(2020년 이후)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '진도는 0–4, 5약, 5강, 6약, 6강, 7입니다. 필터는 신제를 따르며, 이전 지진은 목록에서 구제 표기로 표시됩니다.';
 
   @override
   String get reportFilterMagnitude => '규모';
@@ -168,12 +288,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moreDeveloper => '디버그 정보';
-
-  @override
-  String get developerCopied => '클립보드에 복사되었습니다';
-
-  @override
-  String get developerCopyAll => '모두 복사';
 
   @override
   String get experimentalFeatures => '실험적 기능';
@@ -929,20 +1043,4 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => '취소';
-
-  @override
-  String get developerClearCache => '캐시 지우기';
-
-  @override
-  String get developerClearCacheSubtitle => '저장된 타일과 API 응답을 삭제합니다';
-
-  @override
-  String get developerClearCacheConfirm =>
-      '저장된 지도 타일과 API 응답이 삭제되며, 다음에 필요할 때 다시 다운로드됩니다.';
-
-  @override
-  String get developerCacheCleared => '캐시를 지웠습니다';
 }

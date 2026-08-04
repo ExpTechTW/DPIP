@@ -8,6 +8,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
+import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -19,31 +20,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-/// Accumulation windows exposed by `/api/v5/meteor/rain` (field-array keys).
-enum RainInterval {
-  now,
-  min10,
-  hour1,
-  hour3,
-  hour6,
-  hour12,
-  hour24,
-  day2,
-  day3;
-
-  /// Wire / GeoJSON property key (matches the API column name).
-  String get apiKey => switch (this) {
-    RainInterval.now => 'now',
-    RainInterval.min10 => '10m',
-    RainInterval.hour1 => '1h',
-    RainInterval.hour3 => '3h',
-    RainInterval.hour6 => '6h',
-    RainInterval.hour12 => '12h',
-    RainInterval.hour24 => '24h',
-    RainInterval.day2 => '2d',
-    RainInterval.day3 => '3d',
-  };
-
+/// Localised labels for [RainInterval] (domain stays Flutter-free).
+extension RainIntervalL10n on RainInterval {
   String label(AppLocalizations l10n) => switch (this) {
     RainInterval.now => l10n.rainIntervalNow,
     RainInterval.min10 => l10n.rainInterval10m,
@@ -54,18 +32,6 @@ enum RainInterval {
     RainInterval.hour24 => l10n.rainInterval24h,
     RainInterval.day2 => l10n.rainInterval2d,
     RainInterval.day3 => l10n.rainInterval3d,
-  };
-
-  double? valueOf(RainObservation observation) => switch (this) {
-    RainInterval.now => observation.now,
-    RainInterval.min10 => observation.min10,
-    RainInterval.hour1 => observation.hour1,
-    RainInterval.hour3 => observation.hour3,
-    RainInterval.hour6 => observation.hour6,
-    RainInterval.hour12 => observation.hour12,
-    RainInterval.hour24 => observation.hour24,
-    RainInterval.day2 => observation.day2,
-    RainInterval.day3 => observation.day3,
   };
 }
 

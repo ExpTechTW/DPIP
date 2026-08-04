@@ -22,8 +22,9 @@ void main() {
     final s = await store().stats();
     expect(s.last24h, 0);
     expect(s.last7d, 0);
-    expect(s.total, 0);
-    expect(s.hitRate, 0);
+    expect(s.total24h, 0);
+    expect(s.hitRate24h, 0);
+    expect(s.hitRate7d, 0);
   });
 
   test('records downloads, hits, misses, and saved bytes', () async {
@@ -35,42 +36,44 @@ void main() {
     final stats = await s.stats();
     expect(stats.last24h, 1500);
     expect(stats.last7d, 1500);
-    expect(stats.misses, 2);
-    expect(stats.hits, 1);
+    expect(stats.misses24h, 2);
+    expect(stats.hits24h, 1);
     expect(stats.saved24h, 800);
     expect(stats.saved7d, 800);
-    expect(stats.hitRate, closeTo(1 / 3, 1e-9));
+    expect(stats.hitRate24h, closeTo(1 / 3, 1e-9));
   });
 
-  test('24h and 7d windows exclude older buckets', () async {
+  test('every figure windows, including the hit rate', () async {
     final s = store();
-    await s.record(down: 1000, hit: true, saved: 400); // day 0
+    // Day 0: one hit, one miss → 50%.
+    await s.record(down: 1000, hit: true, saved: 400);
+    await s.record(down: 0, hit: false, saved: 0);
 
     now = now.add(const Duration(days: 2)); // day 2
-    await s.record(down: 2000, hit: true, saved: 700);
+    // Day 2: three hits, one miss → 75%.
+    for (var i = 0; i < 3; i++) {
+      await s.record(down: 0, hit: true, saved: 100);
+    }
+    await s.record(down: 2000, hit: false, saved: 0);
 
     final stats = await s.stats();
+    expect(stats.last24h, 2000, reason: 'only day 2 is within 24h');
+    expect(stats.last7d, 3000, reason: 'both days are within 7 days');
+    expect(stats.saved24h, 300);
+    expect(stats.saved7d, 700);
     expect(
-      stats.last24h,
-      2000,
-      reason: 'only the day-2 download is within 24h',
-    );
-    expect(stats.last7d, 3000, reason: 'both are within 7 days');
-    expect(
-      stats.saved24h,
-      700,
+      stats.hitRate24h,
+      closeTo(0.75, 1e-9),
       reason:
-          'saved bytes window exactly like downloaded ones, so the two '
-          'can be read against each other',
+          'the hit rate windows like everything else, so a bad stretch today '
+          'is not hidden by a good week',
     );
-    expect(stats.saved7d, 1100);
-    expect(stats.hits, 2, reason: 'cumulative totals ignore the window');
+    expect(stats.hitRate7d, closeTo(4 / 6, 1e-9));
   });
 
-  test('a pre-existing database gains the saved column on open', () async {
-    // Rebuild the shape shipped before saved bytes were windowed.
+  test('a pre-existing database is migrated on open', () async {
+    // Rebuild the shape shipped before anything but downloads was windowed.
     await db.execute('DROP TABLE net_bucket');
-    await db.execute('DROP TABLE net_total');
     await db.execute(
       'CREATE TABLE net_bucket (hour INTEGER PRIMARY KEY, '
       'down INTEGER NOT NULL DEFAULT 0)',
@@ -87,12 +90,16 @@ void main() {
 
     final stats = await s.stats();
     expect(stats.saved24h, 60);
+    expect(stats.hits24h, 1);
     expect(
-      await db.query('net_total', where: 'k = ?', whereArgs: ['saved']),
+      await db.rawQuery(
+        "SELECT name FROM sqlite_master "
+        "WHERE type='table' AND name='net_total'",
+      ),
       isEmpty,
       reason:
-          'a lifetime total cannot be windowed after the fact, and leaving '
-          'it would be a second contradictory answer',
+          'lifetime totals cannot be windowed after the fact, and leaving them '
+          'would be a second contradictory answer',
     );
   });
 
@@ -107,10 +114,36 @@ void main() {
 
       final stats = await s.stats();
       expect(stats.last7d, 100, reason: 'the day-0 bucket was swept');
-      // Cumulative totals persist even after bucket eviction.
-      expect(stats.misses, 2);
+      expect(stats.misses7d, 1, reason: 'its counters went with it');
     },
   );
+
+  test('clear drops recorded and still-buffered usage alike', () async {
+    final s = store();
+    await s.record(down: 1000, hit: true, saved: 400);
+    await s.stats(); // force the flush, so this much is on disk
+    await s.record(down: 500, hit: false, saved: 0); // still buffered
+
+    await s.clear();
+
+    final stats = await s.stats();
+    expect(stats.last24h, 0);
+    expect(stats.saved24h, 0);
+    expect(
+      stats.total24h,
+      0,
+      reason:
+          'a hit rate beside an emptied store would describe a cache that '
+          'no longer exists',
+    );
+    expect(
+      await db.query('net_bucket'),
+      isEmpty,
+      reason:
+          'the buffered aggregate must go too, or the counters reappear a '
+          'second later when it flushes',
+    );
+  });
 
   test('coalesces many records into one SQLite flush', () async {
     final s = NetworkUsageStore(
@@ -122,12 +155,11 @@ void main() {
     for (var i = 0; i < 50; i++) {
       await s.record(down: 10, hit: true, saved: 5);
     }
-    // Still buffered — totals table empty until flush/stats.
-    final rows = await db.query('net_total');
-    expect(rows, isEmpty);
+    // Still buffered — the table is empty until flush/stats.
+    expect(await db.query('net_bucket'), isEmpty);
 
     final stats = await s.stats();
-    expect(stats.hits, 50);
+    expect(stats.hits24h, 50);
     expect(stats.saved24h, 250);
     expect(stats.last24h, 500);
   });

@@ -2,7 +2,6 @@ import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
-import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -67,16 +66,5 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   }
 
   @override
-  Widget buildLegend(BuildContext context) => const MapLegendCard(
-    child: ColorScaleLegend(
-      unit: 'K',
-      stops: [
-        (180, '#FFFFFF'),
-        (210, '#CCCCCC'),
-        (240, '#888888'),
-        (270, '#444444'),
-        (300, '#000000'),
-      ],
-    ),
-  );
+  Widget buildLegend(BuildContext context) => const SizedBox.shrink();
 }

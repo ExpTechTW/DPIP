@@ -33,6 +33,84 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dataEarthquakeSubtitle => 'Báo cáo động đất';
 
   @override
+  String get dataSectionWeather => 'Thời tiết';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Xếp hạng trạm trực tiếp';
+
+  @override
+  String get weatherRankingTitle => 'Xếp hạng quan trắc';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Thời gian: $time\n$count trạm';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'Không có quan trắc để xếp hạng';
+
+  @override
+  String get weatherRankingBy => 'Theo';
+
+  @override
+  String get weatherRankingHighest => 'Cao nhất';
+
+  @override
+  String get weatherRankingLowest => 'Thấp nhất';
+
+  @override
+  String get weatherRankingMergeTo => 'Gộp';
+
+  @override
+  String get weatherRankingMergeTown => 'Xã/trấn';
+
+  @override
+  String get weatherRankingMergeCounty => 'Huyện/thành';
+
+  @override
+  String get weatherRankingWind => 'Tốc độ gió';
+
+  @override
+  String get weatherRankingGust => 'Gió giật';
+
+  @override
+  String get weatherRankingTempExtremes => 'Cực trị nhiệt độ';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Cao nhất ngày';
+
+  @override
+  String get weatherRankingExtremeLow => 'Thấp nhất ngày';
+
+  @override
+  String get weatherRankingExtremeRange => 'Biên độ ngày';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Ghi nhận lúc $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Hiện tại $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'Cao $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Thấp $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Biên độ $value°C';
+  }
+
+  @override
   String get reportListEmpty => 'Không có báo cáo động đất';
 
   @override
@@ -72,7 +150,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportFilterTitle => 'Bộ lọc';
 
   @override
+  String get reportFilterSort => 'Sắp xếp';
+
+  @override
+  String get reportFilterSortTime => 'Thời gian';
+
+  @override
+  String get reportFilterSortIntensity => 'Cường độ';
+
+  @override
+  String get reportFilterSortMagnitude => 'Độ lớn';
+
+  @override
+  String get reportFilterSortDepth => 'Độ sâu';
+
+  @override
+  String get reportFilterOrderDesc => 'Giảm dần';
+
+  @override
+  String get reportFilterOrderAsc => 'Tăng dần';
+
+  @override
   String get reportFilterIntensity => 'Cường độ';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'Thang cường độ mới và cũ';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA đổi thang cường độ từ 1/1/2020 (giờ Đài Bắc).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Cũ (trước 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Chỉ có mức 0–7, không tách 5−/5+/6−/6+.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Mới (từ 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Các mức 0–4, 5−, 5+, 6−, 6+, 7. Thanh lọc dùng thang mới; sự kiện cũ vẫn hiện nhãn cũ trong danh sách.';
 
   @override
   String get reportFilterMagnitude => 'Độ lớn';
@@ -168,12 +288,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'Thông tin gỡ lỗi';
-
-  @override
-  String get developerCopied => 'Đã sao chép vào bảng nhớ tạm';
-
-  @override
-  String get developerCopyAll => 'Sao chép tất cả';
 
   @override
   String get experimentalFeatures => 'Tính năng thử nghiệm';
@@ -938,21 +1052,4 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => 'Huỷ';
-
-  @override
-  String get developerClearCache => 'Xoá bộ nhớ đệm';
-
-  @override
-  String get developerClearCacheSubtitle =>
-      'Xoá các ô bản đồ và phản hồi API đã lưu';
-
-  @override
-  String get developerClearCacheConfirm =>
-      'Các ô bản đồ và phản hồi API đã lưu sẽ bị xoá và được tải lại khi cần vào lần sau.';
-
-  @override
-  String get developerCacheCleared => 'Đã xoá bộ nhớ đệm';
 }

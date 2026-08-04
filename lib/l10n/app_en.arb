@@ -32,6 +32,127 @@
   "@dataEarthquakeSubtitle": {
     "description": "Subtitle under the Earthquake tile on the Data hub"
   },
+  "dataSectionWeather": "Weather",
+  "@dataSectionWeather": {
+    "description": "Section header on the Data hub for weather observation rankings"
+  },
+  "dataWeatherRankingSubtitle": "Live station rankings",
+  "@dataWeatherRankingSubtitle": {
+    "description": "Subtitle under weather ranking tiles on the Data hub"
+  },
+  "weatherRankingTitle": "Observation rankings",
+  "@weatherRankingTitle": {
+    "description": "App bar title for the weather station ranking page"
+  },
+  "weatherRankingMeta": "Data time: {time}\n{count} stations",
+  "@weatherRankingMeta": {
+    "description": "Snapshot time and station count above a ranking list",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherRankingEmpty": "No observations to rank",
+  "@weatherRankingEmpty": {
+    "description": "Empty state when a ranking list has no rows after filters"
+  },
+  "weatherRankingBy": "Sort by",
+  "@weatherRankingBy": {
+    "description": "Label before highest/lowest (or desc/asc) chips on ranking"
+  },
+  "weatherRankingHighest": "Highest",
+  "@weatherRankingHighest": {
+    "description": "Chip to rank temperature descending"
+  },
+  "weatherRankingLowest": "Lowest",
+  "@weatherRankingLowest": {
+    "description": "Chip to rank temperature ascending"
+  },
+  "weatherRankingMergeTo": "Merge to",
+  "@weatherRankingMergeTo": {
+    "description": "Label before township/county merge chips on ranking"
+  },
+  "weatherRankingMergeTown": "Township",
+  "@weatherRankingMergeTown": {
+    "description": "Chip to keep one extreme station per township"
+  },
+  "weatherRankingMergeCounty": "County",
+  "@weatherRankingMergeCounty": {
+    "description": "Chip to keep one extreme station per county"
+  },
+  "weatherRankingWind": "Wind speed",
+  "@weatherRankingWind": {
+    "description": "Ranking tab/tile for sustained wind speed"
+  },
+  "weatherRankingGust": "Gust",
+  "@weatherRankingGust": {
+    "description": "Ranking tab/tile for peak gust speed"
+  },
+  "weatherRankingTempExtremes": "Daily extremes",
+  "@weatherRankingTempExtremes": {
+    "description": "Ranking tab for recorded daily high/low/range (not current temp)"
+  },
+  "weatherRankingExtremeHigh": "Daily high",
+  "@weatherRankingExtremeHigh": {
+    "description": "Chip to rank by recorded daily maximum temperature"
+  },
+  "weatherRankingExtremeLow": "Daily low",
+  "@weatherRankingExtremeLow": {
+    "description": "Chip to rank by recorded daily minimum temperature"
+  },
+  "weatherRankingExtremeRange": "Diurnal range",
+  "@weatherRankingExtremeRange": {
+    "description": "Chip to rank by daily high minus low"
+  },
+  "weatherRankingRecordedAt": "Recorded at {time}",
+  "@weatherRankingRecordedAt": {
+    "description": "Occurrence time for a gust or daily extreme",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisCurrent": "Now {value}°C",
+  "@weatherRankingAnalysisCurrent": {
+    "description": "Current temperature fragment in an extremes analysis line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisHigh": "High {value}",
+  "@weatherRankingAnalysisHigh": {
+    "description": "Daily high fragment; value may include clock time",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisLow": "Low {value}",
+  "@weatherRankingAnalysisLow": {
+    "description": "Daily low fragment; value may include clock time",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisRange": "Range {value}°C",
+  "@weatherRankingAnalysisRange": {
+    "description": "Diurnal range fragment in an extremes analysis line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reportListEmpty": "No earthquake reports",
   "@reportListEmpty": {
     "description": "Empty state when the report catalogue has no rows"
@@ -94,10 +215,50 @@
   "@reportFilterTitle": {
     "description": "Title of the earthquake report filter sheet"
   },
+  "reportFilterSort": "Sort",
+  "@reportFilterSort": {
+    "description": "Section title for report list sort field + order"
+  },
+  "reportFilterSortTime": "Time",
+  "@reportFilterSortTime": {
+    "description": "Sort reports by origin time"
+  },
+  "reportFilterSortIntensity": "Intensity",
+  "@reportFilterSortIntensity": {
+    "description": "Sort reports by max intensity"
+  },
+  "reportFilterSortMagnitude": "Magnitude",
+  "@reportFilterSortMagnitude": {
+    "description": "Sort reports by magnitude"
+  },
+  "reportFilterSortDepth": "Depth",
+  "@reportFilterSortDepth": {
+    "description": "Sort reports by hypocentral depth"
+  },
+  "reportFilterOrderDesc": "Descending",
+  "@reportFilterOrderDesc": {
+    "description": "Sort order: newest / largest first"
+  },
+  "reportFilterOrderAsc": "Ascending",
+  "@reportFilterOrderAsc": {
+    "description": "Sort order: oldest / smallest first"
+  },
   "reportFilterIntensity": "Intensity",
   "@reportFilterIntensity": {
     "description": "Label for the felt-intensity range filter"
   },
+  "reportFilterIntensityInfoTitle": "Intensity scales",
+  "@reportFilterIntensityInfoTitle": {
+    "description": "Title of the dialog explaining CWA 新制 vs 舊制 intensity"
+  },
+  "reportFilterIntensityInfoIntro": "CWA changed the felt-intensity scale on 1 Jan 2020 (Taipei time).",
+  "@reportFilterIntensityInfoIntro": {
+    "description": "Intro paragraph for the intensity-scale info dialog"
+  },
+  "reportFilterIntensityInfoLegacyTitle": "Legacy (before 2020)",
+  "reportFilterIntensityInfoLegacyBody": "Only levels 0–7. No 5− / 5+ / 6− / 6+ split.",
+  "reportFilterIntensityInfoModernTitle": "Current (from 2020)",
+  "reportFilterIntensityInfoModernBody": "Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.",
   "reportFilterMagnitude": "Magnitude",
   "@reportFilterMagnitude": {
     "description": "Label for the magnitude range filter"
@@ -239,14 +400,6 @@
   "moreDeveloper": "Debug info",
   "@moreDeveloper": {
     "description": "More-menu entry / title for the developer diagnostics page"
-  },
-  "developerCopied": "Copied to clipboard",
-  "@developerCopied": {
-    "description": "Snackbar shown after copying a diagnostic value"
-  },
-  "developerCopyAll": "Copy all",
-  "@developerCopyAll": {
-    "description": "Tooltip for the copy-all action on the developer page"
   },
   "experimentalFeatures": "Experimental features",
   "@experimentalFeatures": {
@@ -1232,25 +1385,5 @@
   "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
   "@typhoonOverlayForecastCalloutsTooltip": {
     "description": "Tooltip for the forecast callouts overlay toggle"
-  },
-  "commonCancel": "Cancel",
-  "@commonCancel": {
-    "description": "Generic cancel action in a dialog"
-  },
-  "developerClearCache": "Clear cache",
-  "@developerClearCache": {
-    "description": "Developer-page action that empties the app HTTP/tile cache"
-  },
-  "developerClearCacheSubtitle": "Removes stored tiles and API responses",
-  "@developerClearCacheSubtitle": {
-    "description": "Explains what the clear-cache action removes"
-  },
-  "developerClearCacheConfirm": "Stored map tiles and API responses will be deleted and downloaded again next time they are needed.",
-  "@developerClearCacheConfirm": {
-    "description": "Confirmation dialog body for clearing the cache"
-  },
-  "developerCacheCleared": "Cache cleared",
-  "@developerCacheCleared": {
-    "description": "Snackbar shown after the cache has been cleared"
   }
 }

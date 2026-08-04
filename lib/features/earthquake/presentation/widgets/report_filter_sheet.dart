@@ -105,6 +105,17 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
     }(),
   );
   late DateTimeRange? _dates = _datesFromQuery(widget.initial);
+  late String _sort = widget.initial.sort ?? _sortDefault;
+  late String _order = widget.initial.order ?? _orderDefault;
+
+  static const String _sortDefault = 'time';
+  static const String _orderDefault = 'desc';
+  static const List<String> _sortKeys = [
+    'time',
+    'intensity',
+    'magnitude',
+    'depth',
+  ];
 
   @override
   void dispose() {
@@ -157,6 +168,9 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
       maxDepth: _depthFull || _depth.end >= _depthCeil ? null : _depth.end,
       startTime: dates == null ? null : _ymd(dates.start),
       endTime: dates == null ? null : _ymd(dates.end),
+      // Omit server defaults so draft.isEmpty / ETag canonical URL stay clean.
+      sort: _sort == _sortDefault ? null : _sort,
+      order: _order == _orderDefault ? null : _order,
     );
   }
 
@@ -167,7 +181,74 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
       _magnitude = const RangeValues(_magMin, _magMax);
       _depth = const RangeValues(_depthFloor, _depthCeil);
       _dates = null;
+      _sort = _sortDefault;
+      _order = _orderDefault;
     });
+  }
+
+  String _sortLabel(AppLocalizations l10n, String key) => switch (key) {
+    'time' => l10n.reportFilterSortTime,
+    'intensity' => l10n.reportFilterSortIntensity,
+    'magnitude' => l10n.reportFilterSortMagnitude,
+    'depth' => l10n.reportFilterSortDepth,
+    _ => key,
+  };
+
+  Future<void> _showIntensityScaleInfo(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      useRootNavigator: true,
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colors = theme.colorScheme;
+        final bodyStyle = theme.textTheme.bodyMedium?.copyWith(
+          color: colors.onSurfaceVariant,
+          height: 1.45,
+        );
+        final headingStyle = theme.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+        );
+        return AlertDialog(
+          title: Text(l10n.reportFilterIntensityInfoTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.reportFilterIntensityInfoIntro, style: bodyStyle),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.reportFilterIntensityInfoLegacyTitle,
+                  style: headingStyle,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  l10n.reportFilterIntensityInfoLegacyBody,
+                  style: bodyStyle,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.reportFilterIntensityInfoModernTitle,
+                  style: headingStyle,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  l10n.reportFilterIntensityInfoModernBody,
+                  style: bodyStyle,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.commonClose),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   static final DateTime _earliestDate = DateTime(1995, 1, 1);
@@ -287,6 +368,17 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
                                 children: [
                                   Row(
                                     children: [
+                                      IconButton(
+                                        tooltip:
+                                            l10n.reportFilterIntensityInfoTitle,
+                                        visualDensity: VisualDensity.compact,
+                                        onPressed: () =>
+                                            _showIntensityScaleInfo(context),
+                                        icon: Icon(
+                                          Icons.info_outline,
+                                          color: colors.primary,
+                                        ),
+                                      ),
                                       Icon(Icons.tune, color: colors.primary),
                                       const SizedBox(width: AppSpacing.sm),
                                       Expanded(
@@ -303,6 +395,69 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
                                         child: Text(l10n.reportFilterReset),
                                       ),
                                     ],
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  _SectionCard(
+                                    icon: Icons.sort,
+                                    title: l10n.reportFilterSort,
+                                    trailing: _ValuePill(
+                                      label:
+                                          '${_sortLabel(l10n, _sort)} · '
+                                          '${_order == 'desc' ? l10n.reportFilterOrderDesc : l10n.reportFilterOrderAsc}',
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Wrap(
+                                          spacing: AppSpacing.sm,
+                                          runSpacing: AppSpacing.sm,
+                                          children: [
+                                            for (final key in _sortKeys)
+                                              ChoiceChip(
+                                                label: Text(
+                                                  _sortLabel(l10n, key),
+                                                ),
+                                                selected: _sort == key,
+                                                onSelected: (_) {
+                                                  HapticFeedback.selectionClick();
+                                                  setState(() => _sort = key);
+                                                },
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: AppSpacing.md),
+                                        SegmentedButton<String>(
+                                          segments: [
+                                            ButtonSegment(
+                                              value: 'desc',
+                                              icon: const Icon(
+                                                Icons.arrow_downward,
+                                                size: 18,
+                                              ),
+                                              label: Text(
+                                                l10n.reportFilterOrderDesc,
+                                              ),
+                                            ),
+                                            ButtonSegment(
+                                              value: 'asc',
+                                              icon: const Icon(
+                                                Icons.arrow_upward,
+                                                size: 18,
+                                              ),
+                                              label: Text(
+                                                l10n.reportFilterOrderAsc,
+                                              ),
+                                            ),
+                                          ],
+                                          selected: {_order},
+                                          onSelectionChanged: (next) {
+                                            HapticFeedback.selectionClick();
+                                            setState(() => _order = next.first);
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(height: AppSpacing.md),
                                   _SectionCard(

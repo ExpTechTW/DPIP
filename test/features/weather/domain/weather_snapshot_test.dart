@@ -13,10 +13,13 @@ void main() {
       'pres': [1006.8, 1008.1],
       'wdir': [201, 187],
       'wspd': [2.1, 4.2],
-      'gspd': [-99, -99],
-      'gdir': [-99, -99],
+      'gspd': [-99, 8.5],
+      'gdir': [-99, 120],
+      'gt': [0, 1784018000],
       'hi': [31.7, 32.7],
       'lo': [26.3, 25.6],
+      'hit': [1783992000, 1783995600],
+      'lot': [1783958400, 0],
     });
 
     expect(snapshot.time, 1784019000);
@@ -31,12 +34,20 @@ void main() {
     expect(first.windDirection, 201);
     expect(first.high, 31.7);
     expect(first.low, 26.3);
-    // -99 sentinels decode to null.
+    expect(first.highTime, 1783992000);
+    expect(first.lowTime, 1783958400);
+    // -99 / 0 sentinels decode to null.
     expect(first.gustSpeed, isNull);
     expect(first.gustDirection, isNull);
+    expect(first.gustTime, isNull);
 
-    expect(snapshot.stations[1].id, 'C0SD20');
-    expect(snapshot.stations[1].temperature, 31.3);
+    final second = snapshot.stations[1];
+    expect(second.id, 'C0SD20');
+    expect(second.temperature, 31.3);
+    expect(second.gustSpeed, 8.5);
+    expect(second.gustTime, 1784018000);
+    expect(second.highTime, 1783995600);
+    expect(second.lowTime, isNull); // 0 → null
   });
 
   test('WeatherSnapshot.decode handles an empty station list', () {

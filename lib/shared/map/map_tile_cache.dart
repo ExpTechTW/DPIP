@@ -45,14 +45,19 @@ class MapTileCache {
   final EtagCacheStore _store;
   final NetworkUsageStore? _usage;
 
-  /// Native's in-process mirror budget.
+  /// Native's in-process mirror budget — deliberately **small**.
   ///
-  /// Sized to the working set, not to the store: a warm band is ~17 frames of a
-  /// viewport each, which for radar WebP is single-digit megabytes even with
-  /// the basemap's larger vector tiles alongside. This tier exists to keep IPC
-  /// off the drag path, not to be a second copy of [EtagCacheStore] — anything
-  /// beyond the band is better read back from disk than held in RAM.
-  static const int defaultMemoryBytes = 16 * 1024 * 1024;
+  /// This tier is a staging buffer for the warm path, not a second copy of the
+  /// store: the store stays the source of truth for every byte, and anything
+  /// the mirror does not hold is read back from it. Sizing it generously would
+  /// quietly turn it into the real cache and leave [EtagCacheStore] doing
+  /// nothing but the cold start.
+  ///
+  /// A few viewports' worth is enough to cover the frames a drag is actually
+  /// crossing. Keep [RasterTimelineLayer.warmRadius] within what this holds —
+  /// warming a band wider than the budget just evicts its own earlier tiles and
+  /// re-reads them on every settle.
+  static const int defaultMemoryBytes = 2 * 1024 * 1024;
 
   /// Tiles per `injectTiles` message — roughly one frame's viewport.
   static const int _injectChunk = 24;

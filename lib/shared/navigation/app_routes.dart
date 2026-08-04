@@ -30,6 +30,12 @@ abstract final class AppRoutes {
   static const String eew = 'eew';
   static const String eewPath = 'eew';
 
+  /// Weather observation ranking — nested under [dataPath].
+  /// Optional `?tab=` —
+  /// `rain|temperature|tempExtremes|wind|gust|humidity|pressure`.
+  static const String weatherRanking = 'weatherRanking';
+  static const String weatherRankingPath = 'weather-ranking';
+
   static const String more = 'more';
   static const String morePath = '/more';
 

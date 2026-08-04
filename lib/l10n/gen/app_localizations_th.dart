@@ -33,6 +33,84 @@ class AppLocalizationsTh extends AppLocalizations {
   String get dataEarthquakeSubtitle => 'รายงานแผ่นดินไหว';
 
   @override
+  String get dataSectionWeather => 'อากาศ';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'อันดับสถานีแบบเรียลไทม์';
+
+  @override
+  String get weatherRankingTitle => 'อันดับการสังเกต';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'เวลาข้อมูล: $time\n$count สถานี';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'ไม่มีข้อมูลให้จัดอันดับ';
+
+  @override
+  String get weatherRankingBy => 'เรียง';
+
+  @override
+  String get weatherRankingHighest => 'สูงสุด';
+
+  @override
+  String get weatherRankingLowest => 'ต่ำสุด';
+
+  @override
+  String get weatherRankingMergeTo => 'รวม';
+
+  @override
+  String get weatherRankingMergeTown => 'ตำบล';
+
+  @override
+  String get weatherRankingMergeCounty => 'อำเภอ/เมือง';
+
+  @override
+  String get weatherRankingWind => 'ความเร็วลม';
+
+  @override
+  String get weatherRankingGust => 'ลมกระโชก';
+
+  @override
+  String get weatherRankingTempExtremes => 'ค่าสุดขั้วอุณหภูมิ';
+
+  @override
+  String get weatherRankingExtremeHigh => 'สูงสุดวันนี้';
+
+  @override
+  String get weatherRankingExtremeLow => 'ต่ำสุดวันนี้';
+
+  @override
+  String get weatherRankingExtremeRange => 'ช่วงวัน';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'บันทึกเมื่อ $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'ปัจจุบัน $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'สูง $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'ต่ำ $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'ช่วง $value°C';
+  }
+
+  @override
   String get reportListEmpty => 'ไม่มีรายงานแผ่นดินไหว';
 
   @override
@@ -72,7 +150,49 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterTitle => 'ตัวกรอง';
 
   @override
+  String get reportFilterSort => 'เรียงลำดับ';
+
+  @override
+  String get reportFilterSortTime => 'เวลา';
+
+  @override
+  String get reportFilterSortIntensity => 'ความเข้ม';
+
+  @override
+  String get reportFilterSortMagnitude => 'ขนาด';
+
+  @override
+  String get reportFilterSortDepth => 'ความลึก';
+
+  @override
+  String get reportFilterOrderDesc => 'มาก→น้อย';
+
+  @override
+  String get reportFilterOrderAsc => 'น้อย→มาก';
+
+  @override
   String get reportFilterIntensity => 'ความเข้ม';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'มาตรวัดความรุนแรงแบบใหม่/เก่า';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA เปลี่ยนมาตรวัดเมื่อ 1 ม.ค. 2020 (เวลาไทเป)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'แบบเก่า (ก่อน 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'มีระดับ 0–7 เท่านั้น ไม่แยก 5−/5+/6−/6+';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'แบบใหม่ (ตั้งแต่ 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'ระดับ 0–4, 5−, 5+, 6−, 6+, 7 แถบตัวกรองใช้แบบใหม่ เหตุการณ์เก่าในรายการยังแสดงป้ายแบบเก่า';
 
   @override
   String get reportFilterMagnitude => 'ขนาด';
@@ -168,12 +288,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moreDeveloper => 'ข้อมูลดีบัก';
-
-  @override
-  String get developerCopied => 'คัดลอกไปยังคลิปบอร์ดแล้ว';
-
-  @override
-  String get developerCopyAll => 'คัดลอกทั้งหมด';
 
   @override
   String get experimentalFeatures => 'ฟีเจอร์ทดลอง';
@@ -937,21 +1051,4 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
-
-  @override
-  String get commonCancel => 'ยกเลิก';
-
-  @override
-  String get developerClearCache => 'ล้างแคช';
-
-  @override
-  String get developerClearCacheSubtitle =>
-      'ลบไทล์และการตอบกลับ API ที่จัดเก็บไว้';
-
-  @override
-  String get developerClearCacheConfirm =>
-      'ไทล์แผนที่และการตอบกลับ API ที่จัดเก็บไว้จะถูกลบ และจะดาวน์โหลดใหม่เมื่อจำเป็นในครั้งถัดไป';
-
-  @override
-  String get developerCacheCleared => 'ล้างแคชแล้ว';
 }

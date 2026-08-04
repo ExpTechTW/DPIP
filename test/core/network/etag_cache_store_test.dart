@@ -204,8 +204,8 @@ void main() {
     expect(hit!.bytes, bytes);
 
     final stats = await usage.stats();
-    expect(stats.hits, 1);
-    expect(stats.misses, 0);
+    expect(stats.hits24h, 1);
+    expect(stats.misses24h, 0);
     expect(stats.saved24h, 4096);
   });
 
@@ -219,7 +219,7 @@ void main() {
     await metered.readBytes('https://x/m');
 
     final stats = await usage.stats();
-    expect(stats.hits, 2);
+    expect(stats.hits24h, 2);
     expect(stats.saved24h, 256);
   });
 

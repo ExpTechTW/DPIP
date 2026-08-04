@@ -156,7 +156,7 @@ void main() {
   });
 
   test('a settle warms well beyond the mounted ring', () async {
-    // 25 frames so the ±8 warm band is a strict subset, not the whole list.
+    // 25 frames so the ±4 warm band is a strict subset, not the whole list.
     final source = _FakeRadarRepository(_ids(25));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
@@ -167,7 +167,7 @@ void main() {
 
     expect(
       source.warmed.last,
-      unorderedEquals([for (var i = 4; i <= 20; i++) frames[i].id]),
+      unorderedEquals([for (var i = 8; i <= 16; i++) frames[i].id]),
       reason:
           'warming is a local read plus a memory push, so the band a drag '
           'can cross without touching disk is far cheaper to widen than the '

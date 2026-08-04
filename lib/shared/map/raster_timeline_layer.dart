@@ -69,9 +69,12 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// memory ahead of demand.
   ///
   /// Costs nothing to draw — it only decides how far a drag can go before a
-  /// reveal has to reach disk or the network.
+  /// reveal has to read back from the store. Bounded by
+  /// [MapTileCache.defaultMemoryBytes], not by taste: warming a band wider than
+  /// that mirror holds evicts its own earlier tiles mid-injection and re-reads
+  /// the same bytes on every settle, which is worse than not warming them.
   @protected
-  int get warmRadius => 8;
+  int get warmRadius => 4;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast
