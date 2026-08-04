@@ -100,7 +100,12 @@ class DisasterMapLayer implements MapLayer {
     _controller = controller;
     _styleHasAed = true;
     Log.info('DPM AED style tiles: $bakedAedTileUrl');
-    await _applyOverlayVisibilityAsync(controller);
+    // Style JSON already shows AED layers; only push visibility when hiding.
+    // Calling setLayerVisibility(true) before the baked style finishes loading
+    // throws layerNotFound and spams the log.
+    if (!showAed.value) {
+      await _applyOverlayVisibilityAsync(controller);
+    }
     // Warm ambient before MapLibre's own fetches race past us.
     unawaited(_prefetchViewport(controller));
   }
