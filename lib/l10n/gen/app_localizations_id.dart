@@ -1056,6 +1056,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLegendCollapse => 'Sembunyikan legenda';
 
   @override
+  String get mapMyLocation => 'Lokasi saya';
+
+  @override
   String get typhoonLegendCircle15 => 'Lingkar angin kencang';
 
   @override

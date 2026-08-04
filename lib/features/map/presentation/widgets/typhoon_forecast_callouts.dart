@@ -154,10 +154,8 @@ class _TyphoonForecastCalloutOverlayState
   }
 
   void _onSuppress() {
-    if (widget.layer.suppressCallouts.value) {
-      _invalidateAndHide();
-      return;
-    }
+    // Some MapLibre gesture paths can miss the "end" edge and leave
+    // suppressCallouts stuck true; always reschedule so callouts recover.
     _schedule();
   }
 
@@ -167,10 +165,7 @@ class _TyphoonForecastCalloutOverlayState
   }
 
   bool get _blocked {
-    final c = widget.layer.mapController;
-    return !widget.layer.showForecastCallouts.value ||
-        widget.layer.suppressCallouts.value ||
-        (c?.isCameraMoving ?? false);
+    return !widget.layer.showForecastCallouts.value;
   }
 
   void _schedule() {

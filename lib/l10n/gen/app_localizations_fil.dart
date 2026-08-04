@@ -1058,6 +1058,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLegendCollapse => 'Itago ang alamat';
 
   @override
+  String get mapMyLocation => 'Aking lokasyon';
+
+  @override
   String get typhoonLegendCircle15 => 'Gale circle (L7)';
 
   @override

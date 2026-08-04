@@ -1045,6 +1045,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLegendCollapse => '凡例を閉じる';
 
   @override
+  String get mapMyLocation => '現在地';
+
+  @override
   String get typhoonLegendCircle15 => '強風域（30kt）';
 
   @override

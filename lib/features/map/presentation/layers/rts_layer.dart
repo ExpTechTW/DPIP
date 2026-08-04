@@ -13,6 +13,7 @@ import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -103,8 +104,8 @@ class RtsMapLayer implements MapLayer {
       _circleId,
       _circleProps(_liveOpacity),
     );
-    // Station id + raw intensity as a label — only when zoomed in; the engine
-    // places and de-collides them (strongest-first).
+    // Station id over its raw intensity, pinned under the dot; the sort key
+    // lets hot stations win placement (see [stationLabelProps]).
     await controller.addSymbolLayer(
       _sourceId,
       _labelId,
@@ -163,23 +164,13 @@ class RtsMapLayer implements MapLayer {
   );
 
   /// The full label style at [opacity] — station id over its raw intensity.
-  /// Passed whole (setLayerProperties nulls anything omitted). Strongest labels
-  /// win placement, matching the dots' sort.
-  SymbolLayerProperties _labelProps(double opacity) => SymbolLayerProperties(
-    textField: <Object>['get', 'label'],
-    textFont: const ['Noto Sans TC Regular'],
+  /// Passed whole (setLayerProperties nulls anything omitted); the sort key
+  /// places the strongest stations first so a hot reading never loses.
+  SymbolLayerProperties _labelProps(double opacity) => stationLabelProps(
+    textField: const <Object>['get', 'label'],
     textSize: 10,
-    textColor: '#FFFFFF',
-    textHaloColor: '#000000',
-    textHaloWidth: 1.2,
-    textLineHeight: 1.1,
-    textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
-    textRadialOffset: 0.8,
-    textJustify: 'auto',
-    textAllowOverlap: false,
-    textOptional: true,
-    textOpacity: opacity,
-    symbolSortKey: _labelSortKey,
+    opacity: opacity,
+    sortKey: _labelSortKey,
   );
 
   @override

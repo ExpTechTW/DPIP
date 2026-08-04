@@ -4,10 +4,11 @@ import Flutter
 /// EventChannel plugin streaming device heading via CoreLocation, replacing
 /// `flutter_compass` on iOS.
 ///
-/// Emits **magnetic** heading so it agrees with the Android rotation-vector
-/// output; magnetic heading needs no location authorization. (True north would
-/// require active location updates and a usage-description key.) Registered as a
-/// real `FlutterPlugin` for the Flutter 3.44 implicit-engine lifecycle.
+/// Emits **magnetic** heading. Location updates are started alongside heading —
+/// on modern iOS, `startUpdatingHeading` alone often never delivers samples
+/// until the location manager is also running (and when-in-use auth is granted).
+/// Registered as a real `FlutterPlugin` for the Flutter 3.44 implicit-engine
+/// lifecycle.
 public class CompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
   CLLocationManagerDelegate
 {
@@ -32,12 +33,16 @@ public class CompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
     sink = events
     manager.delegate = self
     manager.headingFilter = 1
+    // Desired accuracy for the location side-channel that unlocks heading.
+    manager.desiredAccuracy = kCLLocationAccuracyKilometer
+    manager.startUpdatingLocation()
     manager.startUpdatingHeading()
     return nil
   }
 
   public func onCancel(withArguments arguments: Any?) -> FlutterError? {
     manager.stopUpdatingHeading()
+    manager.stopUpdatingLocation()
     manager.delegate = nil
     sink = nil
     return nil
@@ -46,10 +51,20 @@ public class CompassPlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
   public func locationManager(
     _ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading
   ) {
+    // Negative accuracy means the reading is invalid / uncalibrated.
+    guard newHeading.headingAccuracy >= 0 else { return }
+    let heading = newHeading.magneticHeading
+    guard heading >= 0, heading <= 360, !heading.isNaN else { return }
     sink?([
-      "heading": newHeading.magneticHeading,
+      "heading": heading,
       "accuracy": newHeading.headingAccuracy,
     ])
+  }
+
+  public func locationManager(
+    _ manager: CLLocationManager, didFailWithError error: Error
+  ) {
+    // Location fail must not tear down heading — ignore.
   }
 
   public func locationManagerShouldDisplayHeadingCalibration(

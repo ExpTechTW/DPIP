@@ -296,6 +296,7 @@
   "typhoonLegendCone": "예보 원추",
   "mapLegendExpand": "범례",
   "mapLegendCollapse": "범례 숨기기",
+  "mapMyLocation": "내 위치",
   "typhoonLegendCircle15": "강풍권 (7급)",
   "typhoonLegendCircle25": "폭풍권 (10급)",
   "typhoonLegendProbability": "내습 확률",

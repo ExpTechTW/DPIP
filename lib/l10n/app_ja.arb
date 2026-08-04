@@ -296,6 +296,7 @@
   "typhoonLegendCone": "予報円",
   "mapLegendExpand": "凡例",
   "mapLegendCollapse": "凡例を閉じる",
+  "mapMyLocation": "現在地",
   "typhoonLegendCircle15": "強風域（30kt）",
   "typhoonLegendCircle25": "暴風域（50kt）",
   "typhoonLegendProbability": "接近確率",

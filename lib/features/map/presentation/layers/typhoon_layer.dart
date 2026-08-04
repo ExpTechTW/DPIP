@@ -283,9 +283,12 @@ class TyphoonMapLayer implements MapLayer {
   /// Active MapLibre controller (for Flutter screen-space callouts).
   MapLibreMapController? get mapController => _controller;
 
-  /// Forecast fixes for the focused cyclone (Flutter callout source).
-  List<TrackForecast> get selectedForecasts =>
-      _selectedTrack?.forecast ?? const [];
+  /// Forecast fixes for every active cyclone (Flutter callout source).
+  List<TrackForecast> get selectedForecasts {
+    final payload = track.value;
+    if (payload == null) return const [];
+    return [for (final c in payload.cyclones) ...c.forecast];
+  }
 
   void _applySelection(String? key) {
     summary.value =
@@ -356,6 +359,7 @@ class TyphoonMapLayer implements MapLayer {
       return augmentTyphoonGeojson(
         server,
         selected: selected,
+        tracks: track.value?.cyclones ?? const <TyphoonTrack>[],
         cyclones: cyclones,
       );
     }
@@ -364,6 +368,7 @@ class TyphoonMapLayer implements MapLayer {
         potential: potential,
         probability: probability,
         selected: selected,
+        tracks: track.value?.cyclones ?? const <TyphoonTrack>[],
         cyclones: cyclones,
       );
     }
@@ -536,9 +541,8 @@ class TyphoonMapLayer implements MapLayer {
         textOptional: true,
       ),
       filter: _kindIs('forecastPoint'),
-      // Hide "+Nh" once Flutter callout chips take over.
+      // Keep +Nh labels available as fallback if Flutter callouts are blocked.
       minzoom: 5,
-      maxzoom: kTyphoonCalloutMinZoom,
       enableInteraction: false,
     );
     await controller.addCircleLayer(
@@ -830,7 +834,16 @@ class TyphoonMapLayer implements MapLayer {
       }
     }
     if (point == null) return null;
-    final forecasts = _selectedTrack?.forecast ?? const <TrackForecast>[];
+    final byKey = point.cycloneKey == null
+        ? null
+        : trackForKey(track.value, point.cycloneKey!);
+    final forecasts =
+        byKey?.forecast ??
+        _selectedTrack?.forecast ??
+        [
+          for (final c in (track.value?.cyclones ?? const <TyphoonTrack>[]))
+            ...c.forecast,
+        ];
     if (forecasts.isEmpty) return null;
     TrackForecast? best;
     var bestD = double.infinity;

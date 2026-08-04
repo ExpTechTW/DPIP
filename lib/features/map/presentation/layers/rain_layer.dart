@@ -15,6 +15,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class RainMapLayer implements MapLayer, StationSheetSource {
 
   String get _sourceId => 'rain-src';
   String get _circleId => 'rain-circle';
+
   String get _labelId => 'rain-label';
 
   @override
@@ -141,23 +143,12 @@ class RainMapLayer implements MapLayer, StationSheetSource {
       filter: _visibleFilter,
       enableInteraction: false,
     );
+    // Name over reading, pinned under the dot and de-collided by the engine
+    // (see [stationLabelProps]).
     await controller.addSymbolLayer(
       _sourceId,
       _labelId,
-      SymbolLayerProperties(
-        textField: <Object>['get', 'label'],
-        textFont: const ['Noto Sans TC Regular'],
-        textSize: 11,
-        textColor: '#FFFFFF',
-        textHaloColor: '#000000',
-        textHaloWidth: 1.2,
-        textLineHeight: 1.1,
-        textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
-        textRadialOffset: 0.9,
-        textJustify: 'auto',
-        textAllowOverlap: false,
-        textOptional: true,
-      ),
+      stationLabelProps(textField: const <Object>['get', 'label']),
       minzoom: 9,
       filter: _visibleFilter,
       enableInteraction: false,

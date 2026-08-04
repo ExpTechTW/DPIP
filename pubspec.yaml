@@ -36,7 +36,7 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: a4061dd881b7368e560413fe6c1fa1147a71706a
+      ref: 2c515a3feaa7fee565e1ae03971aade841bec54f
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1

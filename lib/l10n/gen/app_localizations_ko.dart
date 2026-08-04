@@ -1045,6 +1045,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLegendCollapse => '범례 숨기기';
 
   @override
+  String get mapMyLocation => '내 위치';
+
+  @override
   String get typhoonLegendCircle15 => '강풍권 (7급)';
 
   @override

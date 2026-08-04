@@ -9,6 +9,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/typhoon/domain/compass_direction.dart';
+import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
 import 'package:dpip/features/typhoon/domain/storm_circle.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -270,13 +271,16 @@ class _Bulletin extends StatelessWidget {
           );
         }
 
+        // `??` alone is not enough — CWA sends "" (not null) for an unnamed
+        // system, so an empty name would win the chain and the hero row would
+        // render blank. Fall back to the localized "tropical depression".
         final name =
-            summary?.cwaName ??
-            cyclone?.cwaName ??
-            summary?.name ??
-            cyclone?.name ??
-            '';
-        final engName = summary?.name ?? cyclone?.name;
+            cycloneDisplayName(
+              cwaName: summary?.cwaName ?? cyclone?.cwaName,
+              name: summary?.name ?? cyclone?.name,
+            ) ??
+            l10n.typhoonIntensityTd;
+        final engName = presentText(summary?.name ?? cyclone?.name);
         final lat = fix?.latitude ?? summary?.latitude;
         final lon = fix?.longitude ?? summary?.longitude;
         final wind = fix?.wind ?? summary?.wind;

@@ -3,7 +3,6 @@
 library;
 
 import 'dart:async';
-import 'dart:math' show Point;
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -43,6 +42,9 @@ class DisasterMapLayer implements MapLayer {
   final ValueNotifier<String?> _previewPlace = ValueNotifier<String?>(null);
 
   static const _pointColor = '#e74c3c';
+
+  /// Finger-sized hit box around a tap, in logical pixels.
+  static const double _tapSlop = 44;
 
   @override
   String get id => 'dpm';
@@ -134,7 +136,12 @@ class DisasterMapLayer implements MapLayer {
         circleStrokeColor: '#ffffff',
       ),
       sourceLayer: 'aed',
-      enableInteraction: true,
+      // **false on purpose.** An interactive layer makes the plugin fire
+      // `feature#onTap` instead of `map#onMapClick` (unless the map opts into
+      // featureTapsTriggersMapClick), and nothing in this app listens to
+      // feature taps — so tapping an AED dot went nowhere while tapping empty
+      // sea still reached onMapTap. Every other layer here is false too.
+      enableInteraction: false,
     );
   }
 
@@ -153,10 +160,18 @@ class DisasterMapLayer implements MapLayer {
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
     if (!_styleHasAed || !showAed.value) return;
     final screen = await controller.toScreenLocation(latLng);
-    final hit = Point<double>(screen.x.toDouble(), screen.y.toDouble());
-    final points = await controller.queryRenderedFeatures(hit, [
-      dpmAedPointsLayerId,
-    ], null);
+    // Query a box, not the exact pixel: the dots are 6 pt radius, so an exact
+    // hit-test asks for 12 pt of target when a fingertip is nearer 44.
+    const slop = _tapSlop;
+    final points = await controller.queryRenderedFeaturesInRect(
+      Rect.fromCenter(
+        center: Offset(screen.x.toDouble(), screen.y.toDouble()),
+        width: slop,
+        height: slop,
+      ),
+      [dpmAedPointsLayerId],
+      null,
+    );
     if (points.isNotEmpty) await _selectFeature(points.first);
   }
 

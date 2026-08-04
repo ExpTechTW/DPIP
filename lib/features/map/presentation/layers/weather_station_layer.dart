@@ -13,6 +13,7 @@ import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -132,25 +133,12 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         enableInteraction: false,
       );
     }
-    // Name + value labels — shown only when zoomed in; the engine places and
-    // orients them (variable anchor + collision) so they never pile up.
+    // Name over reading, pinned under the dot and de-collided by the engine
+    // (see [stationLabelProps]).
     await controller.addSymbolLayer(
       _sourceId,
       _labelId,
-      SymbolLayerProperties(
-        textField: <Object>['get', 'label'],
-        textFont: const ['Noto Sans TC Regular'],
-        textSize: 11,
-        textColor: '#FFFFFF',
-        textHaloColor: '#000000',
-        textHaloWidth: 1.2,
-        textLineHeight: 1.1,
-        textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
-        textRadialOffset: 0.9,
-        textJustify: 'auto',
-        textAllowOverlap: false,
-        textOptional: true,
-      ),
+      stationLabelProps(textField: const <Object>['get', 'label']),
       minzoom: 9,
       enableInteraction: false,
     );
@@ -348,9 +336,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         'properties': {
           'id': entry.key,
           'value': value,
-          // Preformatted here (name from data, value + unit from the layer) so
-          // the SymbolLayer just reads one `label` string — keeps CJK out of any
-          // hardcoded literal and the l10n gate clean.
+          // Preformatted here (name from data, reading from the layer) so the
+          // symbol layer reads one string — keeps CJK out of any hardcoded
+          // literal and the l10n gate clean.
           'label': '${station.name}\n${value.toStringAsFixed(decimals)} $unit',
           ...extraProperties(observation),
         },

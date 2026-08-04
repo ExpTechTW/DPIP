@@ -2037,6 +2037,12 @@ abstract class AppLocalizations {
   /// **'Hide legend'**
   String get mapLegendCollapse;
 
+  /// Map control that centers the camera on the device GPS fix
+  ///
+  /// In en, this message translates to:
+  /// **'My location'**
+  String get mapMyLocation;
+
   /// Typhoon UI: typhoonLegendCircle15
   ///
   /// In en, this message translates to:

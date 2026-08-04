@@ -6,6 +6,15 @@ import 'package:dpip/features/typhoon/domain/typhoon_cyclone.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 
+/// Trimmed value, or `null` when absent/blank.
+///
+/// CWA sends `""` (not `null`) for a storm that has no name yet, so a plain
+/// `??` chain silently keeps the empty string — see [cycloneDisplayName].
+String? presentText(String? value) {
+  final trimmed = value?.trim();
+  return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+}
+
 /// Case-insensitive trim; treats empty as no match.
 bool cycloneNamesMatch(String? a, String? b) {
   if (a == null || b == null) return false;
@@ -28,8 +37,53 @@ bool sameCyclone({
       cycloneNamesMatch(cwaName, stormCwaName);
 }
 
-/// Stable wire key for selection — international [TyphoonCyclone.name].
-String cycloneKey(TyphoonCyclone c) => c.name;
+/// Stable selection key from a storm's identity fields.
+///
+/// Primary key is always the CWA tropical-depression number (`TD15`), which
+/// exists even before a system is named. This avoids empty-name breakage when
+/// the nearest active system is an unnamed depression.
+///
+/// Falls back to names only when `tdNo` is unexpectedly absent.
+String cycloneKeyOf({String? name, String? cwaName, String? tdNo}) {
+  final td = presentText(tdNo);
+  if (td != null) return 'TD$td';
+  return presentText(name) ?? presentText(cwaName) ?? '';
+}
+
+/// Stable wire key for selection — see [cycloneKeyOf].
+String cycloneKey(TyphoonCyclone c) =>
+    cycloneKeyOf(name: c.name, cwaName: c.cwaName, tdNo: c.tdNo);
+
+/// Whether [key] selects the storm described by the `storm*` fields.
+///
+/// Matches by the storm's stable [cycloneKeyOf] and keeps name checks for
+/// backward compatibility with older persisted selections.
+bool cycloneMatchesKey({
+  required String? key,
+  required String? stormName,
+  String? stormCwaName,
+  String? stormTdNo,
+}) {
+  final k = presentText(key);
+  if (k == null) return false;
+  final stormKey = cycloneKeyOf(
+    name: stormName,
+    cwaName: stormCwaName,
+    tdNo: stormTdNo,
+  );
+  if (cycloneNamesMatch(k, stormKey)) return true;
+  if (cycloneNamesMatch(k, stormName) || cycloneNamesMatch(k, stormCwaName)) {
+    return true;
+  }
+  return false;
+}
+
+/// Display name for a storm — CWA name preferred, else the international name.
+///
+/// `null` when the system is unnamed; the caller supplies the localized
+/// "tropical depression" wording (this layer has no [BuildContext]).
+String? cycloneDisplayName({String? cwaName, String? name}) =>
+    presentText(cwaName) ?? presentText(name);
 
 /// Warning applies only when the CAP typhoon block names the selected storm
 /// and the bulletin is not a lift (`Cancel`) / inactive leftover.
@@ -72,11 +126,16 @@ int indexOfNearestCyclone(
   return best;
 }
 
-/// Track entry matching [key] (international name or CWA name), else `null`.
+/// Track entry matching [key] (name, CWA name, or `TD…` number), else `null`.
 TyphoonTrack? trackForKey(TrackPayload? payload, String? key) {
-  if (payload == null || key == null || key.isEmpty) return null;
+  if (payload == null) return null;
   for (final c in payload.cyclones) {
-    if (sameCyclone(name: key, stormName: c.name, stormCwaName: c.cwaName)) {
+    if (cycloneMatchesKey(
+      key: key,
+      stormName: c.name,
+      stormCwaName: c.cwaName,
+      stormTdNo: c.tdNo,
+    )) {
       return c;
     }
   }
@@ -85,9 +144,14 @@ TyphoonTrack? trackForKey(TrackPayload? payload, String? key) {
 
 /// Index entry matching [key], else `null`.
 TyphoonCyclone? cycloneForKey(CycloneIndex? index, String? key) {
-  if (index == null || key == null || key.isEmpty) return null;
+  if (index == null) return null;
   for (final c in index.cyclones) {
-    if (sameCyclone(name: key, stormName: c.name, stormCwaName: c.cwaName)) {
+    if (cycloneMatchesKey(
+      key: key,
+      stormName: c.name,
+      stormCwaName: c.cwaName,
+      stormTdNo: c.tdNo,
+    )) {
       return c;
     }
   }

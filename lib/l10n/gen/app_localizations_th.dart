@@ -1053,6 +1053,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLegendCollapse => 'ซ่อนคำอธิบาย';
 
   @override
+  String get mapMyLocation => 'ตำแหน่งของฉัน';
+
+  @override
   String get typhoonLegendCircle15 => 'วงพายุ (แรง)';
 
   @override

@@ -32,6 +32,7 @@ class BaseMap extends StatelessWidget {
     this.onMapClick,
     this.onCameraIdle,
     this.interactive = true,
+    this.showUserLocation = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
   });
@@ -92,6 +93,18 @@ class BaseMap extends StatelessWidget {
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
 
+  /// Whether to draw the device-location puck.
+  ///
+  /// This is MapLibre's **native** location component — `MLNUserLocationAnnot‌‍
+  /// ationView` on iOS, `LocationComponent` on Android — so the blue dot,
+  /// accuracy ring and heading cone are rendered and animated on the render
+  /// thread, with no per-frame platform-channel traffic. It runs the platform's
+  /// own location + heading session and starts only once location permission is
+  /// granted (Android logs and skips otherwise); nothing is drawn when it is
+  /// denied. Styling is whatever the platform provides — the plugin exposes no
+  /// hook for colours.
+  final bool showUserLocation;
+
   /// Per-surface zoom floor (typhoon may go lower so the whole basin fits).
   /// Other layers keep [defaultMinZoom].
   final double minZoomPreference;
@@ -133,6 +146,12 @@ class BaseMap extends StatelessWidget {
       rotateGesturesEnabled: interactive,
       tiltGesturesEnabled: false,
       dragEnabled: interactive,
+      myLocationEnabled: showUserLocation,
+      // `compass` is the heading-cone mode; MapLibreMap asserts anything other
+      // than `normal` requires myLocationEnabled, so pair them.
+      myLocationRenderMode: showUserLocation
+          ? MyLocationRenderMode.compass
+          : MyLocationRenderMode.normal,
       onMapClick: onMapClick,
       onMapCreated: onMapCreated,
       onStyleLoadedCallback: onStyleLoaded,

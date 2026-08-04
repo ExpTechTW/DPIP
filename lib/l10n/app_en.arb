@@ -1394,6 +1394,10 @@
   "@mapLegendCollapse": {
     "description": "Tooltip on the control that collapses the map legend"
   },
+  "mapMyLocation": "My location",
+  "@mapMyLocation": {
+    "description": "Map control that centers the camera on the device GPS fix"
+  },
   "typhoonLegendCircle15": "Gale circle (L7)",
   "typhoonLegendCircleAvg": "Average circle",
   "@typhoonLegendCircleAvg": {
