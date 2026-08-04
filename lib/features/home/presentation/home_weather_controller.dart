@@ -1,4 +1,4 @@
-/// Loads the home header's current-area realtime weather.
+/// Loads the home header's realtime weather and the township 24h forecast.
 library;
 
 import 'package:dpip/core/error/failure.dart';
@@ -6,13 +6,14 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter/foundation.dart';
 
-/// Fetches the nearest-station realtime weather for the home header, following
-/// the selected [RegionStore] area (or the current GPS township when the
-/// nationwide view is selected). Reloads when the area changes; the last value
-/// is kept while a new one loads so the header never blanks.
+/// Fetches nearest-station realtime weather and the township hourly forecast for
+/// the home sheet, following the selected [RegionStore] area (or the current GPS
+/// township when nationwide is selected). Reloads when the area changes; the
+/// last values are kept while a new fetch runs so the sheet never blanks.
 class HomeWeatherController extends ChangeNotifier {
   HomeWeatherController(this._repository, this._regions, this._directory) {
     _regions.addListener(_sync);
@@ -24,61 +25,86 @@ class HomeWeatherController extends ChangeNotifier {
   final TownDirectory _directory;
 
   WeatherRealtime? _weather;
+  WeatherForecast? _forecast;
   bool _loading = false;
   Failure? _failure;
+  Failure? _forecastFailure;
   String? _loadedCode;
 
   /// The latest realtime observation, or null before the first load / at sea.
   WeatherRealtime? get weather => _weather;
 
+  /// The latest township 24h forecast, or null before the first load / no code.
+  WeatherForecast? get forecast => _forecast;
+
   /// Whether a fetch is in flight.
   bool get loading => _loading;
 
-  /// The last failure, if the most recent fetch failed.
+  /// The last realtime failure, if the most recent fetch failed.
   Failure? get failure => _failure;
+
+  /// The last forecast failure, if the most recent forecast fetch failed.
+  Failure? get forecastFailure => _forecastFailure;
 
   /// The township code driving the weather: the selected saved/current area, or
   /// the GPS township when nationwide is selected.
-  String? get _areaCode => switch (_regions.selected) {
+  String? get areaCode => switch (_regions.selected) {
     SavedArea(:final code) => code,
     CurrentArea(:final code) => code,
     NationwideArea() => _regions.currentCode,
   };
 
-  /// Re-fetches the current area's weather even though the area has not changed
-  /// — the pull-to-refresh entry point. Completes when the fetch settles so the
-  /// caller can hold its spinner up until there is something new.
+  /// Re-fetches the current area even though it has not changed — the
+  /// pull-to-refresh / tab-reappear entry point.
   Future<void> refresh() async {
-    final code = _areaCode;
+    final code = areaCode;
     final town = code == null ? null : _directory.byCode(code);
-    if (town == null) return;
-    await _load(town.lat, town.lng);
+    if (town == null || code == null) return;
+    await _load(code, town.lat, town.lng);
   }
 
   void _sync() {
-    final code = _areaCode;
+    final code = areaCode;
     if (code == _loadedCode) return;
     _loadedCode = code;
     final town = code == null ? null : _directory.byCode(code);
-    if (town == null) {
+    if (town == null || code == null) {
       _weather = null;
+      _forecast = null;
+      _failure = null;
+      _forecastFailure = null;
       notifyListeners();
       return;
     }
-    _load(town.lat, town.lng);
+    _load(code, town.lat, town.lng);
   }
 
-  Future<void> _load(double lat, double lng) async {
+  Future<void> _load(String code, double lat, double lng) async {
     _loading = true;
     _failure = null;
+    _forecastFailure = null;
     notifyListeners();
-    final result = await _repository.realtime(lat, lng);
+
+    final realtimeFuture = _repository.realtime(lat, lng);
+    final forecastFuture = _repository.forecast(code);
+    final realtime = await realtimeFuture;
+    final forecast = await forecastFuture;
+    // Drop a superseded response if the user switched area mid-flight.
+    if (_loadedCode != code) return;
+
     _loading = false;
-    result.when(
+    realtime.when(
       ok: (value) => _weather = value,
       err: (failure) {
         _failure = failure;
         _weather = null;
+      },
+    );
+    forecast.when(
+      ok: (value) => _forecast = value,
+      err: (failure) {
+        _forecastFailure = failure;
+        _forecast = null;
       },
     );
     notifyListeners();

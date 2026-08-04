@@ -20,6 +20,15 @@ class EventRepositoryImpl implements EventRepository {
         return parseEvents(raw, regionCode: regionCode);
       });
 
+  @override
+  Future<Result<List<Event>>> activeEvents({String? regionCode}) =>
+      guardResult(() async {
+        final raw = regionCode == null
+            ? await _api.getRealtimeList()
+            : await _api.getRealtimeRegion(regionCode);
+        return parseEvents(raw, regionCode: regionCode);
+      });
+
   /// Maps the wire list to [Event]s, newest first.
   ///
   /// Unmappable entries are skipped rather than failing the whole feed: one

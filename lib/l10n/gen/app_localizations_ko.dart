@@ -409,6 +409,46 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherHumidity => '습도';
 
   @override
+  String get homeForecastTitle => '24시간 예보';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '최고 $high° · 최저 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '체감 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '습도 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · 풍력 $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => '지역을 선택하면 예보를 볼 수 있습니다';
+
+  @override
+  String get homeForecastEmpty => '예보 데이터가 없습니다';
+
+  @override
+  String get homeActiveEventsTitle => '발효 중 이벤트';
+
+  @override
+  String get homeActiveEventsEmpty => '발효 중인 이벤트가 없습니다';
+
+  @override
   String get mapLayers => '레이어';
 
   @override

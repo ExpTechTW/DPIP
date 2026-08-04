@@ -413,6 +413,47 @@ class AppLocalizationsFil extends AppLocalizations {
   String get weatherHumidity => 'Halumigmig';
 
   @override
+  String get homeForecastTitle => '24-oras na forecast';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'T $high° · B $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Pakiramdam $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Halumigmig $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Force $level';
+  }
+
+  @override
+  String get homeForecastUnavailable =>
+      'Pumili ng bayan para makita ang forecast';
+
+  @override
+  String get homeForecastEmpty => 'Walang forecast';
+
+  @override
+  String get homeActiveEventsTitle => 'Mga aktibong event';
+
+  @override
+  String get homeActiveEventsEmpty => 'Walang aktibong event';
+
+  @override
   String get mapLayers => 'Mga Layer';
 
   @override

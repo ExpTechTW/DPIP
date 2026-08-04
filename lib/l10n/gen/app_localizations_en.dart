@@ -411,6 +411,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherHumidity => 'Humidity';
 
   @override
+  String get homeForecastTitle => '24-hour forecast';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'H $high° · L $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Feels like $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Humidity $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Force $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'Select a township to see the forecast';
+
+  @override
+  String get homeForecastEmpty => 'No forecast available';
+
+  @override
+  String get homeActiveEventsTitle => 'Active events';
+
+  @override
+  String get homeActiveEventsEmpty => 'No active events';
+
+  @override
   String get mapLayers => 'Layers';
 
   @override

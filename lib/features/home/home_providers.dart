@@ -1,5 +1,7 @@
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/events/domain/event_repository.dart';
+import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
@@ -9,10 +11,9 @@ import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-/// Home providers: the sheet-extent broadcast (drives the immersive chrome), the
-/// tab-reset signal, the home→map camera hand-off (shared with the map tab), and
-/// the header weather controller (follows the selected area, reading the meteor
-/// weather repository `weatherProviders` provides).
+/// Home providers: sheet-extent chrome, tab-reset, map hand-offs, weather
+/// (header + forecast), and active-events (collapsed sheet) — the latter reads
+/// [EventRepository] from `eventsProviders`.
 List<SingleChildWidget> homeProviders() => [
   ChangeNotifierProvider(create: (_) => HomeSheetExtent()),
   ChangeNotifierProvider(create: (_) => HomeResetSignal()),
@@ -23,6 +24,12 @@ List<SingleChildWidget> homeProviders() => [
       context.read<MeteorWeatherRepository>(),
       context.read<RegionStore>(),
       context.read<TownDirectory>(),
+    ),
+  ),
+  ChangeNotifierProvider<HomeActiveEventsController>(
+    create: (context) => HomeActiveEventsController(
+      context.read<EventRepository>(),
+      context.read<RegionStore>(),
     ),
   ),
 ];

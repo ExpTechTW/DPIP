@@ -410,6 +410,46 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherHumidity => 'ความชื้น';
 
   @override
+  String get homeForecastTitle => 'พยากรณ์ 24 ชั่วโมง';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'สูง $high° · ต่ำ $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'รู้สึกเหมือน $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'ความชื้น $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · แรง $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'เลือกพื้นที่เพื่อดูพยากรณ์';
+
+  @override
+  String get homeForecastEmpty => 'ไม่มีข้อมูลพยากรณ์';
+
+  @override
+  String get homeActiveEventsTitle => 'เหตุการณ์ที่ยังมีผล';
+
+  @override
+  String get homeActiveEventsEmpty => 'ไม่มีเหตุการณ์ที่ยังมีผล';
+
+  @override
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override

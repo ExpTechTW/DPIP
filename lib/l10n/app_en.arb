@@ -565,6 +565,63 @@
   "@weatherHumidity": {
     "description": "Label for the humidity metric in the home weather header"
   },
+  "homeForecastTitle": "24-hour forecast",
+  "@homeForecastTitle": {
+    "description": "Section title for the home sheet township hourly forecast"
+  },
+  "homeForecastHighLow": "H {high}° · L {low}°",
+  "@homeForecastHighLow": {
+    "description": "24h forecast series high and low air temperatures",
+    "placeholders": {
+      "high": {"type": "String"},
+      "low": {"type": "String"}
+    }
+  },
+  "homeForecastPop": "{pop}%",
+  "@homeForecastPop": {
+    "description": "Probability of precipitation percent on a forecast hour chip",
+    "placeholders": {
+      "pop": {"type": "String"}
+    }
+  },
+  "homeForecastFeelsLike": "Feels like {temp}°",
+  "@homeForecastFeelsLike": {
+    "description": "Apparent temperature for the selected forecast hour",
+    "placeholders": {
+      "temp": {"type": "String"}
+    }
+  },
+  "homeForecastHumidity": "Humidity {value}%",
+  "@homeForecastHumidity": {
+    "description": "Relative humidity for the selected forecast hour",
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "homeForecastWind": "{direction} · Force {level}",
+  "@homeForecastWind": {
+    "description": "Wind direction string and Beaufort force for the selected hour",
+    "placeholders": {
+      "direction": {"type": "String"},
+      "level": {"type": "String"}
+    }
+  },
+  "homeForecastUnavailable": "Select a township to see the forecast",
+  "@homeForecastUnavailable": {
+    "description": "Shown when no township code is available for the forecast API"
+  },
+  "homeForecastEmpty": "No forecast available",
+  "@homeForecastEmpty": {
+    "description": "Empty or failed forecast on the home sheet"
+  },
+  "homeActiveEventsTitle": "Active events",
+  "@homeActiveEventsTitle": {
+    "description": "Section title for currently active disaster notices on the collapsed home sheet"
+  },
+  "homeActiveEventsEmpty": "No active events",
+  "@homeActiveEventsEmpty": {
+    "description": "Empty state when the realtime event feed has nothing in effect"
+  },
   "mapLayers": "Layers",
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"

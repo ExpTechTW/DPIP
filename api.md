@@ -144,13 +144,13 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | `getStations` | `/api/v1/trem/station` | `legacyApi` | 強震監視器測站 |
 | `getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | 事件頁（全國） |
 | `getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
+| `getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
+| `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
 
 尚未接上、但端點存在於 `api-1`：
 
 | 方法 | 路徑 | 層級 |
 |---|---|---|
-| `getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` |
-| `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` |
 | `getEvent` | `/api/v1/dpip/event/{id}` | `legacyApi` |
 | `getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` |
 | `getEewAt` | `/api/v2/eq/eew/{sec}` | `legacyApi` |

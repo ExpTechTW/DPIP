@@ -411,6 +411,46 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherHumidity => 'Kelembapan';
 
   @override
+  String get homeForecastTitle => 'Prakiraan 24 jam';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'T $high° · R $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Terasa $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Kelembapan $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Skala $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'Pilih wilayah untuk melihat prakiraan';
+
+  @override
+  String get homeForecastEmpty => 'Tidak ada data prakiraan';
+
+  @override
+  String get homeActiveEventsTitle => 'Peristiwa aktif';
+
+  @override
+  String get homeActiveEventsEmpty => 'Tidak ada peristiwa aktif';
+
+  @override
   String get mapLayers => 'Lapisan';
 
   @override

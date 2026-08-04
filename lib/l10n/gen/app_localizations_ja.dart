@@ -409,6 +409,46 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherHumidity => '湿度';
 
   @override
+  String get homeForecastTitle => '24時間予報';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '体感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '湿度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · 風力$level';
+  }
+
+  @override
+  String get homeForecastUnavailable => '地域を選ぶと予報を表示します';
+
+  @override
+  String get homeForecastEmpty => '予報データがありません';
+
+  @override
+  String get homeActiveEventsTitle => '発生中の事象';
+
+  @override
+  String get homeActiveEventsEmpty => '発生中の事象はありません';
+
+  @override
   String get mapLayers => 'レイヤー';
 
   @override

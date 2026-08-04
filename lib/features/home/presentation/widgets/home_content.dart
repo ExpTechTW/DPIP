@@ -1,10 +1,10 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
+import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +16,9 @@ import 'package:provider/provider.dart';
 /// expands the sheet) hosts the grab handle and the per-area panel. Switching
 /// area slides only that panel (`_AreaSlide`); the list and its controller stay
 /// put, which is what keeps the sheet height stable across a switch.
+///
+/// Below the header: **active events** while collapsed; once flush full-screen,
+/// the **24h forecast** appears above those same active events.
 class HomeContent extends StatelessWidget {
   const HomeContent({
     super.key,
@@ -23,6 +26,7 @@ class HomeContent extends StatelessWidget {
     this.handleOpacity = 1,
     this.reveal = 0,
     this.topInset = 0,
+    this.expanded = false,
   });
 
   /// The draggable sheet's scroll controller.
@@ -40,12 +44,14 @@ class HomeContent extends StatelessWidget {
   /// full, so the content isn't hidden behind it.
   final double topInset;
 
+  /// Sheet is flush full-screen — header typography/layout step up (chart-sheet
+  /// pattern), and the 24h forecast appears above the active-events block.
+  final bool expanded;
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
-    final cardColor = glassSurface(colors, reveal);
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.fromLTRB(
@@ -64,20 +70,21 @@ class HomeContent extends StatelessWidget {
             key: ValueKey(areaIndex),
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HomeSheetHeader(reveal: reveal),
+              HomeSheetHeader(reveal: reveal, expanded: expanded),
               const SizedBox(height: AppSpacing.lg),
-              // Placeholder cards until the real sections land.
-              for (var i = 0; i < 6; i++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Container(
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: AppRadius.medium,
-                    ),
-                  ),
+              // Collapsed: active events only. Full-screen: forecast, then the
+              // same active-events block underneath.
+              if (expanded) ...[
+                HomeForecastSection(
+                  key: ValueKey('forecast-$areaIndex'),
+                  reveal: reveal,
                 ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+              HomeActiveEventsSection(
+                key: ValueKey('active-$areaIndex'),
+                reveal: reveal,
+              ),
             ],
           ),
         ),

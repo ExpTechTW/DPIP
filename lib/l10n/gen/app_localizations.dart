@@ -855,6 +855,66 @@ abstract class AppLocalizations {
   /// **'Humidity'**
   String get weatherHumidity;
 
+  /// Section title for the home sheet township hourly forecast
+  ///
+  /// In en, this message translates to:
+  /// **'24-hour forecast'**
+  String get homeForecastTitle;
+
+  /// 24h forecast series high and low air temperatures
+  ///
+  /// In en, this message translates to:
+  /// **'H {high}° · L {low}°'**
+  String homeForecastHighLow(String high, String low);
+
+  /// Probability of precipitation percent on a forecast hour chip
+  ///
+  /// In en, this message translates to:
+  /// **'{pop}%'**
+  String homeForecastPop(String pop);
+
+  /// Apparent temperature for the selected forecast hour
+  ///
+  /// In en, this message translates to:
+  /// **'Feels like {temp}°'**
+  String homeForecastFeelsLike(String temp);
+
+  /// Relative humidity for the selected forecast hour
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity {value}%'**
+  String homeForecastHumidity(String value);
+
+  /// Wind direction string and Beaufort force for the selected hour
+  ///
+  /// In en, this message translates to:
+  /// **'{direction} · Force {level}'**
+  String homeForecastWind(String direction, String level);
+
+  /// Shown when no township code is available for the forecast API
+  ///
+  /// In en, this message translates to:
+  /// **'Select a township to see the forecast'**
+  String get homeForecastUnavailable;
+
+  /// Empty or failed forecast on the home sheet
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast available'**
+  String get homeForecastEmpty;
+
+  /// Section title for currently active disaster notices on the collapsed home sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Active events'**
+  String get homeActiveEventsTitle;
+
+  /// Empty state when the realtime event feed has nothing in effect
+  ///
+  /// In en, this message translates to:
+  /// **'No active events'**
+  String get homeActiveEventsEmpty;
+
   /// Title of the map layer-picker sheet
   ///
   /// In en, this message translates to:

@@ -410,6 +410,46 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherHumidity => 'Độ ẩm';
 
   @override
+  String get homeForecastTitle => 'Dự báo 24 giờ';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'Cao $high° · Thấp $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Cảm giác $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Độ ẩm $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Cấp $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'Chọn khu vực để xem dự báo';
+
+  @override
+  String get homeForecastEmpty => 'Không có dữ liệu dự báo';
+
+  @override
+  String get homeActiveEventsTitle => 'Sự kiện đang hiệu lực';
+
+  @override
+  String get homeActiveEventsEmpty => 'Không có sự kiện đang hiệu lực';
+
+  @override
   String get mapLayers => 'Lớp bản đồ';
 
   @override

@@ -1,6 +1,7 @@
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
@@ -58,13 +59,12 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-  /// Refreshes what goes stale on this screen whenever Home reappears — the tab
-  /// is opened, or the app returns from the background. The header's weather and
-  /// the backdrop's radar frame are the two live things here; the reset signal
-  /// already drives the radar (and the sheet), so this adds the weather.
+  /// Refreshes what goes stale on this screen whenever Home reappears — weather,
+  /// active events, and the backdrop radar (via the reset signal).
   void _refresh() {
     _resetSignal?.fire();
     context.read<HomeWeatherController>().refresh();
+    context.read<HomeActiveEventsController>().refresh();
   }
 
   /// Collapses the sheet to rest whenever Home is (re-)entered, so an expanded,

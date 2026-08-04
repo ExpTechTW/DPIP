@@ -408,6 +408,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherHumidity => '濕度';
 
   @override
+  String get homeForecastTitle => '24小時預報';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '體感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '濕度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · $level 級';
+  }
+
+  @override
+  String get homeForecastUnavailable => '選擇鄉鎮後可查看預報';
+
+  @override
+  String get homeForecastEmpty => '目前沒有預報資料';
+
+  @override
+  String get homeActiveEventsTitle => '生效中事件';
+
+  @override
+  String get homeActiveEventsEmpty => '目前沒有生效中的事件';
+
+  @override
   String get mapLayers => '圖層';
 
   @override
@@ -1497,6 +1537,46 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '湿度';
+
+  @override
+  String get homeForecastTitle => '24小时预报';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '体感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '湿度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · $level 级';
+  }
+
+  @override
+  String get homeForecastUnavailable => '选择乡镇后可查看预报';
+
+  @override
+  String get homeForecastEmpty => '目前没有预报数据';
+
+  @override
+  String get homeActiveEventsTitle => '生效中事件';
+
+  @override
+  String get homeActiveEventsEmpty => '目前没有生效中的事件';
 
   @override
   String get mapLayers => '图层';
@@ -2590,6 +2670,46 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherHumidity => '濕度';
 
   @override
+  String get homeForecastTitle => '24小時預報';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '體感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '濕度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · $level 級';
+  }
+
+  @override
+  String get homeForecastUnavailable => '選擇地區後可查看預報';
+
+  @override
+  String get homeForecastEmpty => '目前沒有預報資料';
+
+  @override
+  String get homeActiveEventsTitle => '生效中事件';
+
+  @override
+  String get homeActiveEventsEmpty => '目前沒有生效中的事件';
+
+  @override
   String get mapLayers => '圖層';
 
   @override
@@ -3679,6 +3799,46 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '濕度';
+
+  @override
+  String get homeForecastTitle => '24小時預報';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '體感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '濕度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · $level 級';
+  }
+
+  @override
+  String get homeForecastUnavailable => '選擇鄉鎮後可查看預報';
+
+  @override
+  String get homeForecastEmpty => '目前沒有預報資料';
+
+  @override
+  String get homeActiveEventsTitle => '生效中事件';
+
+  @override
+  String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
   String get mapLayers => '圖層';
