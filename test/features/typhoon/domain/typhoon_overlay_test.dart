@@ -252,11 +252,10 @@ void main() {
       expect(dolphinPast, hasLength(2));
       expect((dolphinPast.first as Map)['properties']['intensity'], 'moderate');
 
-      final cones15 = (out['features'] as List).where(
-        (f) =>
-            (f as Map)['properties']?['kind'] == 'cone' &&
-            (f as Map)['properties']?['tdNo'] == '15',
-      );
+      final cones15 = (out['features'] as List).where((f) {
+        final p = (f as Map)['properties'];
+        return p?['kind'] == 'cone' && p?['tdNo'] == '15';
+      });
       expect(cones15, hasLength(1));
       final ring15 =
           (((cones15.first as Map)['geometry'] as Map)['coordinates']
@@ -265,11 +264,10 @@ void main() {
       expect(ring15.length, greaterThan(6));
       expect(ring15.first, ring15.last);
 
-      final cones14 = (out['features'] as List).where(
-        (f) =>
-            (f as Map)['properties']?['kind'] == 'cone' &&
-            (f as Map)['properties']?['tdNo'] == '14',
-      );
+      final cones14 = (out['features'] as List).where((f) {
+        final p = (f as Map)['properties'];
+        return p?['kind'] == 'cone' && p?['tdNo'] == '14';
+      });
       expect(cones14, hasLength(1));
       // Official potential cone (3 verts), not r70 hull.
       final ring14 =
