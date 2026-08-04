@@ -454,6 +454,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get homeActiveEventsEmpty => 'Walang aktibong event';
 
   @override
+  String get homeRainTrendTitle => 'Ulan sa susunod na oras';
+
+  @override
   String get mapLayers => 'Mga Layer';
 
   @override

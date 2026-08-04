@@ -622,6 +622,10 @@
   "@homeActiveEventsEmpty": {
     "description": "Empty state when the realtime event feed has nothing in effect"
   },
+  "homeRainTrendTitle": "Next hour rain",
+  "@homeRainTrendTitle": {
+    "description": "Section title for the home sheet 1-hour per-minute rainfall bar chart"
+  },
   "mapLayers": "Layers",
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"

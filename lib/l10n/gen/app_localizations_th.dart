@@ -450,6 +450,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeActiveEventsEmpty => 'ไม่มีเหตุการณ์ที่ยังมีผล';
 
   @override
+  String get homeRainTrendTitle => 'ฝนชั่วโมงถัดไป';
+
+  @override
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override

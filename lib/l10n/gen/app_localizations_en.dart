@@ -451,6 +451,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeActiveEventsEmpty => 'No active events';
 
   @override
+  String get homeRainTrendTitle => 'Next hour rain';
+
+  @override
   String get mapLayers => 'Layers';
 
   @override

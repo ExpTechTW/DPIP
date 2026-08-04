@@ -449,6 +449,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeActiveEventsEmpty => '発生中の事象はありません';
 
   @override
+  String get homeRainTrendTitle => '今後1時間の雨';
+
+  @override
   String get mapLayers => 'レイヤー';
 
   @override

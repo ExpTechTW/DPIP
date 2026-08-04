@@ -11,9 +11,10 @@ import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter/foundation.dart';
 
 /// Fetches nearest-station realtime weather and the township hourly forecast for
-/// the home sheet, following the selected [RegionStore] area (or the current GPS
-/// township when nationwide is selected). Reloads when the area changes; the
-/// last values are kept while a new fetch runs so the sheet never blanks.
+/// the home sheet, following the selected [RegionStore] township. 全國 has no
+/// point weather — [areaCode] is null and both feeds stay cleared. Reloads when
+/// the area changes; the last values are kept while a new fetch runs so the
+/// sheet never blanks.
 class HomeWeatherController extends ChangeNotifier {
   HomeWeatherController(this._repository, this._regions, this._directory) {
     _regions.addListener(_sync);
@@ -46,12 +47,12 @@ class HomeWeatherController extends ChangeNotifier {
   /// The last forecast failure, if the most recent forecast fetch failed.
   Failure? get forecastFailure => _forecastFailure;
 
-  /// The township code driving the weather: the selected saved/current area, or
-  /// the GPS township when nationwide is selected.
+  /// The township code driving the weather. Null for 全國 (no point weather) and
+  /// for 所在地 without a GPS fix.
   String? get areaCode => switch (_regions.selected) {
     SavedArea(:final code) => code,
     CurrentArea(:final code) => code,
-    NationwideArea() => _regions.currentCode,
+    NationwideArea() => null,
   };
 
   /// Re-fetches the current area even though it has not changed — the

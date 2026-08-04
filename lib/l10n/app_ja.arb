@@ -133,6 +133,7 @@
   "homeForecastEmpty": "予報データがありません",
   "homeActiveEventsTitle": "発生中の事象",
   "homeActiveEventsEmpty": "発生中の事象はありません",
+  "homeRainTrendTitle": "今後1時間の雨",
   "mapLayers": "レイヤー",
   "mapLayerRadar": "レーダー合成エコー図",
   "mapLayerSatellite": "ひまわり 赤外線図",

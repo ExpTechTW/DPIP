@@ -189,17 +189,7 @@ class DisasterMapLayer implements MapLayer {
       const CircleLayerProperties(
         circleColor: _clusterColor,
         circleOpacity: 0.75,
-        circleRadius: [
-          'step',
-          ['get', 'point_count'],
-          12,
-          10,
-          16,
-          50,
-          22,
-          200,
-          28,
-        ],
+        circleRadius: 18, // TEMP-DIAG constant instead of step()
       ),
       sourceLayer: 'aed',
       filter: ['has', 'point_count'],

@@ -19,8 +19,7 @@ class DisasterMapApi {
 
   /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
   String tileUrl(String layer) =>
-      '${_client.hostsFor(_tier).first}'
-      '/api/v2/tiles/dpm/$layer/{z}/{x}/{y}.mvt';
+      'http://127.0.0.1:18080/api/v2/tiles/dpm/$layer/{z}/{x}/{y}.mvt'; // TEMP-DIAG
 
   /// `GET /api/v2/tiles/dpm/aed/{id}`
   Future<Map<String, dynamic>> getAedDetail(int id) async {

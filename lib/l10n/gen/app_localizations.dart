@@ -915,6 +915,12 @@ abstract class AppLocalizations {
   /// **'No active events'**
   String get homeActiveEventsEmpty;
 
+  /// Section title for the home sheet 1-hour per-minute rainfall bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Next hour rain'**
+  String get homeRainTrendTitle;
+
   /// Title of the map layer-picker sheet
   ///
   /// In en, this message translates to:

@@ -448,6 +448,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
+  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+
+  @override
   String get mapLayers => '圖層';
 
   @override
@@ -1577,6 +1580,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get homeActiveEventsEmpty => '目前没有生效中的事件';
+
+  @override
+  String get homeRainTrendTitle => '近 1 小时降雨趋势';
 
   @override
   String get mapLayers => '图层';
@@ -2710,6 +2716,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
+  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+
+  @override
   String get mapLayers => '圖層';
 
   @override
@@ -3839,6 +3848,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
+
+  @override
+  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
 
   @override
   String get mapLayers => '圖層';

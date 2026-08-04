@@ -133,6 +133,7 @@
   "homeForecastEmpty": "Tidak ada data prakiraan",
   "homeActiveEventsTitle": "Peristiwa aktif",
   "homeActiveEventsEmpty": "Tidak ada peristiwa aktif",
+  "homeRainTrendTitle": "Hujan 1 jam ke depan",
   "mapLayers": "Lapisan",
   "mapLayerRadar": "Radar Komposit",
   "mapLayerSatellite": "Himawari Inframerah",

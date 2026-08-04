@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -160,6 +161,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, e, _) => RegionBar(
                     blend: HomeChrome.regionBlend(e),
                     dismiss: HomeChrome.regionDismiss(e),
+                    skyIsLight: weatherSkyIsLight(weatherMode),
                   ),
                 ),
               ),

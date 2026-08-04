@@ -133,6 +133,7 @@
   "homeForecastEmpty": "Walang forecast",
   "homeActiveEventsTitle": "Mga aktibong event",
   "homeActiveEventsEmpty": "Walang aktibong event",
+  "homeRainTrendTitle": "Ulan sa susunod na oras",
   "mapLayers": "Mga Layer",
   "mapLayerRadar": "Composite Radar Reflectivity",
   "mapLayerSatellite": "Himawari Infrared",

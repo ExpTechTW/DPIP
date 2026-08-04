@@ -133,6 +133,7 @@
   "homeForecastEmpty": "Không có dữ liệu dự báo",
   "homeActiveEventsTitle": "Sự kiện đang hiệu lực",
   "homeActiveEventsEmpty": "Không có sự kiện đang hiệu lực",
+  "homeRainTrendTitle": "Mưa 1 giờ tới",
   "mapLayers": "Lớp bản đồ",
   "mapLayerRadar": "Radar phản xạ tổng hợp",
   "mapLayerSatellite": "Himawari hồng ngoại",

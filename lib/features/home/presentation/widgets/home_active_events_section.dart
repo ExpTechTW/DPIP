@@ -13,108 +13,112 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-/// Active (realtime) disaster notices under the home header while the sheet is
-/// at rest. Full-screen swaps this out for the 24h forecast.
+/// Active (realtime) disaster notices under the home header. While the sheet is
+/// at rest the list sits flush on the sheet (no card fill); once flush
+/// full-screen it picks up the same glass card as the weather blocks above.
 class HomeActiveEventsSection extends StatelessWidget {
-  const HomeActiveEventsSection({super.key, this.reveal = 0});
+  const HomeActiveEventsSection({
+    super.key,
+    this.reveal = 0,
+    this.expanded = false,
+  });
 
   /// Weather-backdrop reveal (0→1) — glass + lightened foregrounds.
   final double reveal;
+
+  /// Sheet is flush full-screen — apply the glass card surface.
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final foreground = lightenOnReveal(colors.onSurface, reveal);
-    final secondary = lightenOnReveal(
-      colors.onSurfaceVariant,
-      reveal,
-      toAlpha: 0.75,
-    );
-    final cardColor = glassSurface(colors, reveal);
+    // Card / sheet ink — never lightened toward white (that fought the light
+    // glass plate). Header-over-sky contrast is handled separately.
+    final foreground = glassOnSurface(colors);
+    final secondary = glassOnSurfaceVariant(colors);
     final controller = context.watch<HomeActiveEventsController>();
     final area = context.watch<RegionStore>().selected;
     final noGps = area is CurrentArea && area.code == null;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: AppRadius.medium,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.notifications_active_outlined,
-                  size: 18,
+            Icon(
+              Icons.notifications_active_outlined,
+              size: 18,
+              color: secondary,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                l10n.homeActiveEventsTitle,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: foreground,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (controller.loading)
+              SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
                   color: secondary,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    l10n.homeActiveEventsTitle,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: foreground,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (controller.loading)
-                  SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: secondary,
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            if (noGps)
-              Text(
-                l10n.homeActiveEventsEmpty,
-                style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
-              )
-            else if (controller.failure != null && controller.events.isEmpty)
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.homeActiveEventsEmpty,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: secondary,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: controller.refresh,
-                    child: Text(l10n.commonRetry),
-                  ),
-                ],
-              )
-            else if (controller.events.isEmpty)
-              Text(
-                l10n.homeActiveEventsEmpty,
-                style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
-              )
-            else
-              for (var i = 0; i < controller.events.length; i++) ...[
-                if (i > 0) const SizedBox(height: AppSpacing.sm),
-                _ActiveEventRow(
-                  event: controller.events[i],
-                  foreground: foreground,
-                  secondary: secondary,
-                ),
-              ],
+              ),
           ],
         ),
+        const SizedBox(height: AppSpacing.md),
+        if (noGps)
+          Text(
+            l10n.homeActiveEventsEmpty,
+            style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
+          )
+        else if (controller.failure != null && controller.events.isEmpty)
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.homeActiveEventsEmpty,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
+                ),
+              ),
+              TextButton(
+                onPressed: controller.refresh,
+                child: Text(l10n.commonRetry),
+              ),
+            ],
+          )
+        else if (controller.events.isEmpty)
+          Text(
+            l10n.homeActiveEventsEmpty,
+            style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
+          )
+        else
+          for (var i = 0; i < controller.events.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.sm),
+            _ActiveEventRow(
+              event: controller.events[i],
+              foreground: foreground,
+              secondary: secondary,
+            ),
+          ],
+      ],
+    );
+
+    if (!expanded) return body;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: glassSurface(colors, reveal),
+        borderRadius: AppRadius.medium,
       ),
+      child: Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: body),
     );
   }
 }

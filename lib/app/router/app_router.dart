@@ -32,7 +32,7 @@ import 'package:provider/provider.dart';
 /// Route names/paths come from [AppRoutes] so features never import each other's
 /// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.homePath,
+  initialLocation: AppRoutes.mapPath, // TEMP-DIAG
   // First launch: hold everything behind onboarding until it's completed. The
   // redirect reads the app-wide OnboardingStore (mounted above the router), so
   // finishing onboarding (which flips the flag) lets a goNamed(home) through.

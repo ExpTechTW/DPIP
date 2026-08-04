@@ -24,7 +24,8 @@ import 'package:provider/provider.dart';
 class HomeForecastSection extends StatefulWidget {
   const HomeForecastSection({super.key, this.reveal = 0});
 
-  /// Weather-backdrop reveal (0→1) — glass + lightened foregrounds.
+  /// Weather-backdrop reveal (0→1) — drives glass card opacity only; ink stays
+  /// theme on-surface (cards are light plates).
   final double reveal;
 
   @override
@@ -41,12 +42,8 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final colors = theme.colorScheme;
     final controller = context.watch<HomeWeatherController>();
     final reveal = widget.reveal;
-    final foreground = lightenOnReveal(colors.onSurface, reveal);
-    final secondary = lightenOnReveal(
-      colors.onSurfaceVariant,
-      reveal,
-      toAlpha: 0.75,
-    );
+    final foreground = glassOnSurface(colors);
+    final secondary = glassOnSurfaceVariant(colors);
     final cardColor = glassSurface(colors, reveal);
 
     final code = controller.areaCode;
@@ -154,12 +151,8 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               painter: _TempSparklinePainter(
                 temps: temps,
                 selected: selected,
-                line: lightenOnReveal(colors.primary, reveal, toAlpha: 0.9),
-                fill: lightenOnReveal(
-                  colors.primary,
-                  reveal,
-                  toAlpha: 0.9,
-                ).withValues(alpha: 0.18),
+                line: colors.primary,
+                fill: colors.primary.withValues(alpha: 0.18),
                 mark: foreground,
               ),
               child: const SizedBox.expand(),
@@ -181,21 +174,15 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
                 );
                 final isSelected = index == selected;
                 return _HourChip(
-                  time: _hourLabel(p.time),
+                  time: l10n.chartHourLabel(_hourNumber(p.time)),
                   icon: icon,
-                  iconColor: accent != null
-                      ? lightenOnReveal(accent, reveal)
-                      : secondary,
+                  iconColor: accent ?? secondary,
                   temp: '${p.temperature.round()}°',
                   pop: l10n.homeForecastPop(p.pop.toString()),
                   selected: isSelected,
                   foreground: foreground,
                   secondary: secondary,
-                  selectedFill: lightenOnReveal(
-                    colors.primary,
-                    reveal,
-                    toAlpha: 0.22,
-                  ),
+                  selectedFill: colors.primary.withValues(alpha: 0.16),
                   onTap: () => setState(() => _selected = index),
                 );
               },
@@ -222,10 +209,11 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     );
   }
 
-  /// `"14:00"` → `"14"` for compact chips; full `time` stays in the detail band.
-  static String _hourLabel(String time) {
+  /// `"14:00"` → `14` for [AppLocalizations.chartHourLabel] (`14時`).
+  static int _hourNumber(String time) {
     final colon = time.indexOf(':');
-    return colon <= 0 ? time : time.substring(0, colon);
+    final raw = colon <= 0 ? time : time.substring(0, colon);
+    return int.tryParse(raw) ?? 0;
   }
 }
 
@@ -284,7 +272,7 @@ class _HourChip extends StatelessWidget {
         child: AnimatedContainer(
           duration: AppMotion.fast,
           curve: Curves.easeOutCubic,
-          width: 56,
+          width: 64,
           padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.sm,
             horizontal: AppSpacing.xs,

@@ -2,9 +2,12 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
+import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +20,9 @@ import 'package:provider/provider.dart';
 /// area slides only that panel (`_AreaSlide`); the list and its controller stay
 /// put, which is what keeps the sheet height stable across a switch.
 ///
-/// Below the header: **active events** while collapsed; once flush full-screen,
-/// the **24h forecast** appears above those same active events.
+/// Below the header: **active events** while collapsed; once flush full-screen
+/// on a township, **rain trend** + **24h forecast**, then active events. 全國
+/// skips weather entirely (name + events only).
 class HomeContent extends StatelessWidget {
   const HomeContent({
     super.key,
@@ -27,6 +31,7 @@ class HomeContent extends StatelessWidget {
     this.reveal = 0,
     this.topInset = 0,
     this.expanded = false,
+    this.weatherMode = WeatherMode.auto,
   });
 
   /// The draggable sheet's scroll controller.
@@ -36,8 +41,8 @@ class HomeContent extends StatelessWidget {
   /// the pull-up affordance is no longer needed.
   final double handleOpacity;
 
-  /// How much the weather backdrop is revealed (0→1) — content shifts to light
-  /// glass so it stays legible over the weather.
+  /// How much the weather backdrop is revealed (0→1) — glass card opacity +
+  /// sky-aware header ink.
   final double reveal;
 
   /// Extra top padding that clears the region-bar overlay as the sheet reaches
@@ -45,13 +50,18 @@ class HomeContent extends StatelessWidget {
   final double topInset;
 
   /// Sheet is flush full-screen — header typography/layout step up (chart-sheet
-  /// pattern), and the 24h forecast appears above the active-events block.
+  /// pattern); rain trend + 24h forecast appear above the active-events block
+  /// (township only).
   final bool expanded;
+
+  /// Backdrop sky mode — header ink picks dark vs white from this.
+  final WeatherMode weatherMode;
 
   @override
   Widget build(BuildContext context) {
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
+    final showWeather = store.selected is! NationwideArea;
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.fromLTRB(
@@ -70,11 +80,20 @@ class HomeContent extends StatelessWidget {
             key: ValueKey(areaIndex),
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HomeSheetHeader(reveal: reveal, expanded: expanded),
+              HomeSheetHeader(
+                reveal: reveal,
+                expanded: expanded,
+                weatherMode: weatherMode,
+              ),
               const SizedBox(height: AppSpacing.lg),
-              // Collapsed: active events only. Full-screen: forecast, then the
-              // same active-events block underneath.
-              if (expanded) ...[
+              // Collapsed: active events. Full-screen township: rain → forecast
+              // → events. 全國: events only (no point weather).
+              if (expanded && showWeather) ...[
+                HomeRainTrendSection(
+                  key: ValueKey('rain-$areaIndex'),
+                  reveal: reveal,
+                ),
+                const SizedBox(height: AppSpacing.lg),
                 HomeForecastSection(
                   key: ValueKey('forecast-$areaIndex'),
                   reveal: reveal,
@@ -84,6 +103,7 @@ class HomeContent extends StatelessWidget {
               HomeActiveEventsSection(
                 key: ValueKey('active-$areaIndex'),
                 reveal: reveal,
+                expanded: expanded,
               ),
             ],
           ),

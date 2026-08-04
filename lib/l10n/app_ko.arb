@@ -133,6 +133,7 @@
   "homeForecastEmpty": "예보 데이터가 없습니다",
   "homeActiveEventsTitle": "발효 중 이벤트",
   "homeActiveEventsEmpty": "발효 중인 이벤트가 없습니다",
+  "homeRainTrendTitle": "향후 1시간 강수",
   "mapLayers": "레이어",
   "mapLayerRadar": "레이더 합성 에코",
   "mapLayerSatellite": "히마와리 적외",

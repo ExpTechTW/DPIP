@@ -450,6 +450,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeActiveEventsEmpty => 'Không có sự kiện đang hiệu lực';
 
   @override
+  String get homeRainTrendTitle => 'Mưa 1 giờ tới';
+
+  @override
   String get mapLayers => 'Lớp bản đồ';
 
   @override

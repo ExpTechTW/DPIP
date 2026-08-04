@@ -133,6 +133,7 @@
   "homeForecastEmpty": "ไม่มีข้อมูลพยากรณ์",
   "homeActiveEventsTitle": "เหตุการณ์ที่ยังมีผล",
   "homeActiveEventsEmpty": "ไม่มีเหตุการณ์ที่ยังมีผล",
+  "homeRainTrendTitle": "ฝนชั่วโมงถัดไป",
   "mapLayers": "ชั้นข้อมูล",
   "mapLayerRadar": "เรดาร์สะท้อนสังเคราะห์",
   "mapLayerSatellite": "ฮิมาวาริ อินฟราเรด",

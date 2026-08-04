@@ -451,6 +451,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeActiveEventsEmpty => 'Tidak ada peristiwa aktif';
 
   @override
+  String get homeRainTrendTitle => 'Hujan 1 jam ke depan';
+
+  @override
   String get mapLayers => 'Lapisan';
 
   @override

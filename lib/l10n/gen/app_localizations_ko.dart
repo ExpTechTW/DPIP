@@ -449,6 +449,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeActiveEventsEmpty => '발효 중인 이벤트가 없습니다';
 
   @override
+  String get homeRainTrendTitle => '향후 1시간 강수';
+
+  @override
   String get mapLayers => '레이어';
 
   @override

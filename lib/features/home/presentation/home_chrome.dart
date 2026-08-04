@@ -38,7 +38,7 @@ class HomeChrome {
   static double navDismiss(double extent) => _ramp(extent, _navFrom, _navTo);
 
   /// Region-bar blend into the backdrop, `0` (opaque surface) → `1` (transparent
-  /// with light badges) — tracks the weather reveal so the bar dissolves in step
+  /// with sky-aware badge ink) — tracks the weather reveal so the bar dissolves in step
   /// with the weather appearing behind it.
   static double regionBlend(double extent) => weatherReveal(extent);
 

@@ -120,6 +120,7 @@ class HomeSheet extends StatelessWidget {
                   reveal: weatherOpacity,
                   topInset: lerpDouble(0, regionBarInset, flush)!,
                   expanded: HomeSheetExtent.isAtTop(e),
+                  weatherMode: weatherMode,
                 ),
               ],
             ),
