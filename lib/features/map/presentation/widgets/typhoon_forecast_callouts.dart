@@ -193,18 +193,26 @@ class _TyphoonForecastCalloutOverlayState
       if (mounted && gen == _gen) setState(() => _placed = const []);
       return;
     }
-    final forecasts = widget.layer.selectedForecasts;
-    if (forecasts.isEmpty) {
+    // Every active cyclone's forecast — not just the focused one — each
+    // sorted by lead time on its own track so the thinning/placement walk
+    // below stays a sensible pass along that one storm's points.
+    final tracks = <List<TrackForecast>>[
+      for (final t
+          in widget.layer.track.value?.cyclones ?? const <TyphoonTrack>[])
+        if (t.forecast.isNotEmpty)
+          ([...t.forecast]..sort((a, b) => a.tau.compareTo(b.tau))),
+    ];
+    if (tracks.isEmpty) {
       if (mounted && gen == _gen) setState(() => _placed = const []);
       return;
     }
-    final ordered = [...forecasts]..sort((a, b) => a.tau.compareTo(b.tau));
     final stride = forecastCalloutStride(zoom);
 
     late final List<math.Point<num>> screens;
     try {
       screens = await controller.toScreenLocationBatch([
-        for (final f in ordered) LatLng(f.latitude, f.longitude),
+        for (final ordered in tracks)
+          for (final f in ordered) LatLng(f.latitude, f.longitude),
       ]);
     } catch (_) {
       if (mounted && gen == _gen) setState(() => _placed = const []);
@@ -217,58 +225,68 @@ class _TyphoonForecastCalloutOverlayState
     }
 
     final size = MediaQuery.sizeOf(context);
-    // Thin from the first on-screen fix — not track index 0 (may be off-map).
-    final firstVisible = indexOfFirstVisibleForecast(
-      screens: screens,
-      viewport: size,
-    );
-    if (firstVisible < 0) {
-      setState(() => _placed = const []);
-      return;
-    }
-    final picked = pickedForecastIndices(
-      count: ordered.length,
-      firstVisible: firstVisible,
-      stride: stride,
+    // Matched by value, not `tau` — two storms can share a lead time, and
+    // `TrackForecast` is a plain value type so this still lands on the exact
+    // tapped point regardless of which storm it belongs to.
+    final tappedForecast = widget.layer.forecastForLabel(
+      widget.layer.tapped.value,
     );
 
     final placed = <_PlacedCallout>[];
     final boxes = <Rect>[];
-    final tappedTau = widget.layer
-        .forecastForLabel(widget.layer.tapped.value)
-        ?.tau;
-
-    for (var k = 0; k < picked.length; k++) {
-      final i = picked[k];
-      final anchor = Offset(screens[i].x.toDouble(), screens[i].y.toDouble());
-      if (anchor.dx < -40 ||
-          anchor.dy < -40 ||
-          anchor.dx > size.width + 40 ||
-          anchor.dy > size.height + 40) {
-        continue;
-      }
-      final data = ForecastCalloutData.from(ordered[i]);
-      final chipH = data.estimatedHeight;
-      final pick = _pickVerticalTip(
-        anchor: anchor,
-        preferAbove: k.isEven,
-        chipW: _cardW,
-        chipH: chipH,
-        occupied: boxes,
+    var k = 0;
+    var offset = 0;
+    for (final ordered in tracks) {
+      final trackScreens = screens.sublist(offset, offset + ordered.length);
+      offset += ordered.length;
+      // Thin from the first on-screen fix — not track index 0 (may be off-map).
+      final firstVisible = indexOfFirstVisibleForecast(
+        screens: trackScreens,
         viewport: size,
       );
-      boxes.add(Rect.fromLTWH(pick.tip.dx, pick.tip.dy, _cardW, chipH));
-      placed.add(
-        _PlacedCallout(
-          anchor: anchor,
-          tip: pick.tip,
-          width: _cardW,
-          height: chipH,
-          above: pick.above,
-          data: data,
-          selected: tappedTau == ordered[i].tau,
-        ),
+      if (firstVisible < 0) continue;
+      final picked = pickedForecastIndices(
+        count: ordered.length,
+        firstVisible: firstVisible,
+        stride: stride,
       );
+
+      for (final i in picked) {
+        final anchor = Offset(
+          trackScreens[i].x.toDouble(),
+          trackScreens[i].y.toDouble(),
+        );
+        if (anchor.dx < -40 ||
+            anchor.dy < -40 ||
+            anchor.dx > size.width + 40 ||
+            anchor.dy > size.height + 40) {
+          k++;
+          continue;
+        }
+        final data = ForecastCalloutData.from(ordered[i]);
+        final chipH = data.estimatedHeight;
+        final pick = _pickVerticalTip(
+          anchor: anchor,
+          preferAbove: k.isEven,
+          chipW: _cardW,
+          chipH: chipH,
+          occupied: boxes,
+          viewport: size,
+        );
+        k++;
+        boxes.add(Rect.fromLTWH(pick.tip.dx, pick.tip.dy, _cardW, chipH));
+        placed.add(
+          _PlacedCallout(
+            anchor: anchor,
+            tip: pick.tip,
+            width: _cardW,
+            height: chipH,
+            above: pick.above,
+            data: data,
+            selected: tappedForecast != null && tappedForecast == ordered[i],
+          ),
+        );
+      }
     }
     if (!mounted || gen != _gen || _blocked) return;
     setState(() => _placed = placed);

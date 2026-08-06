@@ -85,9 +85,34 @@ class _AedSheetState extends State<AedSheet> {
                 snap: true,
                 snapSizes: const [AedSheet._rest],
                 builder: (context, scrollController) {
+                  // Built once — only `atTop` below needs the live extent;
+                  // handing the list down via the `ValueListenableBuilder`'s
+                  // `child` keeps it out of the per-frame rebuild that would
+                  // otherwise redo it on every pixel of the drag.
+                  final content = ListView(
+                    controller: scrollController,
+                    padding: EdgeInsets.only(
+                      bottom:
+                          MediaQuery.viewPaddingOf(context).bottom +
+                          AppSpacing.md,
+                    ),
+                    children: [
+                      _Grip(extent: _extent),
+                      if (!selected)
+                        _Hint()
+                      else
+                        _Body(
+                          detail: widget.detail,
+                          previewName: widget.previewName,
+                          previewPlace: widget.previewPlace,
+                          onClose: widget.onClose,
+                        ),
+                    ],
+                  );
                   return ValueListenableBuilder<double>(
                     valueListenable: _extent,
-                    builder: (context, extent, _) {
+                    child: content,
+                    builder: (context, extent, content) {
                       final atTop = AedSheet._isAtTop(extent);
                       final topInset = MediaQuery.viewPaddingOf(context).top;
                       return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -105,26 +130,7 @@ class _AedSheetState extends State<AedSheet> {
                           flushTop: atTop,
                           child: Padding(
                             padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                            child: ListView(
-                              controller: scrollController,
-                              padding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.viewPaddingOf(context).bottom +
-                                    AppSpacing.md,
-                              ),
-                              children: [
-                                _Grip(extent: _extent),
-                                if (!selected)
-                                  _Hint()
-                                else
-                                  _Body(
-                                    detail: widget.detail,
-                                    previewName: widget.previewName,
-                                    previewPlace: widget.previewPlace,
-                                    onClose: widget.onClose,
-                                  ),
-                              ],
-                            ),
+                            child: content!,
                           ),
                         ),
                       );

@@ -247,14 +247,65 @@ String cycloneSheetTitle(
   return spec.displayName ?? l10n.typhoonIntensityTd;
 }
 
-class _Bulletin extends StatelessWidget {
+class _Bulletin extends StatefulWidget {
   const _Bulletin({required this.layer, required this.extent});
 
   final TyphoonMapLayer layer;
   final ValueListenable<double> extent;
 
   @override
+  State<_Bulletin> createState() => _BulletinState();
+}
+
+/// Self-listens to [_Bulletin.extent] for just the `atTop` flip — the same
+/// technique as [_Grip] above — instead of merging `extent` straight into the
+/// [ListenableBuilder] below. `extent` used to sit in that same
+/// `Listenable.merge`, which fired this whole bulletin's rebuild (cyclone-name
+/// formatting, the picker menu, the position/wind/pressure table) on every
+/// pixel of the sheet's drag, even though only four style choices below
+/// actually read `atTop`. `setState` only runs when the derived boolean
+/// changes, so the bulletin now rebuilds on data updates plus the (rare) top
+/// threshold crossing — not on every drag tick.
+class _BulletinState extends State<_Bulletin> {
+  late bool _atTop = TyphoonPanel._isAtTop(widget.extent.value);
+
+  @override
+  void initState() {
+    super.initState();
+    widget.extent.addListener(_onExtent);
+  }
+
+  @override
+  void didUpdateWidget(_Bulletin old) {
+    super.didUpdateWidget(old);
+    if (old.extent != widget.extent) {
+      old.extent.removeListener(_onExtent);
+      widget.extent.addListener(_onExtent);
+      _onExtent();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.extent.removeListener(_onExtent);
+    super.dispose();
+  }
+
+  void _onExtent() {
+    final next = TyphoonPanel._isAtTop(widget.extent.value);
+    if (next == _atTop) return;
+    // Defer — flipping mid-DSS-layout dirties parentData for semantics (see
+    // `_Grip`'s identical guard above).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final atTop = TyphoonPanel._isAtTop(widget.extent.value);
+      if (atTop != _atTop) setState(() => _atTop = atTop);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final layer = widget.layer;
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
@@ -274,7 +325,6 @@ class _Bulletin extends StatelessWidget {
         layer.summary,
         layer.track,
         layer.selectedCycloneKey,
-        extent,
       ]),
       builder: (context, _) {
         // Sheet SoT = selected track. Index summary is only a fallback when
@@ -286,7 +336,7 @@ class _Bulletin extends StatelessWidget {
             ? track.analysis.last
             : null;
         final now = track?.now;
-        final atTop = TyphoonPanel._isAtTop(extent.value);
+        final atTop = _atTop;
 
         if (track == null && summary == null) {
           return Padding(

@@ -151,19 +151,26 @@ class _HomePageState extends State<HomePage> {
               ),
               // Region bar overlay — blends into the weather, then dismisses as
               // the rising sheet invades it (Home derives the dials from extent;
-              // the bar itself stays feature-agnostic).
+              // the bar itself stays feature-agnostic). Both dials sit at 0 for
+              // most of the sheet's travel (they only move in its top ~15%), so
+              // this selects the pair rather than rebuilding the badge carousel
+              // on every tick of the drag.
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
-                child: ValueListenableBuilder<double>(
-                  valueListenable: extent,
-                  builder: (context, e, _) => RegionBar(
-                    blend: HomeChrome.regionBlend(e),
-                    dismiss: HomeChrome.regionDismiss(e),
-                    skyIsLight: weatherSkyIsLight(weatherMode),
-                  ),
-                ),
+                child:
+                    Selector<HomeSheetExtent, ({double blend, double dismiss})>(
+                      selector: (_, sheetExtent) => (
+                        blend: HomeChrome.regionBlend(sheetExtent.value),
+                        dismiss: HomeChrome.regionDismiss(sheetExtent.value),
+                      ),
+                      builder: (context, dials, _) => RegionBar(
+                        blend: dials.blend,
+                        dismiss: dials.dismiss,
+                        skyIsLight: weatherSkyIsLight(weatherMode),
+                      ),
+                    ),
               ),
             ],
           ),

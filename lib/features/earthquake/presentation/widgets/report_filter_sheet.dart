@@ -323,13 +323,299 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
             snap: true,
             snapSizes: const [_restExtent],
             builder: (context, scrollController) {
+              // Built once — this outer `builder` only runs once, the same way
+              // `DraggableScrollableSheet` itself hands its child down via `child`
+              // rather than rebuilding it (see its source). Only `atTop` below
+              // needs the live extent; handing the form down via the
+              // `ValueListenableBuilder`'s `child` keeps it (three `RangeSlider`s,
+              // chips, the date section) out of the per-frame rebuild that used to
+              // make dragging this sheet janky.
+              final content = Column(
+                children: [
+                  _SheetGrip(extent: _extent),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      // Scrollables inherit MediaQuery padding by
+                      // default — that would shove a status-bar gap
+                      // above the grip even mid-height.
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.sm,
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                      ),
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              tooltip: l10n.reportFilterIntensityInfoTitle,
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => _showIntensityScaleInfo(context),
+                              icon: Icon(
+                                Icons.info_outline,
+                                color: colors.primary,
+                              ),
+                            ),
+                            Icon(Icons.tune, color: colors.primary),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                l10n.reportFilterTitle,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: _reset,
+                              child: Text(l10n.reportFilterReset),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          icon: Icons.sort,
+                          title: l10n.reportFilterSort,
+                          trailing: _ValuePill(
+                            label:
+                                '${_sortLabel(l10n, _sort)} · '
+                                '${_order == 'desc' ? l10n.reportFilterOrderDesc : l10n.reportFilterOrderAsc}',
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Wrap(
+                                spacing: AppSpacing.sm,
+                                runSpacing: AppSpacing.sm,
+                                children: [
+                                  for (final key in _sortKeys)
+                                    ChoiceChip(
+                                      label: Text(_sortLabel(l10n, key)),
+                                      selected: _sort == key,
+                                      onSelected: (_) {
+                                        HapticFeedback.selectionClick();
+                                        setState(() => _sort = key);
+                                      },
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              SegmentedButton<String>(
+                                segments: [
+                                  ButtonSegment(
+                                    value: 'desc',
+                                    icon: const Icon(
+                                      Icons.arrow_downward,
+                                      size: 18,
+                                    ),
+                                    label: Text(l10n.reportFilterOrderDesc),
+                                  ),
+                                  ButtonSegment(
+                                    value: 'asc',
+                                    icon: const Icon(
+                                      Icons.arrow_upward,
+                                      size: 18,
+                                    ),
+                                    label: Text(l10n.reportFilterOrderAsc),
+                                  ),
+                                ],
+                                selected: {_order},
+                                onSelectionChanged: (next) {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _order = next.first);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          icon: Icons.vibration,
+                          title: l10n.reportFilterIntensity,
+                          trailing: _ValuePill(
+                            label: _intensityFull
+                                ? l10n.reportFilterAny
+                                : l10n.reportFilterRange(
+                                    Intensity.label(_intensity.start.round()),
+                                    Intensity.label(_intensity.end.round()),
+                                  ),
+                          ),
+                          child: SliderTheme(
+                            data: _sliderTheme(context),
+                            child: RangeSlider(
+                              values: _intensity,
+                              min: _intensityMin,
+                              max: _intensityMax,
+                              divisions: 8,
+                              labels: RangeLabels(
+                                Intensity.label(_intensity.start.round()),
+                                Intensity.label(_intensity.end.round()),
+                              ),
+                              onChanged: (v) => setState(() => _intensity = v),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          icon: Icons.speed_outlined,
+                          title: l10n.reportFilterMagnitude,
+                          trailing: _ValuePill(
+                            label: _magnitudeFull
+                                ? l10n.reportFilterAny
+                                : l10n.reportFilterRange(
+                                    'M${_magnitude.start.toStringAsFixed(1)}',
+                                    'M${_magnitude.end.toStringAsFixed(1)}',
+                                  ),
+                          ),
+                          child: SliderTheme(
+                            data: _sliderTheme(context),
+                            child: RangeSlider(
+                              values: _magnitude,
+                              min: _magMin,
+                              max: _magMax,
+                              divisions: 16,
+                              labels: RangeLabels(
+                                'M${_magnitude.start.toStringAsFixed(1)}',
+                                'M${_magnitude.end.toStringAsFixed(1)}',
+                              ),
+                              onChanged: (v) => setState(() => _magnitude = v),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          icon: Icons.vertical_align_bottom_outlined,
+                          title: l10n.reportFilterDepth,
+                          trailing: _ValuePill(
+                            label: _depthFull
+                                ? l10n.reportFilterAny
+                                : l10n.reportFilterRange(
+                                    l10n.reportFilterDepthKm(
+                                      _depth.start.toStringAsFixed(0),
+                                    ),
+                                    _depth.end >= _depthCeil
+                                        ? l10n.reportFilterAny
+                                        : l10n.reportFilterDepthKm(
+                                            _depth.end.toStringAsFixed(0),
+                                          ),
+                                  ),
+                          ),
+                          child: SliderTheme(
+                            data: _sliderTheme(context),
+                            child: RangeSlider(
+                              values: _depth,
+                              min: _depthFloor,
+                              max: _depthCeil,
+                              divisions: 30,
+                              labels: RangeLabels(
+                                l10n.reportFilterDepthKm(
+                                  _depth.start.toStringAsFixed(0),
+                                ),
+                                _depth.end >= _depthCeil
+                                    ? l10n.reportFilterAny
+                                    : l10n.reportFilterDepthKm(
+                                        _depth.end.toStringAsFixed(0),
+                                      ),
+                              ),
+                              onChanged: (v) => setState(() => _depth = v),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          icon: Icons.date_range_outlined,
+                          title: l10n.reportFilterDate,
+                          trailing: _ValuePill(
+                            label: _dates == null
+                                ? l10n.reportFilterAny
+                                : l10n.reportFilterRange(
+                                    dateFmt.format(_dates!.start),
+                                    dateFmt.format(_dates!.end),
+                                  ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: _pickDates,
+                                      icon: const Icon(
+                                        Icons.calendar_month_outlined,
+                                      ),
+                                      label: Text(
+                                        _dates == null
+                                            ? l10n.reportFilterDatePick
+                                            : l10n.reportFilterRange(
+                                                dateFmt.format(_dates!.start),
+                                                dateFmt.format(_dates!.end),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (_dates != null) ...[
+                                    const SizedBox(width: AppSpacing.sm),
+                                    IconButton.filledTonal(
+                                      tooltip: l10n.reportFilterReset,
+                                      onPressed: () =>
+                                          setState(() => _dates = null),
+                                      icon: const Icon(Icons.clear),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                l10n.reportFilterDateStartNote,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                l10n.reportFilterDateEndNote,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                      AppSpacing.lg,
+                      AppSpacing.lg + widget.systemPadding.bottom,
+                    ),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppRadius.medium,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(
+                        context,
+                        ReportFilterSheetResult(query: _build(), search: true),
+                      ),
+                      child: Text(l10n.reportFilterApply),
+                    ),
+                  ),
+                ],
+              );
               return ValueListenableBuilder<double>(
                 valueListenable: _extent,
-                builder: (context, extent, _) {
+                child: content,
+                builder: (context, extent, content) {
                   final atTop = _isAtTop(extent);
                   final viewInsets = MediaQuery.viewInsetsOf(context);
                   final topInset = widget.systemPadding.top;
-                  final bottomInset = widget.systemPadding.bottom;
                   return AnnotatedRegion<SystemUiOverlayStyle>(
                     value: SystemUiOverlayStyle(
                       statusBarColor: atTop
@@ -341,329 +627,16 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
                           : Brightness.dark,
                       statusBarBrightness: theme.brightness,
                     ),
+                    // Sheet paints under the status bar; pad content only when
+                    // flush so mid-height has no top gap (same as StationSheet).
                     child: _SheetSurface(
                       flushTop: atTop,
-                      // Sheet paints under the status bar; pad content only when
-                      // flush so mid-height has no top gap (same as StationSheet).
                       child: Padding(
                         padding: EdgeInsets.only(
                           top: atTop ? topInset : 0,
                           bottom: viewInsets.bottom,
                         ),
-                        child: Column(
-                          children: [
-                            _SheetGrip(extent: _extent),
-                            Expanded(
-                              child: ListView(
-                                controller: scrollController,
-                                // Scrollables inherit MediaQuery padding by
-                                // default — that would shove a status-bar gap
-                                // above the grip even mid-height.
-                                padding: const EdgeInsets.fromLTRB(
-                                  AppSpacing.lg,
-                                  AppSpacing.sm,
-                                  AppSpacing.lg,
-                                  AppSpacing.md,
-                                ),
-                                children: [
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        tooltip:
-                                            l10n.reportFilterIntensityInfoTitle,
-                                        visualDensity: VisualDensity.compact,
-                                        onPressed: () =>
-                                            _showIntensityScaleInfo(context),
-                                        icon: Icon(
-                                          Icons.info_outline,
-                                          color: colors.primary,
-                                        ),
-                                      ),
-                                      Icon(Icons.tune, color: colors.primary),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Expanded(
-                                        child: Text(
-                                          l10n.reportFilterTitle,
-                                          style: theme.textTheme.titleLarge
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: _reset,
-                                        child: Text(l10n.reportFilterReset),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _SectionCard(
-                                    icon: Icons.sort,
-                                    title: l10n.reportFilterSort,
-                                    trailing: _ValuePill(
-                                      label:
-                                          '${_sortLabel(l10n, _sort)} · '
-                                          '${_order == 'desc' ? l10n.reportFilterOrderDesc : l10n.reportFilterOrderAsc}',
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Wrap(
-                                          spacing: AppSpacing.sm,
-                                          runSpacing: AppSpacing.sm,
-                                          children: [
-                                            for (final key in _sortKeys)
-                                              ChoiceChip(
-                                                label: Text(
-                                                  _sortLabel(l10n, key),
-                                                ),
-                                                selected: _sort == key,
-                                                onSelected: (_) {
-                                                  HapticFeedback.selectionClick();
-                                                  setState(() => _sort = key);
-                                                },
-                                              ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: AppSpacing.md),
-                                        SegmentedButton<String>(
-                                          segments: [
-                                            ButtonSegment(
-                                              value: 'desc',
-                                              icon: const Icon(
-                                                Icons.arrow_downward,
-                                                size: 18,
-                                              ),
-                                              label: Text(
-                                                l10n.reportFilterOrderDesc,
-                                              ),
-                                            ),
-                                            ButtonSegment(
-                                              value: 'asc',
-                                              icon: const Icon(
-                                                Icons.arrow_upward,
-                                                size: 18,
-                                              ),
-                                              label: Text(
-                                                l10n.reportFilterOrderAsc,
-                                              ),
-                                            ),
-                                          ],
-                                          selected: {_order},
-                                          onSelectionChanged: (next) {
-                                            HapticFeedback.selectionClick();
-                                            setState(() => _order = next.first);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _SectionCard(
-                                    icon: Icons.vibration,
-                                    title: l10n.reportFilterIntensity,
-                                    trailing: _ValuePill(
-                                      label: _intensityFull
-                                          ? l10n.reportFilterAny
-                                          : l10n.reportFilterRange(
-                                              Intensity.label(
-                                                _intensity.start.round(),
-                                              ),
-                                              Intensity.label(
-                                                _intensity.end.round(),
-                                              ),
-                                            ),
-                                    ),
-                                    child: SliderTheme(
-                                      data: _sliderTheme(context),
-                                      child: RangeSlider(
-                                        values: _intensity,
-                                        min: _intensityMin,
-                                        max: _intensityMax,
-                                        divisions: 8,
-                                        labels: RangeLabels(
-                                          Intensity.label(
-                                            _intensity.start.round(),
-                                          ),
-                                          Intensity.label(
-                                            _intensity.end.round(),
-                                          ),
-                                        ),
-                                        onChanged: (v) =>
-                                            setState(() => _intensity = v),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _SectionCard(
-                                    icon: Icons.speed_outlined,
-                                    title: l10n.reportFilterMagnitude,
-                                    trailing: _ValuePill(
-                                      label: _magnitudeFull
-                                          ? l10n.reportFilterAny
-                                          : l10n.reportFilterRange(
-                                              'M${_magnitude.start.toStringAsFixed(1)}',
-                                              'M${_magnitude.end.toStringAsFixed(1)}',
-                                            ),
-                                    ),
-                                    child: SliderTheme(
-                                      data: _sliderTheme(context),
-                                      child: RangeSlider(
-                                        values: _magnitude,
-                                        min: _magMin,
-                                        max: _magMax,
-                                        divisions: 16,
-                                        labels: RangeLabels(
-                                          'M${_magnitude.start.toStringAsFixed(1)}',
-                                          'M${_magnitude.end.toStringAsFixed(1)}',
-                                        ),
-                                        onChanged: (v) =>
-                                            setState(() => _magnitude = v),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _SectionCard(
-                                    icon: Icons.vertical_align_bottom_outlined,
-                                    title: l10n.reportFilterDepth,
-                                    trailing: _ValuePill(
-                                      label: _depthFull
-                                          ? l10n.reportFilterAny
-                                          : l10n.reportFilterRange(
-                                              l10n.reportFilterDepthKm(
-                                                _depth.start.toStringAsFixed(0),
-                                              ),
-                                              _depth.end >= _depthCeil
-                                                  ? l10n.reportFilterAny
-                                                  : l10n.reportFilterDepthKm(
-                                                      _depth.end
-                                                          .toStringAsFixed(0),
-                                                    ),
-                                            ),
-                                    ),
-                                    child: SliderTheme(
-                                      data: _sliderTheme(context),
-                                      child: RangeSlider(
-                                        values: _depth,
-                                        min: _depthFloor,
-                                        max: _depthCeil,
-                                        divisions: 30,
-                                        labels: RangeLabels(
-                                          l10n.reportFilterDepthKm(
-                                            _depth.start.toStringAsFixed(0),
-                                          ),
-                                          _depth.end >= _depthCeil
-                                              ? l10n.reportFilterAny
-                                              : l10n.reportFilterDepthKm(
-                                                  _depth.end.toStringAsFixed(0),
-                                                ),
-                                        ),
-                                        onChanged: (v) =>
-                                            setState(() => _depth = v),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _SectionCard(
-                                    icon: Icons.date_range_outlined,
-                                    title: l10n.reportFilterDate,
-                                    trailing: _ValuePill(
-                                      label: _dates == null
-                                          ? l10n.reportFilterAny
-                                          : l10n.reportFilterRange(
-                                              dateFmt.format(_dates!.start),
-                                              dateFmt.format(_dates!.end),
-                                            ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: OutlinedButton.icon(
-                                                onPressed: _pickDates,
-                                                icon: const Icon(
-                                                  Icons.calendar_month_outlined,
-                                                ),
-                                                label: Text(
-                                                  _dates == null
-                                                      ? l10n.reportFilterDatePick
-                                                      : l10n.reportFilterRange(
-                                                          dateFmt.format(
-                                                            _dates!.start,
-                                                          ),
-                                                          dateFmt.format(
-                                                            _dates!.end,
-                                                          ),
-                                                        ),
-                                                ),
-                                              ),
-                                            ),
-                                            if (_dates != null) ...[
-                                              const SizedBox(
-                                                width: AppSpacing.sm,
-                                              ),
-                                              IconButton.filledTonal(
-                                                tooltip: l10n.reportFilterReset,
-                                                onPressed: () => setState(
-                                                  () => _dates = null,
-                                                ),
-                                                icon: const Icon(Icons.clear),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                        const SizedBox(height: AppSpacing.sm),
-                                        Text(
-                                          l10n.reportFilterDateStartNote,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                color: colors.onSurfaceVariant,
-                                              ),
-                                        ),
-                                        const SizedBox(height: AppSpacing.xs),
-                                        Text(
-                                          l10n.reportFilterDateEndNote,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                color: colors.onSurfaceVariant,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                AppSpacing.lg,
-                                AppSpacing.sm,
-                                AppSpacing.lg,
-                                AppSpacing.lg + bottomInset,
-                              ),
-                              child: FilledButton(
-                                style: FilledButton.styleFrom(
-                                  minimumSize: const Size.fromHeight(48),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: AppRadius.medium,
-                                  ),
-                                ),
-                                onPressed: () => Navigator.pop(
-                                  context,
-                                  ReportFilterSheetResult(
-                                    query: _build(),
-                                    search: true,
-                                  ),
-                                ),
-                                child: Text(l10n.reportFilterApply),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: content!,
                       ),
                     ),
                   );
