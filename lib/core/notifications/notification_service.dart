@@ -124,37 +124,65 @@ class NotificationService {
     final initial = await messaging.getInitialMessage();
     if (initial != null) _routeTap(initial.data);
 
-    messaging.onTokenRefresh.listen((token) {
+    messaging.onTokenRefresh.listen((token) async {
       Log.debug('Push token refreshed');
-      _prefs.setString(PreferenceKeys.pushToken, token);
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        // This stream only carries the FCM registration token (see
+        // [_fetchToken] for why that's not what iOS registration needs);
+        // re-read the APNs token directly rather than persist [token] as-is.
+        final apns = await messaging.getAPNSToken();
+        if (apns != null) {
+          await _prefs.setString(PreferenceKeys.pushToken, apns);
+        }
+        return;
+      }
+      await _prefs.setString(PreferenceKeys.pushToken, token);
     });
     // Fire-and-forget: this can wait seconds for the iOS APNs token, and
     // `init()` is awaited at launch, so it must not block start-up.
     unawaited(_fetchToken());
   }
 
-  /// Fetches the FCM push token and persists it.
+  /// Fetches the push token and persists it as [PreferenceKeys.pushToken] —
+  /// the identifier every backend registration call (`/v2/location`,
+  /// `/v2/notify`) keys on.
   ///
-  /// On iOS the FCM token needs the **APNs** token first, which arrives
-  /// asynchronously after `registerForRemoteNotifications` (handled by the
-  /// FlutterFire app-delegate proxy). So poll `getAPNSToken` briefly before
-  /// asking — else `getToken` throws `apns-token-not-set`. Recent iOS 16+
-  /// Simulators do provision an APNs token (older ones return null); either way
-  /// delivery still needs the APNs auth key uploaded to the Firebase console.
-  /// Best-effort: a failure just leaves the token unset until [requestPermission]
-  /// or `onTokenRefresh` tries again.
+  /// **Which token, per platform, matters**: on iOS that has to be the raw
+  /// **APNs** device token, not Firebase's FCM registration token — a
+  /// different string the backend's own registration endpoints don't
+  /// recognise (confirmed live: registering with the FCM token 202'd, as a
+  /// write with no format check, but every subsequent `/v2/notify` lookup by
+  /// that same value still 401'd — the legacy app stored exactly and only the
+  /// APNs token on iOS for this reason, in `fcm.dart`). Android's backend
+  /// registration keys on the FCM token, which is `getToken()`'s value there.
+  ///
+  /// `getToken()` is still awaited on iOS (its FCM-pipeline side effects are
+  /// unrelated to which value gets persisted); only what gets *stored* differs
+  /// by platform. The APNs token needs `registerForRemoteNotifications` to have
+  /// completed first (handled by the FlutterFire app-delegate proxy) and
+  /// arrives asynchronously, so poll briefly before giving up — else `getToken`
+  /// itself throws `apns-token-not-set`. Recent iOS 16+ Simulators do provision
+  /// an APNs token (older ones return null); either way delivery still needs
+  /// the APNs auth key uploaded to the Firebase console. Best-effort: a failure
+  /// just leaves the token unset until [requestPermission] or
+  /// `onTokenRefresh` tries again.
   Future<void> _fetchToken() async {
     final messaging = FirebaseMessaging.instance;
     try {
+      String? apnsToken;
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         for (var attempt = 0; attempt < 5; attempt++) {
-          if (await messaging.getAPNSToken() != null) break;
+          apnsToken = await messaging.getAPNSToken();
+          if (apnsToken != null) break;
           await Future<void>.delayed(const Duration(seconds: 1));
         }
       }
-      final token = await messaging.getToken();
-      if (token != null) {
-        await _prefs.setString(PreferenceKeys.pushToken, token);
+      final fcmToken = await messaging.getToken();
+      final pushToken = defaultTargetPlatform == TargetPlatform.iOS
+          ? apnsToken
+          : fcmToken;
+      if (pushToken != null) {
+        await _prefs.setString(PreferenceKeys.pushToken, pushToken);
       }
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'getToken (APNs may not be ready)');

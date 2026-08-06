@@ -165,6 +165,23 @@ class LocationService {
         ),
       ).map((position) => (lat: position.latitude, lng: position.longitude));
 
+  /// Best-effort current fix: a cached position if it's fresh enough
+  /// ([_maxLastKnownAge] — which the OS may have derived from network/Wi-Fi
+  /// rather than GPS), else a medium-accuracy live read. Never throws; null
+  /// when location is unavailable/denied or no position could be resolved.
+  Future<GpsFix?> currentFix() async {
+    try {
+      if (!await _isAvailable()) return null;
+      return await _fix();
+    } on TimeoutException {
+      Log.warning('GPS fix timed out — no current location available');
+      return null;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'GPS fix');
+      return null;
+    }
+  }
+
   /// The current township from GPS, or null if unavailable / no fix.
   Future<Town?> currentTown() async {
     try {

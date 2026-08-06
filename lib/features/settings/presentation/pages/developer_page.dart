@@ -265,6 +265,11 @@ class _DeveloperPageState extends State<DeveloperPage> {
   /// Labels omitted from the clipboard dump (still shown on screen).
   static const _redactedCopyLabels = {'Identifier', 'FCM token', 'APNs token'};
 
+  /// Labels that get their own copy button — long push tokens are the one
+  /// case worth lifting out of a diagnostics screenshot on their own; every
+  /// other row is still covered by "Copy all".
+  static const _individuallyCopyableLabels = {'FCM token', 'APNs token'};
+
   Future<void> _copy(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
     if (!mounted) return;
@@ -313,7 +318,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
               children: [
                 for (final section in sections) ...[
                   SectionHeader(section.title),
-                  for (final field in section.fields) _DiagRow(field: field),
+                  for (final field in section.fields)
+                    _DiagRow(
+                      field: field,
+                      onCopy: _individuallyCopyableLabels.contains(field.label)
+                          ? _copy
+                          : null,
+                    ),
                 ],
                 const SectionHeader('Maintenance'),
                 ListTile(
@@ -344,11 +355,14 @@ class _DeveloperPageState extends State<DeveloperPage> {
   }
 }
 
-/// A diagnostic row: label + value (read-only; copy is app-bar only).
+/// A diagnostic row: label + value. Most rows are read-only (covered by the
+/// app-bar's "Copy all"); [onCopy] adds a per-row copy button for the few that
+/// are worth lifting out on their own (see [_DeveloperPageState._individuallyCopyableLabels]).
 class _DiagRow extends StatelessWidget {
-  const _DiagRow({required this.field});
+  const _DiagRow({required this.field, this.onCopy});
 
   final _Field field;
+  final ValueChanged<String>? onCopy;
 
   @override
   Widget build(BuildContext context) {
@@ -366,6 +380,13 @@ class _DiagRow extends StatelessWidget {
               : theme.colorScheme.outline,
         ),
       ),
+      trailing: hasValue && onCopy != null
+          ? IconButton(
+              icon: const Icon(Icons.copy_outlined),
+              tooltip: 'Copy',
+              onPressed: () => onCopy!(value),
+            )
+          : null,
     );
   }
 }
