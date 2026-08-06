@@ -1,11 +1,13 @@
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
-import 'package:dpip/shared/widgets/location_permission_banner.dart';
-import 'package:dpip/shared/widgets/notification_permission_banner.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/permission_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -32,10 +34,22 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int? _lastIndex;
 
+  /// Which branch is on screen. The branches live in an IndexedStack and stay
+  /// mounted while hidden, so this is how a page learns it was returned to
+  /// (see [RefreshOnAppear]).
+  final VisibleTab _visibleTab = VisibleTab();
+
+  @override
+  void dispose() {
+    _visibleTab.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final index = widget.navigationShell.currentIndex;
+    final mapLayer = context.watch<DefaultMapLayerController>().layer;
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a
@@ -48,10 +62,15 @@ class _MainShellState extends State<MainShell> {
       });
     }
     _lastIndex = index;
+    // Publish after the frame: pages listening to this rebuild on the edge, and
+    // a notify during build would land mid-build for them.
+    if (_visibleTab.value != index) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _visibleTab.value = index;
+      });
+    }
 
-    // Bottom-navigation destinations, in branch order. The 4th slot
-    // (navEarthquake) is intentionally swappable — replace this one entry (and
-    // its branch in the router) to surface a different feature there.
+    // Bottom-navigation destinations, in branch order.
     final destinations = <NavigationDestination>[
       NavigationDestination(
         icon: const Icon(Icons.home_outlined),
@@ -64,14 +83,14 @@ class _MainShellState extends State<MainShell> {
         label: l10n.navEvents,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.map_outlined),
-        selectedIcon: const Icon(Icons.map),
-        label: l10n.navMap,
+        icon: Icon(mapLayer.icon),
+        selectedIcon: Icon(mapLayer.selectedIcon),
+        label: mapLayer.label(l10n),
       ),
       NavigationDestination(
-        icon: const Icon(Icons.monitor_heart_outlined),
-        selectedIcon: const Icon(Icons.monitor_heart),
-        label: l10n.navEarthquake,
+        icon: const Icon(Icons.folder_outlined),
+        selectedIcon: const Icon(Icons.folder),
+        label: l10n.navData,
       ),
       NavigationDestination(
         icon: const Icon(Icons.menu),
@@ -87,9 +106,13 @@ class _MainShellState extends State<MainShell> {
       // location is healthy, so Home's full-bleed layout is unaffected).
       body: Column(
         children: [
-          const LocationPermissionBanner(),
-          const NotificationPermissionBanner(),
-          Expanded(child: widget.navigationShell),
+          const PermissionBanners(),
+          Expanded(
+            child: VisibleTabScope(
+              visibleTab: _visibleTab,
+              child: widget.navigationShell,
+            ),
+          ),
         ],
       ),
       // Only Home dismisses the bar; every other tab keeps it (dismiss 0).
@@ -123,11 +146,15 @@ class _MainShellState extends State<MainShell> {
     // Re-entering Home (including re-tapping it while active) snaps its sheet
     // back to rest; the build-time guard above covers programmatic entry.
     if (index == 0) context.read<HomeResetSignal>().fire();
-    // Opening the map from the nav bar frames the nationwide view (matching
-    // Home's 全國); a tap on the Home backdrop hands off its own view instead
-    // (that path is a programmatic route, so it doesn't come through here).
+    // Opening / re-tapping the map tab: nationwide framing + the user's
+    // configured default overlay (nav icon). Without the layerId, a session that
+    // switched to radar (etc.) would stay there while the bar still shows 衛星.
     if (index == 2) {
-      context.read<MapCameraHandoff>().request(BaseMap.taiwanBounds);
+      final layerId = context.read<DefaultMapLayerController>().layer.id;
+      context.read<MapCameraHandoff>().request(
+        BaseMap.taiwanBounds,
+        layerId: layerId,
+      );
     }
     widget.navigationShell.goBranch(
       index,

@@ -9,8 +9,10 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
+import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -85,6 +87,14 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   String? _radarFrameOnMap;
   int _radarFrameEpoch = -1;
 
+  /// The map view's own size, captured at layout. The camera fit must be
+  /// computed against **this**, not `MediaQuery` — MediaQuery describes the whole
+  /// screen, so on any device whose map area differs from it (system chrome, a
+  /// different aspect ratio) the derived zoom drifts and the framing is wrong by
+  /// a device-dependent amount. Null until the first layout; callers fall back to
+  /// MediaQuery for that one frame.
+  Size? _mapViewSize;
+
   @override
   void initState() {
     super.initState();
@@ -114,8 +124,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
 
   void _onSelectionChanged() => _applySelection();
 
-  void _onMapCreated(MapLibreMapController controller) =>
-      _controller = controller;
+  void _onMapCreated(MapLibreMapController controller) {
+    _controller = controller;
+    unawaited(const MapCache().setMaximumSize());
+  }
 
   void _onStyleLoaded() {
     _styleReady = true;
@@ -141,7 +153,11 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final controller = _controller;
     if (controller == null || !_styleReady) return;
     // Read context-bound values before any await.
-    final size = MediaQuery.sizeOf(context);
+    final size = _mapViewSize ?? MediaQuery.sizeOf(context);
+    // The map fills the page, but the region bar is layered over its top and the
+    // sheet over its bottom, so the band actually visible is shorter at both
+    // ends. Frame into that band, not the whole map.
+    final topInset = MediaQuery.paddingOf(context).top + RegionBar.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final code = _selectedCode;
     final styleEpoch = _styleEpoch;
@@ -163,15 +179,13 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
     final box = safeFitBounds(_latLngBounds(bounds));
     if (box == null) return;
-    // Hand the township box AND the framing inset to the map tab, so it re-fits
-    // with the same box + inset and lands on the identical camera — the Home→Map
-    // transition is then seamless (no jump in scale or position).
+    // Hand the framed geography to the map tab; it fits the same box into its
+    // own visible band (different chrome, so a different camera).
     // (An earlier version projected the on-screen band via controller.toLatLng,
     // but the plugin's screen coordinates didn't line up with MediaQuery's
     // logical size and mis-framed the map onto the strait, so the simple box is
     // used instead.)
     _handoff?.homeBounds = box;
-    _handoff?.bottomInsetFraction = HomeSheetExtent.rest;
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
@@ -183,6 +197,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       final fit = boundsFitCamera(
         box,
         viewport: size,
+        topInset: topInset,
         bottomInset: bottomInset,
       );
       if (fit != null) {
@@ -320,10 +335,28 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // ignored for hit-testing, so the page's tap (open map) and horizontal swipe
     // (switch area) pass straight through.
     return IgnorePointer(
-      child: BaseMap(
-        interactive: false,
-        onMapCreated: _onMapCreated,
-        onStyleLoaded: _onStyleLoaded,
+      // LayoutBuilder measures the map itself, so the camera fit is derived from
+      // the surface the map actually occupies rather than the whole screen. A
+      // size change (rotation, split view, a different device) re-frames.
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final measured = constraints.biggest;
+          if (measured != _mapViewSize && measured.isFinite) {
+            _mapViewSize = measured;
+            // Re-frame once the new size is laid out. Bypasses the
+            // unchanged-selection guard, which only tracks the code, not the size.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _appliedCode = null;
+              _applySelection();
+            });
+          }
+          return BaseMap(
+            interactive: false,
+            onMapCreated: _onMapCreated,
+            onStyleLoaded: _onStyleLoaded,
+          );
+        },
       ),
     );
   }

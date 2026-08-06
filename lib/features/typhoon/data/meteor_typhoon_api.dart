@@ -10,22 +10,23 @@ import 'package:dpip/features/typhoon/domain/typhoon_kind.dart';
 ///
 /// **Cache-split dual host** (both on `core-tnn1`): a history URL ending in a
 /// 10-digit second is immutable and served from `static.core-tnn1`
-/// ([ApiTier.coreStaticExclusive], 1-year cache) — the `/{kind}/:time` snapshots
-/// and `/images/:time` PNGs; everything else (the latest datasets, `/{kind}/list`,
-/// `/geojson`, `/images/list`) is mutable and served from `api.core-tnn1`
-/// ([ApiTier.coreExclusiveApi], ETag/304). Returns raw decoded JSON; the
-/// repository maps it to domain models (geometry is `[lng, lat]`, times are Unix
-/// seconds, missing is `null`).
+/// ([ApiTier.coreStaticExclusive], 1-year cache) — the `/{kind}/:time`
+/// snapshots; everything else (the latest datasets, `/{kind}/list`) is mutable
+/// and served from `api.core-tnn1` ([ApiTier.coreExclusiveApi], ETag/304).
+/// Returns raw decoded JSON; the repository maps it to domain models
+/// (geometry is `[lng, lat]`, times are Unix seconds, missing is `null`).
+///
+/// The map overlay is built client-side from typed payloads (`/track`,
+/// `/potential`, `/probability`, `/`) — `/geojson` is not fetched.
 class MeteorTyphoonApi {
   const MeteorTyphoonApi(this._client);
 
   final ApiClient _client;
 
-  /// Latest datasets, `/list`s, `/geojson`, `/images/list` (mutable) live on
-  /// `api.core-tnn1`.
+  /// Latest datasets and `/list`s (mutable) live on `api.core-tnn1`.
   static const ApiTier _api = ApiTier.coreExclusiveApi;
 
-  /// Timestamped history snapshots + PNGs (immutable) live on `static.core-tnn1`.
+  /// Timestamped history snapshots (immutable) live on `static.core-tnn1`.
   static const ApiTier _static = ApiTier.coreStaticExclusive;
 
   static const String _base = '/api/v5/meteor/typhoon';
@@ -59,22 +60,4 @@ class MeteorTyphoonApi {
   Future<Map<String, dynamic>> getAt(TyphoonKind kind, int second) async =>
       (await _client.get(_static, '$_base/${kind.path}/$second'))
           as Map<String, dynamic>;
-
-  /// Overlay GeoJSON `FeatureCollection` composed from potential + probability
-  /// (v2-compatible); `features: []` when no cyclone is active.
-  Future<Map<String, dynamic>> getGeojson() async =>
-      (await _client.get(_api, '$_base/geojson')) as Map<String, dynamic>;
-
-  /// Available track-image times (Unix seconds). **Not** delta-encoded — a plain
-  /// `number[]` (the payload is tiny).
-  Future<List<dynamic>> getImagesList() async =>
-      (await _client.get(_api, '$_base/images/list')) as List<dynamic>;
-
-  /// The concrete URL of the track-image PNG at [second] (`image/png`, from
-  /// `static`). Handed out for direct fetch (like a tile URL), not decoded to a
-  /// model; the server returns 404 when the image is absent.
-  ///
-  /// `https://static.core-tnn1.exptech.dev/api/v5/meteor/typhoon/images/<sec>`
-  String imagesUrl(int second) =>
-      '${_client.hostsFor(_static).first}$_base/images/$second';
 }

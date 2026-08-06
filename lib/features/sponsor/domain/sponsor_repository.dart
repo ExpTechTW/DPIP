@@ -20,9 +20,11 @@ abstract interface class SponsorRepository {
   /// it can be listened to from wherever the flow is shown.
   Stream<SponsorPurchase> purchases();
 
-  /// Starts buying [product] — routed to the right store call by its type. The
-  /// outcome arrives on [purchases], not as a return value.
-  Future<void> buy(SponsorProduct product);
+  /// 開始購買 [product]
+  ///
+  /// 當商店不開始購買流程時返回 `false`
+  /// 已開始的流程仍然通過 [purchases] 報告最終結果
+  Future<bool> buy(SponsorProduct product);
 
   /// Restores previously bought subscriptions / non-consumables. Returns `false`
   /// when the store is unreachable (nothing was initiated).

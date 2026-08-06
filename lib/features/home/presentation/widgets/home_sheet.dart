@@ -8,6 +8,7 @@ import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 /// The draggable home sheet: a frosted panel over the map that reveals an
 /// animated weather backdrop as it expands to full.
@@ -17,6 +18,20 @@ import 'package:flutter/material.dart';
 /// backdrop's visibility. [restExtent] is also the sheet's floor — it can't be
 /// dragged smaller. The scrollable content lives in [HomeContent]; the drag
 /// mechanics live in the host `HomePage`.
+///
+/// The frosted chrome (blur, surface tint, shadow) genuinely has to redraw on
+/// every pixel of the drag — it ramps across the sheet's *whole* travel. The
+/// heavy stuff underneath it (forecast chart, sparkline, active-events list,
+/// all inside [HomeContent]) does not: its own inputs only move within the
+/// top ~15% of that travel ([HomeChrome.weatherReveal] / the flush window /
+/// [HomeSheetExtent.isAtTop]). Building it once and handing it down via this
+/// [ValueListenableBuilder]'s `child` — rather than reconstructing it inside
+/// `builder` on every tick — keeps that content out of the per-frame rebuild;
+/// [_HomeContentLayer] then re-derives its own inputs straight from
+/// [HomeSheetExtent] with [BuildContext.select], so it only actually rebuilds
+/// within the narrow window where they change. This is what used to make
+/// dragging the sheet janky: every frame was relaying out the forecast chart
+/// and event list for no visible change.
 class HomeSheet extends StatelessWidget {
   const HomeSheet({
     super.key,
@@ -65,7 +80,13 @@ class HomeSheet extends StatelessWidget {
     final regionBarInset = MediaQuery.paddingOf(context).top + _regionBarHeight;
     return ValueListenableBuilder<double>(
       valueListenable: extent,
-      builder: (context, e, _) {
+      // Built once, not on every tick — see the class doc.
+      child: _HomeContentLayer(
+        scrollController: scrollController,
+        weatherMode: weatherMode,
+        regionBarInset: regionBarInset,
+      ),
+      builder: (context, e, content) {
         // 0 until [_flushFrom], then 1 at full — drives the flatten + inset.
         final flush = ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(
           0.0,
@@ -114,17 +135,56 @@ class HomeSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                HomeContent(
-                  scrollController: scrollController,
-                  handleOpacity: 1 - weatherOpacity,
-                  reveal: weatherOpacity,
-                  topInset: lerpDouble(0, regionBarInset, flush)!,
-                ),
+                content!,
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  /// 0 until [_flushFrom], then 1 at full — matches the flatten/inset ramp
+  /// computed alongside it in [build], kept in sync via the same constants.
+  static double _flush(double e) =>
+      ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
+}
+
+/// The scrollable content ([HomeContent]) — forecast chart, sparkline,
+/// active-events list — re-deriving its own inputs from [HomeSheetExtent]
+/// instead of being handed them by the chrome's per-tick rebuild above. Each
+/// [BuildContext.select] only marks this dirty when *that* derived value
+/// changes, so this rebuilds within its own narrow window, not on every pixel
+/// of the drag.
+class _HomeContentLayer extends StatelessWidget {
+  const _HomeContentLayer({
+    required this.scrollController,
+    required this.weatherMode,
+    required this.regionBarInset,
+  });
+
+  final ScrollController scrollController;
+  final WeatherMode weatherMode;
+  final double regionBarInset;
+
+  @override
+  Widget build(BuildContext context) {
+    final reveal = context.select<HomeSheetExtent, double>(
+      (extent) => HomeChrome.weatherReveal(extent.value),
+    );
+    final flush = context.select<HomeSheetExtent, double>(
+      (extent) => HomeSheet._flush(extent.value),
+    );
+    final expanded = context.select<HomeSheetExtent, bool>(
+      (extent) => HomeSheetExtent.isAtTop(extent.value),
+    );
+    return HomeContent(
+      scrollController: scrollController,
+      handleOpacity: 1 - reveal,
+      reveal: reveal,
+      topInset: lerpDouble(0, regionBarInset, flush)!,
+      expanded: expanded,
+      weatherMode: weatherMode,
     );
   }
 }

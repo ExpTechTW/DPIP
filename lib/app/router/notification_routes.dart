@@ -12,12 +12,13 @@ import 'package:dpip/shared/navigation/app_routes.dart';
 String routeForNotificationChannel(String? channelKey) {
   if (channelKey == null) return _unmapped(channelKey);
 
-  // The only intra-group split: report detail lands on the map, while the rest
-  // of the earthquake group (int_report / eq) is the monitor.
-  if (channelKey.startsWith('report')) return AppRoutes.map;
+  // The only intra-group split: report detail lands on the report list for now,
+  // while EEW taps open the live monitor.
+  if (channelKey.startsWith('report')) return AppRoutes.earthquake;
 
   return switch (NotificationChannels.groupOf(channelKey)) {
-    'group_eew' || 'group_eq' => AppRoutes.earthquake,
+    'group_eew' => AppRoutes.eew,
+    'group_eq' => AppRoutes.earthquake,
     'group_info' || 'group_tsunami' || 'group_other' => AppRoutes.home,
     _ => _unmapped(channelKey),
   };

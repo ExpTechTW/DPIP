@@ -59,6 +59,7 @@ class _NotificationPermissionBannerState
 
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    // SafeArea only while visible (see LocationPermissionBanner).
     return Material(
       color: colors.errorContainer,
       child: SafeArea(

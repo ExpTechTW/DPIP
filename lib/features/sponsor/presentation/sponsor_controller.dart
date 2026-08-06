@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:dpip/features/sponsor/domain/sponsor_product.dart';
 import 'package:dpip/features/sponsor/domain/sponsor_purchase.dart';
 import 'package:dpip/features/sponsor/domain/sponsor_repository.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 /// Where the catalogue load stands.
 enum SponsorStatus { loading, error, ready }
@@ -14,13 +14,18 @@ enum SponsorStatus { loading, error, ready }
 /// Holds the sponsor page's state: the product catalogue (split into
 /// subscriptions and one-time tips) and the live purchase state, updated from
 /// the repository's purchase stream.
-class SponsorController extends ChangeNotifier {
+class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
   SponsorController(this._repository) {
+    WidgetsBinding.instance.addObserver(this);
     _sub = _repository.purchases().listen(_onPurchase);
   }
 
+  static const _purchaseLaunchTimeout = Duration(seconds: 8);
+  static const _purchaseResumeGrace = Duration(milliseconds: 600);
+
   final SponsorRepository _repository;
   StreamSubscription<SponsorPurchase>? _sub;
+  Timer? _purchaseWatchdog;
 
   SponsorStatus status = SponsorStatus.loading;
   List<SponsorProduct> subscriptions = const [];
@@ -56,7 +61,48 @@ class SponsorController extends ChangeNotifier {
     if (isBusy || purchasedIds.contains(product.id)) return;
     purchasingId = product.id;
     notifyListeners();
-    await _repository.buy(product);
+    try {
+      final started = await _repository.buy(product);
+      if (!started) _clearPurchase(product.id);
+      if (started) _watchPurchaseLaunch(product.id);
+    } catch (error) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          context: ErrorDescription('buy sponsor product'),
+        ),
+      );
+      _clearPurchase(product.id);
+    }
+  }
+
+  void _watchPurchaseLaunch(String productId) {
+    _purchaseWatchdog?.cancel();
+    _purchaseWatchdog = Timer(_purchaseLaunchTimeout, () {
+      _clearPurchase(productId);
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final productId = purchasingId;
+    if (productId == null) return;
+    _purchaseWatchdog?.cancel();
+    _purchaseWatchdog = Timer(_purchaseResumeGrace, () {
+      _clearPurchase(productId);
+    });
+  }
+
+  bool _clearPurchase(String productId) {
+    if (purchasingId == productId) {
+      _purchaseWatchdog?.cancel();
+      _purchaseWatchdog = null;
+      purchasingId = null;
+      notifyListeners();
+      return true;
+    }
+    return false;
   }
 
   /// Restores past purchases. Returns `false` if the store was unreachable, so
@@ -64,19 +110,26 @@ class SponsorController extends ChangeNotifier {
   Future<bool> restore() => _repository.restore();
 
   void _onPurchase(SponsorPurchase purchase) {
+    var notified = false;
     if (purchase.isSuccess) purchasedIds.add(purchase.productId);
     // Clear the in-flight marker once this product settles (success, error, or
     // cancel) — a still-pending update keeps it busy.
     if (purchase.isSettled && purchasingId == purchase.productId) {
-      purchasingId = null;
+      notified = _clearPurchase(purchase.productId);
     } else if (purchase.status == SponsorPurchaseStatus.pending) {
       purchasingId = purchase.productId;
+      notifyListeners();
+      notified = true;
     }
-    notifyListeners();
+    if (!notified && purchase.isSuccess) {
+      notifyListeners();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _purchaseWatchdog?.cancel();
     _sub?.cancel();
     super.dispose();
   }

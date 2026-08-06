@@ -27,16 +27,26 @@ void main() {
     },
   );
 
-  test('a missing native handler degrades to a no-op (never throws)', () async {
-    // No mock handler → MissingPluginException, which MapCache swallows.
-    await expectLater(const MapCache().setMaximumSize(1024), completes);
-  });
-
-  test('a native error is swallowed (best-effort, never throws)', () async {
+  test('defaults to disabling the ambient cache', () async {
+    MethodCall? received;
     messenger.setMockMethodCallHandler(channel, (call) async {
-      throw PlatformException(code: 'cache_failed', message: 'boom');
+      received = call;
+      return null;
     });
 
+    await const MapCache().setMaximumSize();
+
+    expect(
+      (received!.arguments as Map)['bytes'],
+      0,
+      reason:
+          'the app store is the only disk cache — a second native copy of '
+          'the same tiles is invisible to its eviction policy and its traffic '
+          'accounting',
+    );
+  });
+
+  test('a missing native handler degrades to a no-op (never throws)', () async {
     await expectLater(const MapCache().setMaximumSize(1024), completes);
   });
 }

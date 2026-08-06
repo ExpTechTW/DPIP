@@ -79,12 +79,14 @@ abstract class WarningArea with _$WarningArea {
       _$WarningAreaFromJson(json);
 }
 
-/// The `GET /warning` payload (a CAP-style envelope). [msgType] is `Alert`
-/// (issue) / `Update` / `Cancel` (lift); off-season this is usually the most
-/// recent `Cancel`.
+/// One CAP warning bulletin. [msgType] is `Alert` (issue) / `Update` /
+/// `Cancel` (lift); off-season this is usually the most recent `Cancel`.
 @freezed
 abstract class TyphoonWarning with _$TyphoonWarning {
   const factory TyphoonWarning({
+    /// Matched CWA `tdNo` from the active cyclone index; blank when the
+    /// bulletin can't be paired (e.g. a leftover `Cancel` for a past storm).
+    String? tdNo,
     required bool active,
     required String id,
 
@@ -117,4 +119,34 @@ abstract class TyphoonWarning with _$TyphoonWarning {
 
   factory TyphoonWarning.fromJson(Map<String, dynamic> json) =>
       _$TyphoonWarningFromJson(json);
+}
+
+/// The `GET /warning` payload: update time + CAP bulletins (`cyclones`).
+///
+/// CAP is usually one bulletin → `cyclones.length` is 0–1; the list shape is
+/// reserved for multi-storm seasons.
+@freezed
+abstract class WarningPayload with _$WarningPayload {
+  const factory WarningPayload({
+    required int updated,
+    required List<TyphoonWarning> cyclones,
+  }) = _WarningPayload;
+
+  /// Decodes `{ updated, cyclones: [...] }`.
+  factory WarningPayload.decode(Map<String, dynamic> json) {
+    final raw = json['cyclones'];
+    if (raw is! List) {
+      return WarningPayload(
+        updated: (json['updated'] as num?)?.toInt() ?? 0,
+        cyclones: const [],
+      );
+    }
+    return WarningPayload(
+      updated: (json['updated'] as num?)?.toInt() ?? 0,
+      cyclones: [
+        for (final c in raw)
+          if (c is Map<String, dynamic>) TyphoonWarning.fromJson(c),
+      ],
+    );
+  }
 }

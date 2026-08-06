@@ -25,4 +25,11 @@ class HomeSheetExtent extends ValueNotifier<double> {
 
   /// Fully expanded — the sheet covers the whole screen.
   static const double max = 1.0;
+
+  /// Snap tolerance for "flush full-screen" chrome (grip hide, hero type) —
+  /// matches the station/typhoon chart sheets.
+  static const double atTopEpsilon = 0.02;
+
+  /// Whether [extent] is at (or past) the full-screen detent.
+  static bool isAtTop(double extent) => extent >= max - atTopEpsilon;
 }

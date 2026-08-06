@@ -48,6 +48,12 @@ abstract final class PreferenceKeys {
   /// `ThemeController`.
   static const PrefKey<String> themeMode = PrefKey<String>._('app.themeMode');
 
+  /// Default map overlay when opening the Map tab. See
+  /// `DefaultMapLayerController` (`radar` / `satellite` / … / `dpm`).
+  static const PrefKey<String> defaultMapLayer = PrefKey<String>._(
+    'map.defaultLayer',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const PrefKey<List<String>> savedRegionCodes = PrefKey<List<String>>._(
     'home.savedRegionCodes',
@@ -58,7 +64,9 @@ abstract final class PreferenceKeys {
     'experimental.weatherMode',
   );
 
-  /// Last push (FCM) token. See `NotificationService`.
+  /// Last push token — the FCM registration token on Android, the raw APNs
+  /// device token on iOS (backend registration keys on whichever this
+  /// platform actually uses). See `NotificationService`.
   static const PrefKey<String> pushToken = PrefKey<String>._(
     'notification.pushToken',
   );
@@ -67,6 +75,12 @@ abstract final class PreferenceKeys {
   /// `NotificationService`.
   static const PrefKey<int> channelVersion = PrefKey<int>._(
     'notification.channelVersion',
+  );
+
+  /// Last successful *attempt* to POST `updateDeviceLocation` (UTC millis).
+  /// Foreground reporter skips a new call within 60s — server 429 guard.
+  static const PrefKey<int> deviceLocationUpdatedAtMs = PrefKey<int>._(
+    'location.deviceLocationUpdatedAtMs',
   );
 
   /// Selected LB / Core API region. See `RegionSelection`.

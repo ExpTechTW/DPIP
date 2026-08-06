@@ -4,8 +4,9 @@ import 'package:flutter/services.dart';
 class HeadingEvent {
   const HeadingEvent({required this.heading, this.accuracy});
 
-  /// Heading in degrees clockwise from true north (0–360), or null if the
-  /// platform cannot currently determine it.
+  /// Magnetic heading in degrees clockwise from north (0–360), or null if the
+  /// platform cannot currently determine it. Matches the native plugins
+  /// (CoreLocation magneticHeading / Android rotation vector) — not true north.
   final double? heading;
 
   /// Reported heading accuracy in degrees (smaller is better), if available.

@@ -1,6 +1,6 @@
-/// The 強震監視器 overlay UI: the instrumental-intensity legend (top-left,
-/// matching the station-dot colours) and a bottom freshness strip showing the
-/// feed status, the snapshot time, and the live latency (s).
+/// The 強震監視器 overlay UI: a bottom freshness strip showing the feed status,
+/// the snapshot time, and the live latency (s). The intensity legend lives on
+/// the scaffold via [MapLayer.buildLegend].
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -10,71 +10,36 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
-/// `buildSheet` slot): a fixed legend at top-left and a freshness strip at the
-/// bottom. Both are small so the map stays visible and interactive between them.
+/// `buildSheet` slot): a freshness strip at the bottom. Small so the map stays
+/// visible and interactive above it.
 class RtsMonitorPanel extends StatelessWidget {
   const RtsMonitorPanel({super.key, required this.feed});
 
   final RealtimeNotifier<Rts> feed;
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Instrumental-intensity legend — top-left, same scale as the dots.
-        Positioned(
-          top: 0,
-          left: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: const _LegendCard(),
-            ),
-          ),
-        ),
-        // Feed status + snapshot time + latency — bottom strip.
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: ListenableBuilder(
-                listenable: feed,
-                builder: (context, _) => _StatusBar(state: feed.state),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// The legend in a frosted card so it reads over any map tile.
-class _LegendCard extends StatelessWidget {
-  const _LegendCard();
+  /// Roughly how much of the map height the bottom status strip covers at rest.
+  /// Declared (not measured) because the strip is a floating overlay, not a
+  /// bounded child the scaffold can size; the map subtracts it when framing.
+  static const double bottomStripFraction = 0.1;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: colors.surface.withValues(alpha: 0.92),
-        borderRadius: AppRadius.small,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 8),
-        ],
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ListenableBuilder(
+            listenable: feed,
+            builder: (context, _) => _StatusBar(state: feed.state),
+          ),
+        ),
       ),
-      child: const IntensityLegend(mode: IntensityLegendMode.rts),
     );
   }
 }

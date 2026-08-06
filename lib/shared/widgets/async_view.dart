@@ -25,6 +25,7 @@ class AsyncView<T> extends StatefulWidget {
     this.error,
     this.empty,
     this.isEmpty,
+    this.refreshSignal,
   });
 
   /// Produces the request. Re-invoked on retry.
@@ -51,6 +52,13 @@ class AsyncView<T> extends StatefulWidget {
   /// [builder] (e.g. an empty list).
   final bool Function(T value)? isEmpty;
 
+  /// Re-runs [future] whenever this fires — the screen's "refresh now" signal
+  /// (see `RefreshOnAppear`: entering the tab, or returning from the background).
+  ///
+  /// The previous value stays on screen while the new one loads, so a routine
+  /// refresh never flashes the screen back to a spinner.
+  final Listenable? refreshSignal;
+
   @override
   State<AsyncView<T>> createState() => _AsyncViewState<T>();
 }
@@ -59,16 +67,62 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
   late Future<Result<T>> _future;
   int _attempt = 0;
 
+  /// The last value that loaded successfully, kept so a refresh renders the
+  /// existing content under the spinner instead of tearing the screen down to a
+  /// loading state — pulling to check for news should never first take away the
+  /// news you already had.
+  T? _loaded;
+
   @override
   void initState() {
     super.initState();
     _future = widget.future();
+    widget.refreshSignal?.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(covariant AsyncView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshSignal != widget.refreshSignal) {
+      oldWidget.refreshSignal?.removeListener(_refresh);
+      widget.refreshSignal?.addListener(_refresh);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.refreshSignal?.removeListener(_refresh);
+    super.dispose();
   }
 
   void _retry() => setState(() {
     _attempt++;
     _future = widget.future();
   });
+
+  /// Re-runs the request, keeping the current content on screen until the new
+  /// value lands.
+  void _refresh() {
+    if (!mounted) return;
+    setState(() {
+      _attempt++;
+      _future = widget.future();
+    });
+  }
+
+  /// The success UI for [value] — the empty state when [AsyncView.isEmpty] says
+  /// so, else the caller's builder.
+  Widget _content(BuildContext context, T value) {
+    _loaded = value;
+    if (widget.isEmpty?.call(value) ?? false) {
+      return widget.empty?.call(context) ??
+          EmptyView(
+            icon: Icons.inbox_outlined,
+            message: AppLocalizations.of(context).commonEmpty,
+          );
+    }
+    return widget.builder(context, value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +134,8 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
+          final previous = _loaded;
+          if (previous != null) return _content(context, previous);
           return widget.loading?.call(context) ?? const LoadingView();
         }
         // Repositories return Result and don't throw; a raw error here is
@@ -88,14 +144,7 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
           return ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry);
         }
         return switch (snapshot.data!) {
-          Ok(:final value) =>
-            (widget.isEmpty?.call(value) ?? false)
-                ? (widget.empty?.call(context) ??
-                      EmptyView(
-                        icon: Icons.inbox_outlined,
-                        message: l10n.commonEmpty,
-                      ))
-                : widget.builder(context, value),
+          Ok(:final value) => _content(context, value),
           Err(:final failure) =>
             widget.error?.call(context, failure, _retry) ??
                 ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),

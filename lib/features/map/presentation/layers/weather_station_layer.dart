@@ -10,7 +10,11 @@ import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
+import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_station_labels.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -83,13 +87,26 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   bool get usesTimeline => false;
 
   @override
+  double get bottomChromeFraction => StationSheet.peekExtent;
+
+  @override
+  double get mapMinZoom => 4;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
   Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
 
   @override
-  Future<void> show(MapLibreMapController c, MapFrame frame) async {}
+  Future<void> show(
+    MapLibreMapController c,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -116,25 +133,12 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         enableInteraction: false,
       );
     }
-    // Name + value labels — shown only when zoomed in; the engine places and
-    // orients them (variable anchor + collision) so they never pile up.
+    // Name over reading, pinned under the dot and de-collided by the engine
+    // (see [stationLabelProps]).
     await controller.addSymbolLayer(
       _sourceId,
       _labelId,
-      SymbolLayerProperties(
-        textField: <Object>['get', 'label'],
-        textFont: const ['Noto Sans TC Regular'],
-        textSize: 11,
-        textColor: '#FFFFFF',
-        textHaloColor: '#000000',
-        textHaloWidth: 1.2,
-        textLineHeight: 1.1,
-        textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
-        textRadialOffset: 0.9,
-        textJustify: 'auto',
-        textAllowOverlap: false,
-        textOptional: true,
-      ),
+      stationLabelProps(textField: const <Object>['get', 'label']),
       minzoom: 9,
       enableInteraction: false,
     );
@@ -169,14 +173,43 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
   Widget buildSheet(BuildContext context) =>
       StationSheet(key: ValueKey(id), source: this);
+
+  /// Colour scale from [colorStops] + [unit] — one legend for every station
+  /// value layer (temperature / humidity / pressure); wind overrides.
+  @override
+  Widget buildLegend(BuildContext context) => MapLegendCard(
+    child: ColorScaleLegend(stops: colorStops, unit: unit, appendUnit: true),
+  );
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
     await _removeFromMap(controller);
     _selected.value = null;
   }
+
+  @override
+  void selectFeature(String id) => select(id);
 
   @override
   void onStyleReset() {}
@@ -207,6 +240,35 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   WeatherObservation? observationOf(String id) => _observations[id];
 
   @override
+  Color? valueColor(String id) {
+    final observation = observationOf(id);
+    final value = observation == null ? null : valueOf(observation);
+    return value == null ? null : rampColor(value);
+  }
+
+  /// [value] interpolated on [colorStops] — the Dart twin of the `interpolate`
+  /// expression handed to MapLibre, so the dot and the sheet agree by
+  /// construction rather than by two hand-kept colour tables.
+  @protected
+  Color? rampColor(double value) {
+    final stops = colorStops;
+    if (stops.isEmpty) return null;
+    if (value <= stops.first.$1) return colorFromHexRgb(stops.first.$2);
+    if (value >= stops.last.$1) return colorFromHexRgb(stops.last.$2);
+    for (var i = 0; i < stops.length - 1; i++) {
+      final (lowAt, lowHex) = stops[i];
+      final (highAt, highHex) = stops[i + 1];
+      if (value < lowAt || value > highAt) continue;
+      final low = colorFromHexRgb(lowHex);
+      final high = colorFromHexRgb(highHex);
+      if (low == null || high == null) return low ?? high;
+      final span = highAt - lowAt;
+      return Color.lerp(low, high, span == 0 ? 0 : (value - lowAt) / span);
+    }
+    return colorFromHexRgb(stops.last.$2);
+  }
+
+  @override
   String? reading(String id) {
     final observation = _observations[id];
     if (observation == null) return null;
@@ -215,13 +277,34 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  double? get chartMinY => null;
+
+  @override
+  double? get chartMaxY => null;
+
+  @override
+  bool get chartBars => false;
+
+  @override
   Future<Result<TrendSeries>> trend(String id, String range) async {
     final result = await _repository.trend(id, range: range);
-    return result.map((t) => TrendSeries(times: t.times, values: trendOf(t)));
+    return result.map(seriesOf);
   }
+
+  /// Builds the sheet's trend payload from a decoded [WeatherTrend]. Wind
+  /// overrides to attach the parallel direction series.
+  @protected
+  TrendSeries seriesOf(WeatherTrend trend) =>
+      TrendSeries(times: trend.times, values: trendOf(trend));
 
   @override
   void close() => _selected.value = null;
+
+  @override
+  void select(String id) {
+    _selected.value = id;
+    _selectionRevision.value++;
+  }
 
   // --- internals ---
 
@@ -253,9 +336,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         'properties': {
           'id': entry.key,
           'value': value,
-          // Preformatted here (name from data, value + unit from the layer) so
-          // the SymbolLayer just reads one `label` string — keeps CJK out of any
-          // hardcoded literal and the l10n gate clean.
+          // Preformatted here (name from data, reading from the layer) so the
+          // symbol layer reads one string — keeps CJK out of any hardcoded
+          // literal and the l10n gate clean.
           'label': '${station.name}\n${value.toStringAsFixed(decimals)} $unit',
           ...extraProperties(observation),
         },

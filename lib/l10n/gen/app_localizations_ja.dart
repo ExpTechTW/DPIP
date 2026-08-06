@@ -21,7 +21,224 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navMap => '地図';
 
   @override
+  String get navData => 'データ';
+
+  @override
   String get navEarthquake => '地震';
+
+  @override
+  String get dataSectionSeismic => '地震';
+
+  @override
+  String get dataEarthquakeSubtitle => '地震報告';
+
+  @override
+  String get dataSectionWeather => '気象';
+
+  @override
+  String get dataWeatherRankingSubtitle => '即時観測ランキング';
+
+  @override
+  String get weatherRankingTitle => '観測ランキング';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'データ時刻：$time\n観測点 $count';
+  }
+
+  @override
+  String get weatherRankingEmpty => '並べ替え可能な観測がありません';
+
+  @override
+  String get weatherRankingBy => '並び';
+
+  @override
+  String get weatherRankingHighest => '最高';
+
+  @override
+  String get weatherRankingLowest => '最低';
+
+  @override
+  String get weatherRankingMergeTo => '統合';
+
+  @override
+  String get weatherRankingMergeTown => '町村';
+
+  @override
+  String get weatherRankingMergeCounty => '県市';
+
+  @override
+  String get weatherRankingWind => '風速';
+
+  @override
+  String get weatherRankingGust => '突風';
+
+  @override
+  String get weatherRankingTempExtremes => '気温極値';
+
+  @override
+  String get weatherRankingExtremeHigh => '今日の最高';
+
+  @override
+  String get weatherRankingExtremeLow => '今日の最低';
+
+  @override
+  String get weatherRankingExtremeRange => '日較差';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '記録時刻 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '現在 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '最高 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '最低 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '較差 $value°C';
+  }
+
+  @override
+  String get reportListEmpty => '地震報告はありません';
+
+  @override
+  String get reportListEmptyFiltered => '条件に一致する地震報告はありません';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => '局地有感';
+
+  @override
+  String get reportListToday => '今日';
+
+  @override
+  String get reportListYesterday => '昨日';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String get reportListEnd => 'これ以上ありません';
+
+  @override
+  String get reportFilterTitle => '絞り込み';
+
+  @override
+  String get reportFilterSort => '並び替え';
+
+  @override
+  String get reportFilterSortTime => '時間';
+
+  @override
+  String get reportFilterSortIntensity => '震度';
+
+  @override
+  String get reportFilterSortMagnitude => '規模';
+
+  @override
+  String get reportFilterSortDepth => '深さ';
+
+  @override
+  String get reportFilterOrderDesc => '降順';
+
+  @override
+  String get reportFilterOrderAsc => '昇順';
+
+  @override
+  String get reportFilterIntensity => '震度';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '震度の新制と旧制';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '気象署は 2020 年 1 月 1 日（台北時間）から新制震度を採用しています。';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '旧制（2020 年より前）';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      '震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '新制（2020 年以降）';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '震度は 0–4、5弱、5強、6弱、6強、7。フィルタは新制に準拠し、それ以前の地震はリストで旧制表記になります。';
+
+  @override
+  String get reportFilterMagnitude => 'マグニチュード';
+
+  @override
+  String get reportFilterDepth => '深さ';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => '日付';
+
+  @override
+  String get reportFilterDatePick => '日付を選択';
+
+  @override
+  String get reportFilterDateStartNote => '開始日：当日 00:00（台北時間）';
+
+  @override
+  String get reportFilterDateEndNote => '終了日：当日 24:00（台北時間）';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get reportFilterLocation => '場所';
+
+  @override
+  String get reportFilterLocationHint => '例：花蓮、海域';
+
+  @override
+  String get reportFilterAny => '指定なし';
+
+  @override
+  String get reportFilterApply => '適用';
+
+  @override
+  String get reportFilterReset => 'リセット';
+
+  @override
+  String get reportListSearch => '検索';
 
   @override
   String get navMore => 'その他';
@@ -30,10 +247,37 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appLogs => 'アプリログ';
 
   @override
+  String get changelogTitle => '更新履歴';
+
+  @override
+  String get changelogEmpty => 'リリースノートはまだありません';
+
+  @override
+  String get changelogTypePrerelease => 'ベータ';
+
+  @override
+  String get changelogTypeStable => '正式';
+
+  @override
+  String get changelogCurrentVersion => '現行';
+
+  @override
+  String get changelogVersionDetails => 'リリース詳細';
+
+  @override
+  String get changelogBodyEmpty => 'このリリースの説明はありません。';
+
+  @override
   String get mapPlaceholderDisabled => '地図(一時的に無効)';
 
   @override
-  String get moreSectionGeneral => '一般';
+  String get moreSectionRegion => '地域';
+
+  @override
+  String get moreSectionNotify => '通知';
+
+  @override
+  String get moreSectionDisplay => '表示';
 
   @override
   String get regionManageTitle => '登録地域';
@@ -58,16 +302,13 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get regionEdit => '変更';
+
+  @override
   String get moreSectionAdvanced => '詳細設定';
 
   @override
   String get moreDeveloper => 'デバッグ情報';
-
-  @override
-  String get developerCopied => 'クリップボードにコピーしました';
-
-  @override
-  String get developerCopyAll => 'すべてコピー';
 
   @override
   String get experimentalFeatures => '実験的機能';
@@ -168,10 +409,69 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherHumidity => '湿度';
 
   @override
+  String get homeForecastTitle => '24時間予報';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '高 $high° · 低 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '体感 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '湿度 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · 風力$level';
+  }
+
+  @override
+  String get homeForecastUnavailable => '地域を選ぶと予報を表示します';
+
+  @override
+  String get homeForecastEmpty => '予報データがありません';
+
+  @override
+  String get homeActiveEventsTitle => '発生中の事象';
+
+  @override
+  String get homeActiveEventsEmpty => '発生中の事象はありません';
+
+  @override
+  String get homeRainTrendTitle => '今後1時間の雨';
+
+  @override
   String get mapLayers => 'レイヤー';
 
   @override
-  String get mapLayerRadar => 'レーダー';
+  String get mapLayerRadar => 'レーダー合成エコー図';
+
+  @override
+  String get mapLayerSatellite => 'ひまわり 赤外線図';
+
+  @override
+  String get mapLayerLightning => '雷';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '対地 · $minutes 分以内';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '雲間 · $minutes 分以内';
+  }
 
   @override
   String get mapTimelineNow => '現在';
@@ -388,6 +688,46 @@ class AppLocalizationsJa extends AppLocalizations {
   String get displaySettings => '表示';
 
   @override
+  String get defaultMapLayerSettings => '地図の初期レイヤー';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      '地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。';
+
+  @override
+  String get mapNavRadar => 'レーダー';
+
+  @override
+  String get mapNavSatellite => '衛星';
+
+  @override
+  String get mapNavLightning => '稲妻';
+
+  @override
+  String get mapNavTyphoon => '台風';
+
+  @override
+  String get mapNavEarthquake => '地震';
+
+  @override
+  String get mapNavTemperature => '気温';
+
+  @override
+  String get mapNavHumidity => '湿度';
+
+  @override
+  String get mapNavPressure => '気圧';
+
+  @override
+  String get mapNavWind => '風向';
+
+  @override
+  String get mapNavRain => '雨量';
+
+  @override
+  String get mapNavDisaster => '防災';
+
+  @override
   String get displayTheme => 'テーマ';
 
   @override
@@ -463,13 +803,51 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trendNoData => 'トレンドデータがありません';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hour時';
+  }
+
+  @override
   String get mapLayerHumidity => '湿度';
 
   @override
   String get mapLayerPressure => '気圧';
 
   @override
-  String get mapLayerWind => '風';
+  String get mapLayerWind => '風向';
+
+  @override
+  String get mapLayerRain => '降水量';
+
+  @override
+  String get rainIntervalMenu => '累積期間';
+
+  @override
+  String get rainIntervalNow => '今日';
+
+  @override
+  String get rainInterval10m => '10分';
+
+  @override
+  String get rainInterval1h => '1時間';
+
+  @override
+  String get rainInterval3h => '3時間';
+
+  @override
+  String get rainInterval6h => '6時間';
+
+  @override
+  String get rainInterval12h => '12時間';
+
+  @override
+  String get rainInterval24h => '24時間';
+
+  @override
+  String get rainInterval2d => '2日';
+
+  @override
+  String get rainInterval3d => '3日';
 
   @override
   String get mapLayerTyphoon => '台風';
@@ -490,7 +868,248 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonMotion => '進行';
 
   @override
+  String get typhoonLabelPosition => '中心位置';
+
+  @override
+  String get typhoonLabelDirection => 'これまでの進行方向';
+
+  @override
+  String get typhoonLabelSpeed => 'これまでの移動速度';
+
+  @override
+  String get typhoonLabelPressure => '中心気圧';
+
+  @override
+  String get typhoonLabelWind => '中心付近の最大風速';
+
+  @override
+  String get typhoonLabelGust => '最大瞬間風速';
+
+  @override
+  String get typhoonLabelGaleAvg => '強風域の平均半径';
+
+  @override
+  String get typhoonLabelStormAvg => '暴風域の平均半径';
+
+  @override
+  String get typhoonLabelProbCircle => '70%確率円';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return '予報 +$hours 時間';
+  }
+
+  @override
+  String get typhoonLabelNw => '北西';
+
+  @override
+  String get typhoonLabelNe => '北東';
+
+  @override
+  String get typhoonLabelSw => '南西';
+
+  @override
+  String get typhoonLabelSe => '南東';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '北緯 $lat 度';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '東経 $lon 度';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '毎秒 $n m';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return '資料時刻\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '強震モニタ';
+
+  @override
+  String get mapLayerDisasterMap => '防災マップ';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '防災マップのレイヤー';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'レイヤー';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'AEDの位置を表示';
+
+  @override
+  String get aedAddress => '住所';
+
+  @override
+  String get aedRegion => '地域';
+
+  @override
+  String get aedCategory => '分類';
+
+  @override
+  String get aedType => '種類';
+
+  @override
+  String get aedPlaceDesc => '設置場所';
+
+  @override
+  String get aedDescription => '備考';
+
+  @override
+  String get aedHoursWeekday => '平日の開館時間';
+
+  @override
+  String get aedHoursSaturday => '土曜の開館時間';
+
+  @override
+  String get aedHoursSunday => '日曜の開館時間';
+
+  @override
+  String get aedOpenRemark => '開館時間メモ';
+
+  @override
+  String get aedEmergencyPhone => '緊急連絡先';
+
+  @override
+  String get mapLayerRestroom => 'トイレ';
+
+  @override
+  String get mapLayerShelter => '避難所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'トイレを表示';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '避難所を表示';
+
+  @override
+  String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
+
+  @override
+  String get dpmAddress => '住所';
+
+  @override
+  String get restroomTypeLabel => '種別';
+
+  @override
+  String get restroomCategoryLabel => '区分';
+
+  @override
+  String get restroomGradeLabel => '等級';
+
+  @override
+  String get restroomTypeFemale => '女性用トイレ';
+
+  @override
+  String get restroomTypeMale => '男性用トイレ';
+
+  @override
+  String get restroomTypeMixed => '男女共用トイレ';
+
+  @override
+  String get restroomTypeAccessible => 'バリアフリートイレ';
+
+  @override
+  String get restroomTypeGenderNeutral => 'ジェンダーニュートラルトイレ';
+
+  @override
+  String get restroomTypeFamily => '親子トイレ';
+
+  @override
+  String get restroomTypeUnspecified => '未設定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公園';
+
+  @override
+  String get restroomCategoryCommercial => '商業・営業施設';
+
+  @override
+  String get restroomCategoryReligious => '宗教・礼拝施設';
+
+  @override
+  String get restroomCategoryCultural => '文化・娯楽施設';
+
+  @override
+  String get restroomCategoryGovernment => '行政サービス施設';
+
+  @override
+  String get restroomCategoryWelfare => '社会福祉施設・集会所';
+
+  @override
+  String get restroomCategoryTourist => '観光地・景勝地';
+
+  @override
+  String get restroomCategoryLeisure => 'レジャー・娯楽施設';
+
+  @override
+  String get restroomCategoryOther => 'その他';
+
+  @override
+  String get restroomGradeExcellent => '最上級';
+
+  @override
+  String get restroomGradeGood => '優良';
+
+  @override
+  String get restroomGradeAverage => '普通';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '住所';
+
+  @override
+  String get shelterCapacityLabel => '収容人数';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '対象災害';
+
+  @override
+  String get shelterIndoorLabel => '屋内収容';
+
+  @override
+  String get shelterOutdoorLabel => '屋外収容';
+
+  @override
+  String get shelterVulnerableOkLabel => '要配慮者向け収容';
+
+  @override
+  String get dpmYes => 'はい';
+
+  @override
+  String get dpmNo => 'いいえ';
 
   @override
   String get stationSheetEmpty => '観測点をタップして値を表示';
@@ -502,4 +1121,178 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'データ待機中…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '単位：$unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '実況経路';
+
+  @override
+  String get typhoonIntensityTd => '熱帯低気圧';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return '熱帯低気圧 TD $no';
+  }
+
+  @override
+  String get typhoonIntensityMild => '弱い台風';
+
+  @override
+  String get typhoonIntensityModerate => '並の台風';
+
+  @override
+  String get typhoonIntensityIntense => '強い台風';
+
+  @override
+  String get typhoonLegendForecast => '予報経路';
+
+  @override
+  String get typhoonLegendForecastPoint => '予報点';
+
+  @override
+  String get typhoonLegendCurrent => '現在中心';
+
+  @override
+  String get typhoonLegendCone => '予報円';
+
+  @override
+  String get mapLegendExpand => '凡例';
+
+  @override
+  String get mapLegendCollapse => '凡例を閉じる';
+
+  @override
+  String get mapMyLocation => '現在地';
+
+  @override
+  String get typhoonLegendCircle15 => '強風域（30kt）';
+
+  @override
+  String get typhoonLegendCircleAvg => '平均円';
+
+  @override
+  String get typhoonLegendCircle25 => '暴風域（50kt）';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
+
+  @override
+  String get typhoonLegendProbability => '接近確率';
+
+  @override
+  String get typhoonLegendWarningAreas => '警報区域';
+
+  @override
+  String get typhoonOverlayMenuTooltip => '台風オーバーレイ設定';
+
+  @override
+  String get typhoonOverlaySectionStorm => '暴風域';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'オーバーレイ';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => '平均円付き';
+
+  @override
+  String get typhoonOverlayProbabilityHint => '予報円を隠します';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip => '接近確率を表示（予報円を隠す）';
+
+  @override
+  String get typhoonOverlayWarningTooltip => '台風警報対象の県を強調';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip => '強風域 + 平均円（紫）';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip => '暴風域 + 平均円（黄）';
+
+  @override
+  String get typhoonOverlaySectionWeather => '天気下敷き';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'なし';
+
+  @override
+  String get typhoonOverlayWeatherHint => '通報時刻に合わせる';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip => 'レーダー／赤外線なし';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip => '通報時刻に最も近いレーダー';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip => '通報時刻に最も近い赤外線';
+
+  @override
+  String get typhoonWarningTitle => '台風警報';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '対象地域：$areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '経路詳細';
+
+  @override
+  String get typhoonHistoryTitle => '資料時刻';
+
+  @override
+  String get typhoonHistoryLive => '最新';
+
+  @override
+  String get typhoonSatelliteTitle => '衛星';
+
+  @override
+  String get typhoonOverlayForecastCallouts => '予報点の情報';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip => '拡大時に予報点の詳細カードを表示';
+
+  @override
+  String get dpmFilterSectionRestroom => '施設の種類';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'トイレの種類';
+
+  @override
+  String get dpmFilterSectionShelter => '避難所の災害種別';
+
+  @override
+  String get dpmDisasterFlood => '洪水';
+
+  @override
+  String get dpmDisasterEarthquake => '震災';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '津波';
+
+  @override
+  String get dpmDisasterSlope => '斜面災害';
+
+  @override
+  String get dpmDisasterNuclear => '原子力事故';
 }

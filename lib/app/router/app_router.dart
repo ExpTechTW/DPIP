@@ -1,11 +1,14 @@
 import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
+import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
+import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
@@ -14,8 +17,10 @@ import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart
 import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
+import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
+import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -55,10 +60,35 @@ final GoRouter appRouter = GoRouter(
           (_, _) => const EventsPage(),
         ),
         _branch(AppRoutes.mapPath, AppRoutes.map, (_, _) => const MapPage()),
-        _branch(
-          AppRoutes.earthquakePath,
-          AppRoutes.earthquake,
-          (_, _) => const EarthquakePage(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.dataPath,
+              name: AppRoutes.data,
+              builder: (_, _) => const DataPage(),
+              routes: [
+                GoRoute(
+                  path: AppRoutes.earthquakePath,
+                  name: AppRoutes.earthquake,
+                  builder: (_, _) => const ReportListPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.eewPath,
+                  name: AppRoutes.eew,
+                  builder: (_, _) => const EarthquakePage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.weatherRankingPath,
+                  name: AppRoutes.weatherRanking,
+                  builder: (_, state) => WeatherRankingPage(
+                    initialTab: WeatherRankingTab.parse(
+                      state.uri.queryParameters['tab'],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         _branch(AppRoutes.morePath, AppRoutes.more, (_, _) => const MorePage()),
       ],
@@ -73,6 +103,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.changelogPath,
+      name: AppRoutes.changelog,
+      builder: (_, _) => const ChangelogPage(),
     ),
     GoRoute(
       path: AppRoutes.developerPath,
@@ -90,6 +125,11 @@ final GoRouter appRouter = GoRouter(
       builder: (_, _) => const LanguagePage(),
     ),
     GoRoute(
+      path: AppRoutes.defaultMapLayerPath,
+      name: AppRoutes.defaultMapLayer,
+      builder: (_, _) => const DefaultMapLayerPage(),
+    ),
+    GoRoute(
       path: AppRoutes.regionManagePath,
       name: AppRoutes.regionManage,
       builder: (_, _) => const RegionManagePage(),
@@ -97,13 +137,19 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.regionSelectPath,
       name: AppRoutes.regionSelect,
-      builder: (_, _) => const RegionSelectPage(),
+      builder: (_, state) => RegionSelectPage(
+        replaceCode: state.uri.queryParameters['replace'],
+        returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+      ),
       routes: [
         GoRoute(
           path: AppRoutes.regionSelectCityPath,
           name: AppRoutes.regionSelectCity,
-          builder: (_, state) =>
-              RegionCityPage(city: state.pathParameters['city']!),
+          builder: (_, state) => RegionCityPage(
+            city: state.pathParameters['city']!,
+            replaceCode: state.uri.queryParameters['replace'],
+            returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+          ),
         ),
       ],
     ),

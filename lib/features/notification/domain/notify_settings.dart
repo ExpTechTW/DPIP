@@ -98,6 +98,19 @@ List<NotifyOptionKind> optionsFor(NotifyChannel channel) => switch (channel) {
   ],
 };
 
+/// [optionsFor], paired with each option's wire index, ordered for **display**:
+/// broadest ("receive the most") first, narrowest / off last.
+///
+/// [optionsFor]'s own order is the wire contract — its index *is* the value
+/// sent to the server — so it can't be reordered, and it happens to run the
+/// other way (off, when present, is index 0). Legacy displayed every picker
+/// broadest-first with off at the bottom; this is that same order, derived
+/// without touching the wire list, so each entry keeps its correct index for
+/// both the current-selection check and the value a tap sends.
+List<(int wireIndex, NotifyOptionKind kind)> notifyOptionsForDisplay(
+  NotifyChannel channel,
+) => optionsFor(channel).indexed.toList().reversed.toList();
+
 /// An immutable snapshot of all channel selections, backed by the wire list.
 class NotifySettings {
   const NotifySettings(this._values);

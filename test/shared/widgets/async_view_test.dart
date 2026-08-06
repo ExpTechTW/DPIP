@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -85,5 +86,56 @@ void main() {
       findsOneWidget,
       reason: 'retry re-ran the factory',
     );
+  });
+
+  testWidgets('refreshSignal re-runs the request', (tester) async {
+    final signal = RefreshSignal();
+    var calls = 0;
+    await tester.pumpWidget(
+      _wrap(
+        AsyncView<int>(
+          refreshSignal: signal,
+          future: () async => Ok(++calls),
+          builder: (_, value) => Text('v $value'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('v 1'), findsOneWidget);
+
+    signal.fire();
+    await tester.pumpAndSettle();
+    expect(find.text('v 2'), findsOneWidget);
+  });
+
+  testWidgets('a refresh keeps the current content on screen', (tester) async {
+    final signal = RefreshSignal();
+    var calls = 0;
+    late Completer<Result<int>> pending;
+    await tester.pumpWidget(
+      _wrap(
+        AsyncView<int>(
+          refreshSignal: signal,
+          future: () {
+            calls++;
+            if (calls == 1) return Future.value(const Ok(1));
+            return (pending = Completer<Result<int>>()).future;
+          },
+          builder: (_, value) => Text('v $value'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    signal.fire();
+    await tester.pump();
+    // Refreshing on every appearance would be intolerable if it blanked the
+    // screen each time, so the old value stays until the new one lands.
+    expect(find.text('v 1'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+
+    pending.complete(const Ok(2));
+    await tester.pumpAndSettle();
+    expect(find.text('v 2'), findsOneWidget);
   });
 }

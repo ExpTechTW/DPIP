@@ -1,16 +1,22 @@
+/// Sizes MapLibre's own **ambient tile database** (iOS `MLNOfflineStorage` /
+/// Android `OfflineManager`) — which this app keeps switched off.
+library;
+
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/services.dart';
 
-/// Configures MapLibre's shared **ambient tile cache** — the on-disk store the
-/// live map and the home snapshot both read.
+/// Native ambient-cache bridge.
 ///
-/// `maplibre_gl` 0.25.0 wraps `clearAmbientCache` but not a size bound, and the
-/// native default ceiling is only ~50 MB, so this drives the native
-/// `MLNOfflineStorage` (iOS) / `OfflineManager` (Android)
-/// `setMaximumAmbientCacheSize` directly to raise it — more radar frames stay
-/// cached, so scrubbing the timeline re-fetches far less. Call once the map
-/// exists (MapLibre is then initialised on both platforms). A missing native
-/// handler degrades to a no-op: caching still works at the default size.
+/// MapLibre keeps its own on-disk cache of everything it downloads. This app
+/// **disables it** ([disabledBytes]) and serves those bytes from
+/// [EtagCacheStore] through the Dart bridge instead, because two disk caches of
+/// the same tiles meant ~214 MB for one copy's worth of content and only one of
+/// them was visible to the app's eviction policy and traffic accounting. The
+/// native default (~50 MB) applies if this is never called, so it must be.
+///
+/// Nothing is lost by turning it off: glyphs are in the app's store too, and
+/// the in-process mirror in front of the bridge is what actually keeps IPC off
+/// the hot path — the ambient database was only ever a second copy behind it.
 class MapCache {
   const MapCache();
 
@@ -18,15 +24,17 @@ class MapCache {
     'com.exptech.dpip/map_cache',
   );
 
-  /// Caps the shared ambient cache at [bytes], trimming (LRU) if it is already
-  /// larger. Best-effort — a failure just leaves the default ceiling in place.
-  Future<void> setMaximumSize(int bytes) async {
+  /// A zero ceiling disables ambient caching outright on both platforms.
+  static const int disabledBytes = 0;
+
+  /// Caps the shared ambient cache at [bytes], trimming (LRU) if already larger.
+  Future<void> setMaximumSize([int bytes = disabledBytes]) async {
     try {
       await _channel.invokeMethod<void>('setMaximumAmbientCacheSize', {
         'bytes': bytes,
       });
     } on MissingPluginException {
-      // Platform without the handler — cache stays at its native default size.
+      // Platform without the handler.
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'setMaximumAmbientCacheSize');
     }

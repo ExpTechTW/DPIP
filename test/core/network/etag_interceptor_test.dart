@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -66,7 +67,7 @@ void main() {
 
   tearDown(() async => db.close());
 
-  Dio dioWith(_FakeAdapter adapter) =>
+  Dio dioWith(HttpClientAdapter adapter) =>
       createDio(etagCache: store)..httpClientAdapter = adapter;
 
   test('a 304 is served from cache as a 200 with the cached body', () async {
@@ -120,4 +121,69 @@ void main() {
       expect(await store.read('https://x.test/stream'), isNull);
     },
   );
+
+  test('live / personal paths are never cached', () async {
+    final adapter = _FakeAdapter(body: '[]', etag: 'v1');
+    final dio = dioWith(adapter);
+    const urls = [
+      'https://api.lb-tpe1.exptech.dev/api/v2/eq/eew',
+      'https://api.lb-tpe1.exptech.dev/api/v2/trem/rts',
+      'https://api.core-tnn1.exptech.dev/api/v2/location/1/tok/1.0/25,121',
+      'https://api.core-tnn1.exptech.dev/api/v2/notify/tok',
+      'https://api.core-tnn1.exptech.dev/api/v2/notify/tok/eew/1',
+    ];
+    for (final url in urls) {
+      await dio.get<dynamic>(url);
+      expect(await store.read(url), isNull, reason: url);
+      expect(EtagInterceptor.isUncacheablePath(Uri.parse(url).path), isTrue);
+    }
+  });
+
+  test('basemap PBF 404 is cached as empty and served locally', () async {
+    const url = 'https://lb.exptech.dev/api/v1/map/tiles/7/114/56.pbf';
+    final adapter = _StatusAdapter(404);
+    final dio = dioWith(adapter);
+
+    await expectLater(
+      dio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      ),
+      throwsA(isA<DioException>()),
+    );
+    final cached = await store.readBytes(url);
+    expect(cached, isNotNull);
+    expect(cached!.bytes, isEmpty);
+    expect(cached.etag, EtagInterceptor.negativeTileEtag);
+
+    // Second get is a local hit (200 empty) — no second network call.
+    final again = await dio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    expect(again.statusCode, 200);
+    expect(again.data, isEmpty);
+    expect(adapter.calls, 1);
+  });
+}
+
+/// Adapter that always returns [status] with an empty body.
+class _StatusAdapter implements HttpClientAdapter {
+  _StatusAdapter(this.status);
+
+  final int status;
+  int calls = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    return ResponseBody.fromBytes(Uint8List(0), status, headers: {});
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

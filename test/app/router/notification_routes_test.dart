@@ -8,7 +8,9 @@ void main() {
     AppRoutes.home,
     AppRoutes.events,
     AppRoutes.map,
+    AppRoutes.data,
     AppRoutes.earthquake,
+    AppRoutes.eew,
     AppRoutes.more,
   };
   const knownGroups = {
@@ -46,14 +48,17 @@ void main() {
   test('routes each family to the expected screen', () {
     expect(
       routeForNotificationChannel('eew_alert-important-v2'),
-      AppRoutes.earthquake,
+      AppRoutes.eew,
     );
     expect(routeForNotificationChannel('eq-v2'), AppRoutes.earthquake);
     expect(
       routeForNotificationChannel('int_report-general-v2'),
       AppRoutes.earthquake,
     );
-    expect(routeForNotificationChannel('report-general-v2'), AppRoutes.map);
+    expect(
+      routeForNotificationChannel('report-general-v2'),
+      AppRoutes.earthquake,
+    );
     expect(routeForNotificationChannel('tsunami-important-v2'), AppRoutes.home);
     expect(
       routeForNotificationChannel('announcement-general-v2'),

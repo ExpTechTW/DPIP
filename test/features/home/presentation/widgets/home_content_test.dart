@@ -3,10 +3,14 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_repository.dart';
+import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -14,21 +18,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// The header only calls [MeteorWeatherRepository.realtime]; with an empty town
-/// directory no coordinate resolves, so it's never invoked.
+/// Stub weather: home content resolves no towns from an empty directory, so
+/// neither endpoint is invoked in the switch tests.
 class _FakeWeatherRepository implements MeteorWeatherRepository {
   @override
   Future<Result<WeatherRealtime?>> realtime(double lat, double lng) async =>
       const Ok(null);
 
   @override
+  Future<Result<WeatherForecast>> forecast(String code) async =>
+      Ok(WeatherForecast(updateTime: 0, forecast: const []));
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+class _FakeEventRepository implements EventRepository {
+  @override
+  Future<Result<List<Event>>> events({String? regionCode}) async =>
+      const Ok([]);
+
+  @override
+  Future<Result<List<Event>>> activeEvents({String? regionCode}) async =>
+      const Ok([]);
 }
 
 /// Pumps [HomeContent] with everything it reads: a [RegionStore] to switch on
 /// and localizations for the body.
 Widget _wrap(RegionStore store) {
   const directory = TownDirectory(<String, Town>{});
+  final events = _FakeEventRepository();
   return MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
@@ -37,9 +56,13 @@ Widget _wrap(RegionStore store) {
       providers: [
         ChangeNotifierProvider<RegionStore>.value(value: store),
         Provider<TownDirectory>.value(value: directory),
+        Provider<EventRepository>.value(value: events),
         ChangeNotifierProvider<HomeWeatherController>(
           create: (_) =>
               HomeWeatherController(_FakeWeatherRepository(), store, directory),
+        ),
+        ChangeNotifierProvider<HomeActiveEventsController>(
+          create: (_) => HomeActiveEventsController(events, store),
         ),
       ],
       child: Scaffold(body: HomeContent(scrollController: ScrollController())),
@@ -111,5 +134,50 @@ void main() {
 
     expect(find.byType(HomeSheetHeader), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('no GPS fix → the header says the location is unavailable', (
+    tester,
+  ) async {
+    final store = await _store();
+    // 所在地 is index 1; leaving currentCode null is exactly the no-fix state.
+    store.select(1);
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.regionCurrentUnavailable), findsOneWidget);
+    expect(find.byIcon(Icons.location_off_outlined), findsOneWidget);
+  });
+
+  testWidgets('no GPS fix → no weather readout stands in for the location', (
+    tester,
+  ) async {
+    final store = await _store();
+    store.select(1);
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    // Without a location there is no location's weather. A dashed-out reading
+    // row would read as "we are here, the weather is unknown"; worse, the
+    // precipitation slot used to fabricate "0.0 mm" for missing data, which is
+    // indistinguishable from a real "no rain" reading.
+    expect(find.textContaining('mm'), findsNothing);
+    expect(find.byIcon(Icons.cloud_outlined), findsNothing);
+  });
+
+  testWidgets('a located area shows the reading row, not the notice', (
+    tester,
+  ) async {
+    final store = await _store();
+    store
+      ..select(1)
+      ..setCurrentCode('100');
+    await tester.pumpWidget(_wrap(store));
+    await tester.pumpAndSettle();
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.regionCurrentUnavailable), findsNothing);
+    expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
   });
 }

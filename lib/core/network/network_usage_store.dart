@@ -1,150 +1,293 @@
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
 
 /// A snapshot of network usage for the Debug page.
+///
+/// Every figure is a **trailing window**, never a lifetime total. A cumulative
+/// number only ever grows, so beside a 24-hour download figure it says nothing
+/// about how the cache is doing now — and once recorded it can't be windowed
+/// after the fact.
 class NetworkUsage {
   const NetworkUsage({
     required this.last24h,
     required this.last7d,
-    required this.hits,
-    required this.misses,
-    required this.savedBytes,
+    required this.saved24h,
+    required this.saved7d,
+    required this.hits24h,
+    required this.misses24h,
+    required this.hits7d,
+    required this.misses7d,
   });
+
+  const NetworkUsage.empty()
+    : last24h = 0,
+      last7d = 0,
+      saved24h = 0,
+      saved7d = 0,
+      hits24h = 0,
+      misses24h = 0,
+      hits7d = 0,
+      misses7d = 0;
 
   /// Download bytes in the trailing 24 hours / 7 days.
   final int last24h;
   final int last7d;
 
-  /// ETag revalidations served from cache (`304`) vs full `200` downloads.
-  final int hits;
-  final int misses;
+  /// Bytes never re-downloaded thanks to the cache, over the same windows.
+  final int saved24h;
+  final int saved7d;
 
-  /// Cumulative bytes never re-downloaded thanks to `304`s.
-  final int savedBytes;
+  /// Requests answered from cache vs fetched, over the same windows.
+  final int hits24h;
+  final int misses24h;
+  final int hits7d;
+  final int misses7d;
 
-  int get total => hits + misses;
+  int get total24h => hits24h + misses24h;
+  int get total7d => hits7d + misses7d;
 
   /// Fraction of cacheable requests answered from cache (0 when none yet).
-  double get hitRate => total == 0 ? 0 : hits / total;
+  double get hitRate24h => total24h == 0 ? 0 : hits24h / total24h;
+  double get hitRate7d => total7d == 0 ? 0 : hits7d / total7d;
+}
+
+/// One hour's pending aggregate, before it reaches SQLite.
+class _Pending {
+  int down = 0;
+  int saved = 0;
+  int hits = 0;
+  int misses = 0;
 }
 
 /// Persisted network-usage accounting backed by the shared SQLite database.
 ///
-/// Download bytes accumulate into **hourly buckets** so the Debug page can sum a
-/// trailing 24-hour / 7-day window; buckets older than 7 days are swept on each
-/// write (a sliding window — old data ages out on its own). ETag hit/miss counts
-/// and the cumulative traffic saved by `304`s are kept as running totals (never
-/// swept). All operations are best-effort: any error is swallowed — accounting
-/// must never break a request. Fed by [EtagInterceptor].
+/// Everything — bytes downloaded, bytes saved, and cache hits / misses —
+/// accumulates into **hourly buckets**, so the Debug page can sum any trailing
+/// window and buckets older than 7 days are swept on each flush (a sliding
+/// window: old data ages out on its own, and the table can't grow without
+/// bound).
+///
+/// Hot-path [record] only mutates an in-memory pending aggregate and schedules a
+/// coalesced [flush] (timer and/or event count) so tile storms don't hammer
+/// SQLite. [stats] always flushes first. All operations are best-effort: any
+/// error is swallowed — accounting must never break a request. Binary cache hits
+/// are fed by [EtagCacheStore]; misses and JSON `304`s by [EtagInterceptor] /
+/// MapLibre put.
 class NetworkUsageStore {
-  NetworkUsageStore(this._db, {DateTime Function()? now})
-    : _now = now ?? DateTime.now;
+  NetworkUsageStore(
+    this._db, {
+    DateTime Function()? now,
+    this.flushInterval = const Duration(seconds: 2),
+    this.flushEvery = 64,
+  }) : _now = now ?? DateTime.now;
 
   final Database _db;
 
   /// Injectable clock — the wall time used to bucket and window usage.
   final DateTime Function() _now;
 
+  /// Max delay before a non-empty pending aggregate is written.
+  final Duration flushInterval;
+
+  /// Force a flush once this many [record] events are pending.
+  final int flushEvery;
+
   static const String _buckets = 'net_bucket';
-  static const String _totals = 'net_total';
+
+  /// Pre-window schema: lifetime counters. Dropped on migration.
+  static const String _legacyTotals = 'net_total';
+
   static const int _hourMs = 3600 * 1000;
   static const int _windowHours = 24 * 7;
 
-  /// Creates the usage tables (idempotent) — call on database open. Uses
-  /// `IF NOT EXISTS` so it also adds the tables to a pre-existing cache database
-  /// without a version bump.
+  /// Every counter the bucket table carries.
+  static const List<String> _columns = ['down', 'saved', 'hits', 'misses'];
+
+  /// Aggregates keyed by hour bucket at [record] time (not flush time).
+  final Map<int, _Pending> _pendingByHour = {};
+  int _pendingEvents = 0;
+  Timer? _flushTimer;
+  Future<void>? _flushing;
+
+  /// Creates the usage table (idempotent) — call on database open. Uses
+  /// `IF NOT EXISTS` so it also adds the table to a pre-existing cache database
+  /// without a version bump, then migrates an older shape in place.
   static Future<void> createSchema(Database db) async {
+    final defs = _columns
+        .map((c) => '$c INTEGER NOT NULL DEFAULT 0')
+        .join(', ');
     await db.execute(
-      'CREATE TABLE IF NOT EXISTS $_buckets ('
-      'hour INTEGER PRIMARY KEY, down INTEGER NOT NULL DEFAULT 0)',
+      'CREATE TABLE IF NOT EXISTS $_buckets (hour INTEGER PRIMARY KEY, $defs)',
     );
-    await db.execute(
-      'CREATE TABLE IF NOT EXISTS $_totals ('
-      'k TEXT PRIMARY KEY, v INTEGER NOT NULL DEFAULT 0)',
-    );
+    await _migrate(db);
   }
 
-  /// Records one cacheable response: [down] bytes downloaded, whether it was a
-  /// cache [hit] (`304`), and the bytes [saved] by that hit. Best-effort.
+  /// Brings a bucket table created by an older build up to date.
+  ///
+  /// [createSchema] runs on every open with `IF NOT EXISTS`, so an installed
+  /// database never picks up new columns on its own. Saved bytes and hit/miss
+  /// counts used to be lifetime running totals in a separate table; that table
+  /// is dropped here, because a number that only grows can't be windowed after
+  /// the fact and leaving it would just be a second, contradictory answer.
+  static Future<void> _migrate(Database db) async {
+    try {
+      final existing = {
+        for (final row in await db.rawQuery('PRAGMA table_info($_buckets)'))
+          row['name'] as String,
+      };
+      for (final column in _columns) {
+        if (existing.contains(column)) continue;
+        await db.execute(
+          'ALTER TABLE $_buckets ADD COLUMN $column INTEGER NOT NULL DEFAULT 0',
+        );
+      }
+      await db.execute('DROP TABLE IF EXISTS $_legacyTotals');
+    } catch (_) {
+      // Accounting is diagnostic-only; never break the open on it.
+    }
+  }
+
+  /// Queues one cacheable response for a coalesced flush: [down] bytes
+  /// downloaded, whether it was a cache [hit], and the bytes [saved] by that
+  /// hit. Completes when the event is buffered (not when SQLite lands).
   Future<void> record({
     required int down,
     required bool hit,
     required int saved,
   }) async {
+    final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+    final pending = _pendingByHour.putIfAbsent(hour, _Pending.new);
+    pending.down += down;
+    pending.saved += saved;
+    if (hit) {
+      pending.hits += 1;
+    } else {
+      pending.misses += 1;
+    }
+    _pendingEvents += 1;
+    if (_pendingEvents >= flushEvery) {
+      unawaited(flush());
+    } else {
+      _flushTimer ??= Timer(flushInterval, () {
+        _flushTimer = null;
+        unawaited(flush());
+      });
+    }
+  }
+
+  /// Writes any pending aggregate into SQLite (one transaction). Idempotent.
+  /// Drains again if [record] raced the flush.
+  Future<void> flush() async {
+    while (true) {
+      final inFlight = _flushing;
+      if (inFlight != null) {
+        await inFlight;
+        if (_pendingByHour.isEmpty) return;
+        continue;
+      }
+      if (_pendingByHour.isEmpty) return;
+      final done = _flushBody();
+      _flushing = done.whenComplete(() => _flushing = null);
+      await done;
+      if (_pendingByHour.isEmpty) return;
+    }
+  }
+
+  Future<void> _flushBody() async {
+    _flushTimer?.cancel();
+    _flushTimer = null;
+    if (_pendingByHour.isEmpty) return;
+
+    final pending = Map<int, _Pending>.of(_pendingByHour);
+    _pendingByHour.clear();
+    _pendingEvents = 0;
+
     try {
       final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
-      if (down > 0) await _addToBucket(hour, down);
-      await _bump(hit ? 'hits' : 'misses', 1);
-      if (saved > 0) await _bump('saved', saved);
-      // Sliding window: drop buckets older than 7 days.
-      await _db.delete(
-        _buckets,
-        where: 'hour < ?',
-        whereArgs: [hour - _windowHours],
-      );
+      await _db.transaction((txn) async {
+        for (final entry in pending.entries) {
+          await _addToBucket(txn, entry.key, entry.value);
+        }
+        await txn.delete(
+          _buckets,
+          where: 'hour < ?',
+          whereArgs: [hour - _windowHours],
+        );
+      });
     } catch (_) {
       // Accounting is diagnostic-only; never surface a failure.
     }
   }
 
-  /// The current usage snapshot. Best-effort: zeros on error.
+  /// Drops every recorded bucket and anything still buffered.
+  ///
+  /// The pending aggregate has to go too: it is what a flush would write next,
+  /// so leaving it would let the counters reappear a second or two after the
+  /// user watched them reset.
+  Future<void> clear() async {
+    _flushTimer?.cancel();
+    _flushTimer = null;
+    _pendingByHour.clear();
+    _pendingEvents = 0;
+    try {
+      await _db.delete(_buckets);
+    } catch (_) {
+      // Accounting is diagnostic-only; never surface a failure.
+    }
+  }
+
+  /// The current usage snapshot (flushes pending first). Best-effort: zeros on
+  /// error.
   Future<NetworkUsage> stats() async {
+    await flush();
     try {
       final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+      final day = await _sumSince(hour - 24);
+      final week = await _sumSince(hour - _windowHours);
       return NetworkUsage(
-        last24h: await _sumSince(hour - 24),
-        last7d: await _sumSince(hour - _windowHours),
-        hits: await _readTotal('hits'),
-        misses: await _readTotal('misses'),
-        savedBytes: await _readTotal('saved'),
+        last24h: day.down,
+        last7d: week.down,
+        saved24h: day.saved,
+        saved7d: week.saved,
+        hits24h: day.hits,
+        misses24h: day.misses,
+        hits7d: week.hits,
+        misses7d: week.misses,
       );
     } catch (_) {
-      return const NetworkUsage(
-        last24h: 0,
-        last7d: 0,
-        hits: 0,
-        misses: 0,
-        savedBytes: 0,
-      );
+      return const NetworkUsage.empty();
     }
   }
 
   // Update-then-insert instead of UPSERT, so it works on any bundled SQLite.
-  Future<void> _addToBucket(int hour, int down) async {
-    final updated = await _db.rawUpdate(
-      'UPDATE $_buckets SET down = down + ? WHERE hour = ?',
-      [down, hour],
+  Future<void> _addToBucket(DatabaseExecutor db, int hour, _Pending add) async {
+    final sets = _columns.map((c) => '$c = $c + ?').join(', ');
+    final values = [add.down, add.saved, add.hits, add.misses];
+    final updated = await db.rawUpdate(
+      'UPDATE $_buckets SET $sets WHERE hour = ?',
+      [...values, hour],
     );
     if (updated == 0) {
-      await _db.insert(_buckets, {'hour': hour, 'down': down});
+      await db.insert(_buckets, {
+        'hour': hour,
+        for (var i = 0; i < _columns.length; i++) _columns[i]: values[i],
+      });
     }
   }
 
-  Future<void> _bump(String key, int by) async {
-    final updated = await _db.rawUpdate(
-      'UPDATE $_totals SET v = v + ? WHERE k = ?',
-      [by, key],
-    );
-    if (updated == 0) {
-      await _db.insert(_totals, {'k': key, 'v': by});
-    }
-  }
-
-  Future<int> _sumSince(int sinceHour) async {
+  /// Sums every counter over one trailing window in a single query.
+  Future<_Pending> _sumSince(int sinceHour) async {
+    final sums = _columns.map((c) => 'COALESCE(SUM($c), 0) AS $c').join(', ');
     final rows = await _db.rawQuery(
-      'SELECT COALESCE(SUM(down), 0) AS b FROM $_buckets WHERE hour >= ?',
+      'SELECT $sums FROM $_buckets WHERE hour >= ?',
       [sinceHour],
     );
-    return (rows.first['b'] as num).toInt();
-  }
-
-  Future<int> _readTotal(String key) async {
-    final rows = await _db.query(
-      _totals,
-      columns: ['v'],
-      where: 'k = ?',
-      whereArgs: [key],
-      limit: 1,
-    );
-    return rows.isEmpty ? 0 : (rows.first['v'] as num).toInt();
+    final row = rows.first;
+    return _Pending()
+      ..down = (row['down'] as num).toInt()
+      ..saved = (row['saved'] as num).toInt()
+      ..hits = (row['hits'] as num).toInt()
+      ..misses = (row['misses'] as num).toInt();
   }
 }

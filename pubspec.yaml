@@ -17,19 +17,26 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_markdown_plus: ^1.0.5
   flutter_ntp: ^0.1.0
   freezed_annotation: ^3.1.0
   geolocator: ^14.0.3
   fl_chart: ^1.2.0
   go_router: ^17.3.0
-  in_app_purchase: ^3.2.3
+  in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # Requires MapLibre 6.27.0 exactly — both its podspec and its Package.swift
-  # pin that version. ios/vendor/maplibre vendors that exact xcframework, so
-  # bump the two together: a mismatch fails `pod install` with a version
-  # conflict (and SPM resolution with the same `exact:` constraint).
-  maplibre_gl: ^0.26.2
+  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge.
+  # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
+  # https://github.com/ExpTechTW/flutter-maplibre-gl
+  # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
+  # pubspec.lock. Local path override stays in gitignored
+  # `pubspec_overrides.yaml` — after `pub get` with it, discard lock churn.
+  maplibre_gl:
+    git:
+      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
+      path: maplibre_gl
+      ref: 2c515a3feaa7fee565e1ae03971aade841bec54f
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1

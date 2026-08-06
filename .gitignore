@@ -51,3 +51,6 @@ android/key.properties
 
 # Local read-only reference copy of the pre-rewrite app (see history @ 789f5f18)
 /legacy/
+
+# Local dependency overrides (e.g. a working copy of the maplibre fork).
+pubspec_overrides.yaml

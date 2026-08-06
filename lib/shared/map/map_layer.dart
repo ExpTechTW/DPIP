@@ -54,6 +54,27 @@ abstract interface class MapLayer {
   /// their static overlay in [render] and react to taps in [onMapTap].
   bool get usesTimeline;
 
+  /// How much of the map's height this layer's **resting** chrome covers at the
+  /// bottom, as a fraction (0–1) — a collapsed sheet's peek, a status strip.
+  ///
+  /// The map fills the screen and every layer's chrome is layered *over* it, so
+  /// the band the user can actually see is shorter than the map. The scaffold
+  /// subtracts this when framing, which is why switching layers re-frames: each
+  /// layer hides a different amount. Report only the resting height — a sheet the
+  /// user drags open is their own doing and must not move the camera.
+  ///
+  /// Timeline layers return 0: the scaffold owns the timeline widget and measures
+  /// its real height instead of taking a declared number.
+  double get bottomChromeFraction;
+
+  /// Per-surface MapLibre zoom floor. Default matches [BaseMap.defaultMinZoom]
+  /// (radar tiles); typhoon may go lower so the whole basin fits.
+  double get mapMinZoom;
+
+  /// Per-surface MapLibre zoom ceiling. Default matches [BaseMap.maxZoom].
+  /// Disaster-prevention MVT goes to 16 so AED points can un-cluster.
+  double get mapMaxZoom;
+
   /// Draws this sheet layer's static overlay when it becomes active. Called once
   /// per activation (behind the serial op queue). No-op for timeline layers.
   Future<void> render(MapLibreMapController controller);
@@ -62,10 +83,47 @@ abstract interface class MapLayer {
   /// (opening [buildSheet]); no-op for timeline layers.
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller);
 
+  /// Programmatically open a feature sheet for [id] (e.g. ranking → map
+  /// handoff). No-op for layers without a selectable station/feature sheet.
+  void selectFeature(String id);
+
   /// The bottom sheet for a sheet layer — a self-contained, collapsible panel
   /// that shows the tapped feature's detail. `SizedBox.shrink()` for timeline
   /// layers (the scaffold shows the timeline for those instead).
   Widget buildSheet(BuildContext context);
+
+  /// Optional colour / key legend for the scaffold's top-left overlay.
+  ///
+  /// Return [SizedBox.shrink] when the layer has nothing to key (rare). Keep it
+  /// compact — the map must stay readable beside the layer switcher.
+  Widget buildLegend(BuildContext context);
+
+  /// Optional chrome to the left of the layer switcher (top-right).
+  ///
+  /// Use for layer-specific toggles (e.g. typhoon overlay menu). Default is
+  /// empty — most layers only need the shared switcher.
+  Widget buildTopTrailingChrome(BuildContext context);
+
+  /// Flutter widgets painted over the map (screen-space callouts, etc.).
+  ///
+  /// Prefer this for readable text — MapLibre symbol glyphs can't mix CJK and
+  /// Latin cleanly. Keep the subtree [IgnorePointer]-friendly (scaffold wraps
+  /// it) so pan/zoom still hit the map. Return [SizedBox.shrink] when unused.
+  /// Rebuilds on camera idle so projections stay in sync.
+  Widget buildMapOverlay(BuildContext context);
+
+  /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
+  Future<void> onCameraIdle(MapLibreMapController controller);
+
+  /// Ambient cache was wiped (e.g. after radar scrub + background). Layers that
+  /// pin tiles via app HTTP should rehydrate from their ETag store.
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller);
+
+  /// Finger/stylus went down on the map — hide ephemeral overlays (callouts).
+  void onMapGestureStart();
+
+  /// Gesture finished (pointer up with no camera motion, or camera idle).
+  void onMapGestureEnd();
 
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
@@ -77,8 +135,15 @@ abstract interface class MapLayer {
   Future<void> prepare(MapLibreMapController controller, List<MapFrame> frames);
 
   /// Instantly reveals the already-[prepare]d [frame] (hiding the previous one).
-  /// Cheap enough to call on every scrub tick, so the timeline can animate.
-  Future<void> show(MapLibreMapController controller, MapFrame frame);
+  ///
+  /// [scrubbing] is true while the timeline finger is down / flinging. Raster
+  /// layers must not mount cold frames then (tile HTTP storms); they only
+  /// opacity-switch among residents and load on settle (`scrubbing: false`).
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  });
 
   /// Removes this layer's sources/layers from [controller].
   Future<void> clear(MapLibreMapController controller);

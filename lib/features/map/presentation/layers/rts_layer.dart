@@ -11,8 +11,12 @@ import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/intensity_legend.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -20,7 +24,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// A realtime [MapLayer]: subscribes to the live RTS feed and repaints the
 /// station dots (coloured by raw intensity `i`) on every ~1 Hz snapshot. Not
 /// tap- or timeline-driven; its "sheet" is a compact monitor panel showing the
-/// feed's freshness and the intensity legend.
+/// feed's freshness, and [buildLegend] shows the intensity scale.
 class RtsMapLayer implements MapLayer {
   RtsMapLayer(this._feed, this._stationRepository);
 
@@ -65,13 +69,26 @@ class RtsMapLayer implements MapLayer {
   bool get usesTimeline => false;
 
   @override
+  double get bottomChromeFraction => RtsMonitorPanel.bottomStripFraction;
+
+  @override
+  double get mapMinZoom => 4;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
   Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
 
   @override
-  Future<void> show(MapLibreMapController c, MapFrame frame) async {}
+  Future<void> show(
+    MapLibreMapController c,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -87,8 +104,8 @@ class RtsMapLayer implements MapLayer {
       _circleId,
       _circleProps(_liveOpacity),
     );
-    // Station id + raw intensity as a label — only when zoomed in; the engine
-    // places and de-collides them (strongest-first).
+    // Station id over its raw intensity, pinned under the dot; the sort key
+    // lets hot stations win placement (see [stationLabelProps]).
     await controller.addSymbolLayer(
       _sourceId,
       _labelId,
@@ -147,23 +164,13 @@ class RtsMapLayer implements MapLayer {
   );
 
   /// The full label style at [opacity] — station id over its raw intensity.
-  /// Passed whole (setLayerProperties nulls anything omitted). Strongest labels
-  /// win placement, matching the dots' sort.
-  SymbolLayerProperties _labelProps(double opacity) => SymbolLayerProperties(
-    textField: <Object>['get', 'label'],
-    textFont: const ['Noto Sans TC Regular'],
+  /// Passed whole (setLayerProperties nulls anything omitted); the sort key
+  /// places the strongest stations first so a hot reading never loses.
+  SymbolLayerProperties _labelProps(double opacity) => stationLabelProps(
+    textField: const <Object>['get', 'label'],
     textSize: 10,
-    textColor: '#FFFFFF',
-    textHaloColor: '#000000',
-    textHaloWidth: 1.2,
-    textLineHeight: 1.1,
-    textVariableAnchor: const ['top', 'bottom', 'left', 'right'],
-    textRadialOffset: 0.8,
-    textJustify: 'auto',
-    textAllowOverlap: false,
-    textOptional: true,
-    textOpacity: opacity,
-    symbolSortKey: _labelSortKey,
+    opacity: opacity,
+    sortKey: _labelSortKey,
   );
 
   @override
@@ -176,6 +183,30 @@ class RtsMapLayer implements MapLayer {
   Widget buildSheet(BuildContext context) => RtsMonitorPanel(feed: _feed);
 
   @override
+  Widget buildTopTrailingChrome(BuildContext context) =>
+      const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
+  Widget buildLegend(BuildContext context) => const MapLegendCard(
+    child: IntensityLegend(mode: IntensityLegendMode.rts),
+  );
+
+  @override
   Future<void> clear(MapLibreMapController controller) async {
     if (_listening) {
       _feed.removeListener(_onFeed);
@@ -184,6 +215,9 @@ class RtsMapLayer implements MapLayer {
     await _removeFromMap(controller);
     _controller = null;
   }
+
+  @override
+  void selectFeature(String id) {}
 
   @override
   void onStyleReset() => _added = false;

@@ -4,15 +4,21 @@
 library;
 
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/features/notification/data/notify_api.dart';
 import 'package:dpip/features/notification/data/notify_repository_impl.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-/// The notify settings repository (fetch/set the per-channel push filters).
+/// The notify settings repository (fetch/set the per-channel push filters;
+/// self-heals an unregistered push token — see [NotifyRepositoryImpl]).
 List<SingleChildWidget> notificationProviders(SharedDeps deps) => [
   Provider<NotifyRepository>.value(
-    value: NotifyRepositoryImpl(NotifyApi(deps.apiClient)),
+    value: NotifyRepositoryImpl(
+      NotifyApi(deps.apiClient),
+      LocationApi(deps.apiClient),
+      deps.locationService,
+    ),
   ),
 ];

@@ -100,7 +100,14 @@ class _NotifyList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       children: [
-        for (final section in sections) ...[
+        for (final (i, section) in sections.indexed) ...[
+          // Between categories, not above the first or below the last.
+          if (i > 0)
+            const Divider(
+              height: 1,
+              indent: AppSpacing.lg,
+              endIndent: AppSpacing.lg,
+            ),
           SectionHeader(section.title),
           for (final channel in section.channels)
             _ChannelTile(controller: controller, channel: channel),
@@ -163,8 +170,30 @@ class _ChannelTile extends StatelessWidget {
 }
 
 /// The bottom sheet listing a channel's options; tapping one pops its wire
-/// index (mirroring the selection style used elsewhere: a leading title with a
-/// trailing check on the active row).
+/// index (mirroring the selection style used elsewhere: a leading icon +
+/// title with a trailing check on the active row — see
+/// `DefaultMapLayerPage`). The **only** colour in the list is that trailing
+/// check — every icon stays neutral, so the selection stays the one thing
+/// your eye is drawn to.
+///
+/// [optionsFor] is wire order (its index *is* the value sent to the server,
+/// so that order can't change), broadest-first from the user's point of view
+/// — "off" sits at index 0 for every channel that has it. Every hand-built
+/// list in this app reads top-to-bottom as "receive the most → receive
+/// nothing", so display order is wire order **reversed**; each row keeps its
+/// own original index for the check mark and the popped value.
+///
+/// Hierarchy comes from structure, not colour: a channel that has an "off"
+/// option gets a divider right above it and its row dimmed, so the list reads
+/// as two tiers — degrees of "on", then a clearly separate "off" — instead of
+/// options flattened together with no sense of which is more.
+///
+/// The title is a plain left-aligned, bold, large heading — no icon, no
+/// [ListTile] shape — so it can't be mistaken for another tappable row
+/// (mirrors `ReportFilterSheet`'s own sheet title). It's tinted
+/// [ColorScheme.primary], the same role [SectionHeader] uses for this page's
+/// own category labels, so the sheet's title reads as the same kind of
+/// heading rather than a differently-styled one-off.
 class _OptionSheet extends StatelessWidget {
   const _OptionSheet({required this.channel, required this.current});
 
@@ -175,38 +204,50 @@ class _OptionSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final options = optionsFor(channel);
+    final options = notifyOptionsForDisplay(channel);
 
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.lg,
-              0,
+              AppSpacing.sm,
               AppSpacing.lg,
               AppSpacing.sm,
             ),
-            child: Row(
-              children: [
-                Icon(notifyChannelIcon(channel)),
-                const SizedBox(width: AppSpacing.md),
-                Text(
-                  notifyChannelTitle(channel, l10n),
-                  style: theme.textTheme.titleMedium,
-                ),
-              ],
+            child: Text(
+              notifyChannelTitle(channel, l10n),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
-          for (final (index, kind) in options.indexed)
+          for (final (wireIndex, kind) in options) ...[
+            if (kind == NotifyOptionKind.off)
+              const Divider(
+                height: 1,
+                indent: AppSpacing.lg,
+                endIndent: AppSpacing.lg,
+              ),
             ListTile(
+              iconColor: kind == NotifyOptionKind.off
+                  ? theme.colorScheme.onSurfaceVariant
+                  : null,
+              textColor: kind == NotifyOptionKind.off
+                  ? theme.colorScheme.onSurfaceVariant
+                  : null,
+              leading: Icon(notifyOptionIcon(kind)),
               title: Text(notifyOptionLabel(kind, l10n)),
-              trailing: index == current
+              trailing: wireIndex == current
                   ? Icon(Icons.check, color: theme.colorScheme.primary)
                   : null,
-              onTap: () => Navigator.pop(context, index),
+              onTap: () => Navigator.pop(context, wireIndex),
             ),
+          ],
           const SizedBox(height: AppSpacing.sm),
         ],
       ),

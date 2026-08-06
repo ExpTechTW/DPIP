@@ -1179,7 +1179,9 @@ as String,
 /// @nodoc
 mixin _$TyphoonWarning {
 
- bool get active; String get id;/// Bulletin send time (Unix seconds).
+/// Matched CWA `tdNo` from the active cyclone index; blank when the
+/// bulletin can't be paired (e.g. a leftover `Cancel` for a past storm).
+ String? get tdNo; bool get active; String get id;/// Bulletin send time (Unix seconds).
  int get sent; String get status; String get msgType; String get scope; String get event; String get urgency; String get severity; String get certainty;/// Effective / onset / expiry times (Unix seconds).
  int get effective; int get onset; int get expires; String get headline; String get senderName;/// The warned typhoon; null when the bulletin carries no typhoon block.
  WarningTyphoon? get typhoon;/// Warning body text, section by section.
@@ -1197,16 +1199,16 @@ $TyphoonWarningCopyWith<TyphoonWarning> get copyWith => _$TyphoonWarningCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonWarning&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other.sections, sections)&&const DeepCollectionEquality().equals(other.areas, areas));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonWarning&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other.sections, sections)&&const DeepCollectionEquality().equals(other.areas, areas));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(sections),const DeepCollectionEquality().hash(areas));
+int get hashCode => Object.hashAll([runtimeType,tdNo,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(sections),const DeepCollectionEquality().hash(areas)]);
 
 @override
 String toString() {
-  return 'TyphoonWarning(active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
+  return 'TyphoonWarning(tdNo: $tdNo, active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
 }
 
 
@@ -1217,7 +1219,7 @@ abstract mixin class $TyphoonWarningCopyWith<$Res>  {
   factory $TyphoonWarningCopyWith(TyphoonWarning value, $Res Function(TyphoonWarning) _then) = _$TyphoonWarningCopyWithImpl;
 @useResult
 $Res call({
- bool active, String id, int sent, String status, String msgType, String scope, String event, String urgency, String severity, String certainty, int effective, int onset, int expires, String headline, String senderName, WarningTyphoon? typhoon, List<WarningSection> sections, List<WarningArea> areas
+ String? tdNo, bool active, String id, int sent, String status, String msgType, String scope, String event, String urgency, String severity, String certainty, int effective, int onset, int expires, String headline, String senderName, WarningTyphoon? typhoon, List<WarningSection> sections, List<WarningArea> areas
 });
 
 
@@ -1234,9 +1236,10 @@ class _$TyphoonWarningCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonWarning
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? active = null,Object? id = null,Object? sent = null,Object? status = null,Object? msgType = null,Object? scope = null,Object? event = null,Object? urgency = null,Object? severity = null,Object? certainty = null,Object? effective = null,Object? onset = null,Object? expires = null,Object? headline = null,Object? senderName = null,Object? typhoon = freezed,Object? sections = null,Object? areas = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? active = null,Object? id = null,Object? sent = null,Object? status = null,Object? msgType = null,Object? scope = null,Object? event = null,Object? urgency = null,Object? severity = null,Object? certainty = null,Object? effective = null,Object? onset = null,Object? expires = null,Object? headline = null,Object? senderName = null,Object? typhoon = freezed,Object? sections = null,Object? areas = null,}) {
   return _then(_self.copyWith(
-active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sent: null == sent ? _self.sent : sent // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -1351,10 +1354,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? tdNo,  bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TyphoonWarning() when $default != null:
-return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
+return $default(_that.tdNo,_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
   return orElse();
 
 }
@@ -1372,10 +1375,10 @@ return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? tdNo,  bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonWarning():
-return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
+return $default(_that.tdNo,_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1392,10 +1395,10 @@ return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? tdNo,  bool active,  String id,  int sent,  String status,  String msgType,  String scope,  String event,  String urgency,  String severity,  String certainty,  int effective,  int onset,  int expires,  String headline,  String senderName,  WarningTyphoon? typhoon,  List<WarningSection> sections,  List<WarningArea> areas)?  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonWarning() when $default != null:
-return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
+return $default(_that.tdNo,_that.active,_that.id,_that.sent,_that.status,_that.msgType,_that.scope,_that.event,_that.urgency,_that.severity,_that.certainty,_that.effective,_that.onset,_that.expires,_that.headline,_that.senderName,_that.typhoon,_that.sections,_that.areas);case _:
   return null;
 
 }
@@ -1407,9 +1410,12 @@ return $default(_that.active,_that.id,_that.sent,_that.status,_that.msgType,_tha
 @JsonSerializable()
 
 class _TyphoonWarning implements TyphoonWarning {
-  const _TyphoonWarning({required this.active, required this.id, required this.sent, required this.status, required this.msgType, required this.scope, required this.event, required this.urgency, required this.severity, required this.certainty, required this.effective, required this.onset, required this.expires, required this.headline, required this.senderName, this.typhoon, required final  List<WarningSection> sections, required final  List<WarningArea> areas}): _sections = sections,_areas = areas;
+  const _TyphoonWarning({this.tdNo, required this.active, required this.id, required this.sent, required this.status, required this.msgType, required this.scope, required this.event, required this.urgency, required this.severity, required this.certainty, required this.effective, required this.onset, required this.expires, required this.headline, required this.senderName, this.typhoon, required final  List<WarningSection> sections, required final  List<WarningArea> areas}): _sections = sections,_areas = areas;
   factory _TyphoonWarning.fromJson(Map<String, dynamic> json) => _$TyphoonWarningFromJson(json);
 
+/// Matched CWA `tdNo` from the active cyclone index; blank when the
+/// bulletin can't be paired (e.g. a leftover `Cancel` for a past storm).
+@override final  String? tdNo;
 @override final  bool active;
 @override final  String id;
 /// Bulletin send time (Unix seconds).
@@ -1461,16 +1467,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonWarning&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other._sections, _sections)&&const DeepCollectionEquality().equals(other._areas, _areas));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonWarning&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other._sections, _sections)&&const DeepCollectionEquality().equals(other._areas, _areas));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(_sections),const DeepCollectionEquality().hash(_areas));
+int get hashCode => Object.hashAll([runtimeType,tdNo,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(_sections),const DeepCollectionEquality().hash(_areas)]);
 
 @override
 String toString() {
-  return 'TyphoonWarning(active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
+  return 'TyphoonWarning(tdNo: $tdNo, active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
 }
 
 
@@ -1481,7 +1487,7 @@ abstract mixin class _$TyphoonWarningCopyWith<$Res> implements $TyphoonWarningCo
   factory _$TyphoonWarningCopyWith(_TyphoonWarning value, $Res Function(_TyphoonWarning) _then) = __$TyphoonWarningCopyWithImpl;
 @override @useResult
 $Res call({
- bool active, String id, int sent, String status, String msgType, String scope, String event, String urgency, String severity, String certainty, int effective, int onset, int expires, String headline, String senderName, WarningTyphoon? typhoon, List<WarningSection> sections, List<WarningArea> areas
+ String? tdNo, bool active, String id, int sent, String status, String msgType, String scope, String event, String urgency, String severity, String certainty, int effective, int onset, int expires, String headline, String senderName, WarningTyphoon? typhoon, List<WarningSection> sections, List<WarningArea> areas
 });
 
 
@@ -1498,9 +1504,10 @@ class __$TyphoonWarningCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonWarning
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? active = null,Object? id = null,Object? sent = null,Object? status = null,Object? msgType = null,Object? scope = null,Object? event = null,Object? urgency = null,Object? severity = null,Object? certainty = null,Object? effective = null,Object? onset = null,Object? expires = null,Object? headline = null,Object? senderName = null,Object? typhoon = freezed,Object? sections = null,Object? areas = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tdNo = freezed,Object? active = null,Object? id = null,Object? sent = null,Object? status = null,Object? msgType = null,Object? scope = null,Object? event = null,Object? urgency = null,Object? severity = null,Object? certainty = null,Object? effective = null,Object? onset = null,Object? expires = null,Object? headline = null,Object? senderName = null,Object? typhoon = freezed,Object? sections = null,Object? areas = null,}) {
   return _then(_TyphoonWarning(
-active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sent: null == sent ? _self.sent : sent // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -1535,6 +1542,272 @@ $WarningTyphoonCopyWith<$Res>? get typhoon {
     return _then(_self.copyWith(typhoon: value));
   });
 }
+}
+
+/// @nodoc
+mixin _$WarningPayload {
+
+ int get updated; List<TyphoonWarning> get cyclones;
+/// Create a copy of WarningPayload
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WarningPayloadCopyWith<WarningPayload> get copyWith => _$WarningPayloadCopyWithImpl<WarningPayload>(this as WarningPayload, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+
+@override
+String toString() {
+  return 'WarningPayload(updated: $updated, cyclones: $cyclones)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WarningPayloadCopyWith<$Res>  {
+  factory $WarningPayloadCopyWith(WarningPayload value, $Res Function(WarningPayload) _then) = _$WarningPayloadCopyWithImpl;
+@useResult
+$Res call({
+ int updated, List<TyphoonWarning> cyclones
+});
+
+
+
+
+}
+/// @nodoc
+class _$WarningPayloadCopyWithImpl<$Res>
+    implements $WarningPayloadCopyWith<$Res> {
+  _$WarningPayloadCopyWithImpl(this._self, this._then);
+
+  final WarningPayload _self;
+  final $Res Function(WarningPayload) _then;
+
+/// Create a copy of WarningPayload
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
+  return _then(_self.copyWith(
+updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
+as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<TyphoonWarning>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WarningPayload].
+extension WarningPayloadPatterns on WarningPayload {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WarningPayload value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WarningPayload() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WarningPayload value)  $default,){
+final _that = this;
+switch (_that) {
+case _WarningPayload():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WarningPayload value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WarningPayload() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int updated,  List<TyphoonWarning> cyclones)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WarningPayload() when $default != null:
+return $default(_that.updated,_that.cyclones);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int updated,  List<TyphoonWarning> cyclones)  $default,) {final _that = this;
+switch (_that) {
+case _WarningPayload():
+return $default(_that.updated,_that.cyclones);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int updated,  List<TyphoonWarning> cyclones)?  $default,) {final _that = this;
+switch (_that) {
+case _WarningPayload() when $default != null:
+return $default(_that.updated,_that.cyclones);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _WarningPayload implements WarningPayload {
+  const _WarningPayload({required this.updated, required final  List<TyphoonWarning> cyclones}): _cyclones = cyclones;
+  
+
+@override final  int updated;
+ final  List<TyphoonWarning> _cyclones;
+@override List<TyphoonWarning> get cyclones {
+  if (_cyclones is EqualUnmodifiableListView) return _cyclones;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_cyclones);
+}
+
+
+/// Create a copy of WarningPayload
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WarningPayloadCopyWith<_WarningPayload> get copyWith => __$WarningPayloadCopyWithImpl<_WarningPayload>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+
+@override
+String toString() {
+  return 'WarningPayload(updated: $updated, cyclones: $cyclones)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WarningPayloadCopyWith<$Res> implements $WarningPayloadCopyWith<$Res> {
+  factory _$WarningPayloadCopyWith(_WarningPayload value, $Res Function(_WarningPayload) _then) = __$WarningPayloadCopyWithImpl;
+@override @useResult
+$Res call({
+ int updated, List<TyphoonWarning> cyclones
+});
+
+
+
+
+}
+/// @nodoc
+class __$WarningPayloadCopyWithImpl<$Res>
+    implements _$WarningPayloadCopyWith<$Res> {
+  __$WarningPayloadCopyWithImpl(this._self, this._then);
+
+  final _WarningPayload _self;
+  final $Res Function(_WarningPayload) _then;
+
+/// Create a copy of WarningPayload
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? updated = null,Object? cyclones = null,}) {
+  return _then(_WarningPayload(
+updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
+as int,cyclones: null == cyclones ? _self._cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<TyphoonWarning>,
+  ));
+}
+
+
 }
 
 // dart format on

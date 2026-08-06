@@ -165,6 +165,23 @@ class LocationService {
         ),
       ).map((position) => (lat: position.latitude, lng: position.longitude));
 
+  /// Best-effort current fix: a cached position if it's fresh enough
+  /// ([_maxLastKnownAge] — which the OS may have derived from network/Wi-Fi
+  /// rather than GPS), else a medium-accuracy live read. Never throws; null
+  /// when location is unavailable/denied or no position could be resolved.
+  Future<GpsFix?> currentFix() async {
+    try {
+      if (!await _isAvailable()) return null;
+      return await _fix();
+    } on TimeoutException {
+      Log.warning('GPS fix timed out — no current location available');
+      return null;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'GPS fix');
+      return null;
+    }
+  }
+
   /// The current township from GPS, or null if unavailable / no fix.
   Future<Town?> currentTown() async {
     try {
@@ -183,6 +200,10 @@ class LocationService {
       return null;
     }
   }
+
+  /// The township containing ([lat], [lng]) — for callers that already hold a
+  /// fix (the foreground position stream) and must not pay for another one.
+  Future<Town?> townAt(double lat, double lng) => _resolve(lat, lng);
 
   /// Resolves ([lat], [lng]) to a township: exact point-in-polygon when the
   /// boundary data is loaded, else nearest-centroid (at sea, in a boundary gap,
@@ -203,15 +224,27 @@ class LocationService {
         permission == LocationPermission.whileInUse;
   }
 
+  /// How old a cached OS fix may be and still stand in for a live one. The
+  /// cached fix is only a head start on the first frame, so it has to be recent
+  /// enough that it still describes where the user *is*: an hours-old fix from
+  /// another county would name the wrong 所在地, which for a disaster app means
+  /// showing someone another region's hazards.
+  static const Duration _maxLastKnownAge = Duration(minutes: 10);
+
   static Future<GpsFix?> _geolocatorFix() async {
-    final position =
-        await Geolocator.getLastKnownPosition() ??
-        await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 10),
-          ),
-        );
+    final cached = await Geolocator.getLastKnownPosition();
+    if (cached != null && _isFresh(cached.timestamp)) {
+      return (lat: cached.latitude, lng: cached.longitude);
+    }
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.medium,
+        timeLimit: Duration(seconds: 10),
+      ),
+    );
     return (lat: position.latitude, lng: position.longitude);
   }
+
+  static bool _isFresh(DateTime timestamp) =>
+      DateTime.now().toUtc().difference(timestamp.toUtc()) <= _maxLastKnownAge;
 }

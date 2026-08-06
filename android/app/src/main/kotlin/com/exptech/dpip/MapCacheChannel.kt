@@ -7,11 +7,11 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.offline.OfflineManager
 
 /**
- * Raises MapLibre's shared ambient tile-cache ceiling via [OfflineManager] — the
- * Android counterpart of iOS `MapCachePlugin`. maplibre_gl exposes no size bound
- * and the native default is only ~50 MB, so a bigger ceiling keeps more radar
- * frames cached and scrubbing re-fetches less. Writes to the same shared cache
- * the map view and the home snapshot read.
+ * MapLibre ambient tile-cache bridge — size ceiling only (Android counterpart
+ * of iOS `MapCachePlugin`).
+ *
+ * The app disables ambient caching (`MapCache.disabledBytes`) and serves those
+ * bytes from its own store through the MapLibre tile bridge.
  */
 class MapCacheChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {

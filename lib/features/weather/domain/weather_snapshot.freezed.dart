@@ -17,7 +17,12 @@ mixin _$WeatherObservation {
 /// 6-char station code (the `/station` directory key).
  String get id;/// Weather number code (hundreds: clear 100 / cloudy 200 / overcast 300;
 /// 0 = no data).
- int get weatherCode; double? get temperature; int? get humidity; double? get pressure; int? get windDirection; double? get windSpeed; double? get gustSpeed; int? get gustDirection; double? get high; double? get low;
+ int get weatherCode; double? get temperature; int? get humidity; double? get pressure; int? get windDirection; double? get windSpeed; double? get gustSpeed; int? get gustDirection;/// Gust occurrence time, Unix seconds (`gt`; missing → null).
+ int? get gustTime;/// Today's recorded maximum temperature (`hi`).
+ double? get high;/// When [high] was recorded, Unix seconds (`hit`; missing → null).
+ int? get highTime;/// Today's recorded minimum temperature (`lo`).
+ double? get low;/// When [low] was recorded, Unix seconds (`lot`; missing → null).
+ int? get lowTime;
 /// Create a copy of WeatherObservation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +33,16 @@ $WeatherObservationCopyWith<WeatherObservation> get copyWith => _$WeatherObserva
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.high, high) || other.high == high)&&(identical(other.low, low) || other.low == low));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.gustTime, gustTime) || other.gustTime == gustTime)&&(identical(other.high, high) || other.high == high)&&(identical(other.highTime, highTime) || other.highTime == highTime)&&(identical(other.low, low) || other.low == low)&&(identical(other.lowTime, lowTime) || other.lowTime == lowTime));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,high,low);
+int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,gustTime,high,highTime,low,lowTime);
 
 @override
 String toString() {
-  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, high: $high, low: $low)';
+  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, gustTime: $gustTime, high: $high, highTime: $highTime, low: $low, lowTime: $lowTime)';
 }
 
 
@@ -48,7 +53,7 @@ abstract mixin class $WeatherObservationCopyWith<$Res>  {
   factory $WeatherObservationCopyWith(WeatherObservation value, $Res Function(WeatherObservation) _then) = _$WeatherObservationCopyWithImpl;
 @useResult
 $Res call({
- String id, int weatherCode, double? temperature, int? humidity, double? pressure, int? windDirection, double? windSpeed, double? gustSpeed, int? gustDirection, double? high, double? low
+ String id, int weatherCode, double? temperature, int? humidity, double? pressure, int? windDirection, double? windSpeed, double? gustSpeed, int? gustDirection, int? gustTime, double? high, int? highTime, double? low, int? lowTime
 });
 
 
@@ -65,7 +70,7 @@ class _$WeatherObservationCopyWithImpl<$Res>
 
 /// Create a copy of WeatherObservation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? weatherCode = null,Object? temperature = freezed,Object? humidity = freezed,Object? pressure = freezed,Object? windDirection = freezed,Object? windSpeed = freezed,Object? gustSpeed = freezed,Object? gustDirection = freezed,Object? high = freezed,Object? low = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? weatherCode = null,Object? temperature = freezed,Object? humidity = freezed,Object? pressure = freezed,Object? windDirection = freezed,Object? windSpeed = freezed,Object? gustSpeed = freezed,Object? gustDirection = freezed,Object? gustTime = freezed,Object? high = freezed,Object? highTime = freezed,Object? low = freezed,Object? lowTime = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,weatherCode: null == weatherCode ? _self.weatherCode : weatherCode // ignore: cast_nullable_to_non_nullable
@@ -76,9 +81,12 @@ as double?,windDirection: freezed == windDirection ? _self.windDirection : windD
 as int?,windSpeed: freezed == windSpeed ? _self.windSpeed : windSpeed // ignore: cast_nullable_to_non_nullable
 as double?,gustSpeed: freezed == gustSpeed ? _self.gustSpeed : gustSpeed // ignore: cast_nullable_to_non_nullable
 as double?,gustDirection: freezed == gustDirection ? _self.gustDirection : gustDirection // ignore: cast_nullable_to_non_nullable
+as int?,gustTime: freezed == gustTime ? _self.gustTime : gustTime // ignore: cast_nullable_to_non_nullable
 as int?,high: freezed == high ? _self.high : high // ignore: cast_nullable_to_non_nullable
-as double?,low: freezed == low ? _self.low : low // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,highTime: freezed == highTime ? _self.highTime : highTime // ignore: cast_nullable_to_non_nullable
+as int?,low: freezed == low ? _self.low : low // ignore: cast_nullable_to_non_nullable
+as double?,lowTime: freezed == lowTime ? _self.lowTime : lowTime // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -163,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  double? high,  double? low)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  int? gustTime,  double? high,  int? highTime,  double? low,  int? lowTime)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WeatherObservation() when $default != null:
-return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.high,_that.low);case _:
+return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.gustTime,_that.high,_that.highTime,_that.low,_that.lowTime);case _:
   return orElse();
 
 }
@@ -184,10 +192,10 @@ return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  double? high,  double? low)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  int? gustTime,  double? high,  int? highTime,  double? low,  int? lowTime)  $default,) {final _that = this;
 switch (_that) {
 case _WeatherObservation():
-return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.high,_that.low);case _:
+return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.gustTime,_that.high,_that.highTime,_that.low,_that.lowTime);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +212,10 @@ return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  double? high,  double? low)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  int weatherCode,  double? temperature,  int? humidity,  double? pressure,  int? windDirection,  double? windSpeed,  double? gustSpeed,  int? gustDirection,  int? gustTime,  double? high,  int? highTime,  double? low,  int? lowTime)?  $default,) {final _that = this;
 switch (_that) {
 case _WeatherObservation() when $default != null:
-return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.high,_that.low);case _:
+return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_that.pressure,_that.windDirection,_that.windSpeed,_that.gustSpeed,_that.gustDirection,_that.gustTime,_that.high,_that.highTime,_that.low,_that.lowTime);case _:
   return null;
 
 }
@@ -219,7 +227,7 @@ return $default(_that.id,_that.weatherCode,_that.temperature,_that.humidity,_tha
 
 
 class _WeatherObservation implements WeatherObservation {
-  const _WeatherObservation({required this.id, required this.weatherCode, this.temperature, this.humidity, this.pressure, this.windDirection, this.windSpeed, this.gustSpeed, this.gustDirection, this.high, this.low});
+  const _WeatherObservation({required this.id, required this.weatherCode, this.temperature, this.humidity, this.pressure, this.windDirection, this.windSpeed, this.gustSpeed, this.gustDirection, this.gustTime, this.high, this.highTime, this.low, this.lowTime});
   
 
 /// 6-char station code (the `/station` directory key).
@@ -234,8 +242,16 @@ class _WeatherObservation implements WeatherObservation {
 @override final  double? windSpeed;
 @override final  double? gustSpeed;
 @override final  int? gustDirection;
+/// Gust occurrence time, Unix seconds (`gt`; missing → null).
+@override final  int? gustTime;
+/// Today's recorded maximum temperature (`hi`).
 @override final  double? high;
+/// When [high] was recorded, Unix seconds (`hit`; missing → null).
+@override final  int? highTime;
+/// Today's recorded minimum temperature (`lo`).
 @override final  double? low;
+/// When [low] was recorded, Unix seconds (`lot`; missing → null).
+@override final  int? lowTime;
 
 /// Create a copy of WeatherObservation
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +263,16 @@ _$WeatherObservationCopyWith<_WeatherObservation> get copyWith => __$WeatherObse
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.high, high) || other.high == high)&&(identical(other.low, low) || other.low == low));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.gustTime, gustTime) || other.gustTime == gustTime)&&(identical(other.high, high) || other.high == high)&&(identical(other.highTime, highTime) || other.highTime == highTime)&&(identical(other.low, low) || other.low == low)&&(identical(other.lowTime, lowTime) || other.lowTime == lowTime));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,high,low);
+int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,gustTime,high,highTime,low,lowTime);
 
 @override
 String toString() {
-  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, high: $high, low: $low)';
+  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, gustTime: $gustTime, high: $high, highTime: $highTime, low: $low, lowTime: $lowTime)';
 }
 
 
@@ -267,7 +283,7 @@ abstract mixin class _$WeatherObservationCopyWith<$Res> implements $WeatherObser
   factory _$WeatherObservationCopyWith(_WeatherObservation value, $Res Function(_WeatherObservation) _then) = __$WeatherObservationCopyWithImpl;
 @override @useResult
 $Res call({
- String id, int weatherCode, double? temperature, int? humidity, double? pressure, int? windDirection, double? windSpeed, double? gustSpeed, int? gustDirection, double? high, double? low
+ String id, int weatherCode, double? temperature, int? humidity, double? pressure, int? windDirection, double? windSpeed, double? gustSpeed, int? gustDirection, int? gustTime, double? high, int? highTime, double? low, int? lowTime
 });
 
 
@@ -284,7 +300,7 @@ class __$WeatherObservationCopyWithImpl<$Res>
 
 /// Create a copy of WeatherObservation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? weatherCode = null,Object? temperature = freezed,Object? humidity = freezed,Object? pressure = freezed,Object? windDirection = freezed,Object? windSpeed = freezed,Object? gustSpeed = freezed,Object? gustDirection = freezed,Object? high = freezed,Object? low = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? weatherCode = null,Object? temperature = freezed,Object? humidity = freezed,Object? pressure = freezed,Object? windDirection = freezed,Object? windSpeed = freezed,Object? gustSpeed = freezed,Object? gustDirection = freezed,Object? gustTime = freezed,Object? high = freezed,Object? highTime = freezed,Object? low = freezed,Object? lowTime = freezed,}) {
   return _then(_WeatherObservation(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,weatherCode: null == weatherCode ? _self.weatherCode : weatherCode // ignore: cast_nullable_to_non_nullable
@@ -295,9 +311,12 @@ as double?,windDirection: freezed == windDirection ? _self.windDirection : windD
 as int?,windSpeed: freezed == windSpeed ? _self.windSpeed : windSpeed // ignore: cast_nullable_to_non_nullable
 as double?,gustSpeed: freezed == gustSpeed ? _self.gustSpeed : gustSpeed // ignore: cast_nullable_to_non_nullable
 as double?,gustDirection: freezed == gustDirection ? _self.gustDirection : gustDirection // ignore: cast_nullable_to_non_nullable
+as int?,gustTime: freezed == gustTime ? _self.gustTime : gustTime // ignore: cast_nullable_to_non_nullable
 as int?,high: freezed == high ? _self.high : high // ignore: cast_nullable_to_non_nullable
-as double?,low: freezed == low ? _self.low : low // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,highTime: freezed == highTime ? _self.highTime : highTime // ignore: cast_nullable_to_non_nullable
+as int?,low: freezed == low ? _self.low : low // ignore: cast_nullable_to_non_nullable
+as double?,lowTime: freezed == lowTime ? _self.lowTime : lowTime // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

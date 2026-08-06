@@ -3,16 +3,19 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -27,13 +30,20 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
   ChangeNotifierProvider<ThemeController>.value(value: deps.theme),
+  ChangeNotifierProvider<DefaultMapLayerController>.value(
+    value: deps.defaultMapLayer,
+  ),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
+  Provider<ApiClient>.value(value: deps.apiClient),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),
   Provider<NetworkUsageStore?>.value(value: deps.networkUsage),
+  // MapLibre's tile authority — map surfaces warm through it. Nullable for the
+  // same reason as the cache above.
+  Provider<MapTileCache?>.value(value: deps.mapTileCache),
 ];

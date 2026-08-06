@@ -34,7 +34,7 @@ void main() {
       ChangeNotifierProvider.value(
         value: controller,
         child: const MaterialApp(
-          locale: Locale('zh'),
+          locale: Locale('zh', 'TW'),
           localizationsDelegates: [
             ...AppLocalizations.localizationsDelegates,
             GlobalMaterialLocalizations.delegate,

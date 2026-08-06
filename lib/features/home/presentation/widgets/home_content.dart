@@ -1,13 +1,14 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
+import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
+import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
-import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +19,10 @@ import 'package:provider/provider.dart';
 /// expands the sheet) hosts the grab handle and the per-area panel. Switching
 /// area slides only that panel (`_AreaSlide`); the list and its controller stay
 /// put, which is what keeps the sheet height stable across a switch.
+///
+/// Below the header: **active events** while collapsed; once flush full-screen
+/// on a township, **rain trend** + **24h forecast**, then active events. 全國
+/// skips weather entirely (name + events only).
 class HomeContent extends StatelessWidget {
   const HomeContent({
     super.key,
@@ -25,6 +30,8 @@ class HomeContent extends StatelessWidget {
     this.handleOpacity = 1,
     this.reveal = 0,
     this.topInset = 0,
+    this.expanded = false,
+    this.weatherMode = WeatherMode.auto,
   });
 
   /// The draggable sheet's scroll controller.
@@ -34,23 +41,27 @@ class HomeContent extends StatelessWidget {
   /// the pull-up affordance is no longer needed.
   final double handleOpacity;
 
-  /// How much the weather backdrop is revealed (0→1) — content shifts to light
-  /// glass so it stays legible over the weather.
+  /// How much the weather backdrop is revealed (0→1) — glass card opacity +
+  /// sky-aware header ink.
   final double reveal;
 
   /// Extra top padding that clears the region-bar overlay as the sheet reaches
   /// full, so the content isn't hidden behind it.
   final double topInset;
 
+  /// Sheet is flush full-screen — header typography/layout step up (chart-sheet
+  /// pattern); rain trend + 24h forecast appear above the active-events block
+  /// (township only).
+  final bool expanded;
+
+  /// Backdrop sky mode — header ink picks dark vs white from this.
+  final WeatherMode weatherMode;
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
-    final selected = store.selected;
-    // 所在地 is selected but GPS gave no fix — the slot stays, the body says so.
-    final currentUnavailable = selected is CurrentArea && selected.code == null;
-    final cardColor = glassSurface(colors, reveal);
+    final showWeather = store.selected is! NationwideArea;
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.fromLTRB(
@@ -69,67 +80,35 @@ class HomeContent extends StatelessWidget {
             key: ValueKey(areaIndex),
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HomeSheetHeader(reveal: reveal),
+              HomeSheetHeader(
+                reveal: reveal,
+                expanded: expanded,
+                weatherMode: weatherMode,
+              ),
               const SizedBox(height: AppSpacing.lg),
-              if (currentUnavailable)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: _CurrentUnavailableNotice(reveal: reveal),
+              // Collapsed: active events. Full-screen township: rain → forecast
+              // → events. 全國: events only (no point weather).
+              if (expanded && showWeather) ...[
+                HomeRainTrendSection(
+                  key: ValueKey('rain-$areaIndex'),
+                  reveal: reveal,
                 ),
-              // Placeholder cards until the real sections land.
-              for (var i = 0; i < 6; i++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Container(
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: AppRadius.medium,
-                    ),
-                  ),
+                const SizedBox(height: AppSpacing.lg),
+                HomeForecastSection(
+                  key: ValueKey('forecast-$areaIndex'),
+                  reveal: reveal,
                 ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+              HomeActiveEventsSection(
+                key: ValueKey('active-$areaIndex'),
+                reveal: reveal,
+                expanded: expanded,
+              ),
             ],
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Shown at the top of the 所在地 panel when GPS gave no fix — the current-
-/// location slot stays selectable, but the body explains why it's empty and
-/// nudges the user toward enabling location.
-class _CurrentUnavailableNotice extends StatelessWidget {
-  const _CurrentUnavailableNotice({required this.reveal});
-
-  final double reveal;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    final foreground = lightenOnReveal(colors.onSurfaceVariant, reveal);
-    final background = glassSurface(colors, reveal);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: AppRadius.medium,
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.location_off_outlined, color: foreground, size: 20),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Text(
-              l10n.regionCurrentUnavailable,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: foreground),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

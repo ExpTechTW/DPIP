@@ -2,11 +2,11 @@ import Flutter
 import MapLibre
 import UIKit
 
-/// MethodChannel plugin that raises MapLibre's shared **ambient tile-cache**
-/// ceiling via `MLNOfflineStorage` — `maplibre_gl` exposes no size bound and the
-/// native default is only ~50 MB. It writes to `MLNOfflineStorage.shared`, the
-/// same storage the live map view and the home snapshot read, so more radar
-/// frames stay cached and scrubbing re-fetches less.
+/// MethodChannel plugin for MapLibre's shared **ambient tile-cache**.
+///
+/// Only sizes it. The app disables ambient caching (`MapCache.disabledBytes`)
+/// and serves those bytes from its own store through the MapLibre tile bridge,
+/// so there is nothing to preload here.
 public class MapCachePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(
@@ -25,8 +25,6 @@ public class MapCachePlugin: NSObject, FlutterPlugin {
         result(FlutterError(code: "bad_args", message: "Missing bytes", details: nil))
         return
       }
-      // Lowering the ceiling trims (LRU) immediately; raising it just lifts the
-      // cap. Completion runs on the main queue.
       MLNOfflineStorage.shared.setMaximumAmbientCacheSize(UInt(bytes)) { error in
         if let error = error {
           result(FlutterError(code: "cache_failed", message: error.localizedDescription, details: nil))

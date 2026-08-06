@@ -283,9 +283,277 @@ as List<LatLng>,
 }
 
 /// @nodoc
+mixin _$CycloneProbability {
+
+/// CWA tropical-depression number; may be blank when upstream can't match.
+ String? get tdNo; List<ProbabilityLevel> get levels;
+/// Create a copy of CycloneProbability
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CycloneProbabilityCopyWith<CycloneProbability> get copyWith => _$CycloneProbabilityCopyWithImpl<CycloneProbability>(this as CycloneProbability, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CycloneProbability&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&const DeepCollectionEquality().equals(other.levels, levels));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,tdNo,const DeepCollectionEquality().hash(levels));
+
+@override
+String toString() {
+  return 'CycloneProbability(tdNo: $tdNo, levels: $levels)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CycloneProbabilityCopyWith<$Res>  {
+  factory $CycloneProbabilityCopyWith(CycloneProbability value, $Res Function(CycloneProbability) _then) = _$CycloneProbabilityCopyWithImpl;
+@useResult
+$Res call({
+ String? tdNo, List<ProbabilityLevel> levels
+});
+
+
+
+
+}
+/// @nodoc
+class _$CycloneProbabilityCopyWithImpl<$Res>
+    implements $CycloneProbabilityCopyWith<$Res> {
+  _$CycloneProbabilityCopyWithImpl(this._self, this._then);
+
+  final CycloneProbability _self;
+  final $Res Function(CycloneProbability) _then;
+
+/// Create a copy of CycloneProbability
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? levels = null,}) {
+  return _then(_self.copyWith(
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,levels: null == levels ? _self.levels : levels // ignore: cast_nullable_to_non_nullable
+as List<ProbabilityLevel>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CycloneProbability].
+extension CycloneProbabilityPatterns on CycloneProbability {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CycloneProbability value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CycloneProbability() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CycloneProbability value)  $default,){
+final _that = this;
+switch (_that) {
+case _CycloneProbability():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CycloneProbability value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CycloneProbability() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? tdNo,  List<ProbabilityLevel> levels)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CycloneProbability() when $default != null:
+return $default(_that.tdNo,_that.levels);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? tdNo,  List<ProbabilityLevel> levels)  $default,) {final _that = this;
+switch (_that) {
+case _CycloneProbability():
+return $default(_that.tdNo,_that.levels);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? tdNo,  List<ProbabilityLevel> levels)?  $default,) {final _that = this;
+switch (_that) {
+case _CycloneProbability() when $default != null:
+return $default(_that.tdNo,_that.levels);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _CycloneProbability implements CycloneProbability {
+  const _CycloneProbability({this.tdNo, required final  List<ProbabilityLevel> levels}): _levels = levels;
+  
+
+/// CWA tropical-depression number; may be blank when upstream can't match.
+@override final  String? tdNo;
+ final  List<ProbabilityLevel> _levels;
+@override List<ProbabilityLevel> get levels {
+  if (_levels is EqualUnmodifiableListView) return _levels;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_levels);
+}
+
+
+/// Create a copy of CycloneProbability
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CycloneProbabilityCopyWith<_CycloneProbability> get copyWith => __$CycloneProbabilityCopyWithImpl<_CycloneProbability>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CycloneProbability&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&const DeepCollectionEquality().equals(other._levels, _levels));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,tdNo,const DeepCollectionEquality().hash(_levels));
+
+@override
+String toString() {
+  return 'CycloneProbability(tdNo: $tdNo, levels: $levels)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CycloneProbabilityCopyWith<$Res> implements $CycloneProbabilityCopyWith<$Res> {
+  factory _$CycloneProbabilityCopyWith(_CycloneProbability value, $Res Function(_CycloneProbability) _then) = __$CycloneProbabilityCopyWithImpl;
+@override @useResult
+$Res call({
+ String? tdNo, List<ProbabilityLevel> levels
+});
+
+
+
+
+}
+/// @nodoc
+class __$CycloneProbabilityCopyWithImpl<$Res>
+    implements _$CycloneProbabilityCopyWith<$Res> {
+  __$CycloneProbabilityCopyWithImpl(this._self, this._then);
+
+  final _CycloneProbability _self;
+  final $Res Function(_CycloneProbability) _then;
+
+/// Create a copy of CycloneProbability
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? tdNo = freezed,Object? levels = null,}) {
+  return _then(_CycloneProbability(
+tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
+as String?,levels: null == levels ? _self._levels : levels // ignore: cast_nullable_to_non_nullable
+as List<ProbabilityLevel>,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$TyphoonProbability {
 
- int get updated; List<ProbabilityLevel> get levels;
+ int get updated; List<CycloneProbability> get cyclones;
 /// Create a copy of TyphoonProbability
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -296,16 +564,16 @@ $TyphoonProbabilityCopyWith<TyphoonProbability> get copyWith => _$TyphoonProbabi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.levels, levels));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(levels));
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
 
 @override
 String toString() {
-  return 'TyphoonProbability(updated: $updated, levels: $levels)';
+  return 'TyphoonProbability(updated: $updated, cyclones: $cyclones)';
 }
 
 
@@ -316,7 +584,7 @@ abstract mixin class $TyphoonProbabilityCopyWith<$Res>  {
   factory $TyphoonProbabilityCopyWith(TyphoonProbability value, $Res Function(TyphoonProbability) _then) = _$TyphoonProbabilityCopyWithImpl;
 @useResult
 $Res call({
- int updated, List<ProbabilityLevel> levels
+ int updated, List<CycloneProbability> cyclones
 });
 
 
@@ -333,11 +601,11 @@ class _$TyphoonProbabilityCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonProbability
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? levels = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
   return _then(_self.copyWith(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
-as int,levels: null == levels ? _self.levels : levels // ignore: cast_nullable_to_non_nullable
-as List<ProbabilityLevel>,
+as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<CycloneProbability>,
   ));
 }
 
@@ -422,10 +690,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int updated,  List<ProbabilityLevel> levels)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int updated,  List<CycloneProbability> cyclones)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TyphoonProbability() when $default != null:
-return $default(_that.updated,_that.levels);case _:
+return $default(_that.updated,_that.cyclones);case _:
   return orElse();
 
 }
@@ -443,10 +711,10 @@ return $default(_that.updated,_that.levels);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int updated,  List<ProbabilityLevel> levels)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int updated,  List<CycloneProbability> cyclones)  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonProbability():
-return $default(_that.updated,_that.levels);case _:
+return $default(_that.updated,_that.cyclones);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -463,10 +731,10 @@ return $default(_that.updated,_that.levels);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int updated,  List<ProbabilityLevel> levels)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int updated,  List<CycloneProbability> cyclones)?  $default,) {final _that = this;
 switch (_that) {
 case _TyphoonProbability() when $default != null:
-return $default(_that.updated,_that.levels);case _:
+return $default(_that.updated,_that.cyclones);case _:
   return null;
 
 }
@@ -478,15 +746,15 @@ return $default(_that.updated,_that.levels);case _:
 
 
 class _TyphoonProbability implements TyphoonProbability {
-  const _TyphoonProbability({required this.updated, required final  List<ProbabilityLevel> levels}): _levels = levels;
+  const _TyphoonProbability({required this.updated, required final  List<CycloneProbability> cyclones}): _cyclones = cyclones;
   
 
 @override final  int updated;
- final  List<ProbabilityLevel> _levels;
-@override List<ProbabilityLevel> get levels {
-  if (_levels is EqualUnmodifiableListView) return _levels;
+ final  List<CycloneProbability> _cyclones;
+@override List<CycloneProbability> get cyclones {
+  if (_cyclones is EqualUnmodifiableListView) return _cyclones;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_levels);
+  return EqualUnmodifiableListView(_cyclones);
 }
 
 
@@ -500,16 +768,16 @@ _$TyphoonProbabilityCopyWith<_TyphoonProbability> get copyWith => __$TyphoonProb
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._levels, _levels));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_levels));
+int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
 
 @override
 String toString() {
-  return 'TyphoonProbability(updated: $updated, levels: $levels)';
+  return 'TyphoonProbability(updated: $updated, cyclones: $cyclones)';
 }
 
 
@@ -520,7 +788,7 @@ abstract mixin class _$TyphoonProbabilityCopyWith<$Res> implements $TyphoonProba
   factory _$TyphoonProbabilityCopyWith(_TyphoonProbability value, $Res Function(_TyphoonProbability) _then) = __$TyphoonProbabilityCopyWithImpl;
 @override @useResult
 $Res call({
- int updated, List<ProbabilityLevel> levels
+ int updated, List<CycloneProbability> cyclones
 });
 
 
@@ -537,11 +805,11 @@ class __$TyphoonProbabilityCopyWithImpl<$Res>
 
 /// Create a copy of TyphoonProbability
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? updated = null,Object? levels = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? updated = null,Object? cyclones = null,}) {
   return _then(_TyphoonProbability(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
-as int,levels: null == levels ? _self._levels : levels // ignore: cast_nullable_to_non_nullable
-as List<ProbabilityLevel>,
+as int,cyclones: null == cyclones ? _self._cyclones : cyclones // ignore: cast_nullable_to_non_nullable
+as List<CycloneProbability>,
   ));
 }
 

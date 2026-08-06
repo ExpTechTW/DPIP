@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -15,6 +15,7 @@ void main() {
   setUp(() async {
     db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
     await EtagCacheStore.createSchema(db);
+    await NetworkUsageStore.createSchema(db);
     store = EtagCacheStore(db);
   });
 
@@ -50,17 +51,232 @@ void main() {
     expect(rows.first['c'], 1, reason: 'replaced, not duplicated');
   });
 
-  test('the stored value is gzip-compressed', () async {
+  test('JSON bodies are lightly gzip-compressed on disk', () async {
     final body = List.filled(500, 'compressible').join(',');
     await store.write('https://x/big', etag: '1', body: body);
     final rows = await db.query(
       'http_cache',
-      columns: ['value'],
+      columns: ['body'],
       where: 'key = ?',
       whereArgs: ['https://x/big'],
     );
-    final blob = rows.first['value'] as Uint8List;
-    expect(blob.length, lessThan(body.length), reason: 'gzipped');
+    final blob = rows.first['body'] as Uint8List;
+    expect(blob[0], 0x1f, reason: 'gzip magic');
+    expect(blob.length, lessThan(body.length));
+  });
+
+  test('WebP stays raw (already packed)', () async {
+    // RIFF....WEBP magic — entropy-packed; outer gzip must not wrap.
+    final bytes = Uint8List.fromList([
+      0x52, 0x49, 0x46, 0x46, // RIFF
+      0x00, 0x00, 0x00, 0x00,
+      0x57, 0x45, 0x42, 0x50, // WEBP
+      ...List.generate(52, (i) => i),
+    ]);
+    await store.writeBytes(
+      'https://x/t.webp',
+      etag: 'W/"t"',
+      bytes: bytes,
+      contentType: 'image/webp',
+    );
+    final rows = await db.query(
+      'http_cache',
+      columns: ['kind', 'body'],
+      where: 'key = ?',
+      whereArgs: ['https://x/t.webp'],
+    );
+    expect(rows.first['kind'], EtagCacheStore.kindBinary);
+    expect(rows.first['body'], bytes);
+
+    final hit = await store.readBytes('https://x/t.webp');
+    expect(hit!.bytes, bytes);
+    expect(hit.contentType, 'image/webp');
+  });
+
+  test('MVT / basemap PBF are gzip-1 on disk and round-trip', () async {
+    // Compressible vector-tile-ish payload (real PBF shrinks ~40% with gzip-1).
+    final mvt = Uint8List.fromList([
+      0x1a,
+      0x99,
+      0x0b,
+      0x78,
+      0x02,
+      0x0a,
+      0x03,
+      0x62,
+      ...List.filled(800, 0x20),
+    ]);
+    await store.writeBytes(
+      'https://x/a.mvt',
+      etag: '1',
+      bytes: mvt,
+      contentType: 'application/vnd.mapbox-vector-tile',
+    );
+    final mvtRows = await db.query(
+      'http_cache',
+      columns: ['kind', 'body'],
+      where: 'key = ?',
+      whereArgs: ['https://x/a.mvt'],
+    );
+    expect(mvtRows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    expect((mvtRows.first['body'] as Uint8List).length, lessThan(mvt.length));
+
+    // Basemap LB serves application/octet-stream.
+    final pbf = Uint8List.fromList([
+      0x1a,
+      0x9e,
+      0x06,
+      0x78,
+      0x02,
+      0x0a,
+      0x03,
+      0x62,
+      ...List.filled(600, 0x41),
+    ]);
+    await store.writeBytes(
+      'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      etag: 'W/"u1"',
+      bytes: pbf,
+      contentType: 'application/octet-stream',
+    );
+    final pbfRows = await db.query(
+      'http_cache',
+      columns: ['kind', 'body'],
+      where: 'key = ?',
+      whereArgs: ['https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf'],
+    );
+    expect(pbfRows.first['kind'], EtagCacheStore.kindBinaryGzip);
+
+    final cold = EtagCacheStore(db);
+    expect((await cold.readBytes('https://x/a.mvt'))!.bytes, mvt);
+    expect(
+      (await cold.readBytes(
+        'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      ))!.bytes,
+      pbf,
+    );
+  });
+
+  test('SVG / text binaries are gzip-1 on disk', () async {
+    final svg = Uint8List.fromList(
+      utf8.encode('<svg xmlns="http://www.w3.org/2000/svg">${'x' * 400}</svg>'),
+    );
+    await store.writeBytes(
+      'https://x/i.svg',
+      etag: '1',
+      bytes: svg,
+      contentType: 'image/svg+xml',
+    );
+    final rows = await db.query(
+      'http_cache',
+      columns: ['kind'],
+      where: 'key = ?',
+      whereArgs: ['https://x/i.svg'],
+    );
+    expect(rows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    final cold = EtagCacheStore(db);
+    expect((await cold.readBytes('https://x/i.svg'))!.bytes, svg);
+  });
+
+  test('binary readBytes round-trips from SQLite', () async {
+    final bytes = Uint8List.fromList([9, 8, 7]);
+    await store.writeBytes('https://x/m', etag: '1', bytes: bytes);
+    final first = await store.readBytes('https://x/m');
+    final second = await store.readBytes('https://x/m');
+    expect(first!.bytes, bytes);
+    expect(second!.bytes, bytes);
+  });
+
+  test('readBytes records one hit and saved bytes', () async {
+    final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+    await store.writeBytes(
+      'https://x/tile.pbf',
+      etag: 'W/"t"',
+      bytes: bytes,
+      contentType: 'application/octet-stream',
+      size: 4096,
+    );
+    final usage = NetworkUsageStore(db);
+    final cold = EtagCacheStore(db, usage: usage);
+
+    final hit = await cold.readBytes('https://x/tile.pbf');
+    expect(hit, isNotNull);
+    expect(hit!.bytes, bytes);
+
+    final stats = await usage.stats();
+    expect(stats.hits24h, 1);
+    expect(stats.misses24h, 0);
+    expect(stats.saved24h, 4096);
+  });
+
+  test('repeated readBytes meters each serve', () async {
+    final usage = NetworkUsageStore(db);
+    final metered = EtagCacheStore(db, usage: usage);
+    final bytes = Uint8List.fromList([9, 8, 7]);
+    await metered.writeBytes('https://x/m', etag: '1', bytes: bytes, size: 128);
+
+    await metered.readBytes('https://x/m');
+    await metered.readBytes('https://x/m');
+
+    final stats = await usage.stats();
+    expect(stats.hits24h, 2);
+    expect(stats.saved24h, 256);
+  });
+
+  test('readBytesBatch returns hits keyed by URL, misses absent', () async {
+    await store.writeBytes(
+      'https://x/1',
+      etag: '1',
+      bytes: Uint8List.fromList([1]),
+    );
+    await store.writeBytes(
+      'https://x/2',
+      etag: '2',
+      bytes: Uint8List.fromList([2]),
+    );
+    final hits = await store.readBytesBatch([
+      'https://x/1',
+      'https://x/miss',
+      'https://x/2',
+    ]);
+    expect(hits.keys, unorderedEquals(['https://x/1', 'https://x/2']));
+    expect(hits['https://x/1']!.bytes, [1]);
+    expect(hits['https://x/2']!.bytes, [2]);
+  });
+
+  test('readBytesBatch inflates gzipped bodies (basemap PBF)', () async {
+    // Compressible + big enough that the store actually gzips it.
+    final pbf = Uint8List.fromList(List<int>.filled(4096, 0x41));
+    await store.writeBytes(
+      'https://x/tile.pbf',
+      etag: 'p',
+      bytes: pbf,
+      contentType: 'application/octet-stream',
+    );
+    final hits = await store.readBytesBatch(['https://x/tile.pbf']);
+    expect(hits['https://x/tile.pbf']!.bytes, pbf);
+  });
+
+  test('writeBytesBatch stores every entry in one pass', () async {
+    await store.writeBytesBatch([
+      (
+        url: 'https://x/a',
+        etag: 'a',
+        bytes: Uint8List.fromList([1, 2]),
+        contentType: 'image/webp',
+        size: 2,
+      ),
+      (
+        url: 'https://x/b',
+        etag: 'b',
+        bytes: Uint8List.fromList([3, 4]),
+        contentType: 'image/webp',
+        size: 2,
+      ),
+    ]);
+    final hits = await store.readBytesBatch(['https://x/a', 'https://x/b']);
+    expect(hits['https://x/a']!.bytes, [1, 2]);
+    expect(hits['https://x/b']!.bytes, [3, 4]);
   });
 
   test('distinct URLs are independent entries', () async {
@@ -70,27 +286,13 @@ void main() {
     expect((await store.read('https://x/b'))!.body, 'B');
   });
 
-  test('a corrupt value reads as a miss, not a crash', () async {
-    await store.write('https://x/a', etag: '1', body: 'A');
-    await db.update(
-      'http_cache',
-      {
-        'value': Uint8List.fromList([0, 1, 2, 3]),
-      }, // not gzip
-      where: 'key = ?',
-      whereArgs: ['https://x/a'],
-    );
-    expect(await store.read('https://x/a'), isNull);
-    expect(await store.readEtag('https://x/a'), isNull);
-  });
-
   test('clear removes every entry', () async {
     await store.write('https://x/a', etag: '1', body: 'A');
     await store.clear();
     expect(await store.read('https://x/a'), isNull);
   });
 
-  test('a write sweeps entries older than maxAge (7 days)', () async {
+  test('a write sweeps entries last-used older than maxAge (7 days)', () async {
     await store.write('https://x/old', etag: '1', body: 'A');
     final eightDaysAgo = DateTime.now()
         .subtract(const Duration(days: 8))
@@ -102,7 +304,6 @@ void main() {
       whereArgs: ['https://x/old'],
     );
 
-    // Any fresh write triggers the age sweep.
     await store.write('https://x/new', etag: '2', body: 'B');
 
     expect(
@@ -113,24 +314,31 @@ void main() {
     expect(await store.read('https://x/new'), isNotNull);
   });
 
+  test(
+    'a recent read keeps an otherwise-old entry past the age sweep',
+    () async {
+      await store.write('https://x/kept', etag: '1', body: 'A');
+      final eightDaysAgo = DateTime.now()
+          .subtract(const Duration(days: 8))
+          .millisecondsSinceEpoch;
+      await db.update(
+        'http_cache',
+        {'time': eightDaysAgo},
+        where: 'key = ?',
+        whereArgs: ['https://x/kept'],
+      );
+      expect(await store.read('https://x/kept'), isNotNull);
+      // Allow async touch to land.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      await store.write('https://x/new', etag: '2', body: 'B');
+      expect(await store.read('https://x/kept'), isNotNull);
+    },
+  );
+
   test('size round-trips', () async {
     await store.write('https://x/a', etag: '1', body: 'ABCDE', size: 4096);
     expect((await store.read('https://x/a'))!.size, 4096);
-  });
-
-  test('a legacy entry without a size falls back to body length', () async {
-    // Simulate a pre-`size` entry: a gzipped payload lacking the 'size' key.
-    final payload = GZipCodec(level: 9).encode(
-      utf8.encode(
-        jsonEncode({'etag': '1', 'contentType': null, 'body': 'ABCDE'}),
-      ),
-    );
-    await db.insert('http_cache', {
-      'key': 'https://x/legacy',
-      'value': Uint8List.fromList(payload),
-      'time': DateTime.now().millisecondsSinceEpoch,
-    });
-    expect((await store.read('https://x/legacy'))!.size, 'ABCDE'.length);
   });
 
   test('stats reports row count and total stored bytes', () async {
@@ -141,5 +349,89 @@ void main() {
     final stats = await store.stats();
     expect(stats.rows, 2);
     expect(stats.bytes, greaterThan(0));
+  });
+
+  test('size trim drops least-recently-used rows when over maxBytes', () async {
+    final tight = EtagCacheStore(db, maxBytes: 120);
+    // WebP CT → raw on disk (zeros would otherwise gzip tiny and never trim).
+    final fat = Uint8List(100);
+    await tight.writeBytes(
+      'https://x/old',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+    await tight.writeBytes(
+      'https://x/new',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+
+    expect(
+      await tight.readBytes('https://x/old'),
+      isNull,
+      reason: 'LRU trimmed',
+    );
+    expect(await tight.readBytes('https://x/new'), isNotNull);
+    expect((await tight.stats()).bytes, lessThanOrEqualTo(120));
+  });
+
+  test('size trim prefers unread rows over recently-read ones', () async {
+    final fat = Uint8List(100);
+    await store.writeBytes(
+      'https://x/probe1',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    await store.writeBytes(
+      'https://x/probe2',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    final two = (await store.stats()).bytes;
+    await store.clear();
+    final tight = EtagCacheStore(db, maxBytes: two);
+
+    await tight.writeBytes(
+      'https://x/a',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    await tight.writeBytes(
+      'https://x/b',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    // Pin last-used near "now" so the 7-day age sweep won't eat them, but b
+    // stays older than a (buffered touch timers can't scramble the order).
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.update(
+      'http_cache',
+      {'time': now - 2_000},
+      where: 'key = ?',
+      whereArgs: ['https://x/a'],
+    );
+    await db.update(
+      'http_cache',
+      {'time': now - 4_000},
+      where: 'key = ?',
+      whereArgs: ['https://x/b'],
+    );
+    await tight.writeBytes(
+      'https://x/c',
+      etag: '3',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+
+    expect(await tight.readBytes('https://x/b'), isNull, reason: 'unread LRU');
+    expect(await tight.readBytes('https://x/a'), isNotNull);
+    expect(await tight.readBytes('https://x/c'), isNotNull);
   });
 }

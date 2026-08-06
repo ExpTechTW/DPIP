@@ -9,9 +9,10 @@ import 'package:intl/intl.dart';
 ///
 /// A ruler of ticks scrolls under a fixed centre scrubber; whichever frame sits
 /// under the scrubber is the selection. Dragging updates the big time label
-/// live and, on release, snaps to the nearest frame and reports it via
-/// [onSelected] (so the map re-renders only when scrubbing settles, not every
-/// frame). The newest frame is labelled "now".
+/// live and reports each crossed frame via [onSelected]. [onScrubbing] is true
+/// while the finger is down / the fling is in flight and false on settle — raster
+/// layers use that to opacity-GIF among residents without mounting cold frames.
+/// The newest frame is labelled "now".
 ///
 /// Stateless about the map — it only turns [frames] + [selectedIndex] into a
 /// scrub gesture, so `MapScaffold` can drive any layer's frames through it.
@@ -21,6 +22,7 @@ class MapTimeline extends StatefulWidget {
     required this.frames,
     required this.selectedIndex,
     required this.onSelected,
+    this.onScrubbing,
   });
 
   /// Frames in chronological order (oldest first); must be non-empty.
@@ -29,22 +31,45 @@ class MapTimeline extends StatefulWidget {
   /// Index into [frames] currently under the scrubber.
   final int selectedIndex;
 
-  /// Called with the newly-centred index when a scrub settles.
+  /// Called with the newly-centred index when the scrubber crosses a frame.
   final ValueChanged<int> onSelected;
+
+  /// `true` on scrub start / during drag; `false` when the scrub settles.
+  final ValueChanged<bool>? onScrubbing;
 
   @override
   State<MapTimeline> createState() => _MapTimelineState();
 }
 
 class _MapTimelineState extends State<MapTimeline> {
-  final DateFormat _time = DateFormat('HH:mm');
+  static final DateFormat _time = DateFormat('HH:mm');
   // Numeric so no locale symbol data is needed (as with [_time]).
-  final DateFormat _date = DateFormat('yyyy/MM/dd');
+  static final DateFormat _date = DateFormat('yyyy/MM/dd');
 
   /// Slot width per frame — the scroll offset that centres frame `i` is
   /// `i * _slotWidth` (the leading/trailing pads are symmetric).
   static const double _slotWidth = 14;
   static const double _rulerHeight = 48;
+
+  /// Formatted labels per frame, built once per frame set.
+  ///
+  /// A scrub rebuilds this widget for every frame the finger crosses, and each
+  /// rebuild lays out the whole visible ruler. Formatting dates in `build`
+  /// re-ran `DateFormat` for every on-screen tick on every one of those frames —
+  /// pure repeat work, since a frame's label never changes.
+  List<String> _times = const [];
+  List<String> _dates = const [];
+
+  void _cacheLabels() {
+    _times = [for (final frame in widget.frames) _time.format(frame.time)];
+    _dates = [for (final frame in widget.frames) _date.format(frame.time)];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cacheLabels();
+  }
 
   /// Seeded so the first paint already sits on the selected frame (no flash),
   /// since `i * _slotWidth` centres frame `i`.
@@ -56,6 +81,13 @@ class _MapTimelineState extends State<MapTimeline> {
   /// label tracks the drag before it settles.
   late int _liveIndex = widget.selectedIndex;
   bool _snapping = false;
+  bool _scrubbing = false;
+
+  void _setScrubbing(bool value) {
+    if (_scrubbing == value) return;
+    _scrubbing = value;
+    widget.onScrubbing?.call(value);
+  }
 
   @override
   void didUpdateWidget(covariant MapTimeline oldWidget) {
@@ -63,6 +95,7 @@ class _MapTimelineState extends State<MapTimeline> {
     // Re-centre on an external change (a new layer's frames, or a jump-to-now)
     // but not on the echo of our own onSelected, which already matches.
     final framesChanged = !identical(oldWidget.frames, widget.frames);
+    if (framesChanged) _cacheLabels();
     if (framesChanged || (widget.selectedIndex != _liveIndex && !_snapping)) {
       _liveIndex = widget.selectedIndex.clamp(0, widget.frames.length - 1);
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,16 +135,25 @@ class _MapTimelineState extends State<MapTimeline> {
   bool _onScroll(ScrollNotification notification) {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
-    if (notification is ScrollUpdateNotification) {
+    if (notification is ScrollStartNotification) {
+      _setScrubbing(true);
+    } else if (notification is ScrollUpdateNotification) {
+      _setScrubbing(true);
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
-        // Report every frame the scrubber crosses, not just the final one, so
-        // the map animates through the loop as you drag.
-        if (widget.selectedIndex != centred) widget.onSelected(centred);
+        // Compare against [_liveIndex] (before the update), never
+        // [widget.selectedIndex]: the parent keeps that prop stale on purpose
+        // (no setState during scrub). Guarding on the prop stuck the map on
+        // now−1 when sliding back to the initial frame.
+        widget.onSelected(centred);
       }
     } else if (notification is ScrollEndNotification && !_snapping) {
-      if (widget.selectedIndex != centred) widget.onSelected(centred);
+      if (centred != _liveIndex) {
+        setState(() => _liveIndex = centred);
+        widget.onSelected(centred);
+      }
       _centreOn(centred, animate: true);
+      _setScrubbing(false);
     }
     return false;
   }
@@ -147,7 +189,7 @@ class _MapTimelineState extends State<MapTimeline> {
                     ),
                   ),
                   Text(
-                    _date.format(widget.frames[_liveIndex].time),
+                    _dates[_liveIndex],
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colors.onSurfaceVariant,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -171,7 +213,7 @@ class _MapTimelineState extends State<MapTimeline> {
                     const SizedBox(width: AppSpacing.sm),
                   ],
                   Text(
-                    _time.format(widget.frames[_liveIndex].time),
+                    _times[_liveIndex],
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: colors.primary,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -205,9 +247,7 @@ class _MapTimelineState extends State<MapTimeline> {
                       itemCount: widget.frames.length,
                       itemBuilder: (context, i) => _Tick(
                         width: _slotWidth,
-                        label: i % labelStep == 0
-                            ? _time.format(widget.frames[i].time)
-                            : null,
+                        label: i % labelStep == 0 ? _times[i] : null,
                         emphasised: i == _liveIndex,
                         colors: colors,
                         textStyle: theme.textTheme.labelSmall,

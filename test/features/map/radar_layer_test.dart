@@ -1,153 +1,207 @@
-import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
-class _FakeRadarRepository implements RadarRepository {
-  _FakeRadarRepository(this._frames);
-  final List<String> _frames;
+import 'raster_timeline_harness.dart';
 
-  @override
-  Future<Result<List<String>>> frames() async => Ok(_frames);
+class _FakeRadarRepository extends FakeRasterFrameSource
+    implements RadarRepository {
+  _FakeRadarRepository(super.frames);
 
   @override
-  String tileUrl(String frame) => 'https://host/$frame/{z}/{x}/{y}.png';
-}
-
-/// Records the source/layer mutations a [MapLayer] makes; everything else on the
-/// controller is unused, so [noSuchMethod] absorbs it.
-class _RecordingController implements MapLibreMapController {
-  final List<String> calls = [];
-
-  @override
-  Future<void> addSource(String sourceId, SourceProperties properties) async =>
-      calls.add('addSource:$sourceId');
-
-  @override
-  Future<void> addRasterLayer(
-    String sourceId,
-    String layerId,
-    RasterLayerProperties properties, {
-    String? belowLayerId,
-    String? sourceLayer,
-    double? minzoom,
-    double? maxzoom,
-  }) async => calls.add('addRasterLayer:$layerId');
-
-  @override
-  Future<void> removeLayer(String layerId) async =>
-      calls.add('removeLayer:$layerId');
-
-  @override
-  Future<void> removeSource(String sourceId) async =>
-      calls.add('removeSource:$sourceId');
-
-  @override
-  Future<void> setLayerProperties(
-    String layerId,
-    LayerProperties properties,
-  ) async {
-    final json = properties.toJson();
-    calls.add('set:$layerId:${json['visibility']}:${json['raster-opacity']}');
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
+  String tileUrl(String frame) =>
+      'https://host/api/v2/tiles/radar/$frame/{z}/{x}/{y}.webp';
 }
 
 void main() {
-  test(
-    'frames come back chronological (oldest first), ids preserved',
-    () async {
-      // Given newest-first (as the API returns) and unordered input.
-      final layer = RadarMapLayer(
-        _FakeRadarRepository(['1700000600000', '1700000000000']),
-      );
-
-      final result = await layer.frames();
-      final frames = result.valueOrNull!;
-
-      expect(frames.map((f) => f.id), ['1700000000000', '1700000600000']);
-      expect(frames.first.time.isBefore(frames.last.time), isTrue);
-    },
-  );
-
-  test(
-    'parses second- and millisecond-epoch ids to the same instant',
-    () async {
-      final layer = RadarMapLayer(
-        _FakeRadarRepository(['1700000000', '1700000000000']),
-      );
-
-      final frames = (await layer.frames()).valueOrNull!;
-
-      // Both ids denote the same moment; ordering is stable, times identical.
-      expect(frames.first.time, frames.last.time);
-      expect(
-        frames.first.time,
-        DateTime.fromMillisecondsSinceEpoch(
-          1700000000000,
-          isUtc: true,
-        ).toLocal(),
-      );
-    },
-  );
-
-  test('adds the window lazily and removes frames that leave it', () async {
-    // Four frames, chronological ids f0..f3 (API returns newest-first).
+  test('frames chronological', () async {
     final layer = RadarMapLayer(
-      _FakeRadarRepository([
-        '1700001800000', // f3
-        '1700001200000', // f2
-        '1700000600000', // f1
-        '1700000000000', // f0
-      ]),
+      _FakeRadarRepository(['1700000600', '1700000000']),
     );
-    final frames = (await layer.frames()).valueOrNull!; // [f0, f1, f2, f3]
-    final controller = _RecordingController();
-
-    // prepare touches nothing — frames are added on demand.
-    await layer.prepare(controller, frames);
-    expect(controller.calls, isEmpty);
-
-    // Show newest (f3) → window {f2, f3} added lazily; f3 drawn, f2 prefetching.
-    await layer.show(controller, frames[3]);
-    expect(controller.calls, [
-      'addSource:radar-src-1700001200000',
-      'addRasterLayer:radar-lyr-1700001200000', // f2 prefetch
-      'addSource:radar-src-1700001800000',
-      'addRasterLayer:radar-lyr-1700001800000', // f3 drawn
-    ]);
-
-    // Scrub to oldest (f0) → {f2,f3} leave (removed), {f0,f1} added.
-    controller.calls.clear();
-    await layer.show(controller, frames[0]);
-    expect(controller.calls, [
-      'removeLayer:radar-lyr-1700001200000', // f2 removed
-      'removeSource:radar-src-1700001200000',
-      'removeLayer:radar-lyr-1700001800000', // f3 removed
-      'removeSource:radar-src-1700001800000',
-      'addSource:radar-src-1700000000000',
-      'addRasterLayer:radar-lyr-1700000000000', // f0 drawn
-      'addSource:radar-src-1700000600000',
-      'addRasterLayer:radar-lyr-1700000600000', // f1 prefetch
-    ]);
-
-    // Same frame again → no-op (the map holds at most the window).
-    controller.calls.clear();
-    await layer.show(controller, frames[0]);
-    expect(controller.calls, isEmpty);
+    final frames = (await layer.frames()).valueOrNull!;
+    expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
   });
 
-  test('keeps the whole history scrubbable (no frame cap)', () async {
-    final ids = [for (var i = 0; i < 500; i++) '${1700000000000 + i * 600000}'];
-    final layer = RadarMapLayer(_FakeRadarRepository(ids.reversed.toList()));
-
+  test('a settle mounts the preload ring around the target', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
 
-    expect(frames.length, 500); // all of them, not a recent slice
-    expect(frames.first.id, ids.first);
-    expect(frames.last.id, ids.last);
+    await layer.prepare(controller, frames);
+    // Index 4 with ringRadius 2 → frames 2..6 mounted, 4 at full opacity.
+    await layer.show(controller, frames[4]);
+
+    expect(
+      controller.calls.where((c) => c.startsWith('addSource:')).length,
+      5,
+      reason: 'the ring is current ±2',
+    );
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
+    for (final i in [2, 3, 5, 6]) {
+      expect(
+        controller.visibilityOf('radar-lyr-${frames[i].id}'),
+        'visible',
+        reason: 'neighbours stay visible so their tiles stay loaded',
+      );
+      expect(controller.opacityOf('radar-lyr-${frames[i].id}'), '0.0');
+    }
+  });
+
+  test(
+    'scrubbing inside the ring is two opacity writes, nothing else',
+    () async {
+      final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      controller.calls.clear();
+      controller.sentKeys.clear();
+
+      await layer.show(controller, frames[5], scrubbing: true);
+
+      expect(controller.calls, [
+        'set:radar-lyr-${frames[4].id}:0.0',
+        'set:radar-lyr-${frames[5].id}:0.85',
+      ]);
+      expect(
+        controller.sentKeys,
+        everyElement(equals({'raster-opacity'})),
+        reason:
+            'the scrub path must not re-send visibility or the seven other '
+            'raster properties the layer type has',
+      );
+    },
+  );
+
+  test('frames mount with no opacity transition', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]);
+
+    expect(controller.mountTransitions, isNotEmpty);
+    expect(
+      controller.mountTransitions.values,
+      everyElement(equals({'duration': 0, 'delay': 0})),
+      reason:
+          "raster-opacity's style-spec default is a 300 ms cross-fade, which "
+          'makes every scrub step lag the finger and blend two frames',
+    );
+  });
+
+  test('dragging past the ring still reveals the frame', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    controller.calls.clear();
+
+    await layer.show(controller, frames[0], scrubbing: true);
+
+    expect(
+      controller.opacityOf('radar-lyr-${frames[0].id}'),
+      '0.85',
+      reason:
+          'skipping this froze the map on the old frame until the finger '
+          'came up — the whole drag showed nothing',
+    );
+    expect(controller.calls, contains('addSource:radar-src-${frames[0].id}'));
+  });
+
+  test('a mid-drag reveal does not widen the ring', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    await layer.show(controller, frames[0], scrubbing: true);
+    controller.calls.clear();
+
+    await layer.show(controller, frames[8], scrubbing: true);
+
+    // frames[0] joined nothing: it stops drawing and loading outright, so a
+    // long drag can't leave a trail of live sources behind it.
+    expect(controller.visibilityOf('radar-lyr-${frames[0].id}'), 'none');
+    expect(
+      controller.visibilityOf('radar-lyr-${frames[3].id}'),
+      'visible',
+      reason: 'a real ring member only fades out, keeping its tiles',
+    );
+  });
+
+  test('a settle abandons the frames the scrub swept past', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[1]); // ring 0..3
+    source.abandoned.clear();
+    await layer.show(controller, frames[7]); // ring 5..8
+
+    expect(
+      source.abandoned,
+      unorderedEquals([frames[0].id, frames[1].id, frames[2].id, frames[3].id]),
+      reason: 'only the frames that left the ring, so the target keeps loading',
+    );
+  });
+
+  test('a settle warms well beyond the mounted ring', () async {
+    // 25 frames so the ±4 warm band is a strict subset, not the whole list.
+    final source = _FakeRadarRepository(_ids(25));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[12]);
+
+    expect(
+      source.warmed.last,
+      unorderedEquals([for (var i = 8; i <= 16; i++) frames[i].id]),
+      reason:
+          'warming is a local read plus a memory push, so the band a drag '
+          'can cross without touching disk is far cheaper to widen than the '
+          'band kept mounted',
+    );
+  });
+
+  test('clear releases tiles and removes every mounted frame', () async {
+    final source = _FakeRadarRepository(_ids(5));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    controller.calls.clear();
+
+    await layer.clear(controller);
+
+    expect(source.released, 1);
+    expect(
+      controller.calls.where((c) => c.startsWith('removeSource:')).length,
+      5,
+    );
+  });
+
+  test('history length uncapped', () async {
+    final ids = [for (var i = 0; i < 500; i++) '${1700000000 + i * 600}'];
+    final layer = RadarMapLayer(_FakeRadarRepository(ids.reversed.toList()));
+    expect((await layer.frames()).valueOrNull!.length, 500);
   });
 }
+
+/// [count] frame ids, newest first (the wire order).
+List<String> _ids(int count) => [
+  for (var i = count - 1; i >= 0; i--) '${1700000000 + i * 600}',
+];

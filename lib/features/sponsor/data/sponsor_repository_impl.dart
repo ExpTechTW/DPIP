@@ -72,16 +72,16 @@ class InAppPurchaseSponsorRepository implements SponsorRepository {
   }
 
   @override
-  Future<void> buy(SponsorProduct product) async {
+  Future<bool> buy(SponsorProduct product) async {
     final details = _details[product.id];
-    if (details == null) return;
+    if (details == null) return false;
     final param = PurchaseParam(productDetails: details);
     // Subscriptions and non-consumables buy the same way; one-time tips are
     // consumable so they can be given again.
     if (product.isSubscription) {
-      await _iap.buyNonConsumable(purchaseParam: param);
+      return _iap.buyNonConsumable(purchaseParam: param);
     } else {
-      await _iap.buyConsumable(purchaseParam: param);
+      return _iap.buyConsumable(purchaseParam: param);
     }
   }
 

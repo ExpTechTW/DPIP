@@ -74,4 +74,30 @@ void main() {
     expect(find.text('Now'), findsNothing); // no longer the newest
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'scrubbing away and back to newest still reports the newest index',
+    (tester) async {
+      // Parent keeps selectedIndex stale during scrub (no setState) — returning
+      // to "now" must still fire onSelected, or the map stays on now−1.
+      final frames = _frames(10);
+      final reported = <int>[];
+      await tester.pumpWidget(
+        _wrap(frames: frames, selectedIndex: 9, onSelected: reported.add),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ListView), const Offset(3 * 14.0, 0));
+      await tester.pumpAndSettle();
+      expect(reported, isNotEmpty);
+      expect(reported.last, lessThan(9));
+
+      await tester.drag(find.byType(ListView), const Offset(-3 * 14.0, 0));
+      await tester.pumpAndSettle();
+
+      expect(reported.last, 9);
+      expect(find.text('Now'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

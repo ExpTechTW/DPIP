@@ -12,4 +12,11 @@ void main() {
     expect(HomeSheetExtent.rest, greaterThan(0));
     expect(HomeSheetExtent.rest, lessThan(HomeSheetExtent.max));
   });
+
+  test('isAtTop matches the chart-sheet flush tolerance', () {
+    expect(HomeSheetExtent.isAtTop(1.0), isTrue);
+    expect(HomeSheetExtent.isAtTop(0.99), isTrue);
+    expect(HomeSheetExtent.isAtTop(0.97), isFalse);
+    expect(HomeSheetExtent.isAtTop(HomeSheetExtent.rest), isFalse);
+  });
 }

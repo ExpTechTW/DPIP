@@ -21,7 +21,225 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navMap => 'Map';
 
   @override
+  String get navData => 'Data';
+
+  @override
   String get navEarthquake => 'Earthquake';
+
+  @override
+  String get dataSectionSeismic => 'Seismic';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Earthquake reports';
+
+  @override
+  String get dataSectionWeather => 'Weather';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Live station rankings';
+
+  @override
+  String get weatherRankingTitle => 'Observation rankings';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Data time: $time\n$count stations';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'No observations to rank';
+
+  @override
+  String get weatherRankingBy => 'Sort by';
+
+  @override
+  String get weatherRankingHighest => 'Highest';
+
+  @override
+  String get weatherRankingLowest => 'Lowest';
+
+  @override
+  String get weatherRankingMergeTo => 'Merge to';
+
+  @override
+  String get weatherRankingMergeTown => 'Township';
+
+  @override
+  String get weatherRankingMergeCounty => 'County';
+
+  @override
+  String get weatherRankingWind => 'Wind speed';
+
+  @override
+  String get weatherRankingGust => 'Gust';
+
+  @override
+  String get weatherRankingTempExtremes => 'Daily extremes';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Daily high';
+
+  @override
+  String get weatherRankingExtremeLow => 'Daily low';
+
+  @override
+  String get weatherRankingExtremeRange => 'Diurnal range';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Recorded at $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Now $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'High $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Low $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Range $value°C';
+  }
+
+  @override
+  String get reportListEmpty => 'No earthquake reports';
+
+  @override
+  String get reportListEmptyFiltered =>
+      'No earthquake reports match these filters';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Local felt';
+
+  @override
+  String get reportListToday => 'Today';
+
+  @override
+  String get reportListYesterday => 'Yesterday';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String get reportListEnd => 'End of list';
+
+  @override
+  String get reportFilterTitle => 'Filters';
+
+  @override
+  String get reportFilterSort => 'Sort';
+
+  @override
+  String get reportFilterSortTime => 'Time';
+
+  @override
+  String get reportFilterSortIntensity => 'Intensity';
+
+  @override
+  String get reportFilterSortMagnitude => 'Magnitude';
+
+  @override
+  String get reportFilterSortDepth => 'Depth';
+
+  @override
+  String get reportFilterOrderDesc => 'Descending';
+
+  @override
+  String get reportFilterOrderAsc => 'Ascending';
+
+  @override
+  String get reportFilterIntensity => 'Intensity';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'Intensity scales';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA changed the felt-intensity scale on 1 Jan 2020 (Taipei time).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Legacy (before 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Only levels 0–7. No 5− / 5+ / 6− / 6+ split.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Current (from 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.';
+
+  @override
+  String get reportFilterMagnitude => 'Magnitude';
+
+  @override
+  String get reportFilterDepth => 'Depth';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => 'Date';
+
+  @override
+  String get reportFilterDatePick => 'Pick dates';
+
+  @override
+  String get reportFilterDateStartNote => 'Start day: from 00:00 (Taipei)';
+
+  @override
+  String get reportFilterDateEndNote => 'End day: through 24:00 (Taipei)';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get reportFilterLocation => 'Location';
+
+  @override
+  String get reportFilterLocationHint => 'e.g. Hualien, offshore';
+
+  @override
+  String get reportFilterAny => 'Any';
+
+  @override
+  String get reportFilterApply => 'Apply';
+
+  @override
+  String get reportFilterReset => 'Reset';
+
+  @override
+  String get reportListSearch => 'Search';
 
   @override
   String get navMore => 'More';
@@ -30,10 +248,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appLogs => 'App logs';
 
   @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get changelogEmpty => 'No release notes yet';
+
+  @override
+  String get changelogTypePrerelease => 'Beta';
+
+  @override
+  String get changelogTypeStable => 'Stable';
+
+  @override
+  String get changelogCurrentVersion => 'Current';
+
+  @override
+  String get changelogVersionDetails => 'Release details';
+
+  @override
+  String get changelogBodyEmpty => 'No notes for this release.';
+
+  @override
   String get mapPlaceholderDisabled => 'Map (temporarily disabled)';
 
   @override
-  String get moreSectionGeneral => 'General';
+  String get moreSectionRegion => 'Region';
+
+  @override
+  String get moreSectionNotify => 'Notifications';
+
+  @override
+  String get moreSectionDisplay => 'Display';
 
   @override
   String get regionManageTitle => 'Saved regions';
@@ -58,16 +303,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get regionEdit => 'Edit';
+
+  @override
   String get moreSectionAdvanced => 'Advanced';
 
   @override
   String get moreDeveloper => 'Debug info';
-
-  @override
-  String get developerCopied => 'Copied to clipboard';
-
-  @override
-  String get developerCopyAll => 'Copy all';
 
   @override
   String get experimentalFeatures => 'Experimental features';
@@ -169,10 +411,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherHumidity => 'Humidity';
 
   @override
+  String get homeForecastTitle => '24-hour forecast';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'H $high° · L $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Feels like $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Humidity $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Force $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'Select a township to see the forecast';
+
+  @override
+  String get homeForecastEmpty => 'No forecast available';
+
+  @override
+  String get homeActiveEventsTitle => 'Active events';
+
+  @override
+  String get homeActiveEventsEmpty => 'No active events';
+
+  @override
+  String get homeRainTrendTitle => 'Next hour rain';
+
+  @override
   String get mapLayers => 'Layers';
 
   @override
-  String get mapLayerRadar => 'Radar';
+  String get mapLayerRadar => 'Composite Radar Reflectivity';
+
+  @override
+  String get mapLayerSatellite => 'Himawari Infrared';
+
+  @override
+  String get mapLayerLightning => 'Lightning';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Cloud-to-ground · $minutes min';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Cloud-to-cloud · $minutes min';
+  }
 
   @override
   String get mapTimelineNow => 'Now';
@@ -395,6 +696,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displaySettings => 'Display';
 
   @override
+  String get defaultMapLayerSettings => 'Default map layer';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.';
+
+  @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Satellite';
+
+  @override
+  String get mapNavLightning => 'Lightning';
+
+  @override
+  String get mapNavTyphoon => 'Typhoon';
+
+  @override
+  String get mapNavEarthquake => 'Earthquake';
+
+  @override
+  String get mapNavTemperature => 'Temperature';
+
+  @override
+  String get mapNavHumidity => 'Humidity';
+
+  @override
+  String get mapNavPressure => 'Pressure';
+
+  @override
+  String get mapNavWind => 'Wind';
+
+  @override
+  String get mapNavRain => 'Rain';
+
+  @override
+  String get mapNavDisaster => 'Disaster';
+
+  @override
   String get displayTheme => 'Theme';
 
   @override
@@ -471,13 +812,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trendNoData => 'No trend data';
 
   @override
+  String chartHourLabel(int hour) {
+    return '${hour}h';
+  }
+
+  @override
   String get mapLayerHumidity => 'Humidity';
 
   @override
   String get mapLayerPressure => 'Pressure';
 
   @override
-  String get mapLayerWind => 'Wind';
+  String get mapLayerWind => 'Wind direction';
+
+  @override
+  String get mapLayerRain => 'Rainfall';
+
+  @override
+  String get rainIntervalMenu => 'Accumulation window';
+
+  @override
+  String get rainIntervalNow => 'Today';
+
+  @override
+  String get rainInterval10m => '10 min';
+
+  @override
+  String get rainInterval1h => '1 h';
+
+  @override
+  String get rainInterval3h => '3 h';
+
+  @override
+  String get rainInterval6h => '6 h';
+
+  @override
+  String get rainInterval12h => '12 h';
+
+  @override
+  String get rainInterval24h => '24 h';
+
+  @override
+  String get rainInterval2d => '2 d';
+
+  @override
+  String get rainInterval3d => '3 d';
 
   @override
   String get mapLayerTyphoon => 'Typhoon';
@@ -498,7 +877,248 @@ class AppLocalizationsEn extends AppLocalizations {
   String get typhoonMotion => 'Moving';
 
   @override
+  String get typhoonLabelPosition => 'Centre location';
+
+  @override
+  String get typhoonLabelDirection => 'Past movement direction';
+
+  @override
+  String get typhoonLabelSpeed => 'Past movement speed';
+
+  @override
+  String get typhoonLabelPressure => 'Central pressure';
+
+  @override
+  String get typhoonLabelWind => 'Max. sustained wind near centre';
+
+  @override
+  String get typhoonLabelGust => 'Peak gust';
+
+  @override
+  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+
+  @override
+  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+
+  @override
+  String get typhoonLabelProbCircle => '70% probability circle';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return 'Forecast +$hours h';
+  }
+
+  @override
+  String get typhoonLabelNw => 'NW';
+
+  @override
+  String get typhoonLabelNe => 'NE';
+
+  @override
+  String get typhoonLabelSw => 'SW';
+
+  @override
+  String get typhoonLabelSe => 'SE';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '$lat°N';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '$lon°E';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '$n m/s';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return 'Data time\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => 'Seismic Monitor';
+
+  @override
+  String get mapLayerDisasterMap => 'Disaster Map';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Disaster map layers';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Layers';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Show AED locations';
+
+  @override
+  String get aedAddress => 'Address';
+
+  @override
+  String get aedRegion => 'Region';
+
+  @override
+  String get aedCategory => 'Category';
+
+  @override
+  String get aedType => 'Type';
+
+  @override
+  String get aedPlaceDesc => 'Placement';
+
+  @override
+  String get aedDescription => 'Notes';
+
+  @override
+  String get aedHoursWeekday => 'Weekday hours';
+
+  @override
+  String get aedHoursSaturday => 'Saturday hours';
+
+  @override
+  String get aedHoursSunday => 'Sunday hours';
+
+  @override
+  String get aedOpenRemark => 'Hours note';
+
+  @override
+  String get aedEmergencyPhone => 'Emergency phone';
+
+  @override
+  String get mapLayerRestroom => 'Restrooms';
+
+  @override
+  String get mapLayerShelter => 'Shelters';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'Show public restrooms';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Show evacuation shelters';
+
+  @override
+  String get dpmSheetEmpty => 'Tap a marker on the map for details';
+
+  @override
+  String get dpmAddress => 'Address';
+
+  @override
+  String get restroomTypeLabel => 'Type';
+
+  @override
+  String get restroomCategoryLabel => 'Category';
+
+  @override
+  String get restroomGradeLabel => 'Grade';
+
+  @override
+  String get restroomTypeFemale => 'Female';
+
+  @override
+  String get restroomTypeMale => 'Male';
+
+  @override
+  String get restroomTypeMixed => 'Mixed';
+
+  @override
+  String get restroomTypeAccessible => 'Accessible';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Gender-neutral';
+
+  @override
+  String get restroomTypeFamily => 'Family';
+
+  @override
+  String get restroomTypeUnspecified => 'Unspecified';
+
+  @override
+  String get restroomCategoryTransport => 'Transport';
+
+  @override
+  String get restroomCategoryPark => 'Park';
+
+  @override
+  String get restroomCategoryCommercial => 'Commercial';
+
+  @override
+  String get restroomCategoryReligious => 'Religious';
+
+  @override
+  String get restroomCategoryCultural => 'Cultural';
+
+  @override
+  String get restroomCategoryGovernment => 'Government';
+
+  @override
+  String get restroomCategoryWelfare => 'Welfare';
+
+  @override
+  String get restroomCategoryTourist => 'Tourist';
+
+  @override
+  String get restroomCategoryLeisure => 'Leisure';
+
+  @override
+  String get restroomCategoryOther => 'Other';
+
+  @override
+  String get restroomGradeExcellent => 'Excellent';
+
+  @override
+  String get restroomGradeGood => 'Good';
+
+  @override
+  String get restroomGradeAverage => 'Average';
+
+  @override
+  String get restroomGradePoor => 'Below standard';
+
+  @override
+  String get shelterAddressLabel => 'Address';
+
+  @override
+  String get shelterCapacityLabel => 'Capacity';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n people';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Disaster types';
+
+  @override
+  String get shelterIndoorLabel => 'Indoor shelter';
+
+  @override
+  String get shelterOutdoorLabel => 'Outdoor shelter';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Vulnerable-people friendly';
+
+  @override
+  String get dpmYes => 'Yes';
+
+  @override
+  String get dpmNo => 'No';
 
   @override
   String get stationSheetEmpty => 'Tap a station to see its reading';
@@ -510,4 +1130,186 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Waiting for data…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Unit: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Observed track';
+
+  @override
+  String get typhoonIntensityTd => 'Tropical depression';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return 'Tropical depression TD $no';
+  }
+
+  @override
+  String get typhoonIntensityMild => 'Mild typhoon';
+
+  @override
+  String get typhoonIntensityModerate => 'Moderate typhoon';
+
+  @override
+  String get typhoonIntensityIntense => 'Intense typhoon';
+
+  @override
+  String get typhoonLegendForecast => 'Forecast track';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Forecast point';
+
+  @override
+  String get typhoonLegendCurrent => 'Current centre';
+
+  @override
+  String get typhoonLegendCone => 'Forecast cone';
+
+  @override
+  String get mapLegendExpand => 'Legend';
+
+  @override
+  String get mapLegendCollapse => 'Hide legend';
+
+  @override
+  String get mapMyLocation => 'My location';
+
+  @override
+  String get typhoonLegendCircle15 => 'Gale circle (L7)';
+
+  @override
+  String get typhoonLegendCircleAvg => 'Average circle';
+
+  @override
+  String get typhoonLegendCircle25 => 'Storm circle (L10)';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
+
+  @override
+  String get typhoonLegendProbability => 'Strike probability';
+
+  @override
+  String get typhoonLegendWarningAreas => 'Warning areas';
+
+  @override
+  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+
+  @override
+  String get typhoonOverlaySectionStorm => 'Storm wind';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'Overlays';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+
+  @override
+  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip =>
+      'Show strike probability (hides the forecast cone)';
+
+  @override
+  String get typhoonOverlayWarningTooltip =>
+      'Highlight counties under a typhoon warning';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip =>
+      'Level-7 wind field + average circle (purple)';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip =>
+      'Level-10 wind field + average circle (yellow)';
+
+  @override
+  String get typhoonOverlaySectionWeather => 'Weather underlay';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'None';
+
+  @override
+  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip =>
+      'No radar or infrared underlay';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip =>
+      'Radar echo closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip =>
+      'Infrared closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonWarningTitle => 'Typhoon warning';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'Areas: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'Track detail';
+
+  @override
+  String get typhoonHistoryTitle => 'Dataset time';
+
+  @override
+  String get typhoonHistoryLive => 'Live';
+
+  @override
+  String get typhoonSatelliteTitle => 'Satellite';
+
+  @override
+  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip =>
+      'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Venue types';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Toilet types';
+
+  @override
+  String get dpmFilterSectionShelter => 'Shelter disaster types';
+
+  @override
+  String get dpmDisasterFlood => 'Flood';
+
+  @override
+  String get dpmDisasterEarthquake => 'Earthquake';
+
+  @override
+  String get dpmDisasterLandslide => 'Landslide';
+
+  @override
+  String get dpmDisasterTsunami => 'Tsunami';
+
+  @override
+  String get dpmDisasterSlope => 'Slope hazard';
+
+  @override
+  String get dpmDisasterNuclear => 'Nuclear accident';
 }

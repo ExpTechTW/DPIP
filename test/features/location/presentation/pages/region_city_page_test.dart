@@ -1,12 +1,13 @@
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:dpip/core/settings/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Town _town(String code, String town) => Town(
@@ -26,18 +27,28 @@ final _directory = TownDirectory({
   '105': _town('105', '松山'),
 });
 
-Widget _wrap(RegionStore store) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
-  supportedLocales: AppLocalizations.supportedLocales,
-  locale: const Locale('zh'),
-  home: MultiProvider(
-    providers: [
-      ChangeNotifierProvider<RegionStore>.value(value: store),
-      Provider<TownDirectory>.value(value: _directory),
+Widget _wrap(RegionStore store) {
+  final router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (_, _) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider<RegionStore>.value(value: store),
+            Provider<TownDirectory>.value(value: _directory),
+          ],
+          child: const RegionCityPage(city: '臺北市'),
+        ),
+      ),
     ],
-    child: const RegionCityPage(city: '臺北市'),
-  ),
-);
+  );
+  return MaterialApp.router(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('zh', 'TW'),
+    routerConfig: router,
+  );
+}
 
 Future<RegionStore> _store([List<String>? saved]) async {
   SharedPreferences.setMockInitialValues(
@@ -83,7 +94,7 @@ void main() {
     await tester.pumpWidget(_wrap(store));
 
     await tester.tap(find.text('中正區'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(store.savedCodes, ['103', '104', '105']); // unchanged
     expect(find.text('最多只能選擇 3 個地區'), findsOneWidget);

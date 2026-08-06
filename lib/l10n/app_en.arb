@@ -16,9 +16,317 @@
   "@navMap": {
     "description": "Bottom-nav label and page title for the Map tab"
   },
+  "navData": "Data",
+  "@navData": {
+    "description": "Bottom-nav label and page title for the Data hub tab"
+  },
   "navEarthquake": "Earthquake",
   "@navEarthquake": {
-    "description": "Bottom-nav label and page title for the Earthquake tab (the swappable slot)"
+    "description": "Earthquake report catalogue title (entry under the Data hub)"
+  },
+  "dataSectionSeismic": "Seismic",
+  "@dataSectionSeismic": {
+    "description": "Section header on the Data hub for earthquake-related entries"
+  },
+  "dataEarthquakeSubtitle": "Earthquake reports",
+  "@dataEarthquakeSubtitle": {
+    "description": "Subtitle under the Earthquake tile on the Data hub"
+  },
+  "dataSectionWeather": "Weather",
+  "@dataSectionWeather": {
+    "description": "Section header on the Data hub for weather observation rankings"
+  },
+  "dataWeatherRankingSubtitle": "Live station rankings",
+  "@dataWeatherRankingSubtitle": {
+    "description": "Subtitle under weather ranking tiles on the Data hub"
+  },
+  "weatherRankingTitle": "Observation rankings",
+  "@weatherRankingTitle": {
+    "description": "App bar title for the weather station ranking page"
+  },
+  "weatherRankingMeta": "Data time: {time}\n{count} stations",
+  "@weatherRankingMeta": {
+    "description": "Snapshot time and station count above a ranking list",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherRankingEmpty": "No observations to rank",
+  "@weatherRankingEmpty": {
+    "description": "Empty state when a ranking list has no rows after filters"
+  },
+  "weatherRankingBy": "Sort by",
+  "@weatherRankingBy": {
+    "description": "Label before highest/lowest (or desc/asc) chips on ranking"
+  },
+  "weatherRankingHighest": "Highest",
+  "@weatherRankingHighest": {
+    "description": "Chip to rank temperature descending"
+  },
+  "weatherRankingLowest": "Lowest",
+  "@weatherRankingLowest": {
+    "description": "Chip to rank temperature ascending"
+  },
+  "weatherRankingMergeTo": "Merge to",
+  "@weatherRankingMergeTo": {
+    "description": "Label before township/county merge chips on ranking"
+  },
+  "weatherRankingMergeTown": "Township",
+  "@weatherRankingMergeTown": {
+    "description": "Chip to keep one extreme station per township"
+  },
+  "weatherRankingMergeCounty": "County",
+  "@weatherRankingMergeCounty": {
+    "description": "Chip to keep one extreme station per county"
+  },
+  "weatherRankingWind": "Wind speed",
+  "@weatherRankingWind": {
+    "description": "Ranking tab/tile for sustained wind speed"
+  },
+  "weatherRankingGust": "Gust",
+  "@weatherRankingGust": {
+    "description": "Ranking tab/tile for peak gust speed"
+  },
+  "weatherRankingTempExtremes": "Daily extremes",
+  "@weatherRankingTempExtremes": {
+    "description": "Ranking tab for recorded daily high/low/range (not current temp)"
+  },
+  "weatherRankingExtremeHigh": "Daily high",
+  "@weatherRankingExtremeHigh": {
+    "description": "Chip to rank by recorded daily maximum temperature"
+  },
+  "weatherRankingExtremeLow": "Daily low",
+  "@weatherRankingExtremeLow": {
+    "description": "Chip to rank by recorded daily minimum temperature"
+  },
+  "weatherRankingExtremeRange": "Diurnal range",
+  "@weatherRankingExtremeRange": {
+    "description": "Chip to rank by daily high minus low"
+  },
+  "weatherRankingRecordedAt": "Recorded at {time}",
+  "@weatherRankingRecordedAt": {
+    "description": "Occurrence time for a gust or daily extreme",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisCurrent": "Now {value}°C",
+  "@weatherRankingAnalysisCurrent": {
+    "description": "Current temperature fragment in an extremes analysis line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisHigh": "High {value}",
+  "@weatherRankingAnalysisHigh": {
+    "description": "Daily high fragment; value may include clock time",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisLow": "Low {value}",
+  "@weatherRankingAnalysisLow": {
+    "description": "Daily low fragment; value may include clock time",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherRankingAnalysisRange": "Range {value}°C",
+  "@weatherRankingAnalysisRange": {
+    "description": "Diurnal range fragment in an extremes analysis line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reportListEmpty": "No earthquake reports",
+  "@reportListEmpty": {
+    "description": "Empty state when the report catalogue has no rows"
+  },
+  "reportListEmptyFiltered": "No earthquake reports match these filters",
+  "@reportListEmptyFiltered": {
+    "description": "Empty state when active filters yield no report rows"
+  },
+  "reportListMeta": "M{magnitude} · {depth} km",
+  "@reportListMeta": {
+    "description": "Magnitude and depth line on a report list row",
+    "placeholders": {
+      "magnitude": {
+        "type": "String"
+      },
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
+  "reportListMagnitude": "M{magnitude}",
+  "@reportListMagnitude": {
+    "description": "Emphasized magnitude on a report list row",
+    "placeholders": {
+      "magnitude": {
+        "type": "String"
+      }
+    }
+  },
+  "reportListDepthUnit": "km",
+  "@reportListDepthUnit": {
+    "description": "Depth unit label beside the depth value on a report list row"
+  },
+  "reportListLocalFelt": "Local felt",
+  "@reportListLocalFelt": {
+    "description": "Label for …000 serial reports (small-area felt quake, no CWA number)"
+  },
+  "reportListToday": "Today",
+  "@reportListToday": {
+    "description": "Date section header for reports that originated today (Taipei)"
+  },
+  "reportListYesterday": "Yesterday",
+  "@reportListYesterday": {
+    "description": "Date section header for reports that originated yesterday (Taipei)"
+  },
+  "reportListDayCount": "{count}",
+  "@reportListDayCount": {
+    "description": "Number of reports in a day section",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListEnd": "End of list",
+  "@reportListEnd": {
+    "description": "Footer when the report catalogue has no further pages"
+  },
+  "reportFilterTitle": "Filters",
+  "@reportFilterTitle": {
+    "description": "Title of the earthquake report filter sheet"
+  },
+  "reportFilterSort": "Sort",
+  "@reportFilterSort": {
+    "description": "Section title for report list sort field + order"
+  },
+  "reportFilterSortTime": "Time",
+  "@reportFilterSortTime": {
+    "description": "Sort reports by origin time"
+  },
+  "reportFilterSortIntensity": "Intensity",
+  "@reportFilterSortIntensity": {
+    "description": "Sort reports by max intensity"
+  },
+  "reportFilterSortMagnitude": "Magnitude",
+  "@reportFilterSortMagnitude": {
+    "description": "Sort reports by magnitude"
+  },
+  "reportFilterSortDepth": "Depth",
+  "@reportFilterSortDepth": {
+    "description": "Sort reports by hypocentral depth"
+  },
+  "reportFilterOrderDesc": "Descending",
+  "@reportFilterOrderDesc": {
+    "description": "Sort order: newest / largest first"
+  },
+  "reportFilterOrderAsc": "Ascending",
+  "@reportFilterOrderAsc": {
+    "description": "Sort order: oldest / smallest first"
+  },
+  "reportFilterIntensity": "Intensity",
+  "@reportFilterIntensity": {
+    "description": "Label for the felt-intensity range filter"
+  },
+  "reportFilterIntensityInfoTitle": "Intensity scales",
+  "@reportFilterIntensityInfoTitle": {
+    "description": "Title of the dialog explaining CWA 新制 vs 舊制 intensity"
+  },
+  "reportFilterIntensityInfoIntro": "CWA changed the felt-intensity scale on 1 Jan 2020 (Taipei time).",
+  "@reportFilterIntensityInfoIntro": {
+    "description": "Intro paragraph for the intensity-scale info dialog"
+  },
+  "reportFilterIntensityInfoLegacyTitle": "Legacy (before 2020)",
+  "reportFilterIntensityInfoLegacyBody": "Only levels 0–7. No 5− / 5+ / 6− / 6+ split.",
+  "reportFilterIntensityInfoModernTitle": "Current (from 2020)",
+  "reportFilterIntensityInfoModernBody": "Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.",
+  "reportFilterMagnitude": "Magnitude",
+  "@reportFilterMagnitude": {
+    "description": "Label for the magnitude range filter"
+  },
+  "reportFilterDepth": "Depth",
+  "@reportFilterDepth": {
+    "description": "Label for the hypocentral-depth range filter"
+  },
+  "reportFilterDepthKm": "{depth} km",
+  "@reportFilterDepthKm": {
+    "description": "Depth value with unit in the filter sheet",
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
+  "reportFilterDate": "Date",
+  "@reportFilterDate": {
+    "description": "Label for the origin-time date-range filter"
+  },
+  "reportFilterDatePick": "Pick dates",
+  "@reportFilterDatePick": {
+    "description": "Button to open the date-range picker when none selected"
+  },
+  "reportFilterDateStartNote": "Start day: from 00:00 (Taipei)",
+  "@reportFilterDateStartNote": {
+    "description": "Explains that startTime covers from midnight on that calendar day"
+  },
+  "reportFilterDateEndNote": "End day: through 24:00 (Taipei)",
+  "@reportFilterDateEndNote": {
+    "description": "Explains that endTime covers through the end of that calendar day"
+  },
+  "reportFilterRange": "{start} – {end}",
+  "@reportFilterRange": {
+    "description": "Displays a selected filter range (intensity, magnitude, depth, or dates)",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "reportFilterLocation": "Location",
+  "@reportFilterLocation": {
+    "description": "Label for the location keyword filter field"
+  },
+  "reportFilterLocationHint": "e.g. Hualien, offshore",
+  "@reportFilterLocationHint": {
+    "description": "Hint for the location keyword filter field"
+  },
+  "reportFilterAny": "Any",
+  "@reportFilterAny": {
+    "description": "Chip / slider label meaning no filter applied"
+  },
+  "reportFilterApply": "Apply",
+  "@reportFilterApply": {
+    "description": "Primary button on the report filter sheet — saves draft and searches"
+  },
+  "reportFilterReset": "Reset",
+  "@reportFilterReset": {
+    "description": "Clears all filters in the report filter sheet"
+  },
+  "reportListSearch": "Search",
+  "@reportListSearch": {
+    "description": "Fetches the report list with the current draft filters"
   },
   "navMore": "More",
   "@navMore": {
@@ -28,13 +336,49 @@
   "@appLogs": {
     "description": "Title of the in-app log viewer and its entry in the More menu"
   },
+  "changelogTitle": "Changelog",
+  "@changelogTitle": {
+    "description": "More-menu entry and page title for GitHub release notes"
+  },
+  "changelogEmpty": "No release notes yet",
+  "@changelogEmpty": {
+    "description": "Empty state when the releases API returns nothing"
+  },
+  "changelogTypePrerelease": "Beta",
+  "@changelogTypePrerelease": {
+    "description": "Chip label for a pre-release"
+  },
+  "changelogTypeStable": "Stable",
+  "@changelogTypeStable": {
+    "description": "Chip label for a stable release"
+  },
+  "changelogCurrentVersion": "Current",
+  "@changelogCurrentVersion": {
+    "description": "Chip/badge when a release matches the installed app version"
+  },
+  "changelogVersionDetails": "Release details",
+  "@changelogVersionDetails": {
+    "description": "App bar title on a single release's detail page"
+  },
+  "changelogBodyEmpty": "No notes for this release.",
+  "@changelogBodyEmpty": {
+    "description": "Placeholder when a GitHub release has an empty markdown body"
+  },
   "mapPlaceholderDisabled": "Map (temporarily disabled)",
   "@mapPlaceholderDisabled": {
     "description": "Placeholder shown in place of the map while MapLibre is disabled"
   },
-  "moreSectionGeneral": "General",
-  "@moreSectionGeneral": {
-    "description": "Section header on the More page grouping general settings entries"
+  "moreSectionRegion": "Region",
+  "@moreSectionRegion": {
+    "description": "Section header on the More page for saved regions"
+  },
+  "moreSectionNotify": "Notifications",
+  "@moreSectionNotify": {
+    "description": "Section header on the More page for notification settings"
+  },
+  "moreSectionDisplay": "Display",
+  "@moreSectionDisplay": {
+    "description": "Section header on the More page for language and theme"
   },
   "regionManageTitle": "Saved regions",
   "regionAddButton": "Add a region",
@@ -73,6 +417,10 @@
       }
     }
   },
+  "regionEdit": "Edit",
+  "@regionEdit": {
+    "description": "Edit action on a saved-region bottom sheet"
+  },
   "moreSectionAdvanced": "Advanced",
   "@moreSectionAdvanced": {
     "description": "Section header on the More page grouping advanced/developer entries"
@@ -80,14 +428,6 @@
   "moreDeveloper": "Debug info",
   "@moreDeveloper": {
     "description": "More-menu entry / title for the developer diagnostics page"
-  },
-  "developerCopied": "Copied to clipboard",
-  "@developerCopied": {
-    "description": "Snackbar shown after copying a diagnostic value"
-  },
-  "developerCopyAll": "Copy all",
-  "@developerCopyAll": {
-    "description": "Tooltip for the copy-all action on the developer page"
   },
   "experimentalFeatures": "Experimental features",
   "@experimentalFeatures": {
@@ -225,13 +565,114 @@
   "@weatherHumidity": {
     "description": "Label for the humidity metric in the home weather header"
   },
+  "homeForecastTitle": "24-hour forecast",
+  "@homeForecastTitle": {
+    "description": "Section title for the home sheet township hourly forecast"
+  },
+  "homeForecastHighLow": "H {high}° · L {low}°",
+  "@homeForecastHighLow": {
+    "description": "24h forecast series high and low air temperatures",
+    "placeholders": {
+      "high": {
+        "type": "String"
+      },
+      "low": {
+        "type": "String"
+      }
+    }
+  },
+  "homeForecastPop": "{pop}%",
+  "@homeForecastPop": {
+    "description": "Probability of precipitation percent on a forecast hour chip",
+    "placeholders": {
+      "pop": {
+        "type": "String"
+      }
+    }
+  },
+  "homeForecastFeelsLike": "Feels like {temp}°",
+  "@homeForecastFeelsLike": {
+    "description": "Apparent temperature for the selected forecast hour",
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      }
+    }
+  },
+  "homeForecastHumidity": "Humidity {value}%",
+  "@homeForecastHumidity": {
+    "description": "Relative humidity for the selected forecast hour",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "homeForecastWind": "{direction} · Force {level}",
+  "@homeForecastWind": {
+    "description": "Wind direction string and Beaufort force for the selected hour",
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "homeForecastUnavailable": "Select a township to see the forecast",
+  "@homeForecastUnavailable": {
+    "description": "Shown when no township code is available for the forecast API"
+  },
+  "homeForecastEmpty": "No forecast available",
+  "@homeForecastEmpty": {
+    "description": "Empty or failed forecast on the home sheet"
+  },
+  "homeActiveEventsTitle": "Active events",
+  "@homeActiveEventsTitle": {
+    "description": "Section title for currently active disaster notices on the collapsed home sheet"
+  },
+  "homeActiveEventsEmpty": "No active events",
+  "@homeActiveEventsEmpty": {
+    "description": "Empty state when the realtime event feed has nothing in effect"
+  },
+  "homeRainTrendTitle": "Next hour rain",
+  "@homeRainTrendTitle": {
+    "description": "Section title for the home sheet 1-hour per-minute rainfall bar chart"
+  },
   "mapLayers": "Layers",
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"
   },
-  "mapLayerRadar": "Radar",
+  "mapLayerRadar": "Composite Radar Reflectivity",
   "@mapLayerRadar": {
-    "description": "Name of the radar echo map layer in the layer picker"
+    "description": "Name of the composite radar reflectivity layer in the layer picker"
+  },
+  "mapLayerSatellite": "Himawari Infrared",
+  "@mapLayerSatellite": {
+    "description": "Name of the Himawari infrared layer in the layer picker"
+  },
+  "mapLayerLightning": "Lightning",
+  "@mapLayerLightning": {
+    "description": "Map layer switcher label for the lightning strike timeline"
+  },
+  "lightningLegendCg": "Cloud-to-ground · {minutes} min",
+  "@lightningLegendCg": {
+    "description": "Lightning legend: cloud-to-ground strike within N minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lightningLegendCc": "Cloud-to-cloud · {minutes} min",
+  "@lightningLegendCc": {
+    "description": "Lightning legend: cloud-to-cloud strike within N minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "mapTimelineNow": "Now",
   "@mapTimelineNow": {
@@ -509,6 +950,58 @@
   "@displaySettings": {
     "description": "Display-settings menu entry and page title (theme mode)"
   },
+  "defaultMapLayerSettings": "Default map layer",
+  "@defaultMapLayerSettings": {
+    "description": "More-menu entry and page title for choosing the Map tab's default overlay"
+  },
+  "defaultMapLayerSubtitle": "The Map tab opens on this overlay. The bottom-navigation icon and label follow this choice.",
+  "@defaultMapLayerSubtitle": {
+    "description": "Explanatory subtitle on the default-map-layer settings page"
+  },
+  "mapNavRadar": "Radar",
+  "@mapNavRadar": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for radar"
+  },
+  "mapNavSatellite": "Satellite",
+  "@mapNavSatellite": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for satellite"
+  },
+  "mapNavLightning": "Lightning",
+  "@mapNavLightning": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for lightning"
+  },
+  "mapNavTyphoon": "Typhoon",
+  "@mapNavTyphoon": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for typhoon"
+  },
+  "mapNavEarthquake": "Earthquake",
+  "@mapNavEarthquake": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for RTS seismic monitor"
+  },
+  "mapNavTemperature": "Temperature",
+  "@mapNavTemperature": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for temperature"
+  },
+  "mapNavHumidity": "Humidity",
+  "@mapNavHumidity": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for humidity"
+  },
+  "mapNavPressure": "Pressure",
+  "@mapNavPressure": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for pressure"
+  },
+  "mapNavWind": "Wind",
+  "@mapNavWind": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for wind"
+  },
+  "mapNavRain": "Rain",
+  "@mapNavRain": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for rain"
+  },
+  "mapNavDisaster": "Disaster",
+  "@mapNavDisaster": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for disaster-prevention map"
+  },
   "displayTheme": "Theme",
   "@displayTheme": {
     "description": "Section header for the theme-mode chooser on the Display settings page"
@@ -564,7 +1057,12 @@
   "sponsorPerMonth": "{price} / month",
   "@sponsorPerMonth": {
     "description": "Monthly price label for a subscription; price is the store-localized amount",
-    "placeholders": { "price": { "type": "String", "example": "NT$75" } }
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "NT$75"
+      }
+    }
   },
   "sponsorRestore": "Restore purchases",
   "@sponsorRestore": {
@@ -606,6 +1104,15 @@
   "@trendNoData": {
     "description": "Shown in the station trend chart when there is no data to plot"
   },
+  "chartHourLabel": "{hour}h",
+  "@chartHourLabel": {
+    "description": "Compact chart X-axis hour tick (e.g. 20h / 20時)",
+    "placeholders": {
+      "hour": {
+        "type": "int"
+      }
+    }
+  },
   "mapLayerHumidity": "Humidity",
   "@mapLayerHumidity": {
     "description": "Map layer switcher label for the humidity layer"
@@ -614,7 +1121,27 @@
   "@mapLayerPressure": {
     "description": "Map layer switcher label for the air-pressure layer"
   },
-  "mapLayerWind": "Wind",
+  "mapLayerWind": "Wind direction",
+  "mapLayerRain": "Rainfall",
+  "@mapLayerRain": {
+    "description": "Map layer switcher label for the rainfall station layer"
+  },
+  "rainIntervalMenu": "Accumulation window",
+  "@rainIntervalMenu": {
+    "description": "Tooltip for the rainfall accumulation-interval menu"
+  },
+  "rainIntervalNow": "Today",
+  "@rainIntervalNow": {
+    "description": "Rainfall accumulation since local midnight (API now)"
+  },
+  "rainInterval10m": "10 min",
+  "rainInterval1h": "1 h",
+  "rainInterval3h": "3 h",
+  "rainInterval6h": "6 h",
+  "rainInterval12h": "12 h",
+  "rainInterval24h": "24 h",
+  "rainInterval2d": "2 d",
+  "rainInterval3d": "3 d",
   "mapLayerTyphoon": "Typhoon",
   "@mapLayerTyphoon": {
     "description": "Layer-switcher label for the typhoon map layer"
@@ -624,12 +1151,335 @@
   "typhoonGust": "Gust",
   "typhoonPressure": "Pressure",
   "typhoonMotion": "Moving",
+  "typhoonLabelPosition": "Centre location",
+  "@typhoonLabelPosition": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelDirection": "Past movement direction",
+  "@typhoonLabelDirection": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelSpeed": "Past movement speed",
+  "@typhoonLabelSpeed": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelPressure": "Central pressure",
+  "@typhoonLabelPressure": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelWind": "Max. sustained wind near centre",
+  "@typhoonLabelWind": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelGust": "Peak gust",
+  "@typhoonLabelGust": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
+  "@typhoonLabelGaleAvg": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
+  "@typhoonLabelStormAvg": {
+    "description": "Bulletin table row label"
+  },
+  "typhoonLabelProbCircle": "70% probability circle",
+  "@typhoonLabelProbCircle": {
+    "description": "Forecast point: radius of the 70% track probability circle"
+  },
+  "typhoonForecastLead": "Forecast +{hours} h",
+  "@typhoonForecastLead": {
+    "description": "Forecast lead time for a tapped track point",
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonLabelNw": "NW",
+  "typhoonLabelNe": "NE",
+  "typhoonLabelSw": "SW",
+  "typhoonLabelSe": "SE",
+  "typhoonValueLat": "{lat}°N",
+  "@typhoonValueLat": {
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonValueLon": "{lon}°E",
+  "@typhoonValueLon": {
+    "placeholders": {
+      "lon": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonValueKm": "{n} km",
+  "@typhoonValueKm": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonValueHpa": "{n} hPa",
+  "@typhoonValueHpa": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonValueMs": "{n} m/s",
+  "@typhoonValueMs": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonDataTime": "Data time\n{time}",
+  "@typhoonDataTime": {
+    "description": "Bulletin data time under the intensity chip (Taipei wall clock)",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "@mapLayerWind": {
-    "description": "Map layer switcher label for the wind layer"
+    "description": "Map layer switcher label for the wind-direction layer"
   },
   "mapLayerMonitor": "Seismic Monitor",
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
+  },
+  "mapLayerDisasterMap": "Disaster Map",
+  "@mapLayerDisasterMap": {
+    "description": "Map layer switcher label for the disaster-prevention map (DPM)"
+  },
+  "mapLayerAed": "AED",
+  "@mapLayerAed": {
+    "description": "Disaster-map overlay menu toggle for AED (defibrillator) points"
+  },
+  "disasterMapOverlayMenuTooltip": "Disaster map layers",
+  "@disasterMapOverlayMenuTooltip": {
+    "description": "Tooltip on the disaster-map overlay tune button"
+  },
+  "disasterMapOverlaySectionLayers": "Layers",
+  "@disasterMapOverlaySectionLayers": {
+    "description": "Section header for DPM sub-layer toggles in the overlay menu"
+  },
+  "disasterMapOverlayAedTooltip": "Show AED locations",
+  "@disasterMapOverlayAedTooltip": {
+    "description": "Tooltip for the AED toggle in the disaster-map overlay menu"
+  },
+  "aedAddress": "Address",
+  "@aedAddress": {
+    "description": "AED detail row label"
+  },
+  "aedRegion": "Region",
+  "@aedRegion": {
+    "description": "AED city / district row label"
+  },
+  "aedCategory": "Category",
+  "@aedCategory": {
+    "description": "AED venue category row label"
+  },
+  "aedType": "Type",
+  "@aedType": {
+    "description": "AED venue type row label"
+  },
+  "aedPlaceDesc": "Placement",
+  "@aedPlaceDesc": {
+    "description": "AED placement description row label"
+  },
+  "aedDescription": "Notes",
+  "@aedDescription": {
+    "description": "AED free-text description row label"
+  },
+  "aedHoursWeekday": "Weekday hours",
+  "@aedHoursWeekday": {
+    "description": "AED weekday opening hours row label"
+  },
+  "aedHoursSaturday": "Saturday hours",
+  "@aedHoursSaturday": {
+    "description": "AED Saturday opening hours row label"
+  },
+  "aedHoursSunday": "Sunday hours",
+  "@aedHoursSunday": {
+    "description": "AED Sunday opening hours row label"
+  },
+  "aedOpenRemark": "Hours note",
+  "@aedOpenRemark": {
+    "description": "AED opening-hours remark row label"
+  },
+  "aedEmergencyPhone": "Emergency phone",
+  "@aedEmergencyPhone": {
+    "description": "AED emergency contact phone row label"
+  },
+  "mapLayerRestroom": "Restrooms",
+  "@mapLayerRestroom": {
+    "description": "Disaster-map overlay menu toggle for public restrooms"
+  },
+  "mapLayerShelter": "Shelters",
+  "@mapLayerShelter": {
+    "description": "Disaster-map overlay menu toggle for evacuation shelters"
+  },
+  "disasterMapOverlayRestroomTooltip": "Show public restrooms",
+  "@disasterMapOverlayRestroomTooltip": {
+    "description": "Tooltip for the restroom toggle in the disaster-map overlay menu"
+  },
+  "disasterMapOverlayShelterTooltip": "Show evacuation shelters",
+  "@disasterMapOverlayShelterTooltip": {
+    "description": "Tooltip for the shelter toggle in the disaster-map overlay menu"
+  },
+  "dpmSheetEmpty": "Tap a marker on the map for details",
+  "@dpmSheetEmpty": {
+    "description": "Hint in the disaster-map detail sheet when nothing is selected"
+  },
+  "dpmAddress": "Address",
+  "@dpmAddress": {
+    "description": "Address row label in the disaster-map restroom / shelter detail sheet"
+  },
+  "restroomTypeLabel": "Type",
+  "@restroomTypeLabel": {
+    "description": "Restroom detail row label for the toilet type"
+  },
+  "restroomCategoryLabel": "Category",
+  "@restroomCategoryLabel": {
+    "description": "Restroom detail row label for the venue category"
+  },
+  "restroomGradeLabel": "Grade",
+  "@restroomGradeLabel": {
+    "description": "Restroom detail row label for the cleanliness grade"
+  },
+  "restroomTypeFemale": "Female",
+  "@restroomTypeFemale": {
+    "description": "Restroom type: female restroom"
+  },
+  "restroomTypeMale": "Male",
+  "@restroomTypeMale": {
+    "description": "Restroom type: male restroom"
+  },
+  "restroomTypeMixed": "Mixed",
+  "@restroomTypeMixed": {
+    "description": "Restroom type: mixed/unisex restroom"
+  },
+  "restroomTypeAccessible": "Accessible",
+  "@restroomTypeAccessible": {
+    "description": "Restroom type: accessible restroom"
+  },
+  "restroomTypeGenderNeutral": "Gender-neutral",
+  "@restroomTypeGenderNeutral": {
+    "description": "Restroom type: gender-neutral restroom"
+  },
+  "restroomTypeFamily": "Family",
+  "@restroomTypeFamily": {
+    "description": "Restroom type: family restroom"
+  },
+  "restroomTypeUnspecified": "Unspecified",
+  "@restroomTypeUnspecified": {
+    "description": "Restroom type: not specified"
+  },
+  "restroomCategoryTransport": "Transport",
+  "@restroomCategoryTransport": {
+    "description": "Restroom venue category: transport facility"
+  },
+  "restroomCategoryPark": "Park",
+  "@restroomCategoryPark": {
+    "description": "Restroom venue category: park"
+  },
+  "restroomCategoryCommercial": "Commercial",
+  "@restroomCategoryCommercial": {
+    "description": "Restroom venue category: commercial establishment"
+  },
+  "restroomCategoryReligious": "Religious",
+  "@restroomCategoryReligious": {
+    "description": "Restroom venue category: religious / ceremonial venue"
+  },
+  "restroomCategoryCultural": "Cultural",
+  "@restroomCategoryCultural": {
+    "description": "Restroom venue category: cultural / leisure activity venue"
+  },
+  "restroomCategoryGovernment": "Government",
+  "@restroomCategoryGovernment": {
+    "description": "Restroom venue category: public service office"
+  },
+  "restroomCategoryWelfare": "Welfare",
+  "@restroomCategoryWelfare": {
+    "description": "Restroom venue category: social welfare institution / gathering place"
+  },
+  "restroomCategoryTourist": "Tourist",
+  "@restroomCategoryTourist": {
+    "description": "Restroom venue category: tourist area / scenic spot"
+  },
+  "restroomCategoryLeisure": "Leisure",
+  "@restroomCategoryLeisure": {
+    "description": "Restroom venue category: leisure / entertainment venue"
+  },
+  "restroomCategoryOther": "Other",
+  "@restroomCategoryOther": {
+    "description": "Restroom venue category: other"
+  },
+  "restroomGradeExcellent": "Excellent",
+  "@restroomGradeExcellent": {
+    "description": "Restroom cleanliness grade: excellent"
+  },
+  "restroomGradeGood": "Good",
+  "@restroomGradeGood": {
+    "description": "Restroom cleanliness grade: good"
+  },
+  "restroomGradeAverage": "Average",
+  "@restroomGradeAverage": {
+    "description": "Restroom cleanliness grade: average"
+  },
+  "restroomGradePoor": "Below standard",
+  "@restroomGradePoor": {
+    "description": "Restroom cleanliness grade: below standard"
+  },
+  "shelterAddressLabel": "Address",
+  "@shelterAddressLabel": {
+    "description": "Shelter detail address row label"
+  },
+  "shelterCapacityLabel": "Capacity",
+  "@shelterCapacityLabel": {
+    "description": "Shelter detail capacity row label"
+  },
+  "shelterCapacityValue": "{n} people",
+  "@shelterCapacityValue": {
+    "description": "Shelter detail capacity row value",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "shelterCategoryLabel": "Disaster types",
+  "@shelterCategoryLabel": {
+    "description": "Shelter detail applicable-disaster categories row label"
+  },
+  "shelterIndoorLabel": "Indoor shelter",
+  "@shelterIndoorLabel": {
+    "description": "Shelter detail row: whether indoor shelter is provided"
+  },
+  "shelterOutdoorLabel": "Outdoor shelter",
+  "@shelterOutdoorLabel": {
+    "description": "Shelter detail row: whether outdoor shelter is provided"
+  },
+  "shelterVulnerableOkLabel": "Vulnerable-people friendly",
+  "@shelterVulnerableOkLabel": {
+    "description": "Shelter detail row: whether evacuees needing care can be accommodated"
+  },
+  "dpmYes": "Yes",
+  "@dpmYes": {
+    "description": "Affirmative value in the disaster-map detail sheet"
+  },
+  "dpmNo": "No",
+  "@dpmNo": {
+    "description": "Negative value in the disaster-map detail sheet"
   },
   "stationSheetEmpty": "Tap a station to see its reading",
   "@stationSheetEmpty": {
@@ -647,5 +1497,260 @@
   "monitorWaiting": "Waiting for data…",
   "@monitorWaiting": {
     "description": "Shown in the monitor panel before the first RTS snapshot arrives"
+  },
+  "mapLegendUnit": "Unit: {unit}",
+  "@mapLegendUnit": {
+    "description": "Unit footer under a map colour legend (e.g. Unit: dBZ)",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonLegendPast": "Observed track",
+  "@typhoonLegendPast": {
+    "description": "Typhoon map legend: past/observed path"
+  },
+  "typhoonIntensityTd": "Tropical depression",
+  "@typhoonIntensityTd": {
+    "description": "CWA class: tropical depression (past-track colour)"
+  },
+  "typhoonPickerNamed": "{name} TY {no}",
+  "@typhoonPickerNamed": {
+    "description": "Sheet picker: named typhoon (CWA name + TY tyNo)",
+    "placeholders": {
+      "no": { "type": "String" },
+      "name": { "type": "String" }
+    }
+  },
+  "typhoonPickerTd": "Tropical depression TD {no}",
+  "@typhoonPickerTd": {
+    "description": "Sheet picker: unnamed tropical depression (CWA tdNo)",
+    "placeholders": {
+      "no": { "type": "String" }
+    }
+  },
+  "typhoonIntensityMild": "Mild typhoon",
+  "@typhoonIntensityMild": {
+    "description": "CWA class: mild typhoon (past-track colour)"
+  },
+  "typhoonIntensityModerate": "Moderate typhoon",
+  "@typhoonIntensityModerate": {
+    "description": "CWA class: moderate typhoon (past-track colour)"
+  },
+  "typhoonIntensityIntense": "Intense typhoon",
+  "@typhoonIntensityIntense": {
+    "description": "CWA class: intense typhoon (past-track colour)"
+  },
+  "typhoonLegendForecast": "Forecast track",
+  "@typhoonLegendForecast": {
+    "description": "Typhoon map legend: forecast path"
+  },
+  "typhoonLegendForecastPoint": "Forecast point",
+  "@typhoonLegendForecastPoint": {
+    "description": "Typhoon map legend: forecast waypoint"
+  },
+  "typhoonLegendCurrent": "Current centre",
+  "@typhoonLegendCurrent": {
+    "description": "Typhoon map legend: current storm centre"
+  },
+  "typhoonLegendCone": "Forecast cone",
+  "@typhoonLegendCone": {
+    "description": "Typhoon map legend: uncertainty cone"
+  },
+  "mapLegendExpand": "Legend",
+  "@mapLegendExpand": {
+    "description": "Collapsed map-legend chip label / tooltip — tap to expand"
+  },
+  "mapLegendCollapse": "Hide legend",
+  "@mapLegendCollapse": {
+    "description": "Tooltip on the control that collapses the map legend"
+  },
+  "mapMyLocation": "My location",
+  "@mapMyLocation": {
+    "description": "Map control that centers the camera on the device GPS fix"
+  },
+  "typhoonLegendCircle15": "Gale circle (L7)",
+  "typhoonLegendCircleAvg": "Average circle",
+  "@typhoonLegendCircleAvg": {
+    "description": "Legend for the purple dashed mean-radius storm circle"
+  },
+  "typhoonLegendCircle25": "Storm circle (L10)",
+  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
+  "@typhoonStormRadii": {
+    "description": "Per-quadrant storm-wind radii (km) for a typhoon circle",
+    "placeholders": {
+      "ne": {
+        "type": "String"
+      },
+      "se": {
+        "type": "String"
+      },
+      "sw": {
+        "type": "String"
+      },
+      "nw": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonTimeChip": "{day}日{hour}時",
+  "@typhoonTimeChip": {
+    "description": "Compact typhoon time chip / map label shape (day + hour, no month)",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonLegendProbability": "Strike probability",
+  "typhoonLegendWarningAreas": "Warning areas",
+  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
+  "@typhoonOverlayMenuTooltip": {
+    "description": "Tooltip for the typhoon overlay-toggle chip beside the layer switcher"
+  },
+  "typhoonOverlaySectionStorm": "Storm wind",
+  "@typhoonOverlaySectionStorm": {
+    "description": "Section header for L7/L10 storm-band choices in the overlay menu"
+  },
+  "typhoonOverlaySectionExtra": "Overlays",
+  "@typhoonOverlaySectionExtra": {
+    "description": "Section header for optional typhoon overlays (probability, warning)"
+  },
+  "typhoonOverlayStormBandSubtitle": "With average circle",
+  "@typhoonOverlayStormBandSubtitle": {
+    "description": "Subtitle under each storm-band option (fill + dashed avg)"
+  },
+  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
+  "@typhoonOverlayProbabilityHint": {
+    "description": "Short hint under the strike-probability toggle"
+  },
+  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
+  "@typhoonOverlayProbabilityTooltip": {
+    "description": "Tooltip for the strike-probability toggle; notes mutual exclusion with the cone"
+  },
+  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
+  "@typhoonOverlayWarningTooltip": {
+    "description": "Tooltip for the warning-areas overlay toggle"
+  },
+  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
+  "@typhoonOverlayStormL7Tooltip": {
+    "description": "Tooltip for the L7 storm-band radio option"
+  },
+  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
+  "@typhoonOverlayStormL10Tooltip": {
+    "description": "Tooltip for the L10 storm-band radio row"
+  },
+  "typhoonOverlaySectionWeather": "Weather underlay",
+  "@typhoonOverlaySectionWeather": {
+    "description": "Overlay-menu section for radar / IR under the typhoon vectors"
+  },
+  "typhoonOverlayWeatherNone": "None",
+  "@typhoonOverlayWeatherNone": {
+    "description": "No radar or satellite underlay"
+  },
+  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
+  "@typhoonOverlayWeatherHint": {
+    "description": "Subtitle: weather tile matches typhoon report time"
+  },
+  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
+  "@typhoonOverlayWeatherNoneTooltip": {
+    "description": "Tooltip for clearing the weather underlay"
+  },
+  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
+  "@typhoonOverlayWeatherRadarTooltip": {
+    "description": "Tooltip for radar underlay (mutex with IR)"
+  },
+  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
+  "@typhoonOverlayWeatherSatelliteTooltip": {
+    "description": "Tooltip for Himawari IR underlay (mutex with radar)"
+  },
+  "typhoonWarningTitle": "Typhoon warning",
+  "typhoonWarningAreas": "Areas: {areas}",
+  "typhoonTrackDetail": "Track detail",
+  "typhoonHistoryTitle": "Dataset time",
+  "typhoonHistoryLive": "Live",
+  "typhoonSatelliteTitle": "Satellite",
+  "@typhoonWarningAreas": {
+    "description": "List of counties under a typhoon warning",
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      }
+    }
+  },
+  "@typhoonLegendCircle15": {
+    "description": "Typhoon UI: typhoonLegendCircle15"
+  },
+  "@typhoonLegendCircle25": {
+    "description": "Typhoon UI: typhoonLegendCircle25"
+  },
+  "@typhoonLegendProbability": {
+    "description": "Typhoon UI: typhoonLegendProbability"
+  },
+  "@typhoonLegendWarningAreas": {
+    "description": "Typhoon UI: typhoonLegendWarningAreas"
+  },
+  "@typhoonWarningTitle": {
+    "description": "Typhoon UI: typhoonWarningTitle"
+  },
+  "@typhoonTrackDetail": {
+    "description": "Typhoon UI: typhoonTrackDetail"
+  },
+  "@typhoonHistoryTitle": {
+    "description": "Typhoon UI: typhoonHistoryTitle"
+  },
+  "@typhoonHistoryLive": {
+    "description": "Typhoon UI: typhoonHistoryLive"
+  },
+  "@typhoonSatelliteTitle": {
+    "description": "Typhoon UI: typhoonSatelliteTitle"
+  },
+  "typhoonOverlayForecastCallouts": "Forecast tooltips",
+  "@typhoonOverlayForecastCallouts": {
+    "description": "Overlay menu: toggle forecast-point Flutter callout cards"
+  },
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "@typhoonOverlayForecastCalloutsTooltip": {
+    "description": "Tooltip for the forecast callouts overlay toggle"
+  },
+  "dpmFilterSectionRestroom": "Venue types",
+  "@dpmFilterSectionRestroom": {
+    "description": "Filter section title in the disaster-map sheet: restroom venue categories"
+  },
+  "dpmFilterSectionRestroomType": "Toilet types",
+  "@dpmFilterSectionRestroomType": {
+    "description": "Filter section title in the disaster-map sheet: restroom toilet-kind categories"
+  },
+  "dpmFilterSectionShelter": "Shelter disaster types",
+  "@dpmFilterSectionShelter": {
+    "description": "Filter section title in the disaster-map sheet: shelter disaster types"
+  },
+  "dpmDisasterFlood": "Flood",
+  "@dpmDisasterFlood": {
+    "description": "Shelter disaster-type filter chip: flood"
+  },
+  "dpmDisasterEarthquake": "Earthquake",
+  "@dpmDisasterEarthquake": {
+    "description": "Shelter disaster-type filter chip: earthquake"
+  },
+  "dpmDisasterLandslide": "Landslide",
+  "@dpmDisasterLandslide": {
+    "description": "Shelter disaster-type filter chip: landslide"
+  },
+  "dpmDisasterTsunami": "Tsunami",
+  "@dpmDisasterTsunami": {
+    "description": "Shelter disaster-type filter chip: tsunami"
+  },
+  "dpmDisasterSlope": "Slope hazard",
+  "@dpmDisasterSlope": {
+    "description": "Shelter disaster-type filter chip: slope hazard"
+  },
+  "dpmDisasterNuclear": "Nuclear accident",
+  "@dpmDisasterNuclear": {
+    "description": "Shelter disaster-type filter chip: nuclear accident"
   }
 }

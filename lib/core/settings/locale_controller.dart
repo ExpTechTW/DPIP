@@ -11,9 +11,9 @@ import 'package:flutter/widgets.dart';
 /// resolves it against the supported locales. Setting a locale forces that
 /// language app-wide; the app root watches this and rebuilds `MaterialApp`.
 ///
-/// Persisted as a BCP-47 language tag (e.g. `zh-Hant-HK`, `zh-Hans`, `ja`) so
-/// script- and region-specific variants — Traditional vs Simplified, Taiwan vs
-/// Hong Kong — round-trip losslessly, not just the bare language code.
+/// Persisted as a BCP-47 language tag (e.g. `zh-TW`, `zh-Hant-HK`, `zh-Hans`,
+/// `ja`) so script- and region-specific variants — Traditional vs Simplified,
+/// Taiwan vs Hong Kong — round-trip losslessly, not just the bare language code.
 class LocaleController extends ChangeNotifier {
   LocaleController(this._prefs);
 
@@ -23,7 +23,7 @@ class LocaleController extends ChangeNotifier {
   Locale? get locale {
     final tag = _prefs.getString(PreferenceKeys.locale);
     if (tag == null || tag.isEmpty) return null;
-    return _parseTag(tag);
+    return _canonicalize(_parseTag(tag));
   }
 
   /// Sets the locale override; null clears it (back to the system language).
@@ -31,7 +31,8 @@ class LocaleController extends ChangeNotifier {
     if (locale == null) {
       await _prefs.remove(PreferenceKeys.locale);
     } else {
-      await _prefs.setString(PreferenceKeys.locale, locale.toLanguageTag());
+      final canonical = _canonicalize(locale);
+      await _prefs.setString(PreferenceKeys.locale, canonical.toLanguageTag());
     }
     notifyListeners();
   }
@@ -55,5 +56,16 @@ class LocaleController extends ChangeNotifier {
       scriptCode: script,
       countryCode: country,
     );
+  }
+
+  /// Legacy bare `zh` meant Taiwan Traditional — rewrite to `zh_TW` so Material
+  /// widgets stay Traditional (bare `zh` → Simplified in Flutter).
+  static Locale _canonicalize(Locale locale) {
+    if (locale.languageCode == 'zh' &&
+        locale.scriptCode == null &&
+        locale.countryCode == null) {
+      return const Locale('zh', 'TW');
+    }
+    return locale;
   }
 }

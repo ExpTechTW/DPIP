@@ -1,10 +1,18 @@
-import 'package:dpip/shared/color_hex.dart';
+import 'dart:math' show Point;
+
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+/// Layer-chip band under the safe-area top: outer pad ([AppSpacing.lg]) + chip
+/// height (~36) + a tight gap. iOS MapLibre already anchors ornaments to the
+/// safe top, so this is the full Y margin there; Android still needs safe-area
+/// padding added on top (see [BaseMap.build]).
+const double _layerChipBand = AppSpacing.lg + 36 + AppSpacing.xs;
+
 /// The app's reusable base map — a MapLibre map centred on Taiwan, rendered from
-/// the theme-driven ExpTech vector style (same base as the home snapshot).
+/// the ExpTech vector style tinted by [MapColors] for the active brightness.
 ///
 /// This is the shared foundation every map surface builds on (home backdrop,
 /// map tab, radar preview, event viewers). It is layer-agnostic: callers add
@@ -12,25 +20,43 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// typically anchoring overlays below [outlineLayerId] so the borders stay on
 /// top.
 ///
-/// [interactive] toggles every user gesture (pan/zoom/rotate/tilt) and the
-/// compass at once — pass `false` for a display-only surface like the home
-/// backdrop, where the map is driven entirely from code and the page's own
-/// gestures (tap to open, swipe to switch) must pass straight through.
+/// [interactive] toggles pan/zoom/rotate and the compass at once — pass
+/// `false` for a display-only surface like the home backdrop, where the map is
+/// driven entirely from code and the page's own gestures (tap to open, swipe
+/// to switch) must pass straight through. Tilt is always off.
 class BaseMap extends StatelessWidget {
   const BaseMap({
     super.key,
     this.onMapCreated,
     this.onStyleLoaded,
     this.onMapClick,
+    this.onCameraIdle,
     this.interactive = true,
+    this.showUserLocation = true,
+    this.minZoomPreference = defaultMinZoom,
+    this.maxZoomPreference = maxZoom,
   });
 
-  /// Bounding box framing the Taiwan main island — the single source of the
-  /// nationwide framing, fit to the viewport (never a hardcoded zoom). Kept to
-  /// the main island (no Penghu/Kinmen/Matsu) so it isn't dominated by open sea.
-  static final LatLngBounds taiwanBounds = LatLngBounds(
-    southwest: const LatLng(22.2, 119),
-    northeast: const LatLng(25.35, 121.05),
+  /// Bounding box for the nationwide (全國) framing — the Taiwan main island
+  /// **plus Kinmen**, fit to the viewport (never a hardcoded zoom). Penghu falls
+  /// inside the span already; Matsu does not (it sits at ~26.15°N, north of the
+  /// box) — add it here if it should be framed too.
+  ///
+  /// The corners are the real extremes, with a little margin: Fugui Cape
+  /// 25.30°N, Eluanbi 21.90°N, Sandiao Cape 122.01°E, and Lieyu (Little Kinmen)
+  /// ~118.20°E.
+  ///
+  /// An earlier box read `(22.2, 119) → (25.35, 121.05)`: it reached ~110 km into
+  /// the strait on the west yet stopped at 121.05°E — *inside* the island — so
+  /// the whole east coast (Yilan / Hualien / Taitung) fell outside the box and the
+  /// fit centred on 120.02°E, pushing Taiwan against the right edge with open sea
+  /// filling the left.
+  ///
+  /// A getter, not a `static final`: a lazily-initialised static keeps its first
+  /// value across hot reload, so editing these numbers would appear to do nothing.
+  static LatLngBounds get taiwanBounds => LatLngBounds(
+    southwest: const LatLng(21.87, 118.15),
+    northeast: const LatLng(25.32, 122.05),
   );
 
   /// Centre of [taiwanBounds] — only the pre-layout camera target, before a
@@ -41,13 +67,13 @@ class BaseMap extends StatelessWidget {
     (taiwanBounds.southwest.longitude + taiwanBounds.northeast.longitude) / 2,
   );
 
-  /// Fixed 4–11 zoom range — the radar echo tiles require it.
-  static const double minZoom = 4;
+  /// Default floor for most map surfaces (radar tiles need it).
+  static const double defaultMinZoom = 4;
+
+  /// Alias for call sites / framing that still reference [BaseMap.minZoom].
+  static const double minZoom = defaultMinZoom;
+
   static const double maxZoom = 11;
-  static const MinMaxZoomPreference zoomRange = MinMaxZoomPreference(
-    minZoom,
-    maxZoom,
-  );
 
   /// Called with the controller once the map is ready — add overlay layers here.
   final void Function(MapLibreMapController controller)? onMapCreated;
@@ -59,38 +85,77 @@ class BaseMap extends StatelessWidget {
   /// layers (e.g. selecting the nearest weather station).
   final OnMapClickCallback? onMapClick;
 
+  /// Fires when the camera stops moving — for screen-space Flutter overlays
+  /// that need a fresh `toScreenLocation` projection.
+  final OnCameraIdleCallback? onCameraIdle;
+
   /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
 
+  /// Whether to draw the device-location puck.
+  ///
+  /// This is MapLibre's **native** location component — `MLNUserLocationAnnot‌‍
+  /// ationView` on iOS, `LocationComponent` on Android — so the blue dot,
+  /// accuracy ring and heading cone are rendered and animated on the render
+  /// thread, with no per-frame platform-channel traffic. It runs the platform's
+  /// own location + heading session and starts only once location permission is
+  /// granted (Android logs and skips otherwise); nothing is drawn when it is
+  /// denied. Styling is whatever the platform provides — the plugin exposes no
+  /// hook for colours.
+  final bool showUserLocation;
+
+  /// Per-surface zoom floor (typhoon may go lower so the whole basin fits).
+  /// Other layers keep [defaultMinZoom].
+  final double minZoomPreference;
+
+  /// Per-surface zoom ceiling (DPM AED may go to 16).
+  final double maxZoomPreference;
+
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final palette = MapColors.of(Theme.of(context).brightness);
+    // MapScaffold parks the layer switcher at top-right (SafeArea + lg). Drop
+    // the native compass just under that chip. iOS ornaments are already
+    // constrained to the safe-area top — adding MediaQuery.padding again left
+    // a huge gap under the chip. Android margins are from the view edge.
+    final safeTop = Theme.of(context).platform == TargetPlatform.iOS
+        ? 0.0
+        : MediaQuery.paddingOf(context).top;
+    final compassTop = safeTop + _layerChipBand;
+    final floor = minZoomPreference;
+    final ceiling = maxZoomPreference;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
-      initialCameraPosition: CameraPosition(
-        target: taiwanCenter,
-        zoom: minZoom,
-      ),
+      initialCameraPosition: CameraPosition(target: taiwanCenter, zoom: floor),
+      // Brightness flip / AED overlay changes this string → MapLibre reloads
+      // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
       styleString: exptechVectorStyle(
-        sea: colors.surface.toHexRgb(),
-        land: colors.surfaceContainer.toHexRgb(),
-        countyTown: colors.surfaceContainerHigh.toHexRgb(),
-        outline: colors.outline.toHexRgb(),
-        townOutline: colors.outlineVariant.toHexRgb(),
+        palette,
+        basemapTileUrl: basemapOriginTileUrl,
+        glyphsUrl: glyphsOriginUrl,
       ),
-      minMaxZoomPreference: zoomRange,
+      minMaxZoomPreference: MinMaxZoomPreference(floor, ceiling),
       trackCameraPosition: true,
       compassEnabled: interactive,
+      compassViewPosition: CompassViewPosition.topRight,
+      compassViewMargins: Point(AppSpacing.lg, compassTop),
       scrollGesturesEnabled: interactive,
       zoomGesturesEnabled: interactive,
       rotateGesturesEnabled: interactive,
-      tiltGesturesEnabled: interactive,
+      tiltGesturesEnabled: false,
       dragEnabled: interactive,
+      myLocationEnabled: showUserLocation,
+      // `compass` is the heading-cone mode; MapLibreMap asserts anything other
+      // than `normal` requires myLocationEnabled, so pair them.
+      myLocationRenderMode: showUserLocation
+          ? MyLocationRenderMode.compass
+          : MyLocationRenderMode.normal,
       onMapClick: onMapClick,
       onMapCreated: onMapCreated,
       onStyleLoadedCallback: onStyleLoaded,
+      onCameraIdle: onCameraIdle,
     );
   }
 }

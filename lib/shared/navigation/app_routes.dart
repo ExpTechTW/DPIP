@@ -18,8 +18,23 @@ abstract final class AppRoutes {
   static const String map = 'map';
   static const String mapPath = '/map';
 
+  /// Bottom-nav "資料" hub (was the Earthquake slot).
+  static const String data = 'data';
+  static const String dataPath = '/data';
+
+  /// Earthquake report catalogue — nested under [dataPath].
   static const String earthquake = 'earthquake';
-  static const String earthquakePath = '/earthquake';
+  static const String earthquakePath = 'earthquake';
+
+  /// Live EEW monitor — nested under [dataPath].
+  static const String eew = 'eew';
+  static const String eewPath = 'eew';
+
+  /// Weather observation ranking — nested under [dataPath].
+  /// Optional `?tab=` —
+  /// `rain|temperature|tempExtremes|wind|gust|humidity|pressure`.
+  static const String weatherRanking = 'weatherRanking';
+  static const String weatherRankingPath = 'weather-ranking';
 
   static const String more = 'more';
   static const String morePath = '/more';
@@ -43,8 +58,16 @@ abstract final class AppRoutes {
   static const String language = 'language';
   static const String languagePath = '/language';
 
+  /// Default Map-tab overlay (also drives bottom-nav icon/label).
+  static const String defaultMapLayer = 'defaultMapLayer';
+  static const String defaultMapLayerPath = '/default-map-layer';
+
   static const String log = 'log';
   static const String logPath = '/log';
+
+  /// App release notes (GitHub releases).
+  static const String changelog = 'changelog';
+  static const String changelogPath = '/changelog';
 
   // Saved-region management: the manage page (view/remove saved townships)
   // opens the picker to add. Saved townships feed the Home region bar.

@@ -8,18 +8,23 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_cache.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
-/// Ambient tile-cache ceiling for the live map — well above MapLibre's ~50 MB
-/// native default so a week of small WebP radar frames (plus base tiles) stays
-/// cached and scrubbing the timeline re-fetches far less.
-const int _ambientCacheBytes = 128 * 1024 * 1024;
+/// Basemap XYZ origin — warmed from the app's tile store into MapLibre's tile
+/// memory on camera idle. LB has no ETag; the store keys these by URL hash.
+const String _basemapTileUrl = basemapOriginTileUrl;
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
@@ -33,17 +38,22 @@ const int _ambientCacheBytes = 128 * 1024 * 1024;
 /// calls never overlap, and a generation counter drops results from a superseded
 /// layer load so a slow fetch can't render onto the wrong layer.
 class MapScaffold extends StatefulWidget {
-  const MapScaffold({super.key, required this.layers})
+  const MapScaffold({super.key, required this.layers, this.initialLayerId})
     : assert(layers.length > 0, 'MapScaffold needs at least one layer');
 
-  /// The layers this surface offers; the first is shown initially.
+  /// The layers this surface offers; [initialLayerId] (or the first entry) is
+  /// shown initially.
   final List<MapLayer> layers;
+
+  /// Preferred overlay id (`MapLayer.id`) when the surface mounts. Unknown /
+  /// missing → [layers].first.
+  final String? initialLayerId;
 
   @override
   State<MapScaffold> createState() => _MapScaffoldState();
 }
 
-class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
+class _MapScaffoldState extends State<MapScaffold> {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
@@ -55,7 +65,21 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// tap, or the nav bar). A one-shot request per open; null keeps the view.
   MapCameraHandoff? _handoff;
 
-  late MapLayer _active = widget.layers.first;
+  /// Ranking → map: switch layer, frame station, open sheet.
+  MapStationHandoff? _stationHandoff;
+
+  late MapLayer _active = _resolveInitial(widget);
+
+  static MapLayer _resolveInitial(MapScaffold widget) {
+    final id = widget.initialLayerId;
+    if (id != null) {
+      for (final layer in widget.layers) {
+        if (layer.id == id) return layer;
+      }
+    }
+    return widget.layers.first;
+  }
+
   List<MapFrame> _frames = const [];
   int _selectedIndex = 0;
   Failure? _error;
@@ -66,15 +90,34 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Serialises controller mutations so an add never races a remove.
   Future<void> _mapOps = Future<void>.value();
 
-  /// Whether tiles have been cached since the last clear — so backgrounding only
-  /// clears the shared cache when there's actually something to clear.
-  bool _cacheDirty = false;
+  /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
+  int _cameraEpoch = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
+  /// Basemap tile warm-up. Its own warmer so a layer's cancel can't abort it.
+  MapTileWarmer? _basemapWarmer;
+
+  /// Whether a frame-show op is already queued and hasn't started running yet.
+  ///
+  /// Timeline reports every crossed frame; settle mounts (~3 sources) are the
+  /// expensive path. Coalesce so at most one op waits behind the running one.
+  bool _showQueued = false;
+
+  /// Finger down / fling in flight — raster layers skip cold mounts.
+  bool _scrubbing = false;
+
+  /// Whether a scrub reveal is running (see [_pumpScrub]).
+  bool _scrubInFlight = false;
+
+  /// The map view's own size, captured at layout — see [_applyFraming].
+  Size? _mapViewSize;
+
+  /// The geography the map is framed on, kept across layer switches so each
+  /// layer re-frames the *same* place into its own visible band.
+  LatLngBounds? _target;
+
+  /// Measured height of the timeline panel (0 when the active layer has none).
+  double _timelineHeight = 0;
+  final GlobalKey _timelineKey = GlobalKey();
 
   @override
   void didChangeDependencies() {
@@ -84,12 +127,18 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       _handoff?.removeListener(_onHandoff);
       _handoff = handoff..addListener(_onHandoff);
     }
+    final station = context.read<MapStationHandoff>();
+    if (station != _stationHandoff) {
+      _stationHandoff?.removeListener(_onStationHandoff);
+      _stationHandoff = station..addListener(_onStationHandoff);
+    }
   }
 
   @override
   void dispose() {
+    _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
-    WidgetsBinding.instance.removeObserver(this);
+    _stationHandoff?.removeListener(_onStationHandoff);
     super.dispose();
   }
 
@@ -104,56 +153,161 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // map onstage, so re-entry reframes reliably.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final bounds = _handoff?.takePending();
-      if (bounds != null) _frameBounds(bounds);
+      unawaited(_applyCameraHandoff());
     });
   }
 
-  /// Fits [bounds] into the viewport — no animation, matching the Home backdrop.
-  /// Reserves the same bottom band as the home ([MapCameraHandoff.bottomInsetFraction])
-  /// so a handoff lands on the home's exact camera and the transition is seamless
-  /// (Taiwan doesn't jump bigger / re-centre). The fit is computed in Dart
-  /// ([boundsFitCamera]) and applied as a plain centre+zoom, never MapLibre's
-  /// native `newLatLngBounds`, which aborts the process on a degenerate/unready
-  /// viewport (see camera_fit.dart).
-  void _frameBounds(LatLngBounds bounds) {
-    final safe = safeFitBounds(bounds);
-    if (safe == null || !mounted) return;
-    final size = MediaQuery.sizeOf(context);
+  /// Station focus from ranking (or similar): layer + camera + sheet.
+  void _onStationHandoff() {
+    if (!_styleLoaded) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_applyStationHandoff());
+    });
+  }
+
+  /// Applies a pending camera (+ optional layer) hand-off from Home / nav.
+  Future<void> _applyCameraHandoff() async {
+    final pending = _handoff?.takePending();
+    if (pending == null || !mounted) return;
+    await _switchToLayerId(pending.layerId);
+    if (!mounted) return;
+    _frameBounds(pending.bounds, northUp: true);
+  }
+
+  /// Switches the active overlay when [layerId] is set and known.
+  Future<void> _switchToLayerId(String? layerId) async {
+    if (layerId == null || layerId == _active.id) return;
+    MapLayer? layer;
+    for (final candidate in widget.layers) {
+      if (candidate.id == layerId) {
+        layer = candidate;
+        break;
+      }
+    }
+    if (layer == null) {
+      Log.warning('Map camera handoff: unknown layer $layerId');
+      return;
+    }
+    _onLayerSelected(layer);
+    await _mapOps;
+  }
+
+  Future<void> _applyStationHandoff() async {
+    final pending = _stationHandoff?.takePending();
+    if (pending == null || !mounted) return;
+
+    await _switchToLayerId(pending.layerId);
+    if (!mounted) return;
+    _frameBounds(pending.bounds);
+
+    // Wait for clear+render so station catalogue is loaded before select.
+    await _mapOps;
+    if (!mounted) return;
+    if (_active.id != pending.layerId) return;
+    _active.selectFeature(pending.stationId);
+  }
+
+  /// Adopts [bounds] as the framing target and applies it.
+  void _frameBounds(LatLngBounds bounds, {bool northUp = false}) {
+    _target = safeFitBounds(bounds);
+    _applyFraming(northUp: northUp);
+  }
+
+  /// Points the camera at [_target], fitted into the band the user can actually
+  /// see right now.
+  ///
+  /// Re-run whenever that band changes — a layer switch, or the timeline being
+  /// measured — because each layer covers a different amount of the map: radar
+  /// puts a timeline along the bottom, a station layer a collapsed sheet, RTS a
+  /// status strip. Keeping [_target] separate from the camera is what lets the
+  /// same place stay framed across those switches (pick a township on Home, then
+  /// switch to radar, and the township is still the subject).
+  ///
+  /// The fit is computed in Dart ([boundsFitCamera]) and applied as a plain
+  /// centre+zoom, never MapLibre's native `newLatLngBounds` — that aborts the
+  /// process on a degenerate box, and its padding is dropped on the `camera#move`
+  /// path anyway (see camera_fit.dart).
+  void _applyFraming({bool northUp = false}) {
+    final target = _target;
+    if (target == null || !mounted || _controller == null) return;
+    // The map's own size, not MediaQuery's screen size: this surface sits inside
+    // the shell, so the two differ by a device-dependent amount and a zoom
+    // derived from the screen mis-frames.
+    final size = _mapViewSize ?? MediaQuery.sizeOf(context);
     final fit = boundsFitCamera(
-      safe,
+      target,
       viewport: size,
-      bottomInset: size.height * (_handoff?.bottomInsetFraction ?? 0),
+      topInset: MediaQuery.paddingOf(context).top,
+      bottomInset: _bottomInset(size),
     );
-    if (fit != null) {
+    if (fit == null) return;
+    // A re-entry frame (nav-bar / Home hand-off) snaps the camera back to
+    // north-up: `newLatLngZoom` preserves the current heading on iOS
+    // (Convert.swift keeps `camera.heading`), so a map left rotated would come
+    // back rotated; `newCameraPosition` with bearing 0 always faces north.
+    if (northUp) {
+      _controller?.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: fit.target,
+            zoom: fit.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      );
+    } else {
       _controller?.moveCamera(CameraUpdate.newLatLngZoom(fit.target, fit.zoom));
     }
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Scrubbing a layer caches every frame's tiles in MapLibre's *shared*
-    // on-disk cache (removeSource doesn't evict them). That cache also backs the
-    // home page's off-screen map snapshot, and a bloated one stops its overlay
-    // from rendering. Clear it as the map backgrounds so the next launch's
-    // snapshot starts clean. Harmless: live tiles just refetch on resume.
-    if (state == AppLifecycleState.paused &&
-        _controller != null &&
-        _cacheDirty) {
-      _cacheDirty = false;
-      _controller!.clearAmbientCache().catchError((Object error) {
-        Log.warning('Failed to clear map ambient cache: $error');
-      });
-    }
+  /// How much of the map's bottom the active layer's resting chrome hides: the
+  /// layer's own declared share (a collapsed sheet, a status strip) plus the
+  /// timeline, whose real height the scaffold measures because it owns it.
+  double _bottomInset(Size size) =>
+      size.height * _active.bottomChromeFraction + _timelineHeight;
+
+  /// Measures the timeline panel after layout and re-frames if it changed, so a
+  /// timeline layer frames into the band above the scrubber rather than behind it.
+  void _measureTimeline() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final box = _timelineKey.currentContext?.findRenderObject() as RenderBox?;
+      final height = (box != null && box.hasSize) ? box.size.height : 0.0;
+      if ((height - _timelineHeight).abs() < 0.5) return;
+      _timelineHeight = height;
+      _applyFraming();
+    });
   }
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    // Raise the shared ambient-cache ceiling (MapLibre's default is only ~50 MB)
-    // now that the map exists so MapLibre is initialised on both platforms. The
-    // cache stays bounded (LRU) and is still cleared on background so the home
-    // snapshot starts clean.
-    const MapCache().setMaximumSize(_ambientCacheBytes);
+    _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
+    unawaited(const MapCache().setMaximumSize());
+  }
+
+  Future<void> _warmBasemap(MapLibreMapController controller) async {
+    final warmer = _basemapWarmer;
+    if (warmer == null) return;
+    try {
+      final bounds = await controller.getVisibleRegion();
+      await warmer.warmViewportAbsolute(
+        urlFor: (z, x, y) => _basemapTileUrl
+            .replaceAll('{z}', '$z')
+            .replaceAll('{x}', '$x')
+            .replaceAll('{y}', '$y'),
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: controller.cameraPosition?.zoom ?? 8,
+        maxZoom: 12,
+        logLabel: 'basemap',
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'basemap viewport warm');
+    }
   }
 
   void _onStyleLoaded() {
@@ -169,9 +323,23 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // the island. A reload keeps whatever the user has panned/zoomed to.
     if (!_framed) {
       _framed = true;
-      _frameBounds(_handoff?.takePending() ?? BaseMap.taiwanBounds);
+      final pending = _handoff?.takePending();
+      // Home may force radar before the user's default overlay loads.
+      if (pending?.layerId != null) {
+        for (final layer in widget.layers) {
+          if (layer.id == pending!.layerId) {
+            _active = layer;
+            break;
+          }
+        }
+      }
+      _frameBounds(pending?.bounds ?? BaseMap.taiwanBounds);
     }
     _loadActive();
+    // Ranking may have queued a station focus before the style was ready.
+    unawaited(_applyStationHandoff());
+    // Home/nav camera handoff that arrived before the style was ready.
+    unawaited(_applyCameraHandoff());
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -227,15 +395,33 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final controller = _controller;
     if (controller == null) return;
     final layer = _active;
-    _cacheDirty = true; // showing a frame caches its tiles
-    // Read the target at execution time so a burst of scrub selections
-    // coalesces to the latest frame instead of flooding the map with calls.
+    // Already queued: that op will pick up this newer selection when it runs, so
+    // don't stack another one (see [_showQueued]).
+    if (_showQueued) return;
+    _showQueued = true;
     _queue(() {
+      // Cleared as the op *starts*, not when it finishes: a selection arriving
+      // while this render is in flight then queues exactly one follow-up, so the
+      // final scrub position is always rendered and never more than one op waits.
+      _showQueued = false;
       if (_frames.isEmpty || !identical(layer, _active)) {
         return Future<void>.value();
       }
-      return layer.show(controller, _frames[_selectedIndex]);
+      // Read index + scrubbing at execution time so a settle that landed while
+      // this op was queued still mounts (pending scrub ops must not cold-skip).
+      return layer.show(
+        controller,
+        _frames[_selectedIndex],
+        scrubbing: _scrubbing,
+      );
     });
+  }
+
+  void _onScrubbing(bool scrubbing) {
+    final was = _scrubbing;
+    _scrubbing = scrubbing;
+    // Finger up: force a settle mount for the current index (may be cold).
+    if (was && !scrubbing) _showSelected();
   }
 
   void _onFrameSelected(int index) {
@@ -244,7 +430,37 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // never rebuilds the (expensive) platform-view map. The timeline drives its
     // own display; _selectedIndex is just the source of truth for show().
     _selectedIndex = index;
+    if (_scrubbing) {
+      _pumpScrub();
+      return;
+    }
     _showSelected();
+  }
+
+  /// Drives scrub reveals **latest-wins**: at most one in flight, and whatever
+  /// index the finger has reached by the time it finishes is what runs next.
+  ///
+  /// A fling crosses frames faster than a reveal completes. Firing one
+  /// unawaited `show` per crossed frame piled up platform calls for frames
+  /// already scrolled past — the map fell behind the finger and kept working
+  /// after it stopped. Intermediate frames are *meant* to be dropped here; the
+  /// settle ([_onScrubbing]) always renders the final position.
+  void _pumpScrub() {
+    if (_scrubInFlight) return;
+    final controller = _controller;
+    if (controller == null || _frames.isEmpty) return;
+    _scrubInFlight = true;
+    final index = _selectedIndex;
+    _active
+        .show(controller, _frames[index], scrubbing: true)
+        .catchError((Object e, StackTrace st) {
+          Log.handle(e, st, 'Map scrub reveal (${_active.id})');
+        })
+        .whenComplete(() {
+          _scrubInFlight = false;
+          // The finger moved on while that ran — chase it.
+          if (_scrubbing && _selectedIndex != index) _pumpScrub();
+        });
   }
 
   void _onLayerSelected(MapLayer layer) {
@@ -257,8 +473,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       _active = layer;
       _frames = const [];
       _error = null;
+      // The old layer's chrome is gone; the new one measures itself (a timeline
+      // layer re-measures in build, a sheet layer declares its own share).
+      _timelineHeight = 0;
     });
     if (controller != null) _queue(() => previous.clear(controller));
+    // Re-frame the same target into the new layer's band — switching to radar
+    // after picking a township keeps the township framed, and each layer's
+    // different chrome height is accounted for instead of reusing the old one.
+    _applyFraming();
     _loadActive();
   }
 
@@ -273,50 +496,132 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final measured = constraints.biggest;
+          if (measured.isFinite) _mapViewSize = measured;
+          return _body(context);
+        },
+      ),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    // The timeline's height depends on its content, so measure it after every
+    // build; a change re-frames (see [_measureTimeline]).
+    if (_active.usesTimeline) _measureTimeline();
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => _active.onMapGestureStart(),
+            onPointerUp: (_) {
+              // Tap with no pan: camera idle won't re-fire — restore overlays.
+              final c = _controller;
+              if (c == null || !c.isCameraMoving) {
+                _active.onMapGestureEnd();
+                if (mounted) setState(() => _cameraEpoch++);
+              }
+            },
+            onPointerCancel: (_) {
+              _active.onMapGestureEnd();
+              if (mounted) setState(() => _cameraEpoch++);
+            },
             child: BaseMap(
+              minZoomPreference: _active.mapMinZoom,
+              maxZoomPreference: _active.mapMaxZoom,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),
+              onCameraIdle: () {
+                _active.onMapGestureEnd();
+                final controller = _controller;
+                if (controller != null) {
+                  unawaited(_active.onCameraIdle(controller));
+                  unawaited(_warmBasemap(controller));
+                }
+                if (!mounted) return;
+                setState(() => _cameraEpoch++);
+              },
             ),
           ),
-          // A sheet layer's own collapsible detail sheet (empty until a tap).
-          if (!_active.usesTimeline)
-            Positioned.fill(child: _active.buildSheet(context)),
-          // A timeline layer's bottom scrubber / error strip.
-          if (_active.usesTimeline)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: SafeArea(
-                top: false,
-                child: _frames.isNotEmpty
-                    ? _timelinePanel(context)
-                    : _error != null
-                    ? _errorPanel(context)
-                    : const SizedBox.shrink(),
+        ),
+        // Screen-space Flutter overlays (e.g. typhoon forecast tips) — under
+        // chrome/sheet so they don't steal taps; IgnorePointer keeps pan/zoom.
+        Positioned.fill(
+          child: IgnorePointer(
+            child: KeyedSubtree(
+              key: ValueKey<Object>('${_active.id}-$_cameraEpoch'),
+              child: _active.buildMapOverlay(context),
+            ),
+          ),
+        ),
+        // Colour / key legend — top-left. Under the sheet so a dragged-up
+        // sheet covers it instead of sitting behind a floating chip.
+        Positioned(
+          top: 0,
+          left: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: CollapsibleMapLegend(
+                key: ValueKey(_active.id),
+                legend: _active.buildLegend(context),
               ),
             ),
-          // Layer switcher — top-right, always above the sheet / timeline.
+          ),
+        ),
+        // Layer switcher (+ optional layer chrome) — top-right.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Builder(
+                builder: (context) {
+                  // Non-typhoon layers return [SizedBox.shrink] — skip the gap.
+                  final chrome = _active.buildTopTrailingChrome(context);
+                  final hasChrome = chrome is! SizedBox;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (hasChrome) ...[
+                        chrome,
+                        const SizedBox(width: AppSpacing.sm),
+                      ],
+                      MapLayerSwitcher(
+                        layers: widget.layers,
+                        active: _active,
+                        onSelected: _onLayerSelected,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        // Sheet / timeline last so they paint above the chrome when expanded.
+        if (!_active.usesTimeline)
+          Positioned.fill(child: _active.buildSheet(context)),
+        if (_active.usesTimeline)
           Positioned(
-            top: 0,
+            left: 0,
             right: 0,
+            bottom: 0,
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: MapLayerSwitcher(
-                  layers: widget.layers,
-                  active: _active,
-                  onSelected: _onLayerSelected,
-                ),
-              ),
+              key: _timelineKey,
+              top: false,
+              child: _frames.isNotEmpty
+                  ? _timelinePanel(context)
+                  : _error != null
+                  ? _errorPanel(context)
+                  : const SizedBox.shrink(),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -326,44 +631,44 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Material(
-      color: colors.surface.withValues(alpha: 0.92),
-      borderRadius: AppRadius.topSheet,
-      child: Padding(
-        // The bottom-nav clearance is the SafeArea wrapper's job (see build);
-        // adding MediaQuery's bottom inset here too double-counted it.
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.sm,
-          AppSpacing.md,
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.cloud_off_outlined, color: colors.onSurfaceVariant),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                _error!.message,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
+    return FrostedSurface(
+      borderRadius: AppRadius.large,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Padding(
+          // The bottom-nav clearance is the SafeArea wrapper's job (see build);
+          // adding MediaQuery's bottom inset here too double-counted it.
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.cloud_off_outlined, color: colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  _error!.message,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
-            ),
-            TextButton(onPressed: _loadActive, child: Text(l10n.commonRetry)),
-          ],
+              TextButton(onPressed: _loadActive, child: Text(l10n.commonRetry)),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _timelinePanel(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Material(
-      color: colors.surface.withValues(alpha: 0.92),
-      borderRadius: AppRadius.topSheet,
+    return FrostedSurface(
+      borderRadius: AppRadius.large,
       child: Padding(
         // The bottom-nav clearance is the SafeArea wrapper's job (see build);
         // adding MediaQuery's bottom inset here too made the panel very tall.
@@ -372,6 +677,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           frames: _frames,
           selectedIndex: _selectedIndex,
           onSelected: _onFrameSelected,
+          onScrubbing: _onScrubbing,
         ),
       ),
     );

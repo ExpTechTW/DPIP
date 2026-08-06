@@ -21,7 +21,224 @@ class AppLocalizationsVi extends AppLocalizations {
   String get navMap => 'Bản đồ';
 
   @override
+  String get navData => 'Dữ liệu';
+
+  @override
   String get navEarthquake => 'Động đất';
+
+  @override
+  String get dataSectionSeismic => 'Địa chấn';
+
+  @override
+  String get dataEarthquakeSubtitle => 'Báo cáo động đất';
+
+  @override
+  String get dataSectionWeather => 'Thời tiết';
+
+  @override
+  String get dataWeatherRankingSubtitle => 'Xếp hạng trạm trực tiếp';
+
+  @override
+  String get weatherRankingTitle => 'Xếp hạng quan trắc';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return 'Thời gian: $time\n$count trạm';
+  }
+
+  @override
+  String get weatherRankingEmpty => 'Không có quan trắc để xếp hạng';
+
+  @override
+  String get weatherRankingBy => 'Theo';
+
+  @override
+  String get weatherRankingHighest => 'Cao nhất';
+
+  @override
+  String get weatherRankingLowest => 'Thấp nhất';
+
+  @override
+  String get weatherRankingMergeTo => 'Gộp';
+
+  @override
+  String get weatherRankingMergeTown => 'Xã/trấn';
+
+  @override
+  String get weatherRankingMergeCounty => 'Huyện/thành';
+
+  @override
+  String get weatherRankingWind => 'Tốc độ gió';
+
+  @override
+  String get weatherRankingGust => 'Gió giật';
+
+  @override
+  String get weatherRankingTempExtremes => 'Cực trị nhiệt độ';
+
+  @override
+  String get weatherRankingExtremeHigh => 'Cao nhất ngày';
+
+  @override
+  String get weatherRankingExtremeLow => 'Thấp nhất ngày';
+
+  @override
+  String get weatherRankingExtremeRange => 'Biên độ ngày';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return 'Ghi nhận lúc $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return 'Hiện tại $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return 'Cao $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return 'Thấp $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return 'Biên độ $value°C';
+  }
+
+  @override
+  String get reportListEmpty => 'Không có báo cáo động đất';
+
+  @override
+  String get reportListEmptyFiltered => 'Không có báo cáo khớp bộ lọc';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => 'Cảm nhận cục bộ';
+
+  @override
+  String get reportListToday => 'Hôm nay';
+
+  @override
+  String get reportListYesterday => 'Hôm qua';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String get reportListEnd => 'Hết danh sách';
+
+  @override
+  String get reportFilterTitle => 'Bộ lọc';
+
+  @override
+  String get reportFilterSort => 'Sắp xếp';
+
+  @override
+  String get reportFilterSortTime => 'Thời gian';
+
+  @override
+  String get reportFilterSortIntensity => 'Cường độ';
+
+  @override
+  String get reportFilterSortMagnitude => 'Độ lớn';
+
+  @override
+  String get reportFilterSortDepth => 'Độ sâu';
+
+  @override
+  String get reportFilterOrderDesc => 'Giảm dần';
+
+  @override
+  String get reportFilterOrderAsc => 'Tăng dần';
+
+  @override
+  String get reportFilterIntensity => 'Cường độ';
+
+  @override
+  String get reportFilterIntensityInfoTitle => 'Thang cường độ mới và cũ';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      'CWA đổi thang cường độ từ 1/1/2020 (giờ Đài Bắc).';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => 'Cũ (trước 2020)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      'Chỉ có mức 0–7, không tách 5−/5+/6−/6+.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => 'Mới (từ 2020)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      'Các mức 0–4, 5−, 5+, 6−, 6+, 7. Thanh lọc dùng thang mới; sự kiện cũ vẫn hiện nhãn cũ trong danh sách.';
+
+  @override
+  String get reportFilterMagnitude => 'Độ lớn';
+
+  @override
+  String get reportFilterDepth => 'Độ sâu';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => 'Ngày';
+
+  @override
+  String get reportFilterDatePick => 'Chọn ngày';
+
+  @override
+  String get reportFilterDateStartNote => 'Ngày bắt đầu: từ 00:00（Đài Bắc）';
+
+  @override
+  String get reportFilterDateEndNote => 'Ngày kết thúc: đến 24:00（Đài Bắc）';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get reportFilterLocation => 'Địa điểm';
+
+  @override
+  String get reportFilterLocationHint => 'vd: Hoa Liên, ngoài khơi';
+
+  @override
+  String get reportFilterAny => 'Tất cả';
+
+  @override
+  String get reportFilterApply => 'Áp dụng';
+
+  @override
+  String get reportFilterReset => 'Đặt lại';
+
+  @override
+  String get reportListSearch => 'Tìm';
 
   @override
   String get navMore => 'Thêm';
@@ -30,10 +247,37 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appLogs => 'Nhật ký ứng dụng';
 
   @override
+  String get changelogTitle => 'Nhật ký cập nhật';
+
+  @override
+  String get changelogEmpty => 'Chưa có ghi chú phát hành';
+
+  @override
+  String get changelogTypePrerelease => 'Thử nghiệm';
+
+  @override
+  String get changelogTypeStable => 'Chính thức';
+
+  @override
+  String get changelogCurrentVersion => 'Hiện tại';
+
+  @override
+  String get changelogVersionDetails => 'Chi tiết phiên bản';
+
+  @override
+  String get changelogBodyEmpty => 'Không có ghi chú cho bản phát hành này.';
+
+  @override
   String get mapPlaceholderDisabled => 'Bản đồ (tạm thời vô hiệu hóa)';
 
   @override
-  String get moreSectionGeneral => 'Chung';
+  String get moreSectionRegion => 'Khu vực';
+
+  @override
+  String get moreSectionNotify => 'Thông báo';
+
+  @override
+  String get moreSectionDisplay => 'Hiển thị';
 
   @override
   String get regionManageTitle => 'Khu vực đã lưu';
@@ -58,16 +302,13 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get regionEdit => 'Sửa';
+
+  @override
   String get moreSectionAdvanced => 'Nâng cao';
 
   @override
   String get moreDeveloper => 'Thông tin gỡ lỗi';
-
-  @override
-  String get developerCopied => 'Đã sao chép vào bảng nhớ tạm';
-
-  @override
-  String get developerCopyAll => 'Sao chép tất cả';
 
   @override
   String get experimentalFeatures => 'Tính năng thử nghiệm';
@@ -169,10 +410,69 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherHumidity => 'Độ ẩm';
 
   @override
+  String get homeForecastTitle => 'Dự báo 24 giờ';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return 'Cao $high° · Thấp $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return 'Cảm giác $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return 'Độ ẩm $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · Cấp $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => 'Chọn khu vực để xem dự báo';
+
+  @override
+  String get homeForecastEmpty => 'Không có dữ liệu dự báo';
+
+  @override
+  String get homeActiveEventsTitle => 'Sự kiện đang hiệu lực';
+
+  @override
+  String get homeActiveEventsEmpty => 'Không có sự kiện đang hiệu lực';
+
+  @override
+  String get homeRainTrendTitle => 'Mưa 1 giờ tới';
+
+  @override
   String get mapLayers => 'Lớp bản đồ';
 
   @override
-  String get mapLayerRadar => 'Radar';
+  String get mapLayerRadar => 'Radar phản xạ tổng hợp';
+
+  @override
+  String get mapLayerSatellite => 'Himawari hồng ngoại';
+
+  @override
+  String get mapLayerLightning => 'Sét';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return 'Mây–đất · $minutes phút';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return 'Mây–mây · $minutes phút';
+  }
 
   @override
   String get mapTimelineNow => 'Bây giờ';
@@ -396,6 +696,46 @@ class AppLocalizationsVi extends AppLocalizations {
   String get displaySettings => 'Hiển thị';
 
   @override
+  String get defaultMapLayerSettings => 'Lớp bản đồ mặc định';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      'Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.';
+
+  @override
+  String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavSatellite => 'Vệ tinh';
+
+  @override
+  String get mapNavLightning => 'Sét';
+
+  @override
+  String get mapNavTyphoon => 'Bão';
+
+  @override
+  String get mapNavEarthquake => 'Động đất';
+
+  @override
+  String get mapNavTemperature => 'Nhiệt độ';
+
+  @override
+  String get mapNavHumidity => 'Độ ẩm';
+
+  @override
+  String get mapNavPressure => 'Khí áp';
+
+  @override
+  String get mapNavWind => 'Gió';
+
+  @override
+  String get mapNavRain => 'Mưa';
+
+  @override
+  String get mapNavDisaster => 'Phòng thảm';
+
+  @override
   String get displayTheme => 'Giao diện';
 
   @override
@@ -472,6 +812,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get trendNoData => 'Không có dữ liệu xu hướng';
 
   @override
+  String chartHourLabel(int hour) {
+    return '${hour}h';
+  }
+
+  @override
   String get mapLayerHumidity => 'Độ ẩm';
 
   @override
@@ -479,6 +824,39 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerWind => 'Gió';
+
+  @override
+  String get mapLayerRain => 'Lượng mưa';
+
+  @override
+  String get rainIntervalMenu => 'Khung tích lũy';
+
+  @override
+  String get rainIntervalNow => 'Hôm nay';
+
+  @override
+  String get rainInterval10m => '10 phút';
+
+  @override
+  String get rainInterval1h => '1 giờ';
+
+  @override
+  String get rainInterval3h => '3 giờ';
+
+  @override
+  String get rainInterval6h => '6 giờ';
+
+  @override
+  String get rainInterval12h => '12 giờ';
+
+  @override
+  String get rainInterval24h => '24 giờ';
+
+  @override
+  String get rainInterval2d => '2 ngày';
+
+  @override
+  String get rainInterval3d => '3 ngày';
 
   @override
   String get mapLayerTyphoon => 'Bão';
@@ -499,7 +877,250 @@ class AppLocalizationsVi extends AppLocalizations {
   String get typhoonMotion => 'Di chuyển';
 
   @override
+  String get typhoonLabelPosition => 'Centre location';
+
+  @override
+  String get typhoonLabelDirection => 'Past movement direction';
+
+  @override
+  String get typhoonLabelSpeed => 'Past movement speed';
+
+  @override
+  String get typhoonLabelPressure => 'Central pressure';
+
+  @override
+  String get typhoonLabelWind => 'Max. sustained wind near centre';
+
+  @override
+  String get typhoonLabelGust => 'Peak gust';
+
+  @override
+  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+
+  @override
+  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+
+  @override
+  String get typhoonLabelProbCircle => '70% probability circle';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return 'Forecast +$hours h';
+  }
+
+  @override
+  String get typhoonLabelNw => 'NW';
+
+  @override
+  String get typhoonLabelNe => 'NE';
+
+  @override
+  String get typhoonLabelSw => 'SW';
+
+  @override
+  String get typhoonLabelSe => 'SE';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '$lat°N';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '$lon°E';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '$n m/s';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return 'Data time\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => 'Giám sát địa chấn';
+
+  @override
+  String get mapLayerDisasterMap => 'Bản đồ phòng chống';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => 'Lớp bản đồ phòng chống';
+
+  @override
+  String get disasterMapOverlaySectionLayers => 'Lớp';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'Hiện vị trí AED';
+
+  @override
+  String get aedAddress => 'Địa chỉ';
+
+  @override
+  String get aedRegion => 'Khu vực';
+
+  @override
+  String get aedCategory => 'Phân loại';
+
+  @override
+  String get aedType => 'Loại';
+
+  @override
+  String get aedPlaceDesc => 'Vị trí đặt';
+
+  @override
+  String get aedDescription => 'Ghi chú';
+
+  @override
+  String get aedHoursWeekday => 'Giờ ngày thường';
+
+  @override
+  String get aedHoursSaturday => 'Giờ thứ Bảy';
+
+  @override
+  String get aedHoursSunday => 'Giờ Chủ nhật';
+
+  @override
+  String get aedOpenRemark => 'Ghi chú giờ mở';
+
+  @override
+  String get aedEmergencyPhone => 'Điện thoại khẩn cấp';
+
+  @override
+  String get mapLayerRestroom => 'Nhà vệ sinh công cộng';
+
+  @override
+  String get mapLayerShelter => 'Nơi trú ẩn';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip =>
+      'Hiển thị nhà vệ sinh công cộng';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Hiển thị nơi trú ẩn';
+
+  @override
+  String get dpmSheetEmpty =>
+      'Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết';
+
+  @override
+  String get dpmAddress => 'Địa chỉ';
+
+  @override
+  String get restroomTypeLabel => 'Loại';
+
+  @override
+  String get restroomCategoryLabel => 'Hạng mục';
+
+  @override
+  String get restroomGradeLabel => 'Hạng';
+
+  @override
+  String get restroomTypeFemale => 'Nhà vệ sinh nữ';
+
+  @override
+  String get restroomTypeMale => 'Nhà vệ sinh nam';
+
+  @override
+  String get restroomTypeMixed => 'Nhà vệ sinh chung';
+
+  @override
+  String get restroomTypeAccessible => 'Nhà vệ sinh tiếp cận được';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Nhà vệ sinh trung tính giới';
+
+  @override
+  String get restroomTypeFamily => 'Nhà vệ sinh gia đình';
+
+  @override
+  String get restroomTypeUnspecified => 'Không xác định';
+
+  @override
+  String get restroomCategoryTransport => 'Giao thông';
+
+  @override
+  String get restroomCategoryPark => 'Công viên';
+
+  @override
+  String get restroomCategoryCommercial => 'Cơ sở thương mại';
+
+  @override
+  String get restroomCategoryReligious => 'Nơi tôn giáo';
+
+  @override
+  String get restroomCategoryCultural => 'Địa điểm văn hóa giải trí';
+
+  @override
+  String get restroomCategoryGovernment => 'Cơ quan công quyền';
+
+  @override
+  String get restroomCategoryWelfare => 'Cơ sở phúc lợi';
+
+  @override
+  String get restroomCategoryTourist => 'Khu du lịch thắng cảnh';
+
+  @override
+  String get restroomCategoryLeisure => 'Địa điểm vui chơi giải trí';
+
+  @override
+  String get restroomCategoryOther => 'Khác';
+
+  @override
+  String get restroomGradeExcellent => 'Xuất sắc';
+
+  @override
+  String get restroomGradeGood => 'Tốt';
+
+  @override
+  String get restroomGradeAverage => 'Trung bình';
+
+  @override
+  String get restroomGradePoor => 'Dưới chuẩn';
+
+  @override
+  String get shelterAddressLabel => 'Địa chỉ';
+
+  @override
+  String get shelterCapacityLabel => 'Sức chứa';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n người';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Loại thảm họa';
+
+  @override
+  String get shelterIndoorLabel => 'Trú ẩn trong nhà';
+
+  @override
+  String get shelterOutdoorLabel => 'Trú ẩn ngoài trời';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Phù hợp người yếu thế';
+
+  @override
+  String get dpmYes => 'Có';
+
+  @override
+  String get dpmNo => 'Không';
 
   @override
   String get stationSheetEmpty => 'Chạm vào một trạm để xem số liệu';
@@ -511,4 +1132,186 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get monitorWaiting => 'Đang chờ dữ liệu…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return 'Đơn vị: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => 'Quỹ đạo thực tế';
+
+  @override
+  String get typhoonIntensityTd => 'Tropical depression';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return 'Tropical depression TD $no';
+  }
+
+  @override
+  String get typhoonIntensityMild => 'Mild typhoon';
+
+  @override
+  String get typhoonIntensityModerate => 'Moderate typhoon';
+
+  @override
+  String get typhoonIntensityIntense => 'Intense typhoon';
+
+  @override
+  String get typhoonLegendForecast => 'Quỹ đạo dự báo';
+
+  @override
+  String get typhoonLegendForecastPoint => 'Điểm dự báo';
+
+  @override
+  String get typhoonLegendCurrent => 'Tâm hiện tại';
+
+  @override
+  String get typhoonLegendCone => 'Nón dự báo';
+
+  @override
+  String get mapLegendExpand => 'Chú giải';
+
+  @override
+  String get mapLegendCollapse => 'Ẩn chú giải';
+
+  @override
+  String get mapMyLocation => 'Vị trí của tôi';
+
+  @override
+  String get typhoonLegendCircle15 => 'Vòng gió mạnh';
+
+  @override
+  String get typhoonLegendCircleAvg => 'Average circle';
+
+  @override
+  String get typhoonLegendCircle25 => 'Vòng bão';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
+
+  @override
+  String get typhoonLegendProbability => 'Xác suất đổ bộ';
+
+  @override
+  String get typhoonLegendWarningAreas => 'Vùng cảnh báo';
+
+  @override
+  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+
+  @override
+  String get typhoonOverlaySectionStorm => 'Storm wind';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'Overlays';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+
+  @override
+  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip =>
+      'Show strike probability (hides the forecast cone)';
+
+  @override
+  String get typhoonOverlayWarningTooltip =>
+      'Highlight counties under a typhoon warning';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip =>
+      'Level-7 wind field + average circle (purple)';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip =>
+      'Level-10 wind field + average circle (yellow)';
+
+  @override
+  String get typhoonOverlaySectionWeather => 'Weather underlay';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'None';
+
+  @override
+  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip =>
+      'No radar or infrared underlay';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip =>
+      'Radar echo closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip =>
+      'Infrared closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonWarningTitle => 'Cảnh báo bão';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return 'Khu vực: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => 'Chi tiết quỹ đạo';
+
+  @override
+  String get typhoonHistoryTitle => 'Thời điểm dữ liệu';
+
+  @override
+  String get typhoonHistoryLive => 'Trực tiếp';
+
+  @override
+  String get typhoonSatelliteTitle => 'Vệ tinh';
+
+  @override
+  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip =>
+      'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Loại địa điểm';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Loại nhà vệ sinh';
+
+  @override
+  String get dpmFilterSectionShelter => 'Loại thiên tai nơi trú ẩn';
+
+  @override
+  String get dpmDisasterFlood => 'Lũ lụt';
+
+  @override
+  String get dpmDisasterEarthquake => 'Động đất';
+
+  @override
+  String get dpmDisasterLandslide => 'Sạt lở đất';
+
+  @override
+  String get dpmDisasterTsunami => 'Sóng thần';
+
+  @override
+  String get dpmDisasterSlope => 'Thiên tai sườn dốc';
+
+  @override
+  String get dpmDisasterNuclear => 'Sự cố hạt nhân';
 }

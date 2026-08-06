@@ -2,9 +2,11 @@
 #
 # ARB sources live in lib/l10n; generated Dart is written to lib/l10n/gen and
 # imported as `package:dpip/l10n/gen/app_localizations.dart`. English is the
-# template and ultimate fallback; zh (Traditional Chinese, the Taiwan market)
-# is the base Chinese. Add a locale by dropping app_<locale>.arb into lib/l10n
-# (e.g. app_zh_Hans.arb for Simplified, app_ja.arb for Japanese).
+# template and ultimate fallback; `zh` is the gen-l10n base Chinese file (same
+# Taiwan Traditional wording as `zh_TW`) required when script/region variants
+# exist. The **UI** home locale is `zh_TW` so Material widgets stay Traditional —
+# bare `zh` would pull Simplified Material strings. Add a locale by dropping
+# app_<locale>.arb into lib/l10n (e.g. app_zh_Hans.arb for Simplified).
 arb-dir: lib/l10n
 template-arb-file: app_en.arb
 output-dir: lib/l10n/gen

@@ -32,10 +32,14 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
   final RegionStore _regions;
 
   StreamSubscription<bool>? _serviceSub;
+  StreamSubscription<GpsFix>? _fixSub;
   // Optimistic seed so a bad status flashes only after it's actually confirmed.
   LocationStatus _status = LocationStatus.ready;
   bool _started = false;
   bool _seeded = false;
+
+  /// The township last published, so an unchanged one doesn't churn listeners.
+  String? _publishedCode;
 
   /// The current combined location status.
   LocationStatus get status => _status;
@@ -57,6 +61,21 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
       (_) => _refresh(),
       onError: (_, _) {},
     );
+    // Keep 所在地 pinned to where the user actually is. Without this the current
+    // township was resolved once at launch and then only on a services-off →
+    // on transition, so travelling any distance left the app naming — and
+    // alerting for — the township the app happened to start in.
+    _fixSub = _reporter.fixes.listen(_onFix, onError: (_, _) {});
+  }
+
+  /// Republishes the current township for a fix from the foreground position
+  /// stream. Silent when the township is unchanged (the common case: most moves
+  /// stay inside one township) or unresolvable.
+  Future<void> _onFix(GpsFix fix) async {
+    final code = (await _location.townAt(fix.lat, fix.lng))?.code;
+    if (code == null || code == _publishedCode) return;
+    _publishedCode = code;
+    _regions.setCurrentCode(code);
   }
 
   @override
@@ -72,7 +91,9 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
     // not on every resume — avoids re-subscribing the position stream needlessly.
     if (_seeded && _usable(status) && !_usable(previous)) {
       _reporter.restart();
-      _regions.setCurrentCode((await _location.currentTown())?.code);
+      final code = (await _location.currentTown())?.code;
+      _publishedCode = code;
+      _regions.setCurrentCode(code);
     }
     _seeded = true;
     if (status != previous) notifyListeners();
@@ -86,6 +107,7 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _fixSub?.cancel();
     _serviceSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();

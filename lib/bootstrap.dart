@@ -11,6 +11,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -28,8 +29,12 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/features/changelog/changelog_providers.dart';
+import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
+import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
@@ -79,7 +84,14 @@ Future<void> bootstrap() async {
   final onboarding = OnboardingStore(prefs);
   final locale = LocaleController(prefs);
   final theme = ThemeController(prefs);
+  final defaultMapLayer = DefaultMapLayerController(prefs);
   final cache = await _openCache();
+  // MapLibre asks Dart for every ExpTech tile before it asks the network, so
+  // this must be bound before the first map is built.
+  final mapTileCache = cache == null
+      ? null
+      : MapTileCache(cache.etag, usage: cache.usage);
+  await mapTileCache?.install();
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
 
@@ -125,9 +137,10 @@ Future<void> bootstrap() async {
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
+    prefs: prefs,
     onMoved: (fix) async {
       final token = notificationService.token;
-      if (token == null) return;
+      if (token == null) return false;
       await locationApi.updateDeviceLocation(
         platform: reportPlatform,
         token: token,
@@ -135,6 +148,7 @@ Future<void> bootstrap() async {
         lat: fix.lat,
         lng: fix.lng,
       );
+      return true;
     },
   );
   // Terminated/background counterpart: native reports on significant moves.
@@ -169,8 +183,10 @@ Future<void> bootstrap() async {
     onboarding: onboarding,
     locale: locale,
     theme: theme,
+    defaultMapLayer: defaultMapLayer,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
+    mapTileCache: mapTileCache,
   );
 
   // Each feature turns [deps] into its providers (and registers its realtime
@@ -182,7 +198,10 @@ Future<void> bootstrap() async {
         ...coreProviders(deps),
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
+        ...disasterMapProviders(deps),
         ...typhoonProviders(deps),
+        ...eventsProviders(deps),
+        ...changelogProviders(deps),
         ...notificationProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
@@ -201,11 +220,18 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
     final base = await getApplicationCacheDirectory();
     final db = await openDatabase(
       '${base.path}/http_etag_cache.db',
-      version: 1,
+      version: 2,
       onCreate: (db, _) => EtagCacheStore.createSchema(db),
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // v1 was a gzip+json+base64 envelope — drop and rebuild for the fast
+        // columnar schema (one-time cold miss on upgrade).
+        if (oldVersion < 2) await EtagCacheStore.migrateToV2(db);
+      },
     );
     await NetworkUsageStore.createSchema(db);
-    return (etag: EtagCacheStore(db), usage: NetworkUsageStore(db));
+    await EtagCacheStore.configureConnection(db);
+    final usage = NetworkUsageStore(db);
+    return (etag: EtagCacheStore(db, usage: usage), usage: usage);
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;

@@ -56,6 +56,11 @@ void main() {
     expect(c.locale, isNull);
   });
 
+  test('migrates legacy bare zh to zh_TW', () async {
+    final c = await controller({'app.locale': 'zh'});
+    expect(c.locale, const Locale('zh', 'TW'));
+  });
+
   test('parses a legacy underscore-separated tag', () async {
     // Earlier builds may have persisted "zh_Hant_HK" with underscores.
     final c = await controller({'app.locale': 'zh_Hant_HK'});

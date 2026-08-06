@@ -104,6 +104,22 @@ class RegionStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 替換一個已保存的區域
+  /// 當 [oldCode] 不存在 [newCode] 已經被保存或者已保存的區域達到最大數量時返回 false。
+  /// 替換成功後返回 true。
+  bool replaceSaved(String oldCode, String newCode) {
+    final position = _saved.indexOf(oldCode);
+    if (position < 0) return false;
+    if (oldCode == newCode) return true;
+    if (_saved.contains(newCode)) return false;
+    final list = [..._saved];
+    list[position] = newCode;
+    _saved = list;
+    _persist();
+    notifyListeners();
+    return true;
+  }
+
   /// Moves the saved township from [oldIndex] to [newIndex] — the post-removal
   /// index, per `ReorderableListView.onReorderItem`. Keeps the same area selected
   /// by re-pointing the selection at its township's new slot.

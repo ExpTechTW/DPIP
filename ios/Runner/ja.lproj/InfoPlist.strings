@@ -1,0 +1,3 @@
+"CFBundleDisplayName" = "DPIP防災";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。";
+"NSLocationWhenInUseUsageDescription" = "DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。";

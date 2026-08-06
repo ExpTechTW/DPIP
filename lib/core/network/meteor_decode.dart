@@ -36,4 +36,13 @@ abstract final class MeteorDecode {
     final n = (value as num).toInt();
     return n == -99 ? null : n;
   }
+
+  /// Unix seconds for gust / daily-extreme occurrence times. `0` and `-99`
+  /// mean "no time recorded" (v5 uses `0` for missing event times).
+  static int? unixSeconds(Object? value) {
+    if (value == null) return null;
+    final n = (value as num).toInt();
+    if (n <= 0 || n == -99) return null;
+    return n;
+  }
 }

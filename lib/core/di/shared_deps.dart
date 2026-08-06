@@ -11,12 +11,15 @@ import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 
 /// The shared infrastructure every feature module builds on, assembled once in
 /// `bootstrap()` and handed to each feature's `*Providers(deps)` function.
@@ -44,8 +47,10 @@ class SharedDeps {
     required this.onboarding,
     required this.locale,
     required this.theme,
+    required this.defaultMapLayer,
     this.etagCache,
     this.networkUsage,
+    this.mapTileCache,
   });
 
   /// Persistence for feature-local settings.
@@ -105,6 +110,9 @@ class SharedDeps {
   /// The selected theme mode (also provided; drives `MaterialApp.themeMode`).
   final ThemeController theme;
 
+  /// Default Map-tab overlay (also provided; drives nav chrome + map open).
+  final DefaultMapLayerController defaultMapLayer;
+
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.
   final EtagCacheStore? etagCache;
@@ -112,4 +120,15 @@ class SharedDeps {
   /// Persisted network-usage accounting (also provided) — shares the cache DB,
   /// so null when that is. Exposed for the Debug page's traffic stats.
   final NetworkUsageStore? networkUsage;
+
+  /// MapLibre's tile authority — backed by [etagCache], so null when that is.
+  /// Map layers warm frames through it before revealing them.
+  final MapTileCache? mapTileCache;
+
+  /// A fresh warm scheduler over [mapTileCache].
+  ///
+  /// One per consumer, never shared: a warmer's [MapTileWarmer.cancel] abandons
+  /// *its* schedule, so sharing one would let a layer switch silently drop a
+  /// different layer's warm.
+  MapTileWarmer mapTileWarmer() => MapTileWarmer(mapTileCache);
 }

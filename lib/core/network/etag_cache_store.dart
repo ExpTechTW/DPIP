@@ -1,7 +1,40 @@
+/// On-disk ETag response cache backed by **SQLite**.
+///
+/// Schema v2 stores JSON and binary as body blobs (no gzip-of-JSON-of-base64
+/// envelope):
+/// - **JSON** — always gzip-1.
+/// - **Binary** — gzip-1 whenever it shrinks: basemap PBF / MVT / protobuf /
+///   PDF / text / SVG / … Already entropy-packed formats (WebP / JPEG / PNG /
+///   zip / woff / …) stay raw — outer gzip is a no-op or expands them.
+///
+/// Hot path is SQLite only — no Dart-side decoded LRU. Repeated reads rely on
+/// SQLite's pager / page cache (see [configureConnection], ~25 MiB).
+///
+/// **Tile storms are the design constraint.** A map viewport asks for dozens of
+/// tiles at once, so the batch forms — [readBytesBatch] / [writeBytesBatch] —
+/// are the real API: one `IN` query and one transaction per burst, with any
+/// gzip work for the whole batch done in a single isolate hop rather than one
+/// per row.
+///
+/// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
+/// [maxBytes]. Age expiry is one indexed `DELETE` per write (a batch counts as
+/// one); the byte budget is **amortized**, because knowing the total means
+/// summing every blob in the table — running that per tile written made a scrub
+/// quadratic on the UI isolate. Last-used bumps are likewise **buffered** and
+/// flushed in batches (same idea as [NetworkUsageStore]). All ops best-effort.
+///
+/// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
+/// records one hit + saved wire bytes — callers must not also meter those
+/// serves.
+library;
+
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
+import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// A cached HTTP response: the server [etag] to revalidate with, the response
@@ -21,73 +54,293 @@ class CachedResponse {
   final int size;
 }
 
+/// A cached binary HTTP response (MVT, WebP, …).
+class CachedBytes {
+  const CachedBytes({
+    required this.etag,
+    required this.bytes,
+    this.contentType,
+    this.size = 0,
+  });
+
+  final String etag;
+  final Uint8List bytes;
+  final String? contentType;
+  final int size;
+}
+
 /// Row count and stored byte size of the ETag cache (for the Debug page).
 typedef EtagCacheStats = ({int rows, int bytes});
 
-/// On-disk ETag response cache backed by **SQLite**, so it stays fast with many
-/// entries and evicts by age with a single indexed query.
-///
-/// One table, three columns — `key` (request URL), `value` (the whole entry
-/// gzip level 9 for minimal space), `time` (write instant in ms). A write is a
-/// single-row `INSERT OR REPLACE`, so re-fetching a URL updates it in place and
-/// body/etag can never diverge (SQLite commits the row atomically — no torn
-/// write). Each write also sweeps rows older than [maxAge] (7 days by default),
-/// which suits high-churn feeds like the radar frame list. All operations are
-/// best-effort: any error is swallowed to a cache miss / no-op — the cache must
-/// never break a request.
+/// One pending binary write — the unit [EtagCacheStore.writeBytesBatch] takes.
+typedef BinaryWrite = ({
+  String url,
+  String etag,
+  Uint8List bytes,
+  String? contentType,
+  int size,
+});
+
+/// A [BinaryWrite] after compression, ready to insert.
+typedef _EncodedWrite = ({
+  String url,
+  String etag,
+  String? contentType,
+  int kind,
+  Uint8List body,
+  int size,
+});
+
+/// See library doc.
 class EtagCacheStore {
-  EtagCacheStore(this._db, {this.maxAge = const Duration(days: 7)});
+  EtagCacheStore(
+    this._db, {
+    this.maxAge = const Duration(days: 7),
+    this.maxBytes = defaultMaxBytes,
+    this._usage,
+  });
 
   final Database _db;
 
-  /// Entries whose [time] is older than this are swept on the next write.
+  /// Optional traffic accounting for binary [readBytes] hits. Callers must not
+  /// also [NetworkUsageStore.record] those serves — misses / JSON `304`s stay
+  /// at the interceptor / MapLibre put path.
+  final NetworkUsageStore? _usage;
+
+  /// Entries whose **last-used** is older than this are swept on the next write.
   final Duration maxAge;
 
-  static const String _table = 'http_cache';
-  static final GZipCodec _gzip9 = GZipCodec(level: 9);
+  /// Soft ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first.
+  final int maxBytes;
 
-  /// Creates the cache table and its time index (idempotent) — call from
-  /// `openDatabase`'s `onCreate`.
+  /// Default size budget (~150 MB of body blobs on disk).
+  static const int defaultMaxBytes = 150 * 1024 * 1024;
+
+  /// SQLite page-cache size in kibibytes (negative PRAGMA = KiB, not pages).
+  static const int defaultPageCacheKiB = 25 * 1024;
+
+  static const String _table = 'http_cache';
+  static const int kindJson = 0;
+  static const int kindBinary = 1;
+
+  /// Binary body stored as gzip-1 of the decoded bytes (PBF / MVT / …).
+  static const int kindBinaryGzip = 2;
+
+  /// Content types that are already entropy-packed — never outer-gzip.
+  /// (Vector tiles / protobuf are NOT here — raw PBF/MVT typically shrink ~40%.)
+  static const _precompressedTypes = <String>{
+    'application/gzip',
+    'application/x-gzip',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/wasm', // already LEB + often brotli on wire; leave raw
+    'font/woff',
+    'font/woff2',
+  };
+
+  /// Pending last-used bumps — coalesced into batched `UPDATE … IN (…)`.
+  final Set<String> _pendingTouch = {};
+  Timer? _touchTimer;
+  Future<void>? _touchFlushing;
+
+  static const _touchFlushInterval = Duration(milliseconds: 500);
+  static const _touchFlushEvery = 48;
+  static const _touchInChunk = 64;
+
+  /// Bound parameters per `IN (…)` — well under SQLite's variable limit.
+  static const _readInChunk = 400;
+
+  /// Rows written between byte-budget sweeps (see [_trimToBudget]).
+  static const _sweepEvery = 96;
+
+  /// Compressed bytes above which a batch inflate is worth an isolate hop.
+  static const _isolateThreshold = 64 * 1024;
+
+  /// Running `SUM(LENGTH(body))`, seeded by the first trim. Replacements are
+  /// counted as pure additions between sweeps, so this only ever over-estimates
+  /// — which triggers a sweep early rather than letting the store overrun.
+  int? _trackedBytes;
+  int _writesSinceSweep = 0;
+
+  /// Creates the v2 cache table (idempotent) — call from `onCreate` / migrate.
   static Future<void> createSchema(Database db) async {
     await db.execute(
       'CREATE TABLE IF NOT EXISTS $_table ('
-      'key TEXT PRIMARY KEY, value BLOB NOT NULL, time INTEGER NOT NULL)',
+      'key TEXT PRIMARY KEY, '
+      'etag TEXT NOT NULL, '
+      'content_type TEXT, '
+      'kind INTEGER NOT NULL, '
+      'body BLOB NOT NULL, '
+      'size INTEGER NOT NULL, '
+      'time INTEGER NOT NULL)',
     );
     await db.execute(
       'CREATE INDEX IF NOT EXISTS ${_table}_time ON $_table(time)',
     );
   }
 
-  /// Returns the cached entry for [url], or null on a miss / corruption.
+  /// Connection-level SQLite knobs for hot tile reads (page cache + mmap).
+  /// Call once after [openDatabase].
+  static Future<void> configureConnection(
+    Database db, {
+    int pageCacheKiB = defaultPageCacheKiB,
+  }) async {
+    // PRAGMAs that return a row must use [rawQuery] — on Darwin, [execute]
+    // treats the result as an error ("not an error") and would abort bootstrap
+    // into "ETag cache unavailable".
+    // Negative cache_size = kibibytes reserved for the pager (~25 MiB default).
+    await db.rawQuery('PRAGMA cache_size = -$pageCacheKiB');
+    await db.rawQuery('PRAGMA mmap_size = ${64 * 1024 * 1024}');
+  }
+
+  /// Migrates v1 (single `value` blob envelope) → v2 columnar schema.
+  /// Drops the old table (one-time cold miss) — simpler and safer than parsing
+  /// every legacy row on the UI isolate.
+  static Future<void> migrateToV2(Database db) async {
+    await db.execute('DROP TABLE IF EXISTS $_table');
+    await createSchema(db);
+  }
+
+  /// Returns the cached **JSON** entry for [url], or null on a miss.
   Future<CachedResponse?> read(String url) async {
     try {
-      final entry = await _decode(url);
-      if (entry == null) return null;
-      final body = entry['body'] as String;
+      final row = await _queryRow(url);
+      if (row == null || (row['kind'] as int) != kindJson) return null;
+      _scheduleTouch(url);
+      final bodyBlob = row['body'] as Uint8List;
+      final body = await _decodeJsonBody(bodyBlob);
       return CachedResponse(
-        etag: entry['etag'] as String,
+        etag: row['etag'] as String,
         body: body,
-        contentType: entry['contentType'] as String?,
-        // Pre-`size` entries fall back to the body's length.
-        size: (entry['size'] as num?)?.toInt() ?? body.length,
+        contentType: row['content_type'] as String?,
+        size: (row['size'] as num).toInt(),
       );
     } catch (_) {
       return null;
     }
   }
 
-  /// Returns just the cached etag for [url] (for `If-None-Match` on the request
-  /// path), or null on a miss.
-  Future<String?> readEtag(String url) async {
+  /// Returns the cached **binary** entry for [url], or null on a miss.
+  ///
+  /// Reads SQLite (inflate when [kindBinaryGzip]). Every successful serve is
+  /// metered once via [_usage] when wired. [touch] schedules an async last-used
+  /// bump.
+  Future<CachedBytes?> readBytes(String url, {bool touch = true}) async {
     try {
-      return (await _decode(url))?['etag'] as String?;
+      final row = await _queryRow(url);
+      if (row == null) return null;
+      final kind = row['kind'] as int;
+      if (kind != kindBinary && kind != kindBinaryGzip) return null;
+      if (touch) _scheduleTouch(url);
+      final blob = row['body'] as Uint8List;
+      final bytes = kind == kindBinaryGzip
+          ? await _gunzip(blob)
+          : Uint8List.fromList(blob);
+      final entry = CachedBytes(
+        etag: row['etag'] as String,
+        bytes: bytes,
+        contentType: row['content_type'] as String?,
+        size: (row['size'] as num).toInt(),
+      );
+      _recordBinaryHit(entry);
+      return entry;
     } catch (_) {
       return null;
     }
   }
 
-  /// Stores [body] for [url] under [etag], gzip-9, replacing any existing entry;
-  /// then sweeps entries older than [maxAge]. Best-effort — errors are swallowed.
+  /// Reads many binary entries in **one** SQLite round-trip, keyed by URL.
+  ///
+  /// This is the tile hot path: a map viewport resolves as a single `IN` query
+  /// plus at most one isolate hop for the whole batch, instead of N queries and
+  /// N isolate spawns. Missing URLs are simply absent from the result. Every
+  /// hit is metered once, exactly as [readBytes] does.
+  Future<Map<String, CachedBytes>> readBytesBatch(
+    List<String> urls, {
+    bool touch = true,
+  }) async {
+    if (urls.isEmpty) return const {};
+    try {
+      final rows = <Map<String, Object?>>[];
+      for (var i = 0; i < urls.length; i += _readInChunk) {
+        final end = i + _readInChunk;
+        final chunk = end < urls.length
+            ? urls.sublist(i, end)
+            : urls.sublist(i);
+        final placeholders = List.filled(chunk.length, '?').join(',');
+        rows.addAll(
+          await _db.query(
+            _table,
+            where: 'key IN ($placeholders)',
+            whereArgs: chunk,
+          ),
+        );
+      }
+      if (rows.isEmpty) return const {};
+
+      // Collect every compressed body first so the whole batch inflates in one
+      // hop — `Isolate.run` per row costs more than the decode it moves off.
+      final compressed = <String, Uint8List>{};
+      var compressedBytes = 0;
+      for (final row in rows) {
+        if ((row['kind'] as int) != kindBinaryGzip) continue;
+        final blob = row['body'] as Uint8List;
+        compressed[row['key'] as String] = blob;
+        compressedBytes += blob.length;
+      }
+      final inflated = await _gunzipAll(compressed, compressedBytes);
+
+      final out = <String, CachedBytes>{};
+      for (final row in rows) {
+        final kind = row['kind'] as int;
+        if (kind != kindBinary && kind != kindBinaryGzip) continue;
+        final key = row['key'] as String;
+        final bytes = kind == kindBinaryGzip
+            ? inflated[key]
+            : Uint8List.fromList(row['body'] as Uint8List);
+        if (bytes == null) continue;
+        if (touch) _scheduleTouch(key);
+        final entry = CachedBytes(
+          etag: row['etag'] as String,
+          bytes: bytes,
+          contentType: row['content_type'] as String?,
+          size: (row['size'] as num).toInt(),
+        );
+        _recordBinaryHit(entry);
+        out[key] = entry;
+      }
+      return out;
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Returns just the cached etag for [url], or null on a miss.
+  Future<String?> readEtag(String url) async {
+    try {
+      final rows = await _db.query(
+        _table,
+        columns: ['etag'],
+        where: 'key = ?',
+        whereArgs: [url],
+        limit: 1,
+      );
+      if (rows.isEmpty) return null;
+      _scheduleTouch(url);
+      return rows.first['etag'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Bumps last-used for [url] without reading the body (awaits the flush so
+  /// callers that trim by LRU see the updated `time`).
+  Future<void> touch(String url) {
+    _pendingTouch.add(url);
+    return _flushTouches();
+  }
+
+  /// Stores a JSON [body] for [url] under [etag]. Best-effort.
   Future<void> write(
     String url, {
     required String etag,
@@ -96,47 +349,178 @@ class EtagCacheStore {
     int size = 0,
   }) async {
     try {
-      final payload = utf8.encode(
-        jsonEncode({
-          'etag': etag,
-          'contentType': contentType,
-          'body': body,
-          'size': size,
-        }),
+      // Light gzip on a worker isolate so large JSON writes don't jank the UI.
+      final blob = await Isolate.run(() {
+        return Uint8List.fromList(
+          GZipCodec(level: 1).encode(utf8.encode(body)),
+        );
+      });
+      await _insert(
+        url,
+        etag: etag,
+        contentType: contentType,
+        kind: kindJson,
+        body: blob,
+        size: size,
       );
+    } catch (_) {}
+  }
+
+  /// Stores [bytes] for [url] under [etag]. Best-effort.
+  ///
+  /// Compressible payloads (PBF / MVT / PDF / text / …) are gzip-1 on disk when
+  /// that shrinks them; entropy-packed formats (WebP / JPEG / …) stay raw.
+  Future<void> writeBytes(
+    String url, {
+    required String etag,
+    required Uint8List bytes,
+    String? contentType,
+    int size = 0,
+  }) => writeBytesBatch([
+    (url: url, etag: etag, bytes: bytes, contentType: contentType, size: size),
+  ]);
+
+  /// Stores many binary entries in **one** transaction. Best-effort.
+  ///
+  /// The tile write path: a burst of downloaded tiles compresses in a single
+  /// isolate hop and lands as one transaction, rather than paying a round-trip
+  /// and a maintenance pass per tile.
+  Future<void> writeBytesBatch(List<BinaryWrite> writes) async {
+    if (writes.isEmpty) return;
+    try {
+      final encoded = await _encodeBinaryAll(writes);
       final now = DateTime.now().millisecondsSinceEpoch;
-      await _db.insert(
-        _table,
-        {
-          'key': url,
-          'value': Uint8List.fromList(_gzip9.encode(payload)),
-          'time': now,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace, // same key → update
-      );
+      await _db.transaction((txn) async {
+        for (final row in encoded) {
+          await txn.insert(_table, {
+            'key': row.url,
+            'etag': row.etag,
+            'content_type': row.contentType,
+            'kind': row.kind,
+            'body': row.body,
+            'size': row.size,
+            'time': now,
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      });
+      var added = 0;
+      for (final row in encoded) {
+        added += row.body.length;
+      }
+      await _noteWrite(added, encoded.length);
+    } catch (_) {}
+  }
+
+  Future<void> _insert(
+    String url, {
+    required String etag,
+    required String? contentType,
+    required int kind,
+    required Uint8List body,
+    required int size,
+  }) async {
+    await _db.insert(_table, {
+      'key': url,
+      'etag': etag,
+      'content_type': contentType,
+      'kind': kind,
+      'body': body,
+      'size': size,
+      'time': DateTime.now().millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+    await _noteWrite(body.length, 1);
+  }
+
+  /// Post-write maintenance, split by what it actually costs.
+  ///
+  /// **Age expiry** is one indexed `DELETE` and normally removes nothing, so it
+  /// runs every write — and because tile traffic goes through
+  /// [writeBytesBatch], "every write" already means once per burst.
+  ///
+  /// **The byte budget** is the expensive half: knowing the total means summing
+  /// every blob in the table. That is amortized over [_sweepEvery] writes, or
+  /// forced the moment the running total says the store is over budget. Doing
+  /// it per write made a viewport of tiles a full-table scan per tile.
+  Future<void> _noteWrite(int addedBytes, int rows) async {
+    _writesSinceSweep += rows;
+    final tracked = _trackedBytes;
+    if (tracked != null) _trackedBytes = tracked + addedBytes;
+
+    if (maxBytes <= 0) {
+      await _db.delete(_table);
+      _trackedBytes = 0;
+      _writesSinceSweep = 0;
+      return;
+    }
+
+    // Eviction orders by `time` (last-used) — land buffered bumps first, or a
+    // just-read entry would look untouched and be swept.
+    await _flushTouches();
+    await _db.delete(
+      _table,
+      where: 'time < ?',
+      whereArgs: [
+        DateTime.now().millisecondsSinceEpoch - maxAge.inMilliseconds,
+      ],
+    );
+
+    if (tracked != null &&
+        _trackedBytes! <= maxBytes &&
+        _writesSinceSweep < _sweepEvery) {
+      return;
+    }
+    await _trimToBudget();
+  }
+
+  /// Recounts stored bytes and drops least-recently-used rows until the total
+  /// is within [maxBytes].
+  Future<void> _trimToBudget() async {
+    _writesSinceSweep = 0;
+    var total = await _measureBytes();
+    if (total <= maxBytes) {
+      _trackedBytes = total;
+      return;
+    }
+    final rows = await _db.rawQuery(
+      'SELECT key, LENGTH(body) AS b FROM $_table ORDER BY time ASC',
+    );
+    final keys = <String>[];
+    for (final row in rows) {
+      if (total <= maxBytes) break;
+      keys.add(row['key'] as String);
+      total -= (row['b'] as num).toInt();
+    }
+    if (keys.isNotEmpty) {
       await _db.delete(
         _table,
-        where: 'time < ?',
-        whereArgs: [now - maxAge.inMilliseconds],
+        where: 'key IN (${List.filled(keys.length, '?').join(',')})',
+        whereArgs: keys,
       );
-    } catch (_) {
-      // Caching is an optimisation; a write failure must not surface.
     }
+    _trackedBytes = total;
+  }
+
+  Future<int> _measureBytes() async {
+    final rows = await _db.rawQuery(
+      'SELECT COALESCE(SUM(LENGTH(body)), 0) AS b FROM $_table',
+    );
+    return (rows.first['b'] as num).toInt();
   }
 
   /// Deletes every cached entry.
   Future<void> clear() async {
     try {
       await _db.delete(_table);
+      _trackedBytes = 0;
+      _writesSinceSweep = 0;
     } catch (_) {}
   }
 
-  /// Row count and total stored (gzipped) byte size — for the Debug page.
-  /// Best-effort: returns zeros on error.
+  /// Row count and total stored body bytes — for the Debug page.
   Future<EtagCacheStats> stats() async {
     try {
       final rows = await _db.rawQuery(
-        'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(value)), 0) AS b FROM $_table',
+        'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(body)), 0) AS b FROM $_table',
       );
       final row = rows.first;
       return (
@@ -148,17 +532,223 @@ class EtagCacheStore {
     }
   }
 
-  /// Reads and inflates the entry for [url] into its decoded map, or null.
-  Future<Map<String, dynamic>?> _decode(String url) async {
+  Future<Map<String, Object?>?> _queryRow(String url) async {
     final rows = await _db.query(
       _table,
-      columns: ['value'],
       where: 'key = ?',
       whereArgs: [url],
       limit: 1,
     );
     if (rows.isEmpty) return null;
-    final blob = rows.first['value'] as Uint8List;
-    return jsonDecode(utf8.decode(gzip.decode(blob))) as Map<String, dynamic>;
+    return rows.first;
+  }
+
+  /// JSON bodies are stored gzip-1; inflate off the UI isolate when large.
+  static Future<String> _decodeJsonBody(Uint8List blob) async {
+    if (blob.length >= 2 && blob[0] == 0x1f && blob[1] == 0x8b) {
+      if (blob.length > 16 * 1024) {
+        return Isolate.run(() => utf8.decode(gzip.decode(blob)));
+      }
+      return utf8.decode(gzip.decode(blob));
+    }
+    // Uncompressed fallback.
+    return utf8.decode(blob);
+  }
+
+  /// Compresses a whole batch, moving the work off the UI isolate **once** when
+  /// it is big enough to be worth the hop.
+  ///
+  /// Kind tells [readBytes] whether to inflate: gzip-1 when the type is
+  /// compressible and the result actually shrinks, otherwise raw.
+  static Future<List<_EncodedWrite>> _encodeBinaryAll(
+    List<BinaryWrite> writes,
+  ) async {
+    final compressible = <BinaryWrite>[];
+    final out = <_EncodedWrite>[];
+    var compressibleBytes = 0;
+    for (final write in writes) {
+      if (shouldGzipBinary(write.bytes, write.contentType)) {
+        compressible.add(write);
+        compressibleBytes += write.bytes.length;
+      } else {
+        out.add(_raw(write));
+      }
+    }
+    if (compressible.isEmpty) return out;
+
+    final payload = [for (final write in compressible) write.bytes];
+    final packed = compressibleBytes > _isolateThreshold
+        ? await Isolate.run(() => _gzipAllSync(payload))
+        : _gzipAllSync(payload);
+    for (var i = 0; i < compressible.length; i++) {
+      final write = compressible[i];
+      final body = packed[i];
+      out.add(
+        body.length >= write.bytes.length
+            ? _raw(write)
+            : (
+                url: write.url,
+                etag: write.etag,
+                contentType: write.contentType,
+                kind: kindBinaryGzip,
+                body: body,
+                size: write.size > 0 ? write.size : write.bytes.length,
+              ),
+      );
+    }
+    return out;
+  }
+
+  static _EncodedWrite _raw(BinaryWrite write) => (
+    url: write.url,
+    etag: write.etag,
+    contentType: write.contentType,
+    kind: kindBinary,
+    body: write.bytes,
+    size: write.size > 0 ? write.size : write.bytes.length,
+  );
+
+  static List<Uint8List> _gzipAllSync(List<Uint8List> payload) {
+    final codec = GZipCodec(level: 1);
+    return [
+      for (final bytes in payload) Uint8List.fromList(codec.encode(bytes)),
+    ];
+  }
+
+  /// Inflates a whole batch in at most one isolate hop (keyed by URL).
+  static Future<Map<String, Uint8List>> _gunzipAll(
+    Map<String, Uint8List> blobs,
+    int totalBytes,
+  ) async {
+    if (blobs.isEmpty) return const {};
+    if (totalBytes > _isolateThreshold) {
+      return Isolate.run(() => _gunzipAllSync(blobs));
+    }
+    return _gunzipAllSync(blobs);
+  }
+
+  static Map<String, Uint8List> _gunzipAllSync(Map<String, Uint8List> blobs) =>
+      {
+        for (final entry in blobs.entries)
+          entry.key: Uint8List.fromList(gzip.decode(entry.value)),
+      };
+
+  static Future<Uint8List> _gunzip(Uint8List blob) async {
+    if (blob.length > _isolateThreshold) {
+      return Isolate.run(() => Uint8List.fromList(gzip.decode(blob)));
+    }
+    return Uint8List.fromList(gzip.decode(blob));
+  }
+
+  /// Whether to *try* an outer gzip for this binary payload.
+  ///
+  /// Default is **yes** (basemap PBF is `application/octet-stream` and shrinks
+  /// ~40%; MVT ~30%). Skip only when the type/magic is already packed (WebP /
+  /// JPEG / PNG / zip / gzip / woff / video / audio). [_encodeBinary] still
+  /// keeps the raw body if gzip does not shrink.
+  static bool shouldGzipBinary(Uint8List bytes, String? contentType) {
+    if (_looksPrecompressed(bytes)) return false;
+    final ct = (contentType ?? '').split(';').first.trim().toLowerCase();
+    if (ct.isEmpty) return true;
+    if (_precompressedTypes.contains(ct)) return false;
+    if (ct.startsWith('image/') && ct != 'image/svg+xml') return false;
+    if (ct.startsWith('video/') || ct.startsWith('audio/')) return false;
+    if (ct.startsWith('font/')) return false;
+    return true;
+  }
+
+  static bool _looksPrecompressed(Uint8List b) {
+    if (b.length < 3) return false;
+    // gzip / zip / zstd — don't wrap again.
+    if (b[0] == 0x1f && b[1] == 0x8b) return true;
+    if (b[0] == 0x50 && b[1] == 0x4b) return true; // PK zip
+    if (b.length >= 4 &&
+        b[0] == 0x28 &&
+        b[1] == 0xb5 &&
+        b[2] == 0x2f &&
+        b[3] == 0xfd) {
+      return true; // zstd
+    }
+    // JPEG / PNG / GIF / WebP
+    if (b[0] == 0xff && b[1] == 0xd8 && b[2] == 0xff) return true;
+    if (b.length >= 4 &&
+        b[0] == 0x89 &&
+        b[1] == 0x50 &&
+        b[2] == 0x4e &&
+        b[3] == 0x47) {
+      return true;
+    }
+    if (b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46) return true; // GIF
+    if (b.length >= 12 &&
+        b[0] == 0x52 &&
+        b[1] == 0x49 &&
+        b[2] == 0x46 &&
+        b[3] == 0x46 &&
+        b[8] == 0x57 &&
+        b[9] == 0x45 &&
+        b[10] == 0x42 &&
+        b[11] == 0x50) {
+      return true; // RIFF....WEBP
+    }
+    return false;
+  }
+
+  void _recordBinaryHit(CachedBytes entry) {
+    final usage = _usage;
+    if (usage == null) return;
+    unawaited(usage.record(down: 0, hit: true, saved: entry.size));
+  }
+
+  void _scheduleTouch(String url) {
+    _pendingTouch.add(url);
+    if (_pendingTouch.length >= _touchFlushEvery) {
+      unawaited(_flushTouches());
+      return;
+    }
+    _touchTimer ??= Timer(_touchFlushInterval, () {
+      _touchTimer = null;
+      unawaited(_flushTouches());
+    });
+  }
+
+  Future<void> _flushTouches() async {
+    while (true) {
+      final inFlight = _touchFlushing;
+      if (inFlight != null) {
+        await inFlight;
+        if (_pendingTouch.isEmpty) return;
+        continue;
+      }
+      if (_pendingTouch.isEmpty) return;
+      final done = _flushTouchesBody();
+      _touchFlushing = done.whenComplete(() => _touchFlushing = null);
+      await done;
+      if (_pendingTouch.isEmpty) return;
+    }
+  }
+
+  Future<void> _flushTouchesBody() async {
+    _touchTimer?.cancel();
+    _touchTimer = null;
+    if (_pendingTouch.isEmpty) return;
+
+    final urls = _pendingTouch.toList(growable: false);
+    _pendingTouch.clear();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    try {
+      await _db.transaction((txn) async {
+        for (var i = 0; i < urls.length; i += _touchInChunk) {
+          final end = i + _touchInChunk;
+          final chunk = end < urls.length
+              ? urls.sublist(i, end)
+              : urls.sublist(i);
+          final placeholders = List.filled(chunk.length, '?').join(',');
+          await txn.rawUpdate(
+            'UPDATE $_table SET time = ? WHERE key IN ($placeholders)',
+            [now, ...chunk],
+          );
+        }
+      });
+    } catch (_) {}
   }
 }

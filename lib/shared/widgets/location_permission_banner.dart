@@ -26,6 +26,9 @@ class LocationPermissionBanner extends StatelessWidget {
         ? l10n.locationBannerServiceOff
         : l10n.locationBannerPermission;
 
+    // SafeArea only while visible — wrapping the empty shell would leave a
+    // status-bar-sized blank above full-bleed tabs (map). Nested SafeAreas
+    // collapse: a banner below this one sees top padding already consumed.
     return Material(
       color: colors.errorContainer,
       child: SafeArea(

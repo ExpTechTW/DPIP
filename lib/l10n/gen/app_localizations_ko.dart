@@ -21,7 +21,224 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navMap => '지도';
 
   @override
+  String get navData => '자료';
+
+  @override
   String get navEarthquake => '지진';
+
+  @override
+  String get dataSectionSeismic => '지진';
+
+  @override
+  String get dataEarthquakeSubtitle => '지진 보고서';
+
+  @override
+  String get dataSectionWeather => '기상';
+
+  @override
+  String get dataWeatherRankingSubtitle => '실시간 관측 순위';
+
+  @override
+  String get weatherRankingTitle => '관측 순위';
+
+  @override
+  String weatherRankingMeta(String time, int count) {
+    return '자료 시각: $time\n관측점 $count';
+  }
+
+  @override
+  String get weatherRankingEmpty => '정렬할 관측이 없습니다';
+
+  @override
+  String get weatherRankingBy => '정렬';
+
+  @override
+  String get weatherRankingHighest => '최고';
+
+  @override
+  String get weatherRankingLowest => '최저';
+
+  @override
+  String get weatherRankingMergeTo => '병합';
+
+  @override
+  String get weatherRankingMergeTown => '향진';
+
+  @override
+  String get weatherRankingMergeCounty => '현시';
+
+  @override
+  String get weatherRankingWind => '풍속';
+
+  @override
+  String get weatherRankingGust => '돌풍';
+
+  @override
+  String get weatherRankingTempExtremes => '기온 극값';
+
+  @override
+  String get weatherRankingExtremeHigh => '오늘 최고';
+
+  @override
+  String get weatherRankingExtremeLow => '오늘 최저';
+
+  @override
+  String get weatherRankingExtremeRange => '일교차';
+
+  @override
+  String weatherRankingRecordedAt(String time) {
+    return '기록 시각 $time';
+  }
+
+  @override
+  String weatherRankingAnalysisCurrent(String value) {
+    return '현재 $value°C';
+  }
+
+  @override
+  String weatherRankingAnalysisHigh(String value) {
+    return '최고 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisLow(String value) {
+    return '최저 $value';
+  }
+
+  @override
+  String weatherRankingAnalysisRange(String value) {
+    return '일교차 $value°C';
+  }
+
+  @override
+  String get reportListEmpty => '지진 보고서가 없습니다';
+
+  @override
+  String get reportListEmptyFiltered => '조건에 맞는 지진 보고서가 없습니다';
+
+  @override
+  String reportListMeta(String magnitude, String depth) {
+    return 'M$magnitude · $depth km';
+  }
+
+  @override
+  String reportListMagnitude(String magnitude) {
+    return 'M$magnitude';
+  }
+
+  @override
+  String get reportListDepthUnit => 'km';
+
+  @override
+  String get reportListLocalFelt => '소규모 유감';
+
+  @override
+  String get reportListToday => '오늘';
+
+  @override
+  String get reportListYesterday => '어제';
+
+  @override
+  String reportListDayCount(int count) {
+    return '$count';
+  }
+
+  @override
+  String get reportListEnd => '마지막입니다';
+
+  @override
+  String get reportFilterTitle => '필터';
+
+  @override
+  String get reportFilterSort => '정렬';
+
+  @override
+  String get reportFilterSortTime => '시간';
+
+  @override
+  String get reportFilterSortIntensity => '진도';
+
+  @override
+  String get reportFilterSortMagnitude => '규모';
+
+  @override
+  String get reportFilterSortDepth => '깊이';
+
+  @override
+  String get reportFilterOrderDesc => '내림차순';
+
+  @override
+  String get reportFilterOrderAsc => '오름차순';
+
+  @override
+  String get reportFilterIntensity => '진도';
+
+  @override
+  String get reportFilterIntensityInfoTitle => '진도 신제·구제';
+
+  @override
+  String get reportFilterIntensityInfoIntro =>
+      '기상서는 2020년 1월 1일(타이베이 시간)부터 신제 진도를 사용합니다.';
+
+  @override
+  String get reportFilterIntensityInfoLegacyTitle => '구제(2020년 이전)';
+
+  @override
+  String get reportFilterIntensityInfoLegacyBody =>
+      '진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.';
+
+  @override
+  String get reportFilterIntensityInfoModernTitle => '신제(2020년 이후)';
+
+  @override
+  String get reportFilterIntensityInfoModernBody =>
+      '진도는 0–4, 5약, 5강, 6약, 6강, 7입니다. 필터는 신제를 따르며, 이전 지진은 목록에서 구제 표기로 표시됩니다.';
+
+  @override
+  String get reportFilterMagnitude => '규모';
+
+  @override
+  String get reportFilterDepth => '깊이';
+
+  @override
+  String reportFilterDepthKm(String depth) {
+    return '$depth km';
+  }
+
+  @override
+  String get reportFilterDate => '날짜';
+
+  @override
+  String get reportFilterDatePick => '날짜 선택';
+
+  @override
+  String get reportFilterDateStartNote => '시작일: 당일 00:00（타이베이）';
+
+  @override
+  String get reportFilterDateEndNote => '종료일: 당일 24:00（타이베이）';
+
+  @override
+  String reportFilterRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get reportFilterLocation => '위치';
+
+  @override
+  String get reportFilterLocationHint => '예: 화롄, 해역';
+
+  @override
+  String get reportFilterAny => '전체';
+
+  @override
+  String get reportFilterApply => '적용';
+
+  @override
+  String get reportFilterReset => '초기화';
+
+  @override
+  String get reportListSearch => '조회';
 
   @override
   String get navMore => '더보기';
@@ -30,10 +247,37 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appLogs => '앱 로그';
 
   @override
+  String get changelogTitle => '변경 로그';
+
+  @override
+  String get changelogEmpty => '아직 릴리스 노트가 없습니다';
+
+  @override
+  String get changelogTypePrerelease => '베타';
+
+  @override
+  String get changelogTypeStable => '정식';
+
+  @override
+  String get changelogCurrentVersion => '현재';
+
+  @override
+  String get changelogVersionDetails => '릴리스 상세';
+
+  @override
+  String get changelogBodyEmpty => '이 릴리스에 대한 설명이 없습니다.';
+
+  @override
   String get mapPlaceholderDisabled => '지도 (일시 사용 중지)';
 
   @override
-  String get moreSectionGeneral => '일반';
+  String get moreSectionRegion => '지역';
+
+  @override
+  String get moreSectionNotify => '알림';
+
+  @override
+  String get moreSectionDisplay => '표시';
 
   @override
   String get regionManageTitle => '저장한 지역';
@@ -58,16 +302,13 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get regionEdit => '수정';
+
+  @override
   String get moreSectionAdvanced => '고급';
 
   @override
   String get moreDeveloper => '디버그 정보';
-
-  @override
-  String get developerCopied => '클립보드에 복사되었습니다';
-
-  @override
-  String get developerCopyAll => '모두 복사';
 
   @override
   String get experimentalFeatures => '실험적 기능';
@@ -168,10 +409,69 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherHumidity => '습도';
 
   @override
+  String get homeForecastTitle => '24시간 예보';
+
+  @override
+  String homeForecastHighLow(String high, String low) {
+    return '최고 $high° · 최저 $low°';
+  }
+
+  @override
+  String homeForecastPop(String pop) {
+    return '$pop%';
+  }
+
+  @override
+  String homeForecastFeelsLike(String temp) {
+    return '체감 $temp°';
+  }
+
+  @override
+  String homeForecastHumidity(String value) {
+    return '습도 $value%';
+  }
+
+  @override
+  String homeForecastWind(String direction, String level) {
+    return '$direction · 풍력 $level';
+  }
+
+  @override
+  String get homeForecastUnavailable => '지역을 선택하면 예보를 볼 수 있습니다';
+
+  @override
+  String get homeForecastEmpty => '예보 데이터가 없습니다';
+
+  @override
+  String get homeActiveEventsTitle => '발효 중 이벤트';
+
+  @override
+  String get homeActiveEventsEmpty => '발효 중인 이벤트가 없습니다';
+
+  @override
+  String get homeRainTrendTitle => '향후 1시간 강수';
+
+  @override
   String get mapLayers => '레이어';
 
   @override
-  String get mapLayerRadar => '레이더';
+  String get mapLayerRadar => '레이더 합성 에코';
+
+  @override
+  String get mapLayerSatellite => '히마와리 적외';
+
+  @override
+  String get mapLayerLightning => '번개';
+
+  @override
+  String lightningLegendCg(int minutes) {
+    return '대지로 · $minutes분 이내';
+  }
+
+  @override
+  String lightningLegendCc(int minutes) {
+    return '구름 사이 · $minutes분 이내';
+  }
 
   @override
   String get mapTimelineNow => '현재';
@@ -388,6 +688,46 @@ class AppLocalizationsKo extends AppLocalizations {
   String get displaySettings => '화면';
 
   @override
+  String get defaultMapLayerSettings => '지도 기본 레이어';
+
+  @override
+  String get defaultMapLayerSubtitle =>
+      '지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.';
+
+  @override
+  String get mapNavRadar => '레이더';
+
+  @override
+  String get mapNavSatellite => '위성';
+
+  @override
+  String get mapNavLightning => '번개';
+
+  @override
+  String get mapNavTyphoon => '태풍';
+
+  @override
+  String get mapNavEarthquake => '지진';
+
+  @override
+  String get mapNavTemperature => '온도';
+
+  @override
+  String get mapNavHumidity => '습도';
+
+  @override
+  String get mapNavPressure => '기압';
+
+  @override
+  String get mapNavWind => '풍향';
+
+  @override
+  String get mapNavRain => '강우';
+
+  @override
+  String get mapNavDisaster => '방재';
+
+  @override
   String get displayTheme => '테마';
 
   @override
@@ -463,6 +803,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trendNoData => '추세 데이터 없음';
 
   @override
+  String chartHourLabel(int hour) {
+    return '$hour시';
+  }
+
+  @override
   String get mapLayerHumidity => '습도';
 
   @override
@@ -470,6 +815,39 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerWind => '바람';
+
+  @override
+  String get mapLayerRain => '강수량';
+
+  @override
+  String get rainIntervalMenu => '누적 구간';
+
+  @override
+  String get rainIntervalNow => '오늘';
+
+  @override
+  String get rainInterval10m => '10분';
+
+  @override
+  String get rainInterval1h => '1시간';
+
+  @override
+  String get rainInterval3h => '3시간';
+
+  @override
+  String get rainInterval6h => '6시간';
+
+  @override
+  String get rainInterval12h => '12시간';
+
+  @override
+  String get rainInterval24h => '24시간';
+
+  @override
+  String get rainInterval2d => '2일';
+
+  @override
+  String get rainInterval3d => '3일';
 
   @override
   String get mapLayerTyphoon => '태풍';
@@ -490,7 +868,248 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonMotion => '이동';
 
   @override
+  String get typhoonLabelPosition => 'Centre location';
+
+  @override
+  String get typhoonLabelDirection => 'Past movement direction';
+
+  @override
+  String get typhoonLabelSpeed => 'Past movement speed';
+
+  @override
+  String get typhoonLabelPressure => 'Central pressure';
+
+  @override
+  String get typhoonLabelWind => 'Max. sustained wind near centre';
+
+  @override
+  String get typhoonLabelGust => 'Peak gust';
+
+  @override
+  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+
+  @override
+  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+
+  @override
+  String get typhoonLabelProbCircle => '70% probability circle';
+
+  @override
+  String typhoonForecastLead(String hours) {
+    return 'Forecast +$hours h';
+  }
+
+  @override
+  String get typhoonLabelNw => 'NW';
+
+  @override
+  String get typhoonLabelNe => 'NE';
+
+  @override
+  String get typhoonLabelSw => 'SW';
+
+  @override
+  String get typhoonLabelSe => 'SE';
+
+  @override
+  String typhoonValueLat(String lat) {
+    return '$lat°N';
+  }
+
+  @override
+  String typhoonValueLon(String lon) {
+    return '$lon°E';
+  }
+
+  @override
+  String typhoonValueKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String typhoonValueHpa(String n) {
+    return '$n hPa';
+  }
+
+  @override
+  String typhoonValueMs(String n) {
+    return '$n m/s';
+  }
+
+  @override
+  String typhoonDataTime(String time) {
+    return 'Data time\n$time';
+  }
+
+  @override
   String get mapLayerMonitor => '실시간 지진 모니터';
+
+  @override
+  String get mapLayerDisasterMap => '방재 지도';
+
+  @override
+  String get mapLayerAed => 'AED';
+
+  @override
+  String get disasterMapOverlayMenuTooltip => '방재 지도 레이어';
+
+  @override
+  String get disasterMapOverlaySectionLayers => '레이어';
+
+  @override
+  String get disasterMapOverlayAedTooltip => 'AED 위치 표시';
+
+  @override
+  String get aedAddress => '주소';
+
+  @override
+  String get aedRegion => '지역';
+
+  @override
+  String get aedCategory => '분류';
+
+  @override
+  String get aedType => '유형';
+
+  @override
+  String get aedPlaceDesc => '설치 위치';
+
+  @override
+  String get aedDescription => '비고';
+
+  @override
+  String get aedHoursWeekday => '평일 운영시간';
+
+  @override
+  String get aedHoursSaturday => '토요일 운영시간';
+
+  @override
+  String get aedHoursSunday => '일요일 운영시간';
+
+  @override
+  String get aedOpenRemark => '운영시간 비고';
+
+  @override
+  String get aedEmergencyPhone => '비상 연락처';
+
+  @override
+  String get mapLayerRestroom => '공중화장실';
+
+  @override
+  String get mapLayerShelter => '대피소';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '공중화장실 표시';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '대피소 표시';
+
+  @override
+  String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
+
+  @override
+  String get dpmAddress => '주소';
+
+  @override
+  String get restroomTypeLabel => '유형';
+
+  @override
+  String get restroomCategoryLabel => '구분';
+
+  @override
+  String get restroomGradeLabel => '등급';
+
+  @override
+  String get restroomTypeFemale => '여자 화장실';
+
+  @override
+  String get restroomTypeMale => '남자 화장실';
+
+  @override
+  String get restroomTypeMixed => '남녀 공용 화장실';
+
+  @override
+  String get restroomTypeAccessible => '장애인 화장실';
+
+  @override
+  String get restroomTypeGenderNeutral => '성중립 화장실';
+
+  @override
+  String get restroomTypeFamily => '가족 화장실';
+
+  @override
+  String get restroomTypeUnspecified => '미설정';
+
+  @override
+  String get restroomCategoryTransport => '교통';
+
+  @override
+  String get restroomCategoryPark => '공원';
+
+  @override
+  String get restroomCategoryCommercial => '상업·영업 시설';
+
+  @override
+  String get restroomCategoryReligious => '종교·의례 시설';
+
+  @override
+  String get restroomCategoryCultural => '문화·여가 시설';
+
+  @override
+  String get restroomCategoryGovernment => '민원 업무 시설';
+
+  @override
+  String get restroomCategoryWelfare => '사회복지 기관·집회 시설';
+
+  @override
+  String get restroomCategoryTourist => '관광 지역·경치 구역';
+
+  @override
+  String get restroomCategoryLeisure => '휴양·오락 시설';
+
+  @override
+  String get restroomCategoryOther => '기타';
+
+  @override
+  String get restroomGradeExcellent => '최우수';
+
+  @override
+  String get restroomGradeGood => '우수';
+
+  @override
+  String get restroomGradeAverage => '보통';
+
+  @override
+  String get restroomGradePoor => '불합격';
+
+  @override
+  String get shelterAddressLabel => '주소';
+
+  @override
+  String get shelterCapacityLabel => '수용 인원';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 명';
+  }
+
+  @override
+  String get shelterCategoryLabel => '적용 재해';
+
+  @override
+  String get shelterIndoorLabel => '실내 수용';
+
+  @override
+  String get shelterOutdoorLabel => '실외 수용';
+
+  @override
+  String get shelterVulnerableOkLabel => '취약계층 수용 가능';
+
+  @override
+  String get dpmYes => '예';
+
+  @override
+  String get dpmNo => '아니요';
 
   @override
   String get stationSheetEmpty => '관측소를 눌러 관측값 보기';
@@ -502,4 +1121,186 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get monitorWaiting => '데이터 대기 중…';
+
+  @override
+  String mapLegendUnit(String unit) {
+    return '단위: $unit';
+  }
+
+  @override
+  String get typhoonLegendPast => '실황 경로';
+
+  @override
+  String get typhoonIntensityTd => 'Tropical depression';
+
+  @override
+  String typhoonPickerNamed(String no, String name) {
+    return '$name TY $no';
+  }
+
+  @override
+  String typhoonPickerTd(String no) {
+    return 'Tropical depression TD $no';
+  }
+
+  @override
+  String get typhoonIntensityMild => 'Mild typhoon';
+
+  @override
+  String get typhoonIntensityModerate => 'Moderate typhoon';
+
+  @override
+  String get typhoonIntensityIntense => 'Intense typhoon';
+
+  @override
+  String get typhoonLegendForecast => '예보 경로';
+
+  @override
+  String get typhoonLegendForecastPoint => '예보 지점';
+
+  @override
+  String get typhoonLegendCurrent => '현재 중심';
+
+  @override
+  String get typhoonLegendCone => '예보 원추';
+
+  @override
+  String get mapLegendExpand => '범례';
+
+  @override
+  String get mapLegendCollapse => '범례 숨기기';
+
+  @override
+  String get mapMyLocation => '내 위치';
+
+  @override
+  String get typhoonLegendCircle15 => '강풍권 (7급)';
+
+  @override
+  String get typhoonLegendCircleAvg => 'Average circle';
+
+  @override
+  String get typhoonLegendCircle25 => '폭풍권 (10급)';
+
+  @override
+  String typhoonStormRadii(String ne, String se, String sw, String nw) {
+    return 'NE $ne · SE $se · SW $sw · NW $nw km';
+  }
+
+  @override
+  String typhoonTimeChip(String day, String hour) {
+    return '$day日$hour時';
+  }
+
+  @override
+  String get typhoonLegendProbability => '내습 확률';
+
+  @override
+  String get typhoonLegendWarningAreas => '경보 지역';
+
+  @override
+  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+
+  @override
+  String get typhoonOverlaySectionStorm => 'Storm wind';
+
+  @override
+  String get typhoonOverlaySectionExtra => 'Overlays';
+
+  @override
+  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+
+  @override
+  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+
+  @override
+  String get typhoonOverlayProbabilityTooltip =>
+      'Show strike probability (hides the forecast cone)';
+
+  @override
+  String get typhoonOverlayWarningTooltip =>
+      'Highlight counties under a typhoon warning';
+
+  @override
+  String get typhoonOverlayStormL7Tooltip =>
+      'Level-7 wind field + average circle (purple)';
+
+  @override
+  String get typhoonOverlayStormL10Tooltip =>
+      'Level-10 wind field + average circle (yellow)';
+
+  @override
+  String get typhoonOverlaySectionWeather => 'Weather underlay';
+
+  @override
+  String get typhoonOverlayWeatherNone => 'None';
+
+  @override
+  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherNoneTooltip =>
+      'No radar or infrared underlay';
+
+  @override
+  String get typhoonOverlayWeatherRadarTooltip =>
+      'Radar echo closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonOverlayWeatherSatelliteTooltip =>
+      'Infrared closest to the typhoon bulletin time';
+
+  @override
+  String get typhoonWarningTitle => '태풍 경보';
+
+  @override
+  String typhoonWarningAreas(String areas) {
+    return '대상 지역: $areas';
+  }
+
+  @override
+  String get typhoonTrackDetail => '경로 상세';
+
+  @override
+  String get typhoonHistoryTitle => '자료 시각';
+
+  @override
+  String get typhoonHistoryLive => '실시간';
+
+  @override
+  String get typhoonSatelliteTitle => '위성';
+
+  @override
+  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+
+  @override
+  String get typhoonOverlayForecastCalloutsTooltip =>
+      'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => '시설 유형';
+
+  @override
+  String get dpmFilterSectionRestroomType => '화장실 유형';
+
+  @override
+  String get dpmFilterSectionShelter => '대피소 재해 유형';
+
+  @override
+  String get dpmDisasterFlood => '홍수';
+
+  @override
+  String get dpmDisasterEarthquake => '지진';
+
+  @override
+  String get dpmDisasterLandslide => '산사태';
+
+  @override
+  String get dpmDisasterTsunami => '쓰나미';
+
+  @override
+  String get dpmDisasterSlope => '사면 재해';
+
+  @override
+  String get dpmDisasterNuclear => '핵 사고';
 }

@@ -17,19 +17,33 @@ import 'package:provider/provider.dart';
 /// It only *displays* [RegionStore]; switching is a horizontal swipe anywhere
 /// (see `RegionSwipeArea`) and the carousel slides to re-centre. Two `0→1`
 /// dials drive its look over a backdrop, so the widget stays feature-agnostic:
-/// [blend] fades the background transparent and flips the badges to light;
-/// [dismiss] slides the whole bar up and fades it out. Home feeds these from its
-/// sheet extent; Events leaves them at 0 for an opaque bar. It carries its own
-/// top safe area so both effects cover the status-bar row too.
+/// [blend] fades the bar background transparent and shifts badge ink for the
+/// sky ([skyIsLight]); [dismiss] slides the whole bar up and fades it out. Home
+/// feeds these from its sheet extent; Events leaves them at 0 for an opaque
+/// bar. It carries its own top safe area so both effects cover the status-bar
+/// row too.
 class RegionBar extends StatefulWidget {
-  const RegionBar({super.key, this.blend = 0, this.dismiss = 0});
+  const RegionBar({
+    super.key,
+    this.blend = 0,
+    this.dismiss = 0,
+    this.skyIsLight = true,
+  });
 
-  /// How much the bar blends into the backdrop (0 opaque → 1 transparent, light
-  /// badges).
+  /// The bar's own height, below the status bar it is inset by. Public because
+  /// the Home map is laid out *behind* this bar, so its camera fit has to
+  /// subtract this much from the top to frame inside the band the user can see.
+  static const double height = 44;
+
+  /// How much the bar blends into the backdrop (0 opaque → 1 transparent).
   final double blend;
 
   /// How far the bar has slid up and faded out (0 shown → 1 gone).
   final double dismiss;
+
+  /// Whether the weather sky behind the bar is light — badge ink goes dark on
+  /// a light sky (dark-theme white [ColorScheme.onSurface] would vanish).
+  final bool skyIsLight;
 
   @override
   State<RegionBar> createState() => _RegionBarState();
@@ -62,7 +76,7 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
             child: SafeArea(
               bottom: false,
               child: SizedBox(
-                height: 44,
+                height: RegionBar.height,
                 child: PageView.builder(
                   controller: areaPageController,
                   physics: const NeverScrollableScrollPhysics(),
@@ -73,7 +87,8 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
                       index: index,
                       area: areas[index],
                       distance: (areaPage - index).abs(),
-                      reveal: blend,
+                      blend: blend,
+                      skyIsLight: widget.skyIsLight,
                     ),
                   ),
                 ),
@@ -86,20 +101,21 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
   }
 }
 
-/// A single area badge, styled by its [distance] from the carousel centre and
-/// shifted to light as [reveal] rises so it stays legible over the backdrop.
+/// A single area badge, styled by its [distance] from the carousel centre.
 class _RegionBadge extends StatelessWidget {
   const _RegionBadge({
     required this.index,
     required this.area,
     required this.distance,
-    required this.reveal,
+    required this.blend,
+    required this.skyIsLight,
   });
 
   final int index;
   final HomeArea area;
   final double distance;
-  final double reveal;
+  final double blend;
+  final bool skyIsLight;
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +131,11 @@ class _RegionBadge extends StatelessWidget {
         ? 1.0
         : (1 - (distance - 1) * 0.85).clamp(0.15, 1.0);
 
-    // Palette shifts to light as the backdrop takes over.
-    final badgeBase = Color.lerp(
-      colors.primaryContainer,
-      Colors.white.withValues(alpha: 0.22),
-      reveal,
-    )!;
-    final restText = lightenOnReveal(colors.onSurface, reveal);
-    final centreText = lightenOnReveal(colors.onPrimaryContainer, reveal);
+    // Unfilled neighbours sit on the (possibly transparent) bar — sky-aware
+    // ink. The centre fill keeps [onPrimaryContainer] on [primaryContainer].
+    final badgeBase = colors.primaryContainer;
+    final restText = inkOverWeather(colors, blend, skyIsLight: skyIsLight);
+    final centreText = colors.onPrimaryContainer;
 
     return GestureDetector(
       // Tapping a badge selects it — the other switch mode besides swiping.

@@ -15,8 +15,8 @@ import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 
 /// Maps the datasource's raw JSON to domain models, converting transport/decode
 /// errors to typed failures via [guardResult]. Object payloads (cyclone index,
-/// track, warning) round-trip through `fromJson`; the coordinate-array payloads
-/// (potential, probability) use their custom `decode`.
+/// track, warning) round-trip through `fromJson` / `decode`; the coordinate-
+/// array payloads (potential, probability) use their custom `decode`.
 class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
   const MeteorTyphoonRepositoryImpl(this._api);
 
@@ -31,8 +31,8 @@ class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
       guardResult(() async => TrackPayload.fromJson(await _api.getTrack()));
 
   @override
-  Future<Result<TyphoonPotential>> potential() => guardResult(
-    () async => TyphoonPotential.decode(await _api.getPotential()),
+  Future<Result<PotentialPayload>> potential() => guardResult(
+    () async => PotentialPayload.decode(await _api.getPotential()),
   );
 
   @override
@@ -41,8 +41,8 @@ class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
   );
 
   @override
-  Future<Result<TyphoonWarning>> warning() =>
-      guardResult(() async => TyphoonWarning.fromJson(await _api.getWarning()));
+  Future<Result<WarningPayload>> warning() =>
+      guardResult(() async => WarningPayload.decode(await _api.getWarning()));
 
   @override
   Future<Result<List<int>>> history(TyphoonKind kind) => guardResult(
@@ -56,8 +56,8 @@ class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
   );
 
   @override
-  Future<Result<TyphoonPotential>> potentialAt(int second) => guardResult(
-    () async => TyphoonPotential.decode(
+  Future<Result<PotentialPayload>> potentialAt(int second) => guardResult(
+    () async => PotentialPayload.decode(
       await _api.getAt(TyphoonKind.potential, second),
     ),
   );
@@ -70,22 +70,8 @@ class MeteorTyphoonRepositoryImpl implements MeteorTyphoonRepository {
   );
 
   @override
-  Future<Result<TyphoonWarning>> warningAt(int second) => guardResult(
+  Future<Result<WarningPayload>> warningAt(int second) => guardResult(
     () async =>
-        TyphoonWarning.fromJson(await _api.getAt(TyphoonKind.warning, second)),
+        WarningPayload.decode(await _api.getAt(TyphoonKind.warning, second)),
   );
-
-  @override
-  Future<Result<Map<String, dynamic>>> geojson() =>
-      guardResult(_api.getGeojson);
-
-  @override
-  Future<Result<List<int>>> images() => guardResult(
-    () async => [
-      for (final t in await _api.getImagesList()) (t as num).toInt(),
-    ],
-  );
-
-  @override
-  String imageUrl(int second) => _api.imagesUrl(second);
 }
