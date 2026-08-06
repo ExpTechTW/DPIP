@@ -64,7 +64,9 @@ abstract final class PreferenceKeys {
     'experimental.weatherMode',
   );
 
-  /// Last push (FCM) token. See `NotificationService`.
+  /// Last push token — the FCM registration token on Android, the raw APNs
+  /// device token on iOS (backend registration keys on whichever this
+  /// platform actually uses). See `NotificationService`.
   static const PrefKey<String> pushToken = PrefKey<String>._(
     'notification.pushToken',
   );
