@@ -954,9 +954,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
-  String get aedSheetEmpty => '點選 AED 標記查看詳情';
-
-  @override
   String get aedAddress => '地址';
 
   @override
@@ -988,6 +985,125 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => '緊急聯絡電話';
+
+  @override
+  String get mapLayerRestroom => '公廁';
+
+  @override
+  String get mapLayerShelter => '避難收容場所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '顯示公廁';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
+
+  @override
+  String get dpmAddress => '地址';
+
+  @override
+  String get restroomTypeLabel => '廁所類型';
+
+  @override
+  String get restroomCategoryLabel => '類別';
+
+  @override
+  String get restroomGradeLabel => '等級';
+
+  @override
+  String get restroomTypeFemale => '女廁所';
+
+  @override
+  String get restroomTypeMale => '男廁所';
+
+  @override
+  String get restroomTypeMixed => '混合廁所';
+
+  @override
+  String get restroomTypeAccessible => '無障礙廁所';
+
+  @override
+  String get restroomTypeGenderNeutral => '性別友善廁所';
+
+  @override
+  String get restroomTypeFamily => '親子廁所';
+
+  @override
+  String get restroomTypeUnspecified => '未設定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公園';
+
+  @override
+  String get restroomCategoryCommercial => '商業營業場所';
+
+  @override
+  String get restroomCategoryReligious => '宗教禮儀場所';
+
+  @override
+  String get restroomCategoryCultural => '文化育樂活動場所';
+
+  @override
+  String get restroomCategoryGovernment => '民眾洽公場所';
+
+  @override
+  String get restroomCategoryWelfare => '社福機構、集會場所';
+
+  @override
+  String get restroomCategoryTourist => '觀光地區及風景區';
+
+  @override
+  String get restroomCategoryLeisure => '休閒娛樂場所';
+
+  @override
+  String get restroomCategoryOther => '其他';
+
+  @override
+  String get restroomGradeExcellent => '特優級';
+
+  @override
+  String get restroomGradeGood => '優等級';
+
+  @override
+  String get restroomGradeAverage => '普通級';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '地址';
+
+  @override
+  String get shelterCapacityLabel => '收容人數';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '適用災害';
+
+  @override
+  String get shelterIndoorLabel => '室內收容';
+
+  @override
+  String get shelterOutdoorLabel => '室外收容';
+
+  @override
+  String get shelterVulnerableOkLabel => '適合避難弱者安置';
+
+  @override
+  String get dpmYes => '是';
+
+  @override
+  String get dpmNo => '否';
 
   @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';
@@ -1146,6 +1262,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get dpmFilterSectionRestroom => '場所類型';
+
+  @override
+  String get dpmFilterSectionRestroomType => '廁所類型';
+
+  @override
+  String get dpmFilterSectionShelter => '避難所災害類型';
+
+  @override
+  String get dpmDisasterFlood => '水災';
+
+  @override
+  String get dpmDisasterEarthquake => '震災';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '海嘯';
+
+  @override
+  String get dpmDisasterSlope => '坡地災害';
+
+  @override
+  String get dpmDisasterNuclear => '核子事故';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2098,9 +2241,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get disasterMapOverlayAedTooltip => '显示 AED 位置';
 
   @override
-  String get aedSheetEmpty => '点选 AED 标记查看详情';
-
-  @override
   String get aedAddress => '地址';
 
   @override
@@ -2132,6 +2272,125 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get aedEmergencyPhone => '紧急联络电话';
+
+  @override
+  String get mapLayerRestroom => '公厕';
+
+  @override
+  String get mapLayerShelter => '避难收容场所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '显示公厕';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '显示避难收容场所';
+
+  @override
+  String get dpmSheetEmpty => '点击地图上的标记查看详情';
+
+  @override
+  String get dpmAddress => '地址';
+
+  @override
+  String get restroomTypeLabel => '厕所类型';
+
+  @override
+  String get restroomCategoryLabel => '类别';
+
+  @override
+  String get restroomGradeLabel => '等级';
+
+  @override
+  String get restroomTypeFemale => '女厕所';
+
+  @override
+  String get restroomTypeMale => '男厕所';
+
+  @override
+  String get restroomTypeMixed => '混合厕所';
+
+  @override
+  String get restroomTypeAccessible => '无障碍厕所';
+
+  @override
+  String get restroomTypeGenderNeutral => '性别友善厕所';
+
+  @override
+  String get restroomTypeFamily => '亲子厕所';
+
+  @override
+  String get restroomTypeUnspecified => '未设定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公园';
+
+  @override
+  String get restroomCategoryCommercial => '商业营业场所';
+
+  @override
+  String get restroomCategoryReligious => '宗教礼仪场所';
+
+  @override
+  String get restroomCategoryCultural => '文化育乐活动场所';
+
+  @override
+  String get restroomCategoryGovernment => '民众洽公场所';
+
+  @override
+  String get restroomCategoryWelfare => '社福机构、集会场所';
+
+  @override
+  String get restroomCategoryTourist => '观光地区及风景区';
+
+  @override
+  String get restroomCategoryLeisure => '休闲娱乐场所';
+
+  @override
+  String get restroomCategoryOther => '其他';
+
+  @override
+  String get restroomGradeExcellent => '特优级';
+
+  @override
+  String get restroomGradeGood => '优等级';
+
+  @override
+  String get restroomGradeAverage => '普通级';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '地址';
+
+  @override
+  String get shelterCapacityLabel => '收容人数';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '适用灾害';
+
+  @override
+  String get shelterIndoorLabel => '室内收容';
+
+  @override
+  String get shelterOutdoorLabel => '室外收容';
+
+  @override
+  String get shelterVulnerableOkLabel => '适合避难弱者安置';
+
+  @override
+  String get dpmYes => '是';
+
+  @override
+  String get dpmNo => '否';
 
   @override
   String get stationSheetEmpty => '点选任一测站查看观测值';
@@ -2290,6 +2549,33 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大时显示预测点详细卡片';
+
+  @override
+  String get dpmFilterSectionRestroom => '场所类型';
+
+  @override
+  String get dpmFilterSectionRestroomType => '厕所类型';
+
+  @override
+  String get dpmFilterSectionShelter => '避难所灾害类型';
+
+  @override
+  String get dpmDisasterFlood => '水灾';
+
+  @override
+  String get dpmDisasterEarthquake => '震灾';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '海啸';
+
+  @override
+  String get dpmDisasterSlope => '坡地灾害';
+
+  @override
+  String get dpmDisasterNuclear => '核子事故';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -3242,9 +3528,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
-  String get aedSheetEmpty => '點選 AED 標記查看詳情';
-
-  @override
   String get aedAddress => '地址';
 
   @override
@@ -3276,6 +3559,125 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get aedEmergencyPhone => '緊急聯絡電話';
+
+  @override
+  String get mapLayerRestroom => '公廁';
+
+  @override
+  String get mapLayerShelter => '避難收容場所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '顯示公廁';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
+
+  @override
+  String get dpmAddress => '地址';
+
+  @override
+  String get restroomTypeLabel => '廁所類型';
+
+  @override
+  String get restroomCategoryLabel => '類別';
+
+  @override
+  String get restroomGradeLabel => '等級';
+
+  @override
+  String get restroomTypeFemale => '女廁所';
+
+  @override
+  String get restroomTypeMale => '男廁所';
+
+  @override
+  String get restroomTypeMixed => '混合廁所';
+
+  @override
+  String get restroomTypeAccessible => '無障礙廁所';
+
+  @override
+  String get restroomTypeGenderNeutral => '性別友善廁所';
+
+  @override
+  String get restroomTypeFamily => '親子廁所';
+
+  @override
+  String get restroomTypeUnspecified => '未設定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公園';
+
+  @override
+  String get restroomCategoryCommercial => '商業營業場所';
+
+  @override
+  String get restroomCategoryReligious => '宗教禮儀場所';
+
+  @override
+  String get restroomCategoryCultural => '文化育樂活動場所';
+
+  @override
+  String get restroomCategoryGovernment => '民眾洽公場所';
+
+  @override
+  String get restroomCategoryWelfare => '社福機構、集會場所';
+
+  @override
+  String get restroomCategoryTourist => '觀光地區及風景區';
+
+  @override
+  String get restroomCategoryLeisure => '休閒娛樂場所';
+
+  @override
+  String get restroomCategoryOther => '其他';
+
+  @override
+  String get restroomGradeExcellent => '特優級';
+
+  @override
+  String get restroomGradeGood => '優等級';
+
+  @override
+  String get restroomGradeAverage => '普通級';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '地址';
+
+  @override
+  String get shelterCapacityLabel => '收容人數';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '適用災害';
+
+  @override
+  String get shelterIndoorLabel => '室內收容';
+
+  @override
+  String get shelterOutdoorLabel => '室外收容';
+
+  @override
+  String get shelterVulnerableOkLabel => '適合避難弱者安置';
+
+  @override
+  String get dpmYes => '是';
+
+  @override
+  String get dpmNo => '否';
 
   @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';
@@ -3434,6 +3836,33 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get dpmFilterSectionRestroom => '場所類型';
+
+  @override
+  String get dpmFilterSectionRestroomType => '廁所類型';
+
+  @override
+  String get dpmFilterSectionShelter => '避難所災害類型';
+
+  @override
+  String get dpmDisasterFlood => '水災';
+
+  @override
+  String get dpmDisasterEarthquake => '震災';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '海嘯';
+
+  @override
+  String get dpmDisasterSlope => '坡地災害';
+
+  @override
+  String get dpmDisasterNuclear => '核子事故';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4386,9 +4815,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get disasterMapOverlayAedTooltip => '顯示 AED 位置';
 
   @override
-  String get aedSheetEmpty => '點選 AED 標記查看詳情';
-
-  @override
   String get aedAddress => '地址';
 
   @override
@@ -4420,6 +4846,125 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get aedEmergencyPhone => '緊急聯絡電話';
+
+  @override
+  String get mapLayerRestroom => '公廁';
+
+  @override
+  String get mapLayerShelter => '避難收容場所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '顯示公廁';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
+
+  @override
+  String get dpmAddress => '地址';
+
+  @override
+  String get restroomTypeLabel => '廁所類型';
+
+  @override
+  String get restroomCategoryLabel => '類別';
+
+  @override
+  String get restroomGradeLabel => '等級';
+
+  @override
+  String get restroomTypeFemale => '女廁所';
+
+  @override
+  String get restroomTypeMale => '男廁所';
+
+  @override
+  String get restroomTypeMixed => '混合廁所';
+
+  @override
+  String get restroomTypeAccessible => '無障礙廁所';
+
+  @override
+  String get restroomTypeGenderNeutral => '性別友善廁所';
+
+  @override
+  String get restroomTypeFamily => '親子廁所';
+
+  @override
+  String get restroomTypeUnspecified => '未設定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公園';
+
+  @override
+  String get restroomCategoryCommercial => '商業營業場所';
+
+  @override
+  String get restroomCategoryReligious => '宗教禮儀場所';
+
+  @override
+  String get restroomCategoryCultural => '文化育樂活動場所';
+
+  @override
+  String get restroomCategoryGovernment => '民眾洽公場所';
+
+  @override
+  String get restroomCategoryWelfare => '社福機構、集會場所';
+
+  @override
+  String get restroomCategoryTourist => '觀光地區及風景區';
+
+  @override
+  String get restroomCategoryLeisure => '休閒娛樂場所';
+
+  @override
+  String get restroomCategoryOther => '其他';
+
+  @override
+  String get restroomGradeExcellent => '特優級';
+
+  @override
+  String get restroomGradeGood => '優等級';
+
+  @override
+  String get restroomGradeAverage => '普通級';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '地址';
+
+  @override
+  String get shelterCapacityLabel => '收容人數';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '適用災害';
+
+  @override
+  String get shelterIndoorLabel => '室內收容';
+
+  @override
+  String get shelterOutdoorLabel => '室外收容';
+
+  @override
+  String get shelterVulnerableOkLabel => '適合避難弱者安置';
+
+  @override
+  String get dpmYes => '是';
+
+  @override
+  String get dpmNo => '否';
 
   @override
   String get stationSheetEmpty => '點選任一測站查看觀測值';
@@ -4578,4 +5123,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '放大時顯示預測點詳細卡片';
+
+  @override
+  String get dpmFilterSectionRestroom => '場所類型';
+
+  @override
+  String get dpmFilterSectionRestroomType => '廁所類型';
+
+  @override
+  String get dpmFilterSectionShelter => '避難所災害類型';
+
+  @override
+  String get dpmDisasterFlood => '水災';
+
+  @override
+  String get dpmDisasterEarthquake => '震災';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '海嘯';
+
+  @override
+  String get dpmDisasterSlope => '坡地災害';
+
+  @override
+  String get dpmDisasterNuclear => '核子事故';
 }

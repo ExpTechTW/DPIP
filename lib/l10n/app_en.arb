@@ -1276,10 +1276,6 @@
   "@disasterMapOverlayAedTooltip": {
     "description": "Tooltip for the AED toggle in the disaster-map overlay menu"
   },
-  "aedSheetEmpty": "Tap an AED marker for details",
-  "@aedSheetEmpty": {
-    "description": "Hint in the AED sheet when nothing is selected"
-  },
   "aedAddress": "Address",
   "@aedAddress": {
     "description": "AED detail row label"
@@ -1323,6 +1319,167 @@
   "aedEmergencyPhone": "Emergency phone",
   "@aedEmergencyPhone": {
     "description": "AED emergency contact phone row label"
+  },
+  "mapLayerRestroom": "Restrooms",
+  "@mapLayerRestroom": {
+    "description": "Disaster-map overlay menu toggle for public restrooms"
+  },
+  "mapLayerShelter": "Shelters",
+  "@mapLayerShelter": {
+    "description": "Disaster-map overlay menu toggle for evacuation shelters"
+  },
+  "disasterMapOverlayRestroomTooltip": "Show public restrooms",
+  "@disasterMapOverlayRestroomTooltip": {
+    "description": "Tooltip for the restroom toggle in the disaster-map overlay menu"
+  },
+  "disasterMapOverlayShelterTooltip": "Show evacuation shelters",
+  "@disasterMapOverlayShelterTooltip": {
+    "description": "Tooltip for the shelter toggle in the disaster-map overlay menu"
+  },
+  "dpmSheetEmpty": "Tap a marker on the map for details",
+  "@dpmSheetEmpty": {
+    "description": "Hint in the disaster-map detail sheet when nothing is selected"
+  },
+  "dpmAddress": "Address",
+  "@dpmAddress": {
+    "description": "Address row label in the disaster-map restroom / shelter detail sheet"
+  },
+  "restroomTypeLabel": "Type",
+  "@restroomTypeLabel": {
+    "description": "Restroom detail row label for the toilet type"
+  },
+  "restroomCategoryLabel": "Category",
+  "@restroomCategoryLabel": {
+    "description": "Restroom detail row label for the venue category"
+  },
+  "restroomGradeLabel": "Grade",
+  "@restroomGradeLabel": {
+    "description": "Restroom detail row label for the cleanliness grade"
+  },
+  "restroomTypeFemale": "Female",
+  "@restroomTypeFemale": {
+    "description": "Restroom type: female restroom"
+  },
+  "restroomTypeMale": "Male",
+  "@restroomTypeMale": {
+    "description": "Restroom type: male restroom"
+  },
+  "restroomTypeMixed": "Mixed",
+  "@restroomTypeMixed": {
+    "description": "Restroom type: mixed/unisex restroom"
+  },
+  "restroomTypeAccessible": "Accessible",
+  "@restroomTypeAccessible": {
+    "description": "Restroom type: accessible restroom"
+  },
+  "restroomTypeGenderNeutral": "Gender-neutral",
+  "@restroomTypeGenderNeutral": {
+    "description": "Restroom type: gender-neutral restroom"
+  },
+  "restroomTypeFamily": "Family",
+  "@restroomTypeFamily": {
+    "description": "Restroom type: family restroom"
+  },
+  "restroomTypeUnspecified": "Unspecified",
+  "@restroomTypeUnspecified": {
+    "description": "Restroom type: not specified"
+  },
+  "restroomCategoryTransport": "Transport",
+  "@restroomCategoryTransport": {
+    "description": "Restroom venue category: transport facility"
+  },
+  "restroomCategoryPark": "Park",
+  "@restroomCategoryPark": {
+    "description": "Restroom venue category: park"
+  },
+  "restroomCategoryCommercial": "Commercial",
+  "@restroomCategoryCommercial": {
+    "description": "Restroom venue category: commercial establishment"
+  },
+  "restroomCategoryReligious": "Religious",
+  "@restroomCategoryReligious": {
+    "description": "Restroom venue category: religious / ceremonial venue"
+  },
+  "restroomCategoryCultural": "Cultural",
+  "@restroomCategoryCultural": {
+    "description": "Restroom venue category: cultural / leisure activity venue"
+  },
+  "restroomCategoryGovernment": "Government",
+  "@restroomCategoryGovernment": {
+    "description": "Restroom venue category: public service office"
+  },
+  "restroomCategoryWelfare": "Welfare",
+  "@restroomCategoryWelfare": {
+    "description": "Restroom venue category: social welfare institution / gathering place"
+  },
+  "restroomCategoryTourist": "Tourist",
+  "@restroomCategoryTourist": {
+    "description": "Restroom venue category: tourist area / scenic spot"
+  },
+  "restroomCategoryLeisure": "Leisure",
+  "@restroomCategoryLeisure": {
+    "description": "Restroom venue category: leisure / entertainment venue"
+  },
+  "restroomCategoryOther": "Other",
+  "@restroomCategoryOther": {
+    "description": "Restroom venue category: other"
+  },
+  "restroomGradeExcellent": "Excellent",
+  "@restroomGradeExcellent": {
+    "description": "Restroom cleanliness grade: excellent"
+  },
+  "restroomGradeGood": "Good",
+  "@restroomGradeGood": {
+    "description": "Restroom cleanliness grade: good"
+  },
+  "restroomGradeAverage": "Average",
+  "@restroomGradeAverage": {
+    "description": "Restroom cleanliness grade: average"
+  },
+  "restroomGradePoor": "Below standard",
+  "@restroomGradePoor": {
+    "description": "Restroom cleanliness grade: below standard"
+  },
+  "shelterAddressLabel": "Address",
+  "@shelterAddressLabel": {
+    "description": "Shelter detail address row label"
+  },
+  "shelterCapacityLabel": "Capacity",
+  "@shelterCapacityLabel": {
+    "description": "Shelter detail capacity row label"
+  },
+  "shelterCapacityValue": "{n} people",
+  "@shelterCapacityValue": {
+    "description": "Shelter detail capacity row value",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "shelterCategoryLabel": "Disaster types",
+  "@shelterCategoryLabel": {
+    "description": "Shelter detail applicable-disaster categories row label"
+  },
+  "shelterIndoorLabel": "Indoor shelter",
+  "@shelterIndoorLabel": {
+    "description": "Shelter detail row: whether indoor shelter is provided"
+  },
+  "shelterOutdoorLabel": "Outdoor shelter",
+  "@shelterOutdoorLabel": {
+    "description": "Shelter detail row: whether outdoor shelter is provided"
+  },
+  "shelterVulnerableOkLabel": "Vulnerable-people friendly",
+  "@shelterVulnerableOkLabel": {
+    "description": "Shelter detail row: whether evacuees needing care can be accommodated"
+  },
+  "dpmYes": "Yes",
+  "@dpmYes": {
+    "description": "Affirmative value in the disaster-map detail sheet"
+  },
+  "dpmNo": "No",
+  "@dpmNo": {
+    "description": "Negative value in the disaster-map detail sheet"
   },
   "stationSheetEmpty": "Tap a station to see its reading",
   "@stationSheetEmpty": {
@@ -1559,5 +1716,41 @@
   "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
   "@typhoonOverlayForecastCalloutsTooltip": {
     "description": "Tooltip for the forecast callouts overlay toggle"
+  },
+  "dpmFilterSectionRestroom": "Venue types",
+  "@dpmFilterSectionRestroom": {
+    "description": "Filter section title in the disaster-map sheet: restroom venue categories"
+  },
+  "dpmFilterSectionRestroomType": "Toilet types",
+  "@dpmFilterSectionRestroomType": {
+    "description": "Filter section title in the disaster-map sheet: restroom toilet-kind categories"
+  },
+  "dpmFilterSectionShelter": "Shelter disaster types",
+  "@dpmFilterSectionShelter": {
+    "description": "Filter section title in the disaster-map sheet: shelter disaster types"
+  },
+  "dpmDisasterFlood": "Flood",
+  "@dpmDisasterFlood": {
+    "description": "Shelter disaster-type filter chip: flood"
+  },
+  "dpmDisasterEarthquake": "Earthquake",
+  "@dpmDisasterEarthquake": {
+    "description": "Shelter disaster-type filter chip: earthquake"
+  },
+  "dpmDisasterLandslide": "Landslide",
+  "@dpmDisasterLandslide": {
+    "description": "Shelter disaster-type filter chip: landslide"
+  },
+  "dpmDisasterTsunami": "Tsunami",
+  "@dpmDisasterTsunami": {
+    "description": "Shelter disaster-type filter chip: tsunami"
+  },
+  "dpmDisasterSlope": "Slope hazard",
+  "@dpmDisasterSlope": {
+    "description": "Shelter disaster-type filter chip: slope hazard"
+  },
+  "dpmDisasterNuclear": "Nuclear accident",
+  "@dpmDisasterNuclear": {
+    "description": "Shelter disaster-type filter chip: nuclear accident"
   }
 }

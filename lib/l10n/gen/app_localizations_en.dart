@@ -969,9 +969,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'Show AED locations';
 
   @override
-  String get aedSheetEmpty => 'Tap an AED marker for details';
-
-  @override
   String get aedAddress => 'Address';
 
   @override
@@ -1003,6 +1000,125 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => 'Emergency phone';
+
+  @override
+  String get mapLayerRestroom => 'Restrooms';
+
+  @override
+  String get mapLayerShelter => 'Shelters';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'Show public restrooms';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Show evacuation shelters';
+
+  @override
+  String get dpmSheetEmpty => 'Tap a marker on the map for details';
+
+  @override
+  String get dpmAddress => 'Address';
+
+  @override
+  String get restroomTypeLabel => 'Type';
+
+  @override
+  String get restroomCategoryLabel => 'Category';
+
+  @override
+  String get restroomGradeLabel => 'Grade';
+
+  @override
+  String get restroomTypeFemale => 'Female';
+
+  @override
+  String get restroomTypeMale => 'Male';
+
+  @override
+  String get restroomTypeMixed => 'Mixed';
+
+  @override
+  String get restroomTypeAccessible => 'Accessible';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Gender-neutral';
+
+  @override
+  String get restroomTypeFamily => 'Family';
+
+  @override
+  String get restroomTypeUnspecified => 'Unspecified';
+
+  @override
+  String get restroomCategoryTransport => 'Transport';
+
+  @override
+  String get restroomCategoryPark => 'Park';
+
+  @override
+  String get restroomCategoryCommercial => 'Commercial';
+
+  @override
+  String get restroomCategoryReligious => 'Religious';
+
+  @override
+  String get restroomCategoryCultural => 'Cultural';
+
+  @override
+  String get restroomCategoryGovernment => 'Government';
+
+  @override
+  String get restroomCategoryWelfare => 'Welfare';
+
+  @override
+  String get restroomCategoryTourist => 'Tourist';
+
+  @override
+  String get restroomCategoryLeisure => 'Leisure';
+
+  @override
+  String get restroomCategoryOther => 'Other';
+
+  @override
+  String get restroomGradeExcellent => 'Excellent';
+
+  @override
+  String get restroomGradeGood => 'Good';
+
+  @override
+  String get restroomGradeAverage => 'Average';
+
+  @override
+  String get restroomGradePoor => 'Below standard';
+
+  @override
+  String get shelterAddressLabel => 'Address';
+
+  @override
+  String get shelterCapacityLabel => 'Capacity';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n people';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Disaster types';
+
+  @override
+  String get shelterIndoorLabel => 'Indoor shelter';
+
+  @override
+  String get shelterOutdoorLabel => 'Outdoor shelter';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Vulnerable-people friendly';
+
+  @override
+  String get dpmYes => 'Yes';
+
+  @override
+  String get dpmNo => 'No';
 
   @override
   String get stationSheetEmpty => 'Tap a station to see its reading';
@@ -1169,4 +1285,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Venue types';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Toilet types';
+
+  @override
+  String get dpmFilterSectionShelter => 'Shelter disaster types';
+
+  @override
+  String get dpmDisasterFlood => 'Flood';
+
+  @override
+  String get dpmDisasterEarthquake => 'Earthquake';
+
+  @override
+  String get dpmDisasterLandslide => 'Landslide';
+
+  @override
+  String get dpmDisasterTsunami => 'Tsunami';
+
+  @override
+  String get dpmDisasterSlope => 'Slope hazard';
+
+  @override
+  String get dpmDisasterNuclear => 'Nuclear accident';
 }

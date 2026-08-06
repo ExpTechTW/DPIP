@@ -968,9 +968,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'แสดงตำแหน่ง AED';
 
   @override
-  String get aedSheetEmpty => 'แตะเครื่องหมาย AED เพื่อดูรายละเอียด';
-
-  @override
   String get aedAddress => 'ที่อยู่';
 
   @override
@@ -1002,6 +999,125 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => 'โทรศัพท์ฉุกเฉิน';
+
+  @override
+  String get mapLayerRestroom => 'ห้องน้ำสาธารณะ';
+
+  @override
+  String get mapLayerShelter => 'ศูนย์อพยพ';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'แสดงห้องน้ำสาธารณะ';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'แสดงศูนย์อพยพ';
+
+  @override
+  String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
+
+  @override
+  String get dpmAddress => 'ที่อยู่';
+
+  @override
+  String get restroomTypeLabel => 'ประเภท';
+
+  @override
+  String get restroomCategoryLabel => 'หมวดหมู่';
+
+  @override
+  String get restroomGradeLabel => 'ระดับ';
+
+  @override
+  String get restroomTypeFemale => 'ห้องน้ำหญิง';
+
+  @override
+  String get restroomTypeMale => 'ห้องน้ำชาย';
+
+  @override
+  String get restroomTypeMixed => 'ห้องน้ำรวม';
+
+  @override
+  String get restroomTypeAccessible => 'ห้องน้ำคนพิการ';
+
+  @override
+  String get restroomTypeGenderNeutral => 'ห้องน้ำเป็นกลางทางเพศ';
+
+  @override
+  String get restroomTypeFamily => 'ห้องน้ำครอบครัว';
+
+  @override
+  String get restroomTypeUnspecified => 'ไม่ระบุ';
+
+  @override
+  String get restroomCategoryTransport => 'การคมนาคม';
+
+  @override
+  String get restroomCategoryPark => 'สวนสาธารณะ';
+
+  @override
+  String get restroomCategoryCommercial => 'สถานประกอบการพาณิชย์';
+
+  @override
+  String get restroomCategoryReligious => 'สถานที่ทางศาสนา';
+
+  @override
+  String get restroomCategoryCultural => 'สถานที่ทางวัฒนธรรม';
+
+  @override
+  String get restroomCategoryGovernment => 'สำนักงานราชการ';
+
+  @override
+  String get restroomCategoryWelfare => 'สถานสงเคราะห์';
+
+  @override
+  String get restroomCategoryTourist => 'แหล่งท่องเที่ยว';
+
+  @override
+  String get restroomCategoryLeisure => 'สถานที่พักผ่อนหย่อนใจ';
+
+  @override
+  String get restroomCategoryOther => 'อื่น ๆ';
+
+  @override
+  String get restroomGradeExcellent => 'ดีเยี่ยม';
+
+  @override
+  String get restroomGradeGood => 'ดี';
+
+  @override
+  String get restroomGradeAverage => 'ปานกลาง';
+
+  @override
+  String get restroomGradePoor => 'ต่ำกว่ามาตรฐาน';
+
+  @override
+  String get shelterAddressLabel => 'ที่อยู่';
+
+  @override
+  String get shelterCapacityLabel => 'ความจุ';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n คน';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'ประเภทภัยพิบัติ';
+
+  @override
+  String get shelterIndoorLabel => 'การอพยพในอาคาร';
+
+  @override
+  String get shelterOutdoorLabel => 'การอพยพกลางแจ้ง';
+
+  @override
+  String get shelterVulnerableOkLabel => 'เหมาะกับผู้เปราะบาง';
+
+  @override
+  String get dpmYes => 'ใช่';
+
+  @override
+  String get dpmNo => 'ไม่ใช่';
 
   @override
   String get stationSheetEmpty => 'แตะสถานีเพื่อดูค่าที่วัดได้';
@@ -1168,4 +1284,31 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'ประเภทสถานที่';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'ประเภทห้องน้ำ';
+
+  @override
+  String get dpmFilterSectionShelter => 'ประเภทภัยพิบัติของศูนย์อพยพ';
+
+  @override
+  String get dpmDisasterFlood => 'น้ำท่วม';
+
+  @override
+  String get dpmDisasterEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get dpmDisasterLandslide => 'ดินถล่ม';
+
+  @override
+  String get dpmDisasterTsunami => 'สึนามิ';
+
+  @override
+  String get dpmDisasterSlope => 'ภัยพิบัติลาดชัน';
+
+  @override
+  String get dpmDisasterNuclear => 'อุบัติเหตุนิวเคลียร์';
 }

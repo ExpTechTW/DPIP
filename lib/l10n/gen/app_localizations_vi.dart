@@ -969,9 +969,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'Hiện vị trí AED';
 
   @override
-  String get aedSheetEmpty => 'Chạm điểm AED để xem chi tiết';
-
-  @override
   String get aedAddress => 'Địa chỉ';
 
   @override
@@ -1003,6 +1000,127 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => 'Điện thoại khẩn cấp';
+
+  @override
+  String get mapLayerRestroom => 'Nhà vệ sinh công cộng';
+
+  @override
+  String get mapLayerShelter => 'Nơi trú ẩn';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip =>
+      'Hiển thị nhà vệ sinh công cộng';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Hiển thị nơi trú ẩn';
+
+  @override
+  String get dpmSheetEmpty =>
+      'Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết';
+
+  @override
+  String get dpmAddress => 'Địa chỉ';
+
+  @override
+  String get restroomTypeLabel => 'Loại';
+
+  @override
+  String get restroomCategoryLabel => 'Hạng mục';
+
+  @override
+  String get restroomGradeLabel => 'Hạng';
+
+  @override
+  String get restroomTypeFemale => 'Nhà vệ sinh nữ';
+
+  @override
+  String get restroomTypeMale => 'Nhà vệ sinh nam';
+
+  @override
+  String get restroomTypeMixed => 'Nhà vệ sinh chung';
+
+  @override
+  String get restroomTypeAccessible => 'Nhà vệ sinh tiếp cận được';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Nhà vệ sinh trung tính giới';
+
+  @override
+  String get restroomTypeFamily => 'Nhà vệ sinh gia đình';
+
+  @override
+  String get restroomTypeUnspecified => 'Không xác định';
+
+  @override
+  String get restroomCategoryTransport => 'Giao thông';
+
+  @override
+  String get restroomCategoryPark => 'Công viên';
+
+  @override
+  String get restroomCategoryCommercial => 'Cơ sở thương mại';
+
+  @override
+  String get restroomCategoryReligious => 'Nơi tôn giáo';
+
+  @override
+  String get restroomCategoryCultural => 'Địa điểm văn hóa giải trí';
+
+  @override
+  String get restroomCategoryGovernment => 'Cơ quan công quyền';
+
+  @override
+  String get restroomCategoryWelfare => 'Cơ sở phúc lợi';
+
+  @override
+  String get restroomCategoryTourist => 'Khu du lịch thắng cảnh';
+
+  @override
+  String get restroomCategoryLeisure => 'Địa điểm vui chơi giải trí';
+
+  @override
+  String get restroomCategoryOther => 'Khác';
+
+  @override
+  String get restroomGradeExcellent => 'Xuất sắc';
+
+  @override
+  String get restroomGradeGood => 'Tốt';
+
+  @override
+  String get restroomGradeAverage => 'Trung bình';
+
+  @override
+  String get restroomGradePoor => 'Dưới chuẩn';
+
+  @override
+  String get shelterAddressLabel => 'Địa chỉ';
+
+  @override
+  String get shelterCapacityLabel => 'Sức chứa';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n người';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Loại thảm họa';
+
+  @override
+  String get shelterIndoorLabel => 'Trú ẩn trong nhà';
+
+  @override
+  String get shelterOutdoorLabel => 'Trú ẩn ngoài trời';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Phù hợp người yếu thế';
+
+  @override
+  String get dpmYes => 'Có';
+
+  @override
+  String get dpmNo => 'Không';
 
   @override
   String get stationSheetEmpty => 'Chạm vào một trạm để xem số liệu';
@@ -1169,4 +1287,31 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Loại địa điểm';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Loại nhà vệ sinh';
+
+  @override
+  String get dpmFilterSectionShelter => 'Loại thiên tai nơi trú ẩn';
+
+  @override
+  String get dpmDisasterFlood => 'Lũ lụt';
+
+  @override
+  String get dpmDisasterEarthquake => 'Động đất';
+
+  @override
+  String get dpmDisasterLandslide => 'Sạt lở đất';
+
+  @override
+  String get dpmDisasterTsunami => 'Sóng thần';
+
+  @override
+  String get dpmDisasterSlope => 'Thiên tai sườn dốc';
+
+  @override
+  String get dpmDisasterNuclear => 'Sự cố hạt nhân';
 }

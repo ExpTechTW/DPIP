@@ -2,13 +2,13 @@
 /// grouped by storm band, weather underlay, and optional overlays.
 library;
 
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_storm_band.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_weather_overlay.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 
 /// Compact icon chip that opens a categorised overlay menu.
@@ -46,54 +46,23 @@ class TyphoonOverlayMenu extends StatelessWidget {
             weather != TyphoonWeatherOverlay.none;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
-          style: MenuStyle(
-            backgroundColor: WidgetStatePropertyAll(
-              colors.surfaceContainerHigh,
-            ),
-            elevation: const WidgetStatePropertyAll(6),
-            shadowColor: WidgetStatePropertyAll(
-              Colors.black.withValues(alpha: 0.24),
-            ),
-            shape: WidgetStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: AppRadius.medium),
-            ),
-            padding: const WidgetStatePropertyAll(
-              EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            ),
-          ),
+          style: MapChipButton.menuStyle(context),
           builder: (context, controller, _) {
-            return Tooltip(
-              message: l10n.typhoonOverlayMenuTooltip,
-              child: FrostedSurface(
-                borderRadius: AppRadius.small,
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: InkWell(
-                    borderRadius: AppRadius.small,
-                    onTap: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.sm),
-                      child: Icon(
-                        Icons.tune,
-                        size: 22,
-                        color: active
-                            ? colors.primary
-                            : colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            return MapChipButton(
+              icon: Icons.tune,
+              tooltip: l10n.typhoonOverlayMenuTooltip,
+              active: active,
+              onTap: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
             );
           },
           menuChildren: [
-            _SectionLabel(l10n.typhoonOverlaySectionStorm),
+            SectionHeader(l10n.typhoonOverlaySectionStorm),
             _StormBandRow(
               selected: band == TyphoonStormBand.level7,
               accent: _l7,
@@ -111,7 +80,7 @@ class TyphoonOverlayMenu extends StatelessWidget {
               onTap: () => layer.setStormBand(TyphoonStormBand.level10),
             ),
             _menuDivider(colors),
-            _SectionLabel(l10n.typhoonOverlaySectionWeather),
+            SectionHeader(l10n.typhoonOverlaySectionWeather),
             _WeatherRow(
               selected: weather == TyphoonWeatherOverlay.none,
               icon: Icons.layers_clear_outlined,
@@ -137,7 +106,7 @@ class TyphoonOverlayMenu extends StatelessWidget {
                   layer.setWeatherOverlay(TyphoonWeatherOverlay.satellite),
             ),
             _menuDivider(colors),
-            _SectionLabel(l10n.typhoonOverlaySectionExtra),
+            SectionHeader(l10n.typhoonOverlaySectionExtra),
             _ToggleRow(
               selected: showCallouts,
               icon: Icons.info_outline,
@@ -178,35 +147,6 @@ class TyphoonOverlayMenu extends StatelessWidget {
   );
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.sm,
-        AppSpacing.lg,
-        AppSpacing.xs,
-      ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: colors.onSurfaceVariant,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
-        ),
-      ),
-    );
-  }
-}
-
-/// Radio-style row for the L7 / L10 storm-band combo.
 class _StormBandRow extends StatelessWidget {
   const _StormBandRow({
     required this.selected,
@@ -232,18 +172,15 @@ class _StormBandRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-          backgroundColor: WidgetStatePropertyAll(
-            selected ? accent.withValues(alpha: 0.14) : Colors.transparent,
-          ),
+        style: MapChipButton.rowStyle(
+          selected ? accent.withValues(alpha: 0.14) : Colors.transparent,
         ),
         child: SizedBox(
           width: 228,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
+              vertical: AppSpacing.sm,
             ),
             child: Row(
               children: [
@@ -381,20 +318,17 @@ class _WeatherRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-          backgroundColor: WidgetStatePropertyAll(
-            selected
-                ? colors.primaryContainer.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
+        style: MapChipButton.rowStyle(
+          selected
+              ? colors.primaryContainer.withValues(alpha: 0.45)
+              : Colors.transparent,
         ),
         child: SizedBox(
           width: 228,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
+              vertical: AppSpacing.sm,
             ),
             child: Row(
               children: [
@@ -468,20 +402,17 @@ class _ToggleRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        style: ButtonStyle(
-          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-          backgroundColor: WidgetStatePropertyAll(
-            selected
-                ? colors.primaryContainer.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
+        style: MapChipButton.rowStyle(
+          selected
+              ? colors.primaryContainer.withValues(alpha: 0.45)
+              : Colors.transparent,
         ),
         child: SizedBox(
           width: 228,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
+              vertical: AppSpacing.sm,
             ),
             child: Row(
               children: [

@@ -1875,12 +1875,6 @@ abstract class AppLocalizations {
   /// **'Show AED locations'**
   String get disasterMapOverlayAedTooltip;
 
-  /// Hint in the AED sheet when nothing is selected
-  ///
-  /// In en, this message translates to:
-  /// **'Tap an AED marker for details'**
-  String get aedSheetEmpty;
-
   /// AED detail row label
   ///
   /// In en, this message translates to:
@@ -1946,6 +1940,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Emergency phone'**
   String get aedEmergencyPhone;
+
+  /// Disaster-map overlay menu toggle for public restrooms
+  ///
+  /// In en, this message translates to:
+  /// **'Restrooms'**
+  String get mapLayerRestroom;
+
+  /// Disaster-map overlay menu toggle for evacuation shelters
+  ///
+  /// In en, this message translates to:
+  /// **'Shelters'**
+  String get mapLayerShelter;
+
+  /// Tooltip for the restroom toggle in the disaster-map overlay menu
+  ///
+  /// In en, this message translates to:
+  /// **'Show public restrooms'**
+  String get disasterMapOverlayRestroomTooltip;
+
+  /// Tooltip for the shelter toggle in the disaster-map overlay menu
+  ///
+  /// In en, this message translates to:
+  /// **'Show evacuation shelters'**
+  String get disasterMapOverlayShelterTooltip;
+
+  /// Hint in the disaster-map detail sheet when nothing is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a marker on the map for details'**
+  String get dpmSheetEmpty;
+
+  /// Address row label in the disaster-map restroom / shelter detail sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get dpmAddress;
+
+  /// Restroom detail row label for the toilet type
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get restroomTypeLabel;
+
+  /// Restroom detail row label for the venue category
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get restroomCategoryLabel;
+
+  /// Restroom detail row label for the cleanliness grade
+  ///
+  /// In en, this message translates to:
+  /// **'Grade'**
+  String get restroomGradeLabel;
+
+  /// Restroom type: female restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get restroomTypeFemale;
+
+  /// Restroom type: male restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get restroomTypeMale;
+
+  /// Restroom type: mixed/unisex restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get restroomTypeMixed;
+
+  /// Restroom type: accessible restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Accessible'**
+  String get restroomTypeAccessible;
+
+  /// Restroom type: gender-neutral restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Gender-neutral'**
+  String get restroomTypeGenderNeutral;
+
+  /// Restroom type: family restroom
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get restroomTypeFamily;
+
+  /// Restroom type: not specified
+  ///
+  /// In en, this message translates to:
+  /// **'Unspecified'**
+  String get restroomTypeUnspecified;
+
+  /// Restroom venue category: transport facility
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get restroomCategoryTransport;
+
+  /// Restroom venue category: park
+  ///
+  /// In en, this message translates to:
+  /// **'Park'**
+  String get restroomCategoryPark;
+
+  /// Restroom venue category: commercial establishment
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial'**
+  String get restroomCategoryCommercial;
+
+  /// Restroom venue category: religious / ceremonial venue
+  ///
+  /// In en, this message translates to:
+  /// **'Religious'**
+  String get restroomCategoryReligious;
+
+  /// Restroom venue category: cultural / leisure activity venue
+  ///
+  /// In en, this message translates to:
+  /// **'Cultural'**
+  String get restroomCategoryCultural;
+
+  /// Restroom venue category: public service office
+  ///
+  /// In en, this message translates to:
+  /// **'Government'**
+  String get restroomCategoryGovernment;
+
+  /// Restroom venue category: social welfare institution / gathering place
+  ///
+  /// In en, this message translates to:
+  /// **'Welfare'**
+  String get restroomCategoryWelfare;
+
+  /// Restroom venue category: tourist area / scenic spot
+  ///
+  /// In en, this message translates to:
+  /// **'Tourist'**
+  String get restroomCategoryTourist;
+
+  /// Restroom venue category: leisure / entertainment venue
+  ///
+  /// In en, this message translates to:
+  /// **'Leisure'**
+  String get restroomCategoryLeisure;
+
+  /// Restroom venue category: other
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get restroomCategoryOther;
+
+  /// Restroom cleanliness grade: excellent
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get restroomGradeExcellent;
+
+  /// Restroom cleanliness grade: good
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get restroomGradeGood;
+
+  /// Restroom cleanliness grade: average
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get restroomGradeAverage;
+
+  /// Restroom cleanliness grade: below standard
+  ///
+  /// In en, this message translates to:
+  /// **'Below standard'**
+  String get restroomGradePoor;
+
+  /// Shelter detail address row label
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get shelterAddressLabel;
+
+  /// Shelter detail capacity row label
+  ///
+  /// In en, this message translates to:
+  /// **'Capacity'**
+  String get shelterCapacityLabel;
+
+  /// Shelter detail capacity row value
+  ///
+  /// In en, this message translates to:
+  /// **'{n} people'**
+  String shelterCapacityValue(int n);
+
+  /// Shelter detail applicable-disaster categories row label
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster types'**
+  String get shelterCategoryLabel;
+
+  /// Shelter detail row: whether indoor shelter is provided
+  ///
+  /// In en, this message translates to:
+  /// **'Indoor shelter'**
+  String get shelterIndoorLabel;
+
+  /// Shelter detail row: whether outdoor shelter is provided
+  ///
+  /// In en, this message translates to:
+  /// **'Outdoor shelter'**
+  String get shelterOutdoorLabel;
+
+  /// Shelter detail row: whether evacuees needing care can be accommodated
+  ///
+  /// In en, this message translates to:
+  /// **'Vulnerable-people friendly'**
+  String get shelterVulnerableOkLabel;
+
+  /// Affirmative value in the disaster-map detail sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get dpmYes;
+
+  /// Negative value in the disaster-map detail sheet
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get dpmNo;
 
   /// Empty-state hint in the map station-value sheet, shown before any station is selected
   ///
@@ -2234,6 +2462,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show forecast-point detail cards when zoomed in'**
   String get typhoonOverlayForecastCalloutsTooltip;
+
+  /// Filter section title in the disaster-map sheet: restroom venue categories
+  ///
+  /// In en, this message translates to:
+  /// **'Venue types'**
+  String get dpmFilterSectionRestroom;
+
+  /// Filter section title in the disaster-map sheet: restroom toilet-kind categories
+  ///
+  /// In en, this message translates to:
+  /// **'Toilet types'**
+  String get dpmFilterSectionRestroomType;
+
+  /// Filter section title in the disaster-map sheet: shelter disaster types
+  ///
+  /// In en, this message translates to:
+  /// **'Shelter disaster types'**
+  String get dpmFilterSectionShelter;
+
+  /// Shelter disaster-type filter chip: flood
+  ///
+  /// In en, this message translates to:
+  /// **'Flood'**
+  String get dpmDisasterFlood;
+
+  /// Shelter disaster-type filter chip: earthquake
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get dpmDisasterEarthquake;
+
+  /// Shelter disaster-type filter chip: landslide
+  ///
+  /// In en, this message translates to:
+  /// **'Landslide'**
+  String get dpmDisasterLandslide;
+
+  /// Shelter disaster-type filter chip: tsunami
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami'**
+  String get dpmDisasterTsunami;
+
+  /// Shelter disaster-type filter chip: slope hazard
+  ///
+  /// In en, this message translates to:
+  /// **'Slope hazard'**
+  String get dpmDisasterSlope;
+
+  /// Shelter disaster-type filter chip: nuclear accident
+  ///
+  /// In en, this message translates to:
+  /// **'Nuclear accident'**
+  String get dpmDisasterNuclear;
 }
 
 class _AppLocalizationsDelegate

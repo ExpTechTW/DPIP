@@ -971,9 +971,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'Tampilkan lokasi AED';
 
   @override
-  String get aedSheetEmpty => 'Ketuk penanda AED untuk detail';
-
-  @override
   String get aedAddress => 'Alamat';
 
   @override
@@ -1005,6 +1002,125 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => 'Telepon darurat';
+
+  @override
+  String get mapLayerRestroom => 'Toilet Umum';
+
+  @override
+  String get mapLayerShelter => 'Tempat Evakuasi';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'Tampilkan toilet umum';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Tampilkan tempat evakuasi';
+
+  @override
+  String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
+
+  @override
+  String get dpmAddress => 'Alamat';
+
+  @override
+  String get restroomTypeLabel => 'Jenis';
+
+  @override
+  String get restroomCategoryLabel => 'Kategori';
+
+  @override
+  String get restroomGradeLabel => 'Nilai';
+
+  @override
+  String get restroomTypeFemale => 'Toilet wanita';
+
+  @override
+  String get restroomTypeMale => 'Toilet pria';
+
+  @override
+  String get restroomTypeMixed => 'Toilet campuran';
+
+  @override
+  String get restroomTypeAccessible => 'Toilet aksesibel';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Toilet netral gender';
+
+  @override
+  String get restroomTypeFamily => 'Toilet keluarga';
+
+  @override
+  String get restroomTypeUnspecified => 'Tidak ditentukan';
+
+  @override
+  String get restroomCategoryTransport => 'Transportasi';
+
+  @override
+  String get restroomCategoryPark => 'Taman';
+
+  @override
+  String get restroomCategoryCommercial => 'Tempat komersial';
+
+  @override
+  String get restroomCategoryReligious => 'Tempat ibadah';
+
+  @override
+  String get restroomCategoryCultural => 'Tempat budaya';
+
+  @override
+  String get restroomCategoryGovernment => 'Kantor pelayanan publik';
+
+  @override
+  String get restroomCategoryWelfare => 'Lembaga kesejahteraan';
+
+  @override
+  String get restroomCategoryTourist => 'Kawasan wisata';
+
+  @override
+  String get restroomCategoryLeisure => 'Tempat rekreasi';
+
+  @override
+  String get restroomCategoryOther => 'Lainnya';
+
+  @override
+  String get restroomGradeExcellent => 'Sangat baik';
+
+  @override
+  String get restroomGradeGood => 'Baik';
+
+  @override
+  String get restroomGradeAverage => 'Sedang';
+
+  @override
+  String get restroomGradePoor => 'Di bawah standar';
+
+  @override
+  String get shelterAddressLabel => 'Alamat';
+
+  @override
+  String get shelterCapacityLabel => 'Kapasitas';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n orang';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Jenis bencana';
+
+  @override
+  String get shelterIndoorLabel => 'Penampungan dalam ruangan';
+
+  @override
+  String get shelterOutdoorLabel => 'Penampungan luar ruangan';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Ramah kelompok rentan';
+
+  @override
+  String get dpmYes => 'Ya';
+
+  @override
+  String get dpmNo => 'Tidak';
 
   @override
   String get stationSheetEmpty => 'Ketuk stasiun untuk melihat bacaannya';
@@ -1171,4 +1287,31 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Jenis tempat';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Jenis toilet';
+
+  @override
+  String get dpmFilterSectionShelter => 'Jenis bencana tempat berlindung';
+
+  @override
+  String get dpmDisasterFlood => 'Banjir';
+
+  @override
+  String get dpmDisasterEarthquake => 'Gempa';
+
+  @override
+  String get dpmDisasterLandslide => 'Tanah longsor';
+
+  @override
+  String get dpmDisasterTsunami => 'Tsunami';
+
+  @override
+  String get dpmDisasterSlope => 'Bencana lereng';
+
+  @override
+  String get dpmDisasterNuclear => 'Kecelakaan nuklir';
 }

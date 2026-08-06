@@ -973,9 +973,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'Show AED locations';
 
   @override
-  String get aedSheetEmpty => 'I-tap ang AED marker para sa detalye';
-
-  @override
   String get aedAddress => 'Address';
 
   @override
@@ -1007,6 +1004,126 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => 'Emergency phone';
+
+  @override
+  String get mapLayerRestroom => 'Pampublikong Palikuran';
+
+  @override
+  String get mapLayerShelter => 'Silungan';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip =>
+      'Ipakita ang mga pampublikong palikuran';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => 'Ipakita ang mga silungan';
+
+  @override
+  String get dpmSheetEmpty => 'I-tap ang marker sa mapa para sa detalye';
+
+  @override
+  String get dpmAddress => 'Address';
+
+  @override
+  String get restroomTypeLabel => 'Uri';
+
+  @override
+  String get restroomCategoryLabel => 'Kategorya';
+
+  @override
+  String get restroomGradeLabel => 'Baitang';
+
+  @override
+  String get restroomTypeFemale => 'Palikuran ng babae';
+
+  @override
+  String get restroomTypeMale => 'Palikuran ng lalaki';
+
+  @override
+  String get restroomTypeMixed => 'Pinagsamang palikuran';
+
+  @override
+  String get restroomTypeAccessible => 'Palikurang may accessibility';
+
+  @override
+  String get restroomTypeGenderNeutral => 'Palikurang neutral sa kasarian';
+
+  @override
+  String get restroomTypeFamily => 'Palikuran ng pamilya';
+
+  @override
+  String get restroomTypeUnspecified => 'Hindi natukoy';
+
+  @override
+  String get restroomCategoryTransport => 'Transportasyon';
+
+  @override
+  String get restroomCategoryPark => 'Parke';
+
+  @override
+  String get restroomCategoryCommercial => 'Komersyal na establisyimento';
+
+  @override
+  String get restroomCategoryReligious => 'Relihiyosong lugar';
+
+  @override
+  String get restroomCategoryCultural => 'Pook na pangkultura';
+
+  @override
+  String get restroomCategoryGovernment => 'Opisina ng gobyerno';
+
+  @override
+  String get restroomCategoryWelfare => 'Institusyon ng kapakanan';
+
+  @override
+  String get restroomCategoryTourist => 'Lugar para sa turista';
+
+  @override
+  String get restroomCategoryLeisure => 'Lugar ng libangan';
+
+  @override
+  String get restroomCategoryOther => 'Iba pa';
+
+  @override
+  String get restroomGradeExcellent => 'Napakahusay';
+
+  @override
+  String get restroomGradeGood => 'Mahusay';
+
+  @override
+  String get restroomGradeAverage => 'Katamtaman';
+
+  @override
+  String get restroomGradePoor => 'Mas mababa sa pamantayan';
+
+  @override
+  String get shelterAddressLabel => 'Address';
+
+  @override
+  String get shelterCapacityLabel => 'Kapasidad';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n katao';
+  }
+
+  @override
+  String get shelterCategoryLabel => 'Mga uri ng kalamidad';
+
+  @override
+  String get shelterIndoorLabel => 'Silungan sa loob';
+
+  @override
+  String get shelterOutdoorLabel => 'Silungan sa labas';
+
+  @override
+  String get shelterVulnerableOkLabel => 'Angkop para sa mahihina';
+
+  @override
+  String get dpmYes => 'Oo';
+
+  @override
+  String get dpmNo => 'Hindi';
 
   @override
   String get stationSheetEmpty => 'I-tap ang istasyon para makita ang datos';
@@ -1173,4 +1290,31 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => 'Mga uri ng lugar';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'Mga uri ng banyo';
+
+  @override
+  String get dpmFilterSectionShelter => 'Mga uri ng sakuna sa silungan';
+
+  @override
+  String get dpmDisasterFlood => 'Baha';
+
+  @override
+  String get dpmDisasterEarthquake => 'Lindol';
+
+  @override
+  String get dpmDisasterLandslide => 'Pagguho ng lupa';
+
+  @override
+  String get dpmDisasterTsunami => 'Tsunami';
+
+  @override
+  String get dpmDisasterSlope => 'Panganib sa dalisdis';
+
+  @override
+  String get dpmDisasterNuclear => 'Aksidente sa nukleyar';
 }

@@ -60,9 +60,13 @@ const String outlineLayerId = 'county-outline';
 /// Id of the faint township-outline layer (below the county borders).
 const String townOutlineLayerId = 'town-outline';
 
-/// Baked DPM AED source / layer ids — must match [DisasterMapLayer].
+/// Baked DPM source / layer ids — must match [DisasterMapLayer].
 const String dpmAedSourceId = 'dpm-aed-src';
 const String dpmAedPointsLayerId = 'dpm-aed-points';
+const String dpmRestroomSourceId = 'dpm-restroom-src';
+const String dpmRestroomPointsLayerId = 'dpm-restroom-points';
+const String dpmShelterSourceId = 'dpm-shelter-src';
+const String dpmShelterPointsLayerId = 'dpm-shelter-points';
 
 /// Origin basemap XYZ (LB). Fetched by MapLibre, served from the app's tile
 /// store through the Dart bridge, and warmed by `MapTileWarmer` — the same

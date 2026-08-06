@@ -172,7 +172,7 @@ class _MapScaffoldState extends State<MapScaffold> {
     if (pending == null || !mounted) return;
     await _switchToLayerId(pending.layerId);
     if (!mounted) return;
-    _frameBounds(pending.bounds);
+    _frameBounds(pending.bounds, northUp: true);
   }
 
   /// Switches the active overlay when [layerId] is set and known.
@@ -209,9 +209,9 @@ class _MapScaffoldState extends State<MapScaffold> {
   }
 
   /// Adopts [bounds] as the framing target and applies it.
-  void _frameBounds(LatLngBounds bounds) {
+  void _frameBounds(LatLngBounds bounds, {bool northUp = false}) {
     _target = safeFitBounds(bounds);
-    _applyFraming();
+    _applyFraming(northUp: northUp);
   }
 
   /// Points the camera at [_target], fitted into the band the user can actually
@@ -228,7 +228,7 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// centre+zoom, never MapLibre's native `newLatLngBounds` — that aborts the
   /// process on a degenerate box, and its padding is dropped on the `camera#move`
   /// path anyway (see camera_fit.dart).
-  void _applyFraming() {
+  void _applyFraming({bool northUp = false}) {
     final target = _target;
     if (target == null || !mounted || _controller == null) return;
     // The map's own size, not MediaQuery's screen size: this surface sits inside
@@ -241,7 +241,23 @@ class _MapScaffoldState extends State<MapScaffold> {
       topInset: MediaQuery.paddingOf(context).top,
       bottomInset: _bottomInset(size),
     );
-    if (fit != null) {
+    if (fit == null) return;
+    // A re-entry frame (nav-bar / Home hand-off) snaps the camera back to
+    // north-up: `newLatLngZoom` preserves the current heading on iOS
+    // (Convert.swift keeps `camera.heading`), so a map left rotated would come
+    // back rotated; `newCameraPosition` with bearing 0 always faces north.
+    if (northUp) {
+      _controller?.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: fit.target,
+            zoom: fit.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      );
+    } else {
       _controller?.moveCamera(CameraUpdate.newLatLngZoom(fit.target, fit.zoom));
     }
   }

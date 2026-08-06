@@ -960,9 +960,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'AEDの位置を表示';
 
   @override
-  String get aedSheetEmpty => 'AEDマーカーをタップして詳細を表示';
-
-  @override
   String get aedAddress => '住所';
 
   @override
@@ -994,6 +991,125 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => '緊急連絡先';
+
+  @override
+  String get mapLayerRestroom => 'トイレ';
+
+  @override
+  String get mapLayerShelter => '避難所';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => 'トイレを表示';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '避難所を表示';
+
+  @override
+  String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
+
+  @override
+  String get dpmAddress => '住所';
+
+  @override
+  String get restroomTypeLabel => '種別';
+
+  @override
+  String get restroomCategoryLabel => '区分';
+
+  @override
+  String get restroomGradeLabel => '等級';
+
+  @override
+  String get restroomTypeFemale => '女性用トイレ';
+
+  @override
+  String get restroomTypeMale => '男性用トイレ';
+
+  @override
+  String get restroomTypeMixed => '男女共用トイレ';
+
+  @override
+  String get restroomTypeAccessible => 'バリアフリートイレ';
+
+  @override
+  String get restroomTypeGenderNeutral => 'ジェンダーニュートラルトイレ';
+
+  @override
+  String get restroomTypeFamily => '親子トイレ';
+
+  @override
+  String get restroomTypeUnspecified => '未設定';
+
+  @override
+  String get restroomCategoryTransport => '交通';
+
+  @override
+  String get restroomCategoryPark => '公園';
+
+  @override
+  String get restroomCategoryCommercial => '商業・営業施設';
+
+  @override
+  String get restroomCategoryReligious => '宗教・礼拝施設';
+
+  @override
+  String get restroomCategoryCultural => '文化・娯楽施設';
+
+  @override
+  String get restroomCategoryGovernment => '行政サービス施設';
+
+  @override
+  String get restroomCategoryWelfare => '社会福祉施設・集会所';
+
+  @override
+  String get restroomCategoryTourist => '観光地・景勝地';
+
+  @override
+  String get restroomCategoryLeisure => 'レジャー・娯楽施設';
+
+  @override
+  String get restroomCategoryOther => 'その他';
+
+  @override
+  String get restroomGradeExcellent => '最上級';
+
+  @override
+  String get restroomGradeGood => '優良';
+
+  @override
+  String get restroomGradeAverage => '普通';
+
+  @override
+  String get restroomGradePoor => '不合格';
+
+  @override
+  String get shelterAddressLabel => '住所';
+
+  @override
+  String get shelterCapacityLabel => '収容人数';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 人';
+  }
+
+  @override
+  String get shelterCategoryLabel => '対象災害';
+
+  @override
+  String get shelterIndoorLabel => '屋内収容';
+
+  @override
+  String get shelterOutdoorLabel => '屋外収容';
+
+  @override
+  String get shelterVulnerableOkLabel => '要配慮者向け収容';
+
+  @override
+  String get dpmYes => 'はい';
+
+  @override
+  String get dpmNo => 'いいえ';
 
   @override
   String get stationSheetEmpty => '観測点をタップして値を表示';
@@ -1152,4 +1268,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip => '拡大時に予報点の詳細カードを表示';
+
+  @override
+  String get dpmFilterSectionRestroom => '施設の種類';
+
+  @override
+  String get dpmFilterSectionRestroomType => 'トイレの種類';
+
+  @override
+  String get dpmFilterSectionShelter => '避難所の災害種別';
+
+  @override
+  String get dpmDisasterFlood => '洪水';
+
+  @override
+  String get dpmDisasterEarthquake => '震災';
+
+  @override
+  String get dpmDisasterLandslide => '土石流';
+
+  @override
+  String get dpmDisasterTsunami => '津波';
+
+  @override
+  String get dpmDisasterSlope => '斜面災害';
+
+  @override
+  String get dpmDisasterNuclear => '原子力事故';
 }

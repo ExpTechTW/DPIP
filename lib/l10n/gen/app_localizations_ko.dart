@@ -960,9 +960,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get disasterMapOverlayAedTooltip => 'AED 위치 표시';
 
   @override
-  String get aedSheetEmpty => 'AED 마커를 눌러 상세 보기';
-
-  @override
   String get aedAddress => '주소';
 
   @override
@@ -994,6 +991,125 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get aedEmergencyPhone => '비상 연락처';
+
+  @override
+  String get mapLayerRestroom => '공중화장실';
+
+  @override
+  String get mapLayerShelter => '대피소';
+
+  @override
+  String get disasterMapOverlayRestroomTooltip => '공중화장실 표시';
+
+  @override
+  String get disasterMapOverlayShelterTooltip => '대피소 표시';
+
+  @override
+  String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
+
+  @override
+  String get dpmAddress => '주소';
+
+  @override
+  String get restroomTypeLabel => '유형';
+
+  @override
+  String get restroomCategoryLabel => '구분';
+
+  @override
+  String get restroomGradeLabel => '등급';
+
+  @override
+  String get restroomTypeFemale => '여자 화장실';
+
+  @override
+  String get restroomTypeMale => '남자 화장실';
+
+  @override
+  String get restroomTypeMixed => '남녀 공용 화장실';
+
+  @override
+  String get restroomTypeAccessible => '장애인 화장실';
+
+  @override
+  String get restroomTypeGenderNeutral => '성중립 화장실';
+
+  @override
+  String get restroomTypeFamily => '가족 화장실';
+
+  @override
+  String get restroomTypeUnspecified => '미설정';
+
+  @override
+  String get restroomCategoryTransport => '교통';
+
+  @override
+  String get restroomCategoryPark => '공원';
+
+  @override
+  String get restroomCategoryCommercial => '상업·영업 시설';
+
+  @override
+  String get restroomCategoryReligious => '종교·의례 시설';
+
+  @override
+  String get restroomCategoryCultural => '문화·여가 시설';
+
+  @override
+  String get restroomCategoryGovernment => '민원 업무 시설';
+
+  @override
+  String get restroomCategoryWelfare => '사회복지 기관·집회 시설';
+
+  @override
+  String get restroomCategoryTourist => '관광 지역·경치 구역';
+
+  @override
+  String get restroomCategoryLeisure => '휴양·오락 시설';
+
+  @override
+  String get restroomCategoryOther => '기타';
+
+  @override
+  String get restroomGradeExcellent => '최우수';
+
+  @override
+  String get restroomGradeGood => '우수';
+
+  @override
+  String get restroomGradeAverage => '보통';
+
+  @override
+  String get restroomGradePoor => '불합격';
+
+  @override
+  String get shelterAddressLabel => '주소';
+
+  @override
+  String get shelterCapacityLabel => '수용 인원';
+
+  @override
+  String shelterCapacityValue(int n) {
+    return '$n 명';
+  }
+
+  @override
+  String get shelterCategoryLabel => '적용 재해';
+
+  @override
+  String get shelterIndoorLabel => '실내 수용';
+
+  @override
+  String get shelterOutdoorLabel => '실외 수용';
+
+  @override
+  String get shelterVulnerableOkLabel => '취약계층 수용 가능';
+
+  @override
+  String get dpmYes => '예';
+
+  @override
+  String get dpmNo => '아니요';
 
   @override
   String get stationSheetEmpty => '관측소를 눌러 관측값 보기';
@@ -1160,4 +1276,31 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
       'Show forecast-point detail cards when zoomed in';
+
+  @override
+  String get dpmFilterSectionRestroom => '시설 유형';
+
+  @override
+  String get dpmFilterSectionRestroomType => '화장실 유형';
+
+  @override
+  String get dpmFilterSectionShelter => '대피소 재해 유형';
+
+  @override
+  String get dpmDisasterFlood => '홍수';
+
+  @override
+  String get dpmDisasterEarthquake => '지진';
+
+  @override
+  String get dpmDisasterLandslide => '산사태';
+
+  @override
+  String get dpmDisasterTsunami => '쓰나미';
+
+  @override
+  String get dpmDisasterSlope => '사면 재해';
+
+  @override
+  String get dpmDisasterNuclear => '핵 사고';
 }

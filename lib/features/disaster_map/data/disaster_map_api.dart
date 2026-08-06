@@ -27,4 +27,14 @@ class DisasterMapApi {
     final raw = await _client.get(_tier, '/api/v2/tiles/dpm/aed/$id');
     return Map<String, dynamic>.from(raw as Map);
   }
+
+  Future<Map<String, dynamic>> getRestroomDetail(int id) async {
+    final raw = await _client.get(_tier, '/api/v2/tiles/dpm/restroom/$id');
+    return Map<String, dynamic>.from(raw as Map);
+  }
+
+  Future<Map<String, dynamic>> getShelterDetail(int id) async {
+    final raw = await _client.get(_tier, '/api/v2/tiles/dpm/shelter/$id');
+    return Map<String, dynamic>.from(raw as Map);
+  }
 }
