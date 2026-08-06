@@ -55,4 +55,57 @@ void main() {
       NotifyOptionKind.all,
     ]);
   });
+
+  group('notifyOptionsForDisplay', () {
+    test('is optionsFor reversed, each entry keeping its wire index', () {
+      for (final channel in NotifyChannel.values) {
+        final wireOptions = optionsFor(channel);
+        final display = notifyOptionsForDisplay(channel);
+        expect(display.length, wireOptions.length);
+        for (final (displayPos, entry) in display.indexed) {
+          final (wireIndex, kind) = entry;
+          // Position i from the end of wire order is position i from the
+          // start of display order.
+          final expectedWireIndex = wireOptions.length - 1 - displayPos;
+          expect(wireIndex, expectedWireIndex);
+          expect(kind, wireOptions[wireIndex]);
+        }
+      }
+    });
+
+    test('puts off last and the broadest option first, matching legacy', () {
+      // "接收全部/local" first, "關閉" last — the reverse of wire order (which
+      // has to keep off at index 0 for channels that carry it, per the server
+      // contract), matching the legacy app's hand-built option lists.
+      expect(notifyOptionsForDisplay(NotifyChannel.monitor).map((e) => e.$2), [
+        NotifyOptionKind.all,
+        NotifyOptionKind.localIntensity1,
+        NotifyOptionKind.off,
+      ]);
+      expect(
+        notifyOptionsForDisplay(NotifyChannel.thunderstorm).map((e) => e.$2),
+        [NotifyOptionKind.weatherLocal, NotifyOptionKind.off],
+      );
+      expect(
+        notifyOptionsForDisplay(NotifyChannel.announcement).map((e) => e.$2),
+        [NotifyOptionKind.all, NotifyOptionKind.off],
+      );
+      expect(notifyOptionsForDisplay(NotifyChannel.eew).map((e) => e.$2), [
+        NotifyOptionKind.all,
+        NotifyOptionKind.localIntensity1,
+        NotifyOptionKind.localIntensity4,
+      ]);
+      expect(notifyOptionsForDisplay(NotifyChannel.tsunami).map((e) => e.$2), [
+        NotifyOptionKind.tsunamiAll,
+        NotifyOptionKind.tsunamiWarning,
+      ]);
+    });
+
+    test('tapping the first displayed row for monitor sends wire value 2', () {
+      // Regression: display order must not leak into the value sent to the
+      // server — "接收全部" is shown first but its wire index is still 2.
+      final first = notifyOptionsForDisplay(NotifyChannel.monitor).first;
+      expect(first, (2, NotifyOptionKind.all));
+    });
+  });
 }

@@ -20,7 +20,8 @@ String notifyChannelTitle(NotifyChannel channel, AppLocalizations l10n) =>
       NotifyChannel.announcement => l10n.notifyAnnouncement,
     };
 
-/// The channel's leading icon (outlined, per the icon convention).
+/// The channel's leading icon (outlined, per the icon convention) — one fixed
+/// icon regardless of the current option; the subtitle carries the state.
 IconData notifyChannelIcon(NotifyChannel channel) => switch (channel) {
   NotifyChannel.eew => Icons.crisis_alert_outlined,
   NotifyChannel.monitor => Icons.monitor_heart_outlined,
@@ -44,3 +45,16 @@ String notifyOptionLabel(NotifyOptionKind kind, AppLocalizations l10n) =>
       NotifyOptionKind.tsunamiWarning => l10n.notifyOptTsunamiWarning,
       NotifyOptionKind.tsunamiAll => l10n.notifyOptTsunamiAll,
     };
+
+/// The option's leading icon in the picker sheet — a coarse "how much" cue
+/// (silenced, narrow threshold, or everything) shared by every channel's
+/// option list, per DESIGN.md's "every menu row has a leading icon" rule.
+IconData notifyOptionIcon(NotifyOptionKind kind) => switch (kind) {
+  NotifyOptionKind.off => Icons.notifications_off_outlined,
+  NotifyOptionKind.all => Icons.notifications_active_outlined,
+  NotifyOptionKind.localIntensity4 => Icons.notification_important_outlined,
+  NotifyOptionKind.localIntensity1 => Icons.notifications_outlined,
+  NotifyOptionKind.weatherLocal => Icons.notifications_outlined,
+  NotifyOptionKind.tsunamiWarning => Icons.notification_important_outlined,
+  NotifyOptionKind.tsunamiAll => Icons.notifications_active_outlined,
+};
