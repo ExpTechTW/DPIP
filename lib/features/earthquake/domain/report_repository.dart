@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 
@@ -13,4 +14,8 @@ abstract interface class ReportRepository {
     int page = 1,
     ReportListQuery query = ReportListQuery.empty,
   });
+
+  /// The full report — including the per-area/town intensity breakdown — by
+  /// [id], for the detail page behind a catalogue row.
+  Future<Result<EarthquakeReport>> get(String id);
 }

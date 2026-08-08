@@ -68,3 +68,22 @@ flutter:
     - assets/location.json.gz
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz
+    - assets/map/icons/cross.png
+    - assets/map/icons/intensity-1.png
+    - assets/map/icons/intensity-1-dark.png
+    - assets/map/icons/intensity-2.png
+    - assets/map/icons/intensity-2-dark.png
+    - assets/map/icons/intensity-3.png
+    - assets/map/icons/intensity-3-dark.png
+    - assets/map/icons/intensity-4.png
+    - assets/map/icons/intensity-4-dark.png
+    - assets/map/icons/intensity-5.png
+    - assets/map/icons/intensity-5-dark.png
+    - assets/map/icons/intensity-6.png
+    - assets/map/icons/intensity-6-dark.png
+    - assets/map/icons/intensity-7.png
+    - assets/map/icons/intensity-7-dark.png
+    - assets/map/icons/intensity-8.png
+    - assets/map/icons/intensity-8-dark.png
+    - assets/map/icons/intensity-9.png
+    - assets/map/icons/intensity-9-dark.png

@@ -531,6 +531,78 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get reportListSearch;
 
+  /// Header title over the report detail map's back button
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake Report'**
+  String get reportDetailTitle;
+
+  /// Eyebrow label on the detail header for a numbered CWA report
+  ///
+  /// In en, this message translates to:
+  /// **'No. {number} Significant Earthquake'**
+  String reportDetailNumbered(String number);
+
+  /// Eyebrow label on the detail header for a …000 (unnumbered) report
+  ///
+  /// In en, this message translates to:
+  /// **'Local Felt Earthquake'**
+  String get reportDetailLocalFelt;
+
+  /// Section header over origin time / epicenter / magnitude / depth
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get reportDetailInfo;
+
+  /// Row label for the report's origin date/time
+  ///
+  /// In en, this message translates to:
+  /// **'Origin time'**
+  String get reportDetailOriginTime;
+
+  /// Row label for the epicenter's latitude/longitude
+  ///
+  /// In en, this message translates to:
+  /// **'Epicenter'**
+  String get reportDetailEpicenter;
+
+  /// Row label for the report's magnitude
+  ///
+  /// In en, this message translates to:
+  /// **'Magnitude'**
+  String get reportDetailMagnitude;
+
+  /// Row label for the report's hypocentral depth
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get reportDetailDepth;
+
+  /// Section header over the per-area/town felt-intensity breakdown
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity by area'**
+  String get reportDetailAreaIntensity;
+
+  /// Section header over the CWA-rendered report image
+  ///
+  /// In en, this message translates to:
+  /// **'Report image'**
+  String get reportDetailImage;
+
+  /// Shown in place of the report image when it fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Report image not available'**
+  String get reportDetailImageUnavailable;
+
+  /// Button that opens the official CWA report page in a browser
+  ///
+  /// In en, this message translates to:
+  /// **'Report page'**
+  String get reportDetailOpenReport;
+
   /// Bottom-nav label and page title for the More tab
   ///
   /// In en, this message translates to:

@@ -242,6 +242,44 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportListSearch => 'Cari';
 
   @override
+  String get reportDetailTitle => 'Laporan Gempa';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'Gempa Dirasakan Signifikan No. $number';
+  }
+
+  @override
+  String get reportDetailLocalFelt => 'Gempa Dirasakan Lokal';
+
+  @override
+  String get reportDetailInfo => 'Detail';
+
+  @override
+  String get reportDetailOriginTime => 'Waktu kejadian';
+
+  @override
+  String get reportDetailEpicenter => 'Koordinat episentrum';
+
+  @override
+  String get reportDetailMagnitude => 'Magnitudo';
+
+  @override
+  String get reportDetailDepth => 'Kedalaman hiposenter';
+
+  @override
+  String get reportDetailAreaIntensity => 'Intensitas per wilayah';
+
+  @override
+  String get reportDetailImage => 'Gambar laporan';
+
+  @override
+  String get reportDetailImageUnavailable => 'Gambar laporan belum tersedia';
+
+  @override
+  String get reportDetailOpenReport => 'Halaman laporan';
+
+  @override
   String get navMore => 'Lainnya';
 
   @override

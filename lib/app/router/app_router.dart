@@ -2,6 +2,7 @@ import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_detail_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
@@ -71,6 +72,15 @@ final GoRouter appRouter = GoRouter(
                   path: AppRoutes.earthquakePath,
                   name: AppRoutes.earthquake,
                   builder: (_, _) => const ReportListPage(),
+                  routes: [
+                    GoRoute(
+                      path: AppRoutes.earthquakeReportPath,
+                      name: AppRoutes.earthquakeReport,
+                      builder: (_, state) => ReportDetailPage(
+                        reportId: state.pathParameters['id']!,
+                      ),
+                    ),
+                  ],
                 ),
                 GoRoute(
                   path: AppRoutes.eewPath,

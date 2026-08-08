@@ -242,6 +242,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportListSearch => 'Search';
 
   @override
+  String get reportDetailTitle => 'Earthquake Report';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'No. $number Significant Earthquake';
+  }
+
+  @override
+  String get reportDetailLocalFelt => 'Local Felt Earthquake';
+
+  @override
+  String get reportDetailInfo => 'Details';
+
+  @override
+  String get reportDetailOriginTime => 'Origin time';
+
+  @override
+  String get reportDetailEpicenter => 'Epicenter';
+
+  @override
+  String get reportDetailMagnitude => 'Magnitude';
+
+  @override
+  String get reportDetailDepth => 'Depth';
+
+  @override
+  String get reportDetailAreaIntensity => 'Intensity by area';
+
+  @override
+  String get reportDetailImage => 'Report image';
+
+  @override
+  String get reportDetailImageUnavailable => 'Report image not available';
+
+  @override
+  String get reportDetailOpenReport => 'Report page';
+
+  @override
   String get navMore => 'More';
 
   @override

@@ -241,6 +241,44 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportListSearch => 'ค้นหา';
 
   @override
+  String get reportDetailTitle => 'รายงานแผ่นดินไหว';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'แผ่นดินไหวรู้สึกได้อย่างมีนัยสำคัญ หมายเลข $number';
+  }
+
+  @override
+  String get reportDetailLocalFelt => 'แผ่นดินไหวรู้สึกได้เฉพาะพื้นที่';
+
+  @override
+  String get reportDetailInfo => 'รายละเอียด';
+
+  @override
+  String get reportDetailOriginTime => 'เวลาเกิดเหตุ';
+
+  @override
+  String get reportDetailEpicenter => 'พิกัดศูนย์กลาง';
+
+  @override
+  String get reportDetailMagnitude => 'ขนาดแผ่นดินไหว';
+
+  @override
+  String get reportDetailDepth => 'ความลึกจุดศูนย์กลาง';
+
+  @override
+  String get reportDetailAreaIntensity => 'ความเข้มแยกตามพื้นที่';
+
+  @override
+  String get reportDetailImage => 'ภาพรายงานแผ่นดินไหว';
+
+  @override
+  String get reportDetailImageUnavailable => 'ยังไม่มีภาพรายงาน';
+
+  @override
+  String get reportDetailOpenReport => 'หน้ารายงาน';
+
+  @override
   String get navMore => 'เพิ่มเติม';
 
   @override
