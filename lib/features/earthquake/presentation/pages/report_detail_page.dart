@@ -122,22 +122,50 @@ LatLngBounds _reportBounds(EarthquakeReport report) {
   );
 }
 
-/// Highest intensity first; ties broken by name so the order is stable.
-int _byIntensityDesc(
-  MapEntry<String, AreaIntensity> a,
-  MapEntry<String, AreaIntensity> b,
-) {
-  final byIntensity = b.value.intensity.compareTo(a.value.intensity);
-  return byIntensity != 0 ? byIntensity : a.key.compareTo(b.key);
+/// One 震度 level's counties (縣市) and, per county, the felt area/town names —
+/// grouping by intensity first (highest first), not by county, mirrors the
+/// reference report layout: the level is stated once per group instead of
+/// once per chip.
+class _IntensityGroup {
+  const _IntensityGroup({required this.intensity, required this.counties});
+
+  final int intensity;
+  final List<_CountyAreas> counties;
 }
 
-/// Same ordering as [_byIntensityDesc], for a single area's town entries.
-int _byTownIntensityDesc(
-  MapEntry<String, StationIntensity> a,
-  MapEntry<String, StationIntensity> b,
-) {
-  final byIntensity = b.value.intensity.compareTo(a.value.intensity);
-  return byIntensity != 0 ? byIntensity : a.key.compareTo(b.key);
+/// One county's felt area/town names at its parent [_IntensityGroup]'s level.
+class _CountyAreas {
+  const _CountyAreas({required this.countyName, required this.areaNames});
+
+  final String countyName;
+  final List<String> areaNames;
+}
+
+/// Regroups the report's county→town map by intensity level (highest first),
+/// then by county, preserving each county's/town's original (API) order
+/// within that.
+List<_IntensityGroup> _buildIntensityGroups(EarthquakeReport report) {
+  final byIntensity = <int, Map<String, List<String>>>{};
+  for (final MapEntry(key: countyName, value: area) in report.list.entries) {
+    for (final MapEntry(key: townName, value: town) in area.town.entries) {
+      byIntensity
+          .putIfAbsent(town.intensity, () => {})
+          .putIfAbsent(countyName, () => [])
+          .add(townName);
+    }
+  }
+  final levels = byIntensity.keys.toList()..sort((a, b) => b.compareTo(a));
+  return [
+    for (final intensity in levels)
+      _IntensityGroup(
+        intensity: intensity,
+        counties: [
+          for (final MapEntry(key: countyName, value: areaNames)
+              in byIntensity[intensity]!.entries)
+            _CountyAreas(countyName: countyName, areaNames: areaNames),
+        ],
+      ),
+  ];
 }
 
 /// The map surface: epicentre + per-town intensity dots, framed to the
@@ -449,8 +477,7 @@ class _ReportSheetState extends State<_ReportSheet> {
 
   List<Widget> _expandedContent(BuildContext context, EarthquakeReport report) {
     final l10n = AppLocalizations.of(context);
-    // Highest-felt area first, left-to-right/top-to-bottom reading order.
-    final areas = report.list.entries.toList()..sort(_byIntensityDesc);
+    final groups = _buildIntensityGroups(report);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -461,9 +488,9 @@ class _ReportSheetState extends State<_ReportSheet> {
             const SizedBox(height: AppSpacing.lg),
             SectionHeader(l10n.reportDetailInfo),
             _ReportInfoCard(report: report),
-            if (areas.isNotEmpty) ...[
+            if (groups.isNotEmpty) ...[
               SectionHeader(l10n.reportDetailAreaIntensity),
-              _AreaIntensityCard(report: report, areas: areas),
+              _AreaIntensityCard(groups: groups),
             ],
             SectionHeader(l10n.reportDetailImage),
             _ReportImageCard(report: report),
@@ -818,12 +845,14 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// 各地震度 — one row per area (縣市), each with a wrap of its town chips.
+/// 各地震度 — grouped by felt intensity (highest first), not by county: each
+/// [_IntensityGroup] states its level once in a left-hand column via
+/// [IntensityBadge], with every county (bold) and its felt areas listed to
+/// the right, left-to-right/top-to-bottom.
 class _AreaIntensityCard extends StatelessWidget {
-  const _AreaIntensityCard({required this.report, required this.areas});
+  const _AreaIntensityCard({required this.groups});
 
-  final EarthquakeReport report;
-  final List<MapEntry<String, AreaIntensity>> areas;
+  final List<_IntensityGroup> groups;
 
   @override
   Widget build(BuildContext context) {
@@ -833,112 +862,101 @@ class _AreaIntensityCard extends StatelessWidget {
       borderRadius: AppRadius.medium,
       clipBehavior: Clip.antiAlias,
       child: Column(
-        // Otherwise each row centers as a whole block at its own shrink-wrapped
-        // width (see _AreaRow's inner Column), so a county with fewer/narrower
-        // chips visibly drifts toward the middle instead of sitting flush left.
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (var i = 0; i < areas.length; i++) ...[
-            if (i > 0) const Divider(height: 1),
-            _AreaRow(areaName: areas[i].key, area: areas[i].value),
-          ],
+          for (var i = 0; i < groups.length; i++)
+            _IntensityGroupRow(group: groups[i]),
         ],
       ),
     );
   }
 }
 
-class _AreaRow extends StatelessWidget {
-  const _AreaRow({required this.areaName, required this.area});
+/// One 震度 level's band — a background wash of its palette [IntensityColors]
+/// colour (strongest at the top, fading as intensity drops down the card)
+/// stands in for the vertical divider line a plain list would need, reading
+/// as a single severity gradient at a glance (the broadcast-graphic
+/// convention this section's reference design followed).
+class _IntensityGroupRow extends StatelessWidget {
+  const _IntensityGroupRow({required this.group});
 
-  final String areaName;
-  final AreaIntensity area;
+  final _IntensityGroup group;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    // Raw wire intensity, not [Intensity.displayForReport] — per-town/group
+    // readings have always been on the fine 0–9 scale (only the top-level
+    // report max needed the pre-2020 legacy-scale remap).
+    final label = Intensity.label(group.intensity);
+    final color = IntensityColors.discrete(group.intensity);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.14)),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: IntensityBadge(label: label, color: color, size: 40),
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < group.counties.length; i++) ...[
+                    if (i > 0)
+                      Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                        color: colors.outlineVariant.withValues(alpha: 0.4),
+                      ),
+                    _CountyAreasRow(county: group.counties[i]),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CountyAreasRow extends StatelessWidget {
+  const _CountyAreasRow({required this.county});
+
+  final _CountyAreas county;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.xs,
         children: [
           Text(
-            areaName,
-            style: theme.textTheme.titleSmall?.copyWith(
+            county.countyName,
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              // Highest-felt town first, left-to-right/top-to-bottom.
-              for (final MapEntry(key: townName, value: town)
-                  in area.town.entries.toList()..sort(_byTownIntensityDesc))
-                _TownChip(townName: townName, intensity: town.intensity),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TownChip extends StatelessWidget {
-  const _TownChip({required this.townName, required this.intensity});
-
-  final String townName;
-  final int intensity;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // Raw wire intensity, not [Intensity.displayForReport] — the per-town
-    // reading has always been on the fine 0–9 scale (only the top-level
-    // report max needed the pre-2020 legacy-scale remap).
-    final label = Intensity.label(intensity);
-    final color = IntensityColors.discrete(intensity);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        border: Border.all(color: color),
-        borderRadius: AppRadius.small,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: AppRadius.small,
-              ),
-              child: Center(
-                child: Text(
-                  label,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color:
-                        ThemeData.estimateBrightnessForColor(color) ==
-                            Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                  ),
-                ),
-              ),
+          Text(
+            // l10n-ignore: CJK enumeration comma (頓號) joining names, not display text itself.
+            county.areaNames.join('、'),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: AppSpacing.xs),
-          Text(townName, style: theme.textTheme.labelLarge),
         ],
       ),
     );
