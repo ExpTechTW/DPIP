@@ -893,34 +893,34 @@ class _IntensityGroupRow extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(color: color.withValues(alpha: 0.14)),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: IntensityBadge(label: label, color: color, size: 40),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var i = 0; i < group.counties.length; i++) ...[
-                    if (i > 0)
-                      Divider(
-                        height: 1,
-                        indent: AppSpacing.md,
-                        endIndent: AppSpacing.md,
-                        color: colors.outlineVariant.withValues(alpha: 0.4),
-                      ),
-                    _CountyAreasRow(county: group.counties[i]),
-                  ],
+      child: Row(
+        // Default cross-axis alignment (center), not .stretch — the badge is
+        // a fixed-size square ([IntensityBadge]); stretching would force it
+        // to the county column's height whenever a group spans multiple rows.
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: IntensityBadge(label: label, color: color, size: 40),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < group.counties.length; i++) ...[
+                  if (i > 0)
+                    Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                      color: colors.outlineVariant.withValues(alpha: 0.4),
+                    ),
+                  _CountyAreasRow(county: group.counties[i]),
                 ],
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
