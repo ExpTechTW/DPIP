@@ -26,7 +26,7 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge.
+  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix.
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   # https://github.com/ExpTechTW/flutter-maplibre-gl
   # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
@@ -36,7 +36,7 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 2c515a3feaa7fee565e1ae03971aade841bec54f
+      ref: d3deabfdbe8e99fa3f8c04247e4d404c8c22ecf9
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1
