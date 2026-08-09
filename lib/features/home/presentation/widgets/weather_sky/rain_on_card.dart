@@ -7,16 +7,18 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cach
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/scheduler.dart';
 
-/// Puts rain on one card: droplets clinging to its face, and water caught and
-/// pooling along its top edge.
+/// Puts rain on one card: water caught and pooling along its top edge, and —
+/// while [RainOnCard.glass] is on — droplets clinging to its face.
 ///
 /// Both halves come from the reference and both are separate from the falling
 /// rain in the backdrop. The face gets a droplet shader as a `RenderEffect`
 /// (that is [RainOnGlass]); the edge water is a panel particle system (that is
-/// [CardWaterField] plus `shaders/weather/card_water.frag`).
+/// [CardWaterField] plus `shaders/weather/card_water.frag`) and runs
+/// regardless of [RainOnCard.glass].
 ///
 /// The edge water is drawn the way the engine draws it, in two passes:
 ///
@@ -38,15 +40,49 @@ class RainOnCard extends StatefulWidget {
     this.intensity = 0.0,
     this.opacity = 1.0,
     this.active = true,
+    this.glass = true,
+    this.silhouette = false,
+    this.gated = true,
   });
 
-  /// The card. Water is drawn over it, and it is refracted through the
-  /// droplets on its face.
+  /// The card. Water is drawn over it, and — when [glass] is on — it is
+  /// refracted through the droplets on its face.
   final Widget child;
 
   /// 0 disables both effects; 1 is a downpour on the card. Picks the grade —
   /// how much water arrives — as the reference's rain level picks a preset.
   final double intensity;
+
+  /// Whether the face gets [RainOnGlass]'s refracting droplets, on top of the
+  /// edge water every card gets regardless. `false` skips [RainOnGlass]
+  /// entirely — [child] renders untouched, only the splash along the top edge
+  /// runs. `true` (the default) still only runs it while the card's own
+  /// position gate is open — see the position-gate doc below.
+  final bool glass;
+
+  /// Whether the splash collides with [child]'s own rendered outline instead
+  /// of a flat line across the top of its bounding box.
+  ///
+  /// For [child] shapes that do not fill their own box — text, an icon,
+  /// anything with real gaps in it — a flat edge pools water in mid-air over
+  /// every gap. `true` rasterises [child] each time it actually changes (see
+  /// `_RainOnCardState._scheduleCapture`) and builds a [CardWaterSurface]
+  /// from its alpha channel, so a drop is caught by the nearest glyph or icon
+  /// beneath it, or keeps falling if there genuinely is nothing there.
+  final bool silhouette;
+
+  /// Whether [_RainOnCardState._syncPositionGate]'s scroll-position cut-off
+  /// applies to this card at all.
+  ///
+  /// The gate's fixed threshold (~21 % down the screen) is calibrated for a
+  /// card that starts *below* it and rises past it mid-scroll — true of the
+  /// rain-trend card, which sits at the bottom of the hero block. The header
+  /// sits at the *top* of the same block and is already above that threshold
+  /// at rest, so the same check would hold it permanently closed instead of
+  /// ever opening. `false` skips the cut-off — the card relies on the
+  /// surrounding scroll view culling its paint once it actually scrolls out
+  /// of view, same as it would for any other off-screen widget.
+  final bool gated;
 
   /// The scene alpha — how visible the whole effect is.
   ///
@@ -91,11 +127,67 @@ class _RainOnCardState extends State<RainOnCard>
   double _screenHeight = 0;
   Size _screenSize = Size.zero;
 
+  /// Wraps [RainOnCard.child] so [_capture] has something to rasterise —
+  /// only meaningful while [RainOnCard.silhouette] is on, but cheap enough to
+  /// hold unconditionally rather than juggling a nullable key.
+  final GlobalKey _captureKey = GlobalKey();
+
+  /// The most recently captured outline, or null before the first capture
+  /// completes — [_onTick] holds emission off until then rather than falling
+  /// back to a flat edge for a frame or two, which [CardWaterField.update]
+  /// would otherwise do on its own with a null surface.
+  CardWaterSurface? _surface;
+  bool _captureScheduled = false;
+
   @override
   void initState() {
     super.initState();
     _load();
     _syncRunning();
+    _scheduleCapture();
+  }
+
+  /// Queues a rasterise-and-rebuild-the-surface pass for the end of the
+  /// current frame, unless one is already queued or [RainOnCard.silhouette]
+  /// is off. Coalescing through [_captureScheduled] matters because
+  /// [didUpdateWidget] calls this on every rebuild while rain is running —
+  /// without it, a sheet-drag animation rebuilding this widget every frame
+  /// would queue a GPU readback every frame right along with it.
+  void _scheduleCapture() {
+    if (!widget.silhouette || _captureScheduled) return;
+    _captureScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _capture());
+  }
+
+  /// Rasterises [_captureKey]'s subtree — [RainOnCard.child], not whatever
+  /// [RainOnGlass] does to it, since the boundary sits *inside* that filter
+  /// and captures only its own descendants — and rebuilds [_surface] from
+  /// the result.
+  Future<void> _capture() async {
+    _captureScheduled = false;
+    if (!mounted || !widget.silhouette) return;
+    final boundary = _captureKey.currentContext?.findRenderObject();
+    if (boundary is! RenderRepaintBoundary || boundary.debugNeedsPaint) {
+      // Laid out but not yet painted (common on the very first frame) — try
+      // again next frame instead of reading a boundary with nothing in it.
+      _scheduleCapture();
+      return;
+    }
+    ui.Image? image;
+    try {
+      // 1:1 with the widget's own logical pixels, matching the card-local
+      // coordinates CardWaterField already works in — capturing at the
+      // device's own pixel ratio would need every returned height rescaled
+      // before it meant anything to the solver.
+      image = await boundary.toImage(pixelRatio: 1.0);
+      final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      if (!mounted || data == null) return;
+      _surface = silhouetteSurface(data, image.width, image.height);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Failed to capture the splash outline');
+    } finally {
+      image?.dispose();
+    }
   }
 
   Future<void> _load() async {
@@ -153,6 +245,14 @@ class _RainOnCardState extends State<RainOnCard>
         (oldWidget.opacity > 0.004) != (widget.opacity > 0.004)) {
       _syncRunning();
     }
+    // Rain about to start is exactly when a fresh outline matters most — the
+    // capture from last time rain ran could be reading a since-changed
+    // reading (a new temperature, a switched area). Re-running this on every
+    // rebuild instead, not just this one transition, would queue a GPU
+    // readback on every frame of a sheet-drag animation for no benefit.
+    if (!(oldWidget.intensity > 0.001) && widget.intensity > 0.001) {
+      _scheduleCapture();
+    }
   }
 
   void _syncRunning() {
@@ -173,22 +273,44 @@ class _RainOnCardState extends State<RainOnCard>
   }
 
   /// The position gate: the panel water switches off entirely once the card
-  /// has been scrolled up into the top fifth of the screen.
+  /// has travelled [_gateCloseDistance] upward from the lowest point it has
+  /// been at since appearing — and, alongside `widget.glass`, so does the
+  /// face's refracting droplets, for the same reason: neither has any
+  /// business still running on a card that is on its way off the top of the
+  /// visible sheet.
   ///
-  /// The reference feeds the panel's on-screen y into a comparison against a
-  /// fixed reference height — the water stops once `y` drops below 30 % of it.
-  /// That height defaults to 1714 against a 2400 px screen, so the cut-off
-  /// lands at 21.4 % of the screen height.
+  /// The reference gates on an *absolute* screen fraction instead — the water
+  /// stops once the card's y drops below 30 % of a 1714/2400 reference
+  /// height. That fits the reference's own layout, a list of many cards each
+  /// scrolling past one fixed line, but not this card's: it starts most of a
+  /// screen's height below that line, so the same check needed almost this
+  /// card's entire travel before it closed — the problem this constant
+  /// replaces. Gating on displacement from where the card actually settled
+  /// closes it after a small, consistent swipe regardless of where that is.
+  ///
+  /// Tracking a running *low-water mark* — [_restTopY], the largest
+  /// [_cardTopY] seen, i.e. the furthest down the screen — rather than the
+  /// first sample matters for one reason: the sheet's own open animation
+  /// moves the card by far more than this on its own, before the list is
+  /// ever scrolled. Pinning the reference to wherever the card has actually
+  /// settled, and letting it keep tracking that low point for as long as the
+  /// card is still travelling toward (or resting at) it, keeps that
+  /// animation from closing the gate on its own; displacement only grows
+  /// once the card actually rises away from its settled point, which is
+  /// what a real scroll does.
   ///
   /// The gate guards the particle draw *and* the accumulate-and-blur, so
   /// nothing renders at all — water has no business pooling on a card that is
   /// about to slide under the toolbar.
-  static const double _gateReferenceHeight = 1714 / 2400;
-  static const double _gateFraction = 0.3;
+  static const double _gateCloseDistance = 64;
 
   /// Where the card's top edge currently sits, in logical pixels from the top
   /// of the window. Null before the first layout.
   double? _cardTopY;
+
+  /// Running low-water mark for the gate — see [_gateCloseDistance]. Null
+  /// before the first layout.
+  double? _restTopY;
   bool _gateOpen = true;
 
   /// World gravity is multiplied by **1.5 while the card is travelling up the
@@ -218,6 +340,7 @@ class _RainOnCardState extends State<RainOnCard>
         ? _scrollGravityScale
         : 1.0;
     final open =
+        !widget.gated ||
         _cardTopY! >= _gateFraction * _gateReferenceHeight * _screenHeight;
     if (open == _gateOpen) return;
     setState(() => _gateOpen = open);
@@ -235,7 +358,12 @@ class _RainOnCardState extends State<RainOnCard>
 
     _syncPositionGate();
 
-    final intensity = widget.intensity.clamp(0.0, 1.0);
+    // While silhouette mode is waiting on its first capture there is no
+    // surface to catch a drop on, so hold emission off rather than fall back
+    // to a flat topEdge for a frame or two.
+    final awaitingSurface = widget.silhouette && _surface == null;
+    final intensity = awaitingSurface ? 0.0 : widget.intensity.clamp(0.0, 1.0);
+    final surface = widget.silhouette ? _surface : null;
     final grade = _gradeFor(intensity);
     _primary.update(
       dt,
@@ -244,6 +372,7 @@ class _RainOnCardState extends State<RainOnCard>
       intensity: intensity,
       preset: grade.$1,
       gravityScale: _gravityScale,
+      surface: surface,
     );
     _secondary.update(
       dt,
@@ -252,6 +381,7 @@ class _RainOnCardState extends State<RainOnCard>
       intensity: intensity,
       preset: grade.$2,
       gravityScale: _gravityScale,
+      surface: surface,
     );
     _frame.value++;
 
@@ -330,16 +460,27 @@ class _RainOnCardState extends State<RainOnCard>
           constraints.hasBoundedHeight ? constraints.maxHeight : 0,
         );
         // Height may legitimately be 0 here — see [_onTick].
+        // Boundary sits below RainOnGlass so a capture reads widget.child's
+        // own pixels, not the glass filter's distortion of them — see
+        // [_capture]'s doc.
+        final content = RepaintBoundary(key: _captureKey, child: widget.child);
         return Stack(
           // Water sits above the card's top edge and must not be cut off.
           clipBehavior: Clip.none,
           children: [
-            RainOnGlass(
-              intensity: widget.intensity,
-              opacity: widget.opacity,
-              active: widget.active,
-              child: widget.child,
-            ),
+            // Gated the same as the splash below, not just by widget.glass on
+            // its own: the card sliding up toward the toolbar is exactly when
+            // its content is about to scroll away, and refracting droplets
+            // over content that is mid-scroll (or already off past the fold)
+            // has nothing left to sensibly distort.
+            widget.glass && _gateOpen
+                ? RainOnGlass(
+                    intensity: widget.intensity,
+                    opacity: widget.opacity,
+                    active: widget.active,
+                    child: content,
+                  )
+                : content,
             Positioned.fill(
               child: IgnorePointer(
                 child: RepaintBoundary(

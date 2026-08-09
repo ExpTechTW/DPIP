@@ -49,7 +49,7 @@ class HomeRainTrendSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final skyIsLight = weatherSkyIsLight(weatherMode);
+    final skyIsLight = skyIsLightFrom(sky, weatherMode);
     final foreground = glassOnSurface(
       colors,
       reveal: reveal,
@@ -72,6 +72,9 @@ class HomeRainTrendSection extends StatelessWidget {
       // The backdrop reveal is the scene alpha: the effect fades in with the
       // sky and runs at full strength once the sheet is up.
       opacity: reveal,
+      // glass defaults to true: the face gets the refracting droplets, same
+      // as every other card — gated off automatically once the card's own
+      // position gate closes, on its way up past the fold.
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: cardColor,

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
@@ -22,6 +23,7 @@ void _run(
   double intensity = 1.0,
   CardWaterPreset preset = CardWaterPreset.moderate,
   double step = CardWaterField.emitterTick,
+  CardWaterSurface? surface,
 }) {
   for (var t = 0.0; t < seconds; t += step) {
     field.update(
@@ -30,6 +32,7 @@ void _run(
       screenHeight: _screen,
       intensity: intensity,
       preset: preset,
+      surface: surface,
     );
   }
 }
@@ -385,5 +388,210 @@ void main() {
       preset: CardWaterPreset.moderate,
     );
     expect(field.liveCount, 0);
+  });
+
+  group('CardWaterSurface', () {
+    test('reads back the column it was built from', () {
+      final surface = CardWaterSurface(
+        heights: [0, -10, -10, double.infinity, 5],
+        columnWidth: 4,
+      );
+      expect(surface.heightAt(0), 0); // column 0: [0, 4)
+      expect(surface.heightAt(3.9), 0);
+      expect(surface.heightAt(4), -10); // column 1: [4, 8)
+      expect(surface.heightAt(7.9), -10);
+      expect(surface.heightAt(8), -10); // column 2
+      expect(surface.heightAt(12), double.infinity); // column 3 — empty
+      expect(surface.heightAt(16), 5); // column 4
+    });
+
+    test('is infinite past both ends of the sampled span', () {
+      final surface = CardWaterSurface(heights: [0, 0], columnWidth: 4);
+      expect(surface.heightAt(-1), double.infinity);
+      expect(surface.heightAt(100), double.infinity);
+    });
+
+    test('an all-empty field has no solid x at all', () {
+      final surface = CardWaterSurface(
+        heights: List.filled(10, double.infinity),
+        columnWidth: 4,
+      );
+      expect(surface.randomSolidX(math.Random(1)), isNull);
+    });
+
+    test('a solid x always lands in a column that reads back finite', () {
+      final surface = CardWaterSurface(
+        heights: [double.infinity, 0, double.infinity, -10, double.infinity],
+        columnWidth: 4,
+      );
+      final random = math.Random(7);
+      for (var i = 0; i < 50; i++) {
+        final x = surface.randomSolidX(random);
+        expect(x, isNotNull);
+        expect(surface.heightAt(x!), isNot(double.infinity));
+      }
+    });
+  });
+
+  group('CardWaterField with a CardWaterSurface', () {
+    test('a drop settles at its own column\'s height, not topEdge', () {
+      // Wide, and run for only a fraction of a second — not the single
+      // narrow column and full second an earlier version of this test used.
+      // A growing pile spreads sideways under its own pressure, and given
+      // enough width and enough time that spread reaches past a too-narrow
+      // sampled span: those particles read back `heightAt`'s infinity, lost
+      // their floor, and were still falling when the test read them back.
+      // Wide and short-lived enough that this can't happen here.
+      const raisedY = -40.0;
+      final surface = CardWaterSurface(
+        heights: List.filled(200, raisedY),
+        columnWidth: 4,
+      );
+      final field = _field();
+      _run(field, 0.3, preset: CardWaterPreset.moderate, surface: surface);
+      expect(
+        field.settledCount(_screen, surface: surface),
+        greaterThan(0),
+        reason: 'nothing settled at the surface at all',
+      );
+      for (final p in field.debugPositions) {
+        // Never past the surface — exactly the flat-edge "never gets below
+        // the card top edge" invariant, at an offset that only the surface,
+        // not the flat topEdge=0 default, could have produced. No lower
+        // bound: a splash is expected to throw drops back up by a variable
+        // amount, which is what "a landing group throws water back up"
+        // already covers on its own.
+        expect(p.dy, lessThanOrEqualTo(raisedY + 0.01));
+      }
+    });
+
+    test('nothing solid anywhere means nothing is emitted', () {
+      final empty = CardWaterSurface(
+        heights: List.filled(20, double.infinity),
+        columnWidth: 4,
+      );
+      final field = _field();
+      _run(field, 0.5, preset: CardWaterPreset.heavy, surface: empty);
+      expect(field.liveCount, 0, reason: 'nothing solid to spawn a group over');
+    });
+
+    test('a drop already falling over an empty column is never caught', () {
+      // Seeded on a full-width solid surface (behaves like the flat topEdge=0
+      // case) so the group actually lands somewhere, then handed to a solver
+      // step that sees nothing but empty columns — isolating the solver from
+      // emission, which by itself already refuses to spawn over nothing.
+      final field = _field();
+      field.debugEmit(
+        width: _width,
+        screenHeight: _screen,
+        preset: CardWaterPreset.moderate,
+        surface: CardWaterSurface(heights: [0], columnWidth: _width),
+      );
+      expect(field.liveCount, greaterThan(0));
+      final startY = field.debugPositions.map((p) => p.dy).reduce(math.max);
+
+      final empty = CardWaterSurface(
+        heights: List.filled(20, double.infinity),
+        columnWidth: 4,
+      );
+      // Moderate's own life is 0.38s — well short of that, or every seeded
+      // drop has already expired (and been compacted away) by the time this
+      // reads them back, regardless of whether the solver ever caught them.
+      for (var t = 0.0; t < 0.2; t += 1 / 60) {
+        field.update(
+          1 / 60,
+          width: _width,
+          screenHeight: _screen,
+          intensity: 0, // no new groups — just watch the seeded ones fall
+          preset: CardWaterPreset.moderate,
+          surface: empty,
+        );
+      }
+      expect(
+        field.liveCount,
+        greaterThan(0),
+        reason: 'died before it could fall',
+      );
+      final endY = field.debugPositions.map((p) => p.dy).reduce(math.max);
+      expect(
+        endY,
+        greaterThan(startY + 10),
+        reason: 'a drop over an empty column should keep falling, not park',
+      );
+    });
+  });
+
+  group('silhouetteSurface', () {
+    // width x height RGBA, alpha-only (rgb stays 0 throughout — only alpha
+    // decides what counts as solid).
+    ByteData image(int w, int h, List<(int x, int y, int alpha)> pixels) {
+      final bytes = Uint8List(w * h * 4);
+      for (final (x, y, a) in pixels) {
+        bytes[(y * w + x) * 4 + 3] = a;
+      }
+      return ByteData.sublistView(bytes);
+    }
+
+    test('reports the topmost solid row per column band', () {
+      const w = 6, h = 5;
+      final data = image(w, h, [
+        (0, 2, 255), (1, 2, 255), // columns 0-1: solid starting row 2
+        (2, 0, 255), (3, 0, 255), // columns 2-3: solid starting row 0
+        // columns 4-5: nothing at all
+      ]);
+      final surface = silhouetteSurface(data, w, h, columnWidth: 2);
+      expect(surface.heightAt(0.5), 2.0);
+      expect(surface.heightAt(1.9), 2.0);
+      expect(surface.heightAt(2.0), 0.0);
+      expect(surface.heightAt(3.9), 0.0);
+      expect(surface.heightAt(4.5), double.infinity);
+      expect(surface.heightAt(5.9), double.infinity);
+    });
+
+    test('a thin diagonal stroke is still caught by its column band', () {
+      // One solid pixel per row, stepping right — nothing fills a whole
+      // 2px-wide band on its own, but each band still has *a* solid pixel in
+      // it somewhere, which is the case a coarse column width exists to
+      // handle: real glyph strokes are often thinner than the sample spacing.
+      const w = 8, h = 4;
+      final data = image(w, h, [
+        (0, 0, 255),
+        (2, 1, 255),
+        (4, 2, 255),
+        (6, 3, 255),
+      ]);
+      final surface = silhouetteSurface(data, w, h, columnWidth: 2);
+      expect(surface.heightAt(0.5), 0.0); // band [0,2): pixel at x=0,y=0
+      expect(surface.heightAt(2.5), 1.0); // band [2,4): pixel at x=2,y=1
+      expect(surface.heightAt(4.5), 2.0); // band [4,6): pixel at x=4,y=2
+      expect(surface.heightAt(6.5), 3.0); // band [6,8): pixel at x=6,y=3
+    });
+
+    test('the threshold is a real cutoff, not just a non-zero check', () {
+      const w = 2, h = 3;
+      final data = image(w, h, [
+        (0, 0, 60), // 24%, below a 0.35 threshold
+        (0, 1, 200), // 78%, above it
+      ]);
+      final surface = silhouetteSurface(
+        data,
+        w,
+        h,
+        columnWidth: 2,
+        threshold: 0.35,
+      );
+      expect(
+        surface.heightAt(0.5),
+        1.0,
+        reason: 'the faint pixel at row 0 should not count as solid',
+      );
+    });
+
+    test('an entirely empty image has no solid column anywhere', () {
+      const w = 10, h = 10;
+      final data = image(w, h, const []);
+      final surface = silhouetteSurface(data, w, h, columnWidth: 3);
+      expect(surface.randomSolidX(math.Random(1)), isNull);
+    });
   });
 }

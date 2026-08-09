@@ -134,10 +134,13 @@ class HomeSheet extends StatelessWidget {
                 IgnorePointer(
                   child: Opacity(
                     opacity: weatherOpacity,
-                    child: WeatherSkyBackground(
-                      mode: weatherMode,
-                      timeMode: skyTimeMode,
-                      active: HomeChrome.weatherActive(e),
+                    child: _ScrollBlurredWeather(
+                      scrollController: scrollController,
+                      child: WeatherSkyBackground(
+                        mode: weatherMode,
+                        timeMode: skyTimeMode,
+                        active: HomeChrome.weatherActive(e),
+                      ),
                     ),
                   ),
                 ),
@@ -154,6 +157,69 @@ class HomeSheet extends StatelessWidget {
   /// computed alongside it in [build], kept in sync via the same constants.
   static double _flush(double e) =>
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
+}
+
+/// Blurs [child] in step with [scrollController], so the sky reads as depth
+/// of field behind the content once the sheet's list scrolls the hero's rain
+/// trend card up past the fold — the counterpart to `HomeContent`'s hero
+/// block, which leaves the sky untouched (and unblurred) for as long as the
+/// trend card is still the last thing on screen.
+///
+/// This is a *second*, independent blur from the one [HomeSheet.build] already
+/// ramps off the sheet's `extent` — that one plays only while the sheet itself
+/// is being dragged open and is already at ~0 by the time the content becomes
+/// scrollable (`extent` is pinned at [HomeSheet.maxExtent] for the list to
+/// scroll at all). Driving both off the same value would leave this one dead;
+/// [scrollController] is the only signal that still moves once the sheet does
+/// not.
+///
+/// Listens directly on [scrollController] rather than through `HomeSheetExtent`
+/// so only this small leaf repaints on every scroll tick — not the sheet's
+/// whole frosted-chrome tree, which is the mistake `HomeSheet`'s own class doc
+/// warns against for the drag case.
+class _ScrollBlurredWeather extends StatelessWidget {
+  const _ScrollBlurredWeather({
+    required this.scrollController,
+    required this.child,
+  });
+
+  final ScrollController scrollController;
+  final Widget child;
+
+  /// Scroll distance over which blur reaches its peak. Short on purpose: the
+  /// trend card itself is most of a screen's scroll away, and holding the sky
+  /// crisp for that whole distance would make the blur feel disconnected from
+  /// the gesture that triggered it. This finishes within the first small
+  /// swipe, before the trend card has travelled far at all.
+  static const double _rampExtent = 140;
+
+  /// Peak blur sigma — soft enough to read as out-of-focus depth, not a
+  /// frosted pane; well under the sheet's own drag blur (24, [HomeSheet.build]),
+  /// since this sits behind readable card content rather than standing in for
+  /// the sheet's surface.
+  static const double _maxSigma = 16;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: scrollController,
+      child: child,
+      builder: (context, child) {
+        final offset = scrollController.hasClients
+            ? scrollController.offset
+            : 0.0;
+        final t = (offset / _rampExtent).clamp(0.0, 1.0);
+        // Skip the filter layer entirely at rest, rather than compositing an
+        // always-on blur of sigma 0 — the sheet spends most of its time here.
+        if (t <= 0) return child!;
+        final sigma = _maxSigma * t;
+        return ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+          child: child,
+        );
+      },
+    );
+  }
 }
 
 /// The scrollable content ([HomeContent]) — forecast chart, sparkline,

@@ -85,6 +85,13 @@ Color glassOnSurfaceVariant(
 
 /// Whether [mode]'s sky is light enough that dark foregrounds read better than
 /// white once the weather backdrop is showing.
+///
+/// A **fallback only**, for the brief window before the sky has actually
+/// baked (`SkyLutCache.panelAmbient` is still null): the table only knows the
+/// weather *type*, not the time of day, so `clear`/`cloudy`/`snow`/`fog`/`auto`
+/// all resolve to "light" even at night — a clear night sky is the darkest
+/// thing on screen, and this alone would pick near-black ink for it. Once a
+/// sky colour exists, [skyIsLightFrom] must be used instead.
 bool weatherSkyIsLight(WeatherMode mode) => switch (mode) {
   WeatherMode.rain ||
   WeatherMode.thunderstorm ||
@@ -96,6 +103,24 @@ bool weatherSkyIsLight(WeatherMode mode) => switch (mode) {
   WeatherMode.fog ||
   WeatherMode.auto => true,
 };
+
+/// Whether [sky] — the actual rendered sky colour (`SkyLutCache.panelAmbient`)
+/// — is light enough that dark foregrounds read better than white.
+///
+/// This is what every ink-on-sky decision should call: [weatherSkyIsLight]
+/// alone can only guess from the weather *type*, and the same "clear" sky is
+/// bright blue at noon and near-black past sunset. Falls back to
+/// [weatherSkyIsLight] only while [sky] is still null (nothing has baked yet),
+/// so ink is never left unset before the first frame.
+///
+/// Uses [ThemeData.estimateBrightnessForColor] rather than a hand-picked
+/// luminance cutoff — it is the same "is this background light or dark"
+/// judgment Flutter already ships and tunes, so a border-hue sky (dawn, a
+/// hazy overcast) resolves the way the rest of the framework would resolve it.
+bool skyIsLightFrom(Color? sky, WeatherMode fallbackMode) {
+  if (sky == null) return weatherSkyIsLight(fallbackMode);
+  return ThemeData.estimateBrightnessForColor(sky) == Brightness.light;
+}
 
 /// Ink for content drawn **on** the weather sky (header, region badges).
 ///

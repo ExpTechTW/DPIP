@@ -58,7 +58,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final colors = theme.colorScheme;
     final controller = context.watch<HomeWeatherController>();
     final reveal = widget.reveal;
-    final skyIsLight = weatherSkyIsLight(widget.weatherMode);
+    final skyIsLight = skyIsLightFrom(widget.sky, widget.weatherMode);
     final foreground = glassOnSurface(
       colors,
       reveal: reveal,

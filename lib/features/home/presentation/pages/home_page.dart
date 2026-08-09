@@ -9,6 +9,7 @@ import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -162,18 +163,28 @@ class _HomePageState extends State<HomePage> {
                 top: 0,
                 left: 0,
                 right: 0,
-                child:
-                    Selector<HomeSheetExtent, ({double blend, double dismiss})>(
-                      selector: (_, sheetExtent) => (
-                        blend: HomeChrome.regionBlend(sheetExtent.value),
-                        dismiss: HomeChrome.regionDismiss(sheetExtent.value),
+                // The bar sits directly on the raw sky, same as the sheet
+                // header — it needs the actual sky colour, not just the
+                // weather type, or its badge ink goes near-invisible on a
+                // clear night (see `skyIsLightFrom`).
+                child: ValueListenableBuilder<Color?>(
+                  valueListenable: SkyLutCache.panelAmbient,
+                  builder: (context, sky, _) =>
+                      Selector<
+                        HomeSheetExtent,
+                        ({double blend, double dismiss})
+                      >(
+                        selector: (_, sheetExtent) => (
+                          blend: HomeChrome.regionBlend(sheetExtent.value),
+                          dismiss: HomeChrome.regionDismiss(sheetExtent.value),
+                        ),
+                        builder: (context, dials, _) => RegionBar(
+                          blend: dials.blend,
+                          dismiss: dials.dismiss,
+                          skyIsLight: skyIsLightFrom(sky, weatherMode),
+                        ),
                       ),
-                      builder: (context, dials, _) => RegionBar(
-                        blend: dials.blend,
-                        dismiss: dials.dismiss,
-                        skyIsLight: weatherSkyIsLight(weatherMode),
-                      ),
-                    ),
+                ),
               ),
             ],
           ),

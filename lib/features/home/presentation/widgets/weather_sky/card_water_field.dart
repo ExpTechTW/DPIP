@@ -34,6 +34,13 @@ import 'package:flutter/material.dart';
 /// `shaders/weather/card_water.frag`, which is where the reference's threshold and
 /// lighting live; drawing these particles directly would show the dots the
 /// metaball is supposed to fuse.
+///
+/// [update]'s [CardWaterSurface] parameter is a *third* variant, not the
+/// digit system above: it keeps the panel's own falling-and-pooling model —
+/// downward launch, no bounce, no mesh ray-casts — and only replaces the
+/// single flat `topEdge` with a per-column one, so the pool follows whatever
+/// silhouette is actually there (text, an icon) instead of a rectangle around
+/// it. `topEdge` is still what a flat card uses; a surface is additive.
 class CardWaterField {
   /// The per-drop sprites: positive and negative halves of the signed normal.
   ///
@@ -81,7 +88,8 @@ class CardWaterField {
     required double screenHeight,
     CardWaterPreset preset = CardWaterPreset.moderate,
     double topEdge = 0,
-  }) => _emit(width, screenHeight / _worldHeight, preset, topEdge);
+    CardWaterSurface? surface,
+  }) => _emit(width, screenHeight / _worldHeight, preset, topEdge, surface);
 
   @visibleForTesting
   List<Offset> get debugPositions => [
@@ -99,11 +107,16 @@ class CardWaterField {
   /// There is no "settled" flag any more: every drop stays in the solver, which
   /// is what lets the pile push new arrivals back out.
   @visibleForTesting
-  int settledCount(double screenHeight, {double topEdge = 0}) {
+  int settledCount(
+    double screenHeight, {
+    double topEdge = 0,
+    CardWaterSurface? surface,
+  }) {
     final band = 2 * _particleRadius * screenHeight / _worldHeight;
     var n = 0;
     for (var i = 0; i < _live; i++) {
-      if (_p.y[i] > topEdge - band) n++;
+      final edge = surface?.heightAt(_p.x[i]) ?? topEdge;
+      if (_p.y[i] > edge - band) n++;
     }
     return n;
   }
@@ -154,7 +167,8 @@ class CardWaterField {
   ///
   /// [width] is the card, [screenHeight] the scale the engine's world units are
   /// defined against, and [topEdge] the y (in card space) drops land on — 0 is
-  /// the card's own top.
+  /// the card's own top. [surface], when given, overrides [topEdge] per
+  /// column instead of everywhere at once — see [CardWaterSurface].
   void update(
     double dt, {
     required double width,
@@ -163,6 +177,7 @@ class CardWaterField {
     required CardWaterPreset preset,
     double topEdge = 0,
     double gravityScale = 1.0,
+    CardWaterSurface? surface,
   }) {
     if (dt <= 0 || width <= 0 || screenHeight <= 0) return;
     // A backgrounded tab must not replay minutes of physics on resume.
@@ -183,7 +198,7 @@ class CardWaterField {
       _stepIndex++;
       // the emitter: one group every `interval` ticks, nothing in between.
       if (_stepIndex % preset.interval == 0 && intensity > 0.001) {
-        _emit(width, unit, preset, topEdge);
+        _emit(width, unit, preset, topEdge, surface);
       }
 
       // Five particle iterations per world step, each on `_worldStep/5`.
@@ -192,7 +207,7 @@ class CardWaterField {
       // (viscous, powder, tensile, rigid) removed.
       const sub = _worldStep / _particleIterations;
       for (var it = 0; it < _particleIterations; it++) {
-        _solveIteration(sub, unit, preset, topEdge, gravityScale);
+        _solveIteration(sub, unit, preset, topEdge, gravityScale, surface);
       }
 
       for (var i = 0; i < _live; i++) {
@@ -234,11 +249,23 @@ class CardWaterField {
     CardWaterPreset preset,
     double topEdge,
     double gravityScale,
+    CardWaterSurface? surface,
   ) {
     if (_live == 0) return;
     final invDt = 1.0 / dt;
     final diameter = 2 * _particleRadius * unit;
     final slop = _b2LinearSlop * unit;
+
+    // Resolved once per iteration, not re-looked-up per section: positions
+    // (and so each particle's column) are fixed until Integrate, at the very
+    // end. `double.infinity` for a column with nothing solid in it compares
+    // false against every finite y below, which is what lets the rest of this
+    // function stay unaware a surface is not flat at all — see
+    // [CardWaterSurface].
+    final edge = Float32List(_live);
+    for (var i = 0; i < _live; i++) {
+      edge[i] = surface?.heightAt(_p.x[i]) ?? topEdge;
+    }
 
     // SolveForce — consumes what SolveCollision stored.
     if (_hasForce) {
@@ -257,12 +284,12 @@ class CardWaterField {
       _p.vy[i] += gravity * dt;
     }
 
-    // Contacts. Screen y grows downward, so "above the edge" is y < topEdge
-    // and the signed surface distance is topEdge - y.
+    // Contacts. Screen y grows downward, so "above the edge" is y < edge[i]
+    // and the signed surface distance is edge[i] - y.
     final weight = Float32List(_live);
     final bodyW = Float32List(_live);
     for (var i = 0; i < _live; i++) {
-      final d = topEdge - _p.y[i];
+      final d = edge[i] - _p.y[i];
       if (d < diameter) {
         bodyW[i] = 1.0 - d / diameter; // > 1 once the centre is inside
         weight[i] += bodyW[i];
@@ -348,12 +375,12 @@ class CardWaterField {
     // this only catches a particle crossing *into* the box this sub-step; an
     // already-embedded one is pushed back out by the pressure term alone.
     for (var i = 0; i < _live; i++) {
-      if (_p.y[i] >= topEdge || _p.vy[i] <= 0) continue;
+      if (_p.y[i] >= edge[i] || _p.vy[i] <= 0) continue;
       final travel = _p.vy[i] * dt;
-      final frac = (topEdge - _p.y[i]) / travel;
+      final frac = (edge[i] - _p.y[i]) / travel;
       if (frac < 0 || frac > 1) continue;
       final newX = _p.x[i] + frac * dt * _p.vx[i];
-      final newY = topEdge - slop;
+      final newY = edge[i] - slop;
       final oldVx = _p.vx[i];
       final oldVy = _p.vy[i];
       _p.vx[i] = invDt * (newX - _p.x[i]);
@@ -473,9 +500,24 @@ class CardWaterField {
     double unit,
     CardWaterPreset preset,
     double topEdge,
+    CardWaterSurface? surface,
   ) {
-    final originX = _random.nextDouble() * width;
-    final originY = topEdge - spawnHeight * unit;
+    double originX;
+    double edgeAtOrigin;
+    if (surface != null) {
+      // A centre column with nothing solid under it has no finite height to
+      // spawn *above*, so the pick is restricted to columns that do — the
+      // group's own radius still lets it spill onto neighbouring empty
+      // columns and fall through them, same as any other drop would.
+      final x = surface.randomSolidX(_random);
+      if (x == null) return; // nothing solid anywhere — no group this tick
+      originX = x;
+      edgeAtOrigin = surface.heightAt(x);
+    } else {
+      originX = _random.nextDouble() * width;
+      edgeAtOrigin = topEdge;
+    }
+    final originY = edgeAtOrigin - spawnHeight * unit;
     final radius = preset.groupRadius * unit;
     final stride = 0.75 * 2 * _particleRadius * unit;
     if (stride <= 0) return;
@@ -654,6 +696,114 @@ class CardWaterPreset {
     interval: 1,
     pressure: 0.025,
   );
+}
+
+/// A per-column collision surface: the topmost solid pixel's y in [heights],
+/// one entry every [columnWidth] logical pixels starting at the field's own
+/// x=0. In [CardWaterField.update], a drop at local x lands at
+/// `heightAt(x)` instead of the flat `topEdge`.
+///
+/// Columns are held flat between samples, not interpolated — a glyph's edge
+/// is already jagged at the pixel level, and smoothing it into a slope no
+/// letterform actually has would read as a rendering bug, not as water.
+///
+/// [heightAt] answers `double.infinity` for a column with nothing solid in
+/// it (the gap between two letters, say) as well as for any x outside
+/// [heights]' own span. That is not a missing case to patch — it is the
+/// correct physical answer, and every consumer below leans on it rather than
+/// special-casing it: `double.infinity` compares false against every finite
+/// y, so a drop over an empty column simply never triggers a contact and
+/// keeps falling until its lifetime ends, exactly as it should.
+@immutable
+class CardWaterSurface {
+  CardWaterSurface({required this.heights, required this.columnWidth})
+    : _solidColumns = [
+        for (var i = 0; i < heights.length; i++)
+          if (heights[i].isFinite) i,
+      ];
+
+  /// Per-column height, card-local y. `double.infinity` — nothing solid.
+  final List<double> heights;
+
+  /// Sample spacing, logical pixels.
+  final double columnWidth;
+
+  /// Indices into [heights] that are actually solid — precomputed once so
+  /// [randomSolidX] does not rescan the whole field on every emission.
+  final List<int> _solidColumns;
+
+  /// The surface height at local x.
+  double heightAt(double x) {
+    if (columnWidth <= 0 || heights.isEmpty) return double.infinity;
+    final i = (x / columnWidth).floor();
+    if (i < 0 || i >= heights.length) return double.infinity;
+    return heights[i];
+  }
+
+  /// A uniformly random x with something solid under it, or null if
+  /// [heights] has no solid column at all — nothing was rasterised, or
+  /// everything sampled came back empty.
+  ///
+  /// Emission needs this rather than a plain `random() * width`: the group's
+  /// own spawn height is read from its centre column, and a centre with
+  /// nothing under it has no finite height to spawn *above*.
+  double? randomSolidX(math.Random random) {
+    if (_solidColumns.isEmpty) return null;
+    final i = _solidColumns[random.nextInt(_solidColumns.length)];
+    return (i + 0.5) * columnWidth;
+  }
+}
+
+/// Builds a [CardWaterSurface] from a rendered image's own alpha channel —
+/// what turns "drops fall from above, caught by whatever they hit first"
+/// into a surface that follows real text and icons instead of a hand-placed
+/// shape. For each sampled column, the topmost pixel whose alpha crosses
+/// [threshold] is that column's height; a column with nothing above
+/// [threshold] anywhere in it is left at `double.infinity` — an empty gap
+/// between two letters, honestly reported as nothing to land on, the same
+/// answer [CardWaterSurface.heightAt] already gives past the edge of a
+/// narrower field.
+///
+/// [image] must be captured **1:1 with the widget's own logical pixels**
+/// (`RenderRepaintBoundary.toImage(pixelRatio: 1.0)`) — a returned height is
+/// used directly as a card-local y, with no separate scale factor carried
+/// through the physics, and a mismatched capture scale would silently shift
+/// the whole surface.
+///
+/// Synchronous despite taking an already-decoded [ui.Image]: the one actually
+/// async step, capturing the image itself, is the caller's concern — this
+/// only reads pixels already sitting in memory, which is squarely a
+/// same-frame operation and does not need `async` to say so.
+CardWaterSurface silhouetteSurface(
+  ByteData pixels,
+  int width,
+  int height, {
+  double columnWidth = 3,
+  double threshold = 0.35,
+}) {
+  final px = pixels.buffer.asUint8List();
+  final columns = (width / columnWidth).ceil();
+  final heights = List<double>.filled(columns, double.infinity);
+  final cut = (threshold.clamp(0.0, 1.0) * 255).round();
+  for (var col = 0; col < columns; col++) {
+    final xStart = (col * columnWidth).floor().clamp(0, width - 1);
+    final xEnd = ((col + 1) * columnWidth).ceil().clamp(xStart + 1, width);
+    for (var y = 0; y < height; y++) {
+      final row = y * width;
+      var hit = false;
+      for (var x = xStart; x < xEnd; x++) {
+        if (px[(row + x) * 4 + 3] >= cut) {
+          hit = true;
+          break;
+        }
+      }
+      if (hit) {
+        heights[col] = y.toDouble();
+        break;
+      }
+    }
+  }
+  return CardWaterSurface(heights: heights, columnWidth: columnWidth);
 }
 
 class _Drops {

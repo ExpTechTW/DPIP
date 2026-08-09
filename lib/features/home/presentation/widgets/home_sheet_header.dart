@@ -28,6 +28,7 @@ class HomeSheetHeader extends StatelessWidget {
     this.reveal = 0,
     this.expanded = false,
     this.weatherMode = WeatherMode.auto,
+    this.sky,
   });
 
   /// Weather-backdrop reveal (0→1) — drives sky-aware ink.
@@ -36,15 +37,23 @@ class HomeSheetHeader extends StatelessWidget {
   /// Sheet is at (or past) the full-screen detent — drive larger type + layout.
   final bool expanded;
 
-  /// Which sky the backdrop is rendering — picks dark vs white ink.
+  /// Which sky the backdrop is rendering — the fallback [skyIsLightFrom] uses
+  /// before [sky] exists.
   final WeatherMode weatherMode;
+
+  /// The sky colour the header sits on — `SkyLutCache.panelAmbient`, or null
+  /// before the first bake. The header sits directly on the raw sky with no
+  /// card behind it, so this is the one place a wrong light/dark call is most
+  /// visible: a clear night sky and a clear noon sky are the same [weatherMode]
+  /// but opposite ends of the ink decision.
+  final Color? sky;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final skyIsLight = weatherSkyIsLight(weatherMode);
+    final skyIsLight = skyIsLightFrom(sky, weatherMode);
     // Directly on the weather sky — not inside a glass card. Dark theme's
     // onSurface is white; on clear/fog daylight that must go dark with reveal.
     final foreground = inkOverWeather(colors, reveal, skyIsLight: skyIsLight);

@@ -52,7 +52,7 @@ class HomeActiveEventsSection extends StatelessWidget {
     // Card ink follows the sky: once [reveal] dissolves the card to the reference's
     // 20 % fill it is a pane of the sky, not a plate, and theme on-surface ink
     // stops being legible. At rest (reveal 0) these resolve to the theme roles.
-    final skyIsLight = weatherSkyIsLight(weatherMode);
+    final skyIsLight = skyIsLightFrom(sky, weatherMode);
     final foreground = glassOnSurface(
       colors,
       reveal: reveal,
