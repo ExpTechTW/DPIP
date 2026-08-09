@@ -1,7 +1,9 @@
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/events/presentation/widgets/event_timeline.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_pager.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
@@ -10,7 +12,8 @@ import 'package:provider/provider.dart';
 
 /// Disaster-event feed — a per-area timeline of events from the DPIP history
 /// feed. The region bar switches the area (a swipe pages the whole timeline);
-/// each page fetches the events for its own township.
+/// each page fetches the events for its own township. 所在地 without a GPS fix
+/// says so instead of showing a feed (see [_pageAt]).
 ///
 /// The feed re-fetches whenever the tab is opened or the app returns from the
 /// background ([RefreshOnAppear]): a hazard list is only worth reading if it is
@@ -46,14 +49,7 @@ class _EventsPageState extends State<EventsPage> {
           child: Column(
             children: [
               const RegionBar(),
-              Expanded(
-                child: RegionPager(
-                  itemBuilder: (context, index) => EventTimeline(
-                    regionCode: _codeAt(context, index),
-                    refreshSignal: _refresh,
-                  ),
-                ),
-              ),
+              Expanded(child: RegionPager(itemBuilder: _pageAt)),
             ],
           ),
         ),
@@ -61,16 +57,32 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  /// The township whose events the page at [index] shows — null for 全國, and
-  /// also for 所在地 with no GPS fix, which then falls back to the nationwide
-  /// feed rather than showing an empty thread for an unknown place.
-  static String? _codeAt(BuildContext context, int index) {
+  /// The body for the area at [index].
+  ///
+  /// 所在地 with no GPS fix gets a notice, not a feed: the nationwide list would
+  /// be indistinguishable from "these are the events where you are", which in a
+  /// disaster app is the one thing it must not be mistaken for. Every other area
+  /// is a township code, or null for 全國.
+  Widget _pageAt(BuildContext context, int index) {
+    // `read`, not `watch`: [RegionPager] already watches the store, so a fix
+    // arriving rebuilds every page through it.
     final areas = context.read<RegionStore>().areas;
-    if (index < 0 || index >= areas.length) return null;
-    return switch (areas[index]) {
-      NationwideArea() => null,
-      CurrentArea(:final code) => code,
-      SavedArea(:final code) => code,
-    };
+    final area = index >= 0 && index < areas.length
+        ? areas[index]
+        : const NationwideArea();
+    if (area is CurrentArea && area.code == null) {
+      return EmptyView(
+        icon: Icons.location_off_outlined,
+        message: AppLocalizations.of(context).regionCurrentUnavailable,
+      );
+    }
+    return EventTimeline(
+      regionCode: switch (area) {
+        NationwideArea() => null,
+        CurrentArea(:final code) => code,
+        SavedArea(:final code) => code,
+      },
+      refreshSignal: _refresh,
+    );
   }
 }

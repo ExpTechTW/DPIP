@@ -64,6 +64,12 @@ abstract final class PreferenceKeys {
     'experimental.weatherMode',
   );
 
+  /// Experimental time-of-day override for the backdrop. See
+  /// `ExperimentalSettings`.
+  static const PrefKey<String> skyTimeMode = PrefKey<String>._(
+    'experimental.skyTimeMode',
+  );
+
   /// Last push token — the FCM registration token on Android, the raw APNs
   /// device token on iOS (backend registration keys on whichever this
   /// platform actually uses). See `NotificationService`.

@@ -7,6 +7,7 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/forecast_weather_visual.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
@@ -22,11 +23,26 @@ import 'package:provider/provider.dart';
 /// new: sparkline + selectable hour chips + a detail band for feels-like /
 /// humidity / wind (fields the final legacy strip hid).
 class HomeForecastSection extends StatefulWidget {
-  const HomeForecastSection({super.key, this.reveal = 0});
+  const HomeForecastSection({
+    super.key,
+    this.reveal = 0,
+    this.sky,
+    this.weatherMode = WeatherMode.auto,
+  });
 
   /// Weather-backdrop reveal (0→1) — drives glass card opacity only; ink stays
   /// theme on-surface (cards are light plates).
   final double reveal;
+
+  /// The sky colour the card tints itself from — `SkyLutCache.panelAmbient`, or
+  /// null when no backdrop is running. The reference's card is a 20 % pane of the sky,
+  /// so without one there is nothing for it to be a pane *of* and it falls back
+  /// to an opaque plate.
+  final Color? sky;
+
+  /// Backdrop sky mode — decides whether card ink goes dark or white as the
+  /// card dissolves into the sky.
+  final WeatherMode weatherMode;
 
   @override
   State<HomeForecastSection> createState() => _HomeForecastSectionState();
@@ -42,9 +58,18 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final colors = theme.colorScheme;
     final controller = context.watch<HomeWeatherController>();
     final reveal = widget.reveal;
-    final foreground = glassOnSurface(colors);
-    final secondary = glassOnSurfaceVariant(colors);
-    final cardColor = glassSurface(colors, reveal);
+    final skyIsLight = weatherSkyIsLight(widget.weatherMode);
+    final foreground = glassOnSurface(
+      colors,
+      reveal: reveal,
+      skyIsLight: skyIsLight,
+    );
+    final secondary = glassOnSurfaceVariant(
+      colors,
+      reveal: reveal,
+      skyIsLight: skyIsLight,
+    );
+    final cardColor = glassSurface(colors, reveal, sky: widget.sky);
 
     final code = controller.areaCode;
 

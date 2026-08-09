@@ -154,11 +154,13 @@
   "mapLayers": "ชั้นข้อมูล",
   "mapLayerRadar": "เรดาร์สะท้อนสังเคราะห์",
   "mapLayerSatellite": "ฮิมาวาริ อินฟราเรด",
+  "mapLayerQpesums": "พยากรณ์ฝน 1 ชั่วโมงข้างหน้า",
   "mapLayerLightning": "ฟ้าผ่า",
   "lightningLegendCg": "เมฆสู่พื้น · {minutes} นาที",
   "lightningLegendCc": "เมฆสู่เมฆ · {minutes} นาที",
   "mapTimelineNow": "ตอนนี้",
   "mapTimelineObserved": "เวลาตรวจวัด",
+  "mapTimelineForecast": "พยากรณ์",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
   "notifyTitle": "การแจ้งเตือน",
   "notifyUnavailable": "การแจ้งเตือนแบบพุชยังไม่พร้อม — โปรดลองอีกครั้งในภายหลัง",
@@ -417,5 +419,105 @@
   "dpmDisasterLandslide": "ดินถล่ม",
   "dpmDisasterTsunami": "สึนามิ",
   "dpmDisasterSlope": "ภัยพิบัติลาดชัน",
-  "dpmDisasterNuclear": "อุบัติเหตุนิวเคลียร์"
+  "dpmDisasterNuclear": "อุบัติเหตุนิวเคลียร์",
+  "skyTime": "เวลาท้องฟ้า",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "อัตโนมัติ",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "รุ่งอรุณ",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "พระอาทิตย์ขึ้น",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "ตอนเช้า",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "เที่ยงวัน",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "ตอนบ่าย",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "ช่วงเวลาทอง",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "พระอาทิตย์ตก",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "สนธยา",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "กลางคืน",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "มีเมฆมาก",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "ฟ้าปิด",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "หิมะตก",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "ฝุ่นทราย",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "แสดงขอบเขตการสแกน",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "แสดงพื้นที่ที่เรดาร์ทั้งสี่ตรวจวัดได้จริง",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "นอกกรอบคือไม่ได้ตรวจวัด",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "ตัวเลือกชั้นเรดาร์",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "เส้นแบ่งเขตจังหวัด",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarCountyOutlineHint": "วาดทับภาพเอคโค",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "เส้นแบ่งเขตอำเภอ",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "เส้นแบ่งย่อยกว่า",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  }
 }

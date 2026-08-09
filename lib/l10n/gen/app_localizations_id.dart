@@ -517,6 +517,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Inframerah';
 
   @override
+  String get mapLayerQpesums => 'Prakiraan hujan 1 jam ke depan';
+
+  @override
   String get mapLayerLightning => 'Petir';
 
   @override
@@ -534,6 +537,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'Diamati';
+
+  @override
+  String get mapTimelineForecast => 'Prakiraan';
 
   @override
   String get notifySettingsMenu => 'Pengaturan notifikasi';
@@ -1373,4 +1379,82 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'Kecelakaan nuklir';
+
+  @override
+  String get skyTime => 'Waktu langit';
+
+  @override
+  String get skyTimeAuto => 'Otomatis';
+
+  @override
+  String get skyTimeDawn => 'Fajar';
+
+  @override
+  String get skyTimeSunrise => 'Matahari terbit';
+
+  @override
+  String get skyTimeMorning => 'Pagi';
+
+  @override
+  String get skyTimeNoon => 'Siang';
+
+  @override
+  String get skyTimeAfternoon => 'Sore';
+
+  @override
+  String get skyTimeGolden => 'Jam emas';
+
+  @override
+  String get skyTimeSunset => 'Matahari terbenam';
+
+  @override
+  String get skyTimeDusk => 'Senja';
+
+  @override
+  String get skyTimeNight => 'Malam';
+
+  @override
+  String get weatherModeCloudy => 'Berawan';
+
+  @override
+  String get weatherModeOvercast => 'Mendung';
+
+  @override
+  String get weatherModeSnow => 'Salju';
+
+  @override
+  String get weatherModeSand => 'Debu';
+
+  @override
+  String get radarScanRange => 'Tampilkan jangkauan pindai';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'Menandai area yang benar-benar dipantau keempat radar.';
+
+  @override
+  String get radarScanRangeHint => 'Di luar kotak berarti tak terpantau';
+
+  @override
+  String get radarOverlayMenuTooltip => 'Opsi lapisan radar';
+
+  @override
+  String get radarCountyOutline => 'Batas kabupaten/kota';
+
+  @override
+  String get radarCountyOutlineHint => 'Digambar di atas gema';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'Menjaga batas wilayah tetap terbaca di bawah gema radar.';
+
+  @override
+  String get radarTownOutline => 'Batas kecamatan';
+
+  @override
+  String get radarTownOutlineHint => 'Kisi yang lebih rapat';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'Menjaga batas kecamatan tetap terbaca di bawah gema radar.';
 }

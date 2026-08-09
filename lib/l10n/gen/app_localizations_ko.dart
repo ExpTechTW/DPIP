@@ -514,6 +514,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatellite => '히마와리 적외';
 
   @override
+  String get mapLayerQpesums => '1시간 강수 예보';
+
+  @override
   String get mapLayerLightning => '번개';
 
   @override
@@ -531,6 +534,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => '관측';
+
+  @override
+  String get mapTimelineForecast => '예보';
 
   @override
   String get notifySettingsMenu => '알림 설정';
@@ -1361,4 +1367,79 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => '핵 사고';
+
+  @override
+  String get skyTime => '하늘 시각';
+
+  @override
+  String get skyTimeAuto => '자동';
+
+  @override
+  String get skyTimeDawn => '여명';
+
+  @override
+  String get skyTimeSunrise => '일출';
+
+  @override
+  String get skyTimeMorning => '오전';
+
+  @override
+  String get skyTimeNoon => '정오';
+
+  @override
+  String get skyTimeAfternoon => '오후';
+
+  @override
+  String get skyTimeGolden => '골든아워';
+
+  @override
+  String get skyTimeSunset => '일몰';
+
+  @override
+  String get skyTimeDusk => '땅거미';
+
+  @override
+  String get skyTimeNight => '밤';
+
+  @override
+  String get weatherModeCloudy => '구름 많음';
+
+  @override
+  String get weatherModeOvercast => '흐림';
+
+  @override
+  String get weatherModeSnow => '눈';
+
+  @override
+  String get weatherModeSand => '황사';
+
+  @override
+  String get radarScanRange => '스캔 범위 표시';
+
+  @override
+  String get radarScanRangeSubtitle => '레이더 4기가 실제로 관측하는 범위를 표시합니다.';
+
+  @override
+  String get radarScanRangeHint => '범위 밖 공백은 미관측';
+
+  @override
+  String get radarOverlayMenuTooltip => '레이더 레이어 옵션';
+
+  @override
+  String get radarCountyOutline => '시·군 경계';
+
+  @override
+  String get radarCountyOutlineHint => '에코 위에 표시';
+
+  @override
+  String get radarCountyOutlineSubtitle => '레이더 에코 아래에서도 경계가 보이도록 합니다.';
+
+  @override
+  String get radarTownOutline => '읍·면·동 경계';
+
+  @override
+  String get radarTownOutlineHint => '더 세밀한 구획';
+
+  @override
+  String get radarTownOutlineSubtitle => '레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.';
 }

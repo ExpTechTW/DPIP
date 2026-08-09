@@ -513,6 +513,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
+  String get mapLayerQpesums => '未來1小時降水預報';
+
+  @override
   String get mapLayerLightning => '閃電';
 
   @override
@@ -530,6 +533,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -1347,6 +1353,81 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1858,6 +1939,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 红外线图';
 
   @override
+  String get mapLayerQpesums => '未来1小时降水预报';
+
+  @override
   String get mapLayerLightning => '闪电';
 
   @override
@@ -1875,6 +1959,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapTimelineObserved => '观测';
+
+  @override
+  String get mapTimelineForecast => '预报';
 
   @override
   String get notifySettingsMenu => '通知设置';
@@ -2692,6 +2779,81 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空时间';
+
+  @override
+  String get skyTimeAuto => '自动';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黄金时刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多云';
+
+  @override
+  String get weatherModeOvercast => '阴天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙尘';
+
+  @override
+  String get radarScanRange => '显示扫描范围';
+
+  @override
+  String get radarScanRangeSubtitle => '标示四座雷达实际观测到的范围。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未观测';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷达图层选项';
+
+  @override
+  String get radarCountyOutline => '县市界线';
+
+  @override
+  String get radarCountyOutlineHint => '画在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '让县市界线在雷达回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '乡镇界线';
+
+  @override
+  String get radarTownOutlineHint => '较细的分区';
+
+  @override
+  String get radarTownOutlineSubtitle => '让乡镇界线在雷达回波下仍然清楚。';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -3203,6 +3365,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
+  String get mapLayerQpesums => '未來1小時降水預報';
+
+  @override
   String get mapLayerLightning => '閃電';
 
   @override
@@ -3220,6 +3385,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -4037,6 +4205,81 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4548,6 +4791,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
+  String get mapLayerQpesums => '未來1小時降水預報';
+
+  @override
   String get mapLayerLightning => '閃電';
 
   @override
@@ -4565,6 +4811,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -5382,4 +5631,79 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
 }

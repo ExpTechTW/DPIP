@@ -1041,6 +1041,12 @@ abstract class AppLocalizations {
   /// **'Himawari Infrared'**
   String get mapLayerSatellite;
 
+  /// Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'1h Precipitation Forecast'**
+  String get mapLayerQpesums;
+
   /// Map layer switcher label for the lightning strike timeline
   ///
   /// In en, this message translates to:
@@ -1070,6 +1076,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Observed'**
   String get mapTimelineObserved;
+
+  /// Label above the map timeline's date when the frame times are forecast times, e.g. Forecast / 2026/07/14
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get mapTimelineForecast;
 
   /// More-menu entry that opens the notification-settings page
   ///
@@ -2624,6 +2636,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nuclear accident'**
   String get dpmDisasterNuclear;
+
+  /// Label for the experimental sky time-of-day override.
+  ///
+  /// In en, this message translates to:
+  /// **'Sky time'**
+  String get skyTime;
+
+  /// Label for the skyTimeAuto option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get skyTimeAuto;
+
+  /// Label for the skyTimeDawn option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dawn'**
+  String get skyTimeDawn;
+
+  /// Label for the skyTimeSunrise option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get skyTimeSunrise;
+
+  /// Label for the skyTimeMorning option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get skyTimeMorning;
+
+  /// Label for the skyTimeNoon option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Noon'**
+  String get skyTimeNoon;
+
+  /// Label for the skyTimeAfternoon option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get skyTimeAfternoon;
+
+  /// Label for the skyTimeGolden option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden hour'**
+  String get skyTimeGolden;
+
+  /// Label for the skyTimeSunset option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get skyTimeSunset;
+
+  /// Label for the skyTimeDusk option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dusk'**
+  String get skyTimeDusk;
+
+  /// Label for the skyTimeNight option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get skyTimeNight;
+
+  /// Label for the weatherModeCloudy option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get weatherModeCloudy;
+
+  /// Label for the weatherModeOvercast option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weatherModeOvercast;
+
+  /// Label for the weatherModeSnow option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weatherModeSnow;
+
+  /// Label for the weatherModeSand option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dust'**
+  String get weatherModeSand;
+
+  /// Radar scan-range overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Show scan range'**
+  String get radarScanRange;
+
+  /// Radar scan-range overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlines the area the four radars actually observe.'**
+  String get radarScanRangeSubtitle;
+
+  /// Hint under the radar scan-range toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Blank outside means unobserved'**
+  String get radarScanRangeHint;
+
+  /// Tooltip for the radar overlay-options chip beside the layer switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Radar overlay options'**
+  String get radarOverlayMenuTooltip;
+
+  /// County-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'County borders'**
+  String get radarCountyOutline;
+
+  /// Hint under the county-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Drawn over the echo'**
+  String get radarCountyOutlineHint;
+
+  /// County-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps county borders legible under the radar echo.'**
+  String get radarCountyOutlineSubtitle;
+
+  /// Township-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Township borders'**
+  String get radarTownOutline;
+
+  /// Hint under the township-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'The finer mesh'**
+  String get radarTownOutlineHint;
+
+  /// Township-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps township borders legible under the radar echo.'**
+  String get radarTownOutlineSubtitle;
 }
 
 class _AppLocalizationsDelegate

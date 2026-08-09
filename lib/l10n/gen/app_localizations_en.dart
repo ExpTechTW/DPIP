@@ -516,6 +516,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Infrared';
 
   @override
+  String get mapLayerQpesums => '1h Precipitation Forecast';
+
+  @override
   String get mapLayerLightning => 'Lightning';
 
   @override
@@ -533,6 +536,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'Observed';
+
+  @override
+  String get mapTimelineForecast => 'Forecast';
 
   @override
   String get notifySettingsMenu => 'Notification settings';
@@ -1370,4 +1376,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'Nuclear accident';
+
+  @override
+  String get skyTime => 'Sky time';
+
+  @override
+  String get skyTimeAuto => 'Auto';
+
+  @override
+  String get skyTimeDawn => 'Dawn';
+
+  @override
+  String get skyTimeSunrise => 'Sunrise';
+
+  @override
+  String get skyTimeMorning => 'Morning';
+
+  @override
+  String get skyTimeNoon => 'Noon';
+
+  @override
+  String get skyTimeAfternoon => 'Afternoon';
+
+  @override
+  String get skyTimeGolden => 'Golden hour';
+
+  @override
+  String get skyTimeSunset => 'Sunset';
+
+  @override
+  String get skyTimeDusk => 'Dusk';
+
+  @override
+  String get skyTimeNight => 'Night';
+
+  @override
+  String get weatherModeCloudy => 'Cloudy';
+
+  @override
+  String get weatherModeOvercast => 'Overcast';
+
+  @override
+  String get weatherModeSnow => 'Snow';
+
+  @override
+  String get weatherModeSand => 'Dust';
+
+  @override
+  String get radarScanRange => 'Show scan range';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'Outlines the area the four radars actually observe.';
+
+  @override
+  String get radarScanRangeHint => 'Blank outside means unobserved';
+
+  @override
+  String get radarOverlayMenuTooltip => 'Radar overlay options';
+
+  @override
+  String get radarCountyOutline => 'County borders';
+
+  @override
+  String get radarCountyOutlineHint => 'Drawn over the echo';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'Keeps county borders legible under the radar echo.';
+
+  @override
+  String get radarTownOutline => 'Township borders';
+
+  @override
+  String get radarTownOutlineHint => 'The finer mesh';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'Keeps township borders legible under the radar echo.';
 }

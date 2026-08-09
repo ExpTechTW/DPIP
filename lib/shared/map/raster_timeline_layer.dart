@@ -6,6 +6,7 @@ import 'dart:collection';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -85,6 +86,23 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Hook for extra style work once this layer's first frame is on the map
   /// (e.g. an outline layer that only makes sense over this overlay).
   @protected
+  /// Where this layer's frames are anchored in the style.
+  ///
+  /// Defaults to under the base style's county borders, which keeps them legible
+  /// through the raster. A layer that supplies its **own** borders on top should
+  /// return null instead: leaving the base ones showing through as well draws
+  /// every boundary twice, at two weights, and the pair reads as a smear.
+  @protected
+  String? get rasterBelowLayerId => outlineLayerId;
+
+  /// What the frame times *are*, for the timeline caption above the date.
+  ///
+  /// Observed data (radar, satellite) keeps the shared "observed" label; a
+  /// forecast layer says so instead, so its frames are never read as
+  /// measurements.
+  String timelineCaption(BuildContext context) =>
+      AppLocalizations.of(context).mapTimelineObserved;
+
   Future<void> onAttached(MapLibreMapController controller) async {}
 
   /// Undoes [onAttached]. Called from [clear].
@@ -157,27 +175,42 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// smear: `raster-opacity` is an animated paint property whose style-spec
   /// default is a **300 ms** cross-fade, so every swap used to blend two frames
   /// for longer than the finger takes to cross the next one — the map could
-  /// never catch up, however fast the tiles resolved. Declared once at mount, it
-  /// governs every later opacity change for free.
+  /// never catch up, however fast the tiles resolved.
   static RasterLayerProperties _mountPaint(double value) =>
       RasterLayerProperties(
         visibility: 'visible',
         rasterOpacity: value,
-        rasterOpacityTransition: const {'duration': 0, 'delay': 0},
+        rasterOpacityTransition: _instantTransition,
       );
 
-  /// Scrub-path paint: opacity only.
+  /// The zero cross-fade every opacity write must carry.
   ///
-  /// Sent with `skipNulls` so the platform call carries this one property
-  /// instead of every raster property the layer type has — the full form makes
-  /// the platform side re-assign eight values that did not change, on a path
-  /// that runs for every frame the finger crosses.
-  static RasterLayerProperties _opacity(double value) =>
-      RasterLayerProperties(rasterOpacity: value);
+  /// Declared at mount, `raster-opacity-transition` usually governs later
+  /// changes for free — but only while the native layer keeps it. Some paths
+  /// (a style reload, the platform's layer re-add, an update that only carries
+  /// the changed property) can lose it, which silently restores the 300 ms
+  /// style-spec default and ghosts every old frame behind a fast scrub. Sending
+  /// it with every write makes the zero fade explicit instead of remembered.
+  static const Map<String, Object> _instantTransition = {
+    'duration': 0,
+    'delay': 0,
+  };
+
+  /// Scrub-path paint: opacity + its zero transition.
+  ///
+  /// Sent with `skipNulls` so the platform call carries just these two
+  /// properties instead of every raster property the layer type has — the full
+  /// form makes the platform side re-assign eight values that did not change,
+  /// on a path that runs for every frame the finger crosses.
+  static RasterLayerProperties _opacity(double value) => RasterLayerProperties(
+    rasterOpacity: value,
+    rasterOpacityTransition: _instantTransition,
+  );
 
   static const RasterLayerProperties _hidden = RasterLayerProperties(
     visibility: 'none',
     rasterOpacity: 0,
+    rasterOpacityTransition: _instantTransition,
   );
 
   @override
@@ -256,24 +289,28 @@ abstract class RasterTimelineLayer implements MapLayer {
     await _evictOverflow(controller, keep: {..._ring, frameId});
   }
 
-  /// Scrub hot path — never mounts, never cancels, never touches `visibility`.
+  /// Scrub hot path — never mounts, never cancels, rarely touches `visibility`.
   ///
   /// The two writes go out **together**. Awaiting the hide before sending the
   /// show cost two serial platform round-trips per frame, which is the budget
   /// for the whole frame; pipelined they cost one, and MapLibre applies them in
   /// order within a single render pass, so no in-between state is ever drawn.
+  ///
+  /// The previous frame is hidden either way. A ring member only fades out —
+  /// dropping it to `none` would evict its tiles and make scrubbing back a
+  /// reload — but a frame revealed mid-drag sits **outside** the ring, and
+  /// leaving it at full opacity while the scrub bounces back over it ghosts
+  /// the old frame behind the ring (`visibility: none` hides it outright).
   Future<void> _flip(MapLibreMapController controller, String frameId) async {
     final previous = _shownFrameId;
     _shownFrameId = frameId;
     _touch(frameId);
 
     await Future.wait([
-      if (previous != null && previous != frameId && _ring.contains(previous))
-        // Stays `visible` at zero opacity: dropping it to `none` would evict
-        // its tiles and make scrubbing back a reload.
+      if (previous != null && previous != frameId)
         controller.setLayerProperties(
           _layerId(previous),
-          _opacity(0),
+          _ring.contains(previous) ? _opacity(0) : _hidden,
           skipNulls: true,
         ),
       controller.setLayerProperties(
@@ -330,7 +367,11 @@ abstract class RasterTimelineLayer implements MapLayer {
       // Back into the ring from `none`: restore visibility *and* the opacity.
       await controller.setLayerProperties(
         _layerId(id),
-        RasterLayerProperties(visibility: 'visible', rasterOpacity: value),
+        RasterLayerProperties(
+          visibility: 'visible',
+          rasterOpacity: value,
+          rasterOpacityTransition: _instantTransition,
+        ),
         skipNulls: true,
       );
       return;
@@ -343,7 +384,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       _sourceId(id),
       _layerId(id),
       _mountPaint(value),
-      belowLayerId: outlineLayerId,
+      belowLayerId: rasterBelowLayerId,
     );
     _resident.add(id);
   }

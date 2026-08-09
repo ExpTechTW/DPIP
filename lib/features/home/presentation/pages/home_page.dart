@@ -87,7 +87,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final weatherMode = context.watch<ExperimentalSettings>().weatherMode;
+    final experimental = context.watch<ExperimentalSettings>();
+    final weatherMode = experimental.weatherMode;
+    final skyTimeMode = experimental.skyTimeMode;
     final extent = context.read<HomeSheetExtent>();
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
@@ -145,6 +147,7 @@ class _HomePageState extends State<HomePage> {
                       scrollController: scrollController,
                       extent: extent,
                       weatherMode: weatherMode,
+                      skyTimeMode: skyTimeMode,
                     ),
                   ),
                 ),

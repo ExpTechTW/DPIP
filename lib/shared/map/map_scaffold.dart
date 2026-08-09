@@ -16,6 +16,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
@@ -667,6 +668,13 @@ class _MapScaffoldState extends State<MapScaffold> {
   }
 
   Widget _timelinePanel(BuildContext context) {
+    // Only raster-timeline layers reach here (the usesTimeline gate); the
+    // caption is theirs to say — observed vs forecast — so forecast frames are
+    // never read as measurements. Anything else falls back to "observed".
+    final active = _active;
+    final caption = active is RasterTimelineLayer
+        ? active.timelineCaption(context)
+        : AppLocalizations.of(context).mapTimelineObserved;
     return FrostedSurface(
       borderRadius: AppRadius.large,
       child: Padding(
@@ -678,6 +686,7 @@ class _MapScaffoldState extends State<MapScaffold> {
           selectedIndex: _selectedIndex,
           onSelected: _onFrameSelected,
           onScrubbing: _onScrubbing,
+          caption: caption,
         ),
       ),
     );

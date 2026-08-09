@@ -154,11 +154,13 @@
   "mapLayers": "Lapisan",
   "mapLayerRadar": "Radar Komposit",
   "mapLayerSatellite": "Himawari Inframerah",
+  "mapLayerQpesums": "Prakiraan hujan 1 jam ke depan",
   "mapLayerLightning": "Petir",
   "lightningLegendCg": "Awan–tanah · {minutes} mnt",
   "lightningLegendCc": "Awan–awan · {minutes} mnt",
   "mapTimelineNow": "Sekarang",
   "mapTimelineObserved": "Diamati",
+  "mapTimelineForecast": "Prakiraan",
   "notifySettingsMenu": "Pengaturan notifikasi",
   "notifyTitle": "Notifikasi",
   "notifyUnavailable": "Notifikasi push belum siap — coba lagi sebentar lagi.",
@@ -417,5 +419,105 @@
   "dpmDisasterLandslide": "Tanah longsor",
   "dpmDisasterTsunami": "Tsunami",
   "dpmDisasterSlope": "Bencana lereng",
-  "dpmDisasterNuclear": "Kecelakaan nuklir"
+  "dpmDisasterNuclear": "Kecelakaan nuklir",
+  "skyTime": "Waktu langit",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Otomatis",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Fajar",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Matahari terbit",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Pagi",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Siang",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Sore",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Jam emas",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Matahari terbenam",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Senja",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Malam",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Berawan",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Mendung",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Salju",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Debu",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Tampilkan jangkauan pindai",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Menandai area yang benar-benar dipantau keempat radar.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Di luar kotak berarti tak terpantau",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Opsi lapisan radar",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "Batas kabupaten/kota",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Digambar di atas gema",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Menjaga batas wilayah tetap terbaca di bawah gema radar.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Batas kecamatan",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "Kisi yang lebih rapat",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Menjaga batas kecamatan tetap terbaca di bawah gema radar.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  }
 }

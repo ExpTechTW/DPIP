@@ -9,8 +9,20 @@ enum WeatherMode {
   /// Clear sky.
   clear,
 
+  /// Broken cloud.
+  cloudy,
+
+  /// Solid overcast.
+  overcast,
+
   /// Rain.
   rain,
+
+  /// Snow.
+  snow,
+
+  /// Blowing dust.
+  sand,
 
   /// Heavy fog / mist.
   fog,

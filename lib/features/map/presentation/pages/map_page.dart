@@ -10,6 +10,7 @@ import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
+import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
@@ -21,6 +22,7 @@ import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -47,6 +49,7 @@ class _MapPageState extends State<MapPage> {
   // Built once so each layer keeps its own MapLibre state across rebuilds.
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
+    QpesumsMapLayer(context.read<QpesumsRepository>()),
     SatelliteMapLayer(context.read<SatelliteRepository>()),
     LightningMapLayer(context.read<MeteorLightningRepository>()),
     TyphoonMapLayer(

@@ -1,6 +1,7 @@
 import 'package:dpip/core/settings/persisted.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/foundation.dart';
 
@@ -16,9 +17,16 @@ class ExperimentalSettings extends ChangeNotifier {
         key: PreferenceKeys.weatherMode,
         values: WeatherMode.values,
         fallback: WeatherMode.auto,
+      ),
+      _skyTimeMode = PersistedEnum(
+        prefs,
+        key: PreferenceKeys.skyTimeMode,
+        values: SkyTimeMode.values,
+        fallback: SkyTimeMode.auto,
       );
 
   final PersistedEnum<WeatherMode> _weatherMode;
+  final PersistedEnum<SkyTimeMode> _skyTimeMode;
 
   /// The forced weather-animation mode, or [WeatherMode.auto] to follow real
   /// conditions.
@@ -26,5 +34,13 @@ class ExperimentalSettings extends ChangeNotifier {
 
   set weatherMode(WeatherMode mode) {
     if (_weatherMode.set(mode)) notifyListeners();
+  }
+
+  /// The forced time of day for the backdrop, or [SkyTimeMode.auto] to follow
+  /// the clock.
+  SkyTimeMode get skyTimeMode => _skyTimeMode.value;
+
+  set skyTimeMode(SkyTimeMode mode) {
+    if (_skyTimeMode.set(mode)) notifyListeners();
   }
 }

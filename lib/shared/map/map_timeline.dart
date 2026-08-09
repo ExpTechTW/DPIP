@@ -23,6 +23,7 @@ class MapTimeline extends StatefulWidget {
     required this.selectedIndex,
     required this.onSelected,
     this.onScrubbing,
+    this.caption,
   });
 
   /// Frames in chronological order (oldest first); must be non-empty.
@@ -36,6 +37,10 @@ class MapTimeline extends StatefulWidget {
 
   /// `true` on scrub start / during drag; `false` when the scrub settles.
   final ValueChanged<bool>? onScrubbing;
+
+  /// What the frame times are, shown above the date — "observed" by default,
+  /// "forecast" for a forecast layer.
+  final String? caption;
 
   @override
   State<MapTimeline> createState() => _MapTimelineState();
@@ -182,7 +187,7 @@ class _MapTimelineState extends State<MapTimeline> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.mapTimelineObserved,
+                    widget.caption ?? l10n.mapTimelineObserved,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: colors.onSurface,
                       fontWeight: FontWeight.w600,

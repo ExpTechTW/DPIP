@@ -3,9 +3,10 @@ import 'dart:ui' show ImageFilter, lerpDouble;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
-import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,7 @@ class HomeSheet extends StatelessWidget {
     required this.scrollController,
     required this.extent,
     required this.weatherMode,
+    required this.skyTimeMode,
   });
 
   /// The sheet's detents, sourced from [HomeSheetExtent] so the value notifier's
@@ -66,6 +68,9 @@ class HomeSheet extends StatelessWidget {
 
   /// Which weather look the backdrop renders.
   final WeatherMode weatherMode;
+
+  /// Forced time of day for the backdrop, from experimental settings.
+  final SkyTimeMode skyTimeMode;
 
   // The sheet floors at [restExtent], so surface opacity only ever ramps from
   // its resting translucency up to fully opaque as it climbs to full.
@@ -131,6 +136,7 @@ class HomeSheet extends StatelessWidget {
                     opacity: weatherOpacity,
                     child: WeatherSkyBackground(
                       mode: weatherMode,
+                      timeMode: skyTimeMode,
                       active: HomeChrome.weatherActive(e),
                     ),
                   ),
@@ -165,6 +171,7 @@ class _HomeContentLayer extends StatelessWidget {
 
   final ScrollController scrollController;
   final WeatherMode weatherMode;
+
   final double regionBarInset;
 
   @override

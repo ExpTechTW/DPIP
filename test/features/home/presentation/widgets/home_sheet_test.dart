@@ -3,6 +3,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
@@ -72,6 +73,7 @@ Widget _wrap(RegionStore store, HomeSheetExtent extent) {
           scrollController: ScrollController(),
           extent: extent,
           weatherMode: WeatherMode.auto,
+          skyTimeMode: SkyTimeMode.auto,
         ),
       ),
     ),

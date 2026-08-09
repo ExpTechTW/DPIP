@@ -72,6 +72,17 @@ Himawari Band-13 IR XYZ WebP。時間清單是差量編碼的 Unix 秒（`[baseS
 | `getFrames` | `/api/v2/tiles/satellite/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
 | `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
+### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
+
+QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫秒**
+（`[baseMs, Δ, …]`）；tile 在 **static** 主機。`{ms}` 就是解出清單後的 13 位數
+毫秒，直接使用（時間軸解析已同時支援秒與毫秒）。
+
+| 方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/qpesums/{ms}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
 MapLibre **vector tiles**（gzip MVT）+ 點位詳情 JSON。目前僅 **AED**；未來其他

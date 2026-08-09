@@ -1,3 +1,4 @@
+import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,9 +34,11 @@ void main() {
     await layer.show(controller, frames[4]);
 
     expect(
-      controller.calls.where((c) => c.startsWith('addSource:')).length,
+      controller.calls
+          .where((c) => c.startsWith('addSource:radar-src-'))
+          .length,
       5,
-      reason: 'the ring is current ±2',
+      reason: 'the ring is current ±2; the overlays add sources of their own',
     );
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
     for (final i in [2, 3, 5, 6]) {
@@ -68,10 +71,11 @@ void main() {
       ]);
       expect(
         controller.sentKeys,
-        everyElement(equals({'raster-opacity'})),
+        everyElement(equals({'raster-opacity', 'raster-opacity-transition'})),
         reason:
             'the scrub path must not re-send visibility or the seven other '
-            'raster properties the layer type has',
+            'raster properties the layer type has — only the opacity and the '
+            'zero cross-fade that keeps a scrub a loop instead of a smear',
       );
     },
   );
@@ -137,6 +141,28 @@ void main() {
     );
   });
 
+  test('flipping back over a mid-drag-revealed frame hides it', () async {
+    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    // Drag past the ring, then bounce back into it — a fast fling's shape.
+    await layer.show(controller, frames[0], scrubbing: true);
+    await layer.show(controller, frames[5], scrubbing: true);
+
+    expect(
+      controller.visibilityOf('radar-lyr-${frames[0].id}'),
+      'none',
+      reason:
+          'the cold frame was never part of the ring, so the flip back into '
+          'it must hide it outright — an opacity-0 fade leaves it at full '
+          'strength ghosting behind the ring while the drag bounces around',
+    );
+    expect(controller.opacityOf('radar-lyr-${frames[5].id}'), '0.85');
+  });
+
   test('a settle abandons the frames the scrub swept past', () async {
     final source = _FakeRadarRepository(_ids(9));
     final layer = RadarMapLayer(source);
@@ -189,8 +215,11 @@ void main() {
 
     expect(source.released, 1);
     expect(
-      controller.calls.where((c) => c.startsWith('removeSource:')).length,
+      controller.calls
+          .where((c) => c.startsWith('removeSource:radar-src-'))
+          .length,
       5,
+      reason: 'the frame sources; the overlays tear down separately',
     );
   });
 
@@ -198,6 +227,214 @@ void main() {
     final ids = [for (var i = 0; i < 500; i++) '${1700000000 + i * 600}'];
     final layer = RadarMapLayer(_FakeRadarRepository(ids.reversed.toList()));
     expect((await layer.frames()).valueOrNull!.length, 500);
+  });
+
+  group('overlays', () {
+    /// A layer attached to a live map, ready for the toggles.
+    Future<(RadarMapLayer, RecordingMapController)> attached() async {
+      final layer = RadarMapLayer(_FakeRadarRepository(_ids(3)));
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[1]);
+      return (layer, controller);
+    }
+
+    test('both overlays are on by default and drawn on attach', () async {
+      final (layer, controller) = await attached();
+
+      // Blank outside the coverage means "not observed", and a county you
+      // cannot identify is a county you cannot act on. Neither should have to
+      // be found in a menu first.
+      expect(layer.showScanRange.value, isTrue);
+      expect(layer.showCountyOutline.value, isTrue);
+      expect(layer.showTownOutline.value, isTrue);
+      expect(controller.calls, contains('addSource:radar-scan-range'));
+      expect(
+        controller.calls,
+        contains('addLineLayer:radar-scan-range-outline'),
+      );
+      expect(
+        controller.calls,
+        contains('addLineLayer:admin-county-outline-casing'),
+      );
+      expect(controller.calls, contains('addLineLayer:admin-county-outline'));
+      expect(
+        controller.calls,
+        contains('addLineLayer:admin-town-outline-casing'),
+      );
+      expect(controller.calls, contains('addLineLayer:admin-town-outline'));
+    });
+
+    test('the echo is mounted above the base style borders', () async {
+      final (_, controller) = await attached();
+      // The base style draws its own borders under the raster. Leaving the echo
+      // beneath them meant they always showed through, so the switchable copies
+      // on top would have been a second set at a second weight — and switching
+      // them off would still not have given a clean raster.
+      for (final call in controller.calls.where(
+        (c) => c.startsWith('addRasterLayer:'),
+      )) {
+        expect(controller.belowOf(call.split(':').last), isNull, reason: call);
+      }
+    });
+
+    test('the county and township toggles are independent', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      layer.setShowTownOutline(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, contains('removeLayer:admin-town-outline'));
+      expect(
+        controller.calls.where((c) => c.contains('admin-county-outline')),
+        isEmpty,
+        reason: 'dropping the fine mesh must not take the coarse frame with it',
+      );
+      expect(layer.showCountyOutline.value, isTrue);
+    });
+
+    test('the township mesh is drawn lighter than the county frame', () {
+      // 368 townships at the county stroke turns the island into a net and
+      // buries the echo the borders are meant to sit over.
+      expect(
+        AdminBoundary.town.lineWidth,
+        lessThan(AdminBoundary.county.lineWidth),
+      );
+      expect(
+        AdminBoundary.town.lineOpacity,
+        lessThan(AdminBoundary.county.lineOpacity),
+      );
+    });
+
+    test('the coverage outline has no fill', () async {
+      final (_, controller) = await attached();
+      // A wash over the covered area would tint every dBZ colour under it.
+      expect(
+        controller.calls.where((c) => c.startsWith('addFillLayer:')),
+        isEmpty,
+      );
+    });
+
+    test('the county border is drawn above the raster', () async {
+      final (_, controller) = await attached();
+      // The base style already outlines counties *below* the echo, which is
+      // where they disappear. These must not be anchored under anything.
+      expect(controller.belowOf('admin-county-outline'), isNull);
+      expect(controller.belowOf('admin-county-outline-casing'), isNull);
+    });
+
+    test('turning the coverage outline off removes what it added', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      layer.setShowScanRange(false);
+      await pumpEventQueue();
+
+      expect(
+        controller.calls,
+        contains('removeLayer:radar-scan-range-outline'),
+      );
+      expect(controller.calls, contains('removeSource:radar-scan-range'));
+    });
+
+    test('turning the county border off removes both strokes', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      layer
+        ..setShowCountyOutline(false)
+        ..setShowTownOutline(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, contains('removeLayer:admin-county-outline'));
+      expect(
+        controller.calls,
+        contains('removeLayer:admin-county-outline-casing'),
+      );
+      expect(controller.calls, contains('removeLayer:admin-town-outline'));
+      // The vector source is the base style's; removing it would wipe the map.
+      expect(
+        controller.calls.where((c) => c == 'removeSource:exptech'),
+        isEmpty,
+      );
+    });
+
+    test('the toggles are independent', () async {
+      final (layer, controller) = await attached();
+      layer.setShowScanRange(false);
+      await pumpEventQueue();
+      controller.calls.clear();
+
+      layer.setShowCountyOutline(false);
+      await pumpEventQueue();
+
+      expect(
+        controller.calls.where((c) => c.contains('radar-scan-range')),
+        isEmpty,
+      );
+    });
+
+    test('setting the same value twice touches the map once', () async {
+      final (layer, controller) = await attached();
+      layer.setShowScanRange(false);
+      await pumpEventQueue();
+      controller.calls.clear();
+
+      layer.setShowScanRange(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, isEmpty);
+    });
+
+    test('clear tears both overlays down with the layer', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      await layer.clear(controller);
+
+      expect(controller.calls, contains('removeSource:radar-scan-range'));
+      expect(controller.calls, contains('removeLayer:admin-county-outline'));
+    });
+
+    test('clear with an overlay off issues no removals for it', () async {
+      final (layer, controller) = await attached();
+      layer.setShowScanRange(false);
+      await pumpEventQueue();
+      controller.calls.clear();
+
+      await layer.clear(controller);
+
+      expect(
+        controller.calls.where((c) => c.contains('radar-scan-range')),
+        isEmpty,
+        reason:
+            'tearing down an overlay that was never added is a no-op the map '
+            'should never be asked to perform',
+      );
+    });
+
+    test('a style reset re-adds both on the next attach', () async {
+      final (layer, _) = await attached();
+
+      // The style reload wiped every runtime source/layer under the layer's
+      // feet; nothing may be removed, only forgotten.
+      layer.onStyleReset();
+      final frames = (await layer.frames()).valueOrNull!;
+      final fresh = RecordingMapController();
+      await layer.prepare(fresh, frames);
+      await layer.show(fresh, frames[1]);
+
+      expect(
+        fresh.calls,
+        contains('addSource:radar-scan-range'),
+        reason:
+            'without forgetting the old state the overlays would never '
+            'come back, because the layer still thought they were drawn',
+      );
+      expect(fresh.calls, contains('addLineLayer:admin-county-outline'));
+    });
   });
 }
 

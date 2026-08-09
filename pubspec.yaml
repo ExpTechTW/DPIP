@@ -60,12 +60,23 @@ flutter:
   uses-material-design: true
   generate: true
   shaders:
-    - shaders/fog.frag
-    - shaders/thunderstorm.frag
-    - shaders/weather_sky.frag
+    - shaders/sky/transmittance.frag
+    - shaders/sky/sky_lut.frag
+    - shaders/sky/sky_view.frag
+    - shaders/cloud/clouds.frag
+    - shaders/weather/sun_flare.frag
+    - shaders/weather/galaxy.frag
+    - shaders/weather/night.frag
+    - shaders/weather/rain_on_glass.frag
+    - shaders/weather/lightning.frag
+    - shaders/weather/rainbow.frag
+    - shaders/weather/card_water.frag
   assets:
     - assets/DPIP.png
     - assets/box.json
+    - assets/weather/clouds/
+    - assets/weather/particles/
+    - assets/weather/sky/
     - assets/location.json.gz
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz

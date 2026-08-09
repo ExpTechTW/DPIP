@@ -516,6 +516,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari hồng ngoại';
 
   @override
+  String get mapLayerQpesums => 'Dự báo mưa 1 giờ tới';
+
+  @override
   String get mapLayerLightning => 'Sét';
 
   @override
@@ -533,6 +536,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'Quan trắc';
+
+  @override
+  String get mapTimelineForecast => 'Dự báo';
 
   @override
   String get notifySettingsMenu => 'Cài đặt thông báo';
@@ -1373,4 +1379,82 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'Sự cố hạt nhân';
+
+  @override
+  String get skyTime => 'Thời gian bầu trời';
+
+  @override
+  String get skyTimeAuto => 'Tự động';
+
+  @override
+  String get skyTimeDawn => 'Rạng đông';
+
+  @override
+  String get skyTimeSunrise => 'Bình minh';
+
+  @override
+  String get skyTimeMorning => 'Buổi sáng';
+
+  @override
+  String get skyTimeNoon => 'Buổi trưa';
+
+  @override
+  String get skyTimeAfternoon => 'Buổi chiều';
+
+  @override
+  String get skyTimeGolden => 'Giờ vàng';
+
+  @override
+  String get skyTimeSunset => 'Hoàng hôn';
+
+  @override
+  String get skyTimeDusk => 'Chạng vạng';
+
+  @override
+  String get skyTimeNight => 'Ban đêm';
+
+  @override
+  String get weatherModeCloudy => 'Nhiều mây';
+
+  @override
+  String get weatherModeOvercast => 'Trời âm u';
+
+  @override
+  String get weatherModeSnow => 'Tuyết rơi';
+
+  @override
+  String get weatherModeSand => 'Bụi cát';
+
+  @override
+  String get radarScanRange => 'Hiện phạm vi quét';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'Đánh dấu vùng bốn radar thực sự quan trắc.';
+
+  @override
+  String get radarScanRangeHint => 'Ngoài khung là chưa quan trắc';
+
+  @override
+  String get radarOverlayMenuTooltip => 'Tùy chọn lớp radar';
+
+  @override
+  String get radarCountyOutline => 'Ranh giới huyện thị';
+
+  @override
+  String get radarCountyOutlineHint => 'Vẽ đè lên tiếng vọng';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'Giữ ranh giới rõ ràng dưới lớp phản hồi radar.';
+
+  @override
+  String get radarTownOutline => 'Ranh giới xã phường';
+
+  @override
+  String get radarTownOutlineHint => 'Lưới chi tiết hơn';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'Giữ ranh giới xã phường rõ ràng dưới lớp phản hồi radar.';
 }

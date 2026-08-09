@@ -521,6 +521,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerSatellite => 'Himawari Infrared';
 
   @override
+  String get mapLayerQpesums => 'Pagtaya ng ulan sa susunod na 1 oras';
+
+  @override
   String get mapLayerLightning => 'Kidlat';
 
   @override
@@ -538,6 +541,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'Naobserbahan';
+
+  @override
+  String get mapTimelineForecast => 'Pagtaya';
 
   @override
   String get notifySettingsMenu => 'Mga setting ng notipikasyon';
@@ -1377,4 +1383,82 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'Aksidente sa nukleyar';
+
+  @override
+  String get skyTime => 'Oras ng langit';
+
+  @override
+  String get skyTimeAuto => 'Awtomatiko';
+
+  @override
+  String get skyTimeDawn => 'Bukang-liwayway';
+
+  @override
+  String get skyTimeSunrise => 'Pagsikat ng araw';
+
+  @override
+  String get skyTimeMorning => 'Umaga';
+
+  @override
+  String get skyTimeNoon => 'Tanghali';
+
+  @override
+  String get skyTimeAfternoon => 'Hapon';
+
+  @override
+  String get skyTimeGolden => 'Gintong oras';
+
+  @override
+  String get skyTimeSunset => 'Paglubog ng araw';
+
+  @override
+  String get skyTimeDusk => 'Takipsilim';
+
+  @override
+  String get skyTimeNight => 'Gabi';
+
+  @override
+  String get weatherModeCloudy => 'Maulap';
+
+  @override
+  String get weatherModeOvercast => 'Makulimlim';
+
+  @override
+  String get weatherModeSnow => 'Niyebe';
+
+  @override
+  String get weatherModeSand => 'Alikabok';
+
+  @override
+  String get radarScanRange => 'Ipakita ang saklaw ng pag-scan';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'Ipinapakita ang aktwal na saklaw ng apat na radar.';
+
+  @override
+  String get radarScanRangeHint => 'Sa labas: hindi naoobserbahan';
+
+  @override
+  String get radarOverlayMenuTooltip => 'Mga opsyon sa layer ng radar';
+
+  @override
+  String get radarCountyOutline => 'Mga hangganan ng lalawigan';
+
+  @override
+  String get radarCountyOutlineHint => 'Iginuguhit sa ibabaw ng echo';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'Nananatiling mababasa ang mga hangganan sa ilalim ng radar echo.';
+
+  @override
+  String get radarTownOutline => 'Mga hangganan ng bayan';
+
+  @override
+  String get radarTownOutlineHint => 'Mas pinong hati';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'Nananatiling mababasa ang mga hangganan ng bayan sa ilalim ng radar echo.';
 }

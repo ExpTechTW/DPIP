@@ -515,6 +515,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatellite => 'ฮิมาวาริ อินฟราเรด';
 
   @override
+  String get mapLayerQpesums => 'พยากรณ์ฝน 1 ชั่วโมงข้างหน้า';
+
+  @override
   String get mapLayerLightning => 'ฟ้าผ่า';
 
   @override
@@ -532,6 +535,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => 'เวลาตรวจวัด';
+
+  @override
+  String get mapTimelineForecast => 'พยากรณ์';
 
   @override
   String get notifySettingsMenu => 'การตั้งค่าการแจ้งเตือน';
@@ -1369,4 +1375,82 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'อุบัติเหตุนิวเคลียร์';
+
+  @override
+  String get skyTime => 'เวลาท้องฟ้า';
+
+  @override
+  String get skyTimeAuto => 'อัตโนมัติ';
+
+  @override
+  String get skyTimeDawn => 'รุ่งอรุณ';
+
+  @override
+  String get skyTimeSunrise => 'พระอาทิตย์ขึ้น';
+
+  @override
+  String get skyTimeMorning => 'ตอนเช้า';
+
+  @override
+  String get skyTimeNoon => 'เที่ยงวัน';
+
+  @override
+  String get skyTimeAfternoon => 'ตอนบ่าย';
+
+  @override
+  String get skyTimeGolden => 'ช่วงเวลาทอง';
+
+  @override
+  String get skyTimeSunset => 'พระอาทิตย์ตก';
+
+  @override
+  String get skyTimeDusk => 'สนธยา';
+
+  @override
+  String get skyTimeNight => 'กลางคืน';
+
+  @override
+  String get weatherModeCloudy => 'มีเมฆมาก';
+
+  @override
+  String get weatherModeOvercast => 'ฟ้าปิด';
+
+  @override
+  String get weatherModeSnow => 'หิมะตก';
+
+  @override
+  String get weatherModeSand => 'ฝุ่นทราย';
+
+  @override
+  String get radarScanRange => 'แสดงขอบเขตการสแกน';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'แสดงพื้นที่ที่เรดาร์ทั้งสี่ตรวจวัดได้จริง';
+
+  @override
+  String get radarScanRangeHint => 'นอกกรอบคือไม่ได้ตรวจวัด';
+
+  @override
+  String get radarOverlayMenuTooltip => 'ตัวเลือกชั้นเรดาร์';
+
+  @override
+  String get radarCountyOutline => 'เส้นแบ่งเขตจังหวัด';
+
+  @override
+  String get radarCountyOutlineHint => 'วาดทับภาพเอคโค';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์';
+
+  @override
+  String get radarTownOutline => 'เส้นแบ่งเขตอำเภอ';
+
+  @override
+  String get radarTownOutlineHint => 'เส้นแบ่งย่อยกว่า';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์';
 }

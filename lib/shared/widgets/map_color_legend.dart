@@ -5,6 +5,8 @@
 /// Matches the RTS intensity legend's density so every layer reads the same.
 library;
 
+import 'dart:math' as math;
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -179,4 +181,123 @@ class SymbolLegend extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A short line sample for a [SymbolLegendItem] — the swatch for an outline
+/// overlay (an administrative border, a coverage boundary).
+///
+/// Draws the *same* construction the map does, casing included, so the key can
+/// be matched to the line on screen rather than merely described.
+class LineSwatch extends StatelessWidget {
+  const LineSwatch({
+    super.key,
+    required this.color,
+    this.width = 1.2,
+    this.opacity = 1,
+    this.casingColor,
+    this.casingWidth = 0,
+    this.casingOpacity = 1,
+    this.dash,
+  });
+
+  /// The core stroke.
+  final Color color;
+  final double width;
+  final double opacity;
+
+  /// Optional wider stroke drawn beneath [color].
+  final Color? casingColor;
+  final double casingWidth;
+  final double casingOpacity;
+
+  /// `[dash, gap]` in logical pixels; null draws a solid line.
+  final List<double>? dash;
+
+  static const Size _size = Size(20, 12);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: _size,
+      painter: _LineSwatchPainter(
+        color: color,
+        width: width,
+        opacity: opacity,
+        casingColor: casingColor,
+        casingWidth: casingWidth,
+        casingOpacity: casingOpacity,
+        dash: dash,
+      ),
+    );
+  }
+}
+
+class _LineSwatchPainter extends CustomPainter {
+  _LineSwatchPainter({
+    required this.color,
+    required this.width,
+    required this.opacity,
+    required this.casingColor,
+    required this.casingWidth,
+    required this.casingOpacity,
+    required this.dash,
+  });
+
+  final Color color;
+  final double width;
+  final double opacity;
+  final Color? casingColor;
+  final double casingWidth;
+  final double casingOpacity;
+  final List<double>? dash;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    final casing = casingColor;
+    if (casing != null && casingWidth > 0) {
+      _stroke(
+        canvas,
+        size,
+        y,
+        casing.withValues(alpha: casingOpacity),
+        casingWidth,
+      );
+    }
+    _stroke(canvas, size, y, color.withValues(alpha: opacity), width);
+  }
+
+  void _stroke(Canvas canvas, Size size, double y, Color c, double w) {
+    final paint = Paint()
+      ..color = c
+      ..strokeWidth = w
+      ..strokeCap = StrokeCap.round;
+    final pattern = dash;
+    if (pattern == null || pattern.length < 2) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+      return;
+    }
+    // Dash lengths are in line-width multiples on the map, as MapLibre defines
+    // `line-dasharray`, so scale them the same way here.
+    final on = pattern[0] * w;
+    final off = pattern[1] * w;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + on, size.width), y),
+        paint,
+      );
+      x += on + off;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _LineSwatchPainter old) =>
+      old.color != color ||
+      old.width != width ||
+      old.opacity != opacity ||
+      old.casingColor != casingColor ||
+      old.casingWidth != casingWidth ||
+      old.dash != dash;
 }

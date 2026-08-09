@@ -154,11 +154,13 @@
   "mapLayers": "Lớp bản đồ",
   "mapLayerRadar": "Radar phản xạ tổng hợp",
   "mapLayerSatellite": "Himawari hồng ngoại",
+  "mapLayerQpesums": "Dự báo mưa 1 giờ tới",
   "mapLayerLightning": "Sét",
   "lightningLegendCg": "Mây–đất · {minutes} phút",
   "lightningLegendCc": "Mây–mây · {minutes} phút",
   "mapTimelineNow": "Bây giờ",
   "mapTimelineObserved": "Quan trắc",
+  "mapTimelineForecast": "Dự báo",
   "notifySettingsMenu": "Cài đặt thông báo",
   "notifyTitle": "Thông báo",
   "notifyUnavailable": "Thông báo đẩy chưa sẵn sàng — vui lòng thử lại sau giây lát.",
@@ -417,5 +419,105 @@
   "dpmDisasterLandslide": "Sạt lở đất",
   "dpmDisasterTsunami": "Sóng thần",
   "dpmDisasterSlope": "Thiên tai sườn dốc",
-  "dpmDisasterNuclear": "Sự cố hạt nhân"
+  "dpmDisasterNuclear": "Sự cố hạt nhân",
+  "skyTime": "Thời gian bầu trời",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Tự động",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Rạng đông",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Bình minh",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Buổi sáng",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Buổi trưa",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Buổi chiều",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Giờ vàng",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Hoàng hôn",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Chạng vạng",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Ban đêm",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Nhiều mây",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Trời âm u",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Tuyết rơi",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Bụi cát",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Hiện phạm vi quét",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Đánh dấu vùng bốn radar thực sự quan trắc.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Ngoài khung là chưa quan trắc",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Tùy chọn lớp radar",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "Ranh giới huyện thị",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Vẽ đè lên tiếng vọng",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Giữ ranh giới rõ ràng dưới lớp phản hồi radar.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Ranh giới xã phường",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "Lưới chi tiết hơn",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Giữ ranh giới xã phường rõ ràng dưới lớp phản hồi radar.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  }
 }

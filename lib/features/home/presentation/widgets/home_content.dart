@@ -9,6 +9,7 @@ import 'package:dpip/features/home/presentation/widgets/home_active_events_secti
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,8 @@ import 'package:provider/provider.dart';
 ///
 /// Below the header: **active events** while collapsed; once flush full-screen
 /// on a township, **rain trend** + **24h forecast**, then active events. 全國
-/// skips weather entirely (name + events only).
+/// skips weather entirely (name + events only); 所在地 with no GPS fix shows the
+/// header's "can't locate you" notice **alone** — no cards at all.
 class HomeContent extends StatelessWidget {
   const HomeContent({
     super.key,
@@ -61,7 +63,30 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
-    final showWeather = store.selected is! NationwideArea;
+    final area = store.selected;
+    // 所在地 with no GPS fix has no township to report on. The header already
+    // says so; showing cards below it would only be rows of dashes and empty
+    // feeds pretending to be readings for a place we could not identify.
+    final located = area is! CurrentArea || area.code != null;
+    final showWeather = area is! NationwideArea && located;
+    // One listener for the whole panel: the sky colour only changes when the
+    // LUT re-bakes (a weather or time-slot change), and every card below tints
+    // itself from the same value the way the reference samples one gradient stop for all
+    // of them.
+    return ValueListenableBuilder<Color?>(
+      valueListenable: SkyLutCache.panelAmbient,
+      builder: (context, sky, _) =>
+          _build(context, areaIndex, located, showWeather, sky),
+    );
+  }
+
+  Widget _build(
+    BuildContext context,
+    int areaIndex,
+    bool located,
+    bool showWeather,
+    Color? sky,
+  ) {
     return ListView(
       controller: scrollController,
       padding: EdgeInsets.fromLTRB(
@@ -92,25 +117,55 @@ class HomeContent extends StatelessWidget {
                 HomeRainTrendSection(
                   key: ValueKey('rain-$areaIndex'),
                   reveal: reveal,
+                  sky: sky,
+                  weatherMode: weatherMode,
+                  // Only this card gets wet. The reference rains on the card, not the
+                  // page, and the effect belongs on the one block that is
+                  // *about* rain. The grade is the weather's; [reveal] gates
+                  // visibility separately inside the section, the way the
+                  // engine's scene alpha does — multiplying them together
+                  // washed the water down to a third of its opacity.
+                  rain: _cardRain(weatherMode),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 HomeForecastSection(
                   key: ValueKey('forecast-$areaIndex'),
                   reveal: reveal,
+                  sky: sky,
+                  weatherMode: weatherMode,
                 ),
                 const SizedBox(height: AppSpacing.lg),
               ],
-              HomeActiveEventsSection(
-                key: ValueKey('active-$areaIndex'),
-                reveal: reveal,
-                expanded: expanded,
-              ),
+              if (located)
+                HomeActiveEventsSection(
+                  key: ValueKey('active-$areaIndex'),
+                  reveal: reveal,
+                  expanded: expanded,
+                  sky: sky,
+                  weatherMode: weatherMode,
+                ),
             ],
           ),
         ),
       ],
     );
   }
+
+  /// How wet the rain-trend card gets for a given backdrop.
+  ///
+  /// These are positions on the reference's own weather-type ladder, not a free dial.
+  /// Both effects switch whole parameter sets by the weather-type enum,
+  /// and the ladder is counter-intuitive: **lighter rain means smaller, denser
+  /// beads and sparser edge water**. DPIP's plain rain backdrop is the
+  /// light-rain end of that ladder — which is what the shipped light-rain
+  /// capture shows — and only thunderstorm reaches the downpour band. Sitting
+  /// rain in the middle, as an earlier version did, gave it beads the reference keeps
+  /// for a storm and an edge-water band the reference never shows at that grade.
+  static double _cardRain(WeatherMode mode) => switch (mode) {
+    WeatherMode.rain => 0.3,
+    WeatherMode.thunderstorm => 0.85,
+    _ => 0.0,
+  };
 }
 
 /// Slides its [child] in from the side when the area [index] changes, so a

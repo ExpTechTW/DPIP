@@ -514,6 +514,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 赤外線図';
 
   @override
+  String get mapLayerQpesums => '1時間降水量予報';
+
+  @override
   String get mapLayerLightning => '雷';
 
   @override
@@ -531,6 +534,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapTimelineObserved => '観測';
+
+  @override
+  String get mapTimelineForecast => '予報';
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -1353,4 +1359,79 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => '原子力事故';
+
+  @override
+  String get skyTime => '空の時刻';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '夜明け前';
+
+  @override
+  String get skyTimeSunrise => '日の出';
+
+  @override
+  String get skyTimeMorning => '午前';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '午後';
+
+  @override
+  String get skyTimeGolden => 'ゴールデンアワー';
+
+  @override
+  String get skyTimeSunset => '日の入り';
+
+  @override
+  String get skyTimeDusk => '薄暮';
+
+  @override
+  String get skyTimeNight => '夜';
+
+  @override
+  String get weatherModeCloudy => '曇り';
+
+  @override
+  String get weatherModeOvercast => '本曇り';
+
+  @override
+  String get weatherModeSnow => '雪';
+
+  @override
+  String get weatherModeSand => '砂じん';
+
+  @override
+  String get radarScanRange => '走査範囲を表示';
+
+  @override
+  String get radarScanRangeSubtitle => '4基のレーダーが実際に観測する範囲を示します。';
+
+  @override
+  String get radarScanRangeHint => '枠外の空白は未観測';
+
+  @override
+  String get radarOverlayMenuTooltip => 'レーダーレイヤー設定';
+
+  @override
+  String get radarCountyOutline => '県市境界';
+
+  @override
+  String get radarCountyOutlineHint => 'エコーの上に描画';
+
+  @override
+  String get radarCountyOutlineSubtitle => 'レーダーエコーの下でも県市境界が見えるようにします。';
+
+  @override
+  String get radarTownOutline => '市町村境界';
+
+  @override
+  String get radarTownOutlineHint => 'より細かい区分';
+
+  @override
+  String get radarTownOutlineSubtitle => 'レーダーエコーの下でも市町村境界が見えるようにします。';
 }

@@ -54,10 +54,11 @@ void main() {
       ]);
       expect(
         controller.sentKeys,
-        everyElement(equals({'raster-opacity'})),
+        everyElement(equals({'raster-opacity', 'raster-opacity-transition'})),
         reason:
             'the scrub path must not re-send visibility or the seven other '
-            'raster properties the layer type has',
+            'raster properties the layer type has — only the opacity and the '
+            'zero cross-fade that keeps a scrub a loop instead of a smear',
       );
     },
   );

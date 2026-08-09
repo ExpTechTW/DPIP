@@ -6,6 +6,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -37,6 +38,18 @@ import 'package:provider/provider.dart';
 /// mutations run through one serial queue and are guarded by a style **epoch** and
 /// per-concern **generations**; every add is idempotent (tolerant remove-then-add)
 /// so a reload race or a partial failure re-syncs on the next apply instead of
+/// Which administrative borders the home backdrop draws for [code].
+///
+/// The county frame is always there — it is how a reader places what they are
+/// looking at. The township mesh only joins it once a township is the subject:
+/// the nationwide view is framed far enough out that 368 outlines collapse into
+/// a grey wash over the echo, where the coarse frame is the only boundary still
+/// carrying information.
+List<AdminBoundary> backdropBoundaries(String? code) => [
+  if (code != null) AdminBoundary.town,
+  AdminBoundary.county,
+];
+
 /// wedging.
 class HomeMapBackdrop extends StatefulWidget {
   const HomeMapBackdrop({super.key});
@@ -164,7 +177,6 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // Nothing changed since the last apply (an unrelated RegionStore notify) —
     // don't re-add layers or re-run the camera.
     if (code == _appliedCode && styleEpoch == _appliedCodeEpoch) return;
-    final townCode = code == null ? null : int.tryParse(code);
     final gen = ++_selectionGen;
 
     List<double>? bounds;
@@ -174,7 +186,6 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       bounds = boundaries.boundsFor(code);
     }
 
-    final filter = _filterFor(townCode);
     // Normalise the fit box: a degenerate/non-finite township box would make
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
     final box = safeFitBounds(_latLngBounds(bounds));
@@ -189,7 +200,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      await _addSelectedLayers(controller, filter);
+      await _restackOverlays(controller);
       // Frame the box in the band above the resting sheet — computed in Dart
       // (boundsFitCamera) and applied as a plain centre+zoom, so a degenerate or
       // not-yet-laid-out viewport can't abort the app the way MapLibre's native
@@ -208,6 +219,32 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       _appliedCode = code;
       _appliedCodeEpoch = styleEpoch;
     });
+  }
+
+  /// Re-adds everything that belongs **above** the echo, bottom-up.
+  ///
+  /// The radar layer is swapped on every refresh (remove-then-add), which lands
+  /// it back on top of the style — so these cannot simply be added once. Each
+  /// step removes its own copy first, making the whole thing idempotent and
+  /// safe to run from either trigger.
+  ///
+  /// The township mesh is drawn only when a township is the subject. The
+  /// whole-island framing is far enough out that 368 outlines collapse into a
+  /// grey wash over the echo, and there the county frame is the only boundary
+  /// carrying information.
+  Future<void> _restackOverlays(MapLibreMapController controller) async {
+    final code = _selectedCode;
+    final wanted = backdropBoundaries(code);
+    // Bottom-up, so a later add lands above an earlier one: the coarse county
+    // frame should win where the two run together along a coastline.
+    for (final boundary in [AdminBoundary.town, AdminBoundary.county]) {
+      await AdminOutline.remove(controller, boundary);
+      if (wanted.contains(boundary)) {
+        await AdminOutline.add(controller, boundary);
+      }
+    }
+    // The selection is the point of the backdrop — always last, always on top.
+    await _addSelectedLayers(controller, _filterFor(_townCode(code)));
   }
 
   /// (Re)adds the purple selection outline on the vector `town` layer (filtered
@@ -230,7 +267,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     );
   }
 
-  /// Fetches the newest radar frame and swaps it in (below the borders). A
+  /// Fetches the newest radar frame and swaps it in, then restacks the
+  /// borders over it. A
   /// failed fetch, an unchanged frame, or a superseded refresh is a no-op, so
   /// the current echo stays. The swap is idempotent (tolerant remove-then-add)
   /// so a partial failure can't strand or duplicate the source.
@@ -259,8 +297,11 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         _radarSource,
         _radarLayer,
         const RasterLayerProperties(rasterOpacity: _radarOpacity),
-        belowLayerId: outlineLayerId,
+        // On top of the base style's own borders, as on the radar map: those
+        // are hairlines tuned for a bare basemap and they wash out under the
+        // echo. [_restackOverlays] puts a legible set back over it.
       );
+      await _restackOverlays(controller);
       _radarFrameOnMap = latest;
       _radarFrameEpoch = styleEpoch;
     });
@@ -289,6 +330,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       // Expected when the source isn't on the map (fresh style / first add).
     }
   }
+
+  /// The selected township as an int, or null for the nationwide view.
+  static int? _townCode(String? code) =>
+      code == null ? null : int.tryParse(code);
 
   /// A `CODE` equality filter — the impossible `-1` matches nothing, hiding the
   /// selection layers for the nationwide view.

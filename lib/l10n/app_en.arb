@@ -725,6 +725,10 @@
   "@mapLayerSatellite": {
     "description": "Name of the Himawari infrared layer in the layer picker"
   },
+  "mapLayerQpesums": "1h Precipitation Forecast",
+  "@mapLayerQpesums": {
+    "description": "Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker"
+  },
   "mapLayerLightning": "Lightning",
   "@mapLayerLightning": {
     "description": "Map layer switcher label for the lightning strike timeline"
@@ -754,6 +758,10 @@
   "mapTimelineObserved": "Observed",
   "@mapTimelineObserved": {
     "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"
+  },
+  "mapTimelineForecast": "Forecast",
+  "@mapTimelineForecast": {
+    "description": "Label above the map timeline's date when the frame times are forecast times, e.g. Forecast / 2026/07/14"
   },
   "notifySettingsMenu": "Notification settings",
   "@notifySettingsMenu": {
@@ -1601,15 +1609,21 @@
   "@typhoonPickerNamed": {
     "description": "Sheet picker: named typhoon (CWA name + TY tyNo)",
     "placeholders": {
-      "no": { "type": "String" },
-      "name": { "type": "String" }
+      "no": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typhoonPickerTd": "Tropical depression TD {no}",
   "@typhoonPickerTd": {
     "description": "Sheet picker: unnamed tropical depression (CWA tdNo)",
     "placeholders": {
-      "no": { "type": "String" }
+      "no": {
+        "type": "String"
+      }
     }
   },
   "typhoonIntensityMild": "Mild typhoon",
@@ -1834,5 +1848,105 @@
   "dpmDisasterNuclear": "Nuclear accident",
   "@dpmDisasterNuclear": {
     "description": "Shelter disaster-type filter chip: nuclear accident"
+  },
+  "skyTime": "Sky time",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Auto",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Dawn",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Sunrise",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Morning",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Noon",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Afternoon",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Golden hour",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Sunset",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Dusk",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Night",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Cloudy",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Overcast",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Snow",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Dust",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Show scan range",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Outlines the area the four radars actually observe.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Blank outside means unobserved",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Radar overlay options",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "County borders",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Drawn over the echo",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Keeps county borders legible under the radar echo.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Township borders",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "The finer mesh",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Keeps township borders legible under the radar echo.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
   }
 }
