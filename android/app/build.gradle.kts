@@ -33,7 +33,7 @@ android {
         applicationId = "com.exptech.dpip"
         minSdk = 26
         targetSdk = flutter.targetSdkVersion
-        versionCode = 300909001
+        versionCode = 300909009
         versionName = flutter.versionName
     }
 
