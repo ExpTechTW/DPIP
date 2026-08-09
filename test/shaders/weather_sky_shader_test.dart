@@ -55,8 +55,8 @@ void main() {
       asset: 'shaders/sky/sky_view.frag',
       floats: [
         200, 300, // uResolution
-        0.9214, 0.3886, 0.0, // uFrustumA
-        0.9980, 0.0628, 0.0, // uFrustumC
+        0.0985, 0.0416, 0.0, // uFrustumA
+        0.1010, 0.0064, 0.0, // uFrustumC
         0.5, // uSunAngleY
         7.0, // uTime
         16, 16, // uLutSize
@@ -82,8 +82,8 @@ void main() {
         0.0, 0.0, // fog, inner
         0.1, // iWhitePer
         16, 16, // iLutSize
-        0.9214, 0.3886, 0.0, // iFrustumA
-        0.9980, 0.0628, 0.0, // iFrustumC
+        0.0985, 0.0416, 0.0, // iFrustumA
+        0.1010, 0.0064, 0.0, // iFrustumC
         256, 288, // iTexSize
       ],
       samplers: 2,

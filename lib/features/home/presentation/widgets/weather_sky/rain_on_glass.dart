@@ -180,22 +180,18 @@ class _RainOnGlassState extends State<RainOnGlass>
   }
 }
 
-/// The droplet field's uniforms for one rain grade.
+/// One of the three droplet uniform sets for the card effect.
 ///
-/// One ladder, walked by a single 0->1 grade, rather than a table of
-/// hand-picked rows: every uniform here is monotone in how hard it is raining,
-/// so the rows a table would hold are just this line sampled at three points.
+/// The branch key is the weather *type*, not a rain "level". Light rain and
+/// sleet take [drizzle]; moderate rain takes [steady]; everything from heavy
+/// rain up through storm takes [downpour].
 ///
 /// The ladder runs the way intuition does **not**: the lighter the rain, the
-/// *smaller and denser* the beads. Light rain deposits a fine mist that
-/// condenses everywhere and rarely gathers enough mass to run; heavy rain
-/// arrives in drops that land big, merge fast, and slide almost at once.
-/// [staticSize] and [runningSize] are **divisors** in the shader
-/// (`uv * 40 / uStaticDropSize`), so a smaller value means a tighter lattice:
-/// 0.55 gives a 14.9 device-px cell against 1.15's 31 px — four times the
-/// beads at half the size. Pinning every rain mode to the heavy end, as an
-/// earlier version did, is exactly the "too big, too sparse" that a light-rain
-/// capture shows it should not be.
+/// *smaller and denser* the beads. `uStaticDropSize` is a divisor —
+/// `uv *= 40 / uStaticDropSize` — so 0.5 gives a 13.5 device-px lattice against
+/// 1.0's 27 px, i.e. four times the beads at half the size. Pinning every rain
+/// mode to the downpour set, as an earlier version did, is exactly the "too
+/// big, too sparse" that a light-rain capture shows it should not be.
 class _GlassGrade {
   const _GlassGrade({
     required this.staticSize,
@@ -206,19 +202,6 @@ class _GlassGrade {
     required this.runningSpeed,
   });
 
-  /// The ladder itself: [grade] 0 is a fine mist, 1 is a storm.
-  factory _GlassGrade.atGrade(double grade) {
-    double at(double light, double heavy) => light + (heavy - light) * grade;
-    return _GlassGrade(
-      staticSize: at(0.55, 1.15),
-      staticAmount: at(0.55, 1.0),
-      staticSpeed: at(0.9, 2.2),
-      runningSize: at(0.9, 1.5),
-      runningAmount: at(0.5, 1.0),
-      runningSpeed: at(0.5, 1.4),
-    );
-  }
-
   final double staticSize;
   final double staticAmount;
   final double staticSpeed;
@@ -226,24 +209,43 @@ class _GlassGrade {
   final double runningAmount;
   final double runningSpeed;
 
-  /// Light rain and sleet — fine, dense beads that mostly stay put.
-  static final _GlassGrade drizzle = _GlassGrade.atGrade(0.0);
+  /// Light rain and sleet — fine, dense beads.
+  static const _GlassGrade drizzle = _GlassGrade(
+    staticSize: 0.5,
+    staticAmount: 0.5,
+    staticSpeed: 1.0,
+    runningSize: 0.85,
+    runningAmount: 0.6,
+    runningSpeed: 0.4,
+  );
 
   /// Moderate rain.
   ///
   /// Unreachable today: [WeatherMode] has only `rain` and `thunderstorm` for
-  /// wet weather, which sit at the two ends. Named anyway because the ladder is
-  /// continuous and this is where a heavy-rain mode would land.
-  static final _GlassGrade steady = _GlassGrade.atGrade(0.5);
+  /// wet weather, which sit on the light and storm rungs. Kept because it is
+  /// the ladder's own middle rung, and the moment a heavy-rain mode exists it
+  /// is the set it needs — inventing one then would just be guessing again.
+  static const _GlassGrade steady = _GlassGrade(
+    staticSize: 0.8,
+    staticAmount: 0.8,
+    staticSpeed: 1.5,
+    runningSize: 1.0,
+    runningAmount: 0.7,
+    runningSpeed: 1.0,
+  );
 
-  /// Heavy rain through storm — big, fast beads that run almost at once.
-  static final _GlassGrade downpour = _GlassGrade.atGrade(1.0);
+  /// Heavy rain through storm. Big, fast, sparse beads.
+  static const _GlassGrade downpour = _GlassGrade(
+    staticSize: 1.0,
+    staticAmount: 1.0,
+    staticSpeed: 2.0,
+    runningSize: 1.4,
+    runningAmount: 1.0,
+    runningSpeed: 1.3,
+  );
 
-  /// Maps our 0->1 intensity onto the ladder.
-  ///
-  /// Quantised to three rungs rather than interpolated continuously: the
-  /// intensity is scaled by the sheet's expansion, so a continuous mapping
-  /// would have the beads visibly resizing under the user's finger mid-drag.
+  /// Maps our 0→1 intensity onto the ladder. Whole sets are switched by
+  /// weather type rather than interpolated, so this does the same.
   static _GlassGrade forIntensity(double intensity) {
     if (intensity >= 0.7) return downpour;
     if (intensity >= 0.35) return steady;

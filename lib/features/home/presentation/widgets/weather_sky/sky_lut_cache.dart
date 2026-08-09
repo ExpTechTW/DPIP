@@ -178,44 +178,32 @@ class SkyLutCache {
   }
 }
 
-/// The two rays that bound the visible band of sky: the screen's top edge and
-/// its bottom edge, as directions from the eye.
+/// The view frustum's top and bottom rays, as the engine builds them.
 ///
-/// The backdrop deliberately shows a **narrow slice of sky just above the
-/// horizon**, not a dome. That is the framing a card backdrop wants: the
-/// horizon band is the most saturated, busiest part of the sky and putting it
-/// on screen fights the content in front of it, while a slice taken a little
-/// higher gives a clean gradient that text sits on. [_spanDeg] and
-/// [_baseElevationDeg] state that choice directly, in degrees.
+/// Two properties here are load-bearing for the look and are kept deliberately:
 ///
-/// There is no perspective divide and no aspect correction to do: the sky has
-/// no azimuthal variation at all — `sky_view.frag` resolves every pixel in a
-/// row to the same colour — so only the vertical extent means anything, and
-/// the screen's width cannot enter into it.
+///   • A fixed 20° vertical field of view. The visible sky is a narrow ~19°
+///     band, not a dome — widening it is the quickest way to change the look.
+///     There is nothing to aspect-correct: the sky has no azimuthal variation,
+///     so only the vertical extent means anything.
+///   • The camera's 0.017 height offset is baked into the corners and the
+///     shader normalises them from the world origin rather than the camera, so
+///     that offset acts as a permanent upward pitch bias of about 9.7°.
 typedef Frustum = ({List<double> top, List<double> bottom});
 
-/// Vertical extent of the visible band, degrees.
-const double _spanDeg = 19.264;
-
-/// Elevation of the band's centre at `cameraYaw == 0`, degrees above the
-/// horizon.
-const double _baseElevationDeg = 9.386;
-
-/// How much of a keyframe's `cameraYaw` reaches the band's centre. Slightly
-/// under 1: the keyframes tilt the whole scene, and the sky takes most but not
-/// all of that tilt.
-const double _yawGain = 0.962;
-
 /// Builds the frustum for a keyframe's `cameraYaw` (degrees).
-///
-/// The rays are unit vectors in the x/y plane, `x` forward and `y` up, so
-/// `sky_view.frag`'s `normalize(mix(top, bottom, uv.y))` walks the band
-/// linearly from one edge to the other.
 Frustum buildFrustum(double cameraYawDeg) {
-  final centre = (_baseElevationDeg + _yawGain * cameraYawDeg) * math.pi / 180;
-  final half = (_spanDeg / 2) * math.pi / 180;
+  const nearZ = 0.1;
+  const eyeY = 0.017;
+  const fovDeg = 20.0;
+
+  final fTan = nearZ * math.tan((fovDeg / 2.0) * math.pi / 180.0);
+  final p = cameraYawDeg * math.pi / 180.0;
+  final cp = math.cos(p);
+  final sp = math.sin(p);
+
   return (
-    top: [math.cos(centre + half), math.sin(centre + half), 0.0],
-    bottom: [math.cos(centre - half), math.sin(centre - half), 0.0],
+    top: [nearZ * cp - fTan * sp, eyeY + nearZ * sp + fTan * cp, 0.0],
+    bottom: [nearZ * cp + fTan * sp, eyeY + nearZ * sp - fTan * cp, 0.0],
   );
 }
