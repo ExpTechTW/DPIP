@@ -12,7 +12,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageName => '繁體中文(臺灣)';
 
   @override
-  String get navHome => '主頁';
+  String get navHome => '首頁';
 
   @override
   String get navEvents => '事件';
@@ -1438,7 +1438,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get languageName => '简体中文';
 
   @override
-  String get navHome => '首页';
+  String get navHome => '主页';
 
   @override
   String get navEvents => '事件';
@@ -4290,7 +4290,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get languageName => '繁體中文(臺灣)';
 
   @override
-  String get navHome => '主頁';
+  String get navHome => '首頁';
 
   @override
   String get navEvents => '事件';
