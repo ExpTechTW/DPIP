@@ -1,6 +1,7 @@
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/realtime_view.dart';
@@ -54,54 +55,7 @@ class _EewAlertList extends StatelessWidget {
       ),
       itemCount: alerts.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-      itemBuilder: (context, index) => _EewCard(eew: alerts[index]),
-    );
-  }
-}
-
-/// A single EEW alert: epicentre location with its magnitude and depth.
-class _EewCard extends StatelessWidget {
-  const _EewCard({required this.eew});
-
-  final Eew eew;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final info = eew.info;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Row(
-          children: [
-            Icon(
-              Icons.warning_amber_rounded,
-              color: theme.colorScheme.error,
-              size: 32,
-            ),
-            const SizedBox(width: AppSpacing.lg),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(info.location, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    l10n.eewSummary(
-                      info.magnitude.toStringAsFixed(1),
-                      info.depth.toStringAsFixed(0),
-                    ),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      itemBuilder: (context, index) => EewCard(eew: alerts[index]),
     );
   }
 }

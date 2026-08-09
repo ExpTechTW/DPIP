@@ -271,6 +271,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportDetailAreaIntensity => 'Intensitas per wilayah';
 
   @override
+  String get reportDetailLocalIntensity => 'Intensitas di lokasi Anda';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable =>
+      'Tidak ada data intensitas';
+
+  @override
+  String get reportDetailSortByIntensity => 'Urutkan menurut intensitas';
+
+  @override
+  String get reportDetailSortByCounty => 'Urutkan menurut wilayah';
+
+  @override
   String get reportDetailImage => 'Gambar laporan';
 
   @override
@@ -278,6 +291,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'Halaman laporan';
+
+  @override
+  String get reportDetailReplay => 'Putar ulang';
 
   @override
   String get navMore => 'Lainnya';
@@ -850,6 +866,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get trendNoData => 'Tidak ada data tren';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Total $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

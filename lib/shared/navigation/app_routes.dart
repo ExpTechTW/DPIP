@@ -31,6 +31,13 @@ abstract final class AppRoutes {
   static const String earthquakeReport = 'earthquakeReport';
   static const String earthquakeReportPath = ':id';
 
+  /// RTS + EEW replay from a report's "重播" chip — nested under
+  /// [earthquakeReportPath]. Takes the replay start instant as a required
+  /// `?t=` query parameter (Unix ms); the `:id` param above is unused by the
+  /// replay page itself, just inherited from the parent route.
+  static const String earthquakeReplay = 'earthquakeReplay';
+  static const String earthquakeReplayPath = 'replay';
+
   /// Live EEW monitor — nested under [dataPath].
   static const String eew = 'eew';
   static const String eewPath = 'eew';

@@ -272,6 +272,19 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportDetailAreaIntensity => 'Intensity ayon sa lugar';
 
   @override
+  String get reportDetailLocalIntensity => 'Intensity sa iyong lokasyon';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable =>
+      'Walang datos ng intensity';
+
+  @override
+  String get reportDetailSortByIntensity => 'Ayusin ayon sa intensity';
+
+  @override
+  String get reportDetailSortByCounty => 'Ayusin ayon sa lalawigan';
+
+  @override
   String get reportDetailImage => 'Larawan ng Ulat';
 
   @override
@@ -280,6 +293,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'Pahina ng Ulat';
+
+  @override
+  String get reportDetailReplay => 'I-replay';
 
   @override
   String get navMore => 'Higit Pa';
@@ -853,6 +869,11 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get trendNoData => 'Walang trend data';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Kabuuang $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

@@ -270,6 +270,18 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportDetailAreaIntensity => 'ความเข้มแยกตามพื้นที่';
 
   @override
+  String get reportDetailLocalIntensity => 'ความเข้มที่ตำแหน่งของคุณ';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => 'ไม่มีข้อมูลความเข้ม';
+
+  @override
+  String get reportDetailSortByIntensity => 'เรียงตามความเข้ม';
+
+  @override
+  String get reportDetailSortByCounty => 'เรียงตามพื้นที่';
+
+  @override
   String get reportDetailImage => 'ภาพรายงานแผ่นดินไหว';
 
   @override
@@ -277,6 +289,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'หน้ารายงาน';
+
+  @override
+  String get reportDetailReplay => 'เล่นย้อนหลัง';
 
   @override
   String get navMore => 'เพิ่มเติม';
@@ -847,6 +862,11 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get trendNoData => 'ไม่มีข้อมูลแนวโน้ม';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'สะสม $total มม.';
+  }
 
   @override
   String chartHourLabel(int hour) {

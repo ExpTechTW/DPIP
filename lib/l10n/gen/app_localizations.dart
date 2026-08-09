@@ -585,6 +585,30 @@ abstract class AppLocalizations {
   /// **'Intensity by area'**
   String get reportDetailAreaIntensity;
 
+  /// Section header over the per-location (GPS + saved townships) felt-intensity readout, shown above the area breakdown
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity at your locations'**
+  String get reportDetailLocalIntensity;
+
+  /// Shown in place of an intensity badge when a location's county isn't in this report's felt-area list at all
+  ///
+  /// In en, this message translates to:
+  /// **'No intensity data'**
+  String get reportDetailLocalIntensityUnavailable;
+
+  /// Tooltip on the area-intensity sort toggle when tapping it switches to grouping by intensity level
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by intensity'**
+  String get reportDetailSortByIntensity;
+
+  /// Tooltip on the area-intensity sort toggle when tapping it switches to an alphabetical county list
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by county'**
+  String get reportDetailSortByCounty;
+
   /// Section header over the CWA-rendered report image
   ///
   /// In en, this message translates to:
@@ -602,6 +626,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report page'**
   String get reportDetailOpenReport;
+
+  /// Button that opens the RTS/EEW replay starting from this report's origin time
+  ///
+  /// In en, this message translates to:
+  /// **'Replay'**
+  String get reportDetailReplay;
 
   /// Bottom-nav label and page title for the More tab
   ///
@@ -1664,6 +1694,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No trend data'**
   String get trendNoData;
+
+  /// Running total label above the cumulative station rain trend chart
+  ///
+  /// In en, this message translates to:
+  /// **'Cumulative {total} mm'**
+  String trendCumulativeTotal(String total);
 
   /// Compact chart X-axis hour tick (e.g. 20h / 20時)
   ///

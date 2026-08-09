@@ -65,6 +65,7 @@ flutter:
     - shaders/weather_sky.frag
   assets:
     - assets/DPIP.png
+    - assets/box.json
     - assets/location.json.gz
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz

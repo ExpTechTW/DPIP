@@ -271,6 +271,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportDetailAreaIntensity => 'Intensity by area';
 
   @override
+  String get reportDetailLocalIntensity => 'Intensity at your locations';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => 'No intensity data';
+
+  @override
+  String get reportDetailSortByIntensity => 'Sort by intensity';
+
+  @override
+  String get reportDetailSortByCounty => 'Sort by county';
+
+  @override
   String get reportDetailImage => 'Report image';
 
   @override
@@ -278,6 +290,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'Report page';
+
+  @override
+  String get reportDetailReplay => 'Replay';
 
   @override
   String get navMore => 'More';
@@ -848,6 +863,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trendNoData => 'No trend data';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Cumulative $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

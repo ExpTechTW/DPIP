@@ -270,6 +270,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailAreaIntensity => '지역별 진도';
 
   @override
+  String get reportDetailLocalIntensity => '내 위치의 진도';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '진도 정보 없음';
+
+  @override
+  String get reportDetailSortByIntensity => '진도순 정렬';
+
+  @override
+  String get reportDetailSortByCounty => '지역순 정렬';
+
+  @override
   String get reportDetailImage => '지진 보고서 이미지';
 
   @override
@@ -277,6 +289,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => '보고서 페이지';
+
+  @override
+  String get reportDetailReplay => '다시 보기';
 
   @override
   String get navMore => '더보기';
@@ -839,6 +854,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trendNoData => '추세 데이터 없음';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '누적 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

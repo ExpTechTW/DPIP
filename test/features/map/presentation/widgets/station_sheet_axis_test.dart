@@ -48,6 +48,71 @@ void main() {
     });
   });
 
+  group('barSlotCenterX', () {
+    // Mirrors fl_chart's BarChartAlignment.spaceBetween `calculateGroupsX`
+    // (slot centres are linear: barWidth/2 + i·(barWidth + eachSpace)).
+    List<double> flChartSlots(int count, double barWidth, double viewWidth) {
+      final spaceAvailable = viewWidth - count * barWidth;
+      final eachSpace = spaceAvailable / (count - 1);
+      final out = <double>[];
+      var tempX = 0.0;
+      for (var i = 0; i < count; i++) {
+        tempX += barWidth / 2;
+        if (i != 0) tempX += eachSpace;
+        out.add(tempX);
+        tempX += barWidth / 2;
+      }
+      return out;
+    }
+
+    test('matches fl_chart spaceBetween slots at every index', () {
+      for (final (count, barWidth, plotWidth) in const [
+        (2, 6.0, 226.0),
+        (24, 6.0, 226.0),
+        (144, 1.5, 300.0),
+        (7, 4.0, 180.0),
+      ]) {
+        final expected = flChartSlots(count, barWidth, plotWidth);
+        for (var i = 0; i < count; i++) {
+          expect(
+            barSlotCenterX(i, count, barWidth, plotWidth),
+            closeTo(expected[i], 1e-9),
+            reason: 'count=$count i=$i',
+          );
+        }
+      }
+    });
+
+    test('slots span the canvas with a half-bar inset at each edge', () {
+      for (final (count, barWidth, plotWidth) in const [
+        (24, 6.0, 226.0),
+        (100, 1.5, 300.0),
+      ]) {
+        final first = barSlotCenterX(0, count, barWidth, plotWidth);
+        final last = barSlotCenterX(count - 1, count, barWidth, plotWidth);
+        expect(first, closeTo(barWidth / 2, 1e-9));
+        expect(last, closeTo(plotWidth - barWidth / 2, 1e-9));
+      }
+    });
+
+    test('slots are evenly spaced', () {
+      const count = 24, barWidth = 6.0, plotWidth = 226.0;
+      final gap =
+          barSlotCenterX(1, count, barWidth, plotWidth) -
+          barSlotCenterX(0, count, barWidth, plotWidth);
+      for (var i = 1; i < count; i++) {
+        final g =
+            barSlotCenterX(i, count, barWidth, plotWidth) -
+            barSlotCenterX(i - 1, count, barWidth, plotWidth);
+        expect(g, closeTo(gap, 1e-9));
+      }
+    });
+
+    test('a single bar centres itself', () {
+      expect(barSlotCenterX(0, 1, 6.0, 226.0), 3.0);
+    });
+  });
+
   group('niceAxisStep', () {
     test('picks a 1/2/5 × 10ⁿ step', () {
       for (final span in [0.4, 1.5, 3.0, 7.0, 15.0, 35.0, 90.0, 400.0]) {

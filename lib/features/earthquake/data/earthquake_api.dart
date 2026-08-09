@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/sse_client.dart';
@@ -34,6 +36,31 @@ class EarthquakeApi {
     query: const {'sse': 1, 'compress': 1},
   );
 
+  /// Historical RTS snapshot at [seconds] (Unix seconds) — same shape as
+  /// [getRtsRealtime], for replaying past shaking instead of the live feed.
+  ///
+  /// **`legacyApi`, not `lbApi`:** verified by comparing responses at several
+  /// offsets (2026-08-08) — `api.lb-{tpe1,khh1}` silently **ignores**
+  /// `{seconds}` and returns the live snapshot regardless (its `time` matches
+  /// the plain `/rts` response exactly, for every offset tried); only `api-1`
+  /// actually returns a payload whose `time` tracks the requested second. A
+  /// same-tier guess from `getEewAt`'s working case would have been wrong here.
+  ///
+  /// `https://api-1.exptech.dev/api/v2/trem/rts/{seconds}`
+  Future<dynamic> getRtsAt(int seconds) async {
+    final data = await _client.get(
+      ApiTier.legacyApi,
+      '/api/v2/trem/rts/$seconds',
+    );
+    // Verified 2026-08-09: unlike every other endpoint here (including the
+    // bare `/trem/rts` and `/trem/station` on this same host), api-1 serves
+    // *this* route's body as `text/plain`, so Dio's default transformer
+    // doesn't auto-decode it — the caller gets a raw JSON string instead of
+    // a Map. Decode it here so this method's return shape matches the rest
+    // of [EarthquakeApi] regardless of the host's content-type quirk.
+    return data is String ? jsonDecode(data) : data;
+  }
+
   /// Latest EEW list (one-shot snapshot).
   ///
   /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew`
@@ -54,6 +81,14 @@ class EarthquakeApi {
     '/api/v2/eq/eew',
     query: const {'sse': 1, 'compress': 1},
   );
+
+  /// Historical EEW list at [seconds] (Unix seconds) — same shape as
+  /// [getEewRealtime], for replaying a past event instead of the live feed.
+  ///
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/eew/{seconds}`
+  Future<List<dynamic>> getEewAt(int seconds) async =>
+      (await _client.get(ApiTier.coreApi, '/api/v2/eq/eew/$seconds'))
+          as List<dynamic>;
 
   /// Latest earthquake reports including area `list` (no pagination filters).
   ///

@@ -270,6 +270,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportDetailAreaIntensity => 'Cường độ theo khu vực';
 
   @override
+  String get reportDetailLocalIntensity => 'Cường độ tại vị trí của bạn';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable =>
+      'Không có dữ liệu cường độ';
+
+  @override
+  String get reportDetailSortByIntensity => 'Sắp xếp theo cường độ';
+
+  @override
+  String get reportDetailSortByCounty => 'Sắp xếp theo khu vực';
+
+  @override
   String get reportDetailImage => 'Hình ảnh báo cáo';
 
   @override
@@ -277,6 +290,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'Trang báo cáo';
+
+  @override
+  String get reportDetailReplay => 'Phát lại';
 
   @override
   String get navMore => 'Thêm';
@@ -848,6 +864,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get trendNoData => 'Không có dữ liệu xu hướng';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Tổng cộng $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

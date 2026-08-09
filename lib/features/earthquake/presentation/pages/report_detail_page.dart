@@ -9,13 +9,19 @@ import 'dart:math' as math;
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/settings/home_area.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -477,7 +483,6 @@ class _ReportSheetState extends State<_ReportSheet> {
 
   List<Widget> _expandedContent(BuildContext context, EarthquakeReport report) {
     final l10n = AppLocalizations.of(context);
-    final groups = _buildIntensityGroups(report);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -488,10 +493,8 @@ class _ReportSheetState extends State<_ReportSheet> {
             const SizedBox(height: AppSpacing.lg),
             SectionHeader(l10n.reportDetailInfo),
             _ReportInfoCard(report: report),
-            if (groups.isNotEmpty) ...[
-              SectionHeader(l10n.reportDetailAreaIntensity),
-              _AreaIntensityCard(groups: groups),
-            ],
+            _LocalIntensitySection(report: report),
+            if (report.list.isNotEmpty) _AreaIntensitySection(report: report),
             SectionHeader(l10n.reportDetailImage),
             _ReportImageCard(report: report),
           ],
@@ -730,13 +733,28 @@ class _ReportHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        ActionChip(
-          avatar: Icon(Icons.open_in_new, size: 16, color: colors.onPrimary),
-          label: Text(l10n.reportDetailOpenReport),
-          backgroundColor: colors.primary,
-          labelStyle: TextStyle(color: colors.onPrimary),
-          side: BorderSide(color: colors.primary),
-          onPressed: () => _openReportPage(context),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            ActionChip(
+              avatar: Icon(
+                Icons.open_in_new,
+                size: 16,
+                color: colors.onPrimary,
+              ),
+              label: Text(l10n.reportDetailOpenReport),
+              backgroundColor: colors.primary,
+              labelStyle: TextStyle(color: colors.onPrimary),
+              side: BorderSide(color: colors.primary),
+              onPressed: () => _openReportPage(context),
+            ),
+            ActionChip(
+              avatar: const Icon(Icons.replay, size: 16),
+              label: Text(l10n.reportDetailReplay),
+              onPressed: () => _openReplay(context),
+            ),
+          ],
         ),
       ],
     );
@@ -748,6 +766,16 @@ class _ReportHeader extends StatelessWidget {
     } catch (e, st) {
       Log.handle(e, st, 'open report page failed: ${report.reportUrl}');
     }
+  }
+
+  void _openReplay(BuildContext context) {
+    // 2s lead-in before the report's origin time, matching the legacy replay.
+    final replayTimestamp = report.originTimeUtc.millisecondsSinceEpoch - 2000;
+    context.pushNamed(
+      AppRoutes.earthquakeReplay,
+      pathParameters: {'id': report.id},
+      queryParameters: {'t': '$replayTimestamp'},
+    );
   }
 }
 
@@ -845,6 +873,212 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
+/// 所在地的震度 — one row per [RegionStore] area (GPS 所在地 + saved townships),
+/// each showing that location's felt intensity in [report], or a "no data"
+/// message when its county isn't in the report at all. Hidden entirely when
+/// no area has a resolvable code (no GPS fix yet and nothing saved).
+class _LocalIntensitySection extends StatelessWidget {
+  const _LocalIntensitySection({required this.report});
+
+  final EarthquakeReport report;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final directory = context.read<TownDirectory>();
+    final regionStore = context.watch<RegionStore>();
+
+    final rows = <(bool isCurrent, Town town)>[];
+    for (final area in regionStore.areas) {
+      final (isCurrent, code) = switch (area) {
+        CurrentArea(:final code) => (true, code),
+        SavedArea(:final code) => (false, code),
+        NationwideArea() => (false, null),
+      };
+      if (code == null) continue;
+      final town = directory.byCode(code);
+      if (town != null) rows.add((isCurrent, town));
+    }
+    if (rows.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(l10n.reportDetailLocalIntensity),
+        Material(
+          color: colors.surfaceContainer,
+          borderRadius: AppRadius.medium,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < rows.length; i++) ...[
+                if (i > 0) const Divider(height: 1),
+                _LocalIntensityRow(
+                  isCurrent: rows[i].$1,
+                  town: rows[i].$2,
+                  result: _nearestFeltIntensity(report, rows[i].$2),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A felt reading found for a [_LocalIntensitySection] row: the nearest
+/// station within the location's own county, and its intensity.
+typedef _LocalIntensityResult = ({String stationName, int intensity});
+
+/// The felt intensity nearest to [town] within [report] — null when
+/// [report]'s felt-area list doesn't include [town]'s county at all (that
+/// list only ever contains counties with at least one felt reading, so a
+/// missing county means "no data here", not "checked and found nothing").
+/// Otherwise, the nearest of that county's stations by straight-line
+/// distance to [town]'s centroid stands in for "your township's reading" —
+/// the report's town-level keys are station names (sometimes landmarks, not
+/// administrative townships), so name-matching them to [town] isn't reliable.
+_LocalIntensityResult? _nearestFeltIntensity(
+  EarthquakeReport report,
+  Town town,
+) {
+  final area = report.list[town.cityName];
+  if (area == null || area.town.isEmpty) return null;
+  final here = geo.LatLng(town.lat, town.lng);
+  MapEntry<String, StationIntensity>? nearest;
+  var nearestDistance = double.infinity;
+  for (final entry in area.town.entries) {
+    final distance = here.distanceTo(
+      geo.LatLng(entry.value.latitude, entry.value.longitude),
+    );
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearest = entry;
+    }
+  }
+  if (nearest == null) return null;
+  return (stationName: nearest.key, intensity: nearest.value.intensity);
+}
+
+class _LocalIntensityRow extends StatelessWidget {
+  const _LocalIntensityRow({
+    required this.isCurrent,
+    required this.town,
+    required this.result,
+  });
+
+  final bool isCurrent;
+  final Town town;
+  final _LocalIntensityResult? result;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isCurrent ? Icons.my_location : Icons.push_pin_outlined,
+            size: 18,
+            color: colors.onSurfaceVariant,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              town.fullName,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          if (result case final result?)
+            IntensityBadge(
+              label: Intensity.label(result.intensity),
+              color: IntensityColors.discrete(result.intensity),
+              size: 36,
+            )
+          else
+            Text(
+              l10n.reportDetailLocalIntensityUnavailable,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// How [_AreaIntensitySection] orders 各地震度: grouped by felt intensity
+/// level (the default, bands all counties sharing a level together) or one
+/// row per county, worst-hit county first.
+enum _AreaSortMode { byIntensity, byCounty }
+
+/// 各地震度 with a sort-mode toggle in its [SectionHeader] — switches between
+/// [_AreaIntensityCard] (grouped by intensity level) and [_CountySortedCard]
+/// (flat, one row per county).
+class _AreaIntensitySection extends StatefulWidget {
+  const _AreaIntensitySection({required this.report});
+
+  final EarthquakeReport report;
+
+  @override
+  State<_AreaIntensitySection> createState() => _AreaIntensitySectionState();
+}
+
+class _AreaIntensitySectionState extends State<_AreaIntensitySection> {
+  _AreaSortMode _mode = _AreaSortMode.byIntensity;
+
+  void _toggleMode() {
+    setState(() {
+      _mode = _mode == _AreaSortMode.byIntensity
+          ? _AreaSortMode.byCounty
+          : _AreaSortMode.byIntensity;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    // The tooltip/icon describe the mode a tap switches *to*, not the current
+    // one — the standard button-label convention (says what it does).
+    final (IconData icon, String label) = _mode == _AreaSortMode.byIntensity
+        ? (Icons.sort_by_alpha, l10n.reportDetailSortByCounty)
+        : (Icons.sort, l10n.reportDetailSortByIntensity);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          l10n.reportDetailAreaIntensity,
+          trailing: IconButton(
+            icon: Icon(icon),
+            tooltip: label,
+            onPressed: _toggleMode,
+          ),
+        ),
+        switch (_mode) {
+          _AreaSortMode.byIntensity => _AreaIntensityCard(
+            groups: _buildIntensityGroups(widget.report),
+          ),
+          _AreaSortMode.byCounty => _CountySortedCard(report: widget.report),
+        },
+      ],
+    );
+  }
+}
+
 /// 各地震度 — grouped by felt intensity (highest first), not by county: each
 /// [_IntensityGroup] states its level once in a left-hand column via
 /// [IntensityBadge], with every county (bold) and its felt areas listed to
@@ -894,9 +1128,11 @@ class _IntensityGroupRow extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(color: color.withValues(alpha: 0.14)),
       child: Row(
-        // Default cross-axis alignment (center), not .stretch — the badge is
-        // a fixed-size square ([IntensityBadge]); stretching would force it
-        // to the county column's height whenever a group spans multiple rows.
+        // .start, not the default (center) or .stretch — the badge is a
+        // fixed-size square ([IntensityBadge]) that should sit at the top of
+        // the group, not centred down a tall multi-county block (and
+        // .stretch would force-tallen it to match the county column instead).
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -957,6 +1193,158 @@ class _CountyAreasRow extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 各地震度, one row per county (依縣市排序) — the [_AreaIntensitySection]'s
+/// other sort mode. Unlike [_AreaIntensityCard] (which bands *all* counties
+/// sharing an intensity level together), this keeps each county as its own
+/// row, ordered by that county's own worst intensity first. Each county gets
+/// its own colour-coded chip per felt town (no shared band colour to lean on
+/// here), sorted by intensity descending within the county.
+class _CountySortedCard extends StatelessWidget {
+  const _CountySortedCard({required this.report});
+
+  final EarthquakeReport report;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final counties = report.list.entries.toList()..sort(_byCountyIntensityDesc);
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.medium,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < counties.length; i++) ...[
+            if (i > 0) const Divider(height: 1),
+            _CountyChipsRow(
+              countyName: counties[i].key,
+              area: counties[i].value,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CountyChipsRow extends StatelessWidget {
+  const _CountyChipsRow({required this.countyName, required this.area});
+
+  final String countyName;
+  final AreaIntensity area;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final towns = area.town.entries.toList()..sort(_byTownIntensityDesc);
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            countyName,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              for (final MapEntry(key: townName, value: town) in towns)
+                _TownChip(townName: townName, intensity: town.intensity),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Highest intensity first; ties broken by name so the order is stable.
+int _byTownIntensityDesc(
+  MapEntry<String, StationIntensity> a,
+  MapEntry<String, StationIntensity> b,
+) {
+  final byIntensity = b.value.intensity.compareTo(a.value.intensity);
+  return byIntensity != 0 ? byIntensity : a.key.compareTo(b.key);
+}
+
+/// Highest (county-level) intensity first; ties broken by name so the order
+/// is stable — the worst-hit county leads [_CountySortedCard].
+int _byCountyIntensityDesc(
+  MapEntry<String, AreaIntensity> a,
+  MapEntry<String, AreaIntensity> b,
+) {
+  final byIntensity = b.value.intensity.compareTo(a.value.intensity);
+  return byIntensity != 0 ? byIntensity : a.key.compareTo(b.key);
+}
+
+/// A single felt town/area — colour-coded by its own intensity (no group
+/// colour to borrow here, unlike the intensity-grouped mode's rows).
+class _TownChip extends StatelessWidget {
+  const _TownChip({required this.townName, required this.intensity});
+
+  final String townName;
+  final int intensity;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Raw wire intensity, not [Intensity.displayForReport] — the per-town
+    // reading has always been on the fine 0–9 scale (only the top-level
+    // report max needed the pre-2020 legacy-scale remap).
+    final label = Intensity.label(intensity);
+    final color = IntensityColors.discrete(intensity);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.16),
+        border: Border.all(color: color),
+        borderRadius: AppRadius.small,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: AppRadius.small,
+              ),
+              child: Center(
+                child: Text(
+                  label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color:
+                        ThemeData.estimateBrightnessForColor(color) ==
+                            Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(townName, style: theme.textTheme.labelLarge),
         ],
       ),
     );

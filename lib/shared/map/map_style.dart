@@ -53,6 +53,11 @@ abstract final class MapColors {
       brightness == Brightness.dark ? dark : light;
 }
 
+/// Id of the base landmass fill layer — an overlay that should sit *under*
+/// the whole Taiwan area (land/county/town fills), not wash over it, anchors
+/// below this instead of [outlineLayerId].
+const String landLayerId = 'land';
+
 /// Id of the county-outline layer — overlays (radar) anchor below it so the
 /// county borders stay legible on top.
 const String outlineLayerId = 'county-outline';
@@ -105,7 +110,7 @@ String exptechVectorStyle(
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },
-    { "id": "land", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "$fill" } },
+    { "id": "$landLayerId", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "$fill" } },
     { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$fill" } },
     { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } },
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },

@@ -4,6 +4,7 @@ import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_detail_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
@@ -79,6 +80,17 @@ final GoRouter appRouter = GoRouter(
                       builder: (_, state) => ReportDetailPage(
                         reportId: state.pathParameters['id']!,
                       ),
+                      routes: [
+                        GoRoute(
+                          path: AppRoutes.earthquakeReplayPath,
+                          name: AppRoutes.earthquakeReplay,
+                          builder: (_, state) => ReportReplayPage(
+                            replayTimestamp: int.parse(
+                              state.uri.queryParameters['t']!,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

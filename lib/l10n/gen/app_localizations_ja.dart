@@ -270,6 +270,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailAreaIntensity => '地域別震度';
 
   @override
+  String get reportDetailLocalIntensity => '現在地の震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '震度情報なし';
+
+  @override
+  String get reportDetailSortByIntensity => '震度順に並べ替え';
+
+  @override
+  String get reportDetailSortByCounty => '地域順に並べ替え';
+
+  @override
   String get reportDetailImage => '地震レポート画像';
 
   @override
@@ -277,6 +289,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get reportDetailOpenReport => 'レポートページ';
+
+  @override
+  String get reportDetailReplay => 'リプレイ';
 
   @override
   String get navMore => 'その他';
@@ -839,6 +854,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trendNoData => 'トレンドデータがありません';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累計 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {
