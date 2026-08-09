@@ -172,10 +172,10 @@ class HomeContent extends StatelessWidget {
                               opacity: reveal,
                               glass: false,
                               silhouette: true,
-                              // Pinned at the top of the block, not rising
-                              // into the scroll-position cut-off the way the
-                              // trend card does — see [RainOnCard.gated].
-                              gated: false,
+                              // Default gated: true — the header rises with
+                              // the rest of the hero block once the sheet
+                              // scrolls, so it closes the same short distance
+                              // into the gesture the trend card now does.
                               child: HomeSheetHeader(
                                 reveal: reveal,
                                 expanded: expanded,
@@ -207,15 +207,16 @@ class HomeContent extends StatelessWidget {
                         // Column above, so the Expanded gap between header
                         // and trend card shrinks by exactly this much and
                         // heroHeight itself — and with it the forecast/events
-                        // fold below — never moves. bottomSafeArea is the
-                        // load-bearing part (always reserved, never ramped
-                        // away); _heroBottomGap is the small extra on top
-                        // that collapses once the sheet actually scrolls.
+                        // fold below — never moves. Collapses to 0 as the
+                        // sheet scrolls — see [_bottomGapRampExtent] on why
+                        // that includes the safe area, not just the nicety
+                        // gap on top of it.
                         builder: (context, child) => Padding(
                           padding: EdgeInsets.only(
-                            bottom:
-                                bottomSafeArea +
-                                _heroBottomGap(scrollController),
+                            bottom: _heroBottomGap(
+                              scrollController,
+                              bottomSafeArea,
+                            ),
                           ),
                           child: child,
                         ),
@@ -282,23 +283,33 @@ class HomeContent extends StatelessWidget {
 
   /// Resting-state breathing room between the trend card's own bottom edge
   /// and the safe area below it, on top of the safe area itself, so the card
-  /// doesn't read as glued to the very edge of the screen. Small: this is a
-  /// nicety on top of a reserve that's already doing the load-bearing work,
-  /// not a second one of the same size.
-  static const double _restBottomGap = AppSpacing.xs;
+  /// doesn't read as glued to the very edge of the screen.
+  static const double _restBottomGap = AppSpacing.xl;
 
-  /// Scroll distance over which [_restBottomGap] collapses to 0. Short on
+  /// Scroll distance over which the hero block's *entire* trailing reserve —
+  /// [_restBottomGap] and the safe area alike — collapses to 0. Short on
   /// purpose, same reasoning as `HomeSheet._ScrollBlurredWeather`'s own ramp:
-  /// this is a resting-state nicety, not something to keep paying for once
-  /// the sheet is actually moving — it should be gone within the first small
-  /// swipe rather than riding up the screen as a dead gap.
+  /// both are a resting-state concern, not something to keep paying for once
+  /// the sheet is actually moving.
+  ///
+  /// The safe area has to ramp away too, not just stay as a fixed floor under
+  /// [_restBottomGap] — it exists only because the trend card sits at the
+  /// physical bottom of the screen *at rest*. The moment the list scrolls,
+  /// the card is no longer there and nothing about the device's home
+  /// indicator applies to it anymore; holding that reserve open regardless
+  /// just leaves it as dead space between the trend card and the forecast
+  /// card once scrolled — taller than [AppSpacing.lg], the gap every other
+  /// pair of cards on the second page actually uses, and visibly
+  /// inconsistent with them.
   static const double _bottomGapRampExtent = 32;
 
-  /// Current value of [_restBottomGap] for [controller]'s live scroll offset.
-  static double _heroBottomGap(ScrollController controller) {
+  /// Current size of the hero block's trailing reserve — [_restBottomGap]
+  /// plus [bottomSafeArea] — for [controller]'s live scroll offset.
+  static double _heroBottomGap(ScrollController controller, double bottomSafeArea) {
+    final rest = _restBottomGap + bottomSafeArea;
     final offset = controller.hasClients ? controller.offset : 0.0;
     final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
-    return _restBottomGap * (1 - t);
+    return rest * (1 - t);
   }
 
   /// How wet the rain-trend card gets for a given backdrop.

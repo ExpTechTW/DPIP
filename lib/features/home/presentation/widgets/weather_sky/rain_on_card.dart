@@ -332,6 +332,10 @@ class _RainOnCardState extends State<RainOnCard>
     if (box == null || !box.hasSize) return;
     final previous = _cardTopY;
     _cardTopY = box.localToGlobal(Offset.zero).dy;
+    final restTopY = _restTopY;
+    _restTopY = restTopY == null || _cardTopY! > restTopY
+        ? _cardTopY
+        : restTopY;
     // The reference compares a quantity that grows as the card rises — so the
     // boosted mode is the card moving *up*, not any movement at all.
     _gravityScale =
@@ -340,8 +344,7 @@ class _RainOnCardState extends State<RainOnCard>
         ? _scrollGravityScale
         : 1.0;
     final open =
-        !widget.gated ||
-        _cardTopY! >= _gateFraction * _gateReferenceHeight * _screenHeight;
+        !widget.gated || _restTopY! - _cardTopY! < _gateCloseDistance;
     if (open == _gateOpen) return;
     setState(() => _gateOpen = open);
   }
