@@ -109,8 +109,12 @@ void main() {
       centreX(tester, find.text(l10n.mapLayers)),
       closeTo(screenWidth(tester) / 2, 1),
     );
-    // Group order: typhoon → weather → satellite → radar; the two radar-group
+    // Group order: radar → typhoon → weather → satellite; the two radar-group
     // layers keep their saved relative order (radar echo before precip).
+    expect(
+      topOf(tester, l10n.mapLayerCategoryRadar),
+      lessThan(topOf(tester, l10n.mapLayerCategoryTyphoon)),
+    );
     expect(
       topOf(tester, l10n.mapLayerCategoryTyphoon),
       lessThan(topOf(tester, l10n.mapLayerCategoryWeather)),
@@ -118,10 +122,6 @@ void main() {
     expect(
       topOf(tester, l10n.mapLayerCategoryWeather),
       lessThan(topOf(tester, l10n.mapLayerCategorySatellite)),
-    );
-    expect(
-      topOf(tester, l10n.mapLayerCategorySatellite),
-      lessThan(topOf(tester, l10n.mapLayerCategoryRadar)),
     );
     expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
   });
@@ -136,13 +136,11 @@ void main() {
       await tester.tap(find.text('Radar echo'));
       await tester.pumpAndSettle();
 
-      // Unsaved layers keep the declared order within their groups: Rain
-      // (weather) above Satellite above Radar group (radar echo, precip).
+      // Unsaved layers keep the declared order within their groups: Radar
+      // group (radar echo, precip) at the top, then weather (rain) above
+      // satellite (satellite IR).
+      expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Rain')));
       expect(topOf(tester, 'Rain'), lessThan(topOf(tester, 'Satellite IR')));
-      expect(
-        topOf(tester, 'Satellite IR'),
-        lessThan(topOf(tester, 'Radar echo')),
-      );
       expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
     },
   );
@@ -226,7 +224,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.tune));
     await tester.pumpAndSettle();
 
-    // Radar is the bottom category. Drag its handle far up to the top.
+    // Satellite is the bottom category. Drag its handle far up to the top.
     final handles = find.descendant(
       of: find.byType(ReorderableListView),
       matching: find.byIcon(Icons.drag_handle),
@@ -234,20 +232,20 @@ void main() {
     await tester.drag(handles.last, const Offset(0, -600));
     await tester.pumpAndSettle();
 
-    // Category order moved radar to the top; the layer snapshot follows the
-    // block order (radar group, then the rest in declared order).
+    // Category order moved satellite to the top; the layer snapshot follows
+    // the block order (satellite group, then the rest in declared order).
     expect(controller.categoryOrder, [
+      'satellite',
       'radar',
       'typhoon',
       'weather',
-      'satellite',
     ]);
     expect(controller.order, [
+      'satellite',
       'radar',
       'qpesums',
       'typhoon',
       'rain',
-      'satellite',
     ]);
   });
 
@@ -279,13 +277,13 @@ void main() {
 
     // Only the layer ids changed — precip now before radar echo within the
     // radar group; the category order is untouched (declared order, so the
-    // flattened snapshot leads with the typhoon block).
+    // flattened snapshot leads with the radar block).
     expect(controller.order, [
+      'qpesums',
+      'radar',
       'typhoon',
       'rain',
       'satellite',
-      'qpesums',
-      'radar',
     ]);
     expect(controller.categoryOrder, isEmpty);
   });

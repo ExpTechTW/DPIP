@@ -105,7 +105,7 @@ void main() {
     test('a stale name is ignored without dropping any category', () {
       expect(
         names(orderedCategories(MapLayerCategory.values, ['gone', 'life'])),
-        ['life', 'earthquake', 'typhoon', 'weather', 'satellite', 'radar'],
+        ['life', 'earthquake', 'radar', 'typhoon', 'weather', 'satellite'],
       );
     });
 

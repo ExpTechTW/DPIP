@@ -9,6 +9,9 @@ enum MapLayerCategory {
   /// Seismic-monitor events (RTS).
   earthquake,
 
+  /// Ground-radar imagery + short-term precipitation estimate.
+  radar,
+
   /// Typhoon tracks.
   typhoon,
 
@@ -18,9 +21,6 @@ enum MapLayerCategory {
 
   /// Geostationary-satellite imagery (Himawari infrared).
   satellite,
-
-  /// Ground-radar imagery + short-term precipitation estimate.
-  radar,
 
   /// Everyday-life facilities (disaster-prevention map).
   life,
