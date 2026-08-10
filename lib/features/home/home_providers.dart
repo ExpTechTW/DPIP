@@ -6,6 +6,7 @@ import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ List<SingleChildWidget> homeProviders() => [
   ChangeNotifierProvider<HomeWeatherController>(
     create: (context) => HomeWeatherController(
       context.read<MeteorWeatherRepository>(),
+      context.read<RainHourTrendRepository>(),
       context.read<RegionStore>(),
       context.read<TownDirectory>(),
     ),

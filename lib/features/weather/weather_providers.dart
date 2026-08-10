@@ -9,6 +9,8 @@ import 'package:dpip/features/weather/data/qpesums_api.dart';
 import 'package:dpip/features/weather/data/qpesums_repository_impl.dart';
 import 'package:dpip/features/weather/data/radar_api.dart';
 import 'package:dpip/features/weather/data/radar_repository_impl.dart';
+import 'package:dpip/features/weather/data/rain_hour_trend_api.dart';
+import 'package:dpip/features/weather/data/rain_hour_trend_repository_impl.dart';
 import 'package:dpip/features/weather/data/satellite_api.dart';
 import 'package:dpip/features/weather/data/satellite_repository_impl.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
@@ -16,12 +18,13 @@ import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 /// Weather providers: radar / satellite / QPESUMS overlays, meteor weather /
-/// rain / lightning.
+/// rain / lightning, and the next-hour rain trend.
 ///
 /// The raster overlays each get **their own** warmer: cancelling one layer's
 /// warm on a layer switch must not abandon the other's. A null tile cache (the
@@ -54,6 +57,9 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
     ),
     Provider<MeteorLightningRepository>.value(
       value: MeteorLightningRepositoryImpl(MeteorLightningApi(deps.apiClient)),
+    ),
+    Provider<RainHourTrendRepository>.value(
+      value: RainHourTrendRepositoryImpl(RainHourTrendApi(deps.apiClient)),
     ),
   ];
 }

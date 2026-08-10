@@ -13,6 +13,8 @@ import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -32,6 +34,12 @@ class _FakeWeatherRepository implements MeteorWeatherRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+class _FakeHourTrendRepository implements RainHourTrendRepository {
+  @override
+  Future<Result<RainHourTrend>> hourTrend(String code) async =>
+      Ok(RainHourTrend(startSecond: 1786362600, mm: List.filled(60, 0.5)));
 }
 
 class _FakeEventRepository implements EventRepository {
@@ -61,8 +69,12 @@ Widget _wrap(RegionStore store, HomeSheetExtent extent) {
         Provider<TownDirectory>.value(value: directory),
         Provider<EventRepository>.value(value: events),
         ChangeNotifierProvider<HomeWeatherController>(
-          create: (_) =>
-              HomeWeatherController(_FakeWeatherRepository(), store, directory),
+          create: (_) => HomeWeatherController(
+            _FakeWeatherRepository(),
+            _FakeHourTrendRepository(),
+            store,
+            directory,
+          ),
         ),
         ChangeNotifierProvider<HomeActiveEventsController>(
           create: (_) => HomeActiveEventsController(events, store),

@@ -15,6 +15,8 @@ import 'package:dpip/features/home/presentation/home_active_events_controller.da
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -64,6 +66,22 @@ class _FakeWeatherRepository implements MeteorWeatherRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+/// A mid-hour pulse so the preview chart has visible shape.
+class _FakeHourTrendRepository implements RainHourTrendRepository {
+  @override
+  Future<Result<RainHourTrend>> hourTrend(String code) async => Ok(
+    RainHourTrend(
+      startSecond: 1786362600,
+      mm: [
+        for (var i = 0; i < 60; i++)
+          (i >= 22 && i <= 40)
+              ? (0.5 + (0.9 * (1 - ((i - 31).abs() / 9))))
+              : 0.4,
+      ],
+    ),
+  );
 }
 
 class _FakeEventRepository implements EventRepository {
@@ -127,6 +145,7 @@ void main() {
             ChangeNotifierProvider<HomeWeatherController>(
               create: (_) => HomeWeatherController(
                 _FakeWeatherRepository(),
+                _FakeHourTrendRepository(),
                 store,
                 directory,
               ),

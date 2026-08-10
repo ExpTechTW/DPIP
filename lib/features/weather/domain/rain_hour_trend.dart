@@ -1,8 +1,11 @@
 /// Near-term 1-hour rainfall trend (per-minute mm), for the home sheet card.
 ///
-/// Wire shape (API not shipped yet): a minute-aligned Unix-second
-/// [startSecond] and sixty [mm] samples — one millimetre total for each of the
-/// following sixty minutes. UI can render without a live feed via [placeholder].
+/// Wire shape (`GET /api/weather/rainforecast/{code}` on `exptech.dingbot.tw`):
+/// the response is a single-series envelope keyed by name (e.g.
+/// `rainfallWarnings-rkai`) whose value is a list of `{start, rain}` records —
+/// a minute-aligned Unix-second [startSecond] and sixty [mm] samples, one
+/// millimetre value per minute. UI can render without a live feed via
+/// [placeholder].
 library;
 
 /// Sixty minute-buckets of forecast rainfall starting at [startSecond].
@@ -10,12 +13,36 @@ class RainHourTrend {
   const RainHourTrend({required this.startSecond, required this.mm})
     : assert(mm.length == 60, 'expected 60 one-minute samples');
 
+  /// Decodes the `rainforecast` envelope: the first non-empty series wins; its
+  /// `start` (Unix seconds) and `rain` (60 mm samples) become this trend. An
+  /// empty response — or a series with a non-numeric `start`, non-list `rain`,
+  /// or wrong sample count — throws, which `guardResult` folds into a
+  /// `DecodeFailure`.
+  factory RainHourTrend.decode(Map<String, dynamic> json) {
+    for (final series in json.values) {
+      if (series is! List<dynamic> || series.isEmpty) continue;
+      final raw = series.first;
+      if (raw is! Map<dynamic, dynamic>) continue;
+      final start = raw['start'];
+      final rain = raw['rain'];
+      if (start is! num || rain is! List<dynamic>) continue;
+      if (rain.length != 60) {
+        throw const FormatException('Expected 60 rain samples');
+      }
+      return RainHourTrend(
+        startSecond: start.toInt(),
+        mm: [for (final value in rain) (value as num).toDouble()],
+      );
+    }
+    throw const FormatException('No rainforecast series in response');
+  }
+
   /// Prediction origin, Unix **seconds**, aligned to a whole minute
   /// (`startSecond % 60 == 0`).
   final int startSecond;
 
-  /// Rainfall for each of the next 60 minutes, mm (index 0 = first minute after
-  /// [startSecond]).
+  /// Rainfall for each of the next 60 minutes, mm (index 0 = the minute
+  /// starting at [startSecond]).
   final List<double> mm;
 
   /// Wall-clock UTC instant of [startSecond].
