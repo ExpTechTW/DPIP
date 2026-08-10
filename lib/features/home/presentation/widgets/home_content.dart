@@ -224,15 +224,23 @@ class HomeContent extends StatelessWidget {
                                   // flat top-edge collision would pool water in
                                   // every gap between glyphs. Silhouette
                                   // rasterises the header itself and catches drops
-                                  // on its actual outline instead. Default gated:
-                                  // true — the header rises with the rest of the
-                                  // hero block once the sheet scrolls, so it
-                                  // closes the same short distance into the
-                                  // gesture the trend card now does.
+                                  // on its actual outline instead.
+                                  //
+                                  // Not gated — see [RainOnCard.gated]. The gate
+                                  // closes once the card has risen [_gateCloseDistance]
+                                  // above where it settled, which is exactly what
+                                  // pulling the sheet up does to this header: it
+                                  // starts most of a screen down (rest detent) and
+                                  // rides up with the drag. Gating it there would
+                                  // cut the header's water off the moment the sheet
+                                  // is dragged, and the low-water mark ([_restTopY])
+                                  // pins it shut afterwards. The surrounding scroll
+                                  // view culls its paint once it truly scrolls out.
                                   intensity: _cardRain(weatherMode),
                                   opacity: reveal,
                                   glass: false,
                                   silhouette: true,
+                                  gated: false,
                                   child: HomeSheetHeader(
                                     reveal: reveal,
                                     expanded: expanded,

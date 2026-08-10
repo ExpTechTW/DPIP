@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/rain_interval.dart';
@@ -190,7 +191,7 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
     const threshold = 0.18 * 0.18;
-    final cosLat = math.cos(latLng.latitude * math.pi / 180);
+    final cosLat = math.cos(degToRad(latLng.latitude));
     final window = interval.value;
     final zoom = controller.cameraPosition?.zoom ?? 0;
     final showZero = zoom > 8;
@@ -349,7 +350,7 @@ class RainMapLayer implements MapLayer, StationSheetSource {
     final value = observation == null
         ? null
         : interval.value.valueOf(observation);
-    return value == null ? null : _rampColor(value);
+    return value == null ? null : rampColor(colorStops, value);
   }
 
   @override
@@ -420,24 +421,6 @@ class RainMapLayer implements MapLayer, StationSheetSource {
     <Object>['get', 'value'],
     for (final (at, color) in colorStops) ...[at, color],
   ];
-
-  Color? _rampColor(double value) {
-    final stops = colorStops;
-    if (stops.isEmpty) return null;
-    if (value <= stops.first.$1) return colorFromHexRgb(stops.first.$2);
-    if (value >= stops.last.$1) return colorFromHexRgb(stops.last.$2);
-    for (var i = 0; i < stops.length - 1; i++) {
-      final (lowAt, lowHex) = stops[i];
-      final (highAt, highHex) = stops[i + 1];
-      if (value < lowAt || value > highAt) continue;
-      final low = colorFromHexRgb(lowHex);
-      final high = colorFromHexRgb(highHex);
-      if (low == null || high == null) return low ?? high;
-      final span = highAt - lowAt;
-      return Color.lerp(low, high, span == 0 ? 0 : (value - lowAt) / span);
-    }
-    return colorFromHexRgb(stops.last.$2);
-  }
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
     for (final layerId in [_circleId, _labelId]) {

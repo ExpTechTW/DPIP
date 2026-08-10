@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
@@ -1019,7 +1020,7 @@ class TyphoonMapLayer implements MapLayer {
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
     const threshold = 0.5 * 0.5;
-    final cosLat = math.cos(latLng.latitude * math.pi / 180);
+    final cosLat = math.cos(degToRad(latLng.latitude));
     _StormPoint? best;
     var bestDistance = threshold;
     for (final point in _points) {

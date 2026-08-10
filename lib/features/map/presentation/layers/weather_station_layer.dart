@@ -5,6 +5,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
@@ -151,7 +152,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     // Nearest station within ~0.18° (lon scaled by latitude), so a tap in empty
     // sea doesn't select anything.
     const threshold = 0.18 * 0.18;
-    final cosLat = math.cos(latLng.latitude * math.pi / 180);
+    final cosLat = math.cos(degToRad(latLng.latitude));
     String? best;
     var bestDistance = threshold;
     for (final entry in _stations.entries) {
@@ -246,29 +247,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   Color? valueColor(String id) {
     final observation = observationOf(id);
     final value = observation == null ? null : valueOf(observation);
-    return value == null ? null : rampColor(value);
-  }
-
-  /// [value] interpolated on [colorStops] — the Dart twin of the `interpolate`
-  /// expression handed to MapLibre, so the dot and the sheet agree by
-  /// construction rather than by two hand-kept colour tables.
-  @protected
-  Color? rampColor(double value) {
-    final stops = colorStops;
-    if (stops.isEmpty) return null;
-    if (value <= stops.first.$1) return colorFromHexRgb(stops.first.$2);
-    if (value >= stops.last.$1) return colorFromHexRgb(stops.last.$2);
-    for (var i = 0; i < stops.length - 1; i++) {
-      final (lowAt, lowHex) = stops[i];
-      final (highAt, highHex) = stops[i + 1];
-      if (value < lowAt || value > highAt) continue;
-      final low = colorFromHexRgb(lowHex);
-      final high = colorFromHexRgb(highHex);
-      if (low == null || high == null) return low ?? high;
-      final span = highAt - lowAt;
-      return Color.lerp(low, high, span == 0 ? 0 : (value - lowAt) / span);
-    }
-    return colorFromHexRgb(stops.last.$2);
+    return value == null ? null : rampColor(colorStops, value);
   }
 
   @override

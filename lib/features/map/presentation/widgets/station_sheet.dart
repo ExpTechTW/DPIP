@@ -8,6 +8,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
@@ -1048,7 +1049,7 @@ class _TrendChart extends StatelessWidget {
             final Widget arrow;
             if (from != null && speed != null) {
               arrow = Transform.rotate(
-                angle: (from + 180) * math.pi / 180,
+                angle: degToRad(from + 180),
                 child: WindArrowIcon(size: 12, color: windSpeedColor(speed)),
               );
             } else {

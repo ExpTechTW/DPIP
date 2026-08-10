@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:dpip/core/geo/geo_math.dart';
+
 /// An immutable WGS84 geographic coordinate.
 ///
 /// Deliberately dependency-free so domain logic (EEW estimation, geofencing)
@@ -21,12 +23,12 @@ class LatLng {
   /// seismic distance calculations produce the same results.
   double distanceTo(LatLng other) {
     const earthRadius = 6378137.0;
-    final dLat = _toRadians(other.latitude - latitude);
-    final dLng = _toRadians(other.longitude - longitude);
+    final dLat = degToRad(other.latitude - latitude);
+    final dLng = degToRad(other.longitude - longitude);
     final a =
         math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_toRadians(latitude)) *
-            math.cos(_toRadians(other.latitude)) *
+        math.cos(degToRad(latitude)) *
+            math.cos(degToRad(other.latitude)) *
             math.sin(dLng / 2) *
             math.sin(dLng / 2);
     final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
@@ -41,9 +43,9 @@ class LatLng {
   LatLng destinationPoint(double bearing, double distance) {
     const earthRadius = 6378137.0;
     final delta = distance / earthRadius;
-    final theta = _toRadians(bearing);
-    final lat1 = _toRadians(latitude);
-    final lon1 = _toRadians(longitude);
+    final theta = degToRad(bearing);
+    final lat1 = degToRad(latitude);
+    final lon1 = degToRad(longitude);
 
     final lat2 = math.asin(
       math.sin(lat1) * math.cos(delta) +
@@ -58,8 +60,6 @@ class LatLng {
 
     return LatLng(_toDegrees(lat2), _toDegrees(lon2));
   }
-
-  static double _toRadians(double degrees) => degrees * math.pi / 180.0;
 
   static double _toDegrees(double radians) => radians * 180.0 / math.pi;
 

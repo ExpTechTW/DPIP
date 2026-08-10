@@ -1,10 +1,9 @@
 /// Weather observation ranking — rain / temp / wind / pressure / humidity.
 library;
 
-import 'dart:math' as math;
-
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_interval.dart';
@@ -647,7 +646,7 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                       final dir = item.windDirection;
                       if (dir != null) {
                         // Meteorological "from" → blow-to for Icons.navigation.
-                        final radians = (dir + 180) * math.pi / 180;
+                        final radians = degToRad(dir + 180);
                         windArrow = Transform.rotate(
                           angle: radians,
                           child: Icon(

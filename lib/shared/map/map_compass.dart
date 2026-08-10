@@ -7,8 +7,7 @@
 /// keeps pointing north while the map turns.
 library;
 
-import 'dart:math' as math;
-
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/foundation.dart';
@@ -54,7 +53,7 @@ class MapCompass extends StatelessWidget {
                     // `bearing` means north now sits `-bearing` clockwise from
                     // the screen top, so the needle rotates by `-bearing`.
                     child: Transform.rotate(
-                      angle: -value * math.pi / 180,
+                      angle: -degToRad(value),
                       child: Icon(
                         Icons.navigation,
                         size: 22,

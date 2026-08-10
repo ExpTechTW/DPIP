@@ -3,10 +3,10 @@
 /// degrees and the sheet chart colours the curve by the same speed ramp.
 library;
 
-import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
@@ -273,7 +273,7 @@ class WindMapLayer extends WeatherStationLayer {
     final from = observation?.windDirection;
     if (speed == null || from == null) return null;
     return Transform.rotate(
-      angle: (from + 180) * math.pi / 180,
+      angle: degToRad(from + 180),
       child: WindArrowIcon(
         size: 26,
         outline: 1.5,

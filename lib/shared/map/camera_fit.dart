@@ -12,6 +12,7 @@ library;
 import 'dart:math' as math;
 import 'dart:ui' show Size;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// ~0.02° ≈ 2 km — the minimum span a fit box is widened to. Enough that the fit
@@ -115,7 +116,7 @@ LatLngBounds? safeFitBounds(LatLngBounds bounds) {
 double _mercatorX(double lng) => (lng + 180) / 360;
 
 double _mercatorY(double lat) {
-  final s = math.sin(lat * math.pi / 180).clamp(-0.9999, 0.9999);
+  final s = math.sin(degToRad(lat)).clamp(-0.9999, 0.9999);
   return 0.5 - math.log((1 + s) / (1 - s)) / (4 * math.pi);
 }
 
