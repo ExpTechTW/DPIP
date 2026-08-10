@@ -24,7 +24,13 @@ Three stages:
 |---|---|---|---|
 | transmittance LUT | `sky/transmittance.frag` | 256×256 | on atmosphere change |
 | sky-view LUT | `sky/sky_lut.frag` | 256×141 | on atmosphere change |
-| screen pass | `sky/sky_view.frag` | full screen | every frame |
+| sky gradient | CPU-baked, `SkyLutCache` | 4×1024 | on atmosphere change |
+
+The screen pass is no longer a shader. The sky is a pure vertical gradient of
+the fixed LUT column, so `SkyLutCache._bakeSkyGradient` evaluates the old
+`sky/sky_view.frag` mapping on the CPU once per re-bake (1024 exact samples)
+and the painter stretches that image each frame. `sky_view.frag` survives only
+as the reference for `test/shaders/preview_render_test.dart`.
 
 This is Bruneton & Neyret's precomputed atmospheric scattering (EGSR 2008) in
 the LUT arrangement of Hillaire's *A Scalable and Production Ready Sky and
@@ -43,7 +49,7 @@ change available to the look.
 ## Layer stack (paint order)
 
 ```
-sky_view    sky gradient from the LUT              → sky/sky_view.frag
+sky         CPU-baked gradient from the LUT column  → sky_lut_cache (gradient)
 night       stars + Milky Way + moon                → weather/night.frag
 clouds      lit sprites, drawn per instance         → cloud/clouds.frag
 rain        multi-depth streak curtain              → weather/rain.frag

@@ -74,17 +74,16 @@ void main() {
         0.55, 1.20, 1.0, // iSunCfg
         0.02, 0.70, 0.5, // iGroundCfg
         0.90, 0.80, 0.6, // iAmbientCfg
-        0.5, // iSunElevParam
         1.0, // iOpacity
         0.05, 0.23, // edges
         1.0, 0.35, 0.85, // progress, smooth, cloudDepth
         0.8, // iSunIntensity
         0.0, 0.0, // fog, inner
         0.1, // iWhitePer
-        16, 16, // iLutSize
-        0.0985, 0.0416, 0.0, // iFrustumA
-        0.1010, 0.0064, 0.0, // iFrustumC
+        16, 16, // iLutSize — the sampler is the 1×N sky column; `.y` is height
         256, 288, // iTexSize
+        0.44, 0.50, 0.56, // iBaseSky — CPU-baked base probe
+        0.46, 0.52, 0.58, // iHazeSky — CPU-baked haze probe
       ],
       samplers: 2,
     ),

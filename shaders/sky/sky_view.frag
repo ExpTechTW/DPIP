@@ -1,5 +1,11 @@
 // Sky screen pass — stage 3.
 //
+// **Superseded at runtime:** the production backdrop no longer runs this shader.
+// The pass is a pure vertical gradient of a fixed LUT column, so the painter
+// now draws a CPU-baked ramp (`SkyLutCache._bakeSkyGradient`) stretched to the
+// screen. This file is kept as the reference implementation for the preview
+// tool (`test/shaders/preview_render_test.dart`) and its compile check.
+//
 // This is a **pure vertical gradient**: every pixel in a horizontal row gets
 // the same colour. The sky has no azimuthal variation and no sun disc — the
 // disc belongs to the separate sun layer. All this pass does is turn a screen

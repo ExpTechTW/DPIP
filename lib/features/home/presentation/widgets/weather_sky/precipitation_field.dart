@@ -109,6 +109,18 @@ class PrecipitationField {
     final cosT = math.cos(tilt);
     final sinT = math.sin(tilt);
 
+    // Loop-invariant pieces of the per-particle math, hoisted out of the loop —
+    // with up to 1792 particles a frame the redundant multiplies and the
+    // `num`-typed `clamp` (which boxes `double`) add up. Each value below is
+    // computed once and reads identically at every index.
+    final baseFall = fallSpeed * size.height * dt;
+    final heightRatio = size.height / cell.height;
+    final ax = cell.width * 0.5;
+    final ay = cell.height * 0.5;
+    // `tint` never varies per particle — only alpha does — so pack its RGB
+    // once and OR in the 8-bit alpha instead of building a `Color` per drop.
+    final rgb = tint.toARGB32() & 0x00FFFFFF;
+
     var n = 0;
     for (var i = 0; i < live; i++) {
       _p.age[i] += dt;
@@ -116,7 +128,7 @@ class PrecipitationField {
       final depth = _p.depth[i];
       // The reference's `particle_rain.comp`, verbatim: linear, depth-scaled.
       final speedScale = 0.12 + 0.88 * depth;
-      final fall = fallSpeed * size.height * speedScale * dt;
+      final fall = baseFall * speedScale;
       _p.y[i] += fall;
       _p.x[i] += fall * wind * 0.6;
 
@@ -129,29 +141,37 @@ class PrecipitationField {
         _spawn(i, size, sizeMin, sizeMax, life);
       }
 
-      // `alpha = mix(1, 0, progress²)` from `updateRunState`.
-      final progress = (_p.age[i] / _p.life[i]).clamp(0.0, 1.0);
+      // `alpha = mix(1, 0, progress²)` from `updateRunState`. age/life is always
+      // ≥ 0, so the lower clamp bound never fires — the branch below is exactly
+      // `clamp(0, 1)` but stays `double` (no `num`-typed return to box).
+      final ratio = _p.age[i] / _p.life[i];
+      final progress = ratio < 1.0 ? ratio : 1.0;
       final lifeAlpha = 1.0 - progress * progress;
       // `alphaScale = mix(0.3, 2, depth)` from `particle_rain_frag_shader`.
       final depthAlpha = 0.3 + 1.7 * depth;
-      final a = (lifeAlpha * depthAlpha * 0.4 * opacity).clamp(0.0, 1.0);
+      // Same lower-bound argument: every factor is ≥ 0.
+      final rawAlpha = lifeAlpha * depthAlpha * 0.4 * opacity;
+      final a = rawAlpha < 1.0 ? rawAlpha : 1.0;
       if (a < 0.004) continue;
 
       // Uniform scale: the sprite's cell height maps to the drop's length.
-      final scale = _p.size[i] * size.height / cell.height;
+      final scale = _p.size[i] * heightRatio;
 
       final o = n * 4;
       if (tumble) {
         final spin = _p.spin[i] * (_p.age[i] + _p.phase[i]);
-        _p.transforms[o] = math.cos(spin) * scale;
-        _p.transforms[o + 1] = math.sin(spin) * scale;
+        final c = math.cos(spin) * scale;
+        final s = math.sin(spin) * scale;
+        _p.transforms[o] = c;
+        _p.transforms[o + 1] = s;
       } else {
-        _p.transforms[o] = cosT * scale;
-        _p.transforms[o + 1] = sinT * scale;
+        // cosT/sinT are the same for every drop; only scale changes.
+        final c = cosT * scale;
+        final s = sinT * scale;
+        _p.transforms[o] = c;
+        _p.transforms[o + 1] = s;
       }
       // Anchor at the cell centre so rotation pivots on the drop.
-      final ax = cell.width * 0.5;
-      final ay = cell.height * 0.5;
       _p.transforms[o + 2] =
           _p.x[i] - (_p.transforms[o] * ax - _p.transforms[o + 1] * ay);
       _p.transforms[o + 3] =
@@ -169,7 +189,11 @@ class PrecipitationField {
       _p.rects[o + 2] = (v + 1) * cell.width;
       _p.rects[o + 3] = cell.height;
 
-      _p.colors[n] = tint.withValues(alpha: a).toARGB32();
+      // Pack the drop's colour in place of `tint.withValues(alpha: a)`: the
+      // packed ARGB32 is identical (`withValues` sets alpha verbatim and
+      // `toARGB32` rounds it the same way) without allocating a `Color` per
+      // particle every frame.
+      _p.colors[n] = rgb | ((a * 255.0).round() << 24);
       n++;
     }
 

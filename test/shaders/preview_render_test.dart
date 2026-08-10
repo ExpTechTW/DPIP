@@ -175,7 +175,7 @@ void main() {
     final sunProg = await ui.FragmentProgram.fromAsset(
       'shaders/weather/sun_flare.frag',
     );
-    final rainAtlas = await loadPng('assets/weather/particles/rain_drop.png');
+    final rainAtlas = await loadPng('assets/weather/particles/rain_drop.webp');
     final snowAtlas = await loadPng('assets/weather/particles/snow_flake.webp');
     final cloudProgram = await ui.FragmentProgram.fromAsset(
       'shaders/cloud/clouds.frag',
@@ -197,7 +197,7 @@ void main() {
 
       final trans = _bakeTransmittance(transProgram, sky);
       final lut = _bakeSkyLut(lutProgram, sky, trans);
-      final image = _renderScene(
+      final image = await _renderScene(
         viewProgram,
         cloudProgram,
         sprites,
@@ -330,7 +330,7 @@ ui.Image _bakeSkyLut(
   return _rasterise(s, SkyConstants.skyLutWidth, SkyConstants.skyLutHeight);
 }
 
-ui.Image _renderScene(
+Future<ui.Image> _renderScene(
   ui.FragmentProgram viewProgram,
   ui.FragmentProgram cloudProgram,
   List<ui.Image> sprites,
@@ -348,7 +348,7 @@ ui.Image _renderScene(
   double keyframePos,
   ui.FragmentProgram galaxyProgram,
   ui.Image starMapImage,
-) {
+) async {
   final recorder = ui.PictureRecorder();
   final canvas = ui.Canvas(recorder);
 
@@ -440,6 +440,20 @@ ui.Image _renderScene(
     coverage: coverage,
     wind: 0.2,
   );
+
+  // The base/haze probes are pixel-independent, so — as in production — their
+  // colours are read from a CPU LUT readback rather than fetched per pixel.
+  final lutBytes = (await lut.toByteData(
+    format: ui.ImageByteFormat.rawRgba,
+  ))!.buffer.asUint8List();
+  final lutU = sky.sunAngleY.clamp(0.0, 1.0);
+  final baseSky = _sampleLut(
+    lutBytes,
+    lutU,
+    _skyAtV(0.05 + (lighting.base.$1 - 0.05) * 0.85),
+  );
+  final hazeSky = _sampleLut(lutBytes, lutU, _skyAtV(0.95));
+
   for (final p in placed) {
     final sprite = sprites[p.sprite % sprites.length];
     final shader = cloudProgram.fragmentShader();
@@ -470,7 +484,6 @@ ui.Image _renderScene(
     f(lighting.ambient.$1);
     f(lighting.ambient.$2);
     f(lighting.ambient.$3);
-    f(sky.sunAngleY);
     f(p.opacity);
     f(0.05); // start edge
     f(0.23); // end edge
@@ -481,10 +494,17 @@ ui.Image _renderScene(
     f(0.0); // fog
     f(0.0); // inner
     f(lighting.whitePer);
-    f(SkyConstants.skyLutWidth.toDouble());
+    // The LUT sampler is the 1×N CPU-extracted column; `.y` is its height.
     f(SkyConstants.skyLutHeight.toDouble());
+    f(1.0);
     f(sprite.width.toDouble());
     f(sprite.height.toDouble());
+    f(baseSky.r / 255.0);
+    f(baseSky.g / 255.0);
+    f(baseSky.b / 255.0);
+    f(hazeSky.r / 255.0);
+    f(hazeSky.g / 255.0);
+    f(hazeSky.b / 255.0);
     shader.setImageSampler(0, sprite);
     shader.setImageSampler(1, lut);
 
@@ -611,6 +631,46 @@ ui.FragmentShader _skyShader(
   f(SkyConstants.skyLutHeight.toDouble());
   s.setImageSampler(0, lut);
   return s;
+}
+
+/// The cloud shader's `skyAt` picker→LUT-v mapping — mirrors the painter's
+/// helper (`WeatherSkyPainter._skyAtV`) so the preview bakes the same probes.
+double _skyAtV(double picker) =>
+    (math.sqrt(picker.clamp(0.0, 1.0)) + 0.1015625) / 1.1015625;
+
+/// Bilinear LUT read on the CPU, in the shaders' texel-centre convention —
+/// `uv · size − 0.5` with edge clamping. Mirrors `SkyLutCache.skyAt`.
+({int r, int g, int b}) _sampleLut(Uint8List bytes, double u, double v) {
+  const width = SkyConstants.skyLutWidth;
+  const height = SkyConstants.skyLutHeight;
+  int px(int i) => i.clamp(0, width - 1);
+  int py(int j) => j.clamp(0, height - 1);
+  ({int r, int g, int b}) texel(int x, int y) {
+    final o = (y * width + x) * 4;
+    return (r: bytes[o], g: bytes[o + 1], b: bytes[o + 2]);
+  }
+
+  final sx = u.clamp(0.0, 1.0) * width - 0.5;
+  final x0 = sx.floor();
+  final fx = sx - x0;
+  final sy = v.clamp(0.0, 1.0) * height - 0.5;
+  final y0 = sy.floor();
+  final fy = sy - y0;
+  final c00 = texel(px(x0), py(y0));
+  final c10 = texel(px(x0 + 1), py(y0));
+  final c01 = texel(px(x0), py(y0 + 1));
+  final c11 = texel(px(x0 + 1), py(y0 + 1));
+  final topR = c00.r + (c10.r - c00.r) * fx;
+  final topG = c00.g + (c10.g - c00.g) * fx;
+  final topB = c00.b + (c10.b - c00.b) * fx;
+  final botR = c01.r + (c11.r - c01.r) * fx;
+  final botG = c01.g + (c11.g - c01.g) * fx;
+  final botB = c01.b + (c11.b - c01.b) * fx;
+  return (
+    r: (topR + (botR - topR) * fy).round(),
+    g: (topG + (botG - topG) * fy).round(),
+    b: (topB + (botB - topB) * fy).round(),
+  );
 }
 
 ui.Image _rasterise(ui.FragmentShader shader, int width, int height) {

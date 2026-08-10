@@ -124,14 +124,16 @@ class LightningFrame {
 /// the weather is calm.
 class WeatherSkyPainter extends CustomPainter {
   final Map<String, ui.FragmentShader> shaders;
-  final ui.Image? skyView;
   final List<ui.Image> cloudSprites;
+
+  /// The LUT owner — its CPU-side [SkyLutCache.skyAt] readback supplies the
+  /// cloud shader's pixel-independent base/haze probe colours, [SkyLutCache
+  /// .skyGradient] is the backdrop's sky pass and [SkyLutCache.skyColumn]
+  /// feeds the cloud shader's probes.
+  final SkyLutCache lutCache;
 
   /// Sun disc ramp, static ray pattern and ring ramp, in that order.
   final List<ui.Image> sunTextures;
-
-  /// Equirectangular Milky Way, or `null` if it failed to load.
-  final ui.Image? starMap;
   final SkyFrame frame;
 
   /// Rain and snow particle fields, or `null` before their sprites load.
@@ -143,10 +145,9 @@ class WeatherSkyPainter extends CustomPainter {
 
   const WeatherSkyPainter({
     required this.shaders,
-    required this.skyView,
+    required this.lutCache,
     required this.cloudSprites,
     required this.sunTextures,
-    required this.starMap,
     required this.frame,
     required this.rainField,
     required this.snowField,
@@ -154,9 +155,7 @@ class WeatherSkyPainter extends CustomPainter {
   });
 
   // Asset keys, matching `pubspec.yaml`.
-  static const String skyViewAsset = 'shaders/sky/sky_view.frag';
   static const String cloudsAsset = 'shaders/cloud/clouds.frag';
-  static const String galaxyAsset = 'shaders/weather/galaxy.frag';
   static const String nightAsset = 'shaders/weather/night.frag';
   static const String lightningAsset = 'shaders/weather/lightning.frag';
   static const String sunFlareAsset = 'shaders/weather/sun_flare.frag';
@@ -165,7 +164,6 @@ class WeatherSkyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _paintSky(canvas, size);
-    _paintGalaxy(canvas, size);
     _paintNight(canvas, size);
     _paintClouds(canvas, size);
     _paintRain(canvas, size);
@@ -177,9 +175,7 @@ class WeatherSkyPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(WeatherSkyPainter old) =>
-      old.frame.time != frame.time ||
-      !identical(old.frame, frame) ||
-      !identical(old.skyView, skyView);
+      old.frame.time != frame.time || !identical(old.frame, frame);
 
   void _fill(
     Canvas canvas,
@@ -196,56 +192,31 @@ class WeatherSkyPainter extends CustomPainter {
   }
 
   // --- sky ----------------------------------------------------------------
+  // A pure vertical gradient of the fixed LUT column, so it is precomputed on
+  // the CPU at each re-bake (`SkyLutCache._bakeSkyGradient`) and drawn as one
+  // stretched image — no full-screen shader, no per-pixel `asin`/`sqrt`/hash.
   void _paintSky(Canvas canvas, Size size) {
-    final shader = shaders[skyViewAsset];
-    final lut = skyView;
-    if (shader == null || lut == null) return;
-
-    final fr = buildFrustum(frame.sky.cameraYaw);
-    var i = 0;
-    void set(double v) => shader.setFloat(i++, v);
-    set(size.width);
-    set(size.height);
-    set(fr.top[0]);
-    set(fr.top[1]);
-    set(fr.top[2]);
-    set(fr.bottom[0]);
-    set(fr.bottom[1]);
-    set(fr.bottom[2]);
-    set(frame.sky.sunAngleY);
-    set(frame.time);
-    set(SkyLutCache.skyViewSize.width);
-    set(SkyLutCache.skyViewSize.height);
-    shader.setImageSampler(0, lut);
-
-    _fill(canvas, size, shader);
-  }
-
-  // --- galaxy ---------------------------------------------------------------
-  void _paintGalaxy(Canvas canvas, Size size) {
-    final shader = shaders[galaxyAsset];
-    final map = starMap;
-    final night = frame.nightAmount;
-    if (shader == null || map == null || night < 0.01) return;
-
-    var i = 0;
-    void set(double v) => shader.setFloat(i++, v);
-    set(size.width);
-    set(size.height);
-    // The engine's own orientation. Note the first is
-    // a rotation angle, not an opacity, despite its name.
-    set(0.38);
-    set(0.64);
-    set(0.16);
-    set(0.27); // fov
-    set(frame.time);
-    set(0.9);
-    // Cloud hides the galaxy faster than it hides the brighter stars.
-    set(night * (1.0 - 0.95 * frame.cloudCoverage));
-    shader.setImageSampler(0, map);
-
-    // `SRC_ALPHA, ONE` in the engine.
-    _fill(canvas, size, shader, BlendMode.plus);
+    final gradient = lutCache.skyGradient;
+    if (gradient == null) {
+      // The very first frame lands before the readback — a flat sky instead of
+      // a flash of whatever sits behind the backdrop.
+      canvas.drawRect(
+        Offset.zero & size,
+        Paint()..color = const Color(0xFF3F6DAE),
+      );
+      return;
+    }
+    canvas.drawImageRect(
+      gradient,
+      Rect.fromLTWH(
+        0,
+        0,
+        gradient.width.toDouble(),
+        gradient.height.toDouble(),
+      ),
+      Offset.zero & size,
+      Paint()..filterQuality = FilterQuality.low,
+    );
   }
 
   // --- night --------------------------------------------------------------
@@ -265,7 +236,8 @@ class WeatherSkyPainter extends CustomPainter {
     set(night);
     set(0.0); // scroll
     set(frame.cloudCoverage);
-    // The real Milky Way is its own layer now; the procedural band is off.
+    // The dedicated galaxy layer was removed (it never loaded in production);
+    // the procedural band stays off.
     set(0.0);
 
     _fill(canvas, size, shader);
@@ -274,12 +246,10 @@ class WeatherSkyPainter extends CustomPainter {
   // --- clouds -------------------------------------------------------------
   void _paintClouds(Canvas canvas, Size size) {
     final shader = shaders[cloudsAsset];
-    final lut = skyView;
-    if (shader == null || lut == null || cloudSprites.isEmpty) return;
+    final skyColumn = lutCache.skyColumn;
+    if (shader == null || skyColumn == null || cloudSprites.isEmpty) return;
     if (frame.cloudCoverage < 0.02) return;
 
-    // Clouds probe the same frustum the sky is drawn through.
-    final fr = buildFrustum(frame.sky.cameraYaw);
     final lighting = cloudLighting(sunAngleY: frame.sky.sunAngleY);
     final placed = placeClouds(
       frame.cloudLayout,
@@ -294,6 +264,21 @@ class WeatherSkyPainter extends CustomPainter {
     // move around the cloud through the day.
     final day = frame.dayAmount;
     final sunDir = [-0.55 + 1.1 * day, 0.25 + 0.70 * day, 0.45];
+
+    // The base and haze sky probes are pixel-independent, so their colours are
+    // read once per frame from the CPU LUT readback rather than fetched on
+    // every cloud pixel (see clouds.frag's iBaseSky / iHazeSky). The picker
+    // mapping mirrors the shader's `skyAt` exactly, and the base picker rides
+    // the same `cloudDepth` lerp the shader applies.
+    final lutU = frame.sky.sunAngleY.clamp(0.0, 1.0);
+    final fallback = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
+    final baseSky =
+        lutCache.skyAt(
+          lutU,
+          _skyAtV(0.05 + (lighting.base.$1 - 0.05) * 0.85),
+        ) ??
+        fallback;
+    final hazeSky = lutCache.skyAt(lutU, _skyAtV(0.95)) ?? fallback;
 
     for (final p in placed) {
       final sprite = cloudSprites[p.sprite % cloudSprites.length];
@@ -322,7 +307,6 @@ class WeatherSkyPainter extends CustomPainter {
       set(lighting.ambient.$1);
       set(lighting.ambient.$2);
       set(lighting.ambient.$3);
-      set(frame.sky.sunAngleY);
       set(p.opacity);
       set(0.05); // start edge
       set(0.23); // end edge
@@ -333,18 +317,20 @@ class WeatherSkyPainter extends CustomPainter {
       set(frame.fog * 0.5);
       set(frame.lightning.flash * 0.8);
       set(lighting.whitePer);
-      set(SkyLutCache.skyViewSize.width);
+      // The LUT sampler is the CPU-extracted column: `.y` is its height (141)
+      // and `.x` is unused by the shader.
       set(SkyLutCache.skyViewSize.height);
-      set(fr.top[0]);
-      set(fr.top[1]);
-      set(fr.top[2]);
-      set(fr.bottom[0]);
-      set(fr.bottom[1]);
-      set(fr.bottom[2]);
+      set(1.0);
       set(sprite.width.toDouble());
       set(sprite.height.toDouble());
+      set(baseSky.r);
+      set(baseSky.g);
+      set(baseSky.b);
+      set(hazeSky.r);
+      set(hazeSky.g);
+      set(hazeSky.b);
       shader.setImageSampler(0, sprite);
-      shader.setImageSampler(1, lut);
+      shader.setImageSampler(1, skyColumn);
 
       canvas.save();
       canvas.translate(p.left, p.top);
@@ -355,6 +341,15 @@ class WeatherSkyPainter extends CustomPainter {
       canvas.restore();
     }
   }
+
+  /// The cloud shader's `skyAt` picker→LUT-v mapping, mirrored on the CPU for
+  /// the pre-baked base/haze probes — the shader's `elevation = picker·(π/2)`
+  /// cancels to `sqrt(picker)` (see clouds.frag).
+  static double _skyAtV(double picker) =>
+      ((math.sqrt(picker.clamp(0.0, 1.0)) + 0.1015625) / 1.1015625).clamp(
+        0.0,
+        1.0,
+      );
 
   // --- rain ---------------------------------------------------------------
   //

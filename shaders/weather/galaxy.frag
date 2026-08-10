@@ -119,7 +119,8 @@ void main() {
   color.a *= smoothstep(0.1, 0.2, luminance(color.rgb));
 
   // Fade out toward the horizon and the very top of the frame.
-  float fb = clamp(mix(1.0, 0.0, 1.0 / exp(4.0 * uv.y * uv.y)), 0.0, 1.0);
+  // `1/exp(k)` is `exp(-k)`, which skips the reciprocal.
+  float fb = clamp(1.0 - exp(-4.0 * uv.y * uv.y), 0.0, 1.0);
   float ft = clamp(mix(1.0, 0.0, (uv.y - 0.7) / 0.3), 0.0, 1.0);
   color.a *= ft * fb;
 

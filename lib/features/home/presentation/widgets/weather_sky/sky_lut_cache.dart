@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
@@ -26,12 +27,37 @@ class SkyLutCache {
   ui.Image? _skyView;
   ResolvedSky? _baked;
 
+  /// The baked LUT's raw RGBA rows, read back once per bake so pixel-
+  /// independent probes (the cloud shader's base/haze colours) can be sampled
+  /// on the CPU instead of the GPU fetching them on every cloud pixel.
+  Uint8List? _skyViewBytes;
+
+  /// The LUT column at the keyframe's sun angle, CPU-extracted (1×141). The
+  /// cloud shader samples this instead of the full 2D LUT — its u is the
+  /// constant sun angle, so horizontal filtering happens once at bake time and
+  /// every probe costs a 2-tap vertical fetch instead of a 4-tap bilinear.
+  ui.Image? _skyColumn;
+
+  /// The screen sky gradient (4×1024), rebuilt whenever the keyframe re-bakes.
+  /// The sky pass is a pure vertical gradient of a fixed LUT column, so it is
+  /// precomputed here and drawn as one stretched image per frame instead of
+  /// running a full-screen shader.
+  ui.Image? _skyGradient;
+
   /// Takes the stage-1 and stage-2 bake shaders, in pipeline order. They stay
   /// owned by the caller; [dispose] only releases the baked images.
   SkyLutCache(this._transmittanceShader, this._skyLutShader);
 
   /// The current sky-view LUT, or `null` before the first bake.
   ui.Image? get skyView => _skyView;
+
+  /// The LUT column at the keyframe's sun angle, for the cloud shader's
+  /// probes — or `null` before the first bake's readback completes.
+  ui.Image? get skyColumn => _skyColumn;
+
+  /// The screen sky gradient the backdrop draws each frame, or `null` before
+  /// the first readback completes.
+  ui.Image? get skyGradient => _skyGradient;
 
   /// Size of [skyView] in texels, for the samplers' manual bilinear filter.
   static const Size skyViewSize = Size(256, 141);
@@ -64,23 +90,155 @@ class SkyLutCache {
     _skyView?.dispose();
     _skyView = _bakeSkyView(sky, _transmittance!);
     _baked = sky;
-    _publishPanelAmbient(_skyView!);
+    _publishReadback(_skyView!, sky);
     return true;
   }
 
-  /// Reads the ambient row back — async and once per bake, never per frame.
-  void _publishPanelAmbient(ui.Image skyView) {
-    final x = (_ambientSample.dx * (skyViewSize.width - 1)).round();
-    final y = (_ambientSample.dy * (skyViewSize.height - 1)).round();
+  /// Reads the LUT rows back — async and once per bake, never per frame. The
+  /// buffer is kept so [skyAt] can serve the pixel-independent cloud probes;
+  /// the panel-water ambient row, the cloud shader's column and the screen
+  /// gradient are all derived from the same read.
+  void _publishReadback(ui.Image skyView, ResolvedSky sky) {
     skyView
         .toByteData(format: ui.ImageByteFormat.rawRgba)
         .then((data) {
           if (data == null) return;
+          _skyViewBytes = data.buffer.asUint8List();
+          final bytes = _skyViewBytes!;
+          final x = (_ambientSample.dx * (skyViewSize.width - 1)).round();
+          final y = (_ambientSample.dy * (skyViewSize.height - 1)).round();
           final o = (y * skyViewSize.width.toInt() + x) * 4;
-          final px = data.buffer.asUint8List();
-          panelAmbient.value = Color.fromARGB(255, px[o], px[o + 1], px[o + 2]);
+          panelAmbient.value = Color.fromARGB(
+            255,
+            bytes[o],
+            bytes[o + 1],
+            bytes[o + 2],
+          );
+          _bakeSkyColumn(sky);
+          _bakeSkyGradient(sky);
         })
         .catchError((Object _) {});
+  }
+
+  /// Extracts the LUT column at the keyframe's sun angle into a 1×141 image.
+  ///
+  /// The horizontal tap pair and blend factor are the shaders' own — the same
+  /// texel-centre convention as `sampleLut`, evaluated once on the CPU. A GPU
+  /// 2D bilinear at the constant u then reduces to the identical 2-tap
+  /// vertical fetch, so the cloud lighting is unchanged.
+  void _bakeSkyColumn(ResolvedSky sky) {
+    final bytes = _skyViewBytes;
+    if (bytes == null) return;
+    const width = SkyConstants.skyLutWidth;
+    const height = SkyConstants.skyLutHeight;
+    final sx = sky.sunAngleY.clamp(0.0, 1.0) * width - 0.5;
+    final x0 = sx.floor();
+    final fx = sx - x0;
+    final xa = x0.clamp(0, width - 1);
+    final xb = (x0 + 1).clamp(0, width - 1);
+
+    final image = _rasterize(1, height, (canvas) {
+      for (var r = 0; r < height; r++) {
+        final o = r * width * 4;
+        final ca = o + xa * 4;
+        final cb = o + xb * 4;
+        canvas.drawRect(
+          Rect.fromLTWH(0, r.toDouble(), 1, 1),
+          Paint()
+            ..color = Color.fromARGB(
+              255,
+              (bytes[ca] + (bytes[cb] - bytes[ca]) * fx).round().clamp(0, 255),
+              (bytes[ca + 1] + (bytes[cb + 1] - bytes[ca + 1]) * fx)
+                  .round()
+                  .clamp(0, 255),
+              (bytes[ca + 2] + (bytes[cb + 2] - bytes[ca + 2]) * fx)
+                  .round()
+                  .clamp(0, 255),
+            ),
+        );
+      }
+    });
+    _skyColumn?.dispose();
+    _skyColumn = image;
+  }
+
+  /// Bakes the screen sky gradient — a 4×1024 image whose rows are the exact
+  /// colour the old `sky_view.frag` screen pass produced at that screen
+  /// position, evaluated on the CPU from the frustum and the LUT column.
+  ///
+  /// The shader's per-pixel `normalize → asin → sqrt` chain and its 4-tap
+  /// bilinear are replaced by a piecewise-linear ramp of 1024 exact samples,
+  /// drawn stretched once per frame. Near the horizon — where the mapping is
+  /// steepest — a sample every ~2px keeps the error below one 8-bit level.
+  /// The reference's sub-texel dither is dropped: it existed to hide LUT row
+  /// seams, and this ramp is smooth by construction.
+  void _bakeSkyGradient(ResolvedSky sky) {
+    final bytes = _skyViewBytes;
+    if (bytes == null) return;
+    const width = 4;
+    const rows = 1024;
+    final fr = buildFrustum(sky.cameraYaw);
+    final ax = fr.top[0];
+    final ay = fr.top[1];
+    final bx = fr.bottom[0];
+    final by = fr.bottom[1];
+    final u = sky.sunAngleY.clamp(0.0, 1.0);
+
+    final image = _rasterize(width, rows, (canvas) {
+      for (var r = 0; r < rows; r++) {
+        final t = (r + 0.5) / rows;
+        final x = ax + (bx - ax) * t;
+        final y = ay + (by - ay) * t;
+        final len = math.sqrt(x * x + y * y);
+        final theta = math.asin((y / len).clamp(-1.0, 1.0));
+        final v =
+            0.5 + 0.5 * theta.sign * math.sqrt(theta.abs() / (math.pi / 2.0));
+        final lutV = ((v * 256.0 - 115.0) / 141.0).clamp(0.0, 1.0);
+        final color = skyAt(u, lutV) ?? const Color(0xFF3F6DAE);
+        canvas.drawRect(
+          Rect.fromLTWH(0, r.toDouble(), width.toDouble(), 1),
+          Paint()..color = color,
+        );
+      }
+    });
+    _skyGradient?.dispose();
+    _skyGradient = image;
+  }
+
+  /// The baked sky's colour at LUT coordinate ([u], [v]), bilinear — the same
+  /// manual filtering the shaders' `sampleLut` does (Flutter binds samplers
+  /// NEAREST), and in the same texel-centre convention: `uv · size − 0.5`,
+  /// so the first tap lands on a texel's centre and out-of-range indices
+  /// clamp to the edge texel. `null` before the first readback completes.
+  ///
+  /// Lives here because [sky_view.frag]'s u axis *is* the keyframe's
+  /// `sunAngleY`, so a probe's u is known on the CPU; probes whose picker is
+  /// pixel-independent (the cloud shader's base and haze colours) are then
+  /// baked once per keyframe rather than fetched on every cloud pixel.
+  Color? skyAt(double u, double v) {
+    final bytes = _skyViewBytes;
+    if (bytes == null) return null;
+    const width = SkyConstants.skyLutWidth;
+    const height = SkyConstants.skyLutHeight;
+    Color texel(int px, int py) {
+      final o = (py * width + px) * 4;
+      return Color.fromARGB(255, bytes[o], bytes[o + 1], bytes[o + 2]);
+    }
+
+    final sx = u.clamp(0.0, 1.0) * width - 0.5;
+    final x0 = sx.floor();
+    final fx = sx - x0;
+    final sy = v.clamp(0.0, 1.0) * height - 0.5;
+    final y0 = sy.floor();
+    final fy = sy - y0;
+    int px(int i) => i.clamp(0, width - 1);
+    int py(int j) => j.clamp(0, height - 1);
+
+    final c00 = texel(px(x0), py(y0));
+    final c10 = texel(px(x0 + 1), py(y0));
+    final c01 = texel(px(x0), py(y0 + 1));
+    final c11 = texel(px(x0 + 1), py(y0 + 1));
+    return Color.lerp(Color.lerp(c00, c10, fx), Color.lerp(c01, c11, fx), fy)!;
   }
 
   ui.Image _bakeTransmittance(ResolvedSky sky) {
@@ -154,15 +312,26 @@ class SkyLutCache {
     );
   }
 
-  static ui.Image _rasterise(ui.FragmentShader shader, int width, int height) {
+  static ui.Image _rasterise(ui.FragmentShader shader, int width, int height) =>
+      _rasterize(
+        width,
+        height,
+        (canvas) => canvas.drawRect(
+          Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+          Paint()..shader = shader,
+        ),
+      );
+
+  /// Rasterises [draw] into a small GPU-resident image. Synchronous — no CPU
+  /// round trip, which is what makes an in-frame bake affordable.
+  static ui.Image _rasterize(
+    int width,
+    int height,
+    void Function(ui.Canvas) draw,
+  ) {
     final recorder = ui.PictureRecorder();
-    ui.Canvas(recorder).drawRect(
-      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
-      Paint()..shader = shader,
-    );
+    draw(ui.Canvas(recorder));
     final picture = recorder.endRecording();
-    // Synchronous and GPU-resident — no CPU round trip, which is what makes
-    // an in-frame bake affordable.
     final image = picture.toImageSync(width, height);
     picture.dispose();
     return image;
@@ -172,8 +341,13 @@ class SkyLutCache {
   void dispose() {
     _transmittance?.dispose();
     _skyView?.dispose();
+    _skyGradient?.dispose();
+    _skyColumn?.dispose();
     _transmittance = null;
     _skyView = null;
+    _skyGradient = null;
+    _skyColumn = null;
+    _skyViewBytes = null;
     _baked = null;
   }
 }

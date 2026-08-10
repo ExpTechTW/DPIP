@@ -100,7 +100,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   ];
 
   static const List<String> _layerAssets = [
-    WeatherSkyPainter.skyViewAsset,
     WeatherSkyPainter.nightAsset,
     WeatherSkyPainter.cloudsAsset,
     WeatherSkyPainter.lightningAsset,
@@ -117,7 +116,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   final Map<String, ui.FragmentShader> _shaders = {};
   final List<ui.Image> _sprites = [];
   final List<ui.Image> _sunTextures = [];
-  ui.Image? _starMap;
   SkyLutCache? _lutCache;
   PrecipitationField? _rain;
   PrecipitationField? _snow;
@@ -189,15 +187,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       }
     }
 
-    ui.Image? starMap;
-    try {
-      final data = await rootBundle.load('assets/weather/sky/starmap.webp');
-      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-      starMap = (await codec.getNextFrame()).image;
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'Failed to load starmap');
-    }
-
     final sprites = <ui.Image>[];
     for (var i = 0; i < _spriteCount; i++) {
       final path = 'assets/weather/clouds/${i.toString().padLeft(2, '0')}.webp';
@@ -222,7 +211,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       for (final t in sunTex) {
         t.dispose();
       }
-      starMap?.dispose();
       return;
     }
 
@@ -236,7 +224,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
         ..addAll(bakers);
       _sprites.addAll(sprites);
       _sunTextures.addAll(sunTex);
-      _starMap = starMap;
       // Without both bake shaders there is no sky; the fallback colour shows.
       _lutCache = (transmittance != null && skyLut != null)
           ? SkyLutCache(transmittance, skyLut)
@@ -280,8 +267,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       t.dispose();
     }
     _sunTextures.clear();
-    _starMap?.dispose();
-    _starMap = null;
     _rain?.atlas.dispose();
     _snow?.atlas.dispose();
     _rain = null;
@@ -337,10 +322,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
               size: Size.infinite,
               painter: WeatherSkyPainter(
                 shaders: _shaders,
-                skyView: cache.skyView,
+                lutCache: cache,
                 cloudSprites: _sprites,
                 sunTextures: _sunTextures,
-                starMap: _starMap,
                 frame: frame,
                 rainField: _rain,
                 snowField: _snow,

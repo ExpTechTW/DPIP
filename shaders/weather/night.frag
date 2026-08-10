@@ -107,13 +107,13 @@ float drawStars(vec2 coord, float numCells, float size, float br,
   // Four-point diffraction cross: the spike is longest at ±45°/±135°.
   float angle = atan(offset.y, offset.x) + PI * 0.25;
   float angleOffset = abs(mod(angle, PI * 0.5) - PI * 0.25);
-  float len = mix(0.76, 0.88, pow(angleOffset, 0.5) / (PI * 0.25));
+  float len = mix(0.76, 0.88, sqrt(angleOffset) / (PI * 0.25));
   glow += smoothstep(len + 0.05, 1.1, sqrtd) * 0.5;
 
   // Tight core.
   if (sqrtd > 0.895) {
-    glow += pow(clamp(br * smoothstep(0.895, 1.0, sqrtd), 0.0, 2.0), 2.0) *
-            0.33333333;
+    float core = clamp(br * smoothstep(0.895, 1.0, sqrtd), 0.0, 2.0);
+    glow += core * core * 0.33333333;
   }
 
   // Twinkle gate: mostly dark, with a brief sine pulse every interval.

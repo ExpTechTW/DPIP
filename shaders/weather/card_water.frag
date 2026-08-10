@@ -59,10 +59,8 @@ out vec4 fragColor;
 /// The reference shader's `sunColor` — a desaturated mauve, not white.
 const vec3 kSunColor = vec3(0.59, 0.55, 0.61);
 
-/// `float gloss = 10.0;` on the shipped rain branch.
-const float kGloss = 10.0;
-
-/// `float alpha = 0.6;` — the fixed surface opacity past the threshold.
+/// `float gloss = 10.0;` on the shipped rain branch — written out as `s^10`
+/// below, so no constant is needed.
 const float kSurfaceAlpha = 0.6;
 
 // Bilinear fetch — samplers bind NEAREST, and the two buffers must be
@@ -123,7 +121,11 @@ void main() {
   vec3 viewDir = vec3(0.0, 0.0, 1.0);
   vec3 halfDir = normalize(viewDir + lightDir);
 
-  float specular = pow(max(dot(normal, halfDir), 0.0), kGloss);
+  // x^10, written out — a constant-exponent `pow` would compile to log/exp;
+  // five multiplies are cheaper and bit-identical.
+  float s = max(dot(normal, halfDir), 0.0);
+  float s2 = s * s;
+  float specular = s2 * s2 * s2 * s2 * s2;
   // `texture(uBgLightTex, vUv).rgb * 1.3` — the sky at the panel's height.
   vec3 color = iAmbient * 1.3 + specular * kSunColor * iSpecular;
 

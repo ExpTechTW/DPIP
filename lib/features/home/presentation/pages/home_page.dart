@@ -11,6 +11,7 @@ import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
@@ -108,13 +109,13 @@ class _HomePageState extends State<HomePage> {
     // channels: the code picks the mode (keyframes/clouds), and the rain/snow
     // intensity + humidity ride along as overrides where the code carries them.
     final data = context.watch<HomeWeatherController>().weather?.data;
-    final realtimeCode = data?.weatherCode;
-    final weatherMode = experimental.weatherMode == WeatherMode.auto
-        ? weatherModeFor(realtimeCode ?? 0)
-        : experimental.weatherMode;
-    final rainIntensity = weatherRainIntensity(realtimeCode ?? 0);
-    final snowIntensity = weatherSnowIntensity(realtimeCode ?? 0);
-    final humidity = data?.humidity;
+    final backdrop = resolveBackdrop(experimental.weatherMode, data);
+    final weatherMode = backdrop.mode;
+    final rainIntensity = backdrop.rain;
+    final snowIntensity = backdrop.snow;
+    // Record fields don't promote, so bind the humidity before dividing.
+    final humidityPct = backdrop.humidity;
+    final humidity = humidityPct == null ? null : humidityPct / 100;
     final extent = context.read<HomeSheetExtent>();
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
@@ -251,4 +252,26 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+/// Resolves the home backdrop's inputs from the experimental force setting and
+/// the station's live reading.
+///
+/// A forced [forced] mode shows exactly that authored look — the live code's
+/// continuous channels (rain/snow intensity, humidity) belong to the
+/// real-conditions path only. Otherwise forcing 晴天 while the code says 有雨
+/// would render sunny keyframes with rain drops on top. [humidity] stays on the
+/// API's 0..100 scale; the sheet divides by 100 when it feeds the sky.
+({WeatherMode mode, double? rain, double? snow, int? humidity}) resolveBackdrop(
+  WeatherMode forced,
+  WeatherRealtimeData? data,
+) {
+  final live = forced == WeatherMode.auto;
+  final code = data?.weatherCode ?? 0;
+  return (
+    mode: live ? weatherModeFor(code) : forced,
+    rain: live ? weatherRainIntensity(code) : null,
+    snow: live ? weatherSnowIntensity(code) : null,
+    humidity: live ? data?.humidity : null,
+  );
 }

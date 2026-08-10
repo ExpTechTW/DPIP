@@ -111,9 +111,12 @@ vec3 ghost(int index, vec2 uv, vec2 sunPos, float size, float dist,
 /// The reference's `ring`: the chromatic halo, offset per channel.
 vec3 ring(vec2 uv, vec2 pos, float dist) {
   vec2 uvd = uv * length(uv);
-  float r = max(2.0 / (1.0 + 32.0 * pow(length(uvd + (dist - 0.05) * pos), 2.0)), 0.0) * 0.25;
-  float g = max(2.0 / (1.0 + 32.0 * pow(length(uvd + dist * pos), 2.0)), 0.0) * 0.23;
-  float b = max(2.0 / (1.0 + 32.0 * pow(length(uvd + (dist + 0.05) * pos), 2.0)), 0.0) * 0.21;
+  float rl = length(uvd + (dist - 0.05) * pos);
+  float gl = length(uvd + dist * pos);
+  float bl = length(uvd + (dist + 0.05) * pos);
+  float r = max(2.0 / (1.0 + 32.0 * rl * rl), 0.0) * 0.25;
+  float g = max(2.0 / (1.0 + 32.0 * gl * gl), 0.0) * 0.23;
+  float b = max(2.0 / (1.0 + 32.0 * bl * bl), 0.0) * 0.21;
   return vec3(r, g, b);
 }
 
@@ -158,10 +161,11 @@ void main() {
   vec3 staticRays = texture(iRaysTex, st2).rgb;
 
   // Forward-facing weight: brightest looking straight into the sun.
-  float fan = min(max(0.3, pow(clamp(perFromVal(
-                  dot(normalize(sunPos + 1e-5), normalize(sunPos - uv + 1e-5)),
-                  -1.0, 1.0), 0.0, 1.0), 3.0)), 0.8);
-  fan = max(pow(max(1.0 - dist, 0.0), 3.0), fan);
+  float facing = dot(normalize(sunPos + 1e-5), normalize(sunPos - uv + 1e-5));
+  facing = clamp(perFromVal(facing, -1.0, 1.0), 0.0, 1.0);
+  float fan = min(max(0.3, facing * facing * facing), 0.8);
+  float distFall = max(1.0 - dist, 0.0);
+  fan = max(distFall * distFall * distFall, fan);
   color += staticRays * fan;
 
   // --- animated rays ------------------------------------------------------
@@ -216,7 +220,7 @@ void main() {
   // --- glow ----------------------------------------------------------------
   float x = length(st3 * 2.0 - 1.0) * 2.8;
   color += vec3(0.8509803922, 0.6039215686, 0.3490196078) *
-           (0.5 / exp(x * x)) * clamp(iGlowAlpha, 0.0, 1.0);
+           (0.5 * exp(-x * x)) * clamp(iGlowAlpha, 0.0, 1.0);
 
   // --- falloff -------------------------------------------------------------
   color *= exp(1.0 - dist) / kDecay;
