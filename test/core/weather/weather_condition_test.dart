@@ -26,6 +26,28 @@ void main() {
     });
   });
 
+  group('intensity channels', () {
+    test('rain intensity scales with the phenomenon', () {
+      expect(weatherRainIntensity(106), 0.35); // 有雨
+      expect(weatherRainIntensity(111), 0.35); // 有陣雨
+      expect(weatherRainIntensity(114), 0.70); // 有雷雨
+      expect(weatherRainIntensity(117), 1.00); // 大雷雨
+      expect(weatherRainIntensity(119), 0.15); // 有雷 — lightning only
+    });
+
+    test('rain-free codes carry no rain intensity', () {
+      expect(weatherRainIntensity(100), isNull);
+      expect(weatherRainIntensity(105), isNull); // 有霧
+      expect(weatherRainIntensity(0), isNull);
+    });
+
+    test('snow intensity distinguishes heavy from light', () {
+      expect(weatherSnowIntensity(108), 1.0); // 有大雪
+      expect(weatherSnowIntensity(109), 0.5); // 有雪珠
+      expect(weatherSnowIntensity(106), isNull); // 有雨
+    });
+  });
+
   group('weatherVisual', () {
     test('code phenomenon drives the icon regardless of the label', () {
       // 200 有雷雨 — the code, not the 多雲 label, picks the storm.

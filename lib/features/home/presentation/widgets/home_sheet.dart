@@ -40,6 +40,9 @@ class HomeSheet extends StatelessWidget {
     required this.extent,
     required this.weatherMode,
     required this.skyTimeMode,
+    this.rainIntensity,
+    this.snowIntensity,
+    this.humidity,
   });
 
   /// The sheet's detents, sourced from [HomeSheetExtent] so the value notifier's
@@ -71,6 +74,17 @@ class HomeSheet extends StatelessWidget {
 
   /// Forced time of day for the backdrop, from experimental settings.
   final SkyTimeMode skyTimeMode;
+
+  /// Live rain intensity override for the backdrop, or null for the look's own
+  /// default — from the station's CWB code ([weatherRainIntensity]).
+  final double? rainIntensity;
+
+  /// Live snow intensity override, or null for the look's default.
+  final double? snowIntensity;
+
+  /// Live relative humidity 0..1 for the atmosphere blend, or null for the
+  /// backdrop's own default.
+  final double? humidity;
 
   // The sheet floors at [restExtent], so surface opacity only ever ramps from
   // its resting translucency up to fully opaque as it climbs to full.
@@ -138,6 +152,9 @@ class HomeSheet extends StatelessWidget {
                       scrollController: scrollController,
                       child: WeatherSkyBackground(
                         mode: weatherMode,
+                        rainIntensity: rainIntensity,
+                        snowIntensity: snowIntensity,
+                        humidity: humidity ?? 0.65,
                         timeMode: skyTimeMode,
                         active: HomeChrome.weatherActive(e),
                       ),

@@ -57,6 +57,36 @@ WeatherMode weatherModeFor(int code) {
   return _phenomenonMode[code % 100] ?? _familyMode(code);
 }
 
+/// Rain intensity for a CWB [code], on the painter's continuous ladder where
+/// `0.321` is the 小雨 rung and `1.0` is 暴雨 — `null` when the code carries no
+/// rain (the sky may still be rainy-looking through its mode's keyframes).
+double? weatherRainIntensity(int code) {
+  if (code <= 0) return null;
+  return switch (code % 100) {
+    // Lightning-only phenomena — the storm look, but the rain barely starts.
+    3 || 4 || 19 => 0.15,
+    6 || 11 => 0.35, // 有雨 / 有陣雨
+    7 || 12 => 0.40, // 有雨雪 / 陣雨雪 — mixed; rain is the visible hazard
+    13 => 0.50, // 有雹
+    14 => 0.70, // 有雷雨
+    16 || 18 => 0.85, // 有雷雹 / 大雷雹
+    17 => 1.00, // 大雷雨
+    _ => null,
+  };
+}
+
+/// Snow intensity for a CWB [code], on the painter's continuous snow channel;
+/// `null` when the code carries no snow.
+double? weatherSnowIntensity(int code) {
+  if (code <= 0) return null;
+  return switch (code % 100) {
+    8 => 1.0, // 有大雪
+    10 => 0.6, // 有冰珠
+    9 || 12 || 15 => 0.5, // 有雪珠 / 陣雨雪 / 有雷雪
+    _ => null,
+  };
+}
+
 /// Icon + accent for a forecast point's [weather] text and [weatherCode].
 ///
 /// Codes are authoritative ([weatherModeFor]); the text only comes into play

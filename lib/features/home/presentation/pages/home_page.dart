@@ -104,17 +104,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final experimental = context.watch<ExperimentalSettings>();
     final skyTimeMode = experimental.skyTimeMode;
-    // A forced experimental mode wins outright; otherwise the backdrop follows
-    // the station's live CWB code. 全國 / 所在地 without GPS / still loading
-    // have no reading yet, so they resolve to the `auto` default look.
-    final realtimeCode = context
-        .watch<HomeWeatherController>()
-        .weather
-        ?.data
-        .weatherCode;
+    // The station's live reading drives both the look and the continuous
+    // channels: the code picks the mode (keyframes/clouds), and the rain/snow
+    // intensity + humidity ride along as overrides where the code carries them.
+    final data = context.watch<HomeWeatherController>().weather?.data;
+    final realtimeCode = data?.weatherCode;
     final weatherMode = experimental.weatherMode == WeatherMode.auto
         ? weatherModeFor(realtimeCode ?? 0)
         : experimental.weatherMode;
+    final rainIntensity = weatherRainIntensity(realtimeCode ?? 0);
+    final snowIntensity = weatherSnowIntensity(realtimeCode ?? 0);
+    final humidity = data?.humidity;
     final extent = context.read<HomeSheetExtent>();
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
@@ -199,6 +199,9 @@ class _HomePageState extends State<HomePage> {
                       extent: extent,
                       weatherMode: weatherMode,
                       skyTimeMode: skyTimeMode,
+                      rainIntensity: rainIntensity,
+                      snowIntensity: snowIntensity,
+                      humidity: humidity == null ? null : humidity / 100,
                     ),
                   ),
                 ),

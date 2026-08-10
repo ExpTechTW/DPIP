@@ -39,6 +39,14 @@ class WeatherSkyBackground extends StatefulWidget {
   /// Which weather look to render.
   final WeatherMode mode;
 
+  /// Overrides the look's default rain amount (0..1 on the painter's ladder:
+  /// 0.321 小雨 → 1.0 暴雨) when a live code carries one; `null` keeps the
+  /// look's own default.
+  final double? rainIntensity;
+
+  /// Overrides the look's default snow amount (0..1); `null` keeps the look's.
+  final double? snowIntensity;
+
   /// Whether the animation should run.
   final bool active;
 
@@ -58,6 +66,8 @@ class WeatherSkyBackground extends StatefulWidget {
   const WeatherSkyBackground({
     super.key,
     this.mode = WeatherMode.auto,
+    this.rainIntensity,
+    this.snowIntensity,
     this.active = true,
     this.latitude = kTaiwanLatitude,
     this.longitude = kTaiwanLongitude,
@@ -371,6 +381,12 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
     final look = _lookFor(widget.mode);
     final frames = look.keyframes;
+    // A live code's continuous channels win over the look's defaults — e.g.
+    // 106 有雨 keeps the rain look's keyframes but runs 0.35 instead of the
+    // fixed 小雨 rung. Snow is a separate field, so a rain-snow mix renders
+    // both.
+    final rain = widget.rainIntensity ?? look.rain;
+    final snow = widget.snowIntensity ?? look.snow;
 
     // Anchor the ring to the day's real sunrise and sunset, so dawn keyframes
     // land at dawn in December as well as June.
@@ -400,8 +416,8 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       sky: sky,
       cloudLayout: look.layout,
       cloudCoverage: look.coverage,
-      rain: look.rain,
-      snow: look.snow,
+      rain: rain,
+      snow: snow,
       fog: look.fog,
       rainbow: look.rainbow,
       wind: look.wind,
