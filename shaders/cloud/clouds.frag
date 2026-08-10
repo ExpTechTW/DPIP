@@ -67,7 +67,7 @@
 //                          extracted by `SkyLutCache._bakeSkyColumn`)
 #include <flutter/runtime_effect.glsl>
 
-precision highp float;
+precision mediump float;
 
 uniform vec2 iSpriteSize;
 uniform vec3 iLightDir0;

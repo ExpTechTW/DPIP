@@ -46,7 +46,7 @@
 //   sampler 2: iAnnulus   radial ramp for the ring
 #include <flutter/runtime_effect.glsl>
 
-precision highp float;
+precision mediump float;
 
 uniform vec2 iResolution;
 uniform vec2 iSunPos;

@@ -42,7 +42,7 @@
 //   sampler 0: uTex          the content being filtered — SET BY THE ENGINE
 #include <flutter/runtime_effect.glsl>
 
-precision highp float;
+precision mediump float;
 
 uniform vec2 uSize;
 uniform vec2 uResolution;

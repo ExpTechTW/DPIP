@@ -43,7 +43,7 @@
 // Both sprites are opaque and every datum lives in a colour channel.
 #include <flutter/runtime_effect.glsl>
 
-precision highp float;
+precision mediump float;
 
 uniform vec2 iResolution;
 uniform vec3 iAmbient;
