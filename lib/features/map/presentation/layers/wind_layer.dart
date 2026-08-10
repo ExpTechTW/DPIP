@@ -185,16 +185,6 @@ class WindMapLayer extends WeatherStationLayer {
     const icon = Icons.navigation;
     // Outline thickness on the 96 px canvas — 8 offset copies around the glyph.
     const halo = 5.5;
-    const outlineDirs = <(double, double)>[
-      (1, 0),
-      (-1, 0),
-      (0, 1),
-      (0, -1),
-      (0.7071, 0.7071),
-      (0.7071, -0.7071),
-      (-0.7071, 0.7071),
-      (-0.7071, -0.7071),
-    ];
     final outline = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(
@@ -223,7 +213,6 @@ class WindMapLayer extends WeatherStationLayer {
           center: center,
           size: size,
           halo: halo,
-          outlineDirs: outlineDirs,
         ),
     ];
   }
@@ -237,7 +226,6 @@ class WindMapLayer extends WeatherStationLayer {
     required Offset center,
     required int size,
     required double halo,
-    required List<(double, double)> outlineDirs,
   }) async {
     final fillPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -253,7 +241,7 @@ class WindMapLayer extends WeatherStationLayer {
     )..layout();
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    for (final (dx, dy) in outlineDirs) {
+    for (final (dx, dy) in windOutlineDirs) {
       outline.paint(canvas, center + Offset(dx * halo, dy * halo));
     }
     fillPainter.paint(canvas, center);

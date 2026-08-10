@@ -26,6 +26,21 @@ int windSpeedBucket(double value) {
 /// The discrete ramp colour for [value].
 Color windSpeedColor(double value) => windBuckets[windSpeedBucket(value)].$2;
 
+/// The 8 offset directions (cardinal + diagonal) that bake a black outline
+/// around the arrow glyph — used by the pre-rendered map PNGs
+/// ([WindMapLayer._renderArrow]) and the Flutter [WindArrowIcon], so both
+/// silhouettes share the same edge.
+const windOutlineDirs = <(double, double)>[
+  (1, 0),
+  (-1, 0),
+  (0, 1),
+  (0, -1),
+  (0.7071, 0.7071),
+  (0.7071, -0.7071),
+  (-0.7071, 0.7071),
+  (-0.7071, -0.7071),
+];
+
 /// A [Icons.navigation] glyph with a black offset-outline baked on, tinted
 /// [color] — the same silhouette as the map arrows, so a calm white arrow
 /// stays readable on pale cards.
@@ -46,19 +61,6 @@ class WindArrowIcon extends StatelessWidget {
   /// Outline offset distance, in logical pixels.
   final double outline;
 
-  /// Offset copies that make up the outline — 8 neighbours (cardinal +
-  /// diagonal) at [outline] px.
-  static const List<(double, double)> _outlineDirs = [
-    (1, 0),
-    (-1, 0),
-    (0, 1),
-    (0, -1),
-    (0.7071, 0.7071),
-    (0.7071, -0.7071),
-    (-0.7071, 0.7071),
-    (-0.7071, -0.7071),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final pad = outline + 1;
@@ -68,7 +70,7 @@ class WindArrowIcon extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          for (final (dx, dy) in _outlineDirs)
+          for (final (dx, dy) in windOutlineDirs)
             Transform.translate(
               offset: Offset(dx * outline, dy * outline),
               child: Icon(Icons.navigation, size: size, color: Colors.black),
