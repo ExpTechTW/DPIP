@@ -314,6 +314,28 @@
   "mapLayerShelter": "避難所",
   "disasterMapOverlayRestroomTooltip": "トイレを表示",
   "disasterMapOverlayShelterTooltip": "避難所を表示",
+  "dpmOpenInMaps": "地図アプリで開く",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app}（デフォルト）",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "座標をコピー",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "座標をコピーしました",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
   "dpmAddress": "住所",
   "restroomTypeLabel": "種別",

@@ -2121,6 +2121,42 @@ abstract class AppLocalizations {
   /// **'Show evacuation shelters'**
   String get disasterMapOverlayShelterTooltip;
 
+  /// Action in the disaster-map detail sheet: open the point in an external map app
+  ///
+  /// In en, this message translates to:
+  /// **'Open in maps'**
+  String get dpmOpenInMaps;
+
+  /// External map app choice: Google Maps
+  ///
+  /// In en, this message translates to:
+  /// **'Google Maps'**
+  String get mapAppGoogleMaps;
+
+  /// External map app choice: Apple Maps
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Maps'**
+  String get mapAppAppleMaps;
+
+  /// Choice-sheet label suffix marking the platform home map app, with the app name
+  ///
+  /// In en, this message translates to:
+  /// **'{app} (default)'**
+  String mapAppDefault(String app);
+
+  /// Choice-sheet action: copy the point's coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'Copy coordinates'**
+  String get mapAppCopyCoordinates;
+
+  /// Snackbar confirming the coordinates were copied
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates copied'**
+  String get mapAppCoordinatesCopied;
+
   /// Hint in the disaster-map detail sheet when nothing is selected
   ///
   /// In en, this message translates to:

@@ -1093,6 +1093,26 @@ class AppLocalizationsKo extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => '대피소 표시';
 
   @override
+  String get dpmOpenInMaps => '지도에서 열기';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (기본)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '좌표 복사';
+
+  @override
+  String get mapAppCoordinatesCopied => '좌표가 복사되었습니다';
+
+  @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
 
   @override

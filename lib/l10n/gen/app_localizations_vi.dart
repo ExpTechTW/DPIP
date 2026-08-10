@@ -1104,6 +1104,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => 'Hiển thị nơi trú ẩn';
 
   @override
+  String get dpmOpenInMaps => 'Mở trong bản đồ';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (mặc định)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'Sao chép tọa độ';
+
+  @override
+  String get mapAppCoordinatesCopied => 'Đã sao chép tọa độ';
+
+  @override
   String get dpmSheetEmpty =>
       'Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết';
 

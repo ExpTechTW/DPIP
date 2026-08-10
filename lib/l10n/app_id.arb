@@ -314,6 +314,28 @@
   "mapLayerShelter": "Tempat Evakuasi",
   "disasterMapOverlayRestroomTooltip": "Tampilkan toilet umum",
   "disasterMapOverlayShelterTooltip": "Tampilkan tempat evakuasi",
+  "dpmOpenInMaps": "Buka di peta",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (bawaan)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Salin koordinat",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Koordinat disalin",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "dpmAddress": "Alamat",
   "restroomTypeLabel": "Jenis",

@@ -314,6 +314,28 @@
   "mapLayerShelter": "Nơi trú ẩn",
   "disasterMapOverlayRestroomTooltip": "Hiển thị nhà vệ sinh công cộng",
   "disasterMapOverlayShelterTooltip": "Hiển thị nơi trú ẩn",
+  "dpmOpenInMaps": "Mở trong bản đồ",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (mặc định)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Sao chép tọa độ",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Đã sao chép tọa độ",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết",
   "dpmAddress": "Địa chỉ",
   "restroomTypeLabel": "Loại",

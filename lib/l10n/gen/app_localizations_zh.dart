@@ -1087,6 +1087,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
 
   @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -2541,6 +2561,26 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get disasterMapOverlayShelterTooltip => '显示避难收容场所';
+
+  @override
+  String get dpmOpenInMaps => '打开地图';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（默认）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '复制坐标';
+
+  @override
+  String get mapAppCoordinatesCopied => '已复制坐标';
 
   @override
   String get dpmSheetEmpty => '点击地图上的标记查看详情';
@@ -3999,6 +4039,26 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
 
   @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -5453,6 +5513,26 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';

@@ -1104,6 +1104,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => 'Show evacuation shelters';
 
   @override
+  String get dpmOpenInMaps => 'Open in maps';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (default)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'Copy coordinates';
+
+  @override
+  String get mapAppCoordinatesCopied => 'Coordinates copied';
+
+  @override
   String get dpmSheetEmpty => 'Tap a marker on the map for details';
 
   @override

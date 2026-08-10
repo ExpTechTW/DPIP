@@ -314,6 +314,28 @@
   "mapLayerShelter": "避难收容场所",
   "disasterMapOverlayRestroomTooltip": "显示公厕",
   "disasterMapOverlayShelterTooltip": "显示避难收容场所",
+  "dpmOpenInMaps": "打开地图",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app}（默认）",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "复制坐标",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "已复制坐标",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "点击地图上的标记查看详情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "厕所类型",

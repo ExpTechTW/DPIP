@@ -314,6 +314,28 @@
   "mapLayerShelter": "ศูนย์อพยพ",
   "disasterMapOverlayRestroomTooltip": "แสดงห้องน้ำสาธารณะ",
   "disasterMapOverlayShelterTooltip": "แสดงศูนย์อพยพ",
+  "dpmOpenInMaps": "เปิดในแผนที่",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (ค่าเริ่มต้น)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "คัดลอกพิกัด",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "คัดลอกพิกัดแล้ว",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "dpmAddress": "ที่อยู่",
   "restroomTypeLabel": "ประเภท",

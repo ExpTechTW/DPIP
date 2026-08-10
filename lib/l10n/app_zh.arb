@@ -334,6 +334,28 @@
   "mapLayerShelter": "避難收容場所",
   "disasterMapOverlayRestroomTooltip": "顯示公廁",
   "disasterMapOverlayShelterTooltip": "顯示避難收容場所",
+  "dpmOpenInMaps": "開啟地圖",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app}（預設）",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "複製座標",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "已複製座標",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "廁所類型",

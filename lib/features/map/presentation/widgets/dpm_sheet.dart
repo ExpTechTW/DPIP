@@ -11,6 +11,7 @@ import 'package:dpip/features/disaster_map/domain/restroom_detail.dart';
 import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/maps_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -498,6 +499,9 @@ class _AedBody extends StatelessWidget {
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(lat: d.lat, lng: d.lng, label: d.name),
           body: d == null
               ? [_Loading()]
               : [
@@ -567,6 +571,13 @@ class _RestroomBody extends StatelessWidget {
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(
+                  lat: d.latitude,
+                  lng: d.longitude,
+                  label: d.name,
+                ),
           body: d == null
               ? [_Loading()]
               : [
@@ -625,6 +636,9 @@ class _ShelterBody extends StatelessWidget {
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(lat: d.lat, lng: d.lng, label: d.name),
           body: d == null
               ? [_Loading()]
               : [
@@ -663,6 +677,7 @@ class _Header extends StatelessWidget {
     required this.name,
     required this.place,
     required this.onClose,
+    this.mapsTarget,
     required this.body,
   });
 
@@ -670,12 +685,14 @@ class _Header extends StatelessWidget {
   final String name;
   final String place;
   final VoidCallback onClose;
+  final MapLaunchTarget? mapsTarget;
   final List<Widget> body;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
@@ -693,6 +710,12 @@ class _Header extends StatelessWidget {
                   ),
                 ),
               ),
+              if (mapsTarget != null)
+                IconButton(
+                  tooltip: l10n.dpmOpenInMaps,
+                  onPressed: () => showMapAppPicker(context, mapsTarget!),
+                  icon: const Icon(Icons.directions_outlined),
+                ),
               IconButton(
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: onClose,

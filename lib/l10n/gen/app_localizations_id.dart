@@ -1107,6 +1107,26 @@ class AppLocalizationsId extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => 'Tampilkan tempat evakuasi';
 
   @override
+  String get dpmOpenInMaps => 'Buka di peta';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (bawaan)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'Salin koordinat';
+
+  @override
+  String get mapAppCoordinatesCopied => 'Koordinat disalin';
+
+  @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
 
   @override

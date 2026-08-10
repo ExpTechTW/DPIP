@@ -314,6 +314,28 @@
   "mapLayerShelter": "대피소",
   "disasterMapOverlayRestroomTooltip": "공중화장실 표시",
   "disasterMapOverlayShelterTooltip": "대피소 표시",
+  "dpmOpenInMaps": "지도에서 열기",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (기본)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "좌표 복사",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "좌표가 복사되었습니다",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "지도에서 마커를 눌러 상세 보기",
   "dpmAddress": "주소",
   "restroomTypeLabel": "유형",

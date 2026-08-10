@@ -1102,6 +1102,26 @@ class AppLocalizationsTh extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => 'แสดงศูนย์อพยพ';
 
   @override
+  String get dpmOpenInMaps => 'เปิดในแผนที่';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (ค่าเริ่มต้น)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'คัดลอกพิกัด';
+
+  @override
+  String get mapAppCoordinatesCopied => 'คัดลอกพิกัดแล้ว';
+
+  @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
 
   @override

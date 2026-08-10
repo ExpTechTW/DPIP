@@ -314,6 +314,28 @@
   "mapLayerShelter": "Silungan",
   "disasterMapOverlayRestroomTooltip": "Ipakita ang mga pampublikong palikuran",
   "disasterMapOverlayShelterTooltip": "Ipakita ang mga silungan",
+  "dpmOpenInMaps": "Buksan sa mapa",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (default)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Kopyahin ang coordinates",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Na-kopya ang coordinates",
+  "@mapAppCoordinatesCopied": {
+  },
+
   "dpmSheetEmpty": "I-tap ang marker sa mapa para sa detalye",
   "dpmAddress": "Address",
   "restroomTypeLabel": "Uri",

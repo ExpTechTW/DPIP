@@ -1111,6 +1111,26 @@ class AppLocalizationsFil extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => 'Ipakita ang mga silungan';
 
   @override
+  String get dpmOpenInMaps => 'Buksan sa mapa';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (default)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'Kopyahin ang coordinates';
+
+  @override
+  String get mapAppCoordinatesCopied => 'Na-kopya ang coordinates';
+
+  @override
   String get dpmSheetEmpty => 'I-tap ang marker sa mapa para sa detalye';
 
   @override

@@ -1465,6 +1465,34 @@
   "@disasterMapOverlayShelterTooltip": {
     "description": "Tooltip for the shelter toggle in the disaster-map overlay menu"
   },
+  "dpmOpenInMaps": "Open in maps",
+  "@dpmOpenInMaps": {
+    "description": "Action in the disaster-map detail sheet: open the point in an external map app"
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+    "description": "External map app choice: Google Maps"
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+    "description": "External map app choice: Apple Maps"
+  },
+  "mapAppDefault": "{app} (default)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    },
+    "description": "Choice-sheet label suffix marking the platform home map app, with the app name"
+  },
+  "mapAppCopyCoordinates": "Copy coordinates",
+  "@mapAppCopyCoordinates": {
+    "description": "Choice-sheet action: copy the point's coordinates"
+  },
+  "mapAppCoordinatesCopied": "Coordinates copied",
+  "@mapAppCoordinatesCopied": {
+    "description": "Snackbar confirming the coordinates were copied"
+  },
+
   "dpmSheetEmpty": "Tap a marker on the map for details",
   "@dpmSheetEmpty": {
     "description": "Hint in the disaster-map detail sheet when nothing is selected"

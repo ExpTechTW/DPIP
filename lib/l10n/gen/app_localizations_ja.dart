@@ -1093,6 +1093,26 @@ class AppLocalizationsJa extends AppLocalizations {
   String get disasterMapOverlayShelterTooltip => '避難所を表示';
 
   @override
+  String get dpmOpenInMaps => '地図アプリで開く';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（デフォルト）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '座標をコピー';
+
+  @override
+  String get mapAppCoordinatesCopied => '座標をコピーしました';
+
+  @override
   String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
 
   @override
