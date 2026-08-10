@@ -515,6 +515,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => '데이터 없음';
+
+  @override
   String get homeRainTrendScattered => '약한 비가 올 수 있어요';
 
   @override

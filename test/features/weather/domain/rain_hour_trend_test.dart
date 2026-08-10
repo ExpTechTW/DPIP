@@ -38,8 +38,28 @@ void main() {
     expect(trend.mm.sublist(3), everyElement(0.0));
   });
 
-  test('decode aligns an empty response to FormatException', () {
-    expect(() => RainHourTrend.decode(const {}), throwsFormatException);
+  test('decode returns a dry trend for an empty response', () {
+    final trend = RainHourTrend.decode(const {});
+
+    expect(trend.isDry, isTrue);
+    expect(trend.mm, hasLength(60));
+    expect(trend.mm, everyElement(0.0));
+  });
+
+  test('decode returns a dry trend for an all-empty series (the API "[]")', () {
+    final trend = RainHourTrend.decode({'rainfallWarnings-rkai': <dynamic>[]});
+
+    expect(trend.isDry, isTrue);
+  });
+
+  test('dry factory is minute-aligned and reads as no rain', () {
+    final trend = RainHourTrend.dry(
+      startUtc: DateTime.utc(2026, 8, 11, 2, 34, 59),
+    );
+
+    expect(trend.startSecond % 60, 0);
+    expect(trend.isDry, isTrue);
+    expect(trend.summary.grade, RainHourTrendGrade.none);
   });
 
   test('decode skips empty series before the real one', () {

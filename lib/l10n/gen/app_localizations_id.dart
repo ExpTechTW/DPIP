@@ -518,6 +518,9 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => 'Tidak ada data';
+
+  @override
   String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
 
   @override

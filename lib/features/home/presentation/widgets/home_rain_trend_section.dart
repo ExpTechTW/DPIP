@@ -79,6 +79,15 @@ class HomeRainTrendSection extends StatelessWidget {
     final controller = context.watch<HomeWeatherController>();
     final data = trend ?? controller.hourTrend;
 
+    // An empty `[]` response (or an all-zero series) means no rain this hour —
+    // the card has nothing to chart, so it disappears. The hero block's bottom
+    // card slot is taken over by the compact 24h forecast instead (see
+    // `HomeContent`); this guard keeps the section a no-op wherever else it is
+    // placed with a dry trend.
+    if (data?.isDry ?? false) {
+      return const SizedBox.shrink();
+    }
+
     final Widget body;
     if (data != null) {
       body = _Chart(
@@ -230,7 +239,17 @@ class _NoData extends StatelessWidget {
         ],
       );
     } else {
-      child = const SizedBox.shrink();
+      child = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.cloud_off_outlined, size: 22, color: secondary),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            AppLocalizations.of(context).homeRainTrendNoData,
+            style: theme.textTheme.labelMedium?.copyWith(color: secondary),
+          ),
+        ],
+      );
     }
     return Container(
       height: 120,
@@ -262,6 +281,13 @@ class _Chart extends StatelessWidget {
 
   /// X-axis ticks, minutes from [RainHourTrend.startSecond].
   static const List<int> _ticks = [0, 10, 20, 30, 40, 50];
+
+  /// Chart height and the plot band it leaves for the X-axis labels (the chart
+  /// reserves `_titleBand` px of its height for bottom titles). The hatch
+  /// overlay covers only the plot band so it never bleeds under the labels.
+  static const double _chartHeight = 120;
+  static const double _titleBand = 22;
+  static const double _plotBand = _chartHeight - _titleBand;
 
   /// Pixels the label occupies, so the tick can be re-centred on its axis.
   static double _textWidth(String text, TextStyle? style) {
@@ -302,110 +328,242 @@ class _Chart extends StatelessWidget {
       return math.min(data.mm[source], _maxMm);
     }
 
-    // Minutes outside the data window carry no forecast — render their rods as
-    // full-height grey bars, so the missing span reads as a grey band drawn by
-    // the chart itself (no overlay to misalign with the plot area).
+    // Minutes outside the forecast window carry no forecast — render their rods
+    // invisible (toY 0) and paint one continuous grey band behind them via
+    // fl_chart's own range annotation. The band's x1/x2 are fl_chart axis
+    // values (a linear 0→1 map across the plot width), not bar indices — bar i
+    // sits at `w/2 + i·eachSpace` px with `eachSpace = (width − 60w)/59` under
+    // spaceBetween, so the width from LayoutBuilder converts index → axis value.
     bool hasDataAt(int i) => i >= headEnd && i < tailStart;
 
-    final chart = BarChart(
-      BarChartData(
-        minY: 0,
-        maxY: _maxMm,
-        alignment: BarChartAlignment.spaceBetween,
-        groupsSpace: 0,
-        barGroups: [
-          for (var i = 0; i < data.mm.length; i++)
-            BarChartGroupData(
-              x: i,
-              barRods: [
-                BarChartRodData(
-                  toY: hasDataAt(i) ? valueAt(i) : _maxMm,
-                  width: 2.5,
-                  color: hasDataAt(i)
-                      ? barColor
-                      : secondary.withValues(alpha: 0.28),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(1),
-                  ),
+    final chart = LayoutBuilder(
+      builder: (context, constraints) {
+        const w = 2.5;
+        final width = constraints.maxWidth;
+        // Under spaceBetween every bar's centre sits `w/2 + k·(w + eachSpace)`
+        // px — the bar's own width counts into the distribution, so adjacent
+        // left edges are `(width − w)/(N−1)` apart. Left edge of bar [k] as a
+        // 0→1 axis value:
+        double barLeftEdge(int k) =>
+            k * (width - w) / ((data.mm.length - 1) * width);
+        final bar = BarChart(
+          BarChartData(
+            minY: 0,
+            maxY: _maxMm,
+            alignment: BarChartAlignment.spaceBetween,
+            groupsSpace: 0,
+            barGroups: [
+              for (var i = 0; i < data.mm.length; i++)
+                BarChartGroupData(
+                  x: i,
+                  barRods: [
+                    BarChartRodData(
+                      toY: hasDataAt(i) ? valueAt(i) : 0,
+                      width: w,
+                      color: hasDataAt(i) ? barColor : Colors.transparent,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(1),
+                      ),
+                    ),
+                  ],
                 ),
+            ],
+            // Minutes outside the forecast window are one continuous grey band
+            // — drawn by fl_chart as a vertical range annotation, aligned to the
+            // exact left/right edges of the missing bars. The hatch is painted
+            // by a second, clipped overlay (below) that reuses the same edges.
+            rangeAnnotations: RangeAnnotations(
+              verticalRangeAnnotations: [
+                if (headEnd > 0)
+                  VerticalRangeAnnotation(
+                    x1: 0,
+                    x2: barLeftEdge(headEnd),
+                    color: secondary.withValues(alpha: 0.12),
+                  ),
+                if (tailStart < data.mm.length)
+                  VerticalRangeAnnotation(
+                    x1: barLeftEdge(tailStart),
+                    x2: 1,
+                    color: secondary.withValues(alpha: 0.12),
+                  ),
               ],
             ),
-        ],
-        // A solid X axis, plus 10 / 20 / 30 mm dashed guides — the fixed
-        // Y ceiling makes them land on stable fractions of the chart
-        // height. The 0 line is suppressed: it sits flush on the X axis,
-        // where it would read as an axis rule rather than a guide.
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: false,
-          horizontalInterval: 10,
-          getDrawingHorizontalLine: (value) => value == 0
-              ? FlLine(color: Colors.transparent, strokeWidth: 0)
-              : FlLine(
-                  color: secondary.withValues(alpha: 0.35),
-                  strokeWidth: 1,
-                  dashArray: const [4, 4],
+            // A solid X axis, plus 10 / 20 / 30 mm dashed guides — the fixed
+            // Y ceiling makes them land on stable fractions of the chart
+            // height. The 0 line is suppressed: it sits flush on the X axis,
+            // where it would read as an axis rule rather than a guide.
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: 10,
+              getDrawingHorizontalLine: (value) => value == 0
+                  ? FlLine(color: Colors.transparent, strokeWidth: 0)
+                  : FlLine(
+                      color: secondary.withValues(alpha: 0.35),
+                      strokeWidth: 1,
+                      dashArray: const [4, 4],
+                    ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                bottom: BorderSide(
+                  color: secondary.withValues(alpha: 0.4),
+                  width: 1,
                 ),
-        ),
-        borderData: FlBorderData(
-          show: true,
-          border: Border(
-            bottom: BorderSide(
-              color: secondary.withValues(alpha: 0.4),
-              width: 1,
+              ),
             ),
-          ),
-        ),
-        barTouchData: const BarTouchData(enabled: false),
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(),
-          rightTitles: const AxisTitles(),
-          // No mm / numeric Y labels — height alone carries intensity.
-          leftTitles: const AxisTitles(),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 22,
-              interval: 1,
-              getTitlesWidget: (value, meta) {
-                final minute = value.round();
-                if (!_ticks.contains(minute)) {
-                  return const SizedBox.shrink();
-                }
-                final label = minute == 0
-                    ? l10n.mapTimelineNow
-                    : l10n.homeRainTrendMinute(minute);
-                final style = Theme.of(
-                  context,
-                ).textTheme.labelSmall?.copyWith(color: secondary);
-                // fl_chart centres every title widget on its tick's axis
-                // position, so a bare [tick, label] row would push the tick
-                // left of the bar (X=0's lands off the chart). Mirroring the
-                // label width on the left re-centres the tick on the axis.
-                final labelWidth = _textWidth(label, style);
-                return Padding(
-                  padding: EdgeInsets.only(left: labelWidth + AppSpacing.xs),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 1,
-                        height: 6,
-                        color: secondary.withValues(alpha: 0.5),
+            barTouchData: const BarTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
+              // No mm / numeric Y labels — height alone carries intensity.
+              leftTitles: const AxisTitles(),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 22,
+                  interval: 1,
+                  getTitlesWidget: (value, meta) {
+                    final minute = value.round();
+                    if (!_ticks.contains(minute)) {
+                      return const SizedBox.shrink();
+                    }
+                    final label = minute == 0
+                        ? l10n.mapTimelineNow
+                        : l10n.homeRainTrendMinute(minute);
+                    final style = Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(color: secondary);
+                    // fl_chart centres every title widget on its tick's axis
+                    // position, so a bare [tick, label] row would push the tick
+                    // left of the bar (X=0's lands off the chart). Mirroring the
+                    // label width on the left re-centres the tick on the axis.
+                    final labelWidth = _textWidth(label, style);
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        left: labelWidth + AppSpacing.xs,
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(label, style: style),
-                    ],
-                  ),
-                );
-              },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 1,
+                            height: 6,
+                            color: secondary.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Text(label, style: style),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+
+        // Diagonal hatch + a centred "no data" label over the grey band. The
+        // hatch is a plain overlay on top of the chart (the same x mapping the
+        // annotation uses — no horizontal margin in fl_chart, so
+        // `barLeftEdge × width` is the plot pixel), clipped to its own rect so
+        // no line escapes into the data area, and limited to the plot band so
+        // it never bleeds under the X-axis labels.
+        final headX = barLeftEdge(headEnd) * width;
+        final tailX = barLeftEdge(tailStart) * width;
+        return Stack(
+          children: [
+            SizedBox.expand(child: bar),
+            if (headEnd > 0)
+              Positioned(
+                left: 0,
+                top: 0,
+                width: headX,
+                height: _plotBand,
+                child: _NoDataLabel(
+                  color: secondary,
+                  text: l10n.homeRainTrendNoData,
+                ),
+              ),
+            if (tailStart < data.mm.length)
+              Positioned(
+                left: tailX,
+                top: 0,
+                right: 0,
+                height: _plotBand,
+                child: _NoDataLabel(
+                  color: secondary,
+                  text: l10n.homeRainTrendNoData,
+                ),
+              ),
+          ],
+        );
+      },
     );
 
-    return SizedBox(height: 120, child: chart);
+    return SizedBox(height: _chartHeight, child: chart);
   }
+}
+
+/// "No data" label centred on the diagonal hatch. On bands too narrow for a
+/// horizontal line (a tail only a few minutes wide) the text rotates to read
+/// top-down instead.
+class _NoDataLabel extends StatelessWidget {
+  const _NoDataLabel({required this.color, required this.text});
+
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelSmall?.copyWith(
+      color: color.withValues(alpha: 0.6),
+      fontWeight: FontWeight.w600,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final portrait = constraints.maxWidth < 44;
+        final label = Text(text, style: style, softWrap: false);
+        return ClipRect(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CustomPaint(painter: _HatchPainter(color)),
+              Center(
+                child: portrait
+                    ? RotatedBox(quarterTurns: 1, child: label)
+                    : label,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Diagonal-grey hatch for the no-forecast minutes, painted over the chart's
+/// grey range annotation.
+class _HatchPainter extends CustomPainter {
+  const _HatchPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final line = Paint()
+      ..color = color.withValues(alpha: 0.4)
+      ..strokeWidth = 1.2;
+    const step = 8.0;
+    for (var x = -size.height; x < size.width + size.height; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), line);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _HatchPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

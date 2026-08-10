@@ -153,6 +153,8 @@
   "homeRainTrendTitle": "ฝนชั่วโมงถัดไป",
   "homeRainTrendMinute": "{minute} นาที",
   "homeRainTrendUpdated": "อัปเดต {time}",
+  "homeRainTrendNoData": "ไม่มีข้อมูล",
+
   "homeRainTrendScattered": "อาจมีฝนตกประปราย",
   "homeRainTrendLightSustained": "ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า",
   "homeRainTrendLightStopping": "คาดว่าฝนจะหยุดในอีก {minutes} นาที",

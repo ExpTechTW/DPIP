@@ -183,7 +183,7 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 |---|---|
 | `getLocalizationProgress` | `https://exptech.dev/api/v1/dpip/locale` |
 | `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
-| `getRainHourForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`） |
+| `getRainHourForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
 
 ## curl 可用性（2026-08-02，HTTP 狀態碼）
 

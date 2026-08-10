@@ -731,6 +731,11 @@
       }
     }
   },
+  "homeRainTrendNoData": "No data",
+  "@homeRainTrendNoData": {
+    "description": "Label on the home rain trend chart for minutes beyond the forecast window, and the empty-card hint"
+  },
+
   "homeRainTrendScattered": "Light showers possible",
   "@homeRainTrendScattered": {
     "description": "Home rain trend subtitle: peak intensity below the light-rain threshold"

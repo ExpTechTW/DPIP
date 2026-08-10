@@ -153,6 +153,8 @@
   "homeRainTrendTitle": "Hujan 1 jam ke depan",
   "homeRainTrendMinute": "{minute} mnt",
   "homeRainTrendUpdated": "Diperbarui {time}",
+  "homeRainTrendNoData": "Tidak ada data",
+
   "homeRainTrendScattered": "Kemungkinan hujan ringan",
   "homeRainTrendLightSustained": "Hujan ringan berlanjut selama 1 jam ke depan",
   "homeRainTrendLightStopping": "Hujan ringan diperkirakan berhenti dalam {minutes} menit",

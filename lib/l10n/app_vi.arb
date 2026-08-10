@@ -153,6 +153,8 @@
   "homeRainTrendTitle": "Mưa 1 giờ tới",
   "homeRainTrendMinute": "{minute} phút",
   "homeRainTrendUpdated": "Cập nhật {time}",
+  "homeRainTrendNoData": "Không có dữ liệu",
+
   "homeRainTrendScattered": "Có thể có mưa rào nhẹ",
   "homeRainTrendLightSustained": "Mưa nhỏ tiếp diễn trong 1 giờ tới",
   "homeRainTrendLightStopping": "Mưa nhỏ có thể tạnh trong {minutes} phút nữa",

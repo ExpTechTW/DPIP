@@ -153,6 +153,8 @@
   "homeRainTrendTitle": "近 1 小時降水趨勢",
   "homeRainTrendMinute": "{minute}分",
   "homeRainTrendUpdated": "更新 {time}",
+  "homeRainTrendNoData": "無資料",
+
   "homeRainTrendScattered": "可能會有零星降雨",
   "homeRainTrendLightSustained": "未來 1 小時會有持續小雨",
   "homeRainTrendLightStopping": "預計 {minutes} 分鐘後停止下小雨",

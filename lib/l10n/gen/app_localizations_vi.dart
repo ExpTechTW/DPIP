@@ -517,6 +517,9 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => 'Không có dữ liệu';
+
+  @override
   String get homeRainTrendScattered => 'Có thể có mưa rào nhẹ';
 
   @override

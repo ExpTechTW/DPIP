@@ -517,6 +517,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => 'No data';
+
+  @override
   String get homeRainTrendScattered => 'Light showers possible';
 
   @override

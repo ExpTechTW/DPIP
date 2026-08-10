@@ -92,17 +92,26 @@ class RainHourTrend {
 
   /// Decodes the `rainforecast` envelope: the first non-empty series wins; its
   /// `start` (Unix seconds) and `rain` (60 mm samples) become this trend. An
-  /// empty response — or a series with a non-numeric `start`, non-list `rain`,
-  /// or wrong sample count — throws, which `guardResult` folds into a
+  /// empty response — every series is an empty list — means the API forecasts
+  /// no rain this hour, so this returns a dry trend ([isDry]) instead of
+  /// failing. A series with a non-numeric `start`, non-list `rain`, or wrong
+  /// sample count still throws, which `guardResult` folds into a
   /// `DecodeFailure`.
   factory RainHourTrend.decode(Map<String, dynamic> json) {
     for (final series in json.values) {
       if (series is! List<dynamic> || series.isEmpty) continue;
+      // An empty series is the API's "no rain"; a non-empty one must be the
+      // expected record — anything else is a malformed response, not a dry
+      // hour, and keeps failing the fetch.
       final raw = series.first;
-      if (raw is! Map<dynamic, dynamic>) continue;
+      if (raw is! Map<dynamic, dynamic>) {
+        throw const FormatException('Malformed rainforecast series');
+      }
       final start = raw['start'];
       final rain = raw['rain'];
-      if (start is! num || rain is! List<dynamic>) continue;
+      if (start is! num || rain is! List<dynamic>) {
+        throw const FormatException('Malformed rainforecast series');
+      }
       if (rain.length != 60) {
         throw const FormatException('Expected 60 rain samples');
       }
@@ -111,7 +120,8 @@ class RainHourTrend {
         mm: [for (final value in rain) (value as num).toDouble()],
       );
     }
-    throw const FormatException('No rainforecast series in response');
+    // Every series was empty — the API's `[]` for "no rain this hour".
+    return RainHourTrend.dry();
   }
 
   /// Prediction origin, Unix **seconds**, aligned to a whole minute
@@ -125,6 +135,22 @@ class RainHourTrend {
   /// Wall-clock UTC instant of [startSecond].
   DateTime get startUtc =>
       DateTime.fromMillisecondsSinceEpoch(startSecond * 1000, isUtc: true);
+
+  /// The hour carries no rain at all — an empty `[]` response (the API's way of
+  /// saying no rain is coming) and an all-zero series both land here. The home
+  /// sheet hides the trend card for a dry hour rather than drawing an empty
+  /// chart.
+  bool get isDry => summary.grade == RainHourTrendGrade.none;
+
+  /// A dry hour: all sixty samples are zero, aligned to [startUtc] (defaults to
+  /// "now", minute-aligned). Used by [decode] when the API returns no forecast
+  /// series at all.
+  factory RainHourTrend.dry({DateTime? startUtc}) {
+    final seconds =
+        (startUtc ?? DateTime.now().toUtc()).millisecondsSinceEpoch ~/ 1000;
+    final aligned = seconds - (seconds % 60);
+    return RainHourTrend(startSecond: aligned, mm: List<double>.filled(60, 0));
+  }
 
   /// Synthetic series for UI work until the API lands — a soft pulse peaking
   /// mid-hour so the bar chart has shape.

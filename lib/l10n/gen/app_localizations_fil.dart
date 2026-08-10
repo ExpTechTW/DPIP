@@ -522,6 +522,9 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => 'Walang data';
+
+  @override
   String get homeRainTrendScattered => 'Posibleng mahinang ulan';
 
   @override

@@ -514,6 +514,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get homeRainTrendNoData => '無資料';
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -2008,6 +2011,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String homeRainTrendUpdated(String time) {
     return '更新 $time';
   }
+
+  @override
+  String get homeRainTrendNoData => '无资料';
 
   @override
   String get homeRainTrendScattered => '可能会有零星降雨';
@@ -3506,6 +3512,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String get homeRainTrendNoData => '無資料';
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -5000,6 +5009,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String homeRainTrendUpdated(String time) {
     return '更新 $time';
   }
+
+  @override
+  String get homeRainTrendNoData => '無資料';
 
   @override
   String get homeRainTrendScattered => '可能會有零星降雨';

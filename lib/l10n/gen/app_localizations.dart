@@ -1035,6 +1035,12 @@ abstract class AppLocalizations {
   /// **'Updated {time}'**
   String homeRainTrendUpdated(String time);
 
+  /// Label on the home rain trend chart for minutes beyond the forecast window, and the empty-card hint
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get homeRainTrendNoData;
+
   /// Home rain trend subtitle: peak intensity below the light-rain threshold
   ///
   /// In en, this message translates to:
