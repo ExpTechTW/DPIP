@@ -811,6 +811,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapNavRadar => 'Radar';
 
   @override
+  String get mapNavQpesums => 'Pagtaya';
+
+  @override
   String get mapNavSatellite => 'Satellite';
 
   @override

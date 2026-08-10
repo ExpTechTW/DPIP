@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "Default na layer ng mapa",
   "defaultMapLayerSubtitle": "Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Pagtaya",
   "mapNavSatellite": "Satellite",
   "mapNavLightning": "Kidlat",
   "mapNavTyphoon": "Bagyo",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Layer ng sanggunian",
-  "mapOverlaySectionMap": "Mapa",
+
+
+
+
+
+ "mapOverlaySectionMap": "Mapa",
   "rainIntervalSection": "Window ng oras",
 
   "mapTownLabels": "Mga pangalan ng bayan",

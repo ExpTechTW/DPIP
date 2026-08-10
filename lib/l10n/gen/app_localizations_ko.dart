@@ -795,6 +795,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapNavRadar => '레이더';
 
   @override
+  String get mapNavQpesums => '예보';
+
+  @override
   String get mapNavSatellite => '위성';
 
   @override

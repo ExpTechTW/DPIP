@@ -803,6 +803,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapNavRadar => 'เรดาร์';
 
   @override
+  String get mapNavQpesums => 'พยากรณ์';
+
+  @override
   String get mapNavSatellite => 'ดาวเทียม';
 
   @override

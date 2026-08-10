@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "지도 기본 레이어",
   "defaultMapLayerSubtitle": "지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.",
   "mapNavRadar": "레이더",
+  "mapNavQpesums": "예보",
   "mapNavSatellite": "위성",
   "mapNavLightning": "번개",
   "mapNavTyphoon": "태풍",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "참조 레이어",
-  "mapOverlaySectionMap": "지도",
+
+
+
+
+
+ "mapOverlaySectionMap": "지도",
   "rainIntervalSection": "집계 시간",
 
   "mapTownLabels": "읍면동 이름",

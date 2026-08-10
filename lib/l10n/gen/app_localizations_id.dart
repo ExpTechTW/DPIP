@@ -808,6 +808,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapNavRadar => 'Radar';
 
   @override
+  String get mapNavQpesums => 'Prakiraan';
+
+  @override
   String get mapNavSatellite => 'Satelit';
 
   @override

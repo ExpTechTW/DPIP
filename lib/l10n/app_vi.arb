@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "Lớp bản đồ mặc định",
   "defaultMapLayerSubtitle": "Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Dự báo",
   "mapNavSatellite": "Vệ tinh",
   "mapNavLightning": "Sét",
   "mapNavTyphoon": "Bão",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Lớp tham chiếu",
-  "mapOverlaySectionMap": "Bản đồ",
+
+
+
+
+
+ "mapOverlaySectionMap": "Bản đồ",
   "rainIntervalSection": "Khoảng thời gian",
 
   "mapTownLabels": "Tên hương trấn",

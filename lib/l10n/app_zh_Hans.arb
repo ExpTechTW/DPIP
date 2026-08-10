@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "地图默认图层",
   "defaultMapLayerSubtitle": "打开地图标签页时显示此图层，底部导航栏图标与文字会一并更新。",
   "mapNavRadar": "雷达",
+  "mapNavQpesums": "预报",
   "mapNavSatellite": "卫星",
   "mapNavLightning": "闪电",
   "mapNavTyphoon": "台风",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "参考图层",
-  "mapOverlaySectionMap": "地图",
+
+
+
+
+
+ "mapOverlaySectionMap": "地图",
   "rainIntervalSection": "统计时间",
 
   "mapTownLabels": "乡镇名称",

@@ -1563,6 +1563,12 @@ abstract class AppLocalizations {
   /// **'Radar'**
   String get mapNavRadar;
 
+  /// Short Map-tab bottom-nav / default-layer picker label for the 1h QPESUMS precipitation forecast
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get mapNavQpesums;
+
   /// Short Map-tab bottom-nav / default-layer picker label for satellite
   ///
   /// In en, this message translates to:

@@ -795,6 +795,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapNavRadar => 'レーダー';
 
   @override
+  String get mapNavQpesums => '予報';
+
+  @override
   String get mapNavSatellite => '衛星';
 
   @override

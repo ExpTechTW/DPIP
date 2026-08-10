@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "ชั้นแผนที่เริ่มต้น",
   "defaultMapLayerSubtitle": "แท็บแผนที่จะเปิดชั้นนี้ ไอคอนและป้ายนำทางด้านล่างจะเปลี่ยนตาม",
   "mapNavRadar": "เรดาร์",
+  "mapNavQpesums": "พยากรณ์",
   "mapNavSatellite": "ดาวเทียม",
   "mapNavLightning": "ฟ้าผ่า",
   "mapNavTyphoon": "ไต้ฝุ่น",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
-  "mapOverlaySectionMap": "แผนที่",
+
+
+
+
+
+ "mapOverlaySectionMap": "แผนที่",
   "rainIntervalSection": "ช่วงเวลา",
 
   "mapTownLabels": "ชื่อตำบล",

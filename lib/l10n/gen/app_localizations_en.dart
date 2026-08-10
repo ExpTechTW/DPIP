@@ -805,6 +805,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapNavRadar => 'Radar';
 
   @override
+  String get mapNavQpesums => 'Forecast';
+
+  @override
   String get mapNavSatellite => 'Satellite';
 
   @override

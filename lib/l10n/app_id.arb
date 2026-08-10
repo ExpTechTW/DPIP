@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "Lapisan peta bawaan",
   "defaultMapLayerSubtitle": "Tab Peta membuka lapisan ini. Ikon dan label navigasi bawah ikut pilihan ini.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Prakiraan",
   "mapNavSatellite": "Satelit",
   "mapNavLightning": "Petir",
   "mapNavTyphoon": "Topan",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Lapisan referensi",
-  "mapOverlaySectionMap": "Peta",
+
+
+
+
+
+ "mapOverlaySectionMap": "Peta",
   "rainIntervalSection": "Jendela waktu",
 
   "mapTownLabels": "Nama kecamatan",

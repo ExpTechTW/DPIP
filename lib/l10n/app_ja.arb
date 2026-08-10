@@ -242,6 +242,7 @@
   "defaultMapLayerSettings": "地図の初期レイヤー",
   "defaultMapLayerSubtitle": "地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。",
   "mapNavRadar": "レーダー",
+  "mapNavQpesums": "予報",
   "mapNavSatellite": "衛星",
   "mapNavLightning": "稲妻",
   "mapNavTyphoon": "台風",
@@ -342,7 +343,12 @@
   },
 
   "mapOverlaySectionReference": "参照レイヤー",
-  "mapOverlaySectionMap": "地図",
+
+
+
+
+
+ "mapOverlaySectionMap": "地図",
   "rainIntervalSection": "集計時間",
 
   "mapTownLabels": "郷鎮名",

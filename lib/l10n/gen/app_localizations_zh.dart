@@ -789,6 +789,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapNavRadar => '雷達';
 
   @override
+  String get mapNavQpesums => '預報';
+
+  @override
   String get mapNavSatellite => '衛星';
 
   @override
@@ -2292,6 +2295,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapNavRadar => '雷达';
+
+  @override
+  String get mapNavQpesums => '预报';
 
   @override
   String get mapNavSatellite => '卫星';
@@ -3799,6 +3805,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapNavRadar => '雷達';
 
   @override
+  String get mapNavQpesums => '預報';
+
+  @override
   String get mapNavSatellite => '衛星';
 
   @override
@@ -5302,6 +5311,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavQpesums => '預報';
 
   @override
   String get mapNavSatellite => '衛星';

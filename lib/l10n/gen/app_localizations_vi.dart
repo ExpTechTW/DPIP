@@ -804,6 +804,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapNavRadar => 'Radar';
 
   @override
+  String get mapNavQpesums => 'Dự báo';
+
+  @override
   String get mapNavSatellite => 'Vệ tinh';
 
   @override

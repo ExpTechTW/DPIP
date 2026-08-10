@@ -1104,6 +1104,10 @@
   "@mapNavRadar": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for radar"
   },
+  "mapNavQpesums": "Forecast",
+  "@mapNavQpesums": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for the 1h QPESUMS precipitation forecast"
+  },
   "mapNavSatellite": "Satellite",
   "@mapNavSatellite": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for satellite"
