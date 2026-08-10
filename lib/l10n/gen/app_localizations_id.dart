@@ -1483,4 +1483,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get radarTownOutlineSubtitle =>
       'Menjaga batas kecamatan tetap terbaca di bawah gema radar.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'Opsi lapisan prakiraan curah hujan';
 }

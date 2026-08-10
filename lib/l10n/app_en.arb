@@ -1987,5 +1987,9 @@
   "radarTownOutlineSubtitle": "Keeps township borders legible under the radar echo.",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "QPESUMS overlay options",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

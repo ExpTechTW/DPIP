@@ -108,6 +108,100 @@ void main() {
     expect(find.text('300'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
   });
+
+  group('overlays', () {
+    /// A layer attached to a live map, ready for the toggles.
+    Future<(QpesumsMapLayer, RecordingMapController)> attached() async {
+      final layer = QpesumsMapLayer(_FakeQpesumsRepository(_ids(3)));
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[1]);
+      return (layer, controller);
+    }
+
+    test('all three overlays are on by default and drawn on attach', () async {
+      final (layer, controller) = await attached();
+
+      expect(layer.showScanRange.value, isTrue);
+      expect(layer.showCountyOutline.value, isTrue);
+      expect(layer.showTownOutline.value, isTrue);
+      // QPESUMS shares the radar composite's geometry but draws its own
+      // outline under its own ids, so both layers can be on the map at once.
+      expect(controller.calls, contains('addSource:qpesums-scan-range'));
+      expect(
+        controller.calls,
+        contains('addLineLayer:qpesums-scan-range-outline'),
+      );
+      expect(
+        controller.calls,
+        contains('addLineLayer:admin-county-outline-casing'),
+      );
+      expect(controller.calls, contains('addLineLayer:admin-county-outline'));
+      expect(controller.calls, contains('addLineLayer:admin-town-outline'));
+    });
+
+    test(
+      'turning the coverage outline off removes the qpesums ids only',
+      () async {
+        final (layer, controller) = await attached();
+        controller.calls.clear();
+
+        layer.setShowScanRange(false);
+        await pumpEventQueue();
+
+        expect(
+          controller.calls,
+          contains('removeLayer:qpesums-scan-range-outline'),
+        );
+        expect(controller.calls, contains('removeSource:qpesums-scan-range'));
+        expect(
+          controller.calls.where((c) => c.contains('radar-scan-range')),
+          isEmpty,
+          reason: 'radar\'s outline, if shown, must not be touched',
+        );
+      },
+    );
+
+    test('the toggles are independent', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      layer.setShowTownOutline(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, contains('removeLayer:admin-town-outline'));
+      expect(
+        controller.calls.where((c) => c.contains('admin-county-outline')),
+        isEmpty,
+        reason: 'dropping the fine mesh must not take the coarse frame with it',
+      );
+      expect(layer.showCountyOutline.value, isTrue);
+    });
+
+    test('clear tears the chrome down with the layer', () async {
+      final (layer, controller) = await attached();
+      controller.calls.clear();
+
+      await layer.clear(controller);
+
+      expect(controller.calls, contains('removeSource:qpesums-scan-range'));
+      expect(controller.calls, contains('removeLayer:admin-county-outline'));
+    });
+
+    test('a style reset re-adds the chrome on the next attach', () async {
+      final (layer, _) = await attached();
+
+      layer.onStyleReset();
+      final frames = (await layer.frames()).valueOrNull!;
+      final fresh = RecordingMapController();
+      await layer.prepare(fresh, frames);
+      await layer.show(fresh, frames[1]);
+
+      expect(fresh.calls, contains('addSource:qpesums-scan-range'));
+      expect(fresh.calls, contains('addLineLayer:admin-county-outline'));
+    });
+  });
 }
 
 /// [count] forecast frame ids, newest first (the wire order), 10-min steps.

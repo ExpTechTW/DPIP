@@ -1487,4 +1487,8 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get radarTownOutlineSubtitle =>
       'Nananatiling mababasa ang mga hangganan ng bayan sa ilalim ng radar echo.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip =>
+      'Mga opsyon sa layer ng pagtataya ng pag-ulan';
 }

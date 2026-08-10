@@ -1478,4 +1478,7 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get radarTownOutlineSubtitle =>
       'ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์น้ำฝน';
 }

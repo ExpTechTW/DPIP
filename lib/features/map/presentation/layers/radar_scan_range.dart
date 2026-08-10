@@ -179,10 +179,16 @@ abstract final class RadarScanRange {
   ///
   /// Outline only — no fill. The covered area is where the echo itself is, and
   /// a wash over it would tint every dBZ colour on the map.
+  ///
+  /// [sourceId]/[layerId] let a second raster (QPESUMS, whose coverage is the
+  /// same composite) draw its own outline under distinct ids — the defaults are
+  /// the radar ids, so existing callers pass nothing.
   static Future<void> add(
     MapLibreMapController controller, {
     required String outlineColor,
     String? belowLayerId,
+    String sourceId = RadarScanRange.sourceId,
+    String layerId = RadarScanRange.outlineLayerId,
   }) async {
     await controller.addSource(
       sourceId,
@@ -190,7 +196,7 @@ abstract final class RadarScanRange {
     );
     await controller.addLineLayer(
       sourceId,
-      outlineLayerId,
+      layerId,
       LineLayerProperties(
         lineColor: outlineColor,
         lineWidth: 1.5,
@@ -204,9 +210,15 @@ abstract final class RadarScanRange {
   }
 
   /// Removes the layer and source, tolerating a partially-added state.
-  static Future<void> remove(MapLibreMapController controller) async {
+  ///
+  /// The ids must match the [add] call the outline was drawn with.
+  static Future<void> remove(
+    MapLibreMapController controller, {
+    String sourceId = RadarScanRange.sourceId,
+    String layerId = RadarScanRange.outlineLayerId,
+  }) async {
     try {
-      await controller.removeLayer(outlineLayerId);
+      await controller.removeLayer(layerId);
     } catch (_) {
       // Not present — nothing to undo.
     }

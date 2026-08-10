@@ -1481,4 +1481,7 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get radarTownOutlineSubtitle =>
       'Giữ ranh giới xã phường rõ ràng dưới lớp phản hồi radar.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'Tùy chọn lớp dự báo mưa định lượng';
 }

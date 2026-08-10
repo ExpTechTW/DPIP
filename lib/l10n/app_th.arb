@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์น้ำฝน",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

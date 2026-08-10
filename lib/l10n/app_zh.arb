@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "讓鄉鎮界線在雷達回波下仍然清楚。",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "定量降水預報圖層選項",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

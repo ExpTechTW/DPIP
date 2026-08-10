@@ -1452,6 +1452,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2902,6 +2905,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get radarTownOutlineSubtitle => '让乡镇界线在雷达回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水预报图层选项';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -4352,6 +4358,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5802,4 +5811,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
 }

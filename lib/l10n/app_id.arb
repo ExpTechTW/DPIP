@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "Menjaga batas kecamatan tetap terbaca di bawah gema radar.",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Opsi lapisan prakiraan curah hujan",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

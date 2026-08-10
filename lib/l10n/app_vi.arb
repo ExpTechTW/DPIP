@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "Giữ ranh giới xã phường rõ ràng dưới lớp phản hồi radar.",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Tùy chọn lớp dự báo mưa định lượng",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

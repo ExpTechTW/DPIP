@@ -1466,4 +1466,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get radarTownOutlineSubtitle => '레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '정량 강수 예보 레이어 옵션';
 }

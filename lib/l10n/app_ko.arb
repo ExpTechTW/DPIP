@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

@@ -2822,6 +2822,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keeps township borders legible under the radar echo.'**
   String get radarTownOutlineSubtitle;
+
+  /// Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'QPESUMS overlay options'**
+  String get qpesumsOverlayMenuTooltip;
 }
 
 class _AppLocalizationsDelegate

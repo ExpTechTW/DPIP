@@ -525,5 +525,9 @@
   "radarTownOutlineSubtitle": "Nananatiling mababasa ang mga hangganan ng bayan sa ilalim ng radar echo.",
   "@radarTownOutlineSubtitle": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Mga opsyon sa layer ng pagtataya ng pag-ulan",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   }
 }

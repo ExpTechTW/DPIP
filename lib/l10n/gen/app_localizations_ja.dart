@@ -1458,4 +1458,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get radarTownOutlineSubtitle => 'レーダーエコーの下でも市町村境界が見えるようにします。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水予報レイヤー設定';
 }

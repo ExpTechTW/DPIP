@@ -1480,4 +1480,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get radarTownOutlineSubtitle =>
       'Keeps township borders legible under the radar echo.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'QPESUMS overlay options';
 }
