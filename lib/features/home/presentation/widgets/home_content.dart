@@ -86,30 +86,30 @@ class HomeContent extends StatelessWidget {
     // feeds pretending to be readings for a place we could not identify.
     final located = area is! CurrentArea || area.code != null;
     final showWeather = area is! NationwideArea && located;
-    // Scroll and the sky bake change at very different rates and both feed the
-    // cards — the sky re-bakes rarely, the scroll focus dial moves on every
-    // tick — so merge the two listenables rather than nesting two builders
-    // (the inner ValueListenableBuilder would skip rebuilding on scroll, since
-    // the sky colour did not change, and the focus dial would stall).
+    // MediaQuery.paddingOf(context).bottom is *not* the device's real bottom
+    // safe area in this subtree — MainShell's Scaffold(extendBody: true)
+    // overrides it to the bottom-nav bar's reserved height, so this reads
+    // straight off the platform view (see the original `_build` doc). Computed
+    // once here, not per scroll tick.
+    final bottomSafeArea = MediaQueryData.fromView(
+      View.of(context),
+    ).padding.bottom;
+    // The sky re-bakes rarely; the scroll focus dial moves on every tick. The
+    // ListView's *shell* rebuilds only when the sky changes — the scroll-driven
+    // reveal/focus dial lives one level down, on the panel's own listenable,
+    // so a scroll tick rebuilds the cards it changes instead of the whole list.
     return ListenableBuilder(
-      listenable: Listenable.merge([
-        scrollController,
-        SkyLutCache.panelAmbient,
-      ]),
+      listenable: SkyLutCache.panelAmbient,
       builder: (context, _) {
         final sky = SkyLutCache.panelAmbient.value;
-        final offset = scrollController.hasClients
-            ? scrollController.offset
-            : 0.0;
         return _build(
           context,
           areaIndex,
           located,
           showWeather,
           sky,
-          _focus(offset),
-          offset,
           hourTrend,
+          bottomSafeArea,
         );
       },
     );
@@ -132,21 +132,14 @@ class HomeContent extends StatelessWidget {
     bool located,
     bool showWeather,
     Color? sky,
-    double focus,
-    double offset,
     RainHourTrend? hourTrend,
+    double bottomSafeArea,
   ) {
     // A dry hour (empty `[]` response, or an all-zero series) hides the
     // rain-trend card entirely; the hero block's bottom slot is taken over by
     // a compact 24h forecast so the sheet still has a weather card to read at
     // rest. Null (still loading / failed) keeps the trend card's own pane.
     final dryTrend = hourTrend?.summary.grade == RainHourTrendGrade.none;
-    // The cards read as a pane of the sky only while the sky is the point
-    // (hero showing). Once the list scrolls, they solidify back into solid
-    // plates and their ink back onto the theme surface — a transparent 20 %
-    // sky-pane with sky-tuned ink is exactly what makes scrolled content hard
-    // to read, no matter how dimmed the backdrop behind it is.
-    final reveal = this.reveal * (1 - focus);
     // The hero block needs the sheet's own live pixel height, which only a
     // LayoutBuilder can give — MediaQuery reports the *screen*, not the
     // sheet's current size mid-expand. Null outside the hero layout
@@ -166,18 +159,6 @@ class HomeContent extends StatelessWidget {
     // to paint into that leftover strip. Filling the whole viewport here
     // guarantees nothing after the hero block is ever visible at rest,
     // regardless of how the safe area compares to that spacer's size.
-    //
-    // MediaQuery.paddingOf(context).bottom is *not* the device's real bottom
-    // safe area here: MainShell's Scaffold(extendBody: true) overrides it for
-    // this whole subtree to the bottom-nav-bar's reserved height instead (114
-    // logical px, measured on a real device — the bug that previously made
-    // this leave a stray gap under the trend card). MediaQueryData.fromView
-    // reads straight off the platform view, bypassing that override, and
-    // gives back the one inset that's real in every state the hero block is
-    // ever in: the home indicator.
-    final bottomSafeArea = MediaQueryData.fromView(
-      View.of(context),
-    ).padding.bottom;
     return LayoutBuilder(
       builder: (context, constraints) {
         final rawHeight = constraints.maxHeight;
@@ -197,142 +178,144 @@ class HomeContent extends StatelessWidget {
             // The grab handle above stays put; only the per-area panel slides.
             _AreaSlide(
               index: areaIndex,
-              child: Column(
-                key: ValueKey(areaIndex),
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (heroHeight != null)
-                    SizedBox(
-                      height: heroHeight,
-                      // Only the trailing gap depends on scroll offset, so
-                      // that's the only thing this rebuilds per tick — the
-                      // header/trend-card subtree below is built once and
-                      // handed through as ListenableBuilder's child, same
-                      // split `HomeSheet`'s own `_ScrollBlurredWeather` uses.
-                      child: ListenableBuilder(
-                        listenable: scrollController,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            RainOnCard(
-                              // Text and icons, not a solid card face — a flat
-                              // top-edge collision would pool water in every
-                              // gap between glyphs. Silhouette rasterises the
-                              // header itself and catches drops on its actual
-                              // outline instead.
-                              intensity: _cardRain(weatherMode),
-                              opacity: reveal,
-                              glass: false,
-                              silhouette: true,
-                              // Default gated: true — the header rises with
-                              // the rest of the hero block once the sheet
-                              // scrolls, so it closes the same short distance
-                              // into the gesture the trend card now does.
-                              child: HomeSheetHeader(
-                                reveal: reveal,
-                                expanded: expanded,
-                                weatherMode: weatherMode,
-                                sky: sky,
-                              ),
+              // The scroll focus dial drives every card's reveal and the hero
+              // block's trailing reserve — one listenable, one builder — so a
+              // scroll tick rebuilds this panel's cards rather than the whole
+              // ListView shell around it (which rebuilds only when the sky
+              // re-bakes, in [build]).
+              child: ListenableBuilder(
+                listenable: scrollController,
+                builder: (context, _) {
+                  final offset = scrollController.hasClients
+                      ? scrollController.offset
+                      : 0.0;
+                  // The cards read as a pane of the sky only while the sky is
+                  // the point (hero showing). Once the list scrolls, they
+                  // solidify back into solid plates and their ink back onto
+                  // the theme surface — a transparent 20 % sky-pane with
+                  // sky-tuned ink is exactly what makes scrolled content hard
+                  // to read, no matter how dimmed the backdrop behind it is.
+                  final reveal = this.reveal * (1 - _focus(offset));
+                  return Column(
+                    key: ValueKey(areaIndex),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (heroHeight != null)
+                        SizedBox(
+                          height: heroHeight,
+                          // Only the trailing gap depends on scroll offset, so
+                          // that is all this block's Padding re-reads per tick.
+                          child: Padding(
+                            // Deflates the tight SizedBox height so the Expanded
+                            // gap between header and trend card shrinks by exactly
+                            // this much and heroHeight itself — and with it the
+                            // forecast/events fold below — never moves. Collapses
+                            // to 0 as the sheet scrolls — see
+                            // [_bottomGapRampExtent] on why that includes the
+                            // safe area, not just the nicety gap on top of it.
+                            padding: EdgeInsets.only(
+                              bottom: _heroBottomGap(offset, bottomSafeArea),
                             ),
-                            // The gap is the point — open sky between the two
-                            // fixed edges, not a forgotten card. `HomeSheet`
-                            // blurs it back in once the scroll below carries the
-                            // trend card past the top.
-                            const Expanded(child: SizedBox.shrink()),
-                            if (dryTrend)
-                              // A dry hour has no rain chart, so the forecast
-                              // card itself takes the hero slot. It sits at its
-                              // one-glance summary (title + hour chips) at rest
-                              // and grows into the full card as the sheet is
-                              // pulled up — the summary and the complete card
-                              // are the same widget, not two cards. Rains on
-                              // the card like the trend card does.
-                              ListenableBuilder(
-                                listenable: scrollController,
-                                builder: (context, _) {
-                                  final liveOffset = scrollController.hasClients
-                                      ? scrollController.offset
-                                      : 0.0;
-                                  return RainOnCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                RainOnCard(
+                                  // Text and icons, not a solid card face — a
+                                  // flat top-edge collision would pool water in
+                                  // every gap between glyphs. Silhouette
+                                  // rasterises the header itself and catches drops
+                                  // on its actual outline instead. Default gated:
+                                  // true — the header rises with the rest of the
+                                  // hero block once the sheet scrolls, so it
+                                  // closes the same short distance into the
+                                  // gesture the trend card now does.
+                                  intensity: _cardRain(weatherMode),
+                                  opacity: reveal,
+                                  glass: false,
+                                  silhouette: true,
+                                  child: HomeSheetHeader(
+                                    reveal: reveal,
+                                    expanded: expanded,
+                                    weatherMode: weatherMode,
+                                    sky: sky,
+                                  ),
+                                ),
+                                // The gap is the point — open sky between the two
+                                // fixed edges, not a forgotten card. `HomeSheet`
+                                // blurs it back in once the scroll below carries
+                                // the trend card past the top.
+                                const Expanded(child: SizedBox.shrink()),
+                                if (dryTrend)
+                                  // A dry hour has no rain chart, so the forecast
+                                  // card itself takes the hero slot — a one-glance
+                                  // summary (title + hour chips) at rest that
+                                  // grows into the full card as the sheet is
+                                  // pulled up, and rains on the card like the
+                                  // trend card does.
+                                  RainOnCard(
                                     intensity: _cardRain(weatherMode),
                                     opacity: reveal,
                                     child: HomeForecastSection(
                                       key: ValueKey('forecast-hero-$areaIndex'),
-                                      expansion: _forecastExpansion(liveOffset),
+                                      expansion: _forecastExpansion(offset),
                                       reveal: reveal,
                                       sky: sky,
                                       weatherMode: weatherMode,
                                     ),
-                                  );
-                                },
-                              )
-                            else
-                              HomeRainTrendSection(
-                                key: ValueKey('rain-$areaIndex'),
-                                reveal: reveal,
-                                sky: sky,
-                                weatherMode: weatherMode,
-                                // Only this card gets wet. The reference rains on the card, not the
-                                // page, and the effect belongs on the one block that is
-                                // *about* rain. The grade is the weather's; [reveal] gates
-                                // visibility separately inside the section, the way the
-                                // engine's scene alpha does — multiplying them together
-                                // washed the water down to a third of its opacity.
-                                rain: _cardRain(weatherMode),
-                              ),
-                          ],
-                        ),
-                        // Deflates the tight SizedBox height passed to the
-                        // Column above, so the Expanded gap between header
-                        // and trend card shrinks by exactly this much and
-                        // heroHeight itself — and with it the forecast/events
-                        // fold below — never moves. Collapses to 0 as the
-                        // sheet scrolls — see [_bottomGapRampExtent] on why
-                        // that includes the safe area, not just the nicety
-                        // gap on top of it.
-                        builder: (context, child) => Padding(
-                          padding: EdgeInsets.only(
-                            bottom: _heroBottomGap(
-                              scrollController,
-                              bottomSafeArea,
+                                  )
+                                else
+                                  HomeRainTrendSection(
+                                    key: ValueKey('rain-$areaIndex'),
+                                    reveal: reveal,
+                                    sky: sky,
+                                    weatherMode: weatherMode,
+                                    // Only this card gets wet. The reference rains
+                                    // on the card, not the page, and the effect
+                                    // belongs on the one block that is *about*
+                                    // rain. The grade is the weather's; [reveal]
+                                    // gates visibility separately inside the
+                                    // section, the way the engine's scene alpha
+                                    // does — multiplying them together washed the
+                                    // water down to a third of its opacity.
+                                    rain: _cardRain(weatherMode),
+                                  ),
+                              ],
                             ),
                           ),
-                          child: child,
+                        )
+                      else
+                        HomeSheetHeader(
+                          reveal: reveal,
+                          expanded: expanded,
+                          weatherMode: weatherMode,
+                          sky: sky,
                         ),
-                      ),
-                    )
-                  else
-                    HomeSheetHeader(
-                      reveal: reveal,
-                      expanded: expanded,
-                      weatherMode: weatherMode,
-                      sky: sky,
-                    ),
-                  const SizedBox(height: AppSpacing.lg),
-                  // Collapsed, or nothing to anchor a hero to: active events
-                  // only. Full-screen township: the hero above, then forecast
-                  // → events reached by scrolling past it. 全國: events only
-                  // (no point weather). A dry hour carries its one forecast
-                  // card in the hero itself, so nothing repeats below the fold.
-                  if (heroHeight != null && !dryTrend) ...[
-                    HomeForecastSection(
-                      key: ValueKey('forecast-$areaIndex'),
-                      reveal: reveal,
-                      sky: sky,
-                      weatherMode: weatherMode,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-                  if (located)
-                    HomeActiveEventsSection(
-                      key: ValueKey('active-$areaIndex'),
-                      reveal: reveal,
-                      expanded: expanded,
-                      sky: sky,
-                      weatherMode: weatherMode,
-                    ),
-                ],
+                      const SizedBox(height: AppSpacing.lg),
+                      // Collapsed, or nothing to anchor a hero to: active events
+                      // only. Full-screen township: the hero above, then forecast
+                      // → events reached by scrolling past it. 全國: events only
+                      // (no point weather). A dry hour carries its one forecast
+                      // card in the hero itself, so nothing repeats below the fold.
+                      if (heroHeight != null && !dryTrend) ...[
+                        HomeForecastSection(
+                          key: ValueKey('forecast-$areaIndex'),
+                          reveal: reveal,
+                          sky: sky,
+                          weatherMode: weatherMode,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      if (located)
+                        HomeActiveEventsSection(
+                          key: ValueKey('active-$areaIndex'),
+                          reveal: reveal,
+                          expanded: expanded,
+                          sky: sky,
+                          weatherMode: weatherMode,
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -385,13 +368,9 @@ class HomeContent extends StatelessWidget {
   static const double _bottomGapRampExtent = 32;
 
   /// Current size of the hero block's trailing reserve — [_restBottomGap]
-  /// plus [bottomSafeArea] — for [controller]'s live scroll offset.
-  static double _heroBottomGap(
-    ScrollController controller,
-    double bottomSafeArea,
-  ) {
+  /// plus [bottomSafeArea] — for the live scroll [offset].
+  static double _heroBottomGap(double offset, double bottomSafeArea) {
     final rest = _restBottomGap + bottomSafeArea;
-    final offset = controller.hasClients ? controller.offset : 0.0;
     final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
     return rest * (1 - t);
   }

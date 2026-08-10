@@ -150,13 +150,29 @@ class HomeSheet extends StatelessWidget {
                     opacity: weatherOpacity,
                     child: _ScrollBlurredWeather(
                       scrollController: scrollController,
-                      child: WeatherSkyBackground(
-                        mode: weatherMode,
-                        rainIntensity: rainIntensity,
-                        snowIntensity: snowIntensity,
-                        humidity: humidity ?? 0.65,
-                        timeMode: skyTimeMode,
-                        active: HomeChrome.weatherActive(e),
+                      // The sky freezes the instant the list scrolls: the
+                      // blur/dim it is about to be put under masks the hold,
+                      // and holding the last frame lets the blur layer below
+                      // cache instead of re-rendering the whole backdrop shader
+                      // on every scroll tick. The state's own clock and ticker
+                      // stop together (see `_syncRunning`), so when the list
+                      // returns to the top the animation resumes where it left
+                      // off — no jump.
+                      child: ListenableBuilder(
+                        listenable: scrollController,
+                        builder: (context, _) {
+                          final scrolled =
+                              scrollController.hasClients &&
+                              scrollController.offset > 0;
+                          return WeatherSkyBackground(
+                            mode: weatherMode,
+                            rainIntensity: rainIntensity,
+                            snowIntensity: snowIntensity,
+                            humidity: humidity ?? 0.65,
+                            timeMode: skyTimeMode,
+                            active: HomeChrome.weatherActive(e) && !scrolled,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -238,8 +254,15 @@ class _ScrollBlurredWeather extends StatelessWidget {
             ? scrollController.offset
             : 0.0;
         final t = (offset / _rampExtent).clamp(0.0, 1.0);
-        final sigma = _maxSigma * t;
-        final dim = _maxDim * t;
+        // Quantised so the full-screen blur re-renders only on a few level
+        // changes through the gesture, not on every scroll tick — with the
+        // sky frozen behind it (see HomeSheet's build), the blur layer is
+        // cached between steps and reused as long as the list keeps moving.
+        // The dim rides the same ladder; a 4-step ramp reads as the same
+        // smooth fade.
+        final step = (t * 4).round() / 4;
+        final sigma = _maxSigma * step;
+        final dim = _maxDim * step;
         // The tree's SHAPE never changes — a blur that toggles via `enabled`
         // and an always-present transparent dim. Returning the bare child at
         // rest (as an early version did) re-parents the sky's element the
@@ -256,7 +279,7 @@ class _ScrollBlurredWeather extends StatelessWidget {
               // No-op at rest, so no offscreen layer is composited — the sheet
               // spends most of its time here, and ImageFiltered.enabled skips
               // the filter without touching the tree shape.
-              enabled: t > 0,
+              enabled: step > 0,
               child: child,
             ),
             // Dim sits *above* the blur so the backdrop darkens uniformly; the

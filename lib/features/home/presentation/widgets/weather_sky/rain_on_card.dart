@@ -237,6 +237,11 @@ class _RainOnCardState extends State<RainOnCard>
     return frame.image;
   }
 
+  /// Set while a gate-resume check is queued, so scroll ticks (which rebuild
+  /// this card on every pixel) coalesce into one check rather than one
+  /// post-frame callback each.
+  bool _resumeScheduled = false;
+
   @override
   void didUpdateWidget(RainOnCard oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -252,6 +257,29 @@ class _RainOnCardState extends State<RainOnCard>
     // readback on every frame of a sheet-drag animation for no benefit.
     if (!(oldWidget.intensity > 0.001) && widget.intensity > 0.001) {
       _scheduleCapture();
+    }
+    // A scroll tick rebuilding this card may have reopened the position gate
+    // since the ticker was stopped (a closed gate cuts the water outright).
+    // If rain should be running but the ticker is idle, re-check the gate
+    // once this frame settles and restart if it is open.
+    if (widget.active &&
+        widget.intensity > 0.001 &&
+        !_ticker.isActive &&
+        !_resumeScheduled) {
+      _resumeScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _resumeScheduled = false;
+        _resumeIfGateOpen();
+      });
+    }
+  }
+
+  void _resumeIfGateOpen() {
+    if (!mounted) return;
+    _syncPositionGate();
+    if (_gateOpen && widget.active && widget.intensity > 0.001) {
+      _last = Duration.zero;
+      _ticker.start();
     }
   }
 
@@ -359,6 +387,20 @@ class _RainOnCardState extends State<RainOnCard>
     if (dt <= 0 || _size.width <= 0) return;
 
     _syncPositionGate();
+
+    // Gate closed means the card is leaving the top of the sheet — cut the
+    // water outright instead of letting it drain invisibly. The painter skips
+    // it anyway, and every frame of physics on a card that is about to slide
+    // under the toolbar (or already off past the fold) is wasted; the ticker
+    // stays stopped until a scroll tick rebuilds this card and reopens the
+    // gate (see [didUpdateWidget]).
+    if (!_gateOpen) {
+      _primary.clear();
+      _secondary.clear();
+      _frame.value++;
+      _ticker.stop();
+      return;
+    }
 
     // While silhouette mode is waiting on its first capture there is no
     // surface to catch a drop on, so hold emission off rather than fall back
@@ -479,7 +521,13 @@ class _RainOnCardState extends State<RainOnCard>
                 ? RainOnGlass(
                     intensity: widget.intensity,
                     opacity: widget.opacity,
-                    active: widget.active,
+                    // The position gate closes the card's refracting droplets
+                    // along with its splash — a card sliding up toward the
+                    // toolbar has nothing left to sensibly distort, and
+                    // running the shader filter every frame just to skip it
+                    // wastes the GPU. Restarting when the gate reopens is free:
+                    // the droplets resume from their own clock.
+                    active: widget.active && _gateOpen,
                     child: content,
                   )
                 : content,

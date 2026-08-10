@@ -12,6 +12,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
@@ -146,4 +147,38 @@ void main() {
       expect(content().topInset, greaterThan(0));
     },
   );
+
+  testWidgets('scrolling freezes and unfreezes the weather backdrop', (
+    tester,
+  ) async {
+    final extent = HomeSheetExtent();
+    await tester.pumpWidget(_wrap(await _store(), extent));
+    // Full-screen so the weather backdrop is live. `pump` (not
+    // `pumpAndSettle`): the live sky's own ticker never settles.
+    extent.value = HomeSheetExtent.max;
+    await tester.pump();
+    expect(_sky(tester).active, isTrue);
+
+    // Scrolling the content list freezes the backdrop — the blur about to
+    // cover it hides the hold, and the shader stops re-rendering every frame.
+    final scrollable = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byType(HomeContent),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    scrollable.position.jumpTo(120);
+    await tester.pump();
+    expect(_sky(tester).active, isFalse);
+
+    // Returning to the top resumes the animation where it left off.
+    scrollable.position.jumpTo(0);
+    await tester.pump();
+    expect(_sky(tester).active, isTrue);
+  });
 }
+
+WeatherSkyBackground _sky(WidgetTester tester) =>
+    tester.widget<WeatherSkyBackground>(find.byType(WeatherSkyBackground));
