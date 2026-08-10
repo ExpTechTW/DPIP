@@ -5,6 +5,7 @@ import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The radar echo (雷達回波) raster overlay.
@@ -42,8 +43,15 @@ class RadarMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
   String? get rasterBelowLayerId => null;
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      RadarOverlayMenu(layer: this);
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => RadarOverlayMenu(
+    layer: this,
+    showTownLabels: showTownLabels,
+    onShowTownLabelsChanged: onShowTownLabelsChanged,
+  );
 
   @override
   String get id => 'radar';

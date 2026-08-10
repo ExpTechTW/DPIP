@@ -1132,6 +1132,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Koordinat disalin';
 
   @override
+  String get mapOverlaySectionReference => 'Lapisan referensi';
+
+  @override
+  String get mapOverlaySectionMap => 'Peta';
+
+  @override
+  String get rainIntervalSection => 'Jendela waktu';
+
+  @override
+  String get mapTownLabels => 'Nama kecamatan';
+
+  @override
+  String get mapTownLabelsHint => 'Tampilkan nama kecamatan saat diperbesar';
+
+  @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
 
   @override

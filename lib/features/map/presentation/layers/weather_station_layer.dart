@@ -173,8 +173,11 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => const SizedBox.shrink();
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();

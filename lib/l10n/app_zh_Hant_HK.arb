@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "參考圖層",
+  "mapOverlaySectionMap": "地圖",
+  "rainIntervalSection": "統計時間",
+
+  "mapTownLabels": "鄉鎮名稱",
+  "mapTownLabelsHint": "放大時顯示鄉鎮名稱",
+
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "廁所類型",

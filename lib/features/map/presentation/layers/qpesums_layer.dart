@@ -4,6 +4,7 @@ import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The QPESUMS next-1-hour precipitation forecast (未來一小時降水預報) raster
@@ -57,9 +58,15 @@ class QpesumsMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
       AppLocalizations.of(context).mapTimelineForecast;
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) => ScanRangeOverlayMenu(
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => ScanRangeOverlayMenu(
     layer: this,
     tooltip: AppLocalizations.of(context).qpesumsOverlayMenuTooltip,
+    showTownLabels: showTownLabels,
+    onShowTownLabelsChanged: onShowTownLabelsChanged,
   );
 
   @override

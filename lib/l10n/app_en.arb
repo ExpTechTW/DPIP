@@ -1502,6 +1502,28 @@
     "description": "Snackbar confirming the coordinates were copied"
   },
 
+  "mapOverlaySectionReference": "Reference layers",
+  "@mapOverlaySectionReference": {
+    "description": "Section title in map overlay settings menus: the reference overlays"
+  },
+  "mapOverlaySectionMap": "Map",
+  "@mapOverlaySectionMap": {
+    "description": "Section title in map overlay settings menus: base-map settings"
+  },
+  "rainIntervalSection": "Time window",
+  "@rainIntervalSection": {
+    "description": "Section title in the rainfall menu: the accumulation-interval choices"
+  },
+
+  "mapTownLabels": "Township names",
+  "@mapTownLabels": {
+    "description": "Map setting: show township-name labels when the map is zoomed in"
+  },
+  "mapTownLabelsHint": "Show township names when zoomed in",
+  "@mapTownLabelsHint": {
+    "description": "Hint under the township-names setting"
+  },
+
   "dpmSheetEmpty": "Tap a marker on the map for details",
   "@dpmSheetEmpty": {
     "description": "Hint in the disaster-map detail sheet when nothing is selected"

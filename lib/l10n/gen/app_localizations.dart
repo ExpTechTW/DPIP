@@ -2163,6 +2163,36 @@ abstract class AppLocalizations {
   /// **'Coordinates copied'**
   String get mapAppCoordinatesCopied;
 
+  /// Section title in map overlay settings menus: the reference overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Reference layers'**
+  String get mapOverlaySectionReference;
+
+  /// Section title in map overlay settings menus: base-map settings
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get mapOverlaySectionMap;
+
+  /// Section title in the rainfall menu: the accumulation-interval choices
+  ///
+  /// In en, this message translates to:
+  /// **'Time window'**
+  String get rainIntervalSection;
+
+  /// Map setting: show township-name labels when the map is zoomed in
+  ///
+  /// In en, this message translates to:
+  /// **'Township names'**
+  String get mapTownLabels;
+
+  /// Hint under the township-names setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show township names when zoomed in'**
+  String get mapTownLabelsHint;
+
   /// Hint in the disaster-map detail sheet when nothing is selected
   ///
   /// In en, this message translates to:

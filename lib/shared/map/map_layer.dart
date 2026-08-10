@@ -1,4 +1,5 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -102,7 +103,17 @@ abstract interface class MapLayer {
   ///
   /// Use for layer-specific toggles (e.g. typhoon overlay menu). Default is
   /// empty — most layers only need the shared switcher.
-  Widget buildTopTrailingChrome(BuildContext context);
+  ///
+  /// [showTownLabels] / [onShowTownLabelsChanged] expose the base map's shared
+  /// township-label setting, so a layer's menu can carry it alongside its own
+  /// options (one affordance, not a second chip). Layers whose chrome is not a
+  /// settings menu may ignore them — [MapScaffold] shows a standalone
+  /// township-label menu for layers that return no chrome.
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  });
 
   /// Flutter widgets painted over the map (screen-space callouts, etc.).
   ///

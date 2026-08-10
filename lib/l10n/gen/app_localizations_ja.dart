@@ -1118,6 +1118,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapAppCoordinatesCopied => '座標をコピーしました';
 
   @override
+  String get mapOverlaySectionReference => '参照レイヤー';
+
+  @override
+  String get mapOverlaySectionMap => '地図';
+
+  @override
+  String get rainIntervalSection => '集計時間';
+
+  @override
+  String get mapTownLabels => '郷鎮名';
+
+  @override
+  String get mapTownLabelsHint => '拡大すると郷鎮名を表示';
+
+  @override
   String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
 
   @override

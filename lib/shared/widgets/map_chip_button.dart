@@ -20,12 +20,12 @@ class MapChipButton extends StatelessWidget {
     required this.onTap,
   });
 
-  /// Glyph shown on the chip (outlined variant by convention).
-  final IconData icon;
-
   /// Whether the menu's settings differ from the defaults: tints the icon
   /// primary and draws the marker dot.
   final bool active;
+
+  /// Glyph shown on the chip (outlined variant by convention).
+  final IconData icon;
 
   final String tooltip;
   final VoidCallback onTap;
@@ -99,6 +99,51 @@ class MapChipButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Scrollable container for an overlay menu's rows — a long menu (typhoon's
+/// storm/weather/extra groups) must not fall off the bottom of the screen. The
+/// menu anchors beside the top-right chip, so capping at half the surface
+/// height keeps the far end reachable while the short menus just shrink-wrap.
+class MapMenuScrollView extends StatelessWidget {
+  const MapMenuScrollView({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+      ),
+      child: SingleChildScrollView(
+        primary: false,
+        child: Column(mainAxisSize: MainAxisSize.min, children: children),
+      ),
+    );
+  }
+}
+
+/// Hairline divider between an overlay menu's sections — thin and tinted
+/// [ColorScheme.outlineVariant] so it separates groups without shouting.
+class MapMenuDivider extends StatelessWidget {
+  const MapMenuDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      child: Divider(
+        height: 1,
+        color: Theme.of(
+          context,
+        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
       ),
     );
   }

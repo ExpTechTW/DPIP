@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
+  "mapOverlaySectionMap": "แผนที่",
+  "rainIntervalSection": "ช่วงเวลา",
+
+  "mapTownLabels": "ชื่อตำบล",
+  "mapTownLabelsHint": "แสดงชื่อตำบลเมื่อขยายแผนที่",
+
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "dpmAddress": "ที่อยู่",
   "restroomTypeLabel": "ประเภท",

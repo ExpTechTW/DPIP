@@ -47,7 +47,11 @@ Widget _wrap(TyphoonMapLayer layer) => MaterialApp(
   home: Scaffold(
     body: Align(
       alignment: Alignment.topRight,
-      child: TyphoonOverlayMenu(layer: layer),
+      child: TyphoonOverlayMenu(
+        layer: layer,
+        showTownLabels: ValueNotifier<bool>(true),
+        onShowTownLabelsChanged: (_) {},
+      ),
     ),
   ),
 );

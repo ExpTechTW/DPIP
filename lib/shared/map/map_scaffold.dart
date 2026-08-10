@@ -17,6 +17,7 @@ import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
@@ -117,6 +118,11 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// only the compass rebuilds while the map rotates.
   final ValueNotifier<double> _bearing = ValueNotifier(0);
 
+  /// Whether the base map's township-name labels are shown. A base-map
+  /// property, not a layer's, so it lives here (shared by every layer's menu)
+  /// instead of on one chrome mixin. Defaults on, per the layer docs.
+  final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
+
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
   LatLngBounds? _target;
@@ -143,6 +149,7 @@ class _MapScaffoldState extends State<MapScaffold> {
   @override
   void dispose() {
     _bearing.dispose();
+    _showTownLabels.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
@@ -320,6 +327,27 @@ class _MapScaffoldState extends State<MapScaffold> {
     );
   }
 
+  void _setShowTownLabels(bool value) {
+    if (_showTownLabels.value == value) return;
+    _showTownLabels.value = value;
+    _applyTownLabelVisibility();
+  }
+
+  /// Pushes the township-label setting onto a live map. The base style's
+  /// `town-label` layer survives style reloads, which reset it to visible, so
+  /// this also runs after every [_onStyleLoaded] to re-assert the choice.
+  void _applyTownLabelVisibility() {
+    final controller = _controller;
+    if (controller == null) return;
+    unawaited(
+      controller
+          .setLayerVisibility(townLabelLayerId, _showTownLabels.value)
+          .catchError((Object e, StackTrace st) {
+            Log.handle(e, st, 'Failed to sync the township labels');
+          }),
+    );
+  }
+
   Future<void> _warmBasemap(MapLibreMapController controller) async {
     final warmer = _basemapWarmer;
     if (warmer == null) return;
@@ -373,6 +401,8 @@ class _MapScaffoldState extends State<MapScaffold> {
     unawaited(_applyStationHandoff());
     // Home/nav camera handoff that arrived before the style was ready.
     unawaited(_applyCameraHandoff());
+    // A reload resets the base style's township-label layer to visible.
+    _applyTownLabelVisibility();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -619,14 +649,27 @@ class _MapScaffoldState extends State<MapScaffold> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Builder(
                 builder: (context) {
-                  // Non-typhoon layers return [SizedBox.shrink] — skip the gap.
-                  final chrome = _active.buildTopTrailingChrome(context);
+                  // Layers with a settings menu (radar / QPESUMS / DPM / typhoon
+                  // / rain) receive the shared township-label toggle to carry;
+                  // the rest return [SizedBox.shrink], so show the standalone
+                  // township-label menu instead — every layer can set it.
+                  final chrome = _active.buildTopTrailingChrome(
+                    context,
+                    showTownLabels: _showTownLabels,
+                    onShowTownLabelsChanged: _setShowTownLabels,
+                  );
                   final hasChrome = chrome is! SizedBox;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (hasChrome) ...[
                         chrome,
+                        const SizedBox(width: AppSpacing.sm),
+                      ] else ...[
+                        MapTownLabelsMenu(
+                          showTownLabels: _showTownLabels,
+                          onShowTownLabelsChanged: _setShowTownLabels,
+                        ),
                         const SizedBox(width: AppSpacing.sm),
                       ],
                       MapLayerSwitcher(

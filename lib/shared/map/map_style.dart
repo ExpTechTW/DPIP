@@ -15,6 +15,8 @@ final class MapPalette {
     required this.fill,
     required this.outline,
     required this.townOutline,
+    required this.label,
+    required this.labelHalo,
   });
 
   /// Sea / canvas behind the land fills.
@@ -28,6 +30,12 @@ final class MapPalette {
 
   /// Township borders — quieter than [outline], close to [fill].
   final String townOutline;
+
+  /// Township name text. Contrast against [fill]'s side of the map.
+  final String label;
+
+  /// Township name halo — the outline that lifts [label] off the fill.
+  final String labelHalo;
 }
 
 /// Sole registry of base-map paint colours (light + dark).
@@ -38,6 +46,8 @@ abstract final class MapColors {
     fill: '#3F4045',
     outline: '#a9b4bc',
     townOutline: '#6A6B72',
+    label: '#FFFFFF',
+    labelHalo: '#000000',
   );
 
   /// Light-mode cartography — pale sea, mid-grey land.
@@ -46,6 +56,8 @@ abstract final class MapColors {
     fill: '#ADADAD',
     outline: '#6B6B6B',
     townOutline: '#9A9A9A',
+    label: '#141414',
+    labelHalo: '#FFFFFF',
   );
 
   /// Palette for the given UI [brightness].
@@ -64,6 +76,18 @@ const String outlineLayerId = 'county-outline';
 
 /// Id of the faint township-outline layer (below the county borders).
 const String townOutlineLayerId = 'town-outline';
+
+/// Id of the township-name label layer. Invisible until [townLabelMinZoom]
+/// when the 368-town mesh is dense enough that names can place without a pile-up.
+const String townLabelLayerId = 'town-label';
+
+/// Township labels start placing at this zoom; [townLabelFadeZoom] finishes the
+/// fade-in. Below it the layer is not placed at all (a layer of near-invisible
+/// symbols would still fight for placement space).
+const double townLabelMinZoom = 8.5;
+
+/// Zoom at which township labels reach full opacity (see [townLabelMinZoom]).
+const double townLabelFadeZoom = 9.5;
 
 /// Baked DPM source / layer ids — must match [DisasterMapLayer].
 const String dpmAedSourceId = 'dpm-aed-src';
@@ -86,9 +110,11 @@ const String glyphsOriginUrl =
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
 ///
 /// Pass [MapColors.of] for the active brightness — never ad-hoc hexes. The base
-/// draws no labels itself, but declares a `glyphs` endpoint (the ExpTech
-/// map-assets CDN) so overlay layers can render `text-field` symbols. Overlays
-/// (radar) anchor below [outlineLayerId] so the county borders stay legible.
+/// declares a `glyphs` endpoint (the ExpTech map-assets CDN) so overlay layers
+/// can render `text-field` symbols, and draws township names itself once the
+/// map is zoomed in past [townLabelMinZoom] (the [TOWN] property of the `town`
+/// source-layer). Overlays (radar) anchor below [outlineLayerId] so the county
+/// borders stay legible.
 ///
 /// [basemapTileUrl] / [glyphsUrl] are origin HTTPS templates fetched by
 /// MapLibre and served from the app's tile store through the Dart bridge.
@@ -101,6 +127,8 @@ String exptechVectorStyle(
   final fill = palette.fill;
   final outline = palette.outline;
   final townOutline = palette.townOutline;
+  final label = palette.label;
+  final labelHalo = palette.labelHalo;
   return '''
 {
   "version": 8,
@@ -114,7 +142,20 @@ String exptechVectorStyle(
     { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$fill" } },
     { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } },
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },
-    { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } }
+    { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } },
+    { "id": "$townLabelLayerId", "type": "symbol", "source": "exptech", "source-layer": "town", "minzoom": $townLabelMinZoom, "layout": {
+      "text-field": ["get", "TOWN"],
+      "text-font": ["Noto Sans TC Regular"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], $townLabelMinZoom, 10, 12, 12.5],
+      "text-allow-overlap": false,
+      "text-ignore-placement": false,
+      "text-padding": 2
+    }, "paint": {
+      "text-color": "$label",
+      "text-halo-color": "$labelHalo",
+      "text-halo-width": 1.2,
+      "text-opacity": ["interpolate", ["linear"], ["zoom"], $townLabelMinZoom, 0, $townLabelFadeZoom, 1]
+    } }
   ]
 }''';
 }

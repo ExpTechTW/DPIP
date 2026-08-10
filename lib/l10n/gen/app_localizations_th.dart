@@ -1127,6 +1127,21 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'คัดลอกพิกัดแล้ว';
 
   @override
+  String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';
+
+  @override
+  String get mapOverlaySectionMap => 'แผนที่';
+
+  @override
+  String get rainIntervalSection => 'ช่วงเวลา';
+
+  @override
+  String get mapTownLabels => 'ชื่อตำบล';
+
+  @override
+  String get mapTownLabelsHint => 'แสดงชื่อตำบลเมื่อขยายแผนที่';
+
+  @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
 
   @override

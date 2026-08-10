@@ -3,6 +3,7 @@ import 'package:dpip/features/map/presentation/widgets/radar_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,7 +17,11 @@ class _FakeRadarRepository extends FakeRasterFrameSource
   String tileUrl(String frame) => 'https://host/$frame/{z}/{x}/{y}.webp';
 }
 
-Widget _wrap(RadarMapLayer layer) => MaterialApp(
+Widget _wrap(
+  RadarMapLayer layer, {
+  ValueListenable<bool>? showTownLabels,
+  ValueChanged<bool>? onShowTownLabelsChanged,
+}) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
@@ -24,7 +29,11 @@ Widget _wrap(RadarMapLayer layer) => MaterialApp(
   home: Scaffold(
     body: Align(
       alignment: Alignment.topRight,
-      child: RadarOverlayMenu(layer: layer),
+      child: RadarOverlayMenu(
+        layer: layer,
+        showTownLabels: showTownLabels ?? ValueNotifier<bool>(true),
+        onShowTownLabelsChanged: onShowTownLabelsChanged ?? (_) {},
+      ),
     ),
   ),
 );
@@ -43,7 +52,7 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
-  testWidgets('the chip opens a menu carrying all three overlay toggles', (
+  testWidgets('the chip opens a menu carrying all four overlay toggles', (
     tester,
   ) async {
     _useTallSurface(tester);
@@ -60,8 +69,13 @@ void main() {
     expect(find.text(l10n.radarScanRange), findsOneWidget);
     expect(find.text(l10n.radarCountyOutline), findsOneWidget);
     expect(find.text(l10n.radarTownOutline), findsOneWidget);
-    // All three ship on, so every box starts ticked.
-    expect(find.byIcon(Icons.check_box), findsNWidgets(3));
+    expect(find.text(l10n.mapTownLabels), findsOneWidget);
+    // The menu is sectioned like the typhoon one: the raster's reference
+    // chrome first, then the base-map settings.
+    expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
+    expect(find.text(l10n.mapOverlaySectionMap), findsOneWidget);
+    // All four ship on, so every box starts ticked.
+    expect(find.byIcon(Icons.check_box), findsNWidgets(4));
     expect(find.byIcon(Icons.check_box_outline_blank), findsNothing);
   });
 
@@ -111,6 +125,32 @@ void main() {
 
     expect(layer.showTownOutline.value, isFalse);
     expect(layer.showCountyOutline.value, isTrue);
+  });
+
+  testWidgets('tapping the township-label row reports the flip upward', (
+    tester,
+  ) async {
+    _useTallSurface(tester);
+    final layer = RadarMapLayer(_FakeRadarRepository());
+    final labels = ValueNotifier<bool>(true);
+    final flipped = <bool>[];
+    await tester.pumpWidget(
+      _wrap(
+        layer,
+        showTownLabels: labels,
+        onShowTownLabelsChanged: flipped.add,
+      ),
+    );
+
+    final l10n = await _l10n();
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.mapTownLabels));
+    await tester.pumpAndSettle();
+
+    // The toggle lives on the scaffold, not the layer — the row hands the
+    // new value back up instead of flipping layer state.
+    expect(flipped, [false]);
   });
 
   testWidgets('the chip marks itself active once a default is switched off', (

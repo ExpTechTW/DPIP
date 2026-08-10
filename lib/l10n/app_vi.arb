@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "Lớp tham chiếu",
+  "mapOverlaySectionMap": "Bản đồ",
+  "rainIntervalSection": "Khoảng thời gian",
+
+  "mapTownLabels": "Tên hương trấn",
+  "mapTownLabelsHint": "Hiển thị tên hương trấn khi phóng to",
+
   "dpmSheetEmpty": "Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết",
   "dpmAddress": "Địa chỉ",
   "restroomTypeLabel": "Loại",

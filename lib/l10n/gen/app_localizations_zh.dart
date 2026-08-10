@@ -1112,6 +1112,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapAppCoordinatesCopied => '已複製座標';
 
   @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -2591,6 +2606,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapAppCoordinatesCopied => '已复制坐标';
+
+  @override
+  String get mapOverlaySectionReference => '参考图层';
+
+  @override
+  String get mapOverlaySectionMap => '地图';
+
+  @override
+  String get rainIntervalSection => '统计时间';
+
+  @override
+  String get mapTownLabels => '乡镇名称';
+
+  @override
+  String get mapTownLabelsHint => '放大时显示乡镇名称';
 
   @override
   String get dpmSheetEmpty => '点击地图上的标记查看详情';
@@ -4074,6 +4104,21 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapAppCoordinatesCopied => '已複製座標';
 
   @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -5553,6 +5598,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';

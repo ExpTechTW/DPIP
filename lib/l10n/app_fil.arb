@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "Layer ng sanggunian",
+  "mapOverlaySectionMap": "Mapa",
+  "rainIntervalSection": "Window ng oras",
+
+  "mapTownLabels": "Mga pangalan ng bayan",
+  "mapTownLabelsHint": "Ipakita ang mga pangalan ng bayan kapag naka-zoom",
+
   "dpmSheetEmpty": "I-tap ang marker sa mapa para sa detalye",
   "dpmAddress": "Address",
   "restroomTypeLabel": "Uri",

@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "Lapisan referensi",
+  "mapOverlaySectionMap": "Peta",
+  "rainIntervalSection": "Jendela waktu",
+
+  "mapTownLabels": "Nama kecamatan",
+  "mapTownLabelsHint": "Tampilkan nama kecamatan saat diperbesar",
+
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "dpmAddress": "Alamat",
   "restroomTypeLabel": "Jenis",

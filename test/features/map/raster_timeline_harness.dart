@@ -169,6 +169,16 @@ class RecordingMapController implements MapLibreMapController {
   }
 
   @override
+  Future<void> setLayerVisibility(String layerId, bool visible) async {
+    calls.add('setLayerVisibility:$layerId:$visible');
+    final previous = _state[layerId];
+    _state[layerId] = (
+      visibility: visible ? 'visible' : 'none',
+      opacity: previous?.opacity,
+    );
+  }
+
+  @override
   Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
     southwest: const LatLng(22, 120),
     northeast: const LatLng(25, 122),

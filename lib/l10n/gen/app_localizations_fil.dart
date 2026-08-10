@@ -1136,6 +1136,22 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Na-kopya ang coordinates';
 
   @override
+  String get mapOverlaySectionReference => 'Layer ng sanggunian';
+
+  @override
+  String get mapOverlaySectionMap => 'Mapa';
+
+  @override
+  String get rainIntervalSection => 'Window ng oras';
+
+  @override
+  String get mapTownLabels => 'Mga pangalan ng bayan';
+
+  @override
+  String get mapTownLabelsHint =>
+      'Ipakita ang mga pangalan ng bayan kapag naka-zoom';
+
+  @override
   String get dpmSheetEmpty => 'I-tap ang marker sa mapa para sa detalye';
 
   @override

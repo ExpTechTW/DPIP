@@ -6,7 +6,6 @@
 library;
 
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/error/result.dart';
@@ -18,6 +17,7 @@ import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -85,8 +85,11 @@ class LightningMapLayer implements MapLayer {
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => const SizedBox.shrink();
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();

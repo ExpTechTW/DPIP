@@ -1129,6 +1129,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Đã sao chép tọa độ';
 
   @override
+  String get mapOverlaySectionReference => 'Lớp tham chiếu';
+
+  @override
+  String get mapOverlaySectionMap => 'Bản đồ';
+
+  @override
+  String get rainIntervalSection => 'Khoảng thời gian';
+
+  @override
+  String get mapTownLabels => 'Tên hương trấn';
+
+  @override
+  String get mapTownLabelsHint => 'Hiển thị tên hương trấn khi phóng to';
+
+  @override
   String get dpmSheetEmpty =>
       'Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết';
 

@@ -11,6 +11,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -144,8 +145,11 @@ abstract class RasterTimelineLayer implements MapLayer {
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => const SizedBox.shrink();
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();

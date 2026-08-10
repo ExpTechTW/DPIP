@@ -16,7 +16,10 @@ import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -214,11 +217,15 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   }
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) {
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return ListenableBuilder(
-      listenable: interval,
+      listenable: Listenable.merge([interval, showTownLabels]),
       builder: (context, _) {
         final current = interval.value;
         return MenuAnchor(
@@ -239,14 +246,25 @@ class RainMapLayer implements MapLayer, StationSheetSource {
             );
           },
           menuChildren: [
-            for (final option in RainInterval.values)
-              MenuItemButton(
-                onPressed: () => setInterval(option),
-                trailingIcon: option == current
-                    ? Icon(Icons.check, size: 18, color: colors.primary)
-                    : null,
-                child: Text(option.label(l10n)),
-              ),
+            MapMenuScrollView(
+              children: [
+                SectionHeader(l10n.rainIntervalSection),
+                for (final option in RainInterval.values)
+                  MenuItemButton(
+                    onPressed: () => setInterval(option),
+                    trailingIcon: option == current
+                        ? Icon(Icons.check, size: 18, color: colors.primary)
+                        : null,
+                    child: Text(option.label(l10n)),
+                  ),
+                const MapMenuDivider(),
+                SectionHeader(l10n.mapOverlaySectionMap),
+                MapTownLabelsRow(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+              ],
+            ),
           ],
         );
       },

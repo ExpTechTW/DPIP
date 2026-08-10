@@ -337,6 +337,13 @@
   "@mapAppCoordinatesCopied": {
   },
 
+  "mapOverlaySectionReference": "参考图层",
+  "mapOverlaySectionMap": "地图",
+  "rainIntervalSection": "统计时间",
+
+  "mapTownLabels": "乡镇名称",
+  "mapTownLabelsHint": "放大时显示乡镇名称",
+
   "dpmSheetEmpty": "点击地图上的标记查看详情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "厕所类型",

@@ -1118,6 +1118,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapAppCoordinatesCopied => '좌표가 복사되었습니다';
 
   @override
+  String get mapOverlaySectionReference => '참조 레이어';
+
+  @override
+  String get mapOverlaySectionMap => '지도';
+
+  @override
+  String get rainIntervalSection => '집계 시간';
+
+  @override
+  String get mapTownLabels => '읍면동 이름';
+
+  @override
+  String get mapTownLabelsHint => '확대하면 읍면동 이름 표시';
+
+  @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
 
   @override

@@ -1129,6 +1129,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Coordinates copied';
 
   @override
+  String get mapOverlaySectionReference => 'Reference layers';
+
+  @override
+  String get mapOverlaySectionMap => 'Map';
+
+  @override
+  String get rainIntervalSection => 'Time window';
+
+  @override
+  String get mapTownLabels => 'Township names';
+
+  @override
+  String get mapTownLabelsHint => 'Show township names when zoomed in';
+
+  @override
   String get dpmSheetEmpty => 'Tap a marker on the map for details';
 
   @override
