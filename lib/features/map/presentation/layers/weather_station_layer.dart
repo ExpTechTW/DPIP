@@ -277,6 +277,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  Widget? readingIcon(String id) => null;
+
+  @override
   double? get chartMinY => null;
 
   @override

@@ -348,6 +348,9 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   }
 
   @override
+  Widget? readingIcon(String id) => null;
+
+  @override
   Future<Result<TrendSeries>> trend(String id, String range) async {
     final result = await _repository.trend(id, range: range);
     return result.map((t) => TrendSeries(times: t.times, values: t.rain));
