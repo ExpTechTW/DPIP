@@ -10,11 +10,14 @@ import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/presentation/report_list_controller.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_filter_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -334,12 +337,15 @@ class _ReportTile extends StatelessWidget {
     final mag = report.magnitude.toStringAsFixed(1);
 
     return InkWell(
-      onTap: null, // Detail route lands next.
+      onTap: () => context.pushNamed(
+        AppRoutes.earthquakeReport,
+        pathParameters: {'id': report.id},
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
-            _IntensityBadge(label: intensity.label, color: intensityColor),
+            IntensityBadge(label: intensity.label, color: intensityColor),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -377,39 +383,6 @@ class _ReportTile extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IntensityBadge extends StatelessWidget {
-  const _IntensityBadge({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final onBadge =
-        ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-        ? Colors.white
-        : Colors.black87;
-    return DecoratedBox(
-      decoration: BoxDecoration(color: color, borderRadius: AppRadius.small),
-      child: SizedBox(
-        width: 48,
-        height: 48,
-        child: Center(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: onBadge,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
         ),
       ),
     );

@@ -7,13 +7,17 @@ import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
+import 'package:dpip/features/earthquake/data/rts_box_grid_source.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/trem_station_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
+import 'package:dpip/features/earthquake/data/seismic_travel_time_source.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
+import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
@@ -56,6 +60,14 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   deps.realtimeService.register(rtsChannel);
   final rtsController = RtsRealtimeController(rtsChannel);
 
+  // Bundled CWA P/S travel-time table (asset load, not network) — loaded once
+  // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
+  // `core_providers.dart`) so a consumer just awaits it, no repeated I/O.
+  final travelTimeTable = const SeismicTravelTimeSource().load();
+
+  // Bundled RTS box grid (asset load, not network) — same `Future` pattern.
+  final boxGrid = const RtsBoxGridSource().load();
+
   return [
     Provider<EewRepository>.value(value: repository),
     Provider<ReportRepository>.value(value: reports),
@@ -66,6 +78,8 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     // ChangeNotifierProvider (not Provider) because RealtimeNotifier is a
     // Listenable — a plain Provider throws the invalid-value-type check.
     ChangeNotifierProvider<RealtimeNotifier<Rts>>.value(value: rtsController),
+    Provider<Future<SeismicTravelTimeTable>>.value(value: travelTimeTable),
+    Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
     Provider<TremStationRepository>.value(
       value: TremStationRepositoryImpl(deps.apiClient),
     ),

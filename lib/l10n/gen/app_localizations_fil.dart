@@ -243,6 +243,61 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportListSearch => 'Maghanap';
 
   @override
+  String get reportDetailTitle => 'Ulat ng Lindol';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'Blg. $number Makabuluhang Naramdamang Lindol';
+  }
+
+  @override
+  String get reportDetailLocalFelt => 'Lokal na Naramdamang Lindol';
+
+  @override
+  String get reportDetailInfo => 'Mga Detalye';
+
+  @override
+  String get reportDetailOriginTime => 'Oras ng pangyayari';
+
+  @override
+  String get reportDetailEpicenter => 'Coordinates ng Epicenter';
+
+  @override
+  String get reportDetailMagnitude => 'Magnitude';
+
+  @override
+  String get reportDetailDepth => 'Lalim ng Hypocenter';
+
+  @override
+  String get reportDetailAreaIntensity => 'Intensity ayon sa lugar';
+
+  @override
+  String get reportDetailLocalIntensity => 'Intensity sa iyong lokasyon';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable =>
+      'Walang datos ng intensity';
+
+  @override
+  String get reportDetailSortByIntensity => 'Ayusin ayon sa intensity';
+
+  @override
+  String get reportDetailSortByCounty => 'Ayusin ayon sa lalawigan';
+
+  @override
+  String get reportDetailImage => 'Larawan ng Ulat';
+
+  @override
+  String get reportDetailImageUnavailable =>
+      'Wala pang available na larawan ng ulat';
+
+  @override
+  String get reportDetailOpenReport => 'Pahina ng Ulat';
+
+  @override
+  String get reportDetailReplay => 'I-replay';
+
+  @override
   String get navMore => 'Higit Pa';
 
   @override
@@ -814,6 +869,11 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get trendNoData => 'Walang trend data';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Kabuuang $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

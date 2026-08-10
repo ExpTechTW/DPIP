@@ -241,6 +241,60 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportListSearch => 'Tìm';
 
   @override
+  String get reportDetailTitle => 'Báo cáo động đất';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'Động đất có cảm nhận đáng kể số $number';
+  }
+
+  @override
+  String get reportDetailLocalFelt => 'Động đất cảm nhận cục bộ';
+
+  @override
+  String get reportDetailInfo => 'Chi tiết';
+
+  @override
+  String get reportDetailOriginTime => 'Thời gian xảy ra';
+
+  @override
+  String get reportDetailEpicenter => 'Tọa độ tâm chấn';
+
+  @override
+  String get reportDetailMagnitude => 'Độ lớn';
+
+  @override
+  String get reportDetailDepth => 'Độ sâu chấn tiêu';
+
+  @override
+  String get reportDetailAreaIntensity => 'Cường độ theo khu vực';
+
+  @override
+  String get reportDetailLocalIntensity => 'Cường độ tại vị trí của bạn';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable =>
+      'Không có dữ liệu cường độ';
+
+  @override
+  String get reportDetailSortByIntensity => 'Sắp xếp theo cường độ';
+
+  @override
+  String get reportDetailSortByCounty => 'Sắp xếp theo khu vực';
+
+  @override
+  String get reportDetailImage => 'Hình ảnh báo cáo';
+
+  @override
+  String get reportDetailImageUnavailable => 'Hình ảnh báo cáo chưa có sẵn';
+
+  @override
+  String get reportDetailOpenReport => 'Trang báo cáo';
+
+  @override
+  String get reportDetailReplay => 'Phát lại';
+
+  @override
   String get navMore => 'Thêm';
 
   @override
@@ -810,6 +864,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get trendNoData => 'Không có dữ liệu xu hướng';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return 'Tổng cộng $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

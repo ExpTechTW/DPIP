@@ -826,7 +826,8 @@ class _TrendChart extends StatelessWidget {
   final double? fixedMinY;
   final double? fixedMaxY;
 
-  /// Rainfall uses bars; everything else uses a line.
+  /// Rainfall uses bars (with a cumulative line overlaid); everything else
+  /// uses a line.
   final bool bars;
 
   @override
@@ -953,8 +954,9 @@ class _TrendChart extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           interval: yInterval,
-          // Wide enough for "1007.5" without soft-wrapping mid-number.
-          reservedSize: 44,
+          // Wide enough for "1007.5" without soft-wrapping mid-number. Shared
+          // with the cumulative line so both charts reserve the same gutter.
+          reservedSize: _chartYAxisReserved,
           getTitlesWidget: (value, meta) {
             if (value <= minY || value >= maxY) {
               return const SizedBox.shrink();
@@ -1039,7 +1041,9 @@ class _TrendChart extends StatelessWidget {
     );
 
     if (bars) {
-      // Index-domain bars — dense 10-min rain series stays readable as thin rods.
+      // Slot-based thin rods (bar width is a pixel width — the dense 10-min
+      // rain series stays readable as thin rods), but on a linear time x-axis
+      // so the 累計 line overlaid above lands on the same seconds.
       final barWidth = spots.length > 100
           ? 1.5
           : spots.length > 48
@@ -1050,7 +1054,7 @@ class _TrendChart extends StatelessWidget {
       final groups = [
         for (var i = 0; i < spots.length; i++)
           BarChartGroupData(
-            x: i,
+            x: spots[i].x.toInt(),
             barRods: [
               BarChartRodData(
                 toY: spots[i].y,
@@ -1063,61 +1067,228 @@ class _TrendChart extends StatelessWidget {
             ],
           ),
       ];
-      return BarChart(
-        BarChartData(
-          minY: minY,
-          maxY: maxY,
-          alignment: BarChartAlignment.spaceBetween,
-          groupsSpace: 0,
-          barGroups: groups,
-          gridData: FlGridData(
-            drawVerticalLine: false,
-            horizontalInterval: yInterval,
-            getDrawingHorizontalLine: (_) => FlLine(
-              color: colors.outlineVariant.withValues(alpha: 0.4),
-              strokeWidth: 1,
+      // Running total (mm) at each bar — the overlaid 累計 curve, and the extra
+      // line in the bar tooltip. Gaps (skipped null samples) advance it by 0.
+      final cumulative = <double>[];
+      var runningTotal = 0.0;
+      for (final spot in spots) {
+        runningTotal += spot.y;
+        cumulative.add(runningTotal);
+      }
+      final cumulativeColor = colors.tertiary;
+      final cumulativeMax = cumulative.isEmpty ? 0.0 : cumulative.last;
+
+      // The 累計 legend sits above the plot — the curve's endpoint would
+      // otherwise need a touch to read. The plot is the bars plus the line.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: Row(
+              children: [
+                Container(
+                  width: 18,
+                  height: 2.5,
+                  decoration: BoxDecoration(
+                    color: cumulativeColor,
+                    borderRadius: BorderRadius.circular(1.5),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  l10n.trendCumulativeTotal(cumulativeMax.toStringAsFixed(1)),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: cumulativeColor,
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
             ),
           ),
-          borderData: FlBorderData(show: false),
-          titlesData: titles(
-            titleMinX: minX,
-            titleMaxX: maxX,
-            bottomInterval: 1,
-            labelX: (value) {
-              final i = value.round();
-              if (i < 0 || i >= spots.length) return null;
-              return spots[i].x;
-            },
-          ),
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => colors.surfaceContainerHigh,
-              tooltipBorderRadius: AppRadius.small,
-              tooltipPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              tooltipMargin: AppSpacing.sm,
-              maxContentWidth: 168,
-              fitInsideHorizontally: true,
-              fitInsideVertically: true,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final i = group.x;
-                final x = (i >= 0 && i < spots.length) ? spots[i].x : 0.0;
-                return BarTooltipItem(
-                  '${rod.toY.toStringAsFixed(1)} $unit',
-                  theme.textTheme.titleSmall!.copyWith(
-                    color: lineColor,
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                  ),
-                  textAlign: TextAlign.start,
+          Expanded(
+            // BarChart has no linear x-axis — `BarChartData.minX/maxX` are
+            // hardcoded to 0/1 and bars are laid out on pixel slots, so the
+            // cumulative line must reproduce those slots (not sample time) to
+            // sit on each bar. The canvas width drops the title reservations,
+            // matching fl_chart's own `calculateGroupsX`.
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // BarChart's canvas drops the left Y-axis reservation
+                // (44 px — fl_chart's totalReservedSize; hidden sides reserve
+                // nothing because showSideTitles needs showTitles), so the
+                // cumulative line measures the same canvas width.
+                final plotWidth = constraints.maxWidth - _chartYAxisReserved;
+                return Stack(
                   children: [
-                    TextSpan(
-                      text: '\n${timeLabel(x)}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        height: 1.4,
+                    BarChart(
+                      BarChartData(
+                        minY: minY,
+                        maxY: maxY,
+                        alignment: BarChartAlignment.spaceBetween,
+                        groupsSpace: 0,
+                        barGroups: groups,
+                        gridData: FlGridData(
+                          drawVerticalLine: false,
+                          horizontalInterval: yInterval,
+                          getDrawingHorizontalLine: (_) => FlLine(
+                            color: colors.outlineVariant.withValues(alpha: 0.4),
+                            strokeWidth: 1,
+                          ),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        titlesData: titles(
+                          titleMinX: minX,
+                          titleMaxX: maxX,
+                          bottomInterval: labelStep,
+                          labelX: (value) => value,
+                        ),
+                        barTouchData: BarTouchData(
+                          touchTooltipData: BarTouchTooltipData(
+                            getTooltipColor: (_) => colors.surfaceContainerHigh,
+                            tooltipBorderRadius: AppRadius.small,
+                            tooltipPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            tooltipMargin: AppSpacing.sm,
+                            maxContentWidth: 168,
+                            fitInsideHorizontally: true,
+                            fitInsideVertically: true,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              final x =
+                                  (groupIndex >= 0 && groupIndex < spots.length)
+                                  ? spots[groupIndex].x
+                                  : 0.0;
+                              return BarTooltipItem(
+                                '${rod.toY.toStringAsFixed(1)} $unit',
+                                theme.textTheme.titleSmall!.copyWith(
+                                  color: lineColor,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                ),
+                                textAlign: TextAlign.start,
+                                children: [
+                                  if (groupIndex >= 0 &&
+                                      groupIndex < cumulative.length)
+                                    TextSpan(
+                                      text:
+                                          '\n${l10n.trendCumulativeTotal(cumulative[groupIndex].toStringAsFixed(1))}',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: cumulativeColor,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                  TextSpan(
+                                    text: '\n${timeLabel(x)}',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      duration: Duration.zero,
+                    ),
+                    // The 累計 line: same axis domain and widget size as the bars, so its
+                    // linear pixel mapping lands on the bar slots. Its own scale runs
+                    // 0 → total across the plot height (the running total is unrelated to
+                    // per-interval mm, so the line isn't comparable bar-by-bar). Touch is
+                    // disabled — the bar tooltip already reports the cumulative.
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: LineChart(
+                          LineChartData(
+                            // Same pixel domain as the bar chart's canvas: x is a
+                            // bar-slot centre, so the line lands on the bars.
+                            minX: 0,
+                            maxX: plotWidth,
+                            minY: 0,
+                            maxY: cumulativeMax <= 0 ? 1 : cumulativeMax,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: [
+                                  for (var i = 0; i < spots.length; i++)
+                                    FlSpot(
+                                      barSlotCenterX(
+                                        i,
+                                        spots.length,
+                                        barWidth,
+                                        plotWidth,
+                                      ),
+                                      cumulative[i],
+                                    ),
+                                ],
+                                isCurved: true,
+                                preventCurveOverShooting: true,
+                                color: cumulativeColor,
+                                barWidth: 2,
+                                isStrokeCapRound: true,
+                                isStrokeJoinRound: true,
+                                dotData: FlDotData(
+                                  checkToShowDot: (spot, bar) =>
+                                      spot == bar.spots.last,
+                                  getDotPainter: (spot, percent, bar, index) =>
+                                      FlDotCirclePainter(
+                                        radius: 3.5,
+                                        color: cumulativeColor,
+                                        strokeColor: colors.surface,
+                                        strokeWidth: 1.5,
+                                      ),
+                                ),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      cumulativeColor.withValues(alpha: 0.14),
+                                      cumulativeColor.withValues(alpha: 0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                            gridData: const FlGridData(show: false),
+                            borderData: FlBorderData(show: false),
+                            // Reserve the same title space as the bar chart so both
+                            // canvases — and every bar slot — line up. Ticks are
+                            // blank: the bar chart owns the axes.
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: _chartYAxisReserved,
+                                  getTitlesWidget: (_, _) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: bottomReserved,
+                                  getTitlesWidget: (_, _) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                              topTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                            ),
+                            lineTouchData: const LineTouchData(enabled: false),
+                          ),
+                          duration: Duration.zero,
+                        ),
                       ),
                     ),
                   ],
@@ -1125,8 +1296,7 @@ class _TrendChart extends StatelessWidget {
               },
             ),
           ),
-        ),
-        duration: Duration.zero,
+        ],
       );
     }
 
@@ -1352,4 +1522,25 @@ String _axisLabel(double value, double step) {
   if (step >= 1) return value.toStringAsFixed(0);
   final label = value.toStringAsFixed(1);
   return label.endsWith('.0') ? label.substring(0, label.length - 2) : label;
+}
+
+/// fl_chart reserves a shown side's `reservedSize` as canvas margin
+/// (`AxisTitles.totalReservedSize` — `showSideTitles` needs `showTitles`, and
+/// `showAxisTitles` needs an `axisNameWidget`, neither of which we use). The
+/// rain bar chart shows the Y-axis ([_chartYAxisReserved]) and the bottom
+/// clock; hidden sides reserve nothing. The cumulative line overlaid on the
+/// bars must reserve the same so the two canvases — and therefore every bar
+/// slot — line up pixel-for-pixel.
+const double _chartYAxisReserved = 44;
+
+/// fl_chart's `BarChartAlignment.spaceBetween` bar-slot centre, relative to the
+/// bar chart's canvas width [plotWidth] (full width minus title reservations).
+/// BarChart positions bars by pixel slots, not by their x value, so the
+/// cumulative line reproduces the same slots instead of using sample time —
+/// with a gap in the samples (a null hour) time and slots would diverge.
+/// Public so a test can pin it to fl_chart's own `calculateGroupsX`.
+double barSlotCenterX(int index, int count, double barWidth, double plotWidth) {
+  if (count <= 1) return barWidth / 2;
+  final eachSpace = (plotWidth - count * barWidth) / (count - 1);
+  return barWidth / 2 + index * (barWidth + eachSpace);
 }

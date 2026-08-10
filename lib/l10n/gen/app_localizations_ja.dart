@@ -241,6 +241,59 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportListSearch => '検索';
 
   @override
+  String get reportDetailTitle => '地震レポート';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return 'No.$number 顕著有感地震';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '局地的な有感地震';
+
+  @override
+  String get reportDetailInfo => '詳細情報';
+
+  @override
+  String get reportDetailOriginTime => '発震時刻';
+
+  @override
+  String get reportDetailEpicenter => '震央座標';
+
+  @override
+  String get reportDetailMagnitude => '地震規模';
+
+  @override
+  String get reportDetailDepth => '震源の深さ';
+
+  @override
+  String get reportDetailAreaIntensity => '地域別震度';
+
+  @override
+  String get reportDetailLocalIntensity => '現在地の震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '震度情報なし';
+
+  @override
+  String get reportDetailSortByIntensity => '震度順に並べ替え';
+
+  @override
+  String get reportDetailSortByCounty => '地域順に並べ替え';
+
+  @override
+  String get reportDetailImage => '地震レポート画像';
+
+  @override
+  String get reportDetailImageUnavailable => 'レポート画像はまだありません';
+
+  @override
+  String get reportDetailOpenReport => 'レポートページ';
+
+  @override
+  String get reportDetailReplay => 'リプレイ';
+
+  @override
   String get navMore => 'その他';
 
   @override
@@ -801,6 +854,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trendNoData => 'トレンドデータがありません';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累計 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

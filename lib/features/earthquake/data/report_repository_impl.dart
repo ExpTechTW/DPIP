@@ -4,6 +4,7 @@ library;
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -38,6 +39,12 @@ class ReportRepositoryImpl implements ReportRepository {
       cityMaxInt: query.cityMaxInt,
     );
     return parseReportList(raw);
+  });
+
+  @override
+  Future<Result<EarthquakeReport>> get(String id) => guardResult(() async {
+    final raw = await _api.getReport(id);
+    return EarthquakeReport.fromJson((raw as Map).cast<String, dynamic>());
   });
 
   /// Skips malformed rows so one bad record cannot blank the catalogue.

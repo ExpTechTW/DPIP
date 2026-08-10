@@ -241,6 +241,59 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportListSearch => '조회';
 
   @override
+  String get reportDetailTitle => '지진 보고서';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return '번호 $number 유의미 유감지진';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '국지적 유감지진';
+
+  @override
+  String get reportDetailInfo => '상세 정보';
+
+  @override
+  String get reportDetailOriginTime => '발생 시각';
+
+  @override
+  String get reportDetailEpicenter => '진앙 좌표';
+
+  @override
+  String get reportDetailMagnitude => '지진 규모';
+
+  @override
+  String get reportDetailDepth => '진원 깊이';
+
+  @override
+  String get reportDetailAreaIntensity => '지역별 진도';
+
+  @override
+  String get reportDetailLocalIntensity => '내 위치의 진도';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '진도 정보 없음';
+
+  @override
+  String get reportDetailSortByIntensity => '진도순 정렬';
+
+  @override
+  String get reportDetailSortByCounty => '지역순 정렬';
+
+  @override
+  String get reportDetailImage => '지진 보고서 이미지';
+
+  @override
+  String get reportDetailImageUnavailable => '보고서 이미지가 아직 없습니다';
+
+  @override
+  String get reportDetailOpenReport => '보고서 페이지';
+
+  @override
+  String get reportDetailReplay => '다시 보기';
+
+  @override
   String get navMore => '더보기';
 
   @override
@@ -801,6 +854,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trendNoData => '추세 데이터 없음';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '누적 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {

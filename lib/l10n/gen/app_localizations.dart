@@ -531,6 +531,108 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get reportListSearch;
 
+  /// Header title over the report detail map's back button
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake Report'**
+  String get reportDetailTitle;
+
+  /// Eyebrow label on the detail header for a numbered CWA report
+  ///
+  /// In en, this message translates to:
+  /// **'No. {number} Significant Earthquake'**
+  String reportDetailNumbered(String number);
+
+  /// Eyebrow label on the detail header for a …000 (unnumbered) report
+  ///
+  /// In en, this message translates to:
+  /// **'Local Felt Earthquake'**
+  String get reportDetailLocalFelt;
+
+  /// Section header over origin time / epicenter / magnitude / depth
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get reportDetailInfo;
+
+  /// Row label for the report's origin date/time
+  ///
+  /// In en, this message translates to:
+  /// **'Origin time'**
+  String get reportDetailOriginTime;
+
+  /// Row label for the epicenter's latitude/longitude
+  ///
+  /// In en, this message translates to:
+  /// **'Epicenter'**
+  String get reportDetailEpicenter;
+
+  /// Row label for the report's magnitude
+  ///
+  /// In en, this message translates to:
+  /// **'Magnitude'**
+  String get reportDetailMagnitude;
+
+  /// Row label for the report's hypocentral depth
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get reportDetailDepth;
+
+  /// Section header over the per-area/town felt-intensity breakdown
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity by area'**
+  String get reportDetailAreaIntensity;
+
+  /// Section header over the per-location (GPS + saved townships) felt-intensity readout, shown above the area breakdown
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity at your locations'**
+  String get reportDetailLocalIntensity;
+
+  /// Shown in place of an intensity badge when a location's county isn't in this report's felt-area list at all
+  ///
+  /// In en, this message translates to:
+  /// **'No intensity data'**
+  String get reportDetailLocalIntensityUnavailable;
+
+  /// Tooltip on the area-intensity sort toggle when tapping it switches to grouping by intensity level
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by intensity'**
+  String get reportDetailSortByIntensity;
+
+  /// Tooltip on the area-intensity sort toggle when tapping it switches to an alphabetical county list
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by county'**
+  String get reportDetailSortByCounty;
+
+  /// Section header over the CWA-rendered report image
+  ///
+  /// In en, this message translates to:
+  /// **'Report image'**
+  String get reportDetailImage;
+
+  /// Shown in place of the report image when it fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Report image not available'**
+  String get reportDetailImageUnavailable;
+
+  /// Button that opens the official CWA report page in a browser
+  ///
+  /// In en, this message translates to:
+  /// **'Report page'**
+  String get reportDetailOpenReport;
+
+  /// Button that opens the RTS/EEW replay starting from this report's origin time
+  ///
+  /// In en, this message translates to:
+  /// **'Replay'**
+  String get reportDetailReplay;
+
   /// Bottom-nav label and page title for the More tab
   ///
   /// In en, this message translates to:
@@ -1592,6 +1694,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No trend data'**
   String get trendNoData;
+
+  /// Running total label above the cumulative station rain trend chart
+  ///
+  /// In en, this message translates to:
+  /// **'Cumulative {total} mm'**
+  String trendCumulativeTotal(String total);
 
   /// Compact chart X-axis hour tick (e.g. 20h / 20時)
   ///

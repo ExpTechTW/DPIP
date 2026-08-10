@@ -33,7 +33,35 @@ class LatLng {
     return earthRadius * c;
   }
 
+  /// The point [distance] metres from this one along initial compass
+  /// [bearing] degrees (0 = north, clockwise) — the forward geodesic problem,
+  /// via the same spherical-earth model [distanceTo] uses (so a round trip
+  /// through both is self-consistent). Used to plot a geo circle (e.g. an EEW
+  /// wavefront) as a polygon of points around a centre.
+  LatLng destinationPoint(double bearing, double distance) {
+    const earthRadius = 6378137.0;
+    final delta = distance / earthRadius;
+    final theta = _toRadians(bearing);
+    final lat1 = _toRadians(latitude);
+    final lon1 = _toRadians(longitude);
+
+    final lat2 = math.asin(
+      math.sin(lat1) * math.cos(delta) +
+          math.cos(lat1) * math.sin(delta) * math.cos(theta),
+    );
+    final lon2 =
+        lon1 +
+        math.atan2(
+          math.sin(theta) * math.sin(delta) * math.cos(lat1),
+          math.cos(delta) - math.sin(lat1) * math.sin(lat2),
+        );
+
+    return LatLng(_toDegrees(lat2), _toDegrees(lon2));
+  }
+
   static double _toRadians(double degrees) => degrees * math.pi / 180.0;
+
+  static double _toDegrees(double radians) => radians * 180.0 / math.pi;
 
   @override
   bool operator ==(Object other) =>

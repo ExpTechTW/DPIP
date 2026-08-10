@@ -328,6 +328,79 @@
   "@reportListSearch": {
     "description": "Fetches the report list with the current draft filters"
   },
+  "reportDetailTitle": "Earthquake Report",
+  "@reportDetailTitle": {
+    "description": "Header title over the report detail map's back button"
+  },
+  "reportDetailNumbered": "No. {number} Significant Earthquake",
+  "@reportDetailNumbered": {
+    "description": "Eyebrow label on the detail header for a numbered CWA report",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailLocalFelt": "Local Felt Earthquake",
+  "@reportDetailLocalFelt": {
+    "description": "Eyebrow label on the detail header for a …000 (unnumbered) report"
+  },
+  "reportDetailInfo": "Details",
+  "@reportDetailInfo": {
+    "description": "Section header over origin time / epicenter / magnitude / depth"
+  },
+  "reportDetailOriginTime": "Origin time",
+  "@reportDetailOriginTime": {
+    "description": "Row label for the report's origin date/time"
+  },
+  "reportDetailEpicenter": "Epicenter",
+  "@reportDetailEpicenter": {
+    "description": "Row label for the epicenter's latitude/longitude"
+  },
+  "reportDetailMagnitude": "Magnitude",
+  "@reportDetailMagnitude": {
+    "description": "Row label for the report's magnitude"
+  },
+  "reportDetailDepth": "Depth",
+  "@reportDetailDepth": {
+    "description": "Row label for the report's hypocentral depth"
+  },
+  "reportDetailAreaIntensity": "Intensity by area",
+  "@reportDetailAreaIntensity": {
+    "description": "Section header over the per-area/town felt-intensity breakdown"
+  },
+  "reportDetailLocalIntensity": "Intensity at your locations",
+  "@reportDetailLocalIntensity": {
+    "description": "Section header over the per-location (GPS + saved townships) felt-intensity readout, shown above the area breakdown"
+  },
+  "reportDetailLocalIntensityUnavailable": "No intensity data",
+  "@reportDetailLocalIntensityUnavailable": {
+    "description": "Shown in place of an intensity badge when a location's county isn't in this report's felt-area list at all"
+  },
+  "reportDetailSortByIntensity": "Sort by intensity",
+  "@reportDetailSortByIntensity": {
+    "description": "Tooltip on the area-intensity sort toggle when tapping it switches to grouping by intensity level"
+  },
+  "reportDetailSortByCounty": "Sort by county",
+  "@reportDetailSortByCounty": {
+    "description": "Tooltip on the area-intensity sort toggle when tapping it switches to an alphabetical county list"
+  },
+  "reportDetailImage": "Report image",
+  "@reportDetailImage": {
+    "description": "Section header over the CWA-rendered report image"
+  },
+  "reportDetailImageUnavailable": "Report image not available",
+  "@reportDetailImageUnavailable": {
+    "description": "Shown in place of the report image when it fails to load"
+  },
+  "reportDetailOpenReport": "Report page",
+  "@reportDetailOpenReport": {
+    "description": "Button that opens the official CWA report page in a browser"
+  },
+  "reportDetailReplay": "Replay",
+  "@reportDetailReplay": {
+    "description": "Button that opens the RTS/EEW replay starting from this report's origin time"
+  },
   "navMore": "More",
   "@navMore": {
     "description": "Bottom-nav label and page title for the More tab"
@@ -1103,6 +1176,15 @@
   "trendNoData": "No trend data",
   "@trendNoData": {
     "description": "Shown in the station trend chart when there is no data to plot"
+  },
+  "trendCumulativeTotal": "Cumulative {total} mm",
+  "@trendCumulativeTotal": {
+    "description": "Running total label above the cumulative station rain trend chart",
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "chartHourLabel": "{hour}h",
   "@chartHourLabel": {

@@ -240,6 +240,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportListSearch => '查詢';
 
   @override
+  String get reportDetailTitle => '地震報告';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return '編號 $number 顯著有感地震';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '小區域有感地震';
+
+  @override
+  String get reportDetailInfo => '詳細資訊';
+
+  @override
+  String get reportDetailOriginTime => '發震時間';
+
+  @override
+  String get reportDetailEpicenter => '震央座標';
+
+  @override
+  String get reportDetailMagnitude => '地震規模';
+
+  @override
+  String get reportDetailDepth => '震源深度';
+
+  @override
+  String get reportDetailAreaIntensity => '各地震度';
+
+  @override
+  String get reportDetailLocalIntensity => '所在地的震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '沒有震度訊息';
+
+  @override
+  String get reportDetailSortByIntensity => '依震度排序';
+
+  @override
+  String get reportDetailSortByCounty => '依縣市排序';
+
+  @override
+  String get reportDetailImage => '地震報告圖';
+
+  @override
+  String get reportDetailImageUnavailable => '報告圖尚未提供';
+
+  @override
+  String get reportDetailOpenReport => '報告頁面';
+
+  @override
+  String get reportDetailReplay => '重播';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -795,6 +848,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累計 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {
@@ -1527,6 +1585,59 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportListSearch => '查询';
 
   @override
+  String get reportDetailTitle => '地震报告';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return '编号 $number 显著有感地震';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '小区域有感地震';
+
+  @override
+  String get reportDetailInfo => '详细信息';
+
+  @override
+  String get reportDetailOriginTime => '发震时间';
+
+  @override
+  String get reportDetailEpicenter => '震中坐标';
+
+  @override
+  String get reportDetailMagnitude => '地震规模';
+
+  @override
+  String get reportDetailDepth => '震源深度';
+
+  @override
+  String get reportDetailAreaIntensity => '各地震度';
+
+  @override
+  String get reportDetailLocalIntensity => '所在地的震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '没有震度信息';
+
+  @override
+  String get reportDetailSortByIntensity => '依震度排序';
+
+  @override
+  String get reportDetailSortByCounty => '依县市排序';
+
+  @override
+  String get reportDetailImage => '地震报告图';
+
+  @override
+  String get reportDetailImageUnavailable => '报告图尚未提供';
+
+  @override
+  String get reportDetailOpenReport => '报告页面';
+
+  @override
+  String get reportDetailReplay => '重播';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -2082,6 +2193,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '没有趋势数据';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累计 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {
@@ -2814,6 +2930,59 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportListSearch => '查詢';
 
   @override
+  String get reportDetailTitle => '地震報告';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return '編號 $number 顯著有感地震';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '小區域有感地震';
+
+  @override
+  String get reportDetailInfo => '詳細資訊';
+
+  @override
+  String get reportDetailOriginTime => '發震時間';
+
+  @override
+  String get reportDetailEpicenter => '震央座標';
+
+  @override
+  String get reportDetailMagnitude => '地震規模';
+
+  @override
+  String get reportDetailDepth => '震源深度';
+
+  @override
+  String get reportDetailAreaIntensity => '各地震度';
+
+  @override
+  String get reportDetailLocalIntensity => '所在地的震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '沒有震度訊息';
+
+  @override
+  String get reportDetailSortByIntensity => '依震度排序';
+
+  @override
+  String get reportDetailSortByCounty => '依縣市排序';
+
+  @override
+  String get reportDetailImage => '地震報告圖';
+
+  @override
+  String get reportDetailImageUnavailable => '報告圖尚未提供';
+
+  @override
+  String get reportDetailOpenReport => '報告頁面';
+
+  @override
+  String get reportDetailReplay => '重播';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -3369,6 +3538,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累計 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {
@@ -4101,6 +4275,59 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get reportListSearch => '查詢';
 
   @override
+  String get reportDetailTitle => '地震報告';
+
+  @override
+  String reportDetailNumbered(String number) {
+    return '編號 $number 顯著有感地震';
+  }
+
+  @override
+  String get reportDetailLocalFelt => '小區域有感地震';
+
+  @override
+  String get reportDetailInfo => '詳細資訊';
+
+  @override
+  String get reportDetailOriginTime => '發震時間';
+
+  @override
+  String get reportDetailEpicenter => '震央座標';
+
+  @override
+  String get reportDetailMagnitude => '地震規模';
+
+  @override
+  String get reportDetailDepth => '震源深度';
+
+  @override
+  String get reportDetailAreaIntensity => '各地震度';
+
+  @override
+  String get reportDetailLocalIntensity => '所在地的震度';
+
+  @override
+  String get reportDetailLocalIntensityUnavailable => '沒有震度訊息';
+
+  @override
+  String get reportDetailSortByIntensity => '依震度排序';
+
+  @override
+  String get reportDetailSortByCounty => '依縣市排序';
+
+  @override
+  String get reportDetailImage => '地震報告圖';
+
+  @override
+  String get reportDetailImageUnavailable => '報告圖尚未提供';
+
+  @override
+  String get reportDetailOpenReport => '報告頁面';
+
+  @override
+  String get reportDetailReplay => '重播';
+
+  @override
   String get navMore => '更多';
 
   @override
@@ -4656,6 +4883,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trendNoData => '沒有趨勢資料';
+
+  @override
+  String trendCumulativeTotal(String total) {
+    return '累計 $total mm';
+  }
 
   @override
   String chartHourLabel(int hour) {
