@@ -294,14 +294,17 @@ class LightningMapLayer implements MapLayer {
         iconOpacity: 0.85,
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
+        // Same visual weight as the wind arrows (~35–110 px on screen at
+        // Taiwan overview zooms) — strikes have no speed dimension, so this is
+        // a flat zoom ramp rather than the wind layer's per-speed nested one.
         iconSize: <Object>[
           'interpolate',
           <Object>['linear'],
           <Object>['zoom'],
           5,
-          0.35,
+          0.6,
           15,
-          1.1,
+          1.8,
         ],
       ),
       enableInteraction: false,
@@ -336,12 +339,22 @@ class LightningMapLayer implements MapLayer {
 
   Future<Uint8List> _renderDot() async {
     const size = 64.0;
+    const halo = 3.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final paint = Paint()
-      ..color = const Color(0xFFFFFFFF)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(const Offset(size / 2, size / 2), size * 0.28, paint);
+    // Black offset-outline baked in, like the wind arrows: the image keeps its
+    // white fill for the `icon-color` tint, and the tint (multiply) leaves the
+    // black ring black so strikes stay readable over pale tiles.
+    canvas.drawCircle(
+      const Offset(size / 2, size / 2),
+      size * 0.28 + halo,
+      Paint()..color = const Color(0xFF000000),
+    );
+    canvas.drawCircle(
+      const Offset(size / 2, size / 2),
+      size * 0.28,
+      Paint()..color = const Color(0xFFFFFFFF),
+    );
     final image = await recorder.endRecording().toImage(
       size.toInt(),
       size.toInt(),
@@ -353,34 +366,24 @@ class LightningMapLayer implements MapLayer {
   Future<Uint8List> _renderCross() async {
     const size = 64.0;
     const thickness = 10.0;
+    const halo = 3.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final paint = Paint()
-      ..color = const Color(0xFFFFFFFF)
-      ..style = PaintingStyle.fill;
-    // Vertical + horizontal bars.
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: const Offset(size / 2, size / 2),
-          width: thickness,
-          height: size * 0.7,
-        ),
-        const Radius.circular(2),
+    // Vertical + horizontal bars, black behind white (see [_renderDot]).
+    RRect bar(double w, double h) => RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: const Offset(size / 2, size / 2),
+        width: w,
+        height: h,
       ),
-      paint,
+      const Radius.circular(2),
     );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: const Offset(size / 2, size / 2),
-          width: size * 0.7,
-          height: thickness,
-        ),
-        const Radius.circular(2),
-      ),
-      paint,
-    );
+    final black = Paint()..color = const Color(0xFF000000);
+    final white = Paint()..color = const Color(0xFFFFFFFF);
+    canvas.drawRRect(bar(thickness + halo * 2, size * 0.7 + halo * 2), black);
+    canvas.drawRRect(bar(size * 0.7 + halo * 2, thickness + halo * 2), black);
+    canvas.drawRRect(bar(thickness, size * 0.7), white);
+    canvas.drawRRect(bar(size * 0.7, thickness), white);
     final image = await recorder.endRecording().toImage(
       size.toInt(),
       size.toInt(),
@@ -411,7 +414,13 @@ class _LegendMark extends StatelessWidget {
       return Container(
         width: 12,
         height: 12,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          // Same black outline the map icons bake in — pale strikes (yellow /
+          // blue on the frosted card) need it to read as a mark.
+          border: Border.all(color: Colors.black, width: 1.2),
+        ),
       );
     }
     return SizedBox(
@@ -429,11 +438,18 @@ class _CrossPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Black bars first (thicker), the colour on top — the legend cross mirrors
+    // the map marker's baked black outline.
     final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2.5
+      ..color = const Color(0xFF000000)
+      ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
     final c = Offset(size.width / 2, size.height / 2);
+    canvas.drawLine(Offset(c.dx, 1), Offset(c.dx, size.height - 1), paint);
+    canvas.drawLine(Offset(1, c.dy), Offset(size.width - 1, c.dy), paint);
+    paint
+      ..color = color
+      ..strokeWidth = 2.5;
     canvas.drawLine(Offset(c.dx, 1), Offset(c.dx, size.height - 1), paint);
     canvas.drawLine(Offset(1, c.dy), Offset(size.width - 1, c.dy), paint);
   }
