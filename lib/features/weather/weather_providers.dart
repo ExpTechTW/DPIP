@@ -1,18 +1,14 @@
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/features/weather/data/frame_tile_api.dart';
+import 'package:dpip/features/weather/data/frame_tile_repository.dart';
 import 'package:dpip/features/weather/data/meteor_lightning_api.dart';
 import 'package:dpip/features/weather/data/meteor_lightning_repository_impl.dart';
 import 'package:dpip/features/weather/data/meteor_rain_api.dart';
 import 'package:dpip/features/weather/data/meteor_rain_repository_impl.dart';
 import 'package:dpip/features/weather/data/meteor_weather_api.dart';
 import 'package:dpip/features/weather/data/meteor_weather_repository_impl.dart';
-import 'package:dpip/features/weather/data/qpesums_api.dart';
-import 'package:dpip/features/weather/data/qpesums_repository_impl.dart';
-import 'package:dpip/features/weather/data/radar_api.dart';
-import 'package:dpip/features/weather/data/radar_repository_impl.dart';
 import 'package:dpip/features/weather/data/rain_hour_trend_api.dart';
 import 'package:dpip/features/weather/data/rain_hour_trend_repository_impl.dart';
-import 'package:dpip/features/weather/data/satellite_api.dart';
-import 'package:dpip/features/weather/data/satellite_repository_impl.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
@@ -32,20 +28,20 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> weatherProviders(SharedDeps deps) {
   return [
     Provider<RadarRepository>.value(
-      value: RadarRepositoryImpl(
-        RadarApi(deps.apiClient),
+      value: FrameTileRepositoryImpl(
+        FrameTileApi(deps.apiClient, 'radar'),
         deps.mapTileWarmer(),
       ),
     ),
     Provider<QpesumsRepository>.value(
-      value: QpesumsRepositoryImpl(
-        QpesumsApi(deps.apiClient),
+      value: FrameTileRepositoryImpl(
+        FrameTileApi(deps.apiClient, 'qpesums'),
         deps.mapTileWarmer(),
       ),
     ),
     Provider<SatelliteRepository>.value(
-      value: SatelliteRepositoryImpl(
-        SatelliteApi(deps.apiClient),
+      value: FrameTileRepositoryImpl(
+        FrameTileApi(deps.apiClient, 'satellite'),
         deps.mapTileWarmer(),
       ),
     ),
