@@ -2,6 +2,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:dpip/core/logging/log.dart';
@@ -162,10 +163,8 @@ class MapTileCache {
       // mirror's post-injection usage, so a fill warm can bail as it nears the
       // cap — the remaining (more distant) urls simply stay cold.
       for (var i = 0; i < tiles.length; i += _injectChunk) {
-        final end = i + _injectChunk;
-        final usage = await injectMapLibreTiles(
-          end < tiles.length ? tiles.sublist(i, end) : tiles.sublist(i),
-        );
+        final end = math.min(i + _injectChunk, tiles.length);
+        final usage = await injectMapLibreTiles(tiles.sublist(i, end));
         if (fillUntil > 0 &&
             usage != null &&
             usage.limit > 0 &&
