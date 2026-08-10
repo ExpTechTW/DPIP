@@ -28,8 +28,7 @@ class LightningMapLayer implements MapLayer {
 
   static const String _sourceId = 'lightning-src';
   static const String _layerId = 'lightning-lyr';
-  static const String _dotImageId = 'lightning-dot';
-  static const String _crossImageId = 'lightning-cross';
+  static const String _imagePrefix = 'lightning';
 
   static const Map<String, dynamic> _empty = {
     'type': 'FeatureCollection',
@@ -253,14 +252,28 @@ class LightningMapLayer implements MapLayer {
   Future<void> _ensureImages(MapLibreMapController controller) async {
     if (_imagesReady) return;
     try {
-      await controller.addImage(_dotImageId, await _renderDot(), true);
-      await controller.addImage(_crossImageId, await _renderCross(), true);
+      // One pre-coloured PNG per shape × age bucket, black outline baked in —
+      // the same trick as the wind arrows. MapLibre tints a plain (non-SDF)
+      // image by *replacing* its RGB, which would erase a baked outline, so the
+      // colour has to be baked too; the layer picks the image by feature.
+      for (final kind in const ['dot', 'cross']) {
+        for (final minutes in const [5, 10, 30, 60]) {
+          final fill = colorFromHexRgb(_ageHex[minutes]!)!;
+          final bytes = kind == 'dot'
+              ? await _renderDot(fill)
+              : await _renderCross(fill);
+          await controller.addImage(_imageId(kind, minutes), bytes, false);
+        }
+      }
       _imagesReady = true;
     } catch (error, stackTrace) {
       // Style reload may leave images; retry next show.
       Log.handle(error, stackTrace, 'lightning addImage');
     }
   }
+
+  static String _imageId(String kind, int minutes) =>
+      '$_imagePrefix-$kind-$minutes';
 
   Future<void> _ensureSource(MapLibreMapController controller) async {
     if (_mounted) return;
@@ -273,24 +286,10 @@ class LightningMapLayer implements MapLayer {
       _sourceId,
       _layerId,
       SymbolLayerProperties(
-        iconImage: <Object>[
-          'match',
-          <Object>['get', 'kind'],
-          'cg',
-          _crossImageId,
-          _dotImageId,
-        ],
-        iconColor: <Object>[
-          'match',
-          <Object>['get', 'age'],
-          5,
-          _ageHex[5]!,
-          10,
-          _ageHex[10]!,
-          30,
-          _ageHex[30]!,
-          _ageHex[60]!,
-        ],
+        // The image is picked by the feature's `icon` property (kind + age),
+        // carrying the pre-baked colour + black outline — no `iconColor` tint,
+        // which would replace the baked-in outline on a non-SDF image.
+        iconImage: <Object>['get', 'icon'],
         iconOpacity: 0.85,
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -316,13 +315,18 @@ class LightningMapLayer implements MapLayer {
     final features = <Map<String, dynamic>>[];
     for (final strike in snapshot.strikes) {
       final age = _ageBucket(snapshot.time, strike.time);
+      final kind = strike.type == 1 ? 'cross' : 'dot';
       features.add({
         'type': 'Feature',
         'geometry': {
           'type': 'Point',
           'coordinates': [strike.longitude, strike.latitude],
         },
-        'properties': {'kind': strike.type == 1 ? 'cg' : 'cc', 'age': age},
+        'properties': {
+          'kind': strike.type == 1 ? 'cg' : 'cc',
+          'age': age,
+          'icon': _imageId(kind, age),
+        },
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
@@ -337,14 +341,14 @@ class LightningMapLayer implements MapLayer {
     return 60;
   }
 
-  Future<Uint8List> _renderDot() async {
+  Future<Uint8List> _renderDot(Color fill) async {
     const size = 64.0;
     const halo = 3.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    // Black offset-outline baked in, like the wind arrows: the image keeps its
-    // white fill for the `icon-color` tint, and the tint (multiply) leaves the
-    // black ring black so strikes stay readable over pale tiles.
+    // Black offset-outline baked in (like the wind arrows): the PNG carries the
+    // bucket colour + black ring, and the layer shows it un-tinted so the ring
+    // survives.
     canvas.drawCircle(
       const Offset(size / 2, size / 2),
       size * 0.28 + halo,
@@ -353,7 +357,7 @@ class LightningMapLayer implements MapLayer {
     canvas.drawCircle(
       const Offset(size / 2, size / 2),
       size * 0.28,
-      Paint()..color = const Color(0xFFFFFFFF),
+      Paint()..color = fill,
     );
     final image = await recorder.endRecording().toImage(
       size.toInt(),
@@ -363,13 +367,13 @@ class LightningMapLayer implements MapLayer {
     return data!.buffer.asUint8List();
   }
 
-  Future<Uint8List> _renderCross() async {
+  Future<Uint8List> _renderCross(Color fill) async {
     const size = 64.0;
     const thickness = 10.0;
     const halo = 3.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    // Vertical + horizontal bars, black behind white (see [_renderDot]).
+    // Vertical + horizontal bars, black behind the colour (see [_renderDot]).
     RRect bar(double w, double h) => RRect.fromRectAndRadius(
       Rect.fromCenter(
         center: const Offset(size / 2, size / 2),
@@ -379,11 +383,10 @@ class LightningMapLayer implements MapLayer {
       const Radius.circular(2),
     );
     final black = Paint()..color = const Color(0xFF000000);
-    final white = Paint()..color = const Color(0xFFFFFFFF);
     canvas.drawRRect(bar(thickness + halo * 2, size * 0.7 + halo * 2), black);
     canvas.drawRRect(bar(size * 0.7 + halo * 2, thickness + halo * 2), black);
-    canvas.drawRRect(bar(thickness, size * 0.7), white);
-    canvas.drawRRect(bar(size * 0.7, thickness), white);
+    canvas.drawRRect(bar(thickness, size * 0.7), Paint()..color = fill);
+    canvas.drawRRect(bar(size * 0.7, thickness), Paint()..color = fill);
     final image = await recorder.endRecording().toImage(
       size.toInt(),
       size.toInt(),
