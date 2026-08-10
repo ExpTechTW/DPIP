@@ -53,14 +53,36 @@ void main() {
       // 200 有雷雨 — the code, not the 多雲 label, picks the storm.
       expect(weatherVisual('多雲', 214, colors).$1, Icons.thunderstorm_outlined);
       expect(weatherVisual('晴', 106, colors).$1, Icons.water_drop_outlined);
-      expect(weatherVisual('陰', 208, colors).$1, Icons.ac_unit_outlined);
-      expect(weatherVisual('晴', 105, colors).$1, Icons.blur_on_outlined);
+      expect(weatherVisual('陰', 208, colors).$1, Icons.snowing);
+      expect(weatherVisual('晴', 105, colors).$1, Icons.foggy);
+    });
+
+    test('phenomena refine the glyph beyond the eight modes', () {
+      // A shower reads differently from steady rain, 霾 from a fog bank, and
+      // lightning without rain from a thunderstorm — each its own glyph while
+      // the accent still follows the resolved backdrop mode.
+      expect(weatherVisual('多雲', 111, colors).$1, Icons.grain_outlined); // 有陣雨
+      expect(weatherVisual('晴', 103, colors).$1, Icons.bolt_outlined); // 有閃電
+      expect(weatherVisual('多雲', 107, colors).$1, Icons.sunny_snowing); // 有雨雪
+      expect(weatherVisual('多雲', 112, colors).$1, Icons.cloudy_snowing); // 陣雨雪
+      expect(weatherVisual('陰', 113, colors).$1, Icons.grain_outlined); // 有雹
+      // 大雷雨 is the heaviest rung — filled, so it reads heavier.
+      expect(weatherVisual('多雲', 117, colors).$1, Icons.thunderstorm);
     });
 
     test('plain family codes map clear / cloudy / overcast', () {
       expect(weatherVisual('晴', 100, colors).$1, Icons.wb_sunny_outlined);
       expect(weatherVisual('多雲', 200, colors).$1, Icons.wb_cloudy_outlined);
       expect(weatherVisual('陰', 300, colors).$1, Icons.cloud_outlined);
+    });
+
+    test('the accent colour follows the mode, not the glyph', () {
+      // 陣雨 (rain) and 雷雨 (thunderstorm) both refine their glyph but keep
+      // their family accent — primary for rain, tertiary for storms.
+      expect(weatherVisual('多雲', 111, colors).$2, colors.primary);
+      expect(weatherVisual('多雲', 114, colors).$2, colors.tertiary);
+      expect(weatherVisual('多雲', 200, colors).$2, colors.onSurfaceVariant);
+      expect(weatherVisual('晴', 100, colors).$2, colors.tertiary);
     });
 
     test('a missing code falls back to substring matching', () {
