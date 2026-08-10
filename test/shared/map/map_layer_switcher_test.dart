@@ -147,7 +147,7 @@ void main() {
     },
   );
 
-  testWidgets('the reorder button opens the order editor', (tester) async {
+  testWidgets('the reorder button opens the category editor', (tester) async {
     await pumpSwitcher(tester, {});
     await tester.tap(find.text('Radar echo'));
     await tester.pumpAndSettle();
@@ -163,9 +163,9 @@ void main() {
       centreX(tester, find.text(l10n.mapLayerOrderTitle)),
       closeTo(screenWidth(tester) / 2, 1),
     );
-    // One drag handle per layer row *and* per non-empty category header (the
-    // picker behind also shows headers — scope to the editor's own list).
-    expect(find.byIcon(Icons.drag_handle), findsNWidgets(9));
+    // Level 1 is the category list: one drag handle per category, no layer
+    // rows, no chevron on a single-layer category (typhoon).
+    expect(find.byIcon(Icons.drag_handle), findsNWidgets(4));
     Finder inEditor(String text) => find.descendant(
       of: find.byType(ReorderableListView),
       matching: find.text(text),
@@ -174,51 +174,84 @@ void main() {
     expect(inEditor(l10n.mapLayerCategoryWeather), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategorySatellite), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategoryRadar), findsOneWidget);
+    // The picker behind still shows the active layer's tile — the editor's
+    // level-1 list must not. Only radar holds more than one layer, so just one
+    // category is drill-in-able.
+    expect(inEditor('Radar echo'), findsNothing);
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
   });
 
-  testWidgets('dragging a layer clamps to its category', (tester) async {
-    final controller = await pumpSwitcher(tester, {});
-    await tester.tap(find.text('Radar echo'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.tune));
-    await tester.pumpAndSettle();
-
-    // Precip sits in the bottom (radar) group. Drag its handle far up — past
-    // the typhoon block — and it must land back next to radar, not escape the
-    // group.
-    final handles = find.descendant(
-      of: find.byType(ReorderableListView),
-      matching: find.byIcon(Icons.drag_handle),
-    );
-    await tester.drag(handles.last, const Offset(0, -700));
-    await tester.pumpAndSettle();
-
-    // Precip stays inside the radar group — dragged up it clamps to the
-    // group's head, above radar echo but below the radar header, never
-    // escaping into another category.
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(MapLayerSwitcher)),
-    );
-    expect(
-      topOf(tester, l10n.mapLayerCategoryRadar),
-      lessThan(topOf(tester, 'Precip')),
-    );
-    expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'Radar echo')));
-    // The persisted order is the grouped snapshot — precip flipped above radar
-    // within the radar group, nothing escaped to another category.
-    expect(controller.order, [
-      'typhoon',
-      'rain',
-      'satellite',
-      'qpesums',
-      'radar',
-    ]);
-  });
-
-  testWidgets('dragging a category header moves its whole block', (
+  testWidgets('tapping a category opens its layer list and back returns', (
     tester,
   ) async {
+    await pumpSwitcher(tester, {});
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(MapLayerSwitcher)),
+    );
+    Finder editorText(String text) => find.descendant(
+      of: find.byType(ReorderableListView),
+      matching: find.text(text),
+    );
+    final radarCategory = find.descendant(
+      of: find.byType(ReorderableListView),
+      matching: find.text(l10n.mapLayerCategoryRadar),
+    );
+    await tester.tap(radarCategory);
+    await tester.pumpAndSettle();
+
+    // Level 2 shows just the radar-group layers, each with a drag handle.
+    expect(editorText('Radar echo'), findsOneWidget);
+    expect(editorText('Precip'), findsOneWidget);
+    expect(editorText('Rain'), findsNothing);
+    expect(find.byIcon(Icons.drag_handle), findsNWidgets(2));
+    // The back affordance appears only on level 2.
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+    expect(editorText('Radar echo'), findsNothing);
+    expect(editorText(l10n.mapLayerCategoryTyphoon), findsOneWidget);
+  });
+
+  testWidgets('dragging a category reorders the categories', (tester) async {
+    final controller = await pumpSwitcher(tester, {});
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    // Radar is the bottom category. Drag its handle far up to the top.
+    final handles = find.descendant(
+      of: find.byType(ReorderableListView),
+      matching: find.byIcon(Icons.drag_handle),
+    );
+    await tester.drag(handles.last, const Offset(0, -600));
+    await tester.pumpAndSettle();
+
+    // Category order moved radar to the top; the layer snapshot follows the
+    // block order (radar group, then the rest in declared order).
+    expect(controller.categoryOrder, [
+      'radar',
+      'typhoon',
+      'weather',
+      'satellite',
+    ]);
+    expect(controller.order, [
+      'radar',
+      'qpesums',
+      'typhoon',
+      'rain',
+      'satellite',
+    ]);
+  });
+
+  testWidgets('dragging a layer reorders within its category', (tester) async {
     final controller = await pumpSwitcher(tester, {});
     await tester.tap(find.text('Radar echo'));
     await tester.pumpAndSettle();
@@ -228,43 +261,36 @@ void main() {
     final l10n = AppLocalizations.of(
       tester.element(find.byType(MapLayerSwitcher)),
     );
-    // Typhoon is the top block. Drag its header down past the radar block so
-    // the whole group (header + its layer) lands at the bottom.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(l10n.mapLayerCategoryRadar),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Precip sits below radar echo. Drag its handle far up to flip them.
     final handles = find.descendant(
       of: find.byType(ReorderableListView),
       matching: find.byIcon(Icons.drag_handle),
     );
-    final start = tester.getCenter(handles.first);
-    final end = tester.getCenter(handles.last);
-    await tester.drag(handles.first, end - start + const Offset(0, 30));
+    await tester.drag(handles.last, const Offset(0, -300));
     await tester.pumpAndSettle();
 
-    // The typhoon block now sits below radar echo, header above its layer.
-    expect(
-      topOf(tester, 'Radar echo'),
-      lessThan(topOf(tester, l10n.mapLayerCategoryTyphoon)),
-    );
-    expect(
-      topOf(tester, l10n.mapLayerCategoryTyphoon),
-      lessThan(topOf(tester, 'Typhoon path')),
-    );
-    // Both persisted orders reflect the move: radar group first, typhoon last.
-    expect(controller.categoryOrder, [
-      'weather',
-      'satellite',
-      'radar',
-      'typhoon',
-    ]);
+    // Only the layer ids changed — precip now before radar echo within the
+    // radar group; the category order is untouched (declared order, so the
+    // flattened snapshot leads with the typhoon block).
     expect(controller.order, [
+      'typhoon',
       'rain',
       'satellite',
-      'radar',
       'qpesums',
-      'typhoon',
+      'radar',
     ]);
+    expect(controller.categoryOrder, isEmpty);
   });
 
-  testWidgets('reset restores the grouped default and clears the preference', (
+  testWidgets('reset restores the grouped default and clears both preferences', (
     tester,
   ) async {
     // A saved order that flips the radar pair and moves a category — a
@@ -284,10 +310,16 @@ void main() {
     await tester.tap(find.text(l10n.mapLayerOrderReset));
     await tester.pumpAndSettle();
 
-    // The editor's own list falls back to the grouped default — radar echo
-    // before precip within the bottom group…
+    // The category list falls back to the grouped default…
+    final inEditor = find.descendant(
+      of: find.byType(ReorderableListView),
+      matching: find.text(l10n.mapLayerCategoryRadar),
+    );
+    await tester.tap(inEditor);
+    await tester.pumpAndSettle();
+    // …and radar echo is back before precip within the radar group.
     expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
-    // …and both preferences are cleared.
+    // Both preferences are cleared.
     expect(controller.order, isEmpty);
     expect(controller.categoryOrder, isEmpty);
   });
