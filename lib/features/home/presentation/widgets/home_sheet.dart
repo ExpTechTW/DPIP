@@ -159,11 +159,18 @@ class HomeSheet extends StatelessWidget {
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
 }
 
-/// Blurs [child] in step with [scrollController], so the sky reads as depth
-/// of field behind the content once the sheet's list scrolls the hero's rain
-/// trend card up past the fold — the counterpart to `HomeContent`'s hero
+/// Blurs and dims [child] in step with [scrollController], so the sky reads as
+/// depth of field behind the content once the sheet's list scrolls the hero's
+/// rain trend card up past the fold — the counterpart to `HomeContent`'s hero
 /// block, which leaves the sky untouched (and unblurred) for as long as the
 /// trend card is still the last thing on screen.
+///
+/// The dim rides the same scroll ramp as the blur: scrolling the list is what
+/// shuts the cards' [RainOnGlass] refraction off (their position gate closes a
+/// short distance into the gesture) and what solidifies `HomeContent`'s cards
+/// out of their sky-glass back into solid plates — darkening the backdrop in
+/// step keeps the space between cards quiet so the solid plates they arrive as
+/// carry the reading.
 ///
 /// This is a *second*, independent blur from the one [HomeSheet.build] already
 /// ramps off the sheet's `extent` — that one plays only while the sheet itself
@@ -199,6 +206,11 @@ class _ScrollBlurredWeather extends StatelessWidget {
   /// the sheet's surface.
   static const double _maxSigma = 16;
 
+  /// Peak backdrop dim on the same scroll ramp — enough to drop the sky out of
+  /// competition with the cards once the list is actually moving, without
+  /// turning the whole backdrop into a black hole at the top of the gesture.
+  static const double _maxDim = 0.45;
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -213,9 +225,19 @@ class _ScrollBlurredWeather extends StatelessWidget {
         // always-on blur of sigma 0 — the sheet spends most of its time here.
         if (t <= 0) return child!;
         final sigma = _maxSigma * t;
-        return ImageFiltered(
-          imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
-          child: child,
+        final dim = _maxDim * t;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              child: child,
+            ),
+            // Dim sits *above* the blur so the backdrop darkens uniformly; the
+            // content layer renders above this whole stack in HomeSheet, so the
+            // cards are never dimmed with it.
+            ColoredBox(color: Colors.black.withValues(alpha: dim)),
+          ],
         );
       },
     );

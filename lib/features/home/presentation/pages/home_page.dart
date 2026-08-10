@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
@@ -42,6 +44,16 @@ class _HomePageState extends State<HomePage> {
   final DraggableScrollableController _sheet = DraggableScrollableController();
   HomeSheetExtent? _extent;
   HomeResetSignal? _resetSignal;
+
+  /// Peak blur sigma over the exposed map once the sheet is fully up — matches
+  /// the sheet's own frosted blur ([HomeSheet] at full opacity) so the map's
+  /// edge crossing under the sheet doesn't read as a hard transition.
+  static const double _mapBlurPeak = 24;
+
+  /// Peak dim applied to the same scrim — darkens the exposed map so the
+  /// sheet's cards gain contrast against it. The frosted panel itself is normal
+  /// content and is never dimmed with it.
+  static const double _mapDimPeak = 0.35;
 
   @override
   void didChangeDependencies() {
@@ -126,6 +138,32 @@ class _HomePageState extends State<HomePage> {
                     context.goNamed(AppRoutes.map);
                   },
                   child: const HomeMapBackdrop(),
+                ),
+              ),
+              // Blurs and dims the map backdrop as the sheet climbs
+              // ([HomeChrome.mapDim]), so the exposed map recedes behind the
+              // sheet's frosted chrome and its cards gain contrast. Ignored for
+              // pointers so the map tap still passes.
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: extent,
+                    builder: (context, extentValue, _) {
+                      final t = HomeChrome.mapDim(extentValue);
+                      if (t <= 0) return const SizedBox.shrink();
+                      final sigma = t * _mapBlurPeak;
+                      final dim = t * _mapDimPeak;
+                      return ImageFiltered(
+                        imageFilter: ImageFilter.blur(
+                          sigmaX: sigma,
+                          sigmaY: sigma,
+                        ),
+                        child: ColoredBox(
+                          color: Colors.black.withValues(alpha: dim),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
               // The one weather sheet — full-screen behind the region bar so its

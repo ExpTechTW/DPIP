@@ -77,16 +77,43 @@ class HomeContent extends StatelessWidget {
     // feeds pretending to be readings for a place we could not identify.
     final located = area is! CurrentArea || area.code != null;
     final showWeather = area is! NationwideArea && located;
-    // One listener for the whole panel: the sky colour only changes when the
-    // LUT re-bakes (a weather or time-slot change), and every card below tints
-    // itself from the same value the way the reference samples one gradient stop for all
-    // of them.
-    return ValueListenableBuilder<Color?>(
-      valueListenable: SkyLutCache.panelAmbient,
-      builder: (context, sky, _) =>
-          _build(context, areaIndex, located, showWeather, sky),
+    // Scroll and the sky bake change at very different rates and both feed the
+    // cards — the sky re-bakes rarely, the scroll focus dial moves on every
+    // tick — so merge the two listenables rather than nesting two builders
+    // (the inner ValueListenableBuilder would skip rebuilding on scroll, since
+    // the sky colour did not change, and the focus dial would stall).
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        scrollController,
+        SkyLutCache.panelAmbient,
+      ]),
+      builder: (context, _) {
+        final sky = SkyLutCache.panelAmbient.value;
+        final offset = scrollController.hasClients
+            ? scrollController.offset
+            : 0.0;
+        return _build(
+          context,
+          areaIndex,
+          located,
+          showWeather,
+          sky,
+          _focus(offset),
+        );
+      },
     );
   }
+
+  /// Scroll distance over which the sheet's cards solidify out of their
+  /// sky-glass panes back into solid plates — matched to
+  /// `HomeSheet._ScrollBlurredWeather`'s own ramp so the backdrop dims and the
+  /// cards turn opaque in the same swipe.
+  static const double _focusRampExtent = 140;
+
+  /// Focus dial for the content, `0` (resting) → `1` (scrolled past the hero).
+  /// See [HomeContent._focusRampExtent].
+  static double _focus(double offset) =>
+      (offset / _focusRampExtent).clamp(0.0, 1.0);
 
   Widget _build(
     BuildContext context,
@@ -94,7 +121,14 @@ class HomeContent extends StatelessWidget {
     bool located,
     bool showWeather,
     Color? sky,
+    double focus,
   ) {
+    // The cards read as a pane of the sky only while the sky is the point
+    // (hero showing). Once the list scrolls, they solidify back into solid
+    // plates and their ink back onto the theme surface — a transparent 20 %
+    // sky-pane with sky-tuned ink is exactly what makes scrolled content hard
+    // to read, no matter how dimmed the backdrop behind it is.
+    final reveal = this.reveal * (1 - focus);
     // The hero block needs the sheet's own live pixel height, which only a
     // LayoutBuilder can give — MediaQuery reports the *screen*, not the
     // sheet's current size mid-expand. Null outside the hero layout
@@ -305,7 +339,10 @@ class HomeContent extends StatelessWidget {
 
   /// Current size of the hero block's trailing reserve — [_restBottomGap]
   /// plus [bottomSafeArea] — for [controller]'s live scroll offset.
-  static double _heroBottomGap(ScrollController controller, double bottomSafeArea) {
+  static double _heroBottomGap(
+    ScrollController controller,
+    double bottomSafeArea,
+  ) {
     final rest = _restBottomGap + bottomSafeArea;
     final offset = controller.hasClients ? controller.offset : 0.0;
     final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
