@@ -361,6 +361,7 @@
   "mapLegendExpand": "凡例",
   "mapLegendCollapse": "凡例を閉じる",
   "mapMyLocation": "現在地",
+  "mapResetNorth": "北を上にする",
   "typhoonLegendCircle15": "強風域（30kt）",
   "typhoonLegendCircle25": "暴風域（50kt）",
   "typhoonLegendProbability": "接近確率",

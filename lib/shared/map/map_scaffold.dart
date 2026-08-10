@@ -14,6 +14,7 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
+import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
@@ -112,6 +113,10 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
 
+  /// Current camera heading — drives the Flutter compass needle. A notifier so
+  /// only the compass rebuilds while the map rotates.
+  final ValueNotifier<double> _bearing = ValueNotifier(0);
+
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
   LatLngBounds? _target;
@@ -137,6 +142,7 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   @override
   void dispose() {
+    _bearing.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
@@ -286,6 +292,32 @@ class _MapScaffoldState extends State<MapScaffold> {
     _controller = controller;
     _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
     unawaited(const MapCache().setMaximumSize());
+  }
+
+  /// Feeds the compass needle — camera heading, ° clockwise from north.
+  void _onCameraMove(CameraPosition position) {
+    _bearing.value = position.bearing;
+  }
+
+  /// Re-points the camera north, keeping centre / zoom — the native compass's
+  /// tap action, reproduced for the Flutter replacement.
+  void _resetNorth() {
+    final controller = _controller;
+    if (controller == null) return;
+    final position = controller.cameraPosition;
+    if (position == null) return;
+    unawaited(
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position.target,
+            zoom: position.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {
@@ -535,6 +567,7 @@ class _MapScaffoldState extends State<MapScaffold> {
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),
+              onCameraMove: _onCameraMove,
               onCameraIdle: () {
                 _active.onMapGestureEnd();
                 final controller = _controller;
@@ -545,6 +578,10 @@ class _MapScaffoldState extends State<MapScaffold> {
                 if (!mounted) return;
                 setState(() => _cameraEpoch++);
               },
+              // The native compass lives inside the platform view, so any
+              // Flutter overlay paints over it — MapScaffold draws its own
+              // [MapCompass] at the top of the stack instead.
+              compassEnabled: false,
             ),
           ),
         ),
@@ -622,6 +659,22 @@ class _MapScaffoldState extends State<MapScaffold> {
                   : const SizedBox.shrink(),
             ),
           ),
+        // Compass on top of *everything* — a screen-space callout (typhoon
+        // forecast tips) or an expanded sheet must never hide north. Parked
+        // where the native compass sat: under the layer switcher chip.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: layerChipBand,
+                right: AppSpacing.lg,
+              ),
+              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+            ),
+          ),
+        ),
       ],
     );
   }

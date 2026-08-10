@@ -1705,6 +1705,10 @@
   "@mapMyLocation": {
     "description": "Map control that centers the camera on the device GPS fix"
   },
+  "mapResetNorth": "Reset north",
+  "@mapResetNorth": {
+    "description": "Map compass tooltip: re-points the camera to north-up"
+  },
   "typhoonLegendCircle15": "Gale circle (L7)",
   "typhoonLegendCircleAvg": "Average circle",
   "@typhoonLegendCircleAvg": {

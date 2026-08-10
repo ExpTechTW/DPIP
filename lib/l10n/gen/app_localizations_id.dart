@@ -1276,6 +1276,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapMyLocation => 'Lokasi saya';
 
   @override
+  String get mapResetNorth => 'Kembali ke utara';
+
+  @override
   String get typhoonLegendCircle15 => 'Lingkar angin kencang';
 
   @override

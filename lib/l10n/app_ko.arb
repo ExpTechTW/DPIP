@@ -361,6 +361,7 @@
   "mapLegendExpand": "범례",
   "mapLegendCollapse": "범례 숨기기",
   "mapMyLocation": "내 위치",
+  "mapResetNorth": "북쪽으로 되돌리기",
   "typhoonLegendCircle15": "강풍권 (7급)",
   "typhoonLegendCircle25": "폭풍권 (10급)",
   "typhoonLegendProbability": "내습 확률",

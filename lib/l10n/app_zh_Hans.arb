@@ -361,6 +361,7 @@
   "mapLegendExpand": "图例",
   "mapLegendCollapse": "收起图例",
   "mapMyLocation": "我的位置",
+  "mapResetNorth": "回到正北",
   "typhoonLegendCircle15": "七级风暴风圈",
   "typhoonLegendCircle25": "十级风暴风圈",
   "typhoonLegendProbability": "侵袭概率",

@@ -1262,6 +1262,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapMyLocation => '現在地';
 
   @override
+  String get mapResetNorth => '北を上にする';
+
+  @override
   String get typhoonLegendCircle15 => '強風域（30kt）';
 
   @override

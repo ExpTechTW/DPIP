@@ -2439,6 +2439,12 @@ abstract class AppLocalizations {
   /// **'My location'**
   String get mapMyLocation;
 
+  /// Map compass tooltip: re-points the camera to north-up
+  ///
+  /// In en, this message translates to:
+  /// **'Reset north'**
+  String get mapResetNorth;
+
   /// Typhoon UI: typhoonLegendCircle15
   ///
   /// In en, this message translates to:

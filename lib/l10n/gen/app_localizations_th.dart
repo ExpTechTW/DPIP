@@ -1271,6 +1271,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapMyLocation => 'ตำแหน่งของฉัน';
 
   @override
+  String get mapResetNorth => 'กลับไปทางเหนือ';
+
+  @override
   String get typhoonLegendCircle15 => 'วงพายุ (แรง)';
 
   @override

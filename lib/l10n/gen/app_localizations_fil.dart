@@ -1280,6 +1280,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapMyLocation => 'Aking lokasyon';
 
   @override
+  String get mapResetNorth => 'Bumalik sa hilaga';
+
+  @override
   String get typhoonLegendCircle15 => 'Gale circle (L7)';
 
   @override

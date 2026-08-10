@@ -1262,6 +1262,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapMyLocation => '내 위치';
 
   @override
+  String get mapResetNorth => '북쪽으로 되돌리기';
+
+  @override
   String get typhoonLegendCircle15 => '강풍권 (7급)';
 
   @override

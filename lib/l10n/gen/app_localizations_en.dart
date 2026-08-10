@@ -1273,6 +1273,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapMyLocation => 'My location';
 
   @override
+  String get mapResetNorth => 'Reset north';
+
+  @override
   String get typhoonLegendCircle15 => 'Gale circle (L7)';
 
   @override

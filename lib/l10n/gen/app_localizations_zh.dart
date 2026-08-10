@@ -1256,6 +1256,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapMyLocation => '我的位置';
 
   @override
+  String get mapResetNorth => '回到北方';
+
+  @override
   String get typhoonLegendCircle15 => '七級風暴風圈';
 
   @override
@@ -2707,6 +2710,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到正北';
 
   @override
   String get typhoonLegendCircle15 => '七级风暴风圈';
@@ -4162,6 +4168,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapMyLocation => '我的位置';
 
   @override
+  String get mapResetNorth => '回到北方';
+
+  @override
   String get typhoonLegendCircle15 => '七級風暴風圈';
 
   @override
@@ -5613,6 +5622,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到北方';
 
   @override
   String get typhoonLegendCircle15 => '七級風暴風圈';

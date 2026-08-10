@@ -1274,6 +1274,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapMyLocation => 'Vị trí của tôi';
 
   @override
+  String get mapResetNorth => 'Về hướng bắc';
+
+  @override
   String get typhoonLegendCircle15 => 'Vòng gió mạnh';
 
   @override
