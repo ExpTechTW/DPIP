@@ -21,8 +21,10 @@ void main() {
   test('reads a previously saved order', () async {
     final controller = await controllerWith({
       'map.layerOrder': ['rain', 'radar'],
+      'map.layerCategoryOrder': ['radar', 'typhoon'],
     });
     expect(controller.order, ['rain', 'radar']);
+    expect(controller.categoryOrder, ['radar', 'typhoon']);
   });
 
   test('setOrder persists and notifies, and is idempotent', () async {
@@ -68,5 +70,53 @@ void main() {
 
     final reloaded = await controllerWith({});
     expect(reloaded.order, isEmpty);
+  });
+
+  test('category order starts empty and persists idempotently', () async {
+    final controller = await controllerWith({});
+    expect(controller.categoryOrder, isEmpty);
+    var notified = 0;
+    controller.addListener(() => notified++);
+
+    await controller.setCategoryOrder(['radar', 'typhoon']);
+    expect(controller.categoryOrder, ['radar', 'typhoon']);
+    expect(notified, 1);
+
+    await controller.setCategoryOrder(['radar', 'typhoon']);
+    expect(notified, 1, reason: 'an unchanged order must not notify');
+
+    final reloaded = await controllerWith({});
+    await reloaded.setCategoryOrder(['radar', 'typhoon']);
+    expect(controller.categoryOrder, reloaded.categoryOrder);
+  });
+
+  test('setCategoryOrder never leaks its input list', () async {
+    final controller = await controllerWith({});
+    final input = ['radar'];
+    await controller.setCategoryOrder(input);
+    input.add('typhoon');
+    expect(controller.categoryOrder, ['radar']);
+  });
+
+  test('reset clears both orders and notifies once', () async {
+    final controller = await controllerWith({
+      'map.layerOrder': ['rain', 'radar'],
+      'map.layerCategoryOrder': ['radar', 'typhoon'],
+    });
+    var notified = 0;
+    controller.addListener(() => notified++);
+
+    await controller.reset();
+    expect(controller.order, isEmpty);
+    expect(controller.categoryOrder, isEmpty);
+    expect(notified, 1);
+
+    // Resetting an already-empty pair is a no-op.
+    await controller.reset();
+    expect(notified, 1);
+
+    final reloaded = await controllerWith({});
+    expect(reloaded.order, isEmpty);
+    expect(reloaded.categoryOrder, isEmpty);
   });
 }

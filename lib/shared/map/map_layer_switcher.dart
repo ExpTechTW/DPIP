@@ -8,8 +8,10 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_layer_category.dart';
 import 'package:dpip/shared/map/map_layer_order.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -135,6 +137,10 @@ class MapLayerSwitcher extends StatelessWidget {
                           layers,
                           orderController.order,
                         );
+                        final categories = orderedCategories(
+                          MapLayerCategory.values,
+                          orderController.categoryOrder,
+                        );
                         return ListView(
                           controller: scrollController,
                           padding: EdgeInsets.fromLTRB(
@@ -144,14 +150,18 @@ class MapLayerSwitcher extends StatelessWidget {
                             AppSpacing.md + bottomInset,
                           ),
                           children: [
-                            for (final layer in ordered)
-                              _LayerTile(
-                                layer: layer,
-                                selected: layer.id == active.id,
-                                colors: colors,
-                                onTap: () =>
-                                    Navigator.of(sheetContext).pop(layer),
-                              ),
+                            for (final category in categories) ...[
+                              SectionHeader(categoryLabel(category, l10n)),
+                              for (final layer in ordered)
+                                if (categoryOf(layer.id) == category)
+                                  _LayerTile(
+                                    layer: layer,
+                                    selected: layer.id == active.id,
+                                    colors: colors,
+                                    onTap: () =>
+                                        Navigator.of(sheetContext).pop(layer),
+                                  ),
+                            ],
                           ],
                         );
                       },
@@ -273,11 +283,14 @@ class _LayerTile extends StatelessWidget {
 /// 拖盤), since it opens over the picker and two stacked drag sheets are
 /// confusing.
 ///
-/// Seeded from [MapLayerOrderController.order] resolved against the surface's
-/// actual layers ([orderedLayers]), so a layer added after the order was saved
-/// shows up here — appended at the bottom, ready to be dragged up. Every drop
-/// persists immediately; the reset button clears the saved order so the list
-/// falls back to the surface's declared order.
+/// Seeded from [MapLayerOrderController.order] / `.categoryOrder` resolved
+/// against the surface's actual layers and the current category set
+/// (`orderedLayers` / `orderedCategories`), so a layer or category added after
+/// the order was saved shows up here — appended at the bottom, ready to be
+/// dragged up. A category header drags its whole block (every layer under it);
+/// a layer drag is clamped to its category. Every drop persists immediately;
+/// the reset button clears both saved orders so the list falls back to the
+/// declared order.
 class _LayerOrderSheet extends StatefulWidget {
   const _LayerOrderSheet({required this.layers, required this.controller});
 
@@ -289,15 +302,39 @@ class _LayerOrderSheet extends StatefulWidget {
 }
 
 class _LayerOrderSheetState extends State<_LayerOrderSheet> {
-  late List<String> _ids = [
-    for (final layer in orderedLayers(widget.layers, widget.controller.order))
-      layer.id,
+  // Category blocks — header + its layer ids. Dragging a header reorders the
+  // blocks; dragging a layer reorders within one block's ids.
+  late List<_Block> _blocks = _buildBlocks(
+    widget.layers,
+    widget.controller.order,
+    widget.controller.categoryOrder,
+  );
+
+  /// Layer ids in current block order (headers excluded) — what gets persisted.
+  List<String> get _ids => [
+    for (final block in _blocks)
+      for (final id in block.ids) id,
+  ];
+
+  /// Category names in current block order — persisted alongside the ids.
+  List<String> get _categoryIds => [
+    for (final block in _blocks) block.category.name,
   ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final defaultOrder = [for (final layer in widget.layers) layer.id];
+    final defaults = _buildBlocks(widget.layers, const [], const []);
+    final defaultIds = [
+      for (final block in defaults)
+        for (final id in block.ids) id,
+    ];
+    final defaultCategoryIds = [
+      for (final block in defaults) block.category.name,
+    ];
+    final pristine =
+        listEquals(_ids, defaultIds) &&
+        listEquals(_categoryIds, defaultCategoryIds);
     return SafeArea(
       top: false,
       child: ConstrainedBox(
@@ -312,7 +349,7 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
               _CenteredHeader(
                 title: l10n.mapLayerOrderTitle,
                 left: TextButton(
-                  onPressed: listEquals(_ids, defaultOrder) ? null : _reset,
+                  onPressed: pristine ? null : _reset,
                   child: Text(l10n.mapLayerOrderReset),
                 ),
                 right: IconButton(
@@ -330,14 +367,23 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
                     AppSpacing.md,
                     AppSpacing.md,
                   ),
-                  itemCount: _ids.length,
+                  itemCount: _flatten().length,
                   onReorderItem: _reorder,
                   itemBuilder: (context, index) {
+                    final row = _flatten()[index];
+                    final id = row.id;
+                    if (id == null) {
+                      return _ReorderHeader(
+                        key: ValueKey('header-${row.category.name}'),
+                        category: row.category,
+                        index: index,
+                      );
+                    }
                     final layer = widget.layers.firstWhere(
-                      (layer) => layer.id == _ids[index],
+                      (layer) => layer.id == id,
                     );
                     return _ReorderTile(
-                      key: ValueKey(layer.id),
+                      key: ValueKey(id),
                       layer: layer,
                       index: index,
                     );
@@ -353,20 +399,167 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
 
   void _reorder(int oldIndex, int newIndex) {
     setState(() {
-      // `onReorderItem` already adjusted newIndex for the removed slot.
-      final id = _ids.removeAt(oldIndex);
-      _ids.insert(newIndex, id);
+      final rows = _flatten();
+      final row = rows.removeAt(oldIndex);
+      if (row.id == null) {
+        // Category header — drags its whole block (header + every layer under
+        // it). `onReorderItem` already adjusted newIndex for the removed slot.
+        final block = <_Row>[row];
+        while (rows.isNotEmpty && rows.first.category == row.category) {
+          block.add(rows.removeAt(0));
+        }
+        // Snap the drop to a block boundary: a block must land before a
+        // header (or at the very end), never inside a group.
+        while (newIndex < rows.length && rows[newIndex].id != null) {
+          newIndex++;
+        }
+        newIndex = newIndex.clamp(0, rows.length);
+        rows.insertAll(newIndex, block);
+      } else {
+        // Layer — clamp to its category's band of the remaining rows. A
+        // category that emptied out just goes back to its old slot.
+        final (start, last) = _band(row.category, rows);
+        newIndex = start == -1 ? oldIndex : newIndex.clamp(start, last + 1);
+        rows.insert(newIndex, row);
+      }
+      _blocks = _condense(rows);
     });
     // Fire-and-forget: the next drop supersedes this write anyway, and the
-    // picker below reads the controller's latest order when it rebuilds.
+    // picker below reads the controller's latest orders when it rebuilds.
     unawaited(widget.controller.setOrder(_ids));
+    unawaited(widget.controller.setCategoryOrder(_categoryIds));
   }
 
   void _reset() {
     setState(() {
-      _ids = [for (final layer in widget.layers) layer.id];
+      _blocks = _buildBlocks(widget.layers, const [], const []);
     });
     unawaited(widget.controller.reset());
+  }
+
+  /// Rows in current block order — a header row before each block's layers.
+  List<_Row> _flatten() => [
+    for (final block in _blocks) ...[
+      _Row(block.category, null),
+      for (final id in block.ids) _Row(block.category, id),
+    ],
+  ];
+
+  /// Collapses a flattened row list back into blocks. [rows] always begins a
+  /// block with its header row, so a `_Block` is created there and filled by
+  /// the layer rows that follow.
+  List<_Block> _condense(List<_Row> rows) {
+    final blocks = <_Block>[];
+    _Block? current;
+    for (final row in rows) {
+      if (row.id == null) {
+        blocks.add(current = _Block(row.category));
+      } else {
+        (current ??= _Block(row.category)).ids.add(row.id!);
+      }
+    }
+    return blocks;
+  }
+
+  /// Index band (inclusive) of [category]'s **layer rows** in [rows] — headers
+  /// are not part of the band, so a row can be dropped anywhere between its
+  /// group's first and last layer. `(-1, -1)` when the group has no rows left.
+  static (int, int) _band(MapLayerCategory category, List<_Row> rows) {
+    var start = -1, last = -1;
+    for (var i = 0; i < rows.length; i++) {
+      final row = rows[i];
+      if (row.id != null && row.category == category) {
+        if (start == -1) start = i;
+        last = i;
+      }
+    }
+    return (start, last);
+  }
+}
+
+/// One category block in the order editor — the header plus its layer ids.
+class _Block {
+  _Block(this.category, [List<String>? ids]) : ids = ids ?? [];
+
+  final MapLayerCategory category;
+  final List<String> ids;
+}
+
+/// Groups [layers] (in [order]'s relative sequence) by category, in
+/// [categoryOrder]'s relative sequence — a header block before each non-empty
+/// group.
+List<_Block> _buildBlocks(
+  List<MapLayer> layers,
+  List<String> order,
+  List<String> categoryOrder,
+) {
+  final grouped = <MapLayerCategory, List<String>>{};
+  for (final layer in orderedLayers(layers, order)) {
+    grouped.putIfAbsent(categoryOf(layer.id), () => []).add(layer.id);
+  }
+  return [
+    for (final category in orderedCategories(
+      MapLayerCategory.values,
+      categoryOrder,
+    ))
+      if (grouped[category] case final ids?) _Block(category, ids),
+  ];
+}
+
+/// One reorder-list entry — a layer row or a category section header.
+class _Row {
+  const _Row(this.category, this.id);
+
+  final MapLayerCategory category;
+
+  /// The layer id; null marks a section header row.
+  final String? id;
+}
+
+/// Category header inside the reorder list. Dragging it moves the whole block.
+class _ReorderHeader extends StatelessWidget {
+  const _ReorderHeader({
+    super.key,
+    required this.category,
+    required this.index,
+  });
+
+  final MapLayerCategory category;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.xs,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              categoryLabel(category, l10n),
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ReorderableDragStartListener(
+            index: index,
+            child: const Padding(
+              padding: EdgeInsets.all(4),
+              child: Icon(Icons.drag_handle),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

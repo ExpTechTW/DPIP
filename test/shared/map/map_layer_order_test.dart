@@ -1,4 +1,5 @@
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_layer_category.dart';
 import 'package:dpip/shared/map/map_layer_order.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -75,6 +76,50 @@ void main() {
         'typhoon',
         'radar',
       ]);
+    });
+  });
+
+  group('orderedCategories', () {
+    List<String> names(List<MapLayerCategory> categories) => [
+      for (final c in categories) c.name,
+    ];
+
+    test('an empty order keeps the declared order', () {
+      expect(names(orderedCategories(MapLayerCategory.values, const [])), [
+        for (final c in MapLayerCategory.values) c.name,
+      ]);
+    });
+
+    test(
+      'a partial order moves those categories first, rest keep their order',
+      () {
+        expect(
+          names(
+            orderedCategories(MapLayerCategory.values, ['radar', 'typhoon']),
+          ),
+          ['radar', 'typhoon', 'earthquake', 'weather', 'satellite', 'life'],
+        );
+      },
+    );
+
+    test('a stale name is ignored without dropping any category', () {
+      expect(
+        names(orderedCategories(MapLayerCategory.values, ['gone', 'life'])),
+        ['life', 'earthquake', 'typhoon', 'weather', 'satellite', 'radar'],
+      );
+    });
+
+    test('duplicate names count once', () {
+      expect(
+        names(
+          orderedCategories(MapLayerCategory.values, [
+            'typhoon',
+            'typhoon',
+            'radar',
+          ]),
+        ),
+        ['typhoon', 'radar', 'earthquake', 'weather', 'satellite', 'life'],
+      );
     });
   });
 }

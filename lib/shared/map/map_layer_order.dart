@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_layer_category.dart';
 
 /// [layers] ordered by [order] (layer ids, most-preferred first).
 ///
@@ -30,5 +31,36 @@ List<MapLayer> orderedLayers(List<MapLayer> layers, List<String> order) {
     ...ordered,
     for (final layer in layers)
       if (placed.add(layer.id)) layer,
+  ];
+}
+
+/// [all] (the declared category set, in declared order) re-ordered by [order]
+/// (category names, most-preferred first).
+///
+/// Mirrors [orderedLayers]' tolerance so the persisted category order can
+/// outgrow the code that wrote it:
+/// - a name in [order] with no matching category is ignored;
+/// - a category not in [order] keeps its declared position and is appended
+///   after every ordered one, so a category added later — or the very first
+///   launch, when nothing was saved — still shows up;
+/// - duplicate names count once.
+///
+/// Every category in [all] appears exactly once.
+List<MapLayerCategory> orderedCategories(
+  List<MapLayerCategory> all,
+  List<String> order,
+) {
+  final byName = {for (final category in all) category.name: category};
+  final placed = <MapLayerCategory>{};
+  final ordered = <MapLayerCategory>[];
+  for (final name in order) {
+    final category = byName[name];
+    if (category == null || !placed.add(category)) continue;
+    ordered.add(category);
+  }
+  return [
+    ...ordered,
+    for (final category in all)
+      if (placed.add(category)) category,
   ];
 }
