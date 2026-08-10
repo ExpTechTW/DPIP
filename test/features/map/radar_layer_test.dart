@@ -181,8 +181,8 @@ void main() {
     );
   });
 
-  test('a settle warms well beyond the mounted ring', () async {
-    // 25 frames so the ±4 warm band is a strict subset, not the whole list.
+  test('a settle warms outward from the frame, far beyond the ring', () async {
+    // 25 frames so the ±4 ring is a strict subset of the warm spread.
     final source = _FakeRadarRepository(_ids(25));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
@@ -191,13 +191,53 @@ void main() {
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[12]);
 
+    final warmed = source.warmed.last;
+    expect(warmed, hasLength(25), reason: 'the fill warm spreads to the edge');
+    expect(warmed.first, frames[12].id, reason: 'nearest-the-finger first');
     expect(
-      source.warmed.last,
-      unorderedEquals([for (var i = 8; i <= 16; i++) frames[i].id]),
+      [warmed[1], warmed[2]],
+      unorderedEquals([frames[13].id, frames[11].id]),
       reason:
-          'warming is a local read plus a memory push, so the band a drag '
-          'can cross without touching disk is far cheaper to widen than the '
-          'band kept mounted',
+          'the spread walks outward ±1, ±2, … so fill warm injects the '
+          'nearest frames first and only the most distant stay cold',
+    );
+  });
+
+  test('a scrub reveal past the warm band re-warms around the finger', () async {
+    final source = _FakeRadarRepository(_ids(25));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[12]); // settle → warm 12, ±1, ±2 …
+    source.warmed.clear();
+
+    // Still inside the ±4 guaranteed band: revealing must not re-warm (or
+    // re-fetch the visible region) — the band already covers this mount.
+    await layer.show(controller, frames[16], scrubbing: true);
+    await pumpEventQueue();
+    expect(
+      source.warmed,
+      isEmpty,
+      reason:
+          'every scrub frame inside the warmed band costs one mount and no '
+          'store re-read, so the warm does not chase the finger frame by frame',
+    );
+
+    // Crossed the guaranteed band edge: the warm re-centres on the finger and
+    // spreads outward again, so the rest of a long drag stays on memory hits
+    // instead of store reads.
+    await layer.show(controller, frames[20], scrubbing: true);
+    await pumpEventQueue();
+    final reWarmed = source.warmed.last;
+    expect(reWarmed.first, frames[20].id, reason: 're-warms around the finger');
+    expect(
+      [reWarmed[1], reWarmed[2]],
+      unorderedEquals([frames[21].id, frames[19].id]),
+      reason:
+          'revealing a frame the last-warmed band did not cover re-warms '
+          'around it, so a drag never lands past a warmed mount',
     );
   });
 

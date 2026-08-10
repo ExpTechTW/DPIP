@@ -21,6 +21,11 @@ abstract interface class RasterFrameSource {
   ///
   /// Local only — a tile the app has never downloaded stays a miss, and
   /// MapLibre fetches it the ordinary way.
+  ///
+  /// When [fill] is true, [frames] must be ordered nearest-the-finger first and
+  /// the implementation tops the native mirror up until it is nearly full,
+  /// skipping nothing it holds already — so a timeline can warm far past its
+  /// mounted ring and only the most distant frames stay cold.
   Future<void> warmFrameTiles({
     required List<String> frames,
     required double south,
@@ -28,6 +33,7 @@ abstract interface class RasterFrameSource {
     required double north,
     required double east,
     required double zoom,
+    bool fill = false,
   });
 
   /// Aborts in-flight tile HTTP for [frames] — a scrub swept past them and

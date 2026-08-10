@@ -35,6 +35,7 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
     required double north,
     required double east,
     required double zoom,
+    bool fill = false,
   }) async => warmed.add(List<String>.of(frames));
 
   @override

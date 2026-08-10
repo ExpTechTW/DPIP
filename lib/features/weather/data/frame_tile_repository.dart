@@ -30,6 +30,11 @@ abstract base class FrameTileRepository implements RasterFrameSource {
   @protected
   String get tilePathPrefix;
 
+  /// How close to native's mirror cap a fill warm fills to — a little under the
+  /// cap (native trims only beyond it), so the mirror stays full but never
+  /// churns.
+  static const double _fillTarget = 0.85;
+
   @override
   Future<void> warmFrameTiles({
     required List<String> frames,
@@ -38,6 +43,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     required double north,
     required double east,
     required double zoom,
+    bool fill = false,
   }) {
     if (frames.isEmpty) return Future<void>.value();
     final tiles = viewportTiles(
@@ -49,14 +55,21 @@ abstract base class FrameTileRepository implements RasterFrameSource {
       maxZoom: maxZoom,
     );
     if (tiles.isEmpty) return Future<void>.value();
-    return warmer.warmUrls([
-      for (final frame in frames)
-        for (final tile in tiles)
-          tileUrl(frame)
-              .replaceFirst('{z}', '${tile.z}')
-              .replaceFirst('{x}', '${tile.x}')
-              .replaceFirst('{y}', '${tile.y}'),
-    ], logLabel: '$tilePathPrefix×${frames.length}');
+    return warmer.warmUrls(
+      [
+        // Frame order is preserved, so a fill warm injects nearest-the-finger
+        // frames' tiles first and only the most distant stay cold when the
+        // mirror fills.
+        for (final frame in frames)
+          for (final tile in tiles)
+            tileUrl(frame)
+                .replaceFirst('{z}', '${tile.z}')
+                .replaceFirst('{x}', '${tile.x}')
+                .replaceFirst('{y}', '${tile.y}'),
+      ],
+      logLabel: '$tilePathPrefix×${frames.length}',
+      fillUntil: fill ? _fillTarget : 0,
+    );
   }
 
   @override
