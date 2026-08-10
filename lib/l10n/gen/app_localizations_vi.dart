@@ -1144,6 +1144,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapOverlaySectionReference => 'Lớp tham chiếu';
 
   @override
+  String get mapLayerCategoryEarthquake => 'Động đất';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'Bão';
+
+  @override
+  String get mapLayerCategoryWeather => 'Quan sát thời tiết';
+
+  @override
+  String get mapLayerCategorySatellite => 'Vệ tinh';
+
+  @override
+  String get mapLayerCategoryRadar => 'Ra đa';
+
+  @override
+  String get mapLayerCategoryLife => 'Đời sống';
+
+  @override
   String get mapOverlaySectionMap => 'Bản đồ';
 
   @override

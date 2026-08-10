@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "参考图层",
-
-
-
-
-
- "mapOverlaySectionMap": "地图",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryTyphoon": "台风",
+  "mapLayerCategoryWeather": "气象观测",
+  "mapLayerCategorySatellite": "卫星",
+  "mapLayerCategoryRadar": "雷达",
+  "mapLayerCategoryLife": "生活",  "mapOverlaySectionMap": "地图",
   "rainIntervalSection": "统计时间",
 
   "mapTownLabels": "乡镇名称",

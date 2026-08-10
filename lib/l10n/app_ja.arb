@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "参照レイヤー",
-
-
-
-
-
- "mapOverlaySectionMap": "地図",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryTyphoon": "台風",
+  "mapLayerCategoryWeather": "気象観測",
+  "mapLayerCategorySatellite": "衛星",
+  "mapLayerCategoryRadar": "レーダー",
+  "mapLayerCategoryLife": "生活",  "mapOverlaySectionMap": "地図",
   "rainIntervalSection": "集計時間",
 
   "mapTownLabels": "郷鎮名",

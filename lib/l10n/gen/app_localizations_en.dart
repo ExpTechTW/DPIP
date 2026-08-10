@@ -1144,6 +1144,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapOverlaySectionReference => 'Reference layers';
 
   @override
+  String get mapLayerCategoryEarthquake => 'Earthquake';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'Typhoon';
+
+  @override
+  String get mapLayerCategoryWeather => 'Weather observations';
+
+  @override
+  String get mapLayerCategorySatellite => 'Satellite';
+
+  @override
+  String get mapLayerCategoryRadar => 'Radar';
+
+  @override
+  String get mapLayerCategoryLife => 'Daily life';
+
+  @override
   String get mapOverlaySectionMap => 'Map';
 
   @override

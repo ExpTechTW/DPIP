@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Layer ng sanggunian",
-
-
-
-
-
- "mapOverlaySectionMap": "Mapa",
+  "mapLayerCategoryEarthquake": "Lindol",
+  "mapLayerCategoryTyphoon": "Bagyo",
+  "mapLayerCategoryWeather": "Obserbasyon sa panahon",
+  "mapLayerCategorySatellite": "Satellite",
+  "mapLayerCategoryRadar": "Radar",
+  "mapLayerCategoryLife": "Pang-araw-araw na buhay",  "mapOverlaySectionMap": "Mapa",
   "rainIntervalSection": "Window ng oras",
 
   "mapTownLabels": "Mga pangalan ng bayan",

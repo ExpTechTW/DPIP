@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Lớp tham chiếu",
-
-
-
-
-
- "mapOverlaySectionMap": "Bản đồ",
+  "mapLayerCategoryEarthquake": "Động đất",
+  "mapLayerCategoryTyphoon": "Bão",
+  "mapLayerCategoryWeather": "Quan sát thời tiết",
+  "mapLayerCategorySatellite": "Vệ tinh",
+  "mapLayerCategoryRadar": "Ra đa",
+  "mapLayerCategoryLife": "Đời sống",  "mapOverlaySectionMap": "Bản đồ",
   "rainIntervalSection": "Khoảng thời gian",
 
   "mapTownLabels": "Tên hương trấn",

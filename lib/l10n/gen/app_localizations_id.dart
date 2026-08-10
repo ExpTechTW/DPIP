@@ -1147,6 +1147,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapOverlaySectionReference => 'Lapisan referensi';
 
   @override
+  String get mapLayerCategoryEarthquake => 'Gempa';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'Topan';
+
+  @override
+  String get mapLayerCategoryWeather => 'Pengamatan cuaca';
+
+  @override
+  String get mapLayerCategorySatellite => 'Satelit';
+
+  @override
+  String get mapLayerCategoryRadar => 'Radar';
+
+  @override
+  String get mapLayerCategoryLife => 'Kehidupan sehari-hari';
+
+  @override
   String get mapOverlaySectionMap => 'Peta';
 
   @override

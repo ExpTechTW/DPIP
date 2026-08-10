@@ -1151,6 +1151,24 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapOverlaySectionReference => 'Layer ng sanggunian';
 
   @override
+  String get mapLayerCategoryEarthquake => 'Lindol';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'Bagyo';
+
+  @override
+  String get mapLayerCategoryWeather => 'Obserbasyon sa panahon';
+
+  @override
+  String get mapLayerCategorySatellite => 'Satellite';
+
+  @override
+  String get mapLayerCategoryRadar => 'Radar';
+
+  @override
+  String get mapLayerCategoryLife => 'Pang-araw-araw na buhay';
+
+  @override
   String get mapOverlaySectionMap => 'Mapa';
 
   @override

@@ -6,6 +6,8 @@ import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
+import 'package:dpip/shared/map/map_layer_category.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,18 +43,22 @@ class DefaultMapLayerPage extends StatelessWidget {
               ),
             ),
           ),
-          for (final layer in DefaultMapLayer.values)
-            ListTile(
-              leading: Icon(layer.icon),
-              title: Text(layer.label(l10n)),
-              trailing: current == layer
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  : null,
-              onTap: () => controller.setLayer(layer),
-            ),
+          for (final category in MapLayerCategory.values) ...[
+            SectionHeader(categoryLabel(category, l10n)),
+            for (final layer in DefaultMapLayer.values)
+              if (categoryOf(layer.id) == category)
+                ListTile(
+                  leading: Icon(layer.icon),
+                  title: Text(layer.label(l10n)),
+                  trailing: current == layer
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  onTap: () => controller.setLayer(layer),
+                ),
+          ],
         ],
       ),
     );

@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
-
-
-
-
-
- "mapOverlaySectionMap": "แผนที่",
+  "mapLayerCategoryEarthquake": "แผ่นดินไหว",
+  "mapLayerCategoryTyphoon": "พายุไต้ฝุ่น",
+  "mapLayerCategoryWeather": "การสังเกตสภาพอากาศ",
+  "mapLayerCategorySatellite": "ดาวเทียม",
+  "mapLayerCategoryRadar": "เรดาร์",
+  "mapLayerCategoryLife": "ชีวิตประจำวัน",  "mapOverlaySectionMap": "แผนที่",
   "rainIntervalSection": "ช่วงเวลา",
 
   "mapTownLabels": "ชื่อตำบล",

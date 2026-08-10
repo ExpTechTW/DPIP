@@ -1523,7 +1523,35 @@
   "@mapOverlaySectionReference": {
     "description": "Section title in map overlay settings menus: the reference overlays"
   },
-  "mapOverlaySectionMap": "Map",
+  "mapLayerCategoryEarthquake": "Earthquake",
+  "@mapLayerCategoryEarthquake": {
+    "description": "Section title in map overlay lists: the seismic-monitor overlays"
+  },
+
+  "mapLayerCategoryTyphoon": "Typhoon",
+  "@mapLayerCategoryTyphoon": {
+    "description": "Section title in map overlay lists: typhoon overlays"
+  },
+
+  "mapLayerCategoryWeather": "Weather observations",
+  "@mapLayerCategoryWeather": {
+    "description": "Section title in map overlay lists: the weather-observation overlays"
+  },
+
+  "mapLayerCategorySatellite": "Satellite",
+  "@mapLayerCategorySatellite": {
+    "description": "Section title in map overlay lists: satellite-imagery overlays"
+  },
+
+  "mapLayerCategoryRadar": "Radar",
+  "@mapLayerCategoryRadar": {
+    "description": "Section title in map overlay lists: radar and precipitation-forecast overlays"
+  },
+
+  "mapLayerCategoryLife": "Daily life",
+  "@mapLayerCategoryLife": {
+    "description": "Section title in map overlay lists: everyday-life facility overlays"
+  },  "mapOverlaySectionMap": "Map",
   "@mapOverlaySectionMap": {
     "description": "Section title in map overlay settings menus: base-map settings"
   },

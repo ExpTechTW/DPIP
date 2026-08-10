@@ -1142,6 +1142,24 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';
 
   @override
+  String get mapLayerCategoryEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'พายุไต้ฝุ่น';
+
+  @override
+  String get mapLayerCategoryWeather => 'การสังเกตสภาพอากาศ';
+
+  @override
+  String get mapLayerCategorySatellite => 'ดาวเทียม';
+
+  @override
+  String get mapLayerCategoryRadar => 'เรดาร์';
+
+  @override
+  String get mapLayerCategoryLife => 'ชีวิตประจำวัน';
+
+  @override
   String get mapOverlaySectionMap => 'แผนที่';
 
   @override

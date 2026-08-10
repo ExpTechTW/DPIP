@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "Lapisan referensi",
-
-
-
-
-
- "mapOverlaySectionMap": "Peta",
+  "mapLayerCategoryEarthquake": "Gempa",
+  "mapLayerCategoryTyphoon": "Topan",
+  "mapLayerCategoryWeather": "Pengamatan cuaca",
+  "mapLayerCategorySatellite": "Satelit",
+  "mapLayerCategoryRadar": "Radar",
+  "mapLayerCategoryLife": "Kehidupan sehari-hari",  "mapOverlaySectionMap": "Peta",
   "rainIntervalSection": "Jendela waktu",
 
   "mapTownLabels": "Nama kecamatan",

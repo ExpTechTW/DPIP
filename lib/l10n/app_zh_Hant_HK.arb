@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "參考圖層",
-
-
-
-
-
- "mapOverlaySectionMap": "地圖",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryTyphoon": "颱風",
+  "mapLayerCategoryWeather": "氣象觀測",
+  "mapLayerCategorySatellite": "衛星",
+  "mapLayerCategoryRadar": "雷達",
+  "mapLayerCategoryLife": "生活",  "mapOverlaySectionMap": "地圖",
   "rainIntervalSection": "統計時間",
 
   "mapTownLabels": "鄉鎮名稱",

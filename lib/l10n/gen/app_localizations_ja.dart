@@ -1133,6 +1133,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapOverlaySectionReference => '参照レイヤー';
 
   @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '台風';
+
+  @override
+  String get mapLayerCategoryWeather => '気象観測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => 'レーダー';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
   String get mapOverlaySectionMap => '地図';
 
   @override

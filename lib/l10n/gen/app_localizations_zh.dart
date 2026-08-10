@@ -1127,6 +1127,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapOverlaySectionReference => '參考圖層';
 
   @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
   String get mapOverlaySectionMap => '地圖';
 
   @override
@@ -2633,6 +2651,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapOverlaySectionReference => '参考图层';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '台风';
+
+  @override
+  String get mapLayerCategoryWeather => '气象观测';
+
+  @override
+  String get mapLayerCategorySatellite => '卫星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷达';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
 
   @override
   String get mapOverlaySectionMap => '地图';
@@ -4143,6 +4179,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapOverlaySectionReference => '參考圖層';
 
   @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
   String get mapOverlaySectionMap => '地圖';
 
   @override
@@ -5649,6 +5703,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
 
   @override
   String get mapOverlaySectionMap => '地圖';

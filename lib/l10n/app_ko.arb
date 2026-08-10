@@ -343,12 +343,12 @@
   },
 
   "mapOverlaySectionReference": "참조 레이어",
-
-
-
-
-
- "mapOverlaySectionMap": "지도",
+  "mapLayerCategoryEarthquake": "지진",
+  "mapLayerCategoryTyphoon": "태풍",
+  "mapLayerCategoryWeather": "기상 관측",
+  "mapLayerCategorySatellite": "위성",
+  "mapLayerCategoryRadar": "레이더",
+  "mapLayerCategoryLife": "생활",  "mapOverlaySectionMap": "지도",
   "rainIntervalSection": "집계 시간",
 
   "mapTownLabels": "읍면동 이름",

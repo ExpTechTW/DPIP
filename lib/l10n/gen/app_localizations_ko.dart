@@ -1133,6 +1133,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapOverlaySectionReference => '참조 레이어';
 
   @override
+  String get mapLayerCategoryEarthquake => '지진';
+
+  @override
+  String get mapLayerCategoryTyphoon => '태풍';
+
+  @override
+  String get mapLayerCategoryWeather => '기상 관측';
+
+  @override
+  String get mapLayerCategorySatellite => '위성';
+
+  @override
+  String get mapLayerCategoryRadar => '레이더';
+
+  @override
+  String get mapLayerCategoryLife => '생활';
+
+  @override
   String get mapOverlaySectionMap => '지도';
 
   @override

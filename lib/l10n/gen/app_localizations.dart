@@ -2193,6 +2193,42 @@ abstract class AppLocalizations {
   /// **'Reference layers'**
   String get mapOverlaySectionReference;
 
+  /// Section title in map overlay lists: the seismic-monitor overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get mapLayerCategoryEarthquake;
+
+  /// Section title in map overlay lists: typhoon overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get mapLayerCategoryTyphoon;
+
+  /// Section title in map overlay lists: the weather-observation overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Weather observations'**
+  String get mapLayerCategoryWeather;
+
+  /// Section title in map overlay lists: satellite-imagery overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get mapLayerCategorySatellite;
+
+  /// Section title in map overlay lists: radar and precipitation-forecast overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get mapLayerCategoryRadar;
+
+  /// Section title in map overlay lists: everyday-life facility overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Daily life'**
+  String get mapLayerCategoryLife;
+
   /// Section title in map overlay settings menus: base-map settings
   ///
   /// In en, this message translates to:
