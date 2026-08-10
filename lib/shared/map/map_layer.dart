@@ -1,4 +1,5 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/shared/map/base_map.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -164,4 +165,78 @@ abstract interface class MapLayer {
   /// NOT touch the controller — the map is already wiped — so the next [prepare]
   /// re-adds from scratch instead of no-oping on stale "already added" state.
   void onStyleReset();
+}
+
+/// No-op bodies for the [MapLayer] members a given layer type doesn't use.
+///
+/// Timeline layers (radar, satellite, QPESUMS) draw nothing in [MapLayer.render]
+/// and open no [MapLayer.buildSheet]; sheet layers (stations, typhoon) publish
+/// no [MapLayer.frames]. A layer mixes this in and overrides only what it does —
+/// the scaffold can then call the whole [MapLayer] surface without a chain of
+/// empty implementations per layer.
+mixin MapLayerDefaults implements MapLayer {
+  @override
+  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
+
+  @override
+  Future<void> prepare(
+    MapLibreMapController controller,
+    List<MapFrame> frames,
+  ) async {}
+
+  @override
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
+
+  @override
+  Future<void> render(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onMapTap(
+    LatLng latLng,
+    MapLibreMapController controller,
+  ) async {}
+
+  @override
+  void selectFeature(String id) {}
+
+  @override
+  Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildLegend(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+  }) => const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
+
+  @override
+  double get mapMinZoom => BaseMap.defaultMinZoom;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
+  void onStyleReset() {}
 }

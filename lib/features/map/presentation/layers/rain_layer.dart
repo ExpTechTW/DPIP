@@ -14,7 +14,6 @@ import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
@@ -40,7 +39,9 @@ extension RainIntervalL10n on RainInterval {
   };
 }
 
-class RainMapLayer implements MapLayer, StationSheetSource {
+class RainMapLayer
+    with MapLayerDefaults
+    implements MapLayer, StationSheetSource {
   RainMapLayer(this._repository);
 
   final MeteorRainRepository _repository;
@@ -104,25 +105,6 @@ class RainMapLayer implements MapLayer, StationSheetSource {
 
   @override
   double get bottomChromeFraction => StationSheet.peekExtent;
-
-  @override
-  double get mapMinZoom => 4;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -268,21 +250,6 @@ class RainMapLayer implements MapLayer, StationSheetSource {
   }
 
   @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
-
-  @override
   Widget buildSheet(BuildContext context) => ListenableBuilder(
     listenable: interval,
     builder: (context, _) => StationSheet(key: ValueKey(id), source: this),
@@ -319,9 +286,6 @@ class RainMapLayer implements MapLayer, StationSheetSource {
 
   @override
   void selectFeature(String id) => select(id);
-
-  @override
-  void onStyleReset() {}
 
   @override
   ValueListenable<String?> get selection => _selected;

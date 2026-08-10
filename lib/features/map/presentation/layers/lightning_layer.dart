@@ -14,14 +14,13 @@ import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-class LightningMapLayer implements MapLayer {
+class LightningMapLayer with MapLayerDefaults implements MapLayer {
   LightningMapLayer(this._repository);
 
   final MeteorLightningRepository _repository;
@@ -65,46 +64,6 @@ class LightningMapLayer implements MapLayer {
 
   @override
   double get bottomChromeFraction => 0;
-
-  @override
-  double get mapMinZoom => 4;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<void> render(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onMapTap(
-    LatLng latLng,
-    MapLibreMapController controller,
-  ) async {}
-
-  @override
-  Widget buildSheet(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  Widget buildTopTrailingChrome(
-    BuildContext context, {
-    required ValueListenable<bool> showTownLabels,
-    required ValueChanged<bool> onShowTownLabelsChanged,
-  }) => const SizedBox.shrink();
-
-  @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
 
   @override
   Widget buildLegend(BuildContext context) {
@@ -214,9 +173,6 @@ class LightningMapLayer implements MapLayer {
     _mounted = false;
     _shownFrameId = null;
   }
-
-  @override
-  void selectFeature(String id) {}
 
   @override
   void onStyleReset() {

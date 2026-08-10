@@ -50,7 +50,7 @@ typedef _StormPoint = ({
 /// Sheet-type [MapLayer]: renders every typhoon dataset on the map and drives
 /// [TyphoonPanel] (summary, warning) via notifiers. Meteor satellite PNG and
 /// optional radar/IR underlays are aligned to the live bulletin time.
-class TyphoonMapLayer implements MapLayer {
+class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
   TyphoonMapLayer(
     this._repository, {
     required this.radar,
@@ -190,22 +190,6 @@ class TyphoonMapLayer implements MapLayer {
   /// Basin-wide framing — lower than radar's floor so distant storms fit.
   @override
   double get mapMinZoom => 3;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -417,12 +401,6 @@ class TyphoonMapLayer implements MapLayer {
 
   @override
   void onMapGestureEnd() => suppressCallouts.value = false;
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
 
   /// Active MapLibre controller (for Flutter screen-space callouts).
   MapLibreMapController? get mapController => _controller;
@@ -1295,9 +1273,6 @@ class TyphoonMapLayer implements MapLayer {
     tapped.value = null;
     _controller = null;
   }
-
-  @override
-  void selectFeature(String id) {}
 
   @override
   void onStyleReset() {

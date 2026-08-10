@@ -12,7 +12,6 @@ import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -28,7 +27,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// Concrete layers (temperature, humidity, …) supply only which value to read
 /// from an observation ([valueOf]) and from the trend series ([trendOf]), plus
 /// the unit and the colour ramp. All share one [MeteorWeatherRepository].
-abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
+abstract class WeatherStationLayer
+    with MapLayerDefaults
+    implements MapLayer, StationSheetSource {
   WeatherStationLayer(this._repository);
 
   final MeteorWeatherRepository _repository;
@@ -89,25 +90,6 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
 
   @override
   double get bottomChromeFraction => StationSheet.peekExtent;
-
-  @override
-  double get mapMinZoom => 4;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -174,28 +156,6 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
-  Widget buildTopTrailingChrome(
-    BuildContext context, {
-    required ValueListenable<bool> showTownLabels,
-    required ValueChanged<bool> onShowTownLabelsChanged,
-  }) => const SizedBox.shrink();
-
-  @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
-
-  @override
   Widget buildSheet(BuildContext context) =>
       StationSheet(key: ValueKey(id), source: this);
 
@@ -216,10 +176,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   void selectFeature(String id) => select(id);
 
   @override
-  void onStyleReset() {}
-
   // --- StationSheetSource ---
-
   @override
   ValueListenable<String?> get selection => _selected;
 
