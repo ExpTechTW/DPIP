@@ -75,10 +75,12 @@ abstract final class RadarScanRange {
 
   static const double _deg = math.pi / 180.0;
 
+  /// `x²` — cheaper and cast-free versus `math.pow(x, 2) as double`.
+  static double _sq(double x) => x * x;
+
   /// `kᵢ = sin²(Rᵢ / 2Rₑ)` per site, precomputed.
   static final List<double> _k = [
-    for (final s in sites)
-      math.pow(math.sin(s.radiusKm / (2 * earthRadiusKm)), 2) as double,
+    for (final s in sites) _sq(math.sin(s.radiusKm / (2 * earthRadiusKm))),
   ];
 
   /// `cos φᵢ` per site, precomputed.
@@ -92,8 +94,8 @@ abstract final class RadarScanRange {
     final cosP = math.cos(lat * _deg);
     for (var i = 0; i < sites.length; i++) {
       final site = sites[i];
-      final a = math.pow(math.sin((lat - site.lat) * _deg / 2), 2) as double;
-      final b = math.pow(math.sin((lon - site.lon) * _deg / 2), 2) as double;
+      final a = _sq(math.sin((lat - site.lat) * _deg / 2));
+      final b = _sq(math.sin((lon - site.lon) * _deg / 2));
       if (a + cosP * _cosLat[i] * b <= _k[i]) return true;
     }
     return false;
@@ -103,8 +105,7 @@ abstract final class RadarScanRange {
   /// reach that latitude. Closed-form inverse of the condition above.
   static (double, double)? _lonSpan(int i, double lat, double cosP) {
     final site = sites[i];
-    final s =
-        _k[i] - (math.pow(math.sin((lat - site.lat) * _deg / 2), 2) as double);
+    final s = _k[i] - _sq(math.sin((lat - site.lat) * _deg / 2));
     if (s <= 0) return null;
     final t = s / (cosP * _cosLat[i]);
     if (t <= 0) return null;
