@@ -1,6 +1,34 @@
+import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+
+/// The slice of the router a notification tap needs — [GoRouter.goNamed].
+typedef NotificationRouteNavigator = void Function(
+  String name, {
+  Map<String, String> pathParameters,
+  Map<String, dynamic> queryParameters,
+  String? fragment,
+  Object? extra,
+});
+
+/// Single owner of notification → destination, mirroring the legacy
+/// `notify.dart` tap table in one file: [NotificationTaps] carries the tap
+/// intent and calls [routeNotificationTap] once the router is live (replaying a
+/// cold-start tap through [NotificationTaps.drainPending]). The channel
+/// resolves to a route name via the declarative group table below, then the
+/// router navigates — no widget hosts this logic, so adding an alert family is
+/// one row in the table and nothing else.
+///
+/// [navigate] is injectable for tests; it defaults to the app router's
+/// [GoRouter.goNamed].
+void routeNotificationTap(
+  NotificationTap tap, {
+  NotificationRouteNavigator? navigate,
+}) {
+  (navigate ?? appRouter.goNamed)(routeForNotificationChannel(tap.channelKey));
+}
 
 /// Resolves a tapped notification's channel to a destination route.
 ///
