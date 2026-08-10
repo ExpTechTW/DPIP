@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "ไม่มีเหตุการณ์ที่ยังมีผล",
   "homeRainTrendTitle": "ฝนชั่วโมงถัดไป",
   "homeRainTrendMinute": "{minute} นาที",
+  "homeRainTrendUpdated": "อัปเดต {time}",
   "homeRainTrendScattered": "อาจมีฝนตกประปราย",
   "homeRainTrendLightSustained": "ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า",
   "homeRainTrendLightStopping": "คาดว่าฝนจะหยุดในอีก {minutes} นาที",

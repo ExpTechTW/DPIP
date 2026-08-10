@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "Walang aktibong event",
   "homeRainTrendTitle": "Ulan sa susunod na oras",
   "homeRainTrendMinute": "{minute} min",
+  "homeRainTrendUpdated": "Na-update {time}",
   "homeRainTrendScattered": "Posibleng mahinang ulan",
   "homeRainTrendLightSustained": "Tuloy-tuloy na mahinang ulan sa susunod na oras",
   "homeRainTrendLightStopping": "Baka huminto ang mahinang ulan sa loob ng {minutes} minuto",

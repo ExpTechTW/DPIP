@@ -512,6 +512,11 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return 'Cập nhật $time';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Có thể có mưa rào nhẹ';
 
   @override

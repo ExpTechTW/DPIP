@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "Không có sự kiện đang hiệu lực",
   "homeRainTrendTitle": "Mưa 1 giờ tới",
   "homeRainTrendMinute": "{minute} phút",
+  "homeRainTrendUpdated": "Cập nhật {time}",
   "homeRainTrendScattered": "Có thể có mưa rào nhẹ",
   "homeRainTrendLightSustained": "Mưa nhỏ tiếp diễn trong 1 giờ tới",
   "homeRainTrendLightStopping": "Mưa nhỏ có thể tạnh trong {minutes} phút nữa",

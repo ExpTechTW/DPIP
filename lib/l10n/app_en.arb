@@ -722,6 +722,15 @@
       }
     }
   },
+  "homeRainTrendUpdated": "Updated {time}",
+  "@homeRainTrendUpdated": {
+    "description": "Data-update time beside the home rain trend title, Taipei wall clock HH:mm",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "homeRainTrendScattered": "Light showers possible",
   "@homeRainTrendScattered": {
     "description": "Home rain trend subtitle: peak intensity below the light-rain threshold"

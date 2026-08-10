@@ -511,6 +511,11 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return 'อัปเดต $time';
+  }
+
+  @override
   String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
 
   @override

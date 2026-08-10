@@ -517,6 +517,11 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return 'Na-update $time';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Posibleng mahinang ulan';
 
   @override

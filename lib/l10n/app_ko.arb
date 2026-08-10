@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "발효 중인 이벤트가 없습니다",
   "homeRainTrendTitle": "향후 1시간 강수",
   "homeRainTrendMinute": "{minute}분",
+  "homeRainTrendUpdated": "업데이트 {time}",
   "homeRainTrendScattered": "약한 비가 올 수 있어요",
   "homeRainTrendLightSustained": "앞으로 1시간 동안 약한 비가 이어질 거예요",
   "homeRainTrendLightStopping": "{minutes}분 후에 비가 그칠 것으로 예상돼요",

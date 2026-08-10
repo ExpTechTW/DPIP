@@ -1029,6 +1029,12 @@ abstract class AppLocalizations {
   /// **'{minute} min'**
   String homeRainTrendMinute(int minute);
 
+  /// Data-update time beside the home rain trend title, Taipei wall clock HH:mm
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String homeRainTrendUpdated(String time);
+
   /// Home rain trend subtitle: peak intensity below the light-rain threshold
   ///
   /// In en, this message translates to:

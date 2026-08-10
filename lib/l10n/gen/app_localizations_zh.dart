@@ -509,6 +509,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -1982,6 +1987,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String homeRainTrendMinute(int minute) {
     return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
   }
 
   @override
@@ -3461,6 +3471,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -4934,6 +4949,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String homeRainTrendMinute(int minute) {
     return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
   }
 
   @override

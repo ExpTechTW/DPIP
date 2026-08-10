@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "目前没有生效中的事件",
   "homeRainTrendTitle": "近 1 小时降水趋势",
   "homeRainTrendMinute": "{minute}分",
+  "homeRainTrendUpdated": "更新 {time}",
   "homeRainTrendScattered": "可能会有零星降雨",
   "homeRainTrendLightSustained": "未来 1 小时会有持续小雨",
   "homeRainTrendLightStopping": "预计 {minutes} 分钟后停止下小雨",

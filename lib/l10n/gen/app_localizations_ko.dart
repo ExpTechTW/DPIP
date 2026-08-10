@@ -510,6 +510,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String homeRainTrendUpdated(String time) {
+    return '업데이트 $time';
+  }
+
+  @override
   String get homeRainTrendScattered => '약한 비가 올 수 있어요';
 
   @override

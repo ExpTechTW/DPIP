@@ -152,6 +152,7 @@
   "homeActiveEventsEmpty": "発生中の事象はありません",
   "homeRainTrendTitle": "今後1時間の雨",
   "homeRainTrendMinute": "{minute}分",
+  "homeRainTrendUpdated": "更新 {time}",
   "homeRainTrendScattered": "にわか雨の可能性があります",
   "homeRainTrendLightSustained": "今後1時間は小雨が続きます",
   "homeRainTrendLightStopping": "{minutes}分後に小雨が止む見込みです",
