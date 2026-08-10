@@ -9,7 +9,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
-import 'package:dpip/features/home/presentation/widgets/forecast_weather_visual.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +192,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final p = points[index];
-                final (icon, accent) = forecastWeatherVisual(
+                final (icon, accent) = weatherVisual(
                   p.weather,
                   p.weatherCode,
                   colors,

@@ -4,6 +4,8 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
@@ -101,8 +103,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final experimental = context.watch<ExperimentalSettings>();
-    final weatherMode = experimental.weatherMode;
     final skyTimeMode = experimental.skyTimeMode;
+    // A forced experimental mode wins outright; otherwise the backdrop follows
+    // the station's live CWB code. 全國 / 所在地 without GPS / still loading
+    // have no reading yet, so they resolve to the `auto` default look.
+    final realtimeCode = context
+        .watch<HomeWeatherController>()
+        .weather
+        ?.data
+        .weatherCode;
+    final weatherMode = experimental.weatherMode == WeatherMode.auto
+        ? weatherModeFor(realtimeCode ?? 0)
+        : experimental.weatherMode;
     final extent = context.read<HomeSheetExtent>();
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,

@@ -6,6 +6,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -76,6 +77,13 @@ class HomeSheetHeader extends StatelessWidget {
     final temp = data?.temperature;
     final humidity = data?.humidity;
     final rain = data?.rain;
+    // The condition icon follows the station's code via the shared table; the
+    // cloud placeholder only shows before the first reading arrives.
+    final weather = data == null
+        ? null
+        : weatherVisual(data.weather, data.weatherCode, colors);
+    final conditionIcon = weather?.$1 ?? Icons.cloud_outlined;
+    final conditionAccent = weather?.$2 ?? secondary;
 
     // 全國 has no township weather — name only. 所在地 without GPS: say so
     // instead of a dashed reading row.
@@ -149,9 +157,9 @@ class HomeSheetHeader extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.cloud_outlined,
+                        conditionIcon,
                         size: iconSize,
-                        color: secondary,
+                        color: conditionAccent,
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Text.rich(
@@ -204,9 +212,9 @@ class HomeSheetHeader extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.cloud_outlined,
+                          conditionIcon,
                           size: iconSize,
-                          color: secondary,
+                          color: conditionAccent,
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text.rich(
