@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/home_area.dart';
@@ -71,6 +72,12 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   /// keeps the zoom device-independent (MapLibre derives it from the box and the
   /// viewport). Raise for a looser frame.
   static const double _frameExpansion = 1;
+
+  /// Half-width (degrees) of the GPS-centred frame for 所在地 — the current
+  /// fix sits at the centre of a small span that [_frameExpansion] then pushes
+  /// out. ~0.05° ≈ 5.5 km, township scale: the point is to show *where the
+  /// user is*, not to frame the whole township like a saved area does.
+  static const double _gpsSpan = 0.05;
 
   MapLibreMapController? _controller;
   bool _styleReady = false;
@@ -174,6 +181,12 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final code = _selectedCode;
     final styleEpoch = _styleEpoch;
+    // 所在地 is a *place*, not a region: the current GPS fix is the point, so
+    // the camera centres on it (a fixed span around the fix) instead of framing
+    // the whole township the way a saved area does. Falls back to the township
+    // box — or the whole island when GPS is unavailable — if no fix is had.
+    final gpsCentred = _regions?.selected is CurrentArea;
+    final location = context.read<LocationService>();
     // Nothing changed since the last apply (an unrelated RegionStore notify) —
     // don't re-add layers or re-run the camera.
     if (code == _appliedCode && styleEpoch == _appliedCodeEpoch) return;
@@ -186,9 +199,25 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       bounds = boundaries.boundsFor(code);
     }
 
+    LatLngBounds frame;
+    if (gpsCentred) {
+      final fix = await location.currentFix();
+      if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
+      frame = fix == null
+          ? _latLngBounds(bounds)
+          : _latLngBounds([
+              fix.lng - _gpsSpan,
+              fix.lat - _gpsSpan,
+              fix.lng + _gpsSpan,
+              fix.lat + _gpsSpan,
+            ]);
+    } else {
+      frame = _latLngBounds(bounds);
+    }
+
     // Normalise the fit box: a degenerate/non-finite township box would make
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
-    final box = safeFitBounds(_latLngBounds(bounds));
+    final box = safeFitBounds(frame);
     if (box == null) return;
     // Hand the framed geography to the map tab; it fits the same box into its
     // own visible band (different chrome, so a different camera).
