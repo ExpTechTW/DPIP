@@ -100,10 +100,6 @@ void main() {
       navigate: record,
     );
 
-    expect(named, [
-      AppRoutes.eew,
-      AppRoutes.earthquake,
-      AppRoutes.home,
-    ]);
+    expect(named, [AppRoutes.eew, AppRoutes.earthquake, AppRoutes.home]);
   });
 }
