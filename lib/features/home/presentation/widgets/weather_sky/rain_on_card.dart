@@ -343,8 +343,7 @@ class _RainOnCardState extends State<RainOnCard>
             previous - _cardTopY! > _scrollThresholdRatio * _screenHeight
         ? _scrollGravityScale
         : 1.0;
-    final open =
-        !widget.gated || _restTopY! - _cardTopY! < _gateCloseDistance;
+    final open = !widget.gated || _restTopY! - _cardTopY! < _gateCloseDistance;
     if (open == _gateOpen) return;
     setState(() => _gateOpen = open);
   }

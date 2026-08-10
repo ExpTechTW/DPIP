@@ -162,14 +162,20 @@ class _HomePageState extends State<HomePage> {
                     valueListenable: extent,
                     builder: (context, extentValue, _) {
                       final t = HomeChrome.mapDim(extentValue);
-                      if (t <= 0) return const SizedBox.shrink();
                       final sigma = t * _mapBlurPeak;
                       final dim = t * _mapDimPeak;
+                      // The tree's shape never changes — no SizedBox/ImageFiltered
+                      // swap at t=0, which would re-parent the subtree right over
+                      // the map platform view at the exact edge the sheet starts
+                      // climbing (the same re-parent flash as the sheet's sky).
+                      // `enabled` makes the filter a no-op at rest without
+                      // touching the tree.
                       return ImageFiltered(
                         imageFilter: ImageFilter.blur(
                           sigmaX: sigma,
                           sigmaY: sigma,
                         ),
+                        enabled: t > 0,
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),
                         ),

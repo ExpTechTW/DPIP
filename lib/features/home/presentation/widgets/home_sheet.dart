@@ -238,21 +238,30 @@ class _ScrollBlurredWeather extends StatelessWidget {
             ? scrollController.offset
             : 0.0;
         final t = (offset / _rampExtent).clamp(0.0, 1.0);
-        // Skip the filter layer entirely at rest, rather than compositing an
-        // always-on blur of sigma 0 — the sheet spends most of its time here.
-        if (t <= 0) return child!;
         final sigma = _maxSigma * t;
         final dim = _maxDim * t;
+        // The tree's SHAPE never changes — a blur that toggles via `enabled`
+        // and an always-present transparent dim. Returning the bare child at
+        // rest (as an early version did) re-parents the sky's element the
+        // moment t crosses 0, which disposes and recreates the whole
+        // `WeatherSkyBackground` state: its LUT cache is null again, so the
+        // first blurred frame is the flat fallback colour until every shader
+        // re-decodes. That is the flash. RainOnGlass's doc warns about the
+        // same re-parenting for drags; here it cost a visible blink.
         return Stack(
           fit: StackFit.expand,
           children: [
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              // No-op at rest, so no offscreen layer is composited — the sheet
+              // spends most of its time here, and ImageFiltered.enabled skips
+              // the filter without touching the tree shape.
+              enabled: t > 0,
               child: child,
             ),
             // Dim sits *above* the blur so the backdrop darkens uniformly; the
             // content layer renders above this whole stack in HomeSheet, so the
-            // cards are never dimmed with it.
+            // cards are never dimmed with it. Transparent at rest.
             ColoredBox(color: Colors.black.withValues(alpha: dim)),
           ],
         );
