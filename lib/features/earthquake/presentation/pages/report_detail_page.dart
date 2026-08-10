@@ -4,7 +4,6 @@
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
@@ -112,22 +111,11 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
 /// The report's epicentre + station bounds, in the map library's coordinate
 /// type — computed here (not on the domain model) so the domain layer stays
 /// free of a `maplibre_gl` dependency.
-LatLngBounds _reportBounds(EarthquakeReport report) {
-  var minLat = report.latitude, maxLat = report.latitude;
-  var minLon = report.longitude, maxLon = report.longitude;
-  for (final area in report.list.values) {
-    for (final town in area.town.values) {
-      minLat = math.min(minLat, town.latitude);
-      maxLat = math.max(maxLat, town.latitude);
-      minLon = math.min(minLon, town.longitude);
-      maxLon = math.max(maxLon, town.longitude);
-    }
-  }
-  return LatLngBounds(
-    southwest: LatLng(minLat, minLon),
-    northeast: LatLng(maxLat, maxLon),
-  );
-}
+LatLngBounds _reportBounds(EarthquakeReport report) => boundsFromPoints([
+  LatLng(report.latitude, report.longitude),
+  for (final area in report.list.values)
+    for (final town in area.town.values) LatLng(town.latitude, town.longitude),
+])!;
 
 /// One 震度 level's counties (縣市) and, per county, the felt area/town names —
 /// grouping by intensity first (highest first), not by county, mirrors the

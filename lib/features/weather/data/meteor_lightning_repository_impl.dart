@@ -3,8 +3,8 @@ library;
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
-import 'package:dpip/core/network/meteor_decode.dart';
 import 'package:dpip/features/weather/data/meteor_lightning_api.dart';
+import 'package:dpip/features/weather/data/meteor_station_decode.dart';
 import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 
@@ -20,8 +20,7 @@ class MeteorLightningRepositoryImpl implements MeteorLightningRepository {
       guardResult(() async => LightningSnapshot.decode(await _api.getLatest()));
 
   @override
-  Future<Result<List<int>>> history() =>
-      guardResult(() async => MeteorDecode.deltaSeconds(await _api.getList()));
+  Future<Result<List<int>>> history() => fetchHistory(_api.getList);
 
   @override
   Future<Result<LightningSnapshot>> at(int second) => guardResult(

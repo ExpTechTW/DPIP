@@ -128,3 +128,22 @@ double _mercatorLat(double y) {
 }
 
 double _log2(double x) => math.log(x) / math.ln2;
+
+/// Axis-aligned bounds of [points], or `null` when empty / non-finite.
+LatLngBounds? boundsFromPoints(Iterable<LatLng> points) {
+  double? minLat, maxLat, minLng, maxLng;
+  for (final p in points) {
+    final lat = p.latitude;
+    final lng = p.longitude;
+    if (!lat.isFinite || !lng.isFinite) continue;
+    minLat = minLat == null ? lat : math.min(minLat, lat);
+    maxLat = maxLat == null ? lat : math.max(maxLat, lat);
+    minLng = minLng == null ? lng : math.min(minLng, lng);
+    maxLng = maxLng == null ? lng : math.max(maxLng, lng);
+  }
+  if (minLat == null) return null;
+  return LatLngBounds(
+    southwest: LatLng(minLat, minLng!),
+    northeast: LatLng(maxLat!, maxLng!),
+  );
+}

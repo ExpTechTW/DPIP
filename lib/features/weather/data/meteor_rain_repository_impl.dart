@@ -3,8 +3,8 @@ library;
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
-import 'package:dpip/core/network/meteor_decode.dart';
 import 'package:dpip/features/weather/data/meteor_rain_api.dart';
+import 'package:dpip/features/weather/data/meteor_station_decode.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
@@ -19,23 +19,14 @@ class MeteorRainRepositoryImpl implements MeteorRainRepository {
 
   @override
   Future<Result<Map<String, WeatherStation>>> stations() =>
-      guardResult(() async {
-        final raw = await _api.getStation();
-        return raw.map(
-          (code, value) => MapEntry(
-            code,
-            WeatherStation.fromJson(value as Map<String, dynamic>),
-          ),
-        );
-      });
+      fetchStations(_api.getStation);
 
   @override
   Future<Result<RainSnapshot>> latest() =>
       guardResult(() async => RainSnapshot.decode(await _api.getLatest()));
 
   @override
-  Future<Result<List<int>>> history() =>
-      guardResult(() async => MeteorDecode.deltaSeconds(await _api.getList()));
+  Future<Result<List<int>>> history() => fetchHistory(_api.getList);
 
   @override
   Future<Result<RainSnapshot>> at(int second) =>

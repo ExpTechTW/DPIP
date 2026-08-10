@@ -10,6 +10,8 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/core/realtime/app_time.dart';
+
 /// Rain intensity grade for the next hour, from the peak per-minute value.
 enum RainHourTrendGrade {
   /// No rain forecast at all.
@@ -146,8 +148,7 @@ class RainHourTrend {
   /// "now", minute-aligned). Used by [decode] when the API returns no forecast
   /// series at all.
   factory RainHourTrend.dry({DateTime? startUtc}) {
-    final seconds =
-        (startUtc ?? DateTime.now().toUtc()).millisecondsSinceEpoch ~/ 1000;
+    final seconds = (startUtc ?? AppTime.utc).millisecondsSinceEpoch ~/ 1000;
     final aligned = seconds - (seconds % 60);
     return RainHourTrend(startSecond: aligned, mm: List<double>.filled(60, 0));
   }
@@ -155,8 +156,7 @@ class RainHourTrend {
   /// Synthetic series for UI work until the API lands — a soft pulse peaking
   /// mid-hour so the bar chart has shape.
   static RainHourTrend placeholder({int? startSecond}) {
-    final raw =
-        startSecond ?? (DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000);
+    final raw = startSecond ?? (AppTime.utc.millisecondsSinceEpoch ~/ 1000);
     final aligned = raw - (raw % 60);
     return RainHourTrend(
       startSecond: aligned,
