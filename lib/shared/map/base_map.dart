@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math' show Point;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -8,8 +10,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// Layer-chip band under the safe-area top: outer pad ([AppSpacing.lg]) + chip
 /// height (~36) + a tight gap. iOS MapLibre already anchors ornaments to the
 /// safe top, so this is the full Y margin there; Android still needs safe-area
-/// padding added on top (see [BaseMap.build]).
-const double _layerChipBand = AppSpacing.lg + 36 + AppSpacing.xs;
+/// padding added on top (see [BaseMap.build]). MapScaffold reuses it to park its
+/// Flutter [MapCompass] in the same spot the native compass occupied.
+const double layerChipBand = AppSpacing.lg + 36 + AppSpacing.xs;
 
 /// The app's reusable base map — a MapLibre map centred on Taiwan, rendered from
 /// the ExpTech vector style tinted by [MapColors] for the active brightness.
@@ -24,14 +27,22 @@ const double _layerChipBand = AppSpacing.lg + 36 + AppSpacing.xs;
 /// `false` for a display-only surface like the home backdrop, where the map is
 /// driven entirely from code and the page's own gestures (tap to open, swipe
 /// to switch) must pass straight through. Tilt is always off.
-class BaseMap extends StatelessWidget {
+///
+/// The map is [StatefulWidget] so it can self-heal a failed platform-view
+/// mount: after an iOS hot restart the engine can still own the previous
+/// run's view id, the framework re-issues it, and `UiKitView` creation fails
+/// with `recreating_view` — the map remounts with a fresh id and recovers
+/// (see [_BaseMapState]).
+class BaseMap extends StatefulWidget {
   const BaseMap({
     super.key,
     this.onMapCreated,
     this.onStyleLoaded,
     this.onMapClick,
     this.onCameraIdle,
+    this.onCameraMove,
     this.interactive = true,
+    this.compassEnabled = true,
     this.showUserLocation = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
@@ -89,9 +100,21 @@ class BaseMap extends StatelessWidget {
   /// that need a fresh `toScreenLocation` projection.
   final OnCameraIdleCallback? onCameraIdle;
 
+  /// Fires on every camera move with the new position — [MapCompass] uses the
+  /// bearing so the needle tracks rotation live.
+  final OnCameraMoveCallback? onCameraMove;
+
   /// Whether the user can pan/zoom/rotate the map. `false` makes it display-only
   /// (all gestures + the compass off) so the surrounding page owns every gesture.
   final bool interactive;
+
+  /// Whether the **native** MapLibre compass shows (when [interactive]).
+  ///
+  /// The native compass lives inside the platform view, so any Flutter overlay
+  /// paints over it. MapScaffold turns it off and draws its own [MapCompass]
+  /// at the top of the chrome stack instead, keeping north reachable even under
+  /// screen-space callouts (typhoon forecast tips).
+  final bool compassEnabled;
 
   /// Whether to draw the device-location puck.
   ///
@@ -113,6 +136,63 @@ class BaseMap extends StatelessWidget {
   final double maxZoomPreference;
 
   @override
+  State<BaseMap> createState() => _BaseMapState();
+}
+
+class _BaseMapState extends State<BaseMap> {
+  /// Set once the platform view reports in — the readiness gate for the retry.
+  MapLibreMapController? _controller;
+
+  /// Bumped to remount the map's platform view after a failed first attempt
+  /// (see [_scheduleReadinessRetry]).
+  int _mountAttempt = 0;
+
+  Timer? _readinessTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleReadinessRetry();
+  }
+
+  @override
+  void dispose() {
+    _readinessTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Forwards map readiness to the caller and stops the retry timer.
+  void _onMapCreated(MapLibreMapController controller) {
+    _controller = controller;
+    _readinessTimer?.cancel();
+    // A remount (retry) may have superseded this element — never hand a stale
+    // controller, whose native view is being torn down, to the caller.
+    if (!mounted) return;
+    widget.onMapCreated?.call(controller);
+  }
+
+  /// The engine doesn't tear down iOS platform views synchronously across a
+  /// hot restart, so a fresh isolate can collide with the previous run's view
+  /// (the framework re-issues id 0 while the engine still owns it) and the
+  /// map's UiKitView creation fails with `recreating_view` — [onMapCreated]
+  /// never fires and the surface would sit blank for the session. Remount with
+  /// a fresh key: the new attempt allocates a new platform-view id and
+  /// succeeds. Bounded — two remounts clears any async teardown, and a
+  /// persistent failure is a real problem that should surface, not loop.
+  void _scheduleReadinessRetry() {
+    _readinessTimer?.cancel();
+    _readinessTimer = Timer(const Duration(seconds: 4), () {
+      if (!mounted || _controller != null) return;
+      if (_mountAttempt < 2) {
+        setState(() => _mountAttempt++);
+        _scheduleReadinessRetry();
+        return;
+      }
+      Log.warning('Map platform view never became ready after remounts');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
     // MapScaffold parks the layer switcher at top-right (SafeArea + lg). Drop
@@ -122,13 +202,16 @@ class BaseMap extends StatelessWidget {
     final safeTop = Theme.of(context).platform == TargetPlatform.iOS
         ? 0.0
         : MediaQuery.paddingOf(context).top;
-    final compassTop = safeTop + _layerChipBand;
-    final floor = minZoomPreference;
-    final ceiling = maxZoomPreference;
+    final compassTop = safeTop + layerChipBand;
+    final floor = widget.minZoomPreference;
+    final ceiling = widget.maxZoomPreference;
     return MapLibreMap(
       // Pre-layout placeholder only; each surface fits [taiwanBounds] (or its
       // own selection) once the map is laid out, so no hardcoded framing zoom.
-      initialCameraPosition: CameraPosition(target: taiwanCenter, zoom: floor),
+      initialCameraPosition: CameraPosition(
+        target: BaseMap.taiwanCenter,
+        zoom: floor,
+      ),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
       styleString: exptechVectorStyle(
@@ -136,26 +219,30 @@ class BaseMap extends StatelessWidget {
         basemapTileUrl: basemapOriginTileUrl,
         glyphsUrl: glyphsOriginUrl,
       ),
+      // A remount gets a fresh id, so a collided first attempt recovers (see
+      // [_scheduleReadinessRetry]).
+      key: ValueKey(_mountAttempt),
       minMaxZoomPreference: MinMaxZoomPreference(floor, ceiling),
       trackCameraPosition: true,
-      compassEnabled: interactive,
+      compassEnabled: widget.interactive && widget.compassEnabled,
       compassViewPosition: CompassViewPosition.topRight,
       compassViewMargins: Point(AppSpacing.lg, compassTop),
-      scrollGesturesEnabled: interactive,
-      zoomGesturesEnabled: interactive,
-      rotateGesturesEnabled: interactive,
+      scrollGesturesEnabled: widget.interactive,
+      zoomGesturesEnabled: widget.interactive,
+      rotateGesturesEnabled: widget.interactive,
       tiltGesturesEnabled: false,
-      dragEnabled: interactive,
-      myLocationEnabled: showUserLocation,
+      dragEnabled: widget.interactive,
+      myLocationEnabled: widget.showUserLocation,
       // `compass` is the heading-cone mode; MapLibreMap asserts anything other
       // than `normal` requires myLocationEnabled, so pair them.
-      myLocationRenderMode: showUserLocation
+      myLocationRenderMode: widget.showUserLocation
           ? MyLocationRenderMode.compass
           : MyLocationRenderMode.normal,
-      onMapClick: onMapClick,
-      onMapCreated: onMapCreated,
-      onStyleLoadedCallback: onStyleLoaded,
-      onCameraIdle: onCameraIdle,
+      onMapClick: widget.onMapClick,
+      onMapCreated: _onMapCreated,
+      onStyleLoadedCallback: widget.onStyleLoaded,
+      onCameraMove: widget.onCameraMove,
+      onCameraIdle: widget.onCameraIdle,
     );
   }
 }
