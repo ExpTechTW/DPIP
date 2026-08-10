@@ -17,6 +17,7 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -62,6 +63,11 @@ class DeveloperPage extends StatefulWidget {
 class _DeveloperPageState extends State<DeveloperPage> {
   List<({String title, List<_Field> fields})>? _sections;
   bool _clearing = false;
+
+  /// Version-row taps toward the experimental unlock. Deliberately not
+  /// persisted — a fresh app start re-arms the easter egg.
+  static const int _unlockVersionTaps = 10;
+  int _versionTaps = 0;
 
   @override
   void initState() {
@@ -278,6 +284,36 @@ class _DeveloperPageState extends State<DeveloperPage> {
       ..showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
   }
 
+  /// Version-row taps: count to [_unlockVersionTaps], then unlock the
+  /// experimental-features menu (see `ExperimentalSettings.unlock`). Shows the
+  /// remaining count so the easter egg is discoverable, and confirms once it
+  /// flips.
+  void _onVersionTap() {
+    final settings = context.read<ExperimentalSettings>();
+    if (settings.unlocked) {
+      _showHint('Experimental features are already unlocked');
+      return;
+    }
+    _versionTaps++;
+    final remaining = _unlockVersionTaps - _versionTaps;
+    if (remaining > 0) {
+      _showHint(
+        '$remaining more tap${remaining == 1 ? '' : 's'} to unlock '
+        'experimental features',
+      );
+      return;
+    }
+    _versionTaps = 0;
+    settings.unlock();
+    _showHint('Experimental features unlocked');
+  }
+
+  void _showHint(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void _copyAll() {
     final sections = _sections;
     if (sections == null) return;
@@ -321,6 +357,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   for (final field in section.fields)
                     _DiagRow(
                       field: field,
+                      onTap: field.label == 'Version' ? _onVersionTap : null,
                       onCopy: _individuallyCopyableLabels.contains(field.label)
                           ? _copy
                           : null,
@@ -359,10 +396,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
 /// app-bar's "Copy all"); [onCopy] adds a per-row copy button for the few that
 /// are worth lifting out on their own (see [_DeveloperPageState._individuallyCopyableLabels]).
 class _DiagRow extends StatelessWidget {
-  const _DiagRow({required this.field, this.onCopy});
+  const _DiagRow({required this.field, this.onCopy, this.onTap});
 
   final _Field field;
   final ValueChanged<String>? onCopy;
+
+  /// Tap handler — used by the version row to arm the experimental unlock.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +410,7 @@ class _DiagRow extends StatelessWidget {
     final value = field.value;
     final hasValue = value != null && value.isNotEmpty;
     return ListTile(
+      onTap: onTap,
       title: Text(field.label, style: theme.textTheme.bodyMedium),
       subtitle: Text(
         hasValue ? value : '—',

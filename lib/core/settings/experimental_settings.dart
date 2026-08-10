@@ -9,10 +9,15 @@ import 'package:flutter/foundation.dart';
 ///
 /// Provided near the app root so any feature (e.g. the home weather backdrop)
 /// can react to changes.
+///
+/// The whole surface is gated behind [unlocked], which starts false and is
+/// turned on by ten taps on the Developer page's version row — the More-menu
+/// entry is hidden until then.
 class ExperimentalSettings extends ChangeNotifier {
   /// Loads persisted values from [prefs].
   ExperimentalSettings(Prefs prefs)
-    : _weatherMode = PersistedEnum(
+    : _prefs = prefs,
+      _weatherMode = PersistedEnum(
         prefs,
         key: PreferenceKeys.weatherMode,
         values: WeatherMode.values,
@@ -25,8 +30,21 @@ class ExperimentalSettings extends ChangeNotifier {
         fallback: SkyTimeMode.auto,
       );
 
+  final Prefs _prefs;
   final PersistedEnum<WeatherMode> _weatherMode;
   final PersistedEnum<SkyTimeMode> _skyTimeMode;
+
+  /// Whether the experimental-features menu is unlocked. Defaults to false; see
+  /// the class doc for how it flips.
+  bool get unlocked =>
+      _prefs.getBool(PreferenceKeys.experimentalUnlocked) ?? false;
+
+  /// Persists the unlock and notifies listeners (the More menu shows the
+  /// entry only after this).
+  Future<void> unlock() async {
+    await _prefs.setBool(PreferenceKeys.experimentalUnlocked, true);
+    notifyListeners();
+  }
 
   /// The forced weather-animation mode, or [WeatherMode.auto] to follow real
   /// conditions.

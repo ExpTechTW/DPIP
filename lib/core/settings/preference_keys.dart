@@ -70,6 +70,13 @@ abstract final class PreferenceKeys {
     'experimental.skyTimeMode',
   );
 
+  /// Whether the experimental-features menu is unlocked. Hidden behind ten taps
+  /// on the Developer page's version row so accidental users never see it. See
+  /// `ExperimentalSettings`.
+  static const PrefKey<bool> experimentalUnlocked = PrefKey<bool>._(
+    'experimental.unlocked',
+  );
+
   /// Last push token — the FCM registration token on Android, the raw APNs
   /// device token on iOS (backend registration keys on whichever this
   /// platform actually uses). See `NotificationService`.
