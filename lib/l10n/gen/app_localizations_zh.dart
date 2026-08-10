@@ -537,7 +537,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
-  String get mapLayerQpesums => '未來1小時降水預報';
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';
@@ -1993,7 +1993,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 红外线图';
 
   @override
-  String get mapLayerQpesums => '未来1小时降水预报';
+  String get mapLayerQpesums => '未来 1 小时降水预报';
 
   @override
   String get mapLayerLightning => '闪电';
@@ -3449,7 +3449,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
-  String get mapLayerQpesums => '未來1小時降水預報';
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';
@@ -4905,7 +4905,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線圖';
 
   @override
-  String get mapLayerQpesums => '未來1小時降水預報';
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';

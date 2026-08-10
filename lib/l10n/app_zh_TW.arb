@@ -160,7 +160,7 @@
   "mapLayers": "圖層",
   "mapLayerRadar": "雷達合成回波圖",
   "mapLayerSatellite": "ひまわり 紅外線圖",
-  "mapLayerQpesums": "未來1小時降水預報",
+  "mapLayerQpesums": "未來 1 小時降水預報",
   "mapLayerLightning": "閃電",
   "lightningLegendCg": "對地 · {minutes} 分內",
   "lightningLegendCc": "雲間 · {minutes} 分內",

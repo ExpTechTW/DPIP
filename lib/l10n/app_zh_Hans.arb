@@ -160,7 +160,7 @@
   "mapLayers": "图层",
   "mapLayerRadar": "雷达合成回波图",
   "mapLayerSatellite": "ひまわり 红外线图",
-  "mapLayerQpesums": "未来1小时降水预报",
+  "mapLayerQpesums": "未来 1 小时降水预报",
   "mapLayerLightning": "闪电",
   "lightningLegendCg": "对地 · {minutes} 分钟内",
   "lightningLegendCc": "云间 · {minutes} 分钟内",
