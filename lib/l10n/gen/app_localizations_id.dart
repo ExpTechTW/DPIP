@@ -508,6 +508,32 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeRainTrendTitle => 'Hujan 1 jam ke depan';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute mnt';
+  }
+
+  @override
+  String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
+
+  @override
+  String get homeRainTrendLightSustained =>
+      'Hujan ringan berlanjut selama 1 jam ke depan';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'Hujan ringan diperkirakan berhenti dalam $minutes menit';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained =>
+      'Hujan deras berlanjut selama 1 jam ke depan';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'Hujan deras diperkirakan berhenti dalam $minutes menit';
+  }
+
+  @override
   String get mapLayers => 'Lapisan';
 
   @override

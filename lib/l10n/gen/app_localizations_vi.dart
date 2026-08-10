@@ -507,6 +507,30 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeRainTrendTitle => 'Mưa 1 giờ tới';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute phút';
+  }
+
+  @override
+  String get homeRainTrendScattered => 'Có thể có mưa rào nhẹ';
+
+  @override
+  String get homeRainTrendLightSustained => 'Mưa nhỏ tiếp diễn trong 1 giờ tới';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'Mưa nhỏ có thể tạnh trong $minutes phút nữa';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => 'Mưa lớn tiếp diễn trong 1 giờ tới';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'Mưa lớn có thể tạnh trong $minutes phút nữa';
+  }
+
+  @override
   String get mapLayers => 'Lớp bản đồ';
 
   @override

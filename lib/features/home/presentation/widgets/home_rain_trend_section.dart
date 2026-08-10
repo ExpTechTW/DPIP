@@ -1,5 +1,7 @@
-/// Home-sheet card: next-hour per-minute rainfall as a bar chart.
+/// Home-sheet card: next-hour per-minute precipitation as a bar chart.
 library;
+
+import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_radius.dart';
@@ -109,6 +111,25 @@ class HomeRainTrendSection extends StatelessWidget {
       );
     }
 
+    // The one-line reading under the title — intensity and whether the rain
+    // keeps up through the hour. Nothing for an all-dry hour.
+    String? subtitle;
+    if (data != null) {
+      final s = data.summary;
+      subtitle = switch (s.grade) {
+        RainHourTrendGrade.none => null,
+        RainHourTrendGrade.scattered => l10n.homeRainTrendScattered,
+        RainHourTrendGrade.light =>
+          s.sustained
+              ? l10n.homeRainTrendLightSustained
+              : l10n.homeRainTrendLightStopping(s.stopInMinutes!),
+        RainHourTrendGrade.heavy =>
+          s.sustained
+              ? l10n.homeRainTrendHeavySustained
+              : l10n.homeRainTrendHeavyStopping(s.stopInMinutes!),
+      };
+    }
+
     return RainOnCard(
       intensity: rain,
       // The backdrop reveal is the scene alpha: the effect fades in with the
@@ -147,6 +168,16 @@ class HomeRainTrendSection extends StatelessWidget {
                   ),
                 ],
               ),
+              if (subtitle != null) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: secondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               body,
             ],
@@ -158,7 +189,7 @@ class HomeRainTrendSection extends StatelessWidget {
 }
 
 /// The trend's bar chart: one rod per minute, no mm / numeric Y labels — height
-/// alone carries intensity; the bottom axis shows a few clock ticks.
+/// alone carries intensity; the bottom axis labels minutes from now.
 class _Chart extends StatelessWidget {
   const _Chart({
     required this.data,
@@ -166,87 +197,123 @@ class _Chart extends StatelessWidget {
     required this.secondary,
   });
 
+  /// Fixed Y ceiling in mm — the API can forecast above this, so each bar is
+  /// clamped at [_maxMm]. The scale's top gridline is excluded by fl_chart's
+  /// `maxIncluded: false`, so the ceiling is one interval above the last guide
+  /// (35) to keep the 30 mm line visible.
+  static const double _maxMm = 35;
+
+  /// X-axis ticks, minutes from [RainHourTrend.startSecond].
+  static const List<int> _ticks = [0, 10, 20, 30, 40, 50];
+
   final RainHourTrend data;
   final Color barColor;
   final Color secondary;
 
   @override
   Widget build(BuildContext context) {
-    final maxY = data.mm.fold<double>(0, (a, b) => a > b ? a : b);
-    // Keep a floor so an all-zero hour still draws a readable empty chart.
-    final chartMaxY = maxY <= 0 ? 1.0 : maxY * 1.15;
-
-    return SizedBox(
-      height: 120,
-      child: BarChart(
-        BarChartData(
-          minY: 0,
-          maxY: chartMaxY,
-          alignment: BarChartAlignment.spaceBetween,
-          groupsSpace: 0,
-          barGroups: [
-            for (var i = 0; i < data.mm.length; i++)
-              BarChartGroupData(
-                x: i,
-                barRods: [
-                  BarChartRodData(
-                    toY: data.mm[i],
-                    width: 2.5,
-                    color: barColor,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(1),
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      // Room for the edge X labels (現在 / 50分) — the chart clips its own
+      // titles at the first/last bar otherwise.
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: SizedBox(
+        height: 120,
+        child: BarChart(
+          BarChartData(
+            minY: 0,
+            maxY: _maxMm,
+            alignment: BarChartAlignment.spaceBetween,
+            groupsSpace: 0,
+            barGroups: [
+              for (var i = 0; i < data.mm.length; i++)
+                BarChartGroupData(
+                  x: i,
+                  barRods: [
+                    BarChartRodData(
+                      toY: math.min(data.mm[i], _maxMm),
+                      width: 2.5,
+                      color: barColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(1),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+            ],
+            // A solid X axis, plus 10 / 20 / 30 mm dashed guides — the fixed
+            // Y ceiling makes them land on stable fractions of the chart
+            // height. The 0 line is suppressed: it sits flush on the X axis,
+            // where it would read as an axis rule rather than a guide.
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: 10,
+              getDrawingHorizontalLine: (value) => value == 0
+                  ? FlLine(color: Colors.transparent, strokeWidth: 0)
+                  : FlLine(
+                      color: secondary.withValues(alpha: 0.35),
+                      strokeWidth: 1,
+                      dashArray: const [4, 4],
+                    ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                bottom: BorderSide(
+                  color: secondary.withValues(alpha: 0.4),
+                  width: 1,
+                ),
               ),
-          ],
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          barTouchData: const BarTouchData(enabled: false),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(),
-            rightTitles: const AxisTitles(),
-            // No mm / numeric Y labels — height alone carries intensity.
-            leftTitles: const AxisTitles(),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 22,
-                interval: 1,
-                getTitlesWidget: (value, meta) {
-                  final i = value.round();
-                  // Ticks at start / +15 / +30 / +45 / +60.
-                  if (i != 0 && i != 15 && i != 30 && i != 45 && i != 59) {
-                    return const SizedBox.shrink();
-                  }
-                  final minuteOffset = i == 59 ? 60 : i;
-                  final label = _tickLabel(data.startSecond, minuteOffset);
-                  return Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    child: Text(
-                      label,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: secondary),
-                    ),
-                  );
-                },
+            ),
+            barTouchData: const BarTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
+              // No mm / numeric Y labels — height alone carries intensity.
+              leftTitles: const AxisTitles(),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 22,
+                  interval: 1,
+                  getTitlesWidget: (value, meta) {
+                    final minute = value.round();
+                    if (!_ticks.contains(minute)) {
+                      return const SizedBox.shrink();
+                    }
+                    final label = minute == 0
+                        ? l10n.mapTimelineNow
+                        : l10n.homeRainTrendMinute(minute);
+                    // The titles band starts flush under the X axis, and fl_chart
+                    // stretches each title widget to the full band height — so
+                    // start-alignment pins the tick's top to the axis line (the
+                    // tick hangs down from it) and rides the label up beside it.
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 1,
+                          height: 6,
+                          color: secondary.withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          label,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.copyWith(color: secondary),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  /// Taipei wall clock (`HH:mm`) for [startSecond] + [minuteOffset].
-  static String _tickLabel(int startSecond, int minuteOffset) {
-    final wall = DateTime.fromMillisecondsSinceEpoch(
-      (startSecond + minuteOffset * 60) * 1000,
-      isUtc: true,
-    ).add(const Duration(hours: 8));
-    final hh = wall.hour.toString().padLeft(2, '0');
-    final mm = wall.minute.toString().padLeft(2, '0');
-    return '$hh:$mm';
   }
 }

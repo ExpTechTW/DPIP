@@ -504,7 +504,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeActiveEventsEmpty => 'No active events';
 
   @override
-  String get homeRainTrendTitle => 'Next hour rain';
+  String get homeRainTrendTitle => 'Next hour precipitation';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute min';
+  }
+
+  @override
+  String get homeRainTrendScattered => 'Light showers possible';
+
+  @override
+  String get homeRainTrendLightSustained =>
+      'Light rain continuing for the next hour';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'Light rain likely to stop in $minutes minutes';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained =>
+      'Heavy rain continuing for the next hour';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'Heavy rain likely to stop in $minutes minutes';
+  }
 
   @override
   String get mapLayers => 'Layers';

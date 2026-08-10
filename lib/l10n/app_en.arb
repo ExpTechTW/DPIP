@@ -709,9 +709,48 @@
   "@homeActiveEventsEmpty": {
     "description": "Empty state when the realtime event feed has nothing in effect"
   },
-  "homeRainTrendTitle": "Next hour rain",
+  "homeRainTrendTitle": "Next hour precipitation",
   "@homeRainTrendTitle": {
     "description": "Section title for the home sheet 1-hour per-minute rainfall bar chart"
+  },
+  "homeRainTrendMinute": "{minute} min",
+  "@homeRainTrendMinute": {
+    "description": "X-axis tick label on the home rain trend chart, minutes from now",
+    "placeholders": {
+      "minute": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRainTrendScattered": "Light showers possible",
+  "@homeRainTrendScattered": {
+    "description": "Home rain trend subtitle: peak intensity below the light-rain threshold"
+  },
+  "homeRainTrendLightSustained": "Light rain continuing for the next hour",
+  "@homeRainTrendLightSustained": {
+    "description": "Home rain trend subtitle: light rain that keeps up through the hour"
+  },
+  "homeRainTrendLightStopping": "Light rain likely to stop in {minutes} minutes",
+  "@homeRainTrendLightStopping": {
+    "description": "Home rain trend subtitle: light rain forecast to stop partway through the hour",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRainTrendHeavySustained": "Heavy rain continuing for the next hour",
+  "@homeRainTrendHeavySustained": {
+    "description": "Home rain trend subtitle: heavy rain that keeps up through the hour"
+  },
+  "homeRainTrendHeavyStopping": "Heavy rain likely to stop in {minutes} minutes",
+  "@homeRainTrendHeavyStopping": {
+    "description": "Home rain trend subtitle: heavy rain forecast to stop partway through the hour",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "mapLayers": "Layers",
   "@mapLayers": {

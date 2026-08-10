@@ -505,6 +505,30 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeRainTrendTitle => '향후 1시간 강수';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute분';
+  }
+
+  @override
+  String get homeRainTrendScattered => '약한 비가 올 수 있어요';
+
+  @override
+  String get homeRainTrendLightSustained => '앞으로 1시간 동안 약한 비가 이어질 거예요';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '$minutes분 후에 비가 그칠 것으로 예상돼요';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '앞으로 1시간 동안 강한 비가 이어질 거예요';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '$minutes분 후에 강한 비가 그칠 것으로 예상돼요';
+  }
+
+  @override
   String get mapLayers => '레이어';
 
   @override

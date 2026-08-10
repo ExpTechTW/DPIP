@@ -11,6 +11,13 @@ List<dynamic> _rain60(List<int> leading) {
   return rain;
 }
 
+/// A trend whose first [n] minutes carry [values] then the rest of the hour is
+/// dry — controls both the peak and where the rain stops.
+RainHourTrend _trend(List<double> values) => RainHourTrend(
+  startSecond: 0,
+  mm: [...values, ...List<double>.filled(60 - values.length, 0)],
+);
+
 void main() {
   test('decode reads the first non-empty rainforecast series', () {
     final trend = RainHourTrend.decode({
@@ -84,5 +91,60 @@ void main() {
       }),
       throwsFormatException,
     );
+  });
+
+  group('summary', () {
+    test('all-dry hour is none', () {
+      final s = _trend(List.filled(60, 0)).summary;
+      expect(s.grade, RainHourTrendGrade.none);
+      expect(s.sustained, isFalse);
+      expect(s.stopInMinutes, isNull);
+    });
+
+    test('peak below 5 mm is scattered', () {
+      final s = _trend([0, 4.9, 0, 0, 0, 2.5]).summary;
+      expect(s.grade, RainHourTrendGrade.scattered);
+    });
+
+    test('peak exactly 5 mm is light', () {
+      final s = _trend([5]).summary;
+      expect(s.grade, RainHourTrendGrade.light);
+    });
+
+    test('light rain that stops mid-hour reports the stop minute', () {
+      // Rain through minute 20, dry after — stop is the minute after the last
+      // wet sample.
+      final s = _trend([for (var i = 0; i < 21; i++) 6.0]).summary;
+      expect(s.grade, RainHourTrendGrade.light);
+      expect(s.sustained, isFalse);
+      expect(s.stopInMinutes, 21);
+    });
+
+    test('light rain still falling late in the hour is sustained', () {
+      final values = List<double>.filled(51, 6.0); // wet through minute 50
+      final s = _trend(values).summary;
+      expect(s.grade, RainHourTrendGrade.light);
+      expect(s.sustained, isTrue);
+      expect(s.stopInMinutes, isNull);
+    });
+
+    test('peak at the light threshold (15 mm) is heavy', () {
+      final s = _trend([15]).summary;
+      expect(s.grade, RainHourTrendGrade.heavy);
+    });
+
+    test('heavy rain stopping mid-hour reports the stop minute', () {
+      final s = _trend([for (var i = 0; i < 10; i++) 40.0]).summary;
+      expect(s.grade, RainHourTrendGrade.heavy);
+      expect(s.sustained, isFalse);
+      expect(s.stopInMinutes, 10);
+    });
+
+    test('heavy rain continuing through the hour is sustained', () {
+      final s = _trend(List.filled(60, 40.0)).summary;
+      expect(s.grade, RainHourTrendGrade.heavy);
+      expect(s.sustained, isTrue);
+      expect(s.stopInMinutes, isNull);
+    });
   });
 }

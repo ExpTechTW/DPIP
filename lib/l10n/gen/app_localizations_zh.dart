@@ -501,7 +501,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';
@@ -1927,7 +1951,31 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前没有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小时降雨趋势';
+  String get homeRainTrendTitle => '近 1 小时降水趋势';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String get homeRainTrendScattered => '可能会有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未来 1 小时会有持续小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '预计 $minutes 分钟后停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未来 1 小时会有持续大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '预计 $minutes 分钟后停止下大雨';
+  }
 
   @override
   String get mapLayers => '图层';
@@ -3353,7 +3401,31 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';
@@ -4779,7 +4851,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';

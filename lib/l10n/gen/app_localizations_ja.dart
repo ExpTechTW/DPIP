@@ -505,6 +505,30 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeRainTrendTitle => '今後1時間の雨';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String get homeRainTrendScattered => 'にわか雨の可能性があります';
+
+  @override
+  String get homeRainTrendLightSustained => '今後1時間は小雨が続きます';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '$minutes分後に小雨が止む見込みです';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '今後1時間は大雨が続きます';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '$minutes分後に大雨が止む見込みです';
+  }
+
+  @override
   String get mapLayers => 'レイヤー';
 
   @override

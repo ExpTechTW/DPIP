@@ -506,6 +506,31 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeRainTrendTitle => 'ฝนชั่วโมงถัดไป';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute นาที';
+  }
+
+  @override
+  String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
+
+  @override
+  String get homeRainTrendLightSustained =>
+      'ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'คาดว่าฝนจะหยุดในอีก $minutes นาที';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => 'ฝนตกหนักต่อเนื่องตลอดชั่วโมงหน้า';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'คาดว่าฝนตกหนักจะหยุดในอีก $minutes นาที';
+  }
+
+  @override
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override

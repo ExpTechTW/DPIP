@@ -1020,8 +1020,44 @@ abstract class AppLocalizations {
   /// Section title for the home sheet 1-hour per-minute rainfall bar chart
   ///
   /// In en, this message translates to:
-  /// **'Next hour rain'**
+  /// **'Next hour precipitation'**
   String get homeRainTrendTitle;
+
+  /// X-axis tick label on the home rain trend chart, minutes from now
+  ///
+  /// In en, this message translates to:
+  /// **'{minute} min'**
+  String homeRainTrendMinute(int minute);
+
+  /// Home rain trend subtitle: peak intensity below the light-rain threshold
+  ///
+  /// In en, this message translates to:
+  /// **'Light showers possible'**
+  String get homeRainTrendScattered;
+
+  /// Home rain trend subtitle: light rain that keeps up through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Light rain continuing for the next hour'**
+  String get homeRainTrendLightSustained;
+
+  /// Home rain trend subtitle: light rain forecast to stop partway through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Light rain likely to stop in {minutes} minutes'**
+  String homeRainTrendLightStopping(int minutes);
+
+  /// Home rain trend subtitle: heavy rain that keeps up through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain continuing for the next hour'**
+  String get homeRainTrendHeavySustained;
+
+  /// Home rain trend subtitle: heavy rain forecast to stop partway through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain likely to stop in {minutes} minutes'**
+  String homeRainTrendHeavyStopping(int minutes);
 
   /// Title of the map layer-picker sheet
   ///
