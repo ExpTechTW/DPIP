@@ -935,17 +935,25 @@ class _TrendChart extends StatelessWidget {
     /// Sample index (into [series.values]/[directions]) nearest chart-x [x] —
     /// works across the per-bucket segment bars, whose `spotIndex` is relative
     /// to each segment's own list and so can't index back into the series.
+    ///
+    /// Spots are ordered by time, so this is a binary search — a 7 d series is
+    /// ~170 points, and this runs for every axis tick and tooltip.
     int nearestSample(double x) {
-      var best = 0;
-      var bestDist = (spots.first.x - x).abs();
-      for (var i = 1; i < spots.length; i++) {
-        final d = (spots[i].x - x).abs();
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
+      var lo = 0, hi = spots.length;
+      while (lo < hi) {
+        final mid = (lo + hi) >> 1;
+        if (spots[mid].x < x) {
+          lo = mid + 1;
+        } else {
+          hi = mid;
         }
       }
-      return sampleAt[best];
+      if (lo == 0) return sampleAt[0];
+      if (lo == spots.length) return sampleAt[lo - 1];
+      // Tie → the earlier index, matching the old scan's strict `<`.
+      return (spots[lo].x - x).abs() < (x - spots[lo - 1].x).abs()
+          ? sampleAt[lo]
+          : sampleAt[lo - 1];
     }
 
     /// Nearest sample's meteorological "from" at chart-x [x] (for axis ticks).
