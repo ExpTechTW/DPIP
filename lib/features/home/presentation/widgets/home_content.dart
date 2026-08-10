@@ -5,10 +5,12 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +74,13 @@ class HomeContent extends StatelessWidget {
     final store = context.watch<RegionStore>();
     final areaIndex = store.selectedIndex;
     final area = store.selected;
+    // The hero block's bottom card slot swaps between the rain-trend chart and
+    // a compact 24h summary. Track the trend alone — not the whole controller —
+    // so a forecast/event update (which changes the trend not at all) doesn't
+    // rebuild this whole dashboard.
+    final hourTrend = context.select<HomeWeatherController, RainHourTrend?>(
+      (controller) => controller.hourTrend,
+    );
     // 所在地 with no GPS fix has no township to report on. The header already
     // says so; showing cards below it would only be rows of dashes and empty
     // feeds pretending to be readings for a place we could not identify.
@@ -99,6 +108,8 @@ class HomeContent extends StatelessWidget {
           showWeather,
           sky,
           _focus(offset),
+          offset,
+          hourTrend,
         );
       },
     );
@@ -122,7 +133,14 @@ class HomeContent extends StatelessWidget {
     bool showWeather,
     Color? sky,
     double focus,
+    double offset,
+    RainHourTrend? hourTrend,
   ) {
+    // A dry hour (empty `[]` response, or an all-zero series) hides the
+    // rain-trend card entirely; the hero block's bottom slot is taken over by
+    // a compact 24h forecast so the sheet still has a weather card to read at
+    // rest. Null (still loading / failed) keeps the trend card's own pane.
+    final dryTrend = hourTrend?.summary.grade == RainHourTrendGrade.none;
     // The cards read as a pane of the sky only while the sky is the point
     // (hero showing). Once the list scrolls, they solidify back into solid
     // plates and their ink back onto the theme surface — a transparent 20 %
@@ -222,19 +240,47 @@ class HomeContent extends StatelessWidget {
                             // blurs it back in once the scroll below carries the
                             // trend card past the top.
                             const Expanded(child: SizedBox.shrink()),
-                            HomeRainTrendSection(
-                              key: ValueKey('rain-$areaIndex'),
-                              reveal: reveal,
-                              sky: sky,
-                              weatherMode: weatherMode,
-                              // Only this card gets wet. The reference rains on the card, not the
-                              // page, and the effect belongs on the one block that is
-                              // *about* rain. The grade is the weather's; [reveal] gates
-                              // visibility separately inside the section, the way the
-                              // engine's scene alpha does — multiplying them together
-                              // washed the water down to a third of its opacity.
-                              rain: _cardRain(weatherMode),
-                            ),
+                            if (dryTrend)
+                              // A dry hour has no rain chart, so the forecast
+                              // card itself takes the hero slot. It sits at its
+                              // one-glance summary (title + hour chips) at rest
+                              // and grows into the full card as the sheet is
+                              // pulled up — the summary and the complete card
+                              // are the same widget, not two cards. Rains on
+                              // the card like the trend card does.
+                              ListenableBuilder(
+                                listenable: scrollController,
+                                builder: (context, _) {
+                                  final liveOffset = scrollController.hasClients
+                                      ? scrollController.offset
+                                      : 0.0;
+                                  return RainOnCard(
+                                    intensity: _cardRain(weatherMode),
+                                    opacity: reveal,
+                                    child: HomeForecastSection(
+                                      key: ValueKey('forecast-hero-$areaIndex'),
+                                      expansion: _forecastExpansion(liveOffset),
+                                      reveal: reveal,
+                                      sky: sky,
+                                      weatherMode: weatherMode,
+                                    ),
+                                  );
+                                },
+                              )
+                            else
+                              HomeRainTrendSection(
+                                key: ValueKey('rain-$areaIndex'),
+                                reveal: reveal,
+                                sky: sky,
+                                weatherMode: weatherMode,
+                                // Only this card gets wet. The reference rains on the card, not the
+                                // page, and the effect belongs on the one block that is
+                                // *about* rain. The grade is the weather's; [reveal] gates
+                                // visibility separately inside the section, the way the
+                                // engine's scene alpha does — multiplying them together
+                                // washed the water down to a third of its opacity.
+                                rain: _cardRain(weatherMode),
+                              ),
                           ],
                         ),
                         // Deflates the tight SizedBox height passed to the
@@ -267,8 +313,9 @@ class HomeContent extends StatelessWidget {
                   // Collapsed, or nothing to anchor a hero to: active events
                   // only. Full-screen township: the hero above, then forecast
                   // → events reached by scrolling past it. 全國: events only
-                  // (no point weather).
-                  if (heroHeight != null) ...[
+                  // (no point weather). A dry hour carries its one forecast
+                  // card in the hero itself, so nothing repeats below the fold.
+                  if (heroHeight != null && !dryTrend) ...[
                     HomeForecastSection(
                       key: ValueKey('forecast-$areaIndex'),
                       reveal: reveal,
@@ -348,6 +395,17 @@ class HomeContent extends StatelessWidget {
     final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
     return rest * (1 - t);
   }
+
+  /// Scroll distance over which the hero's forecast card grows from its
+  /// one-glance summary (title + hour chips) to the full card (sparkline +
+  /// detail band). Independent of the shorter resting-state ramps around it —
+  /// this one is the *point* of the gesture on a dry hour, so it deserves the
+  /// distance.
+  static const double _forecastExpandExtent = 200;
+
+  /// Current growth of the hero forecast card for [offset].
+  static double _forecastExpansion(double offset) =>
+      (offset / _forecastExpandExtent).clamp(0.0, 1.0);
 
   /// How wet the rain-trend card gets for a given backdrop.
   ///

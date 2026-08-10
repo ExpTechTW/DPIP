@@ -2,6 +2,7 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show lerpDouble;
 
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
@@ -22,12 +23,19 @@ import 'package:provider/provider.dart';
 /// rain chance %, [WeatherForecastPoint.temperature] = air temp °C. Layout is
 /// new: sparkline + selectable hour chips + a detail band for feels-like /
 /// humidity / wind (fields the final legacy strip hid).
+///
+/// [expansion] animates between the one-glance summary (title + hour chips)
+/// and the full card (with the temperature sparkline and detail band). The
+/// hero block's card slot uses it to grow the single forecast card into its
+/// complete form as the sheet is pulled up — the summary and the full card are
+/// one widget, not two.
 class HomeForecastSection extends StatefulWidget {
   const HomeForecastSection({
     super.key,
     this.reveal = 0,
     this.sky,
     this.weatherMode = WeatherMode.auto,
+    this.expansion = 1,
   });
 
   /// Weather-backdrop reveal (0→1) — drives glass card opacity only; ink stays
@@ -44,6 +52,12 @@ class HomeForecastSection extends StatefulWidget {
   /// card dissolves into the sky.
   final WeatherMode weatherMode;
 
+  /// How fully the card is revealed, `0` (title + hour chips only) → `1` (the
+  /// full card, with the temperature sparkline and the feels-like detail
+  /// band). The hero slot drives this from the sheet's scroll; cards outside
+  /// the hero sit at 1.
+  final double expansion;
+
   @override
   State<HomeForecastSection> createState() => _HomeForecastSectionState();
 }
@@ -56,6 +70,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final expansion = widget.expansion.clamp(0.0, 1.0);
     final controller = context.watch<HomeWeatherController>();
     final reveal = widget.reveal;
     final skyIsLight = skyIsLightFrom(widget.sky, widget.weatherMode);
@@ -89,7 +104,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
         return _Shell(
           color: cardColor,
           child: SizedBox(
-            height: 168,
+            height: lerpDouble(120, 168, expansion)!,
             child: Center(
               child: SizedBox(
                 width: 24,
@@ -170,20 +185,34 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          SizedBox(
-            height: 36,
-            child: CustomPaint(
-              painter: _TempSparklinePainter(
-                temps: temps,
-                selected: selected,
-                line: colors.primary,
-                fill: colors.primary.withValues(alpha: 0.18),
-                mark: foreground,
+          // The sparkline and detail band reveal with [expansion] — the summary
+          // card shows only the title + hour chips, and pulling the sheet up
+          // grows this same card into its full height. Clipped so the not-yet-
+          // revealed parts never bleed over the hour chips below.
+          ClipRect(
+            child: Align(
+              alignment: Alignment.topCenter,
+              heightFactor: expansion,
+              child: Opacity(
+                opacity: expansion,
+                child: SizedBox(
+                  height: 36,
+                  width: double.infinity,
+                  child: CustomPaint(
+                    painter: _TempSparklinePainter(
+                      temps: temps,
+                      selected: selected,
+                      line: colors.primary,
+                      fill: colors.primary.withValues(alpha: 0.18),
+                      mark: foreground,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                ),
               ),
-              child: const SizedBox.expand(),
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: AppSpacing.md * expansion),
           SizedBox(
             height: 108,
             child: ListView.separated(
@@ -213,21 +242,31 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               },
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          _DetailBand(
-            weather: point.weather,
-            time: point.time,
-            feelsLike: l10n.homeForecastFeelsLike(
-              point.apparentTemp.round().toString(),
+          ClipRect(
+            child: Align(
+              alignment: Alignment.topCenter,
+              heightFactor: expansion,
+              child: Opacity(
+                opacity: expansion,
+                child: _DetailBand(
+                  weather: point.weather,
+                  time: point.time,
+                  feelsLike: l10n.homeForecastFeelsLike(
+                    point.apparentTemp.round().toString(),
+                  ),
+                  humidity: l10n.homeForecastHumidity(
+                    point.humidity.toString(),
+                  ),
+                  wind: l10n.homeForecastWind(
+                    point.wind.direction,
+                    point.wind.beaufort.toString(),
+                  ),
+                  foreground: foreground,
+                  secondary: secondary,
+                  divider: secondary.withValues(alpha: 0.35),
+                ),
+              ),
             ),
-            humidity: l10n.homeForecastHumidity(point.humidity.toString()),
-            wind: l10n.homeForecastWind(
-              point.wind.direction,
-              point.wind.beaufort.toString(),
-            ),
-            foreground: foreground,
-            secondary: secondary,
-            divider: secondary.withValues(alpha: 0.35),
           ),
         ],
       ),

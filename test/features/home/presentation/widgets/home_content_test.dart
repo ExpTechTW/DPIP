@@ -12,6 +12,7 @@ import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
@@ -38,11 +39,18 @@ class _FakeWeatherRepository implements MeteorWeatherRepository {
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
 }
 
-/// Stub next-hour rain trend.
+/// Stub next-hour rain trend — dry (no rain) or a steady light rain.
 class _FakeHourTrendRepository implements RainHourTrendRepository {
+  _FakeHourTrendRepository({this.dry = false});
+
+  final bool dry;
+
   @override
-  Future<Result<RainHourTrend>> hourTrend(String code) async =>
-      Ok(RainHourTrend(startSecond: 1786362600, mm: List.filled(60, 0.5)));
+  Future<Result<RainHourTrend>> hourTrend(String code) async => Ok(
+    dry
+        ? RainHourTrend.dry(startUtc: DateTime.utc(2026, 8, 11))
+        : RainHourTrend(startSecond: 1786362600, mm: List.filled(60, 0.5)),
+  );
 }
 
 class _FakeEventRepository implements EventRepository {
@@ -57,8 +65,12 @@ class _FakeEventRepository implements EventRepository {
 
 /// Pumps [HomeContent] with everything it reads: a [RegionStore] to switch on
 /// and localizations for the body.
-Widget _wrap(RegionStore store, {bool expanded = false}) {
-  const directory = TownDirectory(<String, Town>{});
+Widget _wrap(
+  RegionStore store, {
+  bool expanded = false,
+  RainHourTrendRepository? hourTrend,
+  TownDirectory directory = const TownDirectory(<String, Town>{}),
+}) {
   final events = _FakeEventRepository();
   return MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -72,7 +84,7 @@ Widget _wrap(RegionStore store, {bool expanded = false}) {
         ChangeNotifierProvider<HomeWeatherController>(
           create: (_) => HomeWeatherController(
             _FakeWeatherRepository(),
-            _FakeHourTrendRepository(),
+            hourTrend ?? _FakeHourTrendRepository(),
             store,
             directory,
           ),
@@ -230,6 +242,100 @@ void main() {
     expect(find.byType(HomeForecastSection), findsOneWidget);
     expect(find.byType(HomeActiveEventsSection), findsOneWidget);
   });
+
+  testWidgets('a dry hour hides the rain trend and raises a compact forecast', (
+    tester,
+  ) async {
+    final store = await _store();
+    store
+      ..select(1)
+      ..setCurrentCode('100');
+    // A resolvable township, so the trend fetch actually runs and resolves dry.
+    const directory = TownDirectory({
+      '100': Town(
+        code: '100',
+        city: 'Test',
+        town: 'North',
+        lat: 25.0,
+        lng: 121.5,
+        cityLevel: '市',
+        townLevel: '區',
+      ),
+    });
+    await tester.pumpWidget(
+      _wrap(
+        store,
+        expanded: true,
+        hourTrend: _FakeHourTrendRepository(dry: true),
+        directory: directory,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // No rain forecast → the trend card is gone entirely.
+    expect(find.byType(HomeRainTrendSection), findsNothing);
+    // One forecast card only — the hero's summary, not a second full card
+    // below the fold. It starts collapsed and grows with scroll.
+    final sections = tester
+        .widgetList<HomeForecastSection>(find.byType(HomeForecastSection))
+        .toList();
+    expect(sections, hasLength(1));
+    expect(sections.single.expansion, 0);
+    // The hero card gets the same rain-on-glass treatment as the trend card.
+    expect(
+      find.ancestor(
+        of: find.byType(HomeForecastSection),
+        matching: find.byType(RainOnCard),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'pulling the sheet up grows the hero forecast into the full card',
+    (tester) async {
+      final store = await _store();
+      store
+        ..select(1)
+        ..setCurrentCode('100');
+      const directory = TownDirectory({
+        '100': Town(
+          code: '100',
+          city: 'Test',
+          town: 'North',
+          lat: 25.0,
+          lng: 121.5,
+          cityLevel: '市',
+          townLevel: '區',
+        ),
+      });
+      await tester.pumpWidget(
+        _wrap(
+          store,
+          expanded: true,
+          hourTrend: _FakeHourTrendRepository(dry: true),
+          directory: directory,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final section = tester.widget<HomeForecastSection>(
+        find.byType(HomeForecastSection),
+      );
+      expect(section.expansion, 0);
+
+      // Scroll the sheet's list upward — the one forecast card stretches toward
+      // its full form instead of a second full card appearing.
+      await tester.drag(find.byType(ListView).first, const Offset(0, -120));
+      await tester.pump();
+      final grown = tester.widget<HomeForecastSection>(
+        find.byType(HomeForecastSection),
+      );
+      expect(grown.expansion, greaterThan(0));
+      // Still exactly one forecast card — no duplicate full card joined in.
+      expect(find.byType(HomeForecastSection), findsOneWidget);
+    },
+  );
 
   testWidgets('全國 keeps its events card (it is not a missing location)', (
     tester,
