@@ -234,13 +234,13 @@ class LightningMapLayer implements MapLayer {
     return result.when(
       ok: (snapshot) {
         _cache[frameId] = snapshot;
-        // Bound memory — keep ~40 frames.
+        // Bound memory — keep ~40 frames: drop the oldest (ids are Unix
+        // seconds), never the frame that is on screen.
         if (_cache.length > 40) {
-          final keys = _cache.keys.toList()
-            ..sort(); // oldest seconds first as string-sortable? better by int
-          keys.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-          for (final k in keys.take(_cache.length - 40)) {
-            if (k != _shownFrameId) _cache.remove(k);
+          final ids = _cache.keys.toList(growable: false)
+            ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+          for (final id in ids.take(_cache.length - 40)) {
+            if (id != _shownFrameId) _cache.remove(id);
           }
         }
         return snapshot;
