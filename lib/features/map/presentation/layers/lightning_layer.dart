@@ -343,7 +343,10 @@ class LightningMapLayer implements MapLayer {
 
   Future<Uint8List> _renderDot(Color fill) async {
     const size = 64.0;
-    const halo = 3.0;
+    // Same proportional outline as the wind arrows (5.5 on a 96 px canvas ≈
+    // 5.7 %): 4.0 on the smaller 64 px mark keeps the ring visibly as thick
+    // after the layer scales both glyphs to the same on-screen size.
+    const halo = 4.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     // Black offset-outline baked in (like the wind arrows): the PNG carries the
@@ -370,7 +373,8 @@ class LightningMapLayer implements MapLayer {
   Future<Uint8List> _renderCross(Color fill) async {
     const size = 64.0;
     const thickness = 10.0;
-    const halo = 3.0;
+    // Same proportional outline as the wind arrows — see [_renderDot].
+    const halo = 4.0;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     // Vertical + horizontal bars, black behind the colour (see [_renderDot]).
