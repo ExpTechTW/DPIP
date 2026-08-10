@@ -313,6 +313,11 @@ class _MapScaffoldState extends State<MapScaffold> {
     if (controller == null) return;
     final position = controller.cameraPosition;
     if (position == null) return;
+    // The camera stream may not deliver a final north-up event for a
+    // programmatic move (a no-op bearing change can skip region updates), so
+    // settle the needle directly instead of waiting on it — the compass must
+    // hide the instant the map faces north.
+    _bearing.value = 0;
     unawaited(
       controller.moveCamera(
         CameraUpdate.newCameraPosition(
@@ -704,14 +709,14 @@ class _MapScaffoldState extends State<MapScaffold> {
           ),
         // Compass on top of *everything* — a screen-space callout (typhoon
         // forecast tips) or an expanded sheet must never hide north. Parked
-        // where the native compass sat: under the layer switcher chip.
+        // just under the layer switcher chip, with a touch of breathing room.
         Positioned(
           top: 0,
           right: 0,
           child: SafeArea(
             child: Padding(
               padding: EdgeInsets.only(
-                top: layerChipBand,
+                top: layerChipBand + AppSpacing.sm,
                 right: AppSpacing.lg,
               ),
               child: MapCompass(bearing: _bearing, onPressed: _resetNorth),

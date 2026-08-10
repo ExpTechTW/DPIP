@@ -229,22 +229,17 @@ class RainMapLayer implements MapLayer, StationSheetSource {
       builder: (context, _) {
         final current = interval.value;
         return MenuAnchor(
-          builder: (context, controller, child) {
-            return IconButton.filledTonal(
-              tooltip: l10n.rainIntervalMenu,
-              onPressed: () {
-                if (controller.isOpen) {
-                  controller.close();
-                } else {
-                  controller.open();
-                }
-              },
-              icon: Icon(
-                Icons.timelapse_outlined,
-                color: colors.onSecondaryContainer,
-              ),
-            );
-          },
+          alignmentOffset: const Offset(0, 4),
+          style: MapChipButton.menuStyle(context),
+          builder: (context, controller, _) => MapChipButton(
+            icon: Icons.timelapse_outlined,
+            tooltip: l10n.rainIntervalMenu,
+            // Same chip affordance and height as every other layer's menu, so
+            // the compass (parked under the chip band) lines up across layers.
+            active: current != RainInterval.now,
+            onTap: () =>
+                controller.isOpen ? controller.close() : controller.open(),
+          ),
           menuChildren: [
             MapMenuScrollView(
               children: [
