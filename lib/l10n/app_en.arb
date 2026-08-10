@@ -770,6 +770,14 @@
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"
   },
+  "mapLayerOrderTitle": "Reorder layers",
+  "@mapLayerOrderTitle": {
+    "description": "Title of the layer-order editor, also the tooltip of the reorder button in the layer picker"
+  },
+  "mapLayerOrderReset": "Reset order",
+  "@mapLayerOrderReset": {
+    "description": "Button that restores the layer picker's default order"
+  },
   "mapLayerRadar": "Composite Radar Reflectivity",
   "@mapLayerRadar": {
     "description": "Name of the composite radar reflectivity layer in the layer picker"

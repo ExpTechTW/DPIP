@@ -540,6 +540,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayers => 'レイヤー';
 
   @override
+  String get mapLayerOrderTitle => 'レイヤーの順番';
+
+  @override
+  String get mapLayerOrderReset => '既定の順序に戻す';
+
+  @override
   String get mapLayerRadar => 'レーダー合成エコー図';
 
   @override

@@ -161,6 +161,8 @@
   "homeRainTrendHeavySustained": "앞으로 1시간 동안 강한 비가 이어질 거예요",
   "homeRainTrendHeavyStopping": "{minutes}분 후에 강한 비가 그칠 것으로 예상돼요",
   "mapLayers": "레이어",
+  "mapLayerOrderTitle": "레이어 순서",
+  "mapLayerOrderReset": "기본 순서로 재설정",
   "mapLayerRadar": "레이더 합성 에코",
   "mapLayerSatellite": "히마와리 적외",
   "mapLayerQpesums": "1시간 강수 예보",

@@ -542,6 +542,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override
+  String get mapLayerOrderTitle => 'จัดเรียงเลเยอร์';
+
+  @override
+  String get mapLayerOrderReset => 'รีเซ็ตลำดับ';
+
+  @override
   String get mapLayerRadar => 'เรดาร์สะท้อนสังเคราะห์';
 
   @override

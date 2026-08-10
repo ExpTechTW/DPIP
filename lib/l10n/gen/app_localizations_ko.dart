@@ -540,6 +540,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayers => '레이어';
 
   @override
+  String get mapLayerOrderTitle => '레이어 순서';
+
+  @override
+  String get mapLayerOrderReset => '기본 순서로 재설정';
+
+  @override
   String get mapLayerRadar => '레이더 합성 에코';
 
   @override

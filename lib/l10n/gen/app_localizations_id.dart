@@ -545,6 +545,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayers => 'Lapisan';
 
   @override
+  String get mapLayerOrderTitle => 'Urutkan lapisan';
+
+  @override
+  String get mapLayerOrderReset => 'Atur ulang urutan';
+
+  @override
   String get mapLayerRadar => 'Radar Komposit';
 
   @override

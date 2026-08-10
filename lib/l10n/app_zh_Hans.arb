@@ -161,6 +161,8 @@
   "homeRainTrendHeavySustained": "未来 1 小时会有持续大雨",
   "homeRainTrendHeavyStopping": "预计 {minutes} 分钟后停止下大雨",
   "mapLayers": "图层",
+  "mapLayerOrderTitle": "调整图层顺序",
+  "mapLayerOrderReset": "恢复默认顺序",
   "mapLayerRadar": "雷达合成回波图",
   "mapLayerSatellite": "ひまわり 红外线图",
   "mapLayerQpesums": "未来 1 小时降水预报",

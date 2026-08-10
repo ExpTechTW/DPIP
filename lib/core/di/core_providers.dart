@@ -12,6 +12,7 @@ import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
+import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
@@ -32,6 +33,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<ThemeController>.value(value: deps.theme),
   ChangeNotifierProvider<DefaultMapLayerController>.value(
     value: deps.defaultMapLayer,
+  ),
+  ChangeNotifierProvider<MapLayerOrderController>.value(
+    value: deps.mapLayerOrder,
   ),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),

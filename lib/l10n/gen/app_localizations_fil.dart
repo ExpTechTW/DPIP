@@ -549,6 +549,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayers => 'Mga Layer';
 
   @override
+  String get mapLayerOrderTitle => 'Ayusin ang ayos ng layer';
+
+  @override
+  String get mapLayerOrderReset => 'I-reset ang ayos';
+
+  @override
   String get mapLayerRadar => 'Composite Radar Reflectivity';
 
   @override

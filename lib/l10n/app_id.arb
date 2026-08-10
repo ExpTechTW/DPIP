@@ -161,6 +161,8 @@
   "homeRainTrendHeavySustained": "Hujan deras berlanjut selama 1 jam ke depan",
   "homeRainTrendHeavyStopping": "Hujan deras diperkirakan berhenti dalam {minutes} menit",
   "mapLayers": "Lapisan",
+  "mapLayerOrderTitle": "Urutkan lapisan",
+  "mapLayerOrderReset": "Atur ulang urutan",
   "mapLayerRadar": "Radar Komposit",
   "mapLayerSatellite": "Himawari Inframerah",
   "mapLayerQpesums": "Prakiraan hujan 1 jam ke depan",

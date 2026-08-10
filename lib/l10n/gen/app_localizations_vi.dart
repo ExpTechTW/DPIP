@@ -542,6 +542,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayers => 'Lớp bản đồ';
 
   @override
+  String get mapLayerOrderTitle => 'Sắp xếp thứ tự lớp';
+
+  @override
+  String get mapLayerOrderReset => 'Đặt lại thứ tự mặc định';
+
+  @override
   String get mapLayerRadar => 'Radar phản xạ tổng hợp';
 
   @override

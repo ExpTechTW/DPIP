@@ -544,6 +544,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayers => 'Layers';
 
   @override
+  String get mapLayerOrderTitle => 'Reorder layers';
+
+  @override
+  String get mapLayerOrderReset => 'Reset order';
+
+  @override
   String get mapLayerRadar => 'Composite Radar Reflectivity';
 
   @override

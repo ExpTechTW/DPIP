@@ -1077,6 +1077,18 @@ abstract class AppLocalizations {
   /// **'Layers'**
   String get mapLayers;
 
+  /// Title of the layer-order editor, also the tooltip of the reorder button in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder layers'**
+  String get mapLayerOrderTitle;
+
+  /// Button that restores the layer picker's default order
+  ///
+  /// In en, this message translates to:
+  /// **'Reset order'**
+  String get mapLayerOrderReset;
+
   /// Name of the composite radar reflectivity layer in the layer picker
   ///
   /// In en, this message translates to:

@@ -54,6 +54,13 @@ abstract final class PreferenceKeys {
     'map.defaultLayer',
   );
 
+  /// User-customised layer order in the map layer picker (layer ids,
+  /// most-preferred first; empty = the surface's declared order). See
+  /// `MapLayerOrderController`.
+  static const PrefKey<List<String>> mapLayerOrder = PrefKey<List<String>>._(
+    'map.layerOrder',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const PrefKey<List<String>> savedRegionCodes = PrefKey<List<String>>._(
     'home.savedRegionCodes',

@@ -161,6 +161,8 @@
   "homeRainTrendHeavySustained": "今後1時間は大雨が続きます",
   "homeRainTrendHeavyStopping": "{minutes}分後に大雨が止む見込みです",
   "mapLayers": "レイヤー",
+  "mapLayerOrderTitle": "レイヤーの順番",
+  "mapLayerOrderReset": "既定の順序に戻す",
   "mapLayerRadar": "レーダー合成エコー図",
   "mapLayerSatellite": "ひまわり 赤外線図",
   "mapLayerQpesums": "1時間降水量予報",

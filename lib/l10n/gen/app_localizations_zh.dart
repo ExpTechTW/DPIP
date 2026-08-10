@@ -539,6 +539,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayers => '圖層';
 
   @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
+
+  @override
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
@@ -2036,6 +2042,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayers => '图层';
+
+  @override
+  String get mapLayerOrderTitle => '调整图层顺序';
+
+  @override
+  String get mapLayerOrderReset => '恢复默认顺序';
 
   @override
   String get mapLayerRadar => '雷达合成回波图';
@@ -3537,6 +3549,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayers => '圖層';
 
   @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
+
+  @override
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
@@ -5034,6 +5052,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayers => '圖層';
+
+  @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
 
   @override
   String get mapLayerRadar => '雷達合成回波圖';

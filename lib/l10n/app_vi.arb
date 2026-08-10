@@ -161,6 +161,8 @@
   "homeRainTrendHeavySustained": "Mưa lớn tiếp diễn trong 1 giờ tới",
   "homeRainTrendHeavyStopping": "Mưa lớn có thể tạnh trong {minutes} phút nữa",
   "mapLayers": "Lớp bản đồ",
+  "mapLayerOrderTitle": "Sắp xếp thứ tự lớp",
+  "mapLayerOrderReset": "Đặt lại thứ tự mặc định",
   "mapLayerRadar": "Radar phản xạ tổng hợp",
   "mapLayerSatellite": "Himawari hồng ngoại",
   "mapLayerQpesums": "Dự báo mưa 1 giờ tới",
