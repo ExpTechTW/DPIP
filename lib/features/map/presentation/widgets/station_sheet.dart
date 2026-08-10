@@ -1446,22 +1446,15 @@ class _TrendChart extends StatelessWidget {
               color: lineColor.withValues(alpha: 0.55),
               width: 1,
             ),
-            getTooltipItems: (touched) {
-              final seen = <double>{};
-              return [
-                for (final spot in touched)
-                  if (seen.add(spot.x))
-                    _tooltipItem(
-                      spot: spot,
-                      unit: unit,
-                      time: timeLabel(spot.x),
-                      direction: nearestDirection(spot.x),
-                      colors: colors,
-                      textTheme: theme.textTheme,
-                      accent: speedColorAt(spot.x),
-                    ),
-              ];
-            },
+            getTooltipItems: (touched) => windTooltipItems(
+              touched: touched,
+              unit: unit,
+              timeLabel: timeLabel,
+              directionAt: nearestDirection,
+              accentAt: speedColorAt,
+              colors: colors,
+              textTheme: theme.textTheme,
+            ),
           ),
         ),
       ),
@@ -1505,6 +1498,38 @@ List<({List<FlSpot> spots, Color color})> _windSegments(
     start = end;
   }
   return segments;
+}
+
+/// Builds the wind-chart tooltip items for [touched].
+///
+/// fl_chart hard-requires **one item per touched spot** (`drawTouchTooltip`
+/// throws on a length mismatch). The wind curve is drawn as per-bucket segment
+/// bars that share their boundary spots, so a single touch near a threshold
+/// crossing can land on two bars at the same x — every item must be returned,
+/// and the duplicates (same value, same time) render perfectly overlapping, so
+/// a boundary touch still reads as a single card. Do **not** dedupe here.
+@visibleForTesting
+List<LineTooltipItem> windTooltipItems({
+  required List<LineBarSpot> touched,
+  required String unit,
+  required String Function(double x) timeLabel,
+  required int? Function(double x) directionAt,
+  required Color Function(double x) accentAt,
+  required ColorScheme colors,
+  required TextTheme textTheme,
+}) {
+  return [
+    for (final spot in touched)
+      _tooltipItem(
+        spot: spot,
+        unit: unit,
+        time: timeLabel(spot.x),
+        direction: directionAt(spot.x),
+        colors: colors,
+        textTheme: textTheme,
+        accent: accentAt(spot.x),
+      ),
+  ];
 }
 
 /// Chart touch tooltip: value emphasized, meta (direction / time) muted.
