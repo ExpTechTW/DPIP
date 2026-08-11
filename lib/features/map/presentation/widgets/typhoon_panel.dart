@@ -353,47 +353,49 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                     children: [
                       if (serialBadge != null) ...[
                         _SerialBadge(label: serialBadge),
-                        if (intensity != null || dataTime != null)
+                        if (intensity != null)
                           const SizedBox(height: AppSpacing.xs),
                       ],
                       if (intensity != null)
                         _IntensityChip(intensity: intensity),
-                      if (dataTime != null)
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: intensity != null ? AppSpacing.xs : 0,
-                          ),
-                          child: Text(
-                            l10n.typhoonDataTime(
-                              '${dataTime.month.toString().padLeft(2, '0')}/'
-                              '${dataTime.day.toString().padLeft(2, '0')} '
-                              '${dataTime.hour.toString().padLeft(2, '0')}:'
-                              '${dataTime.minute.toString().padLeft(2, '0')}',
-                            ),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                            ),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
                     ],
                   ),
                 ],
               ),
-              if (multi) ...[
+              if (dataTime != null || multi) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.xs,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    for (final o in options)
-                      _CyclonePill(
-                        label: o.label,
-                        selected: o.key == selectedKey,
-                        onTap: () => layer.selectCyclone(o.key),
+                    Expanded(
+                      child: multi
+                          ? Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.xs,
+                              children: [
+                                for (final o in options)
+                                  _CyclonePill(
+                                    label: o.label,
+                                    selected: o.key == selectedKey,
+                                    onTap: () => layer.selectCyclone(o.key),
+                                  ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    if (dataTime != null)
+                      Text(
+                        l10n.typhoonDataTime(
+                          '${dataTime.month.toString().padLeft(2, '0')}/'
+                          '${dataTime.day.toString().padLeft(2, '0')} '
+                          '${dataTime.hour.toString().padLeft(2, '0')}:'
+                          '${dataTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        textAlign: TextAlign.end,
                       ),
                   ],
                 ),
