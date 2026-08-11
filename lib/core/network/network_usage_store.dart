@@ -60,6 +60,25 @@ class _Pending {
   int misses = 0;
 }
 
+/// One hour's recorded usage — the granularity the Debug page's trend chart
+/// plots.
+class HourUsage {
+  const HourUsage({
+    required this.hour,
+    required this.down,
+    required this.saved,
+    required this.hits,
+    required this.misses,
+  });
+
+  /// UTC epoch hour — the same key the store buckets by.
+  final int hour;
+  final int down;
+  final int saved;
+  final int hits;
+  final int misses;
+}
+
 /// Persisted network-usage accounting backed by the shared SQLite database.
 ///
 /// Everything — bytes downloaded, bytes saved, and cache hits / misses —
@@ -259,6 +278,41 @@ class NetworkUsageStore {
       return const NetworkUsage.empty();
     }
   }
+
+  /// Per-hour usage over the trailing [hours] buckets, oldest first — the
+  /// trend series for the Debug page's chart.
+  ///
+  /// Every slot in the window is present: a silent hour is a zero bar, not a
+  /// gap, so the chart stays continuous. Best-effort: empty on error.
+  Future<List<HourUsage>> history({int hours = 24}) async {
+    await flush();
+    try {
+      final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+      final rows = await _db.query(
+        _buckets,
+        where: 'hour >= ?',
+        whereArgs: [hour - hours + 1],
+        orderBy: 'hour',
+      );
+      final byHour = <int, Map<String, Object?>>{
+        for (final row in rows) row['hour'] as int: row,
+      };
+      return [
+        for (var h = hour - hours + 1; h <= hour; h++)
+          HourUsage(
+            hour: h,
+            down: _counter(byHour[h]?['down']),
+            saved: _counter(byHour[h]?['saved']),
+            hits: _counter(byHour[h]?['hits']),
+            misses: _counter(byHour[h]?['misses']),
+          ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static int _counter(Object? value) => (value as num?)?.toInt() ?? 0;
 
   // Update-then-insert instead of UPSERT, so it works on any bundled SQLite.
   Future<void> _addToBucket(DatabaseExecutor db, int hour, _Pending add) async {

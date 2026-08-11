@@ -163,4 +163,28 @@ void main() {
     expect(stats.saved24h, 250);
     expect(stats.last24h, 500);
   });
+
+  test('history returns every hour of the window, zero-filled', () async {
+    now = DateTime.utc(2026, 1, 10, 12, 30); // current hour bucket = 12
+    final s = store();
+    await s.record(down: 1000, hit: false, saved: 0); // hour 12
+    now = now.subtract(const Duration(hours: 3)); // 09:30 → hour 9
+    await s.record(down: 0, hit: true, saved: 800); // hour 9
+    now = now.add(const Duration(hours: 3));
+
+    final history = await s.history(hours: 4);
+    expect(history, hasLength(4));
+    expect(history[0].saved, 800, reason: 'the 09:00 hit lands in its slot');
+    expect(history[0].down, 0);
+    expect(history[1].down, 0, reason: 'the 10:00 gap hour is a zero bar');
+    expect(history[1].saved, 0);
+    expect(history[2].down, 0, reason: 'the 11:00 gap hour is a zero bar');
+    expect(history[3].down, 1000, reason: 'the 12:00 miss lands in its slot');
+    expect(history[3].saved, 0);
+    // Oldest first, ascending UTC epoch hours.
+    expect(
+      [for (final h in history) h.hour],
+      List.generate(4, (i) => history.first.hour + i),
+    );
+  });
 }
