@@ -182,9 +182,8 @@ void main() {
     expect(history[3].down, 1000, reason: 'the 12:00 miss lands in its slot');
     expect(history[3].saved, 0);
     // Oldest first, ascending UTC epoch hours.
-    expect(
-      [for (final h in history) h.hour],
-      List.generate(4, (i) => history.first.hour + i),
-    );
+    expect([
+      for (final h in history) h.hour,
+    ], List.generate(4, (i) => history.first.hour + i));
   });
 }
