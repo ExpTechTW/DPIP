@@ -41,7 +41,10 @@ List<MapFrame> _forecastFrames() {
   final now = DateTime.now();
   return [
     for (var h = -6; h <= 16; h++)
-      MapFrame(id: '$h', time: now.add(Duration(hours: h))),
+      MapFrame(
+        id: '$h',
+        time: now.add(Duration(hours: h)),
+      ),
   ];
 }
 

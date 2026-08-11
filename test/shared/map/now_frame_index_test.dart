@@ -7,7 +7,10 @@ final _now = DateTime(2026, 8, 11, 11, 0);
 /// after — negative for history, positive for forecast steps.
 List<MapFrame> _span(int fromHours, int toHours, {int stepHours = 1}) => [
   for (var h = fromHours; h <= toHours; h += stepHours)
-    MapFrame(id: '$h', time: _now.add(Duration(hours: h))),
+    MapFrame(
+      id: '$h',
+      time: _now.add(Duration(hours: h)),
+    ),
 ];
 
 void main() {

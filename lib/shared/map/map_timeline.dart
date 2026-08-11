@@ -293,11 +293,12 @@ class _MapTimelineState extends State<MapTimeline> {
 /// Which side of the present a frame sits on.
 enum TimelineEra { past, now, future }
 
-TimelineEra _eraOf(int index, int nowIndex) => switch (index.compareTo(nowIndex)) {
-  -1 => TimelineEra.past,
-  0 => TimelineEra.now,
-  _ => TimelineEra.future,
-};
+TimelineEra _eraOf(int index, int nowIndex) =>
+    switch (index.compareTo(nowIndex)) {
+      -1 => TimelineEra.past,
+      0 => TimelineEra.now,
+      _ => TimelineEra.future,
+    };
 
 /// The era colours, one pair per brightness so each reads on both themes.
 ///
@@ -312,8 +313,7 @@ const Color _futureLight = Color(0xFF7B1FA2);
 const Color _futureDark = Color(0xFFBA68C8);
 
 Color _eraColor(TimelineEra era, Brightness brightness) => switch (era) {
-  TimelineEra.past =>
-    brightness == Brightness.dark ? _pastDark : _pastLight,
+  TimelineEra.past => brightness == Brightness.dark ? _pastDark : _pastLight,
   TimelineEra.now => brightness == Brightness.dark ? _nowDark : _nowLight,
   TimelineEra.future =>
     brightness == Brightness.dark ? _futureDark : _futureLight,

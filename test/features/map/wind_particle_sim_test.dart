@@ -10,21 +10,21 @@ import 'package:flutter_test/flutter_test.dart';
 /// (so all cells carry the same wind), or -1 for a full eastward gradient.
 WindField _field({int uValue = 128, int vValue = 128, double lon0 = 0}) =>
     WindField(
-  width: 2,
-  height: 2,
-  lat0: 90,
-  lon0: lon0,
-  dLat: -90,
-  dLon: 180,
-  uMin: -1,
-  uMax: 1,
-  vMin: -1,
-  vMax: 1,
-  timeMs: 0,
-  model: 'gfs',
-  u: Uint8List.fromList([uValue, uValue, uValue, uValue]),
-  v: Uint8List.fromList([vValue, vValue, vValue, vValue]),
-);
+      width: 2,
+      height: 2,
+      lat0: 90,
+      lon0: lon0,
+      dLat: -90,
+      dLon: 180,
+      uMin: -1,
+      uMax: 1,
+      vMin: -1,
+      vMax: 1,
+      timeMs: 0,
+      model: 'gfs',
+      u: Uint8List.fromList([uValue, uValue, uValue, uValue]),
+      v: Uint8List.fromList([vValue, vValue, vValue, vValue]),
+    );
 
 /// A wind field whose every cell blows due east at ~1 m/s.
 WindField _eastField() => _field(uValue: 255, vValue: 128);
@@ -211,10 +211,7 @@ void main() {
       // holding it fixed made particles 23× too fast at z7 — the "flying
       // everywhere" that a fixed step always ends in.
       double pixelsPerFrame(double zoom) {
-        final sim = WindParticleSim(
-          _eastField(),
-          random: math.Random(5),
-        );
+        final sim = WindParticleSim(_eastField(), random: math.Random(5));
         final cam = WindCamera(
           centerLat: 25,
           centerLng: 121,
@@ -250,6 +247,5 @@ void main() {
       // clamp is not mistaken for a bug next time someone measures z10.
       expect(pixelsPerFrame(10), greaterThan(slow * 4));
     });
-
   });
 }
