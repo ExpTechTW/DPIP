@@ -9,26 +9,56 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-/// One stacked bar per hour over the trailing [history] (typically 24 h, Taipei
-/// wall-clock on the x-axis): the blue segment is what the app actually
-/// downloaded, the green segment what the cache saved on top — so the shape of
-/// the day and the cache payoff read together.
+/// Which series the chart plots: both stacked, or one on its own.
+enum NetworkChartMode {
+  /// Download (red) and Saved (green) as stacked bars.
+  both,
+
+  /// Download bars only.
+  download,
+
+  /// Saved bars only.
+  saved,
+}
+
+/// Hourly trend for the Network usage section.
+///
+/// One bar per hour over the trailing [history] (typically 24 h, Taipei
+/// wall-clock on the x-axis): **red** is what the app actually downloaded,
+/// **green** what the cache saved on top — so the shape of the day and the
+/// cache payoff read together. A [SegmentedButton] switches between stacked
+/// and single-series views.
 ///
 /// Deliberately English-only, matching the Debug page's convention.
-class NetworkUsageChart extends StatelessWidget {
+class NetworkUsageChart extends StatefulWidget {
   const NetworkUsageChart({super.key, required this.history});
 
   final List<HourUsage> history;
 
-  static const Color _savedColor = Color(0xFF66BB6A);
+  @override
+  State<NetworkUsageChart> createState() => _NetworkUsageChartState();
+}
+
+class _NetworkUsageChartState extends State<NetworkUsageChart> {
+  static const Color _downloadColor = Color(0xFFE53935); // red 600
+  static const Color _savedColor = Color(0xFF66BB6A); // green 400
+
+  NetworkChartMode _mode = NetworkChartMode.both;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final maxBytes = history.fold<int>(
+    final showDownload =
+        _mode == NetworkChartMode.both || _mode == NetworkChartMode.download;
+    final showSaved =
+        _mode == NetworkChartMode.both || _mode == NetworkChartMode.saved;
+
+    // Scale the max to what this mode actually plots.
+    final maxBytes = widget.history.fold<int>(
       0,
-      (m, h) => math.max(m, h.down + h.saved),
+      (m, h) =>
+          math.max(m, (showDownload ? h.down : 0) + (showSaved ? h.saved : 0)),
     );
     if (maxBytes == 0) {
       return Padding(
@@ -54,30 +84,10 @@ class NetworkUsageChart extends StatelessWidget {
     final yInterval = maxY / 4;
 
     final groups = [
-      for (var i = 0; i < history.length; i++)
+      for (var i = 0; i < widget.history.length; i++)
         BarChartGroupData(
           x: i,
-          barRods: [
-            BarChartRodData(
-              toY: history[i].down / divisor + history[i].saved / divisor,
-              width: 6,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(2),
-              ),
-              rodStackItems: [
-                BarChartRodStackItem(
-                  0,
-                  history[i].down / divisor,
-                  colors.primary,
-                ),
-                BarChartRodStackItem(
-                  history[i].down / divisor,
-                  history[i].down / divisor + history[i].saved / divisor,
-                  _savedColor,
-                ),
-              ],
-            ),
-          ],
+          barRods: [_rod(widget.history[i], divisor, showDownload, showSaved)],
         ),
     ];
 
@@ -94,14 +104,42 @@ class NetworkUsageChart extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _legendDot(colors.primary),
-              const SizedBox(width: AppSpacing.sm),
-              const Text('Downloaded'),
-              const SizedBox(width: AppSpacing.md),
-              _legendDot(_savedColor),
-              const SizedBox(width: AppSpacing.sm),
-              const Text('Saved'),
+              if (showDownload) ...[
+                _legendDot(_downloadColor),
+                const SizedBox(width: AppSpacing.sm),
+                const Text('Downloaded'),
+              ],
+              if (showDownload && showSaved) ...[
+                const SizedBox(width: AppSpacing.md),
+              ],
+              if (showSaved) ...[
+                _legendDot(_savedColor),
+                const SizedBox(width: AppSpacing.sm),
+                const Text('Saved'),
+              ],
             ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SegmentedButton<NetworkChartMode>(
+            segments: const [
+              ButtonSegment(value: NetworkChartMode.both, label: Text('Both')),
+              ButtonSegment(
+                value: NetworkChartMode.download,
+                label: Text('Download'),
+              ),
+              ButtonSegment(
+                value: NetworkChartMode.saved,
+                label: Text('Saved'),
+              ),
+            ],
+            selected: {_mode},
+            onSelectionChanged: (selection) =>
+                setState(() => _mode = selection.first),
+            showSelectedIcon: false,
+            style: const ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
@@ -152,13 +190,13 @@ class NetworkUsageChart extends StatelessWidget {
                       interval: 4,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < 0 || index >= history.length) {
+                        if (index < 0 || index >= widget.history.length) {
                           return const SizedBox.shrink();
                         }
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            _taipeiHour(history[index].hour).toString(),
+                            _taipeiHour(widget.history[index].hour).toString(),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colors.onSurfaceVariant,
                               fontFeatures: const [
@@ -181,13 +219,22 @@ class NetworkUsageChart extends StatelessWidget {
                     ),
                     tooltipMargin: AppSpacing.sm,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final hour = history[group.x];
-                      final down = hour.down / divisor;
-                      final saved = hour.saved / divisor;
+                      final hour = widget.history[group.x];
+                      final lines = StringBuffer(
+                        '${_taipeiHour(hour.hour).toString().padLeft(2, '0')}:00',
+                      );
+                      if (showDownload) {
+                        lines.writeln(
+                          '↓ ${_formatNumber(hour.down / divisor)} $unit',
+                        );
+                      }
+                      if (showSaved) {
+                        lines.writeln(
+                          'Saved ${_formatNumber(hour.saved / divisor)} $unit',
+                        );
+                      }
                       return BarTooltipItem(
-                        '${_taipeiHour(hour.hour).toString().padLeft(2, '0')}:00\n'
-                        '↓ ${_formatNumber(down)} $unit\n'
-                        'Saved ${_formatNumber(saved)} $unit',
+                        lines.toString().trimRight(),
                         theme.textTheme.labelSmall!.copyWith(
                           color: colors.onSurface,
                           fontFeatures: const [FontFeature.tabularFigures()],
@@ -201,6 +248,30 @@ class NetworkUsageChart extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  BarChartRodData _rod(
+    HourUsage hour,
+    double divisor,
+    bool showDownload,
+    bool showSaved,
+  ) {
+    final down = hour.down / divisor;
+    final saved = hour.saved / divisor;
+    return BarChartRodData(
+      toY: (showDownload ? down : 0) + (showSaved ? saved : 0),
+      width: 6,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+      rodStackItems: switch ((showDownload, showSaved)) {
+        (true, true) => [
+          BarChartRodStackItem(0, down, _downloadColor),
+          BarChartRodStackItem(down, down + saved, _savedColor),
+        ],
+        (true, false) => [BarChartRodStackItem(0, down, _downloadColor)],
+        (false, true) => [BarChartRodStackItem(0, saved, _savedColor)],
+        (false, false) => const [],
+      },
     );
   }
 
