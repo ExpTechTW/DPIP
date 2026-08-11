@@ -183,6 +183,39 @@ class SymbolLegend extends StatelessWidget {
   }
 }
 
+/// A solid circular colour swatch for a [SymbolLegendItem] — the dot mark for
+/// discrete categories (feed status, storm intensity, station type). Drawn the
+/// same way as the layer's map markers where applicable.
+class LegendDot extends StatelessWidget {
+  const LegendDot({
+    super.key,
+    required this.color,
+    this.size = 10,
+    this.borderWidth = 0,
+  });
+
+  final Color color;
+  final double size;
+
+  /// White ring width — `1` matches a marker that's ringed on the map.
+  final double borderWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: borderWidth > 0
+            ? Border.all(color: Colors.white, width: borderWidth)
+            : null,
+      ),
+    );
+  }
+}
+
 /// A short line sample for a [SymbolLegendItem] — the swatch for an outline
 /// overlay (an administrative border, a coverage boundary).
 ///

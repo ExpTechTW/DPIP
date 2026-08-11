@@ -13,6 +13,7 @@ import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -105,16 +106,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
           color: cardColor,
           child: SizedBox(
             height: lerpDouble(120, 168, expansion)!,
-            child: Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: secondary,
-                ),
-              ),
-            ),
+            child: Center(child: InlineLoading(color: secondary)),
           ),
         );
       }

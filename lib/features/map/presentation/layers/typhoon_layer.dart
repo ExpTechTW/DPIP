@@ -1137,11 +1137,18 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                 label: l10n.typhoonLegendForecast,
               ),
               SymbolLegendItem(
-                swatch: const _DotSwatch(color: Color(0xFFFF7043)),
+                swatch: const LegendDot(
+                  color: Color(0xFFFF7043),
+                  borderWidth: 1,
+                ),
                 label: l10n.typhoonLegendForecastPoint,
               ),
               SymbolLegendItem(
-                swatch: const _DotSwatch(color: Color(0xFFD32F2F), size: 10),
+                swatch: const LegendDot(
+                  color: Color(0xFFD32F2F),
+                  size: 10,
+                  borderWidth: 1,
+                ),
                 label: l10n.typhoonLegendCurrent,
               ),
               if (!showProb)
@@ -1374,26 +1381,6 @@ class _TrackPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _TrackPainter oldDelegate) =>
       oldDelegate.color != color || oldDelegate.dashed != dashed;
-}
-
-class _DotSwatch extends StatelessWidget {
-  const _DotSwatch({required this.color, this.size = 8});
-
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 1),
-      ),
-    );
-  }
 }
 
 /// Bounding box of every coordinate in a typhoon [geo] `FeatureCollection`.

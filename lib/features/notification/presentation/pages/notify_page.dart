@@ -137,11 +137,7 @@ class _ChannelTile extends StatelessWidget {
       title: Text(notifyChannelTitle(channel, l10n)),
       subtitle: Text(notifyOptionLabel(settings.kindOf(channel), l10n)),
       trailing: saving
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
+          ? const InlineLoading(size: 20)
           : const Icon(Icons.chevron_right),
       enabled: !busy,
       onTap: () => _edit(context),

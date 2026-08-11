@@ -12,6 +12,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
@@ -27,6 +28,8 @@ import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -613,7 +616,7 @@ class _ReportPeekSummary extends StatelessWidget {
       report.maxIntensity,
       report.originTimeUtc,
     );
-    final taipei = report.originTimeUtc.add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(report.originTimeUtc);
     final time = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
 
     return Column(
@@ -826,7 +829,7 @@ class _ReportInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final taipei = report.originTimeUtc.add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(report.originTimeUtc);
     final originTime = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
     final coordinates =
         '${report.latitude.toStringAsFixed(2)}°N・'
@@ -887,14 +890,7 @@ class _InfoRow extends StatelessWidget {
           ),
           const Spacer(),
           if (dotColor != null) ...[
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
-              ),
-            ),
+            LegendDot(color: dotColor!),
             const SizedBox(width: AppSpacing.sm),
           ],
           Text(
@@ -1444,7 +1440,7 @@ class _ReportImageCardState extends State<_ReportImageCard> {
             width: double.infinity,
             color: colors.surfaceContainer,
             alignment: Alignment.center,
-            child: const CircularProgressIndicator(),
+            child: const InlineLoading(size: 36),
           );
         },
         errorBuilder: (context, error, stackTrace) {

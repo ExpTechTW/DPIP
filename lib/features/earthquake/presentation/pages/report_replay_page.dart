@@ -17,6 +17,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
@@ -37,6 +38,7 @@ import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_style.dart' show landLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -682,7 +684,7 @@ class _ReplayStatusBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final taipeiTime = clock.now().add(const Duration(hours: 8));
+    final taipeiTime = AppTime.taipei(clock.now());
     final timeText = DateFormat('HH:mm:ss').format(taipeiTime);
 
     final (Color dot, String? statusWord) = switch (rts.status) {
@@ -711,11 +713,7 @@ class _ReplayStatusBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-          ),
+          LegendDot(color: dot),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(

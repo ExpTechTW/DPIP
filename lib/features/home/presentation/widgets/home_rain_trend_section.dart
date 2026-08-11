@@ -13,6 +13,7 @@ import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 // intl 0.20 defines its own `TextDirection` class, which would shadow dart:ui's
@@ -192,7 +193,7 @@ class HomeRainTrendSection extends StatelessWidget {
   /// Taipei wall-clock `HH:mm` of the trend's server `start` stamp — the
   /// data's own moment, so it stays honest even if the fetch was a while ago.
   static String _updatedClock(RainHourTrend data) {
-    final taipei = data.startUtc.add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(data.startUtc);
     return DateFormat('HH:mm').format(taipei);
   }
 }
@@ -218,11 +219,7 @@ class _NoData extends StatelessWidget {
     final colors = theme.colorScheme;
     final Widget child;
     if (loading) {
-      child = SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2, color: secondary),
-      );
+      child = InlineLoading(color: secondary);
     } else if (failure != null) {
       child = Row(
         children: [

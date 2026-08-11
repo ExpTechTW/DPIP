@@ -2,6 +2,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
+import 'package:dpip/shared/widgets/event_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -70,7 +71,7 @@ class _EventTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Connector(
-            icon: _iconFor(event.type),
+            icon: eventTypeIcon(event.type.iconKey),
             isFirst: isFirst,
             isLast: isLast,
           ),
@@ -159,14 +160,3 @@ class _Connector extends StatelessWidget {
     );
   }
 }
-
-IconData _iconFor(EventType type) => switch (type) {
-  EventType.earthquake => Icons.crisis_alert,
-  EventType.report => Icons.description_outlined,
-  EventType.intensity => Icons.graphic_eq,
-  EventType.thunderstorm => Icons.thunderstorm_outlined,
-  EventType.heavyRain => Icons.water_drop_outlined,
-  EventType.weatherWarning => Icons.warning_amber_rounded,
-  EventType.tsunami => Icons.tsunami_outlined,
-  EventType.other => Icons.notifications_outlined,
-};

@@ -22,6 +22,19 @@ enum EventType {
     null => EventType.other,
     _ => EventType.weatherWarning,
   };
+
+  /// Semantic icon key for the shared [eventTypeIcon] resolver — kept a plain
+  /// string so this domain enum never imports Material.
+  String get iconKey => switch (this) {
+    EventType.earthquake => 'earthquake',
+    EventType.report => 'report',
+    EventType.intensity => 'intensity',
+    EventType.thunderstorm => 'thunderstorm',
+    EventType.heavyRain => 'heavy_rain',
+    EventType.weatherWarning => 'weather_warning',
+    EventType.tsunami => 'tsunami',
+    EventType.other => 'other',
+  };
 }
 
 /// One item in the events timeline — an earthquake report, weather warning, etc.

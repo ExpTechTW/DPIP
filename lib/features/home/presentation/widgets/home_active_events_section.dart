@@ -8,6 +8,8 @@ import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/event_icon.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -85,15 +87,7 @@ class HomeActiveEventsSection extends StatelessWidget {
                 ),
               ),
             ),
-            if (controller.loading)
-              SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: secondary,
-                ),
-              ),
+            if (controller.loading) InlineLoading(size: 14, color: secondary),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
@@ -167,7 +161,7 @@ class _ActiveEventRow extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Icon(
-            _iconFor(event.type),
+            eventTypeIcon(event.type.iconKey),
             size: 18,
             color: colors.onPrimaryContainer,
           ),
@@ -215,14 +209,3 @@ class _ActiveEventRow extends StatelessWidget {
     );
   }
 }
-
-IconData _iconFor(EventType type) => switch (type) {
-  EventType.earthquake => Icons.crisis_alert,
-  EventType.report => Icons.description_outlined,
-  EventType.intensity => Icons.graphic_eq,
-  EventType.thunderstorm => Icons.thunderstorm_outlined,
-  EventType.heavyRain => Icons.water_drop_outlined,
-  EventType.weatherWarning => Icons.warning_amber_rounded,
-  EventType.tsunami => Icons.tsunami_outlined,
-  EventType.other => Icons.notifications_outlined,
-};

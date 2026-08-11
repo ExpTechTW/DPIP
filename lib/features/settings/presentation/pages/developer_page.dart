@@ -378,12 +378,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   subtitle: const Text(
                     'Removes stored tiles, API responses, and usage stats',
                   ),
-                  trailing: _clearing
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : null,
+                  trailing: _clearing ? const InlineLoading(size: 18) : null,
                   onTap: _clearing ? null : _confirmClearCache,
                 ),
               ],
