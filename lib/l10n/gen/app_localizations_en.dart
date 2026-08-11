@@ -1335,6 +1335,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Coordinates copied';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return 'Could not open $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => 'Reference layers';
 
   @override

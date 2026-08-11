@@ -1762,6 +1762,13 @@
   "@mapAppCoordinatesCopied": {
     "description": "Snackbar confirming the coordinates were copied"
   },
+  "mapAppOpenFailed": "Could not open {app}",
+  "@mapAppOpenFailed": {
+    "placeholders": {
+      "app": {"type": "String"}
+    },
+    "description": "Snackbar when the chosen map app cannot be opened on this device"
+  },
 
   "mapOverlaySectionReference": "Reference layers",
   "@mapOverlaySectionReference": {

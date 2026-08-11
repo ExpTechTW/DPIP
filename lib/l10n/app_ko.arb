@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "좌표가 복사되었습니다",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "{app}을(를) 열 수 없습니다",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "참조 레이어",
   "mapLayerCategoryEarthquake": "지진",

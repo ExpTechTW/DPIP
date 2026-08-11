@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "Đã sao chép tọa độ",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "Không thể mở {app}",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "Lớp tham chiếu",
   "mapLayerCategoryEarthquake": "Động đất",

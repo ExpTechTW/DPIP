@@ -1313,6 +1313,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapAppCoordinatesCopied => '座標をコピーしました';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return '$app を開けませんでした';
+  }
+
+  @override
   String get mapOverlaySectionReference => '参照レイヤー';
 
   @override

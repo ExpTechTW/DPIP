@@ -2553,6 +2553,12 @@ abstract class AppLocalizations {
   /// **'Coordinates copied'**
   String get mapAppCoordinatesCopied;
 
+  /// Snackbar when the chosen map app cannot be opened on this device
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open {app}'**
+  String mapAppOpenFailed(String app);
+
   /// Section title in map overlay settings menus: the reference overlays
   ///
   /// In en, this message translates to:

@@ -1335,6 +1335,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Đã sao chép tọa độ';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return 'Không thể mở $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => 'Lớp tham chiếu';
 
   @override

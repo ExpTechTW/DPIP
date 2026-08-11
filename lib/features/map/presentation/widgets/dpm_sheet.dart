@@ -567,7 +567,7 @@ class _Header extends StatelessWidget {
               if (mapsTarget != null)
                 IconButton(
                   tooltip: l10n.dpmOpenInMaps,
-                  onPressed: () => showMapAppPicker(context, mapsTarget!),
+                  onPressed: () => pickAndOpenMapApp(context, mapsTarget!),
                   icon: const Icon(Icons.directions_outlined),
                 ),
               IconButton(

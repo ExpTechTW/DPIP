@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "คัดลอกพิกัดแล้ว",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "ไม่สามารถเปิด {app} ได้",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
   "mapLayerCategoryEarthquake": "แผ่นดินไหว",

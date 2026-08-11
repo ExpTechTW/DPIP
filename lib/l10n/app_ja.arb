@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "座標をコピーしました",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "{app} を開けませんでした",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "参照レイヤー",
   "mapLayerCategoryEarthquake": "地震",

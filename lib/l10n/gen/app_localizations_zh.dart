@@ -1307,6 +1307,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapAppCoordinatesCopied => '已複製座標';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => '參考圖層';
 
   @override
@@ -3035,6 +3040,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapAppCoordinatesCopied => '已复制坐标';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '无法打开 $app';
+  }
 
   @override
   String get mapOverlaySectionReference => '参考图层';
@@ -4767,6 +4777,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapAppCoordinatesCopied => '已複製座標';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => '參考圖層';
 
   @override
@@ -6495,6 +6510,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
 
   @override
   String get mapOverlaySectionReference => '參考圖層';

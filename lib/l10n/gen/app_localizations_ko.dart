@@ -1314,6 +1314,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapAppCoordinatesCopied => '좌표가 복사되었습니다';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return '$app을(를) 열 수 없습니다';
+  }
+
+  @override
   String get mapOverlaySectionReference => '참조 레이어';
 
   @override

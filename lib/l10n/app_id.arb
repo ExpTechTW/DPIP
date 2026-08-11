@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "Koordinat disalin",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "Tidak dapat membuka {app}",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "Lapisan referensi",
   "mapLayerCategoryEarthquake": "Gempa",

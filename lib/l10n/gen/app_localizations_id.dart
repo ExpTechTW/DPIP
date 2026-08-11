@@ -1338,6 +1338,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Koordinat disalin';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return 'Tidak dapat membuka $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => 'Lapisan referensi';
 
   @override

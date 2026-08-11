@@ -1333,6 +1333,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'คัดลอกพิกัดแล้ว';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return 'ไม่สามารถเปิด $app ได้';
+  }
+
+  @override
   String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';
 
   @override

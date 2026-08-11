@@ -402,6 +402,9 @@
   "mapAppCoordinatesCopied": "Na-kopya ang coordinates",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "Hindi mabuksan ang {app}",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "Layer ng sanggunian",
   "mapLayerCategoryEarthquake": "Lindol",

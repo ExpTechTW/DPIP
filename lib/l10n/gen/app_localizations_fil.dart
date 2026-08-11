@@ -1342,6 +1342,11 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapAppCoordinatesCopied => 'Na-kopya ang coordinates';
 
   @override
+  String mapAppOpenFailed(String app) {
+    return 'Hindi mabuksan ang $app';
+  }
+
+  @override
   String get mapOverlaySectionReference => 'Layer ng sanggunian';
 
   @override

@@ -422,6 +422,9 @@
   "mapAppCoordinatesCopied": "已複製座標",
   "@mapAppCoordinatesCopied": {
   },
+  "mapAppOpenFailed": "無法開啟 {app}",
+  "@mapAppOpenFailed": {
+  },
 
   "mapOverlaySectionReference": "參考圖層",
   "mapLayerCategoryEarthquake": "地震",
