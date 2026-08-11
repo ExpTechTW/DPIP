@@ -16,12 +16,20 @@ void main() {
   );
 
   /// The chart built for [usage] bars with real traffic.
-  Future<BarChartData> pumpChart(WidgetTester tester) async {
+  Future<BarChartData> pumpChart(
+    WidgetTester tester, {
+    int hours = 24,
+    int weekPoints = 28,
+  }) async {
     await tester.pumpWidget(
       wrap(
         NetworkUsageChart(
           history: [
-            for (var h = 0; h < 24; h++) usage(h, down: 2048, saved: 1024),
+            for (var h = 0; h < hours; h++) usage(h, down: 2048, saved: 1024),
+          ],
+          week: [
+            for (var i = 0; i < weekPoints; i++)
+              usage(i * 6, down: 2048, saved: 1024),
           ],
         ),
       ),
@@ -29,11 +37,11 @@ void main() {
     return tester.widget<BarChart>(find.byType(BarChart)).data;
   }
 
-  /// Taps one [SegmentedButton] segment by its label.
-  Future<void> tapSegment(WidgetTester tester, String label) async {
+  /// Taps a segment inside the [SegmentedButton] of type [T] by label.
+  Future<void> tapSegment<T>(WidgetTester tester, String label) async {
     await tester.tap(
       find.descendant(
-        of: find.byType(SegmentedButton<NetworkChartMode>),
+        of: find.byType(SegmentedButton<T>),
         matching: find.text(label),
       ),
     );
@@ -42,35 +50,44 @@ void main() {
 
   testWidgets('empty history shows a placeholder, no chart', (tester) async {
     await tester.pumpWidget(
-      wrap(NetworkUsageChart(history: [for (var h = 0; h < 24; h++) usage(h)])),
+      wrap(
+        NetworkUsageChart(
+          history: [for (var h = 0; h < 24; h++) usage(h)],
+          week: [for (var i = 0; i < 28; i++) usage(i * 6)],
+        ),
+      ),
     );
 
     expect(find.byType(BarChart), findsNothing);
     expect(find.textContaining('No traffic recorded yet'), findsOneWidget);
   });
 
-  testWidgets('defaults to stacked red download over green saved', (
-    tester,
-  ) async {
+  testWidgets('defaults to the 24h window with hourly points', (tester) async {
     final data = await pumpChart(tester);
 
-    expect(find.text('Downloaded'), findsOneWidget);
-    // "Saved" appears twice: the legend dot row and the switch segment.
-    expect(find.text('Saved'), findsNWidgets(2));
-
-    // The chart is the data, not a blank stub: 24 groups with one rod each.
     expect(data.barGroups, hasLength(24));
     final stacks = data.barGroups.first.barRods.first.rodStackItems;
     expect(stacks, hasLength(2));
     expect(stacks[0].color, const Color(0xFFE53935));
     expect(stacks[1].color, const Color(0xFF66BB6A));
+    // Taipei labels: epoch hour 16 → 1970-01-02 00:00 +08 → 2日0時.
+    expect(find.text('2日0時'), findsWidgets);
+  });
+
+  testWidgets('switching to 7d shows 28 six-hour buckets', (tester) async {
+    await pumpChart(tester);
+    await tapSegment<NetworkChartWindow>(tester, '7d');
+
+    final data = tester.widget<BarChart>(find.byType(BarChart)).data;
+    expect(data.barGroups, hasLength(28));
+    expect(data.barGroups.first.barRods.first.width, 12);
   });
 
   testWidgets('switching to Download plots only the red series', (
     tester,
   ) async {
     await pumpChart(tester);
-    await tapSegment(tester, 'Download');
+    await tapSegment<NetworkChartMode>(tester, 'Download');
 
     final stacks = tester
         .widget<BarChart>(find.byType(BarChart))
@@ -88,7 +105,7 @@ void main() {
 
   testWidgets('switching to Saved plots only the green series', (tester) async {
     await pumpChart(tester);
-    await tapSegment(tester, 'Saved');
+    await tapSegment<NetworkChartMode>(tester, 'Saved');
 
     final stacks = tester
         .widget<BarChart>(find.byType(BarChart))

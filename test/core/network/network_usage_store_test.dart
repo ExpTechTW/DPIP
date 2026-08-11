@@ -186,4 +186,39 @@ void main() {
       for (final h in history) h.hour,
     ], List.generate(4, (i) => history.first.hour + i));
   });
+
+  test('history aggregates into coarser buckets for the 7-day view', () async {
+    now = DateTime.utc(2026, 1, 10, 12, 30); // current hour bucket = 12
+    final s = store();
+    await s.record(down: 300, hit: false, saved: 0); // hour 12
+    await s.record(down: 100, hit: true, saved: 50); // hour 12 → same 6h slot
+    now = now.subtract(const Duration(hours: 2)); // 10:30 → hour 10
+    await s.record(down: 600, hit: false, saved: 0); // hour 10 → 6h slot 6
+    now = now.add(const Duration(hours: 2));
+
+    // A 12-hour window bucketed by 6: two samples per slot boundary.
+    final epochHour = now.millisecondsSinceEpoch ~/ 3600000;
+    final history = await s.history(hours: 12, bucketHours: 6);
+    expect(history, hasLength(2));
+    expect(
+      history[0].hour,
+      (epochHour - 2) ~/ 6 * 6,
+      reason: 'slot starts at the epoch hour its record falls into',
+    );
+    expect(
+      history[0].down,
+      600,
+      reason: 'hour-10 bytes land in the first slot',
+    );
+    expect(history[0].saved, 0);
+    expect(
+      history[1].hour,
+      epochHour ~/ 6 * 6,
+      reason: 'slot starts at the epoch hour now falls into',
+    );
+    expect(history[1].down, 400, reason: 'both hour-12 records aggregate');
+    expect(history[1].saved, 50);
+    expect(history[1].hits, 1);
+    expect(history[1].misses, 1);
+  });
 }

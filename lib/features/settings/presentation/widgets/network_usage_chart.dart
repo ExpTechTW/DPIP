@@ -21,19 +21,37 @@ enum NetworkChartMode {
   saved,
 }
 
-/// Hourly trend for the Network usage section.
+/// Which time window the chart shows.
+enum NetworkChartWindow {
+  /// Trailing 24 hours, one point per hour.
+  day,
+
+  /// Trailing 7 days, one point per 6 hours.
+  week,
+}
+
+/// Trend for the Network usage section, switchable between the last 24 hours
+/// (hourly) and the last 7 days (6-hour buckets).
 ///
-/// One bar per hour over the trailing [history] (typically 24 h, Taipei
-/// wall-clock on the x-axis): **red** is what the app actually downloaded,
-/// **green** what the cache saved on top — so the shape of the day and the
-/// cache payoff read together. A [SegmentedButton] switches between stacked
-/// and single-series views.
+/// One bar per point: **red** is what the app actually downloaded, **green**
+/// what the cache saved on top — so the shape of the day and the cache payoff
+/// read together. A [SegmentedButton] switches the window (24h / 7d), another
+/// the series (stacked, download-only, saved-only). The x-axis is labelled in
+/// Taipei wall-clock (`11日13時`).
 ///
 /// Deliberately English-only, matching the Debug page's convention.
 class NetworkUsageChart extends StatefulWidget {
-  const NetworkUsageChart({super.key, required this.history});
+  const NetworkUsageChart({
+    super.key,
+    required this.history,
+    required this.week,
+  });
 
+  /// Trailing 24 hours, one [HourUsage] per hour.
   final List<HourUsage> history;
+
+  /// Trailing 7 days, one [HourUsage] per 6-hour bucket.
+  final List<HourUsage> week;
 
   @override
   State<NetworkUsageChart> createState() => _NetworkUsageChartState();
@@ -44,18 +62,24 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
   static const Color _savedColor = Color(0xFF66BB6A); // green 400
 
   NetworkChartMode _mode = NetworkChartMode.both;
+  NetworkChartWindow _window = NetworkChartWindow.day;
+
+  /// The samples the active window plots.
+  List<HourUsage> get _samples =>
+      _window == NetworkChartWindow.day ? widget.history : widget.week;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final samples = _samples;
     final showDownload =
         _mode == NetworkChartMode.both || _mode == NetworkChartMode.download;
     final showSaved =
         _mode == NetworkChartMode.both || _mode == NetworkChartMode.saved;
 
     // Scale the max to what this mode actually plots.
-    final maxBytes = widget.history.fold<int>(
+    final maxBytes = samples.fold<int>(
       0,
       (m, h) =>
           math.max(m, (showDownload ? h.down : 0) + (showSaved ? h.saved : 0)),
@@ -75,7 +99,7 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
       );
     }
 
-    // Plot in the smaller unit that still fits the largest hour, so a light
+    // Plot in the smaller unit that still fits the largest point, so a light
     // usage day isn't a sub-one-MB sliver.
     final (String unit, double divisor) = maxBytes >= 1024 * 1024
         ? ('MB', 1024 * 1024)
@@ -84,10 +108,10 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
     final yInterval = maxY / 4;
 
     final groups = [
-      for (var i = 0; i < widget.history.length; i++)
+      for (var i = 0; i < samples.length; i++)
         BarChartGroupData(
           x: i,
-          barRods: [_rod(widget.history[i], divisor, showDownload, showSaved)],
+          barRods: [_rod(samples[i], divisor, showDownload, showSaved)],
         ),
     ];
 
@@ -120,21 +144,19 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          SegmentedButton<NetworkChartMode>(
+          _ModeToggle(
+            mode: _mode,
+            onChanged: (mode) => setState(() => _mode = mode),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SegmentedButton<NetworkChartWindow>(
             segments: const [
-              ButtonSegment(value: NetworkChartMode.both, label: Text('Both')),
-              ButtonSegment(
-                value: NetworkChartMode.download,
-                label: Text('Download'),
-              ),
-              ButtonSegment(
-                value: NetworkChartMode.saved,
-                label: Text('Saved'),
-              ),
+              ButtonSegment(value: NetworkChartWindow.day, label: Text('24h')),
+              ButtonSegment(value: NetworkChartWindow.week, label: Text('7d')),
             ],
-            selected: {_mode},
+            selected: {_window},
             onSelectionChanged: (selection) =>
-                setState(() => _mode = selection.first),
+                setState(() => _window = selection.first),
             showSelectedIcon: false,
             style: const ButtonStyle(
               visualDensity: VisualDensity.compact,
@@ -148,7 +170,7 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
               BarChartData(
                 maxY: maxY,
                 alignment: BarChartAlignment.spaceBetween,
-                groupsSpace: 2,
+                groupsSpace: _window == NetworkChartWindow.day ? 2 : 6,
                 barGroups: groups,
                 gridData: FlGridData(
                   drawVerticalLine: false,
@@ -187,16 +209,18 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 22,
+                      // 24h: every 4th hour. 7d: every 4th six-hour bucket,
+                      // i.e. one label a day.
                       interval: 4,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < 0 || index >= widget.history.length) {
+                        if (index < 0 || index >= samples.length) {
                           return const SizedBox.shrink();
                         }
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            _taipeiHour(widget.history[index].hour).toString(),
+                            _taipeiLabel(samples[index].hour),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colors.onSurfaceVariant,
                               fontFeatures: const [
@@ -219,18 +243,16 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
                     ),
                     tooltipMargin: AppSpacing.sm,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final hour = widget.history[group.x];
-                      final lines = StringBuffer(
-                        '${_taipeiHour(hour.hour).toString().padLeft(2, '0')}:00',
-                      );
+                      final sample = samples[group.x];
+                      final lines = StringBuffer(_taipeiLabel(sample.hour));
                       if (showDownload) {
                         lines.writeln(
-                          '↓ ${_formatNumber(hour.down / divisor)} $unit',
+                          '↓ ${_formatNumber(sample.down / divisor)} $unit',
                         );
                       }
                       if (showSaved) {
                         lines.writeln(
-                          'Saved ${_formatNumber(hour.saved / divisor)} $unit',
+                          'Saved ${_formatNumber(sample.saved / divisor)} $unit',
                         );
                       }
                       return BarTooltipItem(
@@ -252,16 +274,16 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
   }
 
   BarChartRodData _rod(
-    HourUsage hour,
+    HourUsage sample,
     double divisor,
     bool showDownload,
     bool showSaved,
   ) {
-    final down = hour.down / divisor;
-    final saved = hour.saved / divisor;
+    final down = sample.down / divisor;
+    final saved = sample.saved / divisor;
     return BarChartRodData(
       toY: (showDownload ? down : 0) + (showSaved ? saved : 0),
-      width: 6,
+      width: _window == NetworkChartWindow.day ? 6 : 12,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
       rodStackItems: switch ((showDownload, showSaved)) {
         (true, true) => [
@@ -286,8 +308,41 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
     return value.toStringAsFixed(1);
   }
 
-  /// Taipei wall-clock hour of a UTC epoch hour — what the "now" column reads.
-  static int _taipeiHour(int utcHour) => AppTime.taipei(
-    DateTime.fromMillisecondsSinceEpoch(utcHour * 3600000, isUtc: true),
-  ).hour;
+  /// Taipei wall-clock label of a UTC epoch hour, e.g. `11日13時`.
+  static String _taipeiLabel(int utcHour) {
+    final time = AppTime.taipei(
+      DateTime.fromMillisecondsSinceEpoch(utcHour * 3600000, isUtc: true),
+    );
+    // l10n-ignore: owner-specified zh-TW time format on the English-only debug page.
+    return '${time.day}日${time.hour}時';
+  }
+}
+
+/// The series selector — stacked, download-only, or saved-only.
+class _ModeToggle extends StatelessWidget {
+  const _ModeToggle({required this.mode, required this.onChanged});
+
+  final NetworkChartMode mode;
+  final ValueChanged<NetworkChartMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<NetworkChartMode>(
+      segments: const [
+        ButtonSegment(value: NetworkChartMode.both, label: Text('Both')),
+        ButtonSegment(
+          value: NetworkChartMode.download,
+          label: Text('Download'),
+        ),
+        ButtonSegment(value: NetworkChartMode.saved, label: Text('Saved')),
+      ],
+      selected: {mode},
+      onSelectionChanged: (selection) => onChanged(selection.first),
+      showSelectedIcon: false,
+      style: const ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
 }

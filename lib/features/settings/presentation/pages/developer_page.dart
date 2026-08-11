@@ -64,6 +64,7 @@ class DeveloperPage extends StatefulWidget {
 class _DeveloperPageState extends State<DeveloperPage> {
   List<({String title, List<_Field> fields})>? _sections;
   List<HourUsage>? _usageHistory;
+  List<HourUsage>? _usageWeek;
   bool _clearing = false;
 
   /// Version-row taps toward the experimental unlock. Deliberately not
@@ -87,6 +88,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final cacheStats = await etagCache?.stats();
     final usage = await networkUsage?.stats();
     final usageHistory = await networkUsage?.history();
+    final usageWeek = await networkUsage?.history(
+      hours: 24 * 7,
+      bucketHours: 6,
+    );
     final device = await DeviceInfoService.load();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
@@ -185,6 +190,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
       setState(() {
         _sections = sections;
         _usageHistory = usageHistory;
+        _usageWeek = usageWeek;
       });
     }
   }
@@ -371,8 +377,12 @@ class _DeveloperPageState extends State<DeveloperPage> {
                           : null,
                     ),
                   if (sections[i].title == 'Network usage' &&
-                      _usageHistory != null)
-                    NetworkUsageChart(history: _usageHistory!),
+                      _usageHistory != null &&
+                      _usageWeek != null)
+                    NetworkUsageChart(
+                      history: _usageHistory!,
+                      week: _usageWeek!,
+                    ),
                 ],
                 const SectionHeader('Maintenance'),
                 ListTile(
