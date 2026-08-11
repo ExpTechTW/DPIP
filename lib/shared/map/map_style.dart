@@ -165,12 +165,22 @@ String exptechVectorStyle(
 /// Purple used to highlight the selected township (fill + border).
 const String selectedColor = '#7C4DFF';
 
-/// Borders drawn on top of IR satellite imagery — black so they stay readable
-/// on greyscale Himawari tiles (themed [MapPalette.outline] does not).
-const String satelliteOutlineColor = '#000000';
+/// Bright yellow country / county borders drawn **over** satellite imagery.
+///
+/// The hue that stays legible on true-colour satellite (which is overall
+/// dark); tune it per channel if another imagery needs it. [AdminBoundary]
+/// overlays keep their own white core — only satellite is yellow.
+const String satelliteOutlineColor = '#FFD400';
+
+/// Satellite township borders — dark yellow ([satelliteOutlineColor]'s
+/// secondary), the fine mesh beneath the county/country frame.
+const String satelliteTownOutlineColor = '#B79A00';
 
 /// Runtime line layer: world land / country edges (`global` source-layer).
 const String satelliteGlobalOutlineLayerId = 'satellite-global-outline';
 
 /// Runtime line layer: Taiwan county edges (`city` source-layer).
 const String satelliteCountyOutlineLayerId = 'satellite-county-outline';
+
+/// Runtime line layer: Taiwan township edges (`town` source-layer).
+const String satelliteTownOutlineLayerId = 'satellite-town-outline';

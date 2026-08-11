@@ -62,6 +62,7 @@ class QpesumsMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => ScanRangeOverlayMenu(
     layer: this,
     tooltip: AppLocalizations.of(context).qpesumsOverlayMenuTooltip,

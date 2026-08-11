@@ -47,6 +47,7 @@ class RadarMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => RadarOverlayMenu(
     layer: this,
     showTownLabels: showTownLabels,

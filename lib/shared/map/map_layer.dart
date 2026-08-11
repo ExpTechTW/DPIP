@@ -47,6 +47,10 @@ abstract interface class MapLayer {
   /// The switcher label (localised by the implementation via [context]).
   String label(BuildContext context);
 
+  /// Secondary switcher line under [label] — formula, band composition, or
+  /// anything that differentiates the layer at a glance. `null` hides it.
+  String? subtitle(BuildContext context);
+
   /// The switcher icon — outlined, per the app's icon convention.
   IconData get icon;
 
@@ -110,10 +114,15 @@ abstract interface class MapLayer {
   /// options (one affordance, not a second chip). Layers whose chrome is not a
   /// settings menu may ignore them — [MapScaffold] shows a standalone
   /// township-label menu for layers that return no chrome.
+  ///
+  /// [onReloadActive] re-loads this layer from scratch — a chrome option that
+  /// changes what the layer renders (e.g. the satellite colour style) calls it
+  /// after mutating its source so the already-mounted tiles re-fetch.
   Widget buildTopTrailingChrome(
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   });
 
   /// Flutter widgets painted over the map (screen-space callouts, etc.).
@@ -176,6 +185,9 @@ abstract interface class MapLayer {
 /// empty implementations per layer.
 mixin MapLayerDefaults implements MapLayer {
   @override
+  String? subtitle(BuildContext context) => null;
+
+  @override
   Future<Result<List<MapFrame>>> frames() async => const Ok([]);
 
   @override
@@ -214,6 +226,7 @@ mixin MapLayerDefaults implements MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => const SizedBox.shrink();
 
   @override

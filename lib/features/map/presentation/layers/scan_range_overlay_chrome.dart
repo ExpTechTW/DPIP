@@ -8,6 +8,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
@@ -202,7 +203,7 @@ mixin ScanRangeOverlayChrome on RasterTimelineLayer {
       if (showCountyOutline.value)
         SymbolLegendItem(
           swatch: LineSwatch(
-            color: const Color(0xFFFFFFFF),
+            color: colorFromHexRgb(AdminOutline.lineColor)!,
             width: AdminBoundary.county.lineWidth,
             opacity: AdminBoundary.county.lineOpacity,
             casingColor: const Color(0xFF000000),
@@ -214,7 +215,7 @@ mixin ScanRangeOverlayChrome on RasterTimelineLayer {
       if (showTownOutline.value)
         SymbolLegendItem(
           swatch: LineSwatch(
-            color: const Color(0xFFFFFFFF),
+            color: colorFromHexRgb(AdminOutline.lineColor)!,
             width: AdminBoundary.town.lineWidth,
             opacity: AdminBoundary.town.lineOpacity,
             casingColor: const Color(0xFF000000),

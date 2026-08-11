@@ -29,6 +29,7 @@ import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -113,6 +114,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
   final ValueNotifier<bool> showTownOutline = ValueNotifier(true);
 
   bool _rangeShown = false;
+  bool _globalShown = false;
   final Set<AdminBoundary> _boundariesShown = {};
 
   /// Blue-grey, matching the radar surface — distinct from every dBZ colour so
@@ -793,7 +795,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     _queue(() => _syncRadarChrome(controller));
   }
 
-  /// Turns the 縣市 borders on/off (radar underlay only).
+  /// Turns the 縣市 borders on/off (radar and satellite underlays).
   void setShowCountyOutline(bool value) {
     if (showCountyOutline.value == value) return;
     showCountyOutline.value = value;
@@ -802,7 +804,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     _queue(() => _syncRadarChrome(controller));
   }
 
-  /// Turns the 鄉鎮 borders on/off (radar underlay only).
+  /// Turns the 鄉鎮 borders on/off (radar and satellite underlays).
   void setShowTownOutline(bool value) {
     if (showTownOutline.value == value) return;
     showTownOutline.value = value;
@@ -811,20 +813,28 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     _queue(() => _syncRadarChrome(controller));
   }
 
-  /// Adds or removes the radar underlay's chrome — the coverage outline and the
-  /// county borders — to match the toggles.
+  /// Adds or removes the weather underlay's chrome — the scan-range outline
+  /// (radar only), the country/global border (satellite only), and the county
+  /// and township borders (both underlays) — to match the toggles.
   ///
   /// Anchored under the lowest typhoon vector, not on top as on the radar
   /// surface: here the track and the storm bands are the subject, and a white
   /// border crossing them would compete with the thing being read. Below the
   /// vectors it still clears the echo, which is the whole problem.
   Future<void> _syncRadarChrome(MapLibreMapController controller) async {
-    final isRadar = weatherOverlay.value == TyphoonWeatherOverlay.radar;
+    final kind = weatherOverlay.value;
+    final isRadar = kind == TyphoonWeatherOverlay.radar;
+    final hasUnderlay = kind != TyphoonWeatherOverlay.none;
     final wantRange = isRadar && showScanRange.value;
+    // Both underlays are opaque weather rasters, so the admin frame is drawn
+    // over each. Satellite is fully opaque and covers the country edges too,
+    // so its country border is drawn as well — the frame a satellite viewer
+    // navigates by.
     final wantBoundaries = <AdminBoundary>{
-      if (isRadar && showTownOutline.value) AdminBoundary.town,
-      if (isRadar && showCountyOutline.value) AdminBoundary.county,
+      if (hasUnderlay && showTownOutline.value) AdminBoundary.town,
+      if (hasUnderlay && showCountyOutline.value) AdminBoundary.county,
     };
+    final wantGlobal = hasUnderlay && !isRadar && showCountyOutline.value;
 
     final below = _warningNames.isNotEmpty ? _warnLyr : _probLyr;
     try {
@@ -840,8 +850,30 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           await RadarScanRange.remove(controller);
         }
       }
-      // Borders after the range so they insert above it: the dashed range is a
-      // hint, the borders are the reference frame.
+      if (wantGlobal != _globalShown) {
+        _globalShown = wantGlobal;
+        if (wantGlobal) {
+          await controller.addLineLayer(
+            AdminOutline.sourceId,
+            satelliteGlobalOutlineLayerId,
+            LineLayerProperties(
+              lineColor: satelliteOutlineColor,
+              lineWidth: 1.0,
+            ),
+            sourceLayer: 'global',
+            belowLayerId: below,
+            enableInteraction: false,
+          );
+        } else {
+          try {
+            await controller.removeLayer(satelliteGlobalOutlineLayerId);
+          } catch (_) {}
+        }
+      }
+      // Borders after the range/global so they insert above it: the dashed
+      // range is a hint, the borders are the reference frame. Satellite's
+      // frame is bright yellow — the hue that survives fully-opaque imagery;
+      // radar keeps the default white core.
       for (final boundary in AdminBoundary.values) {
         final shown = _boundariesShown.contains(boundary);
         if (wantBoundaries.contains(boundary) == shown) continue;
@@ -850,15 +882,29 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           await AdminOutline.remove(controller, boundary);
         } else {
           _boundariesShown.add(boundary);
-          await AdminOutline.add(controller, boundary, belowLayerId: below);
+          await AdminOutline.add(
+            controller,
+            boundary,
+            lineColor: isRadar
+                ? AdminOutline.lineColor
+                : boundary == AdminBoundary.town
+                ? satelliteTownOutlineColor
+                : satelliteOutlineColor,
+            belowLayerId: below,
+          );
         }
       }
     } catch (error, stackTrace) {
       // A style reload or an overlay switch can race this; the next sync
       // rebuilds from a known-clean state.
       _rangeShown = false;
+      _globalShown = false;
       _boundariesShown.clear();
-      Log.handle(error, stackTrace, 'Failed to sync the typhoon radar chrome');
+      Log.handle(
+        error,
+        stackTrace,
+        'Failed to sync the typhoon weather chrome',
+      );
     }
   }
 
@@ -939,6 +985,12 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     if (_rangeShown) {
       _rangeShown = false;
       await RadarScanRange.remove(controller);
+    }
+    if (_globalShown) {
+      _globalShown = false;
+      try {
+        await controller.removeLayer(satelliteGlobalOutlineLayerId);
+      } catch (_) {}
     }
     for (final boundary in _boundariesShown.toList()) {
       _boundariesShown.remove(boundary);
@@ -1072,6 +1124,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => TyphoonOverlayMenu(
     layer: this,
     showTownLabels: showTownLabels,
@@ -1098,6 +1151,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
         // has to follow it: naming a line that is not on the map is worse than
         // saying nothing.
         final isRadar = weatherOverlay.value == TyphoonWeatherOverlay.radar;
+        final isSatellite =
+            weatherOverlay.value == TyphoonWeatherOverlay.satellite;
         return MapLegendCard(
           child: SymbolLegend(
             items: [
@@ -1243,10 +1298,20 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                   ),
                   label: l10n.radarScanRange,
                 ),
-              if (isRadar && showCountyOutline.value)
+              if (isSatellite && showCountyOutline.value)
+                SymbolLegendItem(
+                  swatch: const LineSwatch(
+                    color: Color(0xFFFFD400),
+                    width: 1.0,
+                  ),
+                  label: l10n.mapLayerSatelliteGlobalOutline,
+                ),
+              if ((isRadar || isSatellite) && showCountyOutline.value)
                 SymbolLegendItem(
                   swatch: LineSwatch(
-                    color: const Color(0xFFFFFFFF),
+                    color: colorFromHexRgb(
+                      isRadar ? AdminOutline.lineColor : satelliteOutlineColor,
+                    )!,
                     width: AdminBoundary.county.lineWidth,
                     opacity: AdminBoundary.county.lineOpacity,
                     casingColor: const Color(0xFF000000),
@@ -1255,10 +1320,14 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                   ),
                   label: l10n.radarCountyOutline,
                 ),
-              if (isRadar && showTownOutline.value)
+              if ((isRadar || isSatellite) && showTownOutline.value)
                 SymbolLegendItem(
                   swatch: LineSwatch(
-                    color: const Color(0xFFFFFFFF),
+                    color: colorFromHexRgb(
+                      isRadar
+                          ? AdminOutline.lineColor
+                          : satelliteTownOutlineColor,
+                    )!,
                     width: AdminBoundary.town.lineWidth,
                     opacity: AdminBoundary.town.lineOpacity,
                     casingColor: const Color(0xFF000000),
@@ -1287,6 +1356,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     // the next attach re-adds instead of no-oping on stale state.
     _added = false;
     _rangeShown = false;
+    _globalShown = false;
     _boundariesShown.clear();
   }
 

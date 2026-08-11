@@ -131,6 +131,14 @@ class _MapScaffoldState extends State<MapScaffold> {
   double _timelineHeight = 0;
   final GlobalKey _timelineKey = GlobalKey();
 
+  /// A deliberate framing ([_frameBounds] — a nav-bar / Home entry, the first
+  /// load, a station focus) ran while the timeline's height was still zero —
+  /// switching into a timeline layer zeroes it and the fit placed the subject
+  /// behind the scrubber. Set by [_frameBounds], cleared once the measured
+  /// height re-fits the camera, and never set by a bare layer switch (which
+  /// must not move the camera at all).
+  bool _reframeOnMeasure = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -225,6 +233,11 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// Adopts [bounds] as the framing target and applies it.
   void _frameBounds(LatLngBounds bounds, {bool northUp = false}) {
     _target = safeFitBounds(bounds);
+    // The active layer's chrome height is measured, not predicted — a timeline
+    // layer's panel only exists after its frames load. A deliberate framing
+    // that runs before then fits against a zero-height band, so remember to
+    // re-fit once [_measureTimeline] learns the real height.
+    _reframeOnMeasure = _active.usesTimeline;
     _applyFraming(northUp: northUp);
   }
 
@@ -282,8 +295,15 @@ class _MapScaffoldState extends State<MapScaffold> {
   double _bottomInset(Size size) =>
       size.height * _active.bottomChromeFraction + _timelineHeight;
 
-  /// Measures the timeline panel after layout and re-frames if it changed, so a
-  /// timeline layer frames into the band above the scrubber rather than behind it.
+  /// Measures the timeline panel after layout.
+  ///
+  /// The height feeds [_bottomInset] for the *next* deliberate framing (a nav-bar
+  /// / Home entry), so that framing avoids the scrubber. It never moves the
+  /// camera on its own — re-framing on a layer switch is exactly what was
+  /// removed: switching overlays keeps the user's camera untouched. The one
+  /// exception is a deferred deliberate framing ([_reframeOnMeasure]): it ran
+  /// before this panel existed, so once the real height lands it re-fits the
+  /// same target into the corrected band.
   void _measureTimeline() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -291,7 +311,10 @@ class _MapScaffoldState extends State<MapScaffold> {
       final height = (box != null && box.hasSize) ? box.size.height : 0.0;
       if ((height - _timelineHeight).abs() < 0.5) return;
       _timelineHeight = height;
-      _applyFraming();
+      if (_reframeOnMeasure) {
+        _reframeOnMeasure = false;
+        _applyFraming();
+      }
     });
   }
 
@@ -546,11 +569,29 @@ class _MapScaffoldState extends State<MapScaffold> {
       _timelineHeight = 0;
     });
     if (controller != null) _queue(() => previous.clear(controller));
-    // Re-frame the same target into the new layer's band — switching to radar
-    // after picking a township keeps the township framed, and each layer's
-    // different chrome height is accounted for instead of reusing the old one.
-    _applyFraming();
+    // A bare switch is never a deliberate framing — the camera stays exactly as
+    // the user left it, and the [_reframeOnMeasure] deferred re-fit must not
+    // fire off it either (the height will change as the new layer's frames
+    // load, and that is a reason to *not* move the camera).
+    _reframeOnMeasure = false;
+    // Keep the camera exactly as the user left it — switching overlays must not
+    // zoom, re-centre, or rotate the map. Only a deliberate framing entry (the
+    // nav bar / Home hand-off, or a ranking station focus) moves the camera.
     _loadActive();
+  }
+
+  /// Re-loads the active layer from scratch: clear its on-map state (sources
+  /// mounted under the old URLs), then re-fetch frames and re-mount. A chrome
+  /// option that changes what a layer renders (e.g. the satellite colour style)
+  /// calls this after mutating its source.
+  Future<void> _reloadActive() async {
+    final controller = _controller;
+    if (controller == null || !_styleLoaded) return;
+    final layer = _active;
+    // Clear first — the queued re-mount ops below land after it on the serial
+    // chain, so the map never shows new-style tiles over old ones.
+    _queue(() => layer.clear(controller));
+    await _loadActive();
   }
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
@@ -662,6 +703,7 @@ class _MapScaffoldState extends State<MapScaffold> {
                     context,
                     showTownLabels: _showTownLabels,
                     onShowTownLabelsChanged: _setShowTownLabels,
+                    onReloadActive: _reloadActive,
                   );
                   final hasChrome = chrome is! SizedBox;
                   return Row(

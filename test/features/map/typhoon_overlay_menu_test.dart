@@ -6,6 +6,7 @@ import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,9 @@ class _FakeSatelliteRepository extends FakeRasterFrameSource
 
   @override
   String tileUrl(String frame) => 'https://host/sat/$frame/{z}/{x}/{y}.png';
+
+  @override
+  void setStyle(String? style) {}
 }
 
 TyphoonMapLayer _layer() => TyphoonMapLayer(
@@ -109,8 +113,9 @@ void main() {
     await _open(tester);
 
     final l10n = await _l10n();
-    // A coverage boundary over Himawari IR would bound an instrument that is
-    // not on screen, and IR does not bury the base style's borders.
+    // The radar chrome toggles exist only while the radar underlay does — a
+    // coverage boundary over Himawari IR would bound an instrument that is not
+    // on screen, and the base style's borders only disappear under the echo.
     expect(find.text(l10n.radarScanRange), findsNothing);
     expect(find.text(l10n.radarCountyOutline), findsNothing);
     expect(find.text(l10n.radarTownOutline), findsNothing);
@@ -203,6 +208,35 @@ void main() {
     );
   });
 
+  testWidgets(
+    'the legend carries the satellite frame while satellite is the underlay',
+    (tester) async {
+      _useTallSurface(tester);
+      final layer = _layer();
+      layer.setWeatherOverlay(TyphoonWeatherOverlay.satellite);
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: Builder(builder: (context) => layer.buildLegend(context)),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final l10n = await _l10n();
+      // The fully-opaque IR underlay buries the base style, so the bright-yellow
+      // country/county frame and the dark-yellow township mesh are keyed — but
+      // the radar scan range has no instrument on screen and is not.
+      expect(find.text(l10n.mapLayerSatelliteGlobalOutline), findsOneWidget);
+      expect(find.text(l10n.radarCountyOutline), findsOneWidget);
+      expect(find.text(l10n.radarTownOutline), findsOneWidget);
+      expect(find.text(l10n.radarScanRange), findsNothing);
+    },
+  );
+
   test('the county border can be anchored under the typhoon vectors', () async {
     final controller = RecordingMapController();
     await AdminOutline.add(
@@ -222,6 +256,33 @@ void main() {
       'typhoon-probability',
     );
   });
+
+  test(
+    'the default border core is white; satellite passes bright yellow',
+    () async {
+      final controller = RecordingMapController();
+      await AdminOutline.add(controller, AdminBoundary.county);
+      expect(
+        controller.lineColorOf(AdminBoundary.county.lineLayerId),
+        '#FFFFFF',
+      );
+      expect(
+        controller.lineColorOf(AdminBoundary.county.casingLayerId),
+        '#000000',
+      );
+
+      final satelliteController = RecordingMapController();
+      await AdminOutline.add(
+        satelliteController,
+        AdminBoundary.town,
+        lineColor: satelliteOutlineColor,
+      );
+      expect(
+        satelliteController.lineColorOf(AdminBoundary.town.lineLayerId),
+        '#FFD400',
+      );
+    },
+  );
 
   test('omitting the anchor keeps the borders on top', () async {
     final controller = RecordingMapController();

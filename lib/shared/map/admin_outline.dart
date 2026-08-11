@@ -73,13 +73,17 @@ abstract final class AdminOutline {
 
   /// Adds [boundary]'s two strokes. Casing first so the core paints over it.
   ///
-  /// [belowLayerId] omitted puts them on top, which is what the radar surface
-  /// wants. The typhoon surface passes an anchor instead: there the borders
-  /// still need to clear the echo, but the track and storm bands are the
-  /// subject and must not be crossed by a white line.
+  /// [lineColor] overrides the default light core — the typhoon surface's
+  /// satellite underlay passes bright yellow there, because on fully-opaque
+  /// imagery the default white does not survive. [belowLayerId] omitted puts
+  /// them on top, which is what the radar surface wants; the typhoon surface
+  /// passes an anchor instead: there the borders still need to clear the
+  /// echo, but the track and storm bands are the subject and must not be
+  /// crossed by a white line.
   static Future<void> add(
     MapLibreMapController controller,
     AdminBoundary boundary, {
+    String lineColor = AdminOutline.lineColor,
     String? belowLayerId,
   }) async {
     await controller.addLineLayer(

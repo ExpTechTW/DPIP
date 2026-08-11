@@ -109,6 +109,7 @@ class RecordingMapController implements MapLibreMapController {
     bool enableInteraction = true,
   }) async {
     below[layerId] = belowLayerId;
+    lineColor[layerId] = properties.toJson()['line-color']?.toString();
     calls.add('addLineLayer:$layerId');
   }
 
@@ -120,6 +121,13 @@ class RecordingMapController implements MapLibreMapController {
   /// The anchor recorded for [layerId]; also null when never added, so pair it
   /// with a `calls` assertion.
   String? belowOf(String layerId) => below[layerId];
+
+  /// The `line-color` each line layer was drawn with — lets a test pin the
+  /// white radar border vs the yellow satellite one.
+  final Map<String, String?> lineColor = {};
+
+  /// The colour recorded for [layerId], or null when never added.
+  String? lineColorOf(String layerId) => lineColor[layerId];
 
   @override
   Future<void> addFillLayer(

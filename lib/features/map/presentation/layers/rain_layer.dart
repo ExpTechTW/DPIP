@@ -138,6 +138,7 @@ class RainMapLayer
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;

@@ -611,6 +611,7 @@ class DisasterMapLayer with MapLayerDefaults implements MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => DisasterMapOverlayMenu(
     layer: this,
     showTownLabels: showTownLabels,

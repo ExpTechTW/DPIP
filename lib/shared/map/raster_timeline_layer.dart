@@ -124,6 +124,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   bool get usesTimeline => true;
 
   @override
+  String? subtitle(BuildContext context) => null;
+
+  @override
   double get bottomChromeFraction => 0;
 
   @override
@@ -149,6 +152,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
   }) => const SizedBox.shrink();
 
   @override
