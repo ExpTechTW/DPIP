@@ -247,6 +247,11 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
                       vertical: AppSpacing.sm,
                     ),
                     tooltipMargin: AppSpacing.sm,
+                    // Edge bars sit under the screen edge — clamp the bubble
+                    // inside the chart so it never spills off the phone.
+                    maxContentWidth: 200,
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final sample = samples[group.x];
                       final lines = StringBuffer(_taipeiLabel(sample.hour));

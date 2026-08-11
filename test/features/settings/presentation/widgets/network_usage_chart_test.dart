@@ -74,6 +74,12 @@ void main() {
     expect(find.text('1日8時'), findsOneWidget);
     // Labels are spaced out, not one per bar: 24 h at every 6 → 4 labels.
     expect(find.textContaining('日'), findsNWidgets(4));
+    // The tooltip clamps inside the chart so an edge bar never spills off the
+    // phone screen.
+    final tooltip = data.barTouchData.touchTooltipData;
+    expect(tooltip.fitInsideHorizontally, isTrue);
+    expect(tooltip.fitInsideVertically, isTrue);
+    expect(tooltip.maxContentWidth, 200);
   });
 
   testWidgets('switching to 7d shows 28 six-hour buckets', (tester) async {
