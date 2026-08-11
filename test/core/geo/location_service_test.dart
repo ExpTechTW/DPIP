@@ -57,4 +57,35 @@ void main() {
     );
     expect(await service.currentTown(), isNull);
   });
+
+  test('lastKnownFix serves the cached fix without a live read', () async {
+    var liveReads = 0;
+    final service = LocationService(
+      _dir(),
+      lastKnown: () async => (lat: 25.05, lng: 121.55),
+      fix: () async {
+        liveReads++;
+        return (lat: 25.05, lng: 121.55);
+      },
+    );
+    expect(await service.lastKnownFix(), (lat: 25.05, lng: 121.55));
+    expect(liveReads, 0, reason: 'the live read must not run');
+  });
+
+  test('lastKnownFix is null when no cached fix exists', () async {
+    final service = LocationService(
+      _dir(),
+      lastKnown: () async => null,
+      fix: () async => (lat: 25.05, lng: 121.55),
+    );
+    expect(await service.lastKnownFix(), isNull);
+  });
+
+  test('a lastKnownFix fault degrades to null, never throws', () async {
+    final service = LocationService(
+      _dir(),
+      lastKnown: () async => throw Exception('platform fault'),
+    );
+    expect(await service.lastKnownFix(), isNull);
+  });
 }

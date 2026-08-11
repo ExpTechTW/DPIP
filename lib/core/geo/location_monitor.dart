@@ -87,9 +87,19 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
     final previous = _status;
     final status = await _location.status();
     _status = status;
+    final wasUsable = _usable(previous);
+    final nowUsable = _usable(status);
+    // GPS lost (services off / permission revoked): 所在地 must not keep
+    // presenting the last-known township as where the user is. Clearing the
+    // code puts the whole app back in the "can't locate" state (nationwide map
+    // + the header's notice) instead of a stale place.
+    if (wasUsable && !nowUsable) {
+      _publishedCode = null;
+      _regions.setCurrentCode(null);
+    }
     // Recover only on an unusable → usable transition (services back / granted),
     // not on every resume — avoids re-subscribing the position stream needlessly.
-    if (_seeded && _usable(status) && !_usable(previous)) {
+    if (_seeded && nowUsable && !wasUsable) {
       _reporter.restart();
       final code = (await _location.currentTown())?.code;
       _publishedCode = code;

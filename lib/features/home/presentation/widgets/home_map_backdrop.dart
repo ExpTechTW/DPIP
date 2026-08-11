@@ -159,13 +159,6 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     _refreshRadar();
   }
 
-  /// The selected township code, or null for the nationwide (whole-island) view.
-  String? get _selectedCode => switch (_regions?.selected) {
-    SavedArea(:final code) => code,
-    CurrentArea(:final code) => code,
-    _ => null,
-  };
-
   /// Frames the map on the selected township and highlights it — or fits the
   /// whole island for the nationwide view. Skips unchanged selections.
   Future<void> _applySelection() async {
@@ -179,38 +172,57 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // ends. Frame into that band, not the whole map.
     final topInset = MediaQuery.paddingOf(context).top + RegionBar.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
-    final code = _selectedCode;
+    final selected = _regions?.selected;
+    final code = switch (selected) {
+      SavedArea(:final code) => code,
+      CurrentArea(:final code) => code,
+      _ => null,
+    };
     final styleEpoch = _styleEpoch;
     // 所在地 is a *place*, not a region: the current GPS fix is the point, so
     // the camera centres on it (a fixed span around the fix) instead of framing
-    // the whole township the way a saved area does. Falls back to the township
-    // box — or the whole island when GPS is unavailable — if no fix is had.
-    final gpsCentred = _regions?.selected is CurrentArea;
+    // the whole township the way a saved area does.
+    final gpsCentred = selected is CurrentArea;
     final location = context.read<LocationService>();
     // Nothing changed since the last apply (an unrelated RegionStore notify) —
     // don't re-add layers or re-run the camera.
     if (code == _appliedCode && styleEpoch == _appliedCodeEpoch) return;
     final gen = ++_selectionGen;
 
+    // The GPS fix decides 所在地's subject. No fix — services off, permission
+    // denied, or a fix timeout — degrades 所在地 to the nationwide view: the
+    // last-known township is not where the user is, so it must not frame or
+    // outline it. Falls back to the township box — or the whole island when no
+    // code is had — when a fix exists but the township isn't resolved.
+    //
+    // A *cached* fix, never a live read: `currentFix` can wait out a 10s GPS
+    // timeout, and while it did the backdrop sat on the base map's pre-layout
+    // camera (a tiny Taiwan) instead of framing. The cached fix answers
+    // instantly, and the position stream's own updates re-apply this when they
+    // land. A `CurrentArea` whose code is null means 所在地 has no township at
+    // all (GPS lost) — skip the lookup entirely and go nationwide.
+    GpsFix? fix;
+    if (gpsCentred && code != null) {
+      fix = await location.lastKnownFix();
+      if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
+    }
+    final effective = gpsCentred && fix == null ? null : code;
+
     List<double>? bounds;
-    if (code != null) {
+    if (effective != null) {
       final boundaries = await boundariesFuture;
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      bounds = boundaries.boundsFor(code);
+      bounds = boundaries.boundsFor(effective);
     }
 
     LatLngBounds frame;
-    if (gpsCentred) {
-      final fix = await location.currentFix();
-      if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      frame = fix == null
-          ? _latLngBounds(bounds)
-          : _latLngBounds([
-              fix.lng - _gpsSpan,
-              fix.lat - _gpsSpan,
-              fix.lng + _gpsSpan,
-              fix.lat + _gpsSpan,
-            ]);
+    if (gpsCentred && fix != null) {
+      frame = _latLngBounds([
+        fix.lng - _gpsSpan,
+        fix.lat - _gpsSpan,
+        fix.lng + _gpsSpan,
+        fix.lat + _gpsSpan,
+      ]);
     } else {
       frame = _latLngBounds(bounds);
     }
@@ -229,7 +241,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      await _restackOverlays(controller);
+      await _restackOverlays(controller, code: effective);
       // Frame the box in the band above the resting sheet — computed in Dart
       // (boundsFitCamera) and applied as a plain centre+zoom, so a degenerate or
       // not-yet-laid-out viewport can't abort the app the way MapLibre's native
@@ -245,7 +257,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
           CameraUpdate.newLatLngZoom(fit.target, fit.zoom),
         );
       }
-      _appliedCode = code;
+      _appliedCode = effective;
       _appliedCodeEpoch = styleEpoch;
     });
   }
@@ -261,9 +273,15 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   /// whole-island framing is far enough out that 368 outlines collapse into a
   /// grey wash over the echo, and there the county frame is the only boundary
   /// carrying information.
-  Future<void> _restackOverlays(MapLibreMapController controller) async {
-    final code = _selectedCode;
-    final wanted = backdropBoundaries(code);
+  Future<void> _restackOverlays(
+    MapLibreMapController controller, {
+    String? code,
+  }) async {
+    // The caller passes the *effective* code (GPS-aware). A radar refresh has no
+    // selection context, so it falls back to the last applied one — the outline
+    // must match what the camera is framing, never drift back to a stale code.
+    final subject = code ?? _appliedCode;
+    final wanted = backdropBoundaries(subject);
     // Bottom-up, so a later add lands above an earlier one: the coarse county
     // frame should win where the two run together along a coastline.
     for (final boundary in [AdminBoundary.town, AdminBoundary.county]) {
@@ -273,7 +291,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       }
     }
     // The selection is the point of the backdrop — always last, always on top.
-    await _addSelectedLayers(controller, _filterFor(_townCode(code)));
+    await _addSelectedLayers(controller, _filterFor(_townCode(subject)));
   }
 
   /// (Re)adds the purple selection outline on the vector `town` layer (filtered
