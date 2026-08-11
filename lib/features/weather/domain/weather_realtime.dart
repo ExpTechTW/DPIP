@@ -17,8 +17,11 @@ part 'weather_realtime.g.dart';
 @freezed
 abstract class WeatherRealtime with _$WeatherRealtime {
   const factory WeatherRealtime({
-    /// Full 6-char station code (the `/station` directory key).
-    required String id,
+    /// Full 6-char station code — the `/station` directory key. The API returns
+    /// the 5-char form (e.g. `C0X16`); it is padded to the directory's 6-char
+    /// key (`C0X160`) so the id matches `WeatherStation`'s key space wherever a
+    /// station sheet or `trend/{id}` is addressed by it.
+    @JsonKey(fromJson: WeatherRealtime._stationKey) required String id,
     required WeatherRealtimeStation station,
 
     /// Observation time, Unix seconds.
@@ -28,6 +31,13 @@ abstract class WeatherRealtime with _$WeatherRealtime {
 
   factory WeatherRealtime.fromJson(Map<String, dynamic> json) =>
       _$WeatherRealtimeFromJson(json);
+
+  /// `/station` keys are six chars; the realtime endpoint trims the trailing
+  /// `0`. Padding restores the directory key so both stay the same key space.
+  static String _stationKey(Object? id) {
+    final s = id as String;
+    return s.length == 5 ? '${s}0' : s;
+  }
 }
 
 /// The resolved station's identity and its [distance] from the query point.

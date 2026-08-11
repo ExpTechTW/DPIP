@@ -78,26 +78,29 @@ class _FakeHourTrendRepository implements RainHourTrendRepository {
       Ok(RainHourTrend(startSecond: 0, mm: List.filled(60, 0)));
 }
 
-WeatherRealtime _realtime(String station, double temp) => WeatherRealtime(
-  id: '467410',
-  station: WeatherRealtimeStation(
-    name: station,
-    latitude: 25.0,
-    longitude: 121.5,
-    altitude: 10,
-    distance: 1.0,
-  ),
-  time: 0,
-  data: WeatherRealtimeData(
-    weather: '晴',
-    weatherCode: 100,
-    temperature: temp,
-    humidity: 50,
-    rain: 0,
-    wind: WeatherWind(),
-    gust: WeatherWind(),
-  ),
-);
+/// Built through `fromJson` so the 5-char realtime id exercises the same
+/// directory-key padding the live API payload goes through.
+WeatherRealtime _realtime(String station, double temp) =>
+    WeatherRealtime.fromJson({
+      'id': 'C0X16',
+      'station': {
+        'name': station,
+        'lat': 25.0,
+        'lon': 121.5,
+        'altitude': 10,
+        'distance': 1.0,
+      },
+      'time': 0,
+      'data': {
+        'weather': '晴',
+        'weatherCode': 100,
+        'temperature': temp,
+        'humidity': 50,
+        'rain': 0,
+        'wind': {'speed': 0.0, 'beaufort': 0},
+        'gust': {'speed': -99, 'beaufort': -99},
+      },
+    });
 
 Future<RegionStore> _store() async {
   SharedPreferences.setMockInitialValues({
@@ -227,7 +230,9 @@ void main() {
       final pending = handoff.takePending();
       expect(pending, isNotNull);
       expect(pending!.layerId, 'temperature');
-      expect(pending.stationId, '467410');
+      // The 5-char realtime id is padded to the directory's 6-char key on
+      // decode — this is the id the map layer's station sheet can resolve.
+      expect(pending.stationId, 'C0X160');
     },
   );
 
