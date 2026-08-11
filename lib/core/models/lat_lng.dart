@@ -75,3 +75,13 @@ class LatLng {
   @override
   String toString() => 'LatLng($latitude, $longitude)';
 }
+
+/// Maps a single GeoJSON `[lng, lat]` pair to a [LatLng] (mind the axis order).
+LatLng latLngFromPair(List<dynamic> pair) =>
+    LatLng((pair[1] as num).toDouble(), (pair[0] as num).toDouble());
+
+/// Maps a GeoJSON `[[lng, lat], …]` list to [LatLng]s; absent/empty in → empty
+/// out.
+List<LatLng> latLngsFromPairs(Object? raw) => [
+  for (final p in (raw as List? ?? const [])) latLngFromPair(p as List),
+];

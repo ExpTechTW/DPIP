@@ -3,6 +3,7 @@
 library;
 
 import 'package:dpip/core/models/lat_lng.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_decode.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'typhoon_potential.freezed.dart';
@@ -59,15 +60,17 @@ abstract class TyphoonPotential with _$TyphoonPotential {
   /// Decodes one cyclone object, mapping every `[lng, lat]` pair to a [LatLng].
   factory TyphoonPotential.decode(Map<String, dynamic> json) =>
       TyphoonPotential(
-        tdNo: _blankToNull(json['tdNo'] as String?),
-        name: _blankToNull(json['name'] as String?),
-        past: _coords(json['past']),
-        forecast: _coords(json['forecast']),
-        cone: _coords(json['cone']),
-        circle: json['circle'] == null ? null : _coords(json['circle']),
+        tdNo: trimToNull(json['tdNo'] as String?),
+        name: trimToNull(json['name'] as String?),
+        past: latLngsFromPairs(json['past']),
+        forecast: latLngsFromPairs(json['forecast']),
+        cone: latLngsFromPairs(json['cone']),
+        circle: json['circle'] == null
+            ? null
+            : latLngsFromPairs(json['circle']),
         current: json['current'] == null
             ? null
-            : _coord(json['current'] as List),
+            : latLngFromPair(json['current'] as List),
         points: [
           for (final p in (json['points'] as List? ?? const []))
             ForecastPoint.fromJson(p as Map<String, dynamic>),
@@ -84,32 +87,15 @@ abstract class PotentialPayload with _$PotentialPayload {
   }) = _PotentialPayload;
 
   /// Decodes `{ updated, cyclones: [...] }`. Missing/empty `cyclones` → [].
-  factory PotentialPayload.decode(Map<String, dynamic> json) {
-    final updated = (json['updated'] as num?)?.toInt() ?? 0;
-    final raw = json['cyclones'];
-    if (raw is! List) {
-      return PotentialPayload(updated: updated, cyclones: const []);
-    }
-    return PotentialPayload(
-      updated: updated,
-      cyclones: [
-        for (final c in raw)
-          if (c is Map<String, dynamic>) TyphoonPotential.decode(c),
-      ],
-    );
-  }
+  factory PotentialPayload.decode(Map<String, dynamic> json) =>
+      decodeCyclonesPayload(
+        json,
+        (updated, raw) => PotentialPayload(
+          updated: updated,
+          cyclones: [
+            for (final c in raw)
+              if (c is Map<String, dynamic>) TyphoonPotential.decode(c),
+          ],
+        ),
+      );
 }
-
-String? _blankToNull(String? value) {
-  final t = value?.trim();
-  return (t == null || t.isEmpty) ? null : t;
-}
-
-/// Maps a single `[lng, lat]` pair to a [LatLng] (mind the GeoJSON axis order).
-LatLng _coord(List<dynamic> pair) =>
-    LatLng((pair[1] as num).toDouble(), (pair[0] as num).toDouble());
-
-/// Maps a list of `[lng, lat]` pairs to [LatLng]s; empty/absent in → empty out.
-List<LatLng> _coords(Object? raw) => [
-  for (final p in (raw as List? ?? const [])) _coord(p as List),
-];
