@@ -465,6 +465,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherHumidity => 'Kelembapan';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Waktu data $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'Lihat di peta';
+
+  @override
   String get homeForecastTitle => 'Prakiraan 24 jam';
 
   @override

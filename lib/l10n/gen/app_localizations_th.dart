@@ -463,6 +463,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherHumidity => 'ความชื้น';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · เวลาข้อมูล $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'ดูบนแผนที่';
+
+  @override
   String get homeForecastTitle => 'พยากรณ์ 24 ชั่วโมง';
 
   @override

@@ -1,20 +1,34 @@
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
-import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 /// The header at the top of the home sheet: the selected area name and, for a
 /// township, its current weather — condition icon + temperature on the left
-/// (2/3), precipitation + humidity stacked on the right (1/3). 全國 shows the
-/// name only (no point weather).
+/// (2/3), precipitation over humidity on the right (1/3). The nearest-station
+/// name + observation time (Taipei HH:mm) sit as small print under the name,
+/// with a "view on map" link that opens the map on that station's temperature
+/// layer. 全國 shows the name only (no point weather).
+///
+/// Readings are shown only while they belong to the *selected* area — a
+/// previous area's observation is held by the controller while the new fetch
+/// runs, but a wrong-area temperature must never masquerade as the new one
+/// (the sheet shows dashes instead until the new reading lands).
 ///
 /// When [expanded] (sheet flush full-screen), typography and layout step up to
 /// fill the hero band — same pattern as the station/typhoon chart sheets — so a
@@ -73,7 +87,14 @@ class HomeSheetHeader extends StatelessWidget {
       SavedArea(:final code) => directory.byCode(code)?.fullName ?? '',
     };
 
-    final data = context.watch<HomeWeatherController>().weather?.data;
+    final controller = context.watch<HomeWeatherController>();
+    // A reading from a previous area is held while the new one loads (never
+    // blanking the sheet), but it must not be shown as the new area's — only
+    // data belonging to the currently selected township passes through here.
+    final realtime = controller.weatherCode == controller.areaCode
+        ? controller.weather
+        : null;
+    final data = realtime?.data;
     final temp = data?.temperature;
     final humidity = data?.humidity;
     final rain = data?.rain;
@@ -125,6 +146,29 @@ class HomeSheetHeader extends StatelessWidget {
             style: nameStyle ?? const TextStyle(),
             child: Text(areaName),
           ),
+          if (realtime case final current?) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.weatherDataTime(
+                current.station.name,
+                DateFormat('HH:mm').format(
+                  AppTime.taipei(
+                    DateTime.fromMillisecondsSinceEpoch(
+                      current.time * 1000,
+                      isUtc: true,
+                    ),
+                  ),
+                ),
+              ),
+              style:
+                  (expanded
+                          ? theme.textTheme.labelMedium
+                          : theme.textTheme.labelSmall)
+                      ?.copyWith(color: secondary),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
           if (!nationwide) ...[
             SizedBox(height: expanded ? AppSpacing.xl : AppSpacing.lg),
             if (currentUnavailable)
@@ -200,6 +244,39 @@ class HomeSheetHeader extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (realtime case final current?) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    // Below the left-hand (precipitation) metric — a quiet
+                    // path to the same station on the map, shown only when the
+                    // sheet is flush so a collapsed header stays uncluttered.
+                    InkWell(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      onTap: () => _openNearestStationOnMap(context, current),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                          vertical: AppSpacing.xs / 2,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              l10n.homeViewOnMap,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: foreground,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              size: 14,
+                              color: foreground,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               )
             else
@@ -240,8 +317,8 @@ class HomeSheetHeader extends StatelessWidget {
                       children: [
                         _Metric(
                           label: l10n.weatherPrecipitation,
-                          // A missing reading is a dash, never a fabricated 0.0 —
-                          // "no rain" and "no data" must not look the same.
+                          // A missing reading is a dash, never a fabricated
+                          // 0.0 — "no rain" and "no data" must not match.
                           value: rain == null
                               ? '—'
                               : '${rain.toStringAsFixed(1)} mm',
@@ -308,4 +385,18 @@ class _Metric extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Opens the map tab on the temperature layer, focused on [realtime]'s station —
+/// the same nearest station the header's reading came from (resolved against the
+/// township centre / GPS fix by the repository). The one-shot station hand-off
+/// switches the overlay, frames the station, and opens its sheet.
+void _openNearestStationOnMap(BuildContext context, WeatherRealtime realtime) {
+  context.read<MapStationHandoff>().request(
+    layerId: 'temperature',
+    stationId: realtime.id,
+    latitude: realtime.station.latitude,
+    longitude: realtime.station.longitude,
+  );
+  context.goNamed(AppRoutes.map);
 }

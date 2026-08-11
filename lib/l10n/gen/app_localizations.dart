@@ -957,6 +957,18 @@ abstract class AppLocalizations {
   /// **'Humidity'**
   String get weatherHumidity;
 
+  /// Nearest-station name and observation time shown as small text under the home weather header name
+  ///
+  /// In en, this message translates to:
+  /// **'{station} · Data {time}'**
+  String weatherDataTime(String station, String time);
+
+  /// Small home-header link that opens the map tab on the temperature layer at the nearest station
+  ///
+  /// In en, this message translates to:
+  /// **'View on map'**
+  String get homeViewOnMap;
+
   /// Section title for the home sheet township hourly forecast
   ///
   /// In en, this message translates to:

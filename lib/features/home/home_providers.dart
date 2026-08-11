@@ -1,3 +1,4 @@
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
@@ -26,6 +27,7 @@ List<SingleChildWidget> homeProviders() => [
       context.read<RainHourTrendRepository>(),
       context.read<RegionStore>(),
       context.read<TownDirectory>(),
+      gpsFix: context.read<LocationService>().currentFix,
     ),
   ),
   ChangeNotifierProvider<HomeActiveEventsController>(

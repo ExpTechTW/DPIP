@@ -464,6 +464,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherHumidity => 'Humidity';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Data $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'View on map';
+
+  @override
   String get homeForecastTitle => '24-hour forecast';
 
   @override

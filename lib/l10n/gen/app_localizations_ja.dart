@@ -462,6 +462,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherHumidity => '湿度';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · データ時刻 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '地図で見る';
+
+  @override
   String get homeForecastTitle => '24時間予報';
 
   @override

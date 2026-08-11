@@ -638,6 +638,22 @@
   "@weatherHumidity": {
     "description": "Label for the humidity metric in the home weather header"
   },
+  "weatherDataTime": "{station} · Data {time}",
+  "@weatherDataTime": {
+    "description": "Nearest-station name and observation time shown as small text under the home weather header name",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "homeViewOnMap": "View on map",
+  "@homeViewOnMap": {
+    "description": "Small home-header link that opens the map tab on the temperature layer at the nearest station"
+  },
   "homeForecastTitle": "24-hour forecast",
   "@homeForecastTitle": {
     "description": "Section title for the home sheet township hourly forecast"

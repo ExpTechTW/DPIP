@@ -468,6 +468,14 @@ class AppLocalizationsFil extends AppLocalizations {
   String get weatherHumidity => 'Halumigmig';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Oras ng datos $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'Tingnan sa mapa';
+
+  @override
   String get homeForecastTitle => '24-oras na forecast';
 
   @override

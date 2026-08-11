@@ -461,6 +461,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherHumidity => '濕度';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
+
+  @override
   String get homeForecastTitle => '24小時預報';
 
   @override
@@ -2212,6 +2220,14 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '湿度';
+
+  @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 资料时间 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地图察看';
 
   @override
   String get homeForecastTitle => '24小时预报';
@@ -3967,6 +3983,14 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherHumidity => '濕度';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
+
+  @override
   String get homeForecastTitle => '24小時預報';
 
   @override
@@ -5718,6 +5742,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '濕度';
+
+  @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
 
   @override
   String get homeForecastTitle => '24小時預報';
