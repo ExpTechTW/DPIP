@@ -284,6 +284,20 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: atTop ? 56 : 46,
+                    height: atTop ? 56 : 46,
+                    decoration: BoxDecoration(
+                      color: colors.primaryContainer.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.cyclone,
+                      color: colors.primary,
+                      size: atTop ? 32 : 26,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,6 +405,7 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                   children: [
                     if (lat != null && lon != null)
                       _TableRow(
+                        icon: Icons.place_outlined,
                         label: l10n.typhoonLabelPosition,
                         value: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -408,11 +423,13 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                       ),
                     if (dirLabel != null && dirLabel.isNotEmpty)
                       _TableRow(
+                        icon: Icons.explore_outlined,
                         label: l10n.typhoonLabelDirection,
                         value: Text(dirLabel, style: _valueStyle(theme)),
                       ),
                     if (speed != null)
                       _TableRow(
+                        icon: Icons.navigation_outlined,
                         label: l10n.typhoonLabelSpeed,
                         value: Text(
                           l10n.typhoonValueKm(speed.toStringAsFixed(0)),
@@ -421,6 +438,7 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                       ),
                     if (pressure != null)
                       _TableRow(
+                        icon: Icons.compress_outlined,
                         label: l10n.typhoonLabelPressure,
                         value: Text(
                           l10n.typhoonValueHpa(pressure.toStringAsFixed(0)),
@@ -429,6 +447,7 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                       ),
                     if (wind != null)
                       _TableRow(
+                        icon: Icons.air_outlined,
                         label: l10n.typhoonLabelWind,
                         value: Text(
                           l10n.typhoonValueMs(wind.toStringAsFixed(0)),
@@ -437,6 +456,7 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                       ),
                     if (gust != null)
                       _TableRow(
+                        icon: Icons.air,
                         label: l10n.typhoonLabelGust,
                         value: Text(
                           l10n.typhoonValueMs(gust.toStringAsFixed(0)),
@@ -481,17 +501,24 @@ class _TableRow extends StatelessWidget {
   const _TableRow({
     required this.label,
     required this.value,
+    this.icon,
     this.showDivider = true,
   });
 
   final String label;
   final Widget value;
+
+  /// Leading glyph, so the fact sheet scans by picture (position → place pin,
+  /// motion → heading, pressure → gauge) instead of by caption.
+  final IconData? icon;
+
   final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final icon = this.icon;
     return DecoratedBox(
       decoration: BoxDecoration(
         border: showDivider
@@ -508,8 +535,12 @@ class _TableRow extends StatelessWidget {
           vertical: AppSpacing.sm + 2,
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (icon != null) ...[
+              Icon(icon, size: 16, color: colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+            ],
             Expanded(
               flex: 5,
               child: Text(
@@ -759,18 +790,33 @@ class _WarningBlock extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors.errorContainer.withValues(alpha: 0.45),
               borderRadius: AppRadius.small,
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.45),
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.typhoonWarningTitle,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: colors.onErrorContainer,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: colors.onErrorContainer,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          l10n.typhoonWarningTitle,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.onErrorContainer,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
@@ -851,107 +897,280 @@ class _TappedWaypoint extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
             0,
-            AppSpacing.sm,
+            AppSpacing.lg,
             AppSpacing.md,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: colors.primaryContainer.withValues(alpha: 0.35),
               borderRadius: AppRadius.small,
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.45),
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.md,
                     AppSpacing.md,
-                    0,
-                    AppSpacing.md,
+                    AppSpacing.xs,
+                    AppSpacing.sm,
                   ),
-                  child: Icon(
-                    Icons.place_outlined,
-                    size: 20,
-                    color: colors.primary,
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.place,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                label,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                ),
+                              ),
+                              if (forecast != null) ...[
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  l10n.typhoonForecastLead(
+                                    forecast.tau.toString(),
+                                  ),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        if (forecast != null) ...[
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            l10n.typhoonForecastLead(forecast.tau.toString()),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w600,
+                      ),
+                      IconButton(
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: layer.clearForecastSelection,
+                      ),
+                    ],
+                  ),
+                ),
+                if (forecast != null) ...[
+                  const _WaypointDivider(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                      AppSpacing.md,
+                      AppSpacing.md,
+                    ),
+                    child: Column(
+                      children: [
+                        if (forecast.pressure != null)
+                          _WaypointRow(
+                            icon: Icons.compress_outlined,
+                            label: l10n.typhoonLabelPressure,
+                            value: l10n.typhoonValueHpa(
+                              forecast.pressure!.toStringAsFixed(0),
                             ),
                           ),
-                          if (forecast.pressure != null)
-                            Text(
-                              '${l10n.typhoonLabelPressure}  '
-                              '${l10n.typhoonValueHpa(forecast.pressure!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                        if (forecast.wind != null)
+                          _WaypointRow(
+                            icon: Icons.air_outlined,
+                            label: l10n.typhoonLabelWind,
+                            value: l10n.typhoonValueMs(
+                              forecast.wind!.toStringAsFixed(0),
                             ),
-                          if (forecast.wind != null)
-                            Text(
-                              '${l10n.typhoonLabelWind}  '
-                              '${l10n.typhoonValueMs(forecast.wind!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.gust != null)
+                          _WaypointRow(
+                            icon: Icons.air,
+                            label: l10n.typhoonLabelGust,
+                            value: l10n.typhoonValueMs(
+                              forecast.gust!.toStringAsFixed(0),
                             ),
-                          if (forecast.gust != null)
-                            Text(
-                              '${l10n.typhoonLabelGust}  '
-                              '${l10n.typhoonValueMs(forecast.gust!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.speed != null)
+                          _WaypointRow(
+                            icon: Icons.navigation_outlined,
+                            label: l10n.typhoonLabelSpeed,
+                            value: l10n.typhoonValueKm(
+                              forecast.speed!.toStringAsFixed(0),
                             ),
-                          if (forecast.speed != null)
-                            Text(
-                              '${l10n.typhoonLabelSpeed}  '
-                              '${l10n.typhoonValueKm(forecast.speed!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (dirLabel != null && dirLabel.isNotEmpty)
+                          _WaypointRow(
+                            icon: Icons.explore_outlined,
+                            label: l10n.typhoonLabelDirection,
+                            value: dirLabel,
+                          ),
+                        if (forecast.r15 != null || forecast.r70 != null)
+                          const _WaypointDivider(indented: true),
+                        if (forecast.r15 != null)
+                          _WaypointRow(
+                            icon: Icons.radio_button_unchecked,
+                            label: l10n.typhoonLabelGaleAvg,
+                            value: l10n.typhoonValueKm(
+                              forecast.r15!.toStringAsFixed(0),
                             ),
-                          if (dirLabel != null && dirLabel.isNotEmpty)
-                            Text(
-                              '${l10n.typhoonLabelDirection}  $dirLabel',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.r70 != null)
+                          _WaypointRow(
+                            icon: Icons.radio_button_checked,
+                            label: l10n.typhoonLabelProbCircle,
+                            value: l10n.typhoonValueKm(
+                              forecast.r70!.toStringAsFixed(0),
                             ),
-                          if (forecast.r15 != null)
-                            Text(
-                              '${l10n.typhoonLabelGaleAvg}  '
-                              '${l10n.typhoonValueKm(forecast.r15!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          if (forecast.r70 != null)
-                            Text(
-                              '${l10n.typhoonLabelProbCircle}  '
-                              '${l10n.typhoonValueKm(forecast.r70!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          if (stateNote != null && stateNote.isNotEmpty)
-                            Text(stateNote, style: theme.textTheme.bodySmall),
+                          ),
+                        if (stateNote != null && stateNote.isNotEmpty) ...[
+                          const _WaypointDivider(indented: true),
+                          _WaypointNote(text: stateNote),
                         ],
                       ],
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 18),
-                  onPressed: layer.clearForecastSelection,
-                ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// A thin rule grouping the waypoint rows; [indented] aligns it under the text
+/// column (right of the leading icon), so the groups read as subdivisions.
+class _WaypointDivider extends StatelessWidget {
+  const _WaypointDivider({this.indented = false});
+
+  final bool indented;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: indented ? AppSpacing.lg + AppSpacing.md : 0,
+        top: AppSpacing.sm,
+        bottom: AppSpacing.sm,
+      ),
+      child: Divider(
+        height: 1,
+        color: Theme.of(
+          context,
+        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+      ),
+    );
+  }
+}
+
+/// Label | value row for a forecast metric — same icon hierarchy as the DPM
+/// sheet: small grey caption over a weighted value, scanning by picture.
+class _WaypointRow extends StatelessWidget {
+  const _WaypointRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: colors.onSurfaceVariant),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Free-form note (the CWA forecast-state sentence) under the metric rows.
+class _WaypointNote extends StatelessWidget {
+  const _WaypointNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.info_outline,
+              size: 18,
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
