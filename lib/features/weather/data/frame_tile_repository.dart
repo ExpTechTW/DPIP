@@ -115,4 +115,7 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
 
   @override
   String tileUrl(String frame) => _api.tileUrl(frame);
+
+  @override
+  void setStyle(String? style) => _api.style = style;
 }

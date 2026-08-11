@@ -17,7 +17,7 @@ import 'package:dpip/core/network/meteor_decode.dart';
 /// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
 /// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
 class FrameTileApi {
-  const FrameTileApi(this._client, this.path, {this.channel});
+  FrameTileApi(this._client, this.path, {this.channel, this.style});
 
   final ApiClient _client;
 
@@ -28,6 +28,12 @@ class FrameTileApi {
   /// derived product a frame renders. Null keeps the server default (B13) and
   /// the URL channel-free; radar / qpesums never set it.
   final String? channel;
+
+  /// Optional `?style=` for a **single-band** satellite channel — which colour
+  /// rendering to use (`gray` / `jma` / `bd`). Mutable because the map's style
+  /// menu switches it live (via `SatelliteRepository.setStyle`); named-product
+  /// channels ignore it.
+  String? style;
 
   /// The v2 frame list lives on `api.core-tnn1` (no region failover).
   static const ApiTier _listTier = ApiTier.coreExclusiveApi;
@@ -44,14 +50,20 @@ class FrameTileApi {
 
   /// XYZ WebP raster tile URL template for a [frame] (a Unix timestamp).
   ///
-  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp[?channel=…]`
+  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp[?channel=…][&style=…]`
   String tileUrl(String frame) =>
       '${_client.hostsFor(_tileTier).first}'
       '${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp$_query';
 
   String get _query {
     final channel = this.channel;
-    return channel == null ? '' : '?channel=$channel';
+    final style = this.style;
+    if (channel == null && style == null) return '';
+    final parts = <String>[
+      if (channel != null) 'channel=$channel',
+      if (style != null) 'style=$style',
+    ];
+    return '?${parts.join('&')}';
   }
 
   /// Restores the delta-encoded list `[base, Δ, Δ, …]` to absolute timestamps
