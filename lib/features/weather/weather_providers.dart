@@ -1,10 +1,9 @@
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:dpip/features/weather/data/frame_tile_repository.dart';
-import 'package:dpip/features/weather/data/meteor_lightning_api.dart';
 import 'package:dpip/features/weather/data/meteor_lightning_repository_impl.dart';
-import 'package:dpip/features/weather/data/meteor_rain_api.dart';
 import 'package:dpip/features/weather/data/meteor_rain_repository_impl.dart';
+import 'package:dpip/features/weather/data/meteor_snapshot_api.dart';
 import 'package:dpip/features/weather/data/meteor_weather_api.dart';
 import 'package:dpip/features/weather/data/meteor_weather_repository_impl.dart';
 import 'package:dpip/features/weather/data/rain_hour_trend_api.dart';
@@ -49,10 +48,14 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       value: MeteorWeatherRepositoryImpl(MeteorWeatherApi(deps.apiClient)),
     ),
     Provider<MeteorRainRepository>.value(
-      value: MeteorRainRepositoryImpl(MeteorRainApi(deps.apiClient)),
+      value: MeteorRainRepositoryImpl(
+        MeteorSnapshotApi(deps.apiClient, '/api/v5/meteor/rain'),
+      ),
     ),
     Provider<MeteorLightningRepository>.value(
-      value: MeteorLightningRepositoryImpl(MeteorLightningApi(deps.apiClient)),
+      value: MeteorLightningRepositoryImpl(
+        MeteorSnapshotApi(deps.apiClient, '/api/v5/meteor/lightning'),
+      ),
     ),
     Provider<RainHourTrendRepository>.value(
       value: RainHourTrendRepositoryImpl(RainHourTrendApi(deps.apiClient)),
