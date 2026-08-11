@@ -98,11 +98,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
       bearing: position.bearing,
     );
     final previous = _lastCamera;
-    if (previous != null &&
-        (previous.centerLat != camera.centerLat ||
-            previous.centerLng != camera.centerLng ||
-            previous.zoom != camera.zoom ||
-            previous.bearing != camera.bearing)) {
+    if (previous != null && previous != camera) {
       _trails.clear();
     }
     _lastCamera = camera;
@@ -153,10 +149,20 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
 class _TrailBuffer {
   ui.Image? _image;
 
+  /// Speed buckets for [_stamp], reused across frames — the stamp path runs
+  /// once a frame, so allocating fresh lists for it (16 × up to 6400 points)
+  /// is garbage the collector pays for on the hottest path in the app.
+  final List<List<Offset>> _buckets = List.generate(
+    16,
+    (_) => <Offset>[],
+    growable: false,
+  );
+
   /// Live camera zoom and device pixel ratio, written by the ticker. The
   /// painter needs both at paint time and neither is known at build time —
   /// the widget does not rebuild when the map zooms.
-  double zoom = 3; // the wind layer's own floor, until the ticker says otherwise
+  double zoom =
+      3; // the wind layer's own floor, until the ticker says otherwise
   double devicePixelRatio = 1;
 
   void clear() {
@@ -172,8 +178,7 @@ class _TrailBuffer {
     final w = math.max(1, (size.width * dpr).round());
     final h = math.max(1, (size.height * dpr).round());
     final previous = _image;
-    if (previous != null &&
-        (previous.width != w || previous.height != h)) {
+    if (previous != null && (previous.width != w || previous.height != h)) {
       clear();
     }
 
@@ -185,9 +190,9 @@ class _TrailBuffer {
         old,
         Offset.zero,
         Paint()
-          ..color = const Color(0xFFFFFFFF).withValues(
-            alpha: fadeOpacityFor(zoom),
-          ),
+          ..color = const Color(
+            0xFFFFFFFF,
+          ).withValues(alpha: fadeOpacityFor(zoom)),
       );
     }
     _stamp(canvas, particles, dpr);
@@ -207,7 +212,10 @@ class _TrailBuffer {
   /// rounding does to it anyway.
   void _stamp(Canvas canvas, Iterable<WindParticle> particles, double dpr) {
     const buckets = 16;
-    final points = List.generate(buckets, (_) => <Offset>[], growable: false);
+    final points = _buckets;
+    for (final bucket in points) {
+      bucket.clear();
+    }
     for (final p in particles) {
       final screen = p.screen;
       if (screen == null) continue;

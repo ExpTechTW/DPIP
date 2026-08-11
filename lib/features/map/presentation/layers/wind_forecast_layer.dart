@@ -61,6 +61,11 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
     await _loadField(frame.id);
   }
 
+  /// This layer's wind repository — [RasterTimelineLayer] only knows it as a
+  /// [RasterFrameSource], so the call site narrows it back to the declared
+  /// [WindForecastRepository] type.
+  WindForecastRepository get _wind => source as WindForecastRepository;
+
   /// Fetches the WND1 grid for [frameId] and publishes it to [field]. A failed
   /// fetch keeps the previous field — scrubbing through a gap shows the last
   /// known wind rather than a blank — and rolls the guard back so the next
@@ -68,9 +73,7 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   Future<void> _loadField(String frameId) async {
     if (frameId == _loadedFieldFrame) return;
     _loadedFieldFrame = frameId;
-    final result = await (source as WindForecastRepository).fetchWindField(
-      frameId,
-    );
+    final result = await _wind.fetchWindField(frameId);
     result.when(
       ok: (windField) => field.value = windField,
       err: (failure) {

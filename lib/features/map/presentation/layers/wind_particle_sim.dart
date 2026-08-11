@@ -9,6 +9,7 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:dpip/features/weather/domain/wind_field.dart';
@@ -93,13 +94,12 @@ double fadeOpacityFor(double zoom) => _lerpStops(_kFadeOpacity, zoom);
 /// It has to fall with zoom: a field-space step is a fraction of the *world*,
 /// so the pixels it covers double with every zoom level in. Held constant at
 /// the value that suits z3, particles at z7 move 23× too fast.
-double fieldStepFor(double zoom) =>
-    0.0001 * _logLerpStops(_kSpeedFactor, zoom);
+double fieldStepFor(double zoom) => 0.0001 * _logLerpStops(_kSpeedFactor, zoom);
 
 /// The web's `densityWeight`: how many particles a place should hold relative
 /// to spreading them evenly, by how hard the wind is blowing there.
 double densityWeight(double speed) {
-  final t = ((speed - 0) / (0.6 * kWindSpeedScale - 0)).clamp(0.0, 1.0);
+  final t = (speed / (0.6 * kWindSpeedScale)).clamp(0.0, 1.0);
   final s = t * t * (3 - 2 * t); // smoothstep
   return _kDensityCalm + (_kDensityStrong - _kDensityCalm) * s;
 }
@@ -120,6 +120,17 @@ class WindCamera {
 
   /// Camera heading, degrees clockwise from north.
   final double bearing;
+
+  @override
+  bool operator ==(Object other) =>
+      other is WindCamera &&
+      other.centerLat == centerLat &&
+      other.centerLng == centerLng &&
+      other.zoom == zoom &&
+      other.bearing == bearing;
+
+  @override
+  int get hashCode => Object.hash(centerLat, centerLng, zoom, bearing);
 }
 
 /// The rectangle of the world a [Size] screen shows, as a lat/lng span.
@@ -255,6 +266,11 @@ class WindParticleSim {
 
   /// Moves every particle one frame: sample the wind, step, work out where
   /// that lands on screen, and recycle the ones that have left.
+  ///
+  /// The view's projection is shared by the whole population, so its rotation
+  /// and origin are computed here once and the loop inlines the same arithmetic
+  /// [projectLatLng] does per point — six thousand `sin`/`cos` calls a frame
+  /// become two.
   void step(WindCamera cam, Size size) {
     final vp = viewportBounds(cam, size);
     final fieldSpace = _fieldRect(vp);
@@ -265,20 +281,31 @@ class WindParticleSim {
     }
     _resize(particleCountFor(cam.zoom), fieldSpace);
 
-    for (final p in particles) {
-      final u = _windU(p.x, p.y);
-      final v = _windV(p.x, p.y);
-      p.speed = math.sqrt(u * u + v * v);
-      final lat = field.lat0 + p.y * field.dLat * field.height;
-      final distortion = math.cos(lat * math.pi / 180);
-      p.x = (p.x + u / distortion * fieldStep) % 1.0;
-      p.y = p.y - v * fieldStep;
+    final world = _worldSize(cam.zoom);
+    final cx = (cam.centerLng + 180) / 360 * world;
+    final cy = mercatorY(cam.centerLat) * world;
+    final r = cam.bearing * math.pi / 180;
+    final cosR = math.cos(r);
+    final sinR = math.sin(r);
+    final halfWidth = size.width / 2;
+    final halfHeight = size.height / 2;
+    final latScale = field.dLat * field.height;
+    const degToRad = math.pi / 180;
 
-      final screen = projectLatLng(
-        cam,
-        field.lat0 + p.y * field.dLat * field.height,
-        field.lon0 + p.x * 360,
-        size,
+    for (final p in particles) {
+      final (u, v) = _sampleUV(p.x, p.y);
+      p.speed = math.sqrt(u * u + v * v);
+      final lat = field.lat0 + p.y * latScale;
+      p.x = (p.x + u / math.cos(lat * degToRad) * fieldStep) % 1.0;
+      p.y -= v * fieldStep;
+
+      final wx = (field.lon0 + p.x * 360 + 180) / 360 * world;
+      final wy = mercatorY(field.lat0 + p.y * latScale) * world;
+      final dx = _wrapWorld(wx - cx, world);
+      final dy = wy - cy;
+      final screen = Offset(
+        halfWidth + dx * cosR - dy * sinR,
+        halfHeight + dx * sinR + dy * cosR,
       );
       final onField = p.y >= 0 && p.y <= 1;
       final inView = onField && _inView(screen, size);
@@ -303,7 +330,10 @@ class WindParticleSim {
     }
     while (particles.length < count) {
       particles.add(
-        WindParticle(_lerpX(r, _random.nextDouble()), _lerp(r.y0, r.y1, _random.nextDouble())),
+        WindParticle(
+          _lerpX(r, _random.nextDouble()),
+          _lerp(r.y0, r.y1, _random.nextDouble()),
+        ),
       );
     }
   }
@@ -362,8 +392,7 @@ class WindParticleSim {
   void _respawn(WindParticle p, _FieldRect r) {
     final x = _lerpX(r, _random.nextDouble());
     final y = _lerp(r.y0, r.y1, _random.nextDouble());
-    final u = _windU(x, y);
-    final v = _windV(x, y);
+    final (u, v) = _sampleUV(x, y);
     final weight = densityWeight(math.sqrt(u * u + v * v));
     if (_random.nextDouble() <
         weight / math.max(_kDensityCalm, _kDensityStrong)) {
@@ -372,13 +401,12 @@ class WindParticleSim {
     }
   }
 
-  /// Bilinear wind lookup at field-space [x], [y] — the hand-rolled texture
-  /// sample the web shader does (`lookup_wind`), reading the two quantised
-  /// planes directly.
-  double _windU(double x, double y) => _sample(0, x, y);
-  double _windV(double x, double y) => _sample(1, x, y);
-
-  double _sample(int component, double x, double y) {
+  /// Bilinear sample of both wind components at field-space [x], [y] in one
+  /// pass — the four-cell geometry (which cells, how much of each) is shared by
+  /// u and v, so two separate lookups would redo every floor, wrap, and lerp
+  /// once per component. This is the hand-rolled texture sample the web shader
+  /// does (`lookup_wind`), reading the two quantised planes directly.
+  (double, double) _sampleUV(double x, double y) {
     final fx = x * field.width;
     final fy = y * field.height;
     // Columns wrap — the grid's last column neighbours its first, and clamping
@@ -392,16 +420,33 @@ class WindParticleSim {
     final j1 = j0 + 1 < field.height ? j0 + 1 : j0;
     final tx = fx - fx.floorToDouble();
     final ty = (fy - j0).clamp(0.0, 1.0);
-    final plane = component == 0 ? field.u : field.v;
-    final min = component == 0 ? field.uMin : field.vMin;
-    final max = component == 0 ? field.uMax : field.vMax;
-    final a = plane[j0 * field.width + i0];
-    final b = plane[j0 * field.width + i1];
-    final c = plane[j1 * field.width + i0];
-    final d = plane[j1 * field.width + i1];
+    final row0 = j0 * field.width;
+    final row1 = j1 * field.width;
+    return (
+      _lerpPlane(field.u, row0, row1, i0, i1, tx, ty, field.uMin, field.uMax),
+      _lerpPlane(field.v, row0, row1, i0, i1, tx, ty, field.vMin, field.vMax),
+    );
+  }
+
+  /// One plane's bilinear interpolation over the shared cell geometry.
+  double _lerpPlane(
+    Uint8List plane,
+    int row0,
+    int row1,
+    int i0,
+    int i1,
+    double tx,
+    double ty,
+    double lo,
+    double hi,
+  ) {
+    final a = plane[row0 + i0];
+    final b = plane[row0 + i1];
+    final c = plane[row1 + i0];
+    final d = plane[row1 + i1];
     final top = a + (b - a) * tx;
     final bottom = c + (d - c) * tx;
-    return min + ((top + (bottom - top) * ty) / 255) * (max - min);
+    return lo + (top + (bottom - top) * ty) / 255 * (hi - lo);
   }
 
   double _lerp(double a, double b, double t) => a + (b - a) * t;
