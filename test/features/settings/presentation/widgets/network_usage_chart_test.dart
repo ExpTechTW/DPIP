@@ -70,8 +70,10 @@ void main() {
     expect(stacks, hasLength(2));
     expect(stacks[0].color, const Color(0xFFE53935));
     expect(stacks[1].color, const Color(0xFF66BB6A));
-    // Taipei labels: epoch hour 16 → 1970-01-02 00:00 +08 → 2日0時.
-    expect(find.text('2日0時'), findsWidgets);
+    // Taipei labels: epoch hour 0 → 1970-01-01 08:00 +08 → 1日8時.
+    expect(find.text('1日8時'), findsOneWidget);
+    // Labels are spaced out, not one per bar: 24 h at every 6 → 4 labels.
+    expect(find.textContaining('日'), findsNWidgets(4));
   });
 
   testWidgets('switching to 7d shows 28 six-hour buckets', (tester) async {
@@ -80,7 +82,9 @@ void main() {
 
     final data = tester.widget<BarChart>(find.byType(BarChart)).data;
     expect(data.barGroups, hasLength(28));
-    expect(data.barGroups.first.barRods.first.width, 12);
+    expect(data.barGroups.first.barRods.first.width, 8);
+    // 28 buckets at every 7 → 4 labels.
+    expect(find.textContaining('日'), findsNWidgets(4));
   });
 
   testWidgets('switching to Download plots only the red series', (

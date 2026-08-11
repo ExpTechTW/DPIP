@@ -209,12 +209,17 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 22,
-                      // 24h: every 4th hour. 7d: every 4th six-hour bucket,
-                      // i.e. one label a day.
-                      interval: 4,
+                      // BarChart's x-axis is discrete slots, so `interval` is
+                      // ignored and getTitlesWidget runs for every bar — the
+                      // step has to be applied here. A full-width label
+                      // (11日13時 ≈ 66 px) is wider than a 4-bar gap (~52 px on
+                      // a phone), so labels sit every 6 h (24h) / 42 h (7d).
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < 0 || index >= samples.length) {
+                        final step = _window == NetworkChartWindow.day ? 6 : 7;
+                        if (index < 0 ||
+                            index >= samples.length ||
+                            index % step != 0) {
                           return const SizedBox.shrink();
                         }
                         return SideTitleWidget(
@@ -283,7 +288,7 @@ class _NetworkUsageChartState extends State<NetworkUsageChart> {
     final saved = sample.saved / divisor;
     return BarChartRodData(
       toY: (showDownload ? down : 0) + (showSaved ? saved : 0),
-      width: _window == NetworkChartWindow.day ? 6 : 12,
+      width: _window == NetworkChartWindow.day ? 6 : 8,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
       rodStackItems: switch ((showDownload, showSaved)) {
         (true, true) => [
