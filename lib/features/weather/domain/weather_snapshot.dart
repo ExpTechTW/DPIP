@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/meteor_decode.dart';
+import 'package:dpip/features/weather/domain/station_value_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'weather_snapshot.freezed.dart';
@@ -10,7 +11,9 @@ part 'weather_snapshot.freezed.dart';
 /// from a per-station JSON object), so it has no `fromJson`; nullable fields are
 /// the API's `-99` missing sentinel decoded to null.
 @freezed
-abstract class WeatherObservation with _$WeatherObservation {
+abstract class WeatherObservation
+    with _$WeatherObservation
+    implements StationObservation {
   const factory WeatherObservation({
     /// 6-char station code (the `/station` directory key).
     required String id,
@@ -46,7 +49,9 @@ abstract class WeatherObservation with _$WeatherObservation {
 /// A weather snapshot: the observation [time] and one [WeatherObservation] per
 /// station, aligned by index to the station directory.
 @freezed
-abstract class WeatherSnapshot with _$WeatherSnapshot {
+abstract class WeatherSnapshot
+    with _$WeatherSnapshot
+    implements StationSnapshot<WeatherObservation> {
   const factory WeatherSnapshot({
     required int time,
     required List<WeatherObservation> stations,

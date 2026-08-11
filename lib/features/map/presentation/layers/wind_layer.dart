@@ -18,7 +18,9 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-class WindMapLayer extends WeatherStationLayer {
+class WindMapLayer
+    extends
+        WeatherStationLayer<WeatherSnapshot, WeatherObservation, WeatherTrend> {
   WindMapLayer(super.repository);
 
   /// Shared arrow image ids (registered once per render) and the arrow layer

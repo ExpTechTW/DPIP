@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/meteor_decode.dart';
+import 'package:dpip/features/weather/domain/station_value_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'weather_trend.freezed.dart';
@@ -12,7 +13,7 @@ part 'weather_trend.freezed.dart';
 /// [pressure] hPa, [windSpeed] m/s, [windDirection] °; each `-99` → null). Built
 /// from a field-array payload, so it has no `fromJson`.
 @freezed
-abstract class WeatherTrend with _$WeatherTrend {
+abstract class WeatherTrend with _$WeatherTrend implements TrendTimeAxis {
   const factory WeatherTrend({
     /// 6-char station code (the `/station` directory key).
     required String id,

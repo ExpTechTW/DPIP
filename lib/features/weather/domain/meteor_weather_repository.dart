@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/features/weather/domain/station_value_repository.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
@@ -11,11 +12,14 @@ import 'package:dpip/features/weather/domain/weather_trend.dart';
 /// Weather observations from the v5 meteor API. Returns a [Result] so a failed
 /// fetch/decode is explicit (never a silently blank weather panel); the impl in
 /// `data/` maps transport/decode errors to a typed `Failure`.
-abstract interface class MeteorWeatherRepository {
+abstract interface class MeteorWeatherRepository
+    implements StationValueRepository<WeatherSnapshot, WeatherTrend> {
   /// The static station directory, keyed by station code.
+  @override
   Future<Result<Map<String, WeatherStation>>> stations();
 
   /// The latest observation snapshot.
+  @override
   Future<Result<WeatherSnapshot>> latest();
 
   /// Available history snapshot times (Unix seconds, ascending); `Ok([])` when
@@ -26,6 +30,7 @@ abstract interface class MeteorWeatherRepository {
   Future<Result<WeatherSnapshot>> at(int second);
 
   /// The weather trend series for station [id] over [range] (`24h` | `7d`).
+  @override
   Future<Result<WeatherTrend>> trend(String id, {String range = '24h'});
 
   /// The nearest station's realtime observation to ([latitude], [longitude]).
