@@ -39,23 +39,17 @@ class MapLegendCard extends StatelessWidget {
 
 /// Vertical colour scale built from ascending [stops] — strongest (last stop)
 /// at the top, matching legacy `ColorLegend(reverse: true)`.
+///
+/// The unit, when present, is always shown **below** the scale ([unit]); it is
+/// never appended to every value label — a number column stays numbers.
 class ColorScaleLegend extends StatelessWidget {
-  const ColorScaleLegend({
-    super.key,
-    required this.stops,
-    this.unit,
-    this.appendUnit = false,
-  });
+  const ColorScaleLegend({super.key, required this.stops, this.unit});
 
   /// Ascending value → hex colour pairs (same order as MapLibre ramps).
   final List<ColorStop> stops;
 
-  /// Optional unit shown below the scale, or appended to each label when
-  /// [appendUnit] is true.
+  /// Unit shown below the scale, e.g. `m/s` or `°C`.
   final String? unit;
-
-  /// When true, append [unit] after each value instead of under the scale.
-  final bool appendUnit;
 
   static const double _cell = 14;
   static const double _swatch = 8;
@@ -104,18 +98,13 @@ class ColorScaleLegend extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (final stop in rows)
-                    Expanded(
-                      child: Text(
-                        _label(stop.$1, unit, appendUnit),
-                        style: labelStyle,
-                      ),
-                    ),
+                    Expanded(child: Text(_label(stop.$1), style: labelStyle)),
                 ],
               ),
             ),
           ],
         ),
-        if (unit != null && !appendUnit) ...[
+        if (unit != null) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(l10n.mapLegendUnit(unit!), style: labelStyle),
         ],
@@ -123,12 +112,10 @@ class ColorScaleLegend extends StatelessWidget {
     );
   }
 
-  static String _label(double value, String? unit, bool appendUnit) {
-    final number = value == value.roundToDouble()
+  static String _label(double value) {
+    return value == value.roundToDouble()
         ? value.toInt().toString()
         : value.toString();
-    if (appendUnit && unit != null) return '$number $unit';
-    return number;
   }
 }
 

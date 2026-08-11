@@ -211,11 +211,7 @@ abstract class WeatherStationLayer<
   @override
   Widget buildLegend(BuildContext context) {
     final header = legendHeader(context);
-    final scale = ColorScaleLegend(
-      stops: colorStops,
-      unit: unit,
-      appendUnit: true,
-    );
+    final scale = ColorScaleLegend(stops: colorStops, unit: unit);
     final child = header == null
         ? scale
         : Column(
