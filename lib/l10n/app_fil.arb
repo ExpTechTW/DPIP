@@ -227,6 +227,8 @@
   "lightningLegendCg": "Ulap–lupa · {minutes} min",
   "lightningLegendCc": "Ulap–ulap · {minutes} min",
   "mapTimelineNow": "Ngayon",
+  "mapTimelinePast": "Nakaraan",
+  "mapTimelineFuture": "Hinaharap",
   "mapTimelineObserved": "Naobserbahan",
   "mapTimelineForecast": "Pagtaya",
   "notifySettingsMenu": "Mga setting ng notipikasyon",

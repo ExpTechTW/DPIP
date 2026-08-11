@@ -743,6 +743,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTimelineNow => '현재';
 
   @override
+  String get mapTimelinePast => '과거';
+
+  @override
+  String get mapTimelineFuture => '미래';
+
+  @override
   String get mapTimelineObserved => '관측';
 
   @override

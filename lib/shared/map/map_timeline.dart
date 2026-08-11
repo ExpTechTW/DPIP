@@ -171,15 +171,16 @@ class _MapTimelineState extends State<MapTimeline> {
     final colors = theme.colorScheme;
     // Asked of the clock rather than of the list, so a forecast's "現在" lands
     // on the present rather than on its furthest step.
-    final isNow = _liveIndex == nowFrameIndex(widget.frames);
+    final nowIndex = nowFrameIndex(widget.frames);
+    final era = _eraOf(_liveIndex, nowIndex);
     final labelStep = (48 / _slotWidth).ceil();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Left: 觀測 (label) over the selected date; right: the big time
-        // ("now" when the newest frame is under the scrubber). FittedBox keeps
-        // the row on one line on narrow screens instead of overflowing.
+        // Left: 觀測 (label) over the selected date; right: the big time with
+        // its era label (現在/歷史/未來) + HH:mm. FittedBox keeps the row on
+        // one line on narrow screens instead of overflowing.
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Row(
@@ -211,19 +212,21 @@ class _MapTimelineState extends State<MapTimeline> {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  if (isNow) ...[
-                    Text(
-                      l10n.mapTimelineNow,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colors.primary,
-                      ),
+                  Text(
+                    switch (era) {
+                      TimelineEra.past => l10n.mapTimelinePast,
+                      TimelineEra.now => l10n.mapTimelineNow,
+                      TimelineEra.future => l10n.mapTimelineFuture,
+                    },
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: _eraColor(era, theme.brightness),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                  ],
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     _times[_liveIndex],
                     style: theme.textTheme.headlineSmall?.copyWith(
-                      color: colors.primary,
+                      color: _eraColor(era, theme.brightness),
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
@@ -256,6 +259,10 @@ class _MapTimelineState extends State<MapTimeline> {
                       itemBuilder: (context, i) => _Tick(
                         width: _slotWidth,
                         label: i % labelStep == 0 ? _times[i] : null,
+                        labelColor: _eraColor(
+                          _eraOf(i, nowIndex),
+                          theme.brightness,
+                        ),
                         emphasised: i == _liveIndex,
                         colors: colors,
                         textStyle: theme.textTheme.labelSmall,
@@ -283,11 +290,41 @@ class _MapTimelineState extends State<MapTimeline> {
   }
 }
 
+/// Which side of the present a frame sits on.
+enum TimelineEra { past, now, future }
+
+TimelineEra _eraOf(int index, int nowIndex) => switch (index.compareTo(nowIndex)) {
+  -1 => TimelineEra.past,
+  0 => TimelineEra.now,
+  _ => TimelineEra.future,
+};
+
+/// The era colours, one pair per brightness so each reads on both themes.
+///
+/// The hues are fixed (not theme roles) because they are the semantics: 歷史
+/// blue, 現在 green, 未來 purple — a dark surface gets the lighter shade of the
+/// same hue, a light surface the deeper one.
+const Color _pastLight = Color(0xFF1565C0);
+const Color _pastDark = Color(0xFF64B5F6);
+const Color _nowLight = Color(0xFF2E7D32);
+const Color _nowDark = Color(0xFF81C784);
+const Color _futureLight = Color(0xFF7B1FA2);
+const Color _futureDark = Color(0xFFBA68C8);
+
+Color _eraColor(TimelineEra era, Brightness brightness) => switch (era) {
+  TimelineEra.past =>
+    brightness == Brightness.dark ? _pastDark : _pastLight,
+  TimelineEra.now => brightness == Brightness.dark ? _nowDark : _nowLight,
+  TimelineEra.future =>
+    brightness == Brightness.dark ? _futureDark : _futureLight,
+};
+
 /// One ruler tick — a mark plus an optional time [label] beneath it.
 class _Tick extends StatelessWidget {
   const _Tick({
     required this.width,
     required this.label,
+    required this.labelColor,
     required this.emphasised,
     required this.colors,
     required this.textStyle,
@@ -295,6 +332,7 @@ class _Tick extends StatelessWidget {
 
   final double width;
   final String? label;
+  final Color labelColor;
   final bool emphasised;
   final ColorScheme colors;
   final TextStyle? textStyle;
@@ -325,9 +363,7 @@ class _Tick extends StatelessWidget {
                       label!,
                       maxLines: 1,
                       softWrap: false,
-                      style: textStyle?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: textStyle?.copyWith(color: labelColor),
                     ),
                   ),
           ),

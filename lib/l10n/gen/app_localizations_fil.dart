@@ -762,6 +762,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapTimelineNow => 'Ngayon';
 
   @override
+  String get mapTimelinePast => 'Nakaraan';
+
+  @override
+  String get mapTimelineFuture => 'Hinaharap';
+
+  @override
   String get mapTimelineObserved => 'Naobserbahan';
 
   @override

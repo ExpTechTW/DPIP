@@ -758,6 +758,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTimelineNow => 'Sekarang';
 
   @override
+  String get mapTimelinePast => 'Lampau';
+
+  @override
+  String get mapTimelineFuture => 'Mendatang';
+
+  @override
   String get mapTimelineObserved => 'Diamati';
 
   @override

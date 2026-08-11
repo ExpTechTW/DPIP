@@ -741,6 +741,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
+
+  @override
   String get mapTimelineObserved => '觀測';
 
   @override
@@ -2463,6 +2469,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapTimelineNow => '现在';
+
+  @override
+  String get mapTimelinePast => '历史';
+
+  @override
+  String get mapTimelineFuture => '未来';
 
   @override
   String get mapTimelineObserved => '观测';
@@ -4189,6 +4201,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
+
+  @override
   String get mapTimelineObserved => '觀測';
 
   @override
@@ -5911,6 +5929,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTimelineNow => '現在';
+
+  @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
 
   @override
   String get mapTimelineObserved => '觀測';

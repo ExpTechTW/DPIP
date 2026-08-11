@@ -227,6 +227,8 @@
   "lightningLegendCg": "Awan–tanah · {minutes} mnt",
   "lightningLegendCc": "Awan–awan · {minutes} mnt",
   "mapTimelineNow": "Sekarang",
+  "mapTimelinePast": "Lampau",
+  "mapTimelineFuture": "Mendatang",
   "mapTimelineObserved": "Diamati",
   "mapTimelineForecast": "Prakiraan",
   "notifySettingsMenu": "Pengaturan notifikasi",

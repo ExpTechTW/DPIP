@@ -227,6 +227,8 @@
   "lightningLegendCg": "เมฆสู่พื้น · {minutes} นาที",
   "lightningLegendCc": "เมฆสู่เมฆ · {minutes} นาที",
   "mapTimelineNow": "ตอนนี้",
+  "mapTimelinePast": "อดีต",
+  "mapTimelineFuture": "อนาคต",
   "mapTimelineObserved": "เวลาตรวจวัด",
   "mapTimelineForecast": "พยากรณ์",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",

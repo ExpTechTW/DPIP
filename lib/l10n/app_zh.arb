@@ -227,6 +227,8 @@
   "lightningLegendCg": "對地 · {minutes} 分內",
   "lightningLegendCc": "雲間 · {minutes} 分內",
   "mapTimelineNow": "現在",
+  "mapTimelinePast": "歷史",
+  "mapTimelineFuture": "未來",
   "mapTimelineObserved": "觀測",
   "mapTimelineForecast": "預報",
   "notifySettingsMenu": "通知設定",

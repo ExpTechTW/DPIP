@@ -755,6 +755,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapTimelineNow => 'Bây giờ';
 
   @override
+  String get mapTimelinePast => 'Quá khứ';
+
+  @override
+  String get mapTimelineFuture => 'Tương lai';
+
+  @override
   String get mapTimelineObserved => 'Quan trắc';
 
   @override

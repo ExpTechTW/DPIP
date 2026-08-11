@@ -1044,6 +1044,14 @@
   "@mapTimelineNow": {
     "description": "Label on the map timeline when the newest (latest) frame is selected"
   },
+  "mapTimelinePast": "Past",
+  "@mapTimelinePast": {
+    "description": "Label on the map timeline when the selected frame predates the present"
+  },
+  "mapTimelineFuture": "Future",
+  "@mapTimelineFuture": {
+    "description": "Label on the map timeline when the selected frame postdates the present"
+  },
   "mapTimelineObserved": "Observed",
   "@mapTimelineObserved": {
     "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"

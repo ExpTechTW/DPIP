@@ -1473,6 +1473,18 @@ abstract class AppLocalizations {
   /// **'Now'**
   String get mapTimelineNow;
 
+  /// Label on the map timeline when the selected frame predates the present
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get mapTimelinePast;
+
+  /// Label on the map timeline when the selected frame postdates the present
+  ///
+  /// In en, this message translates to:
+  /// **'Future'**
+  String get mapTimelineFuture;
+
   /// Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14
   ///
   /// In en, this message translates to:

@@ -742,6 +742,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '過去';
+
+  @override
+  String get mapTimelineFuture => '未来';
+
+  @override
   String get mapTimelineObserved => '観測';
 
   @override

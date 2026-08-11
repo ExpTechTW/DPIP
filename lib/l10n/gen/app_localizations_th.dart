@@ -755,6 +755,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTimelineNow => 'ตอนนี้';
 
   @override
+  String get mapTimelinePast => 'อดีต';
+
+  @override
+  String get mapTimelineFuture => 'อนาคต';
+
+  @override
   String get mapTimelineObserved => 'เวลาตรวจวัด';
 
   @override

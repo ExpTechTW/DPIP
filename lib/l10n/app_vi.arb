@@ -227,6 +227,8 @@
   "lightningLegendCg": "Mây–đất · {minutes} phút",
   "lightningLegendCc": "Mây–mây · {minutes} phút",
   "mapTimelineNow": "Bây giờ",
+  "mapTimelinePast": "Quá khứ",
+  "mapTimelineFuture": "Tương lai",
   "mapTimelineObserved": "Quan trắc",
   "mapTimelineForecast": "Dự báo",
   "notifySettingsMenu": "Cài đặt thông báo",

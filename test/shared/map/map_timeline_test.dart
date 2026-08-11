@@ -74,6 +74,25 @@ void main() {
     expect(find.text('Now'), findsNothing);
   });
 
+  testWidgets('history and future frames carry their own era labels', (
+    tester,
+  ) async {
+    final frames = _forecastFrames(); // 6 hours back, 16 ahead; index 6 is now
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 2, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Past'), findsOneWidget);
+
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 12, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Future'), findsOneWidget);
+    expect(find.text('Past'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'labels the newest selected frame as "now" without layout error',
     (tester) async {

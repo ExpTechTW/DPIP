@@ -227,6 +227,8 @@
   "lightningLegendCg": "대지로 · {minutes}분 이내",
   "lightningLegendCc": "구름 사이 · {minutes}분 이내",
   "mapTimelineNow": "현재",
+  "mapTimelinePast": "과거",
+  "mapTimelineFuture": "미래",
   "mapTimelineObserved": "관측",
   "mapTimelineForecast": "예보",
   "notifySettingsMenu": "알림 설정",
