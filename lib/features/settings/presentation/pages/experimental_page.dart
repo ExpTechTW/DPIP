@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -56,7 +57,7 @@ class ExperimentalPage extends StatelessWidget {
     WeatherMode.clear => Icons.wb_sunny_outlined,
     WeatherMode.cloudy => Icons.filter_drama_outlined,
     WeatherMode.overcast => Icons.cloud_outlined,
-    WeatherMode.rain => Icons.water_drop_outlined,
+    WeatherMode.rain => rainy,
     WeatherMode.snow => Icons.ac_unit_outlined,
     WeatherMode.sand => Icons.blur_on_outlined,
     WeatherMode.fog => Icons.foggy,

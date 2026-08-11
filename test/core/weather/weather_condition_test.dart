@@ -1,5 +1,6 @@
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -52,7 +53,7 @@ void main() {
     test('code phenomenon drives the icon regardless of the label', () {
       // 200 有雷雨 — the code, not the 多雲 label, picks the storm.
       expect(weatherVisual('多雲', 214, colors).$1, Icons.thunderstorm_outlined);
-      expect(weatherVisual('晴', 106, colors).$1, Icons.water_drop_outlined);
+      expect(weatherVisual('晴', 106, colors).$1, rainy);
       expect(weatherVisual('陰', 208, colors).$1, Icons.snowing);
       expect(weatherVisual('晴', 105, colors).$1, Icons.foggy);
     });
@@ -61,7 +62,7 @@ void main() {
       // A shower reads differently from steady rain, 霾 from a fog bank, and
       // lightning without rain from a thunderstorm — each its own glyph while
       // the accent still follows the resolved backdrop mode.
-      expect(weatherVisual('多雲', 111, colors).$1, Icons.grain_outlined); // 有陣雨
+      expect(weatherVisual('多雲', 111, colors).$1, rainyLight); // 有陣雨
       expect(weatherVisual('晴', 103, colors).$1, Icons.bolt_outlined); // 有閃電
       expect(weatherVisual('多雲', 107, colors).$1, Icons.sunny_snowing); // 有雨雪
       expect(weatherVisual('多雲', 112, colors).$1, Icons.cloudy_snowing); // 陣雨雪
@@ -87,7 +88,7 @@ void main() {
 
     test('a missing code falls back to substring matching', () {
       expect(weatherVisual('午後雷陣雨', 0, colors).$1, Icons.thunderstorm_outlined);
-      expect(weatherVisual('短暫雨', 0, colors).$1, Icons.water_drop_outlined);
+      expect(weatherVisual('短暫雨', 0, colors).$1, rainy);
       expect(weatherVisual('雪', 0, colors).$1, Icons.ac_unit_outlined);
       expect(weatherVisual('晴時多雲', 0, colors).$1, Icons.wb_sunny_outlined);
       expect(weatherVisual('多雲', 0, colors).$1, Icons.cloud_outlined);

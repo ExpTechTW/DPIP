@@ -2,6 +2,7 @@
 /// timeline rows and home cards.
 library;
 
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
 
 /// The icon for an event kind, keyed off `EventType.iconKey` so the domain
@@ -12,7 +13,7 @@ IconData eventTypeIcon(String key) => switch (key) {
   'report' => Icons.description_outlined,
   'intensity' => Icons.graphic_eq,
   'thunderstorm' => Icons.thunderstorm_outlined,
-  'heavy_rain' => Icons.water_drop_outlined,
+  'heavy_rain' => rainyHeavy,
   'weather_warning' => Icons.warning_amber_rounded,
   'tsunami' => Icons.tsunami_outlined,
   _ => Icons.notifications_outlined,

@@ -5,6 +5,7 @@
 library;
 
 import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
 
 /// The single mapping for CWB's weather-code table: families 100 (晴) / 200
@@ -51,12 +52,12 @@ const Map<int, IconData> _phenomenonIcon = {
   3: Icons.bolt_outlined, // 有閃電 — lightning with no rain on the ground
   4: Icons.bolt_outlined, // 有雷聲
   5: Icons.foggy, // 有霧 — a real fog bank reads denser than 霾
-  6: Icons.water_drop_outlined, // 有雨
+  6: rainy, // 有雨 — the cloud-and-rain mark, not a single drop
   7: Icons.sunny_snowing, // 有雨雪 — the sun-through-snow glyph reads as the mix
   8: Icons.snowing, // 有大雪
   9: Icons.ac_unit_outlined, // 有雪珠
   10: Icons.ac_unit_outlined, // 有冰珠
-  11: Icons.grain_outlined, // 有陣雨 — a shower, distinct from steady 有雨
+  11: rainyLight, // 有陣雨 — a shower, lighter drops than steady 有雨
   12: Icons.cloudy_snowing, // 陣雨雪
   13: Icons.grain_outlined, // 有雹
   14: Icons.thunderstorm_outlined, // 有雷雨
@@ -138,7 +139,7 @@ double? weatherSnowIntensity(int code) {
     WeatherMode.auto => _fallback(weather, colors),
     WeatherMode.thunderstorm => (Icons.thunderstorm_outlined, colors.tertiary),
     WeatherMode.snow => (Icons.ac_unit_outlined, colors.primary),
-    WeatherMode.rain => (Icons.water_drop_outlined, colors.primary),
+    WeatherMode.rain => (rainy, colors.primary),
     WeatherMode.fog => (Icons.blur_on_outlined, colors.onSurfaceVariant),
     WeatherMode.sand => (Icons.air_outlined, colors.onSurfaceVariant),
     WeatherMode.clear => (Icons.wb_sunny_outlined, colors.tertiary),
@@ -168,7 +169,7 @@ Color? _accent(WeatherMode mode, ColorScheme colors) => switch (mode) {
     return (Icons.ac_unit_outlined, colors.primary);
   }
   if (weather.contains('雨')) {
-    return (Icons.water_drop_outlined, colors.primary);
+    return (rainy, colors.primary);
   }
   if (weather.contains('晴')) {
     return (Icons.wb_sunny_outlined, colors.tertiary);
