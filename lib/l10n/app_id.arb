@@ -339,6 +339,8 @@
   "mapLayerHumidity": "Kelembapan",
   "mapLayerPressure": "Tekanan",
   "mapLayerWind": "Angin",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Curah hujan",
   "rainIntervalMenu": "Jendela akumulasi",
   "rainIntervalNow": "Hari ini",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "Pengamatan cuaca",
   "mapLayerCategorySatellite": "Satelit",
   "mapLayerCategoryRadar": "Radar",
-  "mapLayerCategoryLife": "Kehidupan sehari-hari",  "mapOverlaySectionMap": "Peta",
+  "mapLayerCategoryLife": "Kehidupan sehari-hari",
+  "mapLayerCategoryForecast": "Prakiraan numerik",  "mapOverlaySectionMap": "Peta",
   "rainIntervalSection": "Jendela waktu",
 
   "mapTownLabels": "Nama kecamatan",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "Batas negara",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Bingkai luar setiap negara",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "Digambar di atas gema",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "Opsi lapisan prakiraan curah hujan",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Opsi lapisan prakiraan angin",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Digambar di atas bidang angin",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Bingkai luar setiap negara",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Jaring yang lebih halus",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

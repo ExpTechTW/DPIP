@@ -1246,6 +1246,12 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
@@ -1349,6 +1355,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => 'Pang-araw-araw na buhay';
+
+  @override
+  String get mapLayerCategoryForecast => 'Numerical forecast';
 
   @override
   String get mapOverlaySectionMap => 'Mapa';
@@ -1728,6 +1737,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get radarCountyOutline => 'Mga hangganan ng lalawigan';
 
   @override
+  String get radarGlobalOutline => 'Mga hangganan ng bansa';
+
+  @override
+  String get radarGlobalOutlineHint => 'Panlabas na balangkas ng bawat bansa';
+
+  @override
   String get radarCountyOutlineHint => 'Iginuguhit sa ibabaw ng echo';
 
   @override
@@ -1747,4 +1762,19 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get qpesumsOverlayMenuTooltip =>
       'Mga opsyon sa layer ng pagtataya ng pag-ulan';
+
+  @override
+  String get windForecastOverlayMenuTooltip =>
+      'Mga opsyon sa layer ng pagtataya ng hangin';
+
+  @override
+  String get windForecastCountyOutlineHint =>
+      'Iginuhit sa itaas ng patlang ng hangin';
+
+  @override
+  String get windForecastGlobalOutlineHint =>
+      'Panlabas na balangkas ng bawat bansa';
+
+  @override
+  String get windForecastTownOutlineHint => 'Ang mas pinong mesh';
 }

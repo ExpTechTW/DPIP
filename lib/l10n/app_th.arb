@@ -339,6 +339,8 @@
   "mapLayerHumidity": "ความชื้น",
   "mapLayerPressure": "ความกดอากาศ",
   "mapLayerWind": "ลม",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "ปริมาณฝน",
   "rainIntervalMenu": "ช่วงสะสม",
   "rainIntervalNow": "วันนี้",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "การสังเกตสภาพอากาศ",
   "mapLayerCategorySatellite": "ดาวเทียม",
   "mapLayerCategoryRadar": "เรดาร์",
-  "mapLayerCategoryLife": "ชีวิตประจำวัน",  "mapOverlaySectionMap": "แผนที่",
+  "mapLayerCategoryLife": "ชีวิตประจำวัน",
+  "mapLayerCategoryForecast": "การพยากรณ์เชิงตัวเลข",  "mapOverlaySectionMap": "แผนที่",
   "rainIntervalSection": "ช่วงเวลา",
 
   "mapTownLabels": "ชื่อตำบล",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "เส้นแบ่งเขตประเทศ",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "กรอบนอกของทุกประเทศ",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "วาดทับภาพเอคโค",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์น้ำฝน",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์ลม",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "วาดทับบนสนามลม",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "กรอบนอกของทุกประเทศ",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "ตาข่ายที่ละเอียดกว่า",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

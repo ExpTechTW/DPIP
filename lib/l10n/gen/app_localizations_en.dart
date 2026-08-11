@@ -1240,6 +1240,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'Seismic Monitor';
 
   @override
@@ -1342,6 +1348,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => 'Daily life';
+
+  @override
+  String get mapLayerCategoryForecast => 'Numerical forecast';
 
   @override
   String get mapOverlaySectionMap => 'Map';
@@ -1720,6 +1729,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radarCountyOutline => 'County borders';
 
   @override
+  String get radarGlobalOutline => 'National borders';
+
+  @override
+  String get radarGlobalOutlineHint => 'Every country\'s outer frame';
+
+  @override
   String get radarCountyOutlineHint => 'Drawn over the echo';
 
   @override
@@ -1738,4 +1753,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => 'QPESUMS overlay options';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'Wind forecast overlay options';
+
+  @override
+  String get windForecastCountyOutlineHint => 'Drawn over the wind field';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'Every country\'s outer frame';
+
+  @override
+  String get windForecastTownOutlineHint => 'The finer mesh';
 }

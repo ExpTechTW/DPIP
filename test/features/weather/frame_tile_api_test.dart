@@ -108,5 +108,35 @@ void main() {
       expect(adapter.urls[0], contains('channel=13'));
       expect(adapter.urls[1], contains('channel=btd_wvirw'));
     });
+
+    test('each wind model hits its own list endpoint', () async {
+      final adapter = _RecordingAdapter();
+      final client = ApiClient(Dio()..httpClientAdapter = adapter, regions);
+      final gfs = FrameTileApi(client, 'wind', model: 'gfs');
+      final ecmwf = FrameTileApi(client, 'wind', model: 'ecmwf');
+
+      await gfs.getFrames();
+      await ecmwf.getFrames();
+
+      expect(adapter.urls, hasLength(2));
+      expect(adapter.urls[0], isNot(adapter.urls[1]));
+      expect(adapter.urls[0], contains('list?model=gfs'));
+      expect(adapter.urls[1], contains('list?model=ecmwf'));
+      // The tile URL template carries the model too, so MapLibre and the
+      // warmer fetch the same field the list named.
+      expect(gfs.tileUrl('1783360200'), contains('model=gfs'));
+      expect(ecmwf.tileUrl('1783360200'), contains('model=ecmwf'));
+    });
+
+    test('fetchWindBin targets the v1 binary endpoint per model', () async {
+      final adapter = _RecordingAdapter();
+      final client = ApiClient(Dio()..httpClientAdapter = adapter, regions);
+      final gfs = FrameTileApi(client, 'wind', model: 'gfs');
+
+      await gfs.fetchWindBin('1783360200');
+
+      expect(adapter.urls, hasLength(1));
+      expect(adapter.urls.single, contains('/api/v1/wind/gfs/1783360200.bin'));
+    });
   });
 }

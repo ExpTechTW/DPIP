@@ -4,13 +4,17 @@ library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
 
-/// The six groups the overlays fall into, in display order.
+/// The seven groups the overlays fall into, in display order.
 enum MapLayerCategory {
   /// Seismic-monitor events (RTS).
   earthquake,
 
-  /// Ground-radar imagery + short-term precipitation estimate.
+  /// Ground-radar imagery.
   radar,
+
+  /// Numerical weather prediction: the short-term precipitation forecast
+  /// (QPESUMS) and the ECMWF / GFS wind fields.
+  forecast,
 
   /// Typhoon tracks.
   typhoon,
@@ -37,6 +41,12 @@ MapLayerCategory categoryOf(String layerId) {
   if (layerId == 'satellite' || layerId.startsWith('satellite-')) {
     return MapLayerCategory.satellite;
   }
+  // The wind forecast split namespaced the forecast layers into
+  // `wind-<model>` ids, so those match by prefix off the historical `wind`
+  // station layer.
+  if (layerId.startsWith('wind-')) {
+    return MapLayerCategory.forecast;
+  }
   return switch (layerId) {
     'monitor' => MapLayerCategory.earthquake,
     'typhoon' => MapLayerCategory.typhoon,
@@ -46,7 +56,11 @@ MapLayerCategory categoryOf(String layerId) {
     'wind' ||
     'rain' ||
     'lightning' => MapLayerCategory.weather,
-    'radar' || 'qpesums' => MapLayerCategory.radar,
+    'radar' => MapLayerCategory.radar,
+    // The QPESUMS next-1-hour forecast is a numerical model output like the
+    // wind fields, so it shares their group rather than radar's — which is
+    // purely an instrument.
+    'qpesums' => MapLayerCategory.forecast,
     'dpm' => MapLayerCategory.life,
     _ => MapLayerCategory.weather,
   };
@@ -59,6 +73,7 @@ String categoryLabel(MapLayerCategory category, AppLocalizations l10n) =>
       MapLayerCategory.typhoon => l10n.mapLayerCategoryTyphoon,
       MapLayerCategory.weather => l10n.mapLayerCategoryWeather,
       MapLayerCategory.satellite => l10n.mapLayerCategorySatellite,
+      MapLayerCategory.forecast => l10n.mapLayerCategoryForecast,
       MapLayerCategory.radar => l10n.mapLayerCategoryRadar,
       MapLayerCategory.life => l10n.mapLayerCategoryLife,
     };

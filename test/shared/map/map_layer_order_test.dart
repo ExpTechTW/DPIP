@@ -101,7 +101,15 @@ void main() {
           names(
             orderedCategories(MapLayerCategory.values, ['radar', 'typhoon']),
           ),
-          ['radar', 'typhoon', 'earthquake', 'weather', 'satellite', 'life'],
+          [
+            'radar',
+            'typhoon',
+            'earthquake',
+            'forecast',
+            'weather',
+            'satellite',
+            'life',
+          ],
         );
       },
     );
@@ -109,7 +117,15 @@ void main() {
     test('a stale name is ignored without dropping any category', () {
       expect(
         names(orderedCategories(MapLayerCategory.values, ['gone', 'life'])),
-        ['life', 'earthquake', 'radar', 'typhoon', 'weather', 'satellite'],
+        [
+          'life',
+          'earthquake',
+          'radar',
+          'forecast',
+          'typhoon',
+          'weather',
+          'satellite',
+        ],
       );
     });
 
@@ -122,7 +138,15 @@ void main() {
             'radar',
           ]),
         ),
-        ['typhoon', 'radar', 'earthquake', 'weather', 'satellite', 'life'],
+        [
+          'typhoon',
+          'radar',
+          'earthquake',
+          'forecast',
+          'weather',
+          'satellite',
+          'life',
+        ],
       );
     });
   });

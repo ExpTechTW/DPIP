@@ -1635,6 +1635,14 @@
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind-direction layer"
   },
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "@mapLayerWindForecastEcmwf": {
+    "description": "Map layer switcher label for the ECMWF wind-forecast layer"
+  },
+  "mapLayerWindForecastGfs": "GFS",
+  "@mapLayerWindForecastGfs": {
+    "description": "Map layer switcher label for the GFS wind-forecast layer"
+  },
   "mapLayerMonitor": "Seismic Monitor",
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
@@ -1779,6 +1787,11 @@
   "mapLayerCategoryLife": "Daily life",
   "@mapLayerCategoryLife": {
     "description": "Section title in map overlay lists: everyday-life facility overlays"
+  },
+
+  "mapLayerCategoryForecast": "Numerical forecast",
+  "@mapLayerCategoryForecast": {
+    "description": "Section title in map overlay lists: numerical weather prediction (ECMWF/GFS) wind-field overlays"
   },  "mapOverlaySectionMap": "Map",
   "@mapOverlaySectionMap": {
     "description": "Section title in map overlay settings menus: base-map settings"
@@ -2304,6 +2317,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "National borders",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Every country's outer frame",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "Drawn over the echo",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -2327,5 +2348,21 @@
   "qpesumsOverlayMenuTooltip": "QPESUMS overlay options",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Wind forecast overlay options",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Drawn over the wind field",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Every country's outer frame",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "The finer mesh",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

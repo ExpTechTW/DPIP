@@ -9,6 +9,8 @@ import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
+import 'package:dpip/features/weather/domain/wind_field.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
@@ -94,18 +96,25 @@ abstract base class FrameTileRepository implements RasterFrameSource {
 
 /// [RasterFrameSource] for one v2 tile overlay, backed by [FrameTileApi].
 ///
-/// The concrete overlay is selected by the API's [FrameTileApi.path]. The three
+/// The concrete overlay is selected by the API's [FrameTileApi.path]. The four
 /// per-overlay domain interfaces are empty aliases of [RasterFrameSource], so a
 /// single parameterised impl satisfies them all; the provider layer still
 /// injects each overlay under its own interface.
 final class FrameTileRepositoryImpl extends FrameTileRepository
-    implements RadarRepository, SatelliteRepository, QpesumsRepository {
-  FrameTileRepositoryImpl(this._api, super.warmer);
+    implements
+        RadarRepository,
+        SatelliteRepository,
+        QpesumsRepository,
+        WindForecastRepository {
+  FrameTileRepositoryImpl(this._api, super.warmer, {this.maxZoom = 11});
 
   final FrameTileApi _api;
 
+  /// Highest zoom this overlay publishes tiles for. Radar / satellite /
+  /// QPESUMS reach 11; the 0.25° wind forecast grids stop at 7 (any deeper is
+  /// upsampled to nothing new).
   @override
-  int get maxZoom => 11;
+  final int maxZoom;
 
   @override
   String get tilePathPrefix => '${ApiPaths.tiles}/${_api.path}/';
@@ -115,6 +124,13 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
 
   @override
   String tileUrl(String frame) => _api.tileUrl(frame);
+
+  @override
+  Future<Result<WindField>> fetchWindField(String frame) =>
+      guardResult(() async {
+        final bytes = await _api.fetchWindBin(frame);
+        return WindField.fromWnd1(bytes);
+      });
 
   @override
   void setStyle(String? style) => _api.style = style;

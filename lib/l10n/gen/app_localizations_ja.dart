@@ -1218,6 +1218,12 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震モニタ';
 
   @override
@@ -1320,6 +1326,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '数値予報';
 
   @override
   String get mapOverlaySectionMap => '地図';
@@ -1689,6 +1698,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get radarCountyOutline => '県市境界';
 
   @override
+  String get radarGlobalOutline => '国境線';
+
+  @override
+  String get radarGlobalOutlineHint => '各国の国境外枠';
+
+  @override
   String get radarCountyOutlineHint => 'エコーの上に描画';
 
   @override
@@ -1705,4 +1720,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => '定量降水予報レイヤー設定';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風予報レイヤー設定';
+
+  @override
+  String get windForecastCountyOutlineHint => '風場の上に描画';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各国の国境外枠';
+
+  @override
+  String get windForecastTownOutlineHint => 'より細かいメッシュ';
 }

@@ -2367,6 +2367,18 @@ abstract class AppLocalizations {
   /// **'Data time\n{time}'**
   String typhoonDataTime(String time);
 
+  /// Map layer switcher label for the ECMWF wind-forecast layer
+  ///
+  /// In en, this message translates to:
+  /// **'ECMWF'**
+  String get mapLayerWindForecastEcmwf;
+
+  /// Map layer switcher label for the GFS wind-forecast layer
+  ///
+  /// In en, this message translates to:
+  /// **'GFS'**
+  String get mapLayerWindForecastGfs;
+
   /// Map layer switcher label for the real-time seismic monitor (RTS)
   ///
   /// In en, this message translates to:
@@ -2570,6 +2582,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Daily life'**
   String get mapLayerCategoryLife;
+
+  /// Section title in map overlay lists: numerical weather prediction (ECMWF/GFS) wind-field overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Numerical forecast'**
+  String get mapLayerCategoryForecast;
 
   /// Section title in map overlay settings menus: base-map settings
   ///
@@ -3273,6 +3291,18 @@ abstract class AppLocalizations {
   /// **'County borders'**
   String get radarCountyOutline;
 
+  /// World-country-border overlay toggle in the map's reference-layer overlay menus.
+  ///
+  /// In en, this message translates to:
+  /// **'National borders'**
+  String get radarGlobalOutline;
+
+  /// Hint under the national-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Every country\'s outer frame'**
+  String get radarGlobalOutlineHint;
+
   /// Hint under the county-border toggle in the radar overlay menu.
   ///
   /// In en, this message translates to:
@@ -3308,6 +3338,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'QPESUMS overlay options'**
   String get qpesumsOverlayMenuTooltip;
+
+  /// Tooltip for the wind-forecast overlay-options chip beside the layer switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind forecast overlay options'**
+  String get windForecastOverlayMenuTooltip;
+
+  /// Hint under the county-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Drawn over the wind field'**
+  String get windForecastCountyOutlineHint;
+
+  /// Hint under the national-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Every country\'s outer frame'**
+  String get windForecastGlobalOutlineHint;
+
+  /// Hint under the township-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'The finer mesh'**
+  String get windForecastTownOutlineHint;
 }
 
 class _AppLocalizationsDelegate

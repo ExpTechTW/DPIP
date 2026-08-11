@@ -1212,6 +1212,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -1314,6 +1320,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
 
   @override
   String get mapOverlaySectionMap => '地圖';
@@ -1683,6 +1692,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radarCountyOutline => '縣市界線';
 
   @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
   String get radarCountyOutlineHint => '畫在回波之上';
 
   @override
@@ -1699,6 +1714,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2909,6 +2936,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '强震监视器';
 
   @override
@@ -3011,6 +3044,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '数值预报';
 
   @override
   String get mapOverlaySectionMap => '地图';
@@ -3380,6 +3416,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get radarCountyOutline => '县市界线';
 
   @override
+  String get radarGlobalOutline => '国界';
+
+  @override
+  String get radarGlobalOutlineHint => '各国国界外框';
+
+  @override
   String get radarCountyOutlineHint => '画在回波之上';
 
   @override
@@ -3396,6 +3438,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get qpesumsOverlayMenuTooltip => '定量降水预报图层选项';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '风场预报图层选项';
+
+  @override
+  String get windForecastCountyOutlineHint => '绘制于风场之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各国国界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更细的网格';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -4606,6 +4660,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -4708,6 +4768,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
 
   @override
   String get mapOverlaySectionMap => '地圖';
@@ -5077,6 +5140,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get radarCountyOutline => '縣市界線';
 
   @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
   String get radarCountyOutlineHint => '畫在回波之上';
 
   @override
@@ -5093,6 +5162,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6303,6 +6384,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -6405,6 +6492,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
 
   @override
   String get mapOverlaySectionMap => '地圖';
@@ -6774,6 +6864,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radarCountyOutline => '縣市界線';
 
   @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
   String get radarCountyOutlineHint => '畫在回波之上';
 
   @override
@@ -6790,4 +6886,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }

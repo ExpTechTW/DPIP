@@ -1238,6 +1238,12 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override
@@ -1340,6 +1346,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => 'ชีวิตประจำวัน';
+
+  @override
+  String get mapLayerCategoryForecast => 'การพยากรณ์เชิงตัวเลข';
 
   @override
   String get mapOverlaySectionMap => 'แผนที่';
@@ -1718,6 +1727,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get radarCountyOutline => 'เส้นแบ่งเขตจังหวัด';
 
   @override
+  String get radarGlobalOutline => 'เส้นแบ่งเขตประเทศ';
+
+  @override
+  String get radarGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
+
+  @override
   String get radarCountyOutlineHint => 'วาดทับภาพเอคโค';
 
   @override
@@ -1736,4 +1751,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์น้ำฝน';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์ลม';
+
+  @override
+  String get windForecastCountyOutlineHint => 'วาดทับบนสนามลม';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
+
+  @override
+  String get windForecastTownOutlineHint => 'ตาข่ายที่ละเอียดกว่า';
 }

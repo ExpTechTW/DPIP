@@ -1239,6 +1239,12 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'Giám sát địa chấn';
 
   @override
@@ -1342,6 +1348,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => 'Đời sống';
+
+  @override
+  String get mapLayerCategoryForecast => 'Dự báo số';
 
   @override
   String get mapOverlaySectionMap => 'Bản đồ';
@@ -1721,6 +1730,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get radarCountyOutline => 'Ranh giới huyện thị';
 
   @override
+  String get radarGlobalOutline => 'Biên giới quốc gia';
+
+  @override
+  String get radarGlobalOutlineHint => 'Khung ngoài của mỗi quốc gia';
+
+  @override
   String get radarCountyOutlineHint => 'Vẽ đè lên tiếng vọng';
 
   @override
@@ -1739,4 +1754,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => 'Tùy chọn lớp dự báo mưa định lượng';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'Tùy chọn lớp dự báo gió';
+
+  @override
+  String get windForecastCountyOutlineHint => 'Vẽ trên trường gió';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'Khung ngoài của mỗi quốc gia';
+
+  @override
+  String get windForecastTownOutlineHint => 'Lưới mịn hơn';
 }

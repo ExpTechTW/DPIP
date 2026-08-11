@@ -339,6 +339,8 @@
   "mapLayerHumidity": "Độ ẩm",
   "mapLayerPressure": "Áp suất",
   "mapLayerWind": "Gió",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Lượng mưa",
   "rainIntervalMenu": "Khung tích lũy",
   "rainIntervalNow": "Hôm nay",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "Quan sát thời tiết",
   "mapLayerCategorySatellite": "Vệ tinh",
   "mapLayerCategoryRadar": "Ra đa",
-  "mapLayerCategoryLife": "Đời sống",  "mapOverlaySectionMap": "Bản đồ",
+  "mapLayerCategoryLife": "Đời sống",
+  "mapLayerCategoryForecast": "Dự báo số",  "mapOverlaySectionMap": "Bản đồ",
   "rainIntervalSection": "Khoảng thời gian",
 
   "mapTownLabels": "Tên hương trấn",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "Biên giới quốc gia",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "Vẽ đè lên tiếng vọng",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "Tùy chọn lớp dự báo mưa định lượng",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Tùy chọn lớp dự báo gió",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Vẽ trên trường gió",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Lưới mịn hơn",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

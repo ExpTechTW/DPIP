@@ -26,6 +26,34 @@ class MapFrame {
   int get hashCode => Object.hash(id, time);
 }
 
+/// Index of the frame nearest the present moment in a chronological [frames]
+/// list, or 0 when it is empty.
+///
+/// Observed data only ever reaches the present, so for radar or satellite this
+/// is the last frame and saying "the last one" would have done. A forecast runs
+/// past it — GFS by sixteen days — and there the two answers are nothing alike:
+/// treating the last frame as now opens the map on next week, labels it 現在,
+/// and leaves the scrubber pinned at the right-hand end with the entire
+/// forecast behind it and nothing ahead. The forecast is not missing at that
+/// point, it is just all to the left of a scrubber that claims to be at the
+/// present.
+///
+/// So: ask the clock, not the list. For observations the answer is unchanged.
+int nowFrameIndex(List<MapFrame> frames, {DateTime? now}) {
+  if (frames.isEmpty) return 0;
+  final at = now ?? DateTime.now();
+  var best = 0;
+  var bestGap = Duration.zero;
+  for (var i = 0; i < frames.length; i++) {
+    final gap = frames[i].time.difference(at).abs();
+    if (i == 0 || gap < bestGap) {
+      best = i;
+      bestGap = gap;
+    }
+  }
+  return best;
+}
+
 /// A pluggable overlay on the shared map — radar today, rain / lightning /
 /// typhoon / … as they land.
 ///

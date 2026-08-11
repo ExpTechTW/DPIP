@@ -339,6 +339,8 @@
   "mapLayerHumidity": "湿度",
   "mapLayerPressure": "気圧",
   "mapLayerWind": "風向",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "降水量",
   "rainIntervalMenu": "累積期間",
   "rainIntervalNow": "今日",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "気象観測",
   "mapLayerCategorySatellite": "衛星",
   "mapLayerCategoryRadar": "レーダー",
-  "mapLayerCategoryLife": "生活",  "mapOverlaySectionMap": "地図",
+  "mapLayerCategoryLife": "生活",
+  "mapLayerCategoryForecast": "数値予報",  "mapOverlaySectionMap": "地図",
   "rainIntervalSection": "集計時間",
 
   "mapTownLabels": "郷鎮名",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "国境線",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "各国の国境外枠",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "エコーの上に描画",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "定量降水予報レイヤー設定",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "風予報レイヤー設定",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "風場の上に描画",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "各国の国境外枠",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "より細かいメッシュ",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

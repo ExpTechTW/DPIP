@@ -2,6 +2,19 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// An administrative boundary set that can be redrawn over a weather raster.
 enum AdminBoundary {
+  /// 國界 — the world's country borders. The outermost frame; drawn only when
+  /// explicitly asked for, because on a Taiwan-focused surface the neighbours'
+  /// outlines are usually noise.
+  global(
+    sourceLayer: 'global',
+    casingLayerId: 'admin-global-outline-casing',
+    lineLayerId: 'admin-global-outline',
+    casingWidth: 2.8,
+    casingOpacity: 0.4,
+    lineWidth: 1.1,
+    lineOpacity: 0.9,
+  ),
+
   /// 縣市 — the coarse frame. Heavier, because it is the one people navigate by.
   county(
     sourceLayer: 'city',

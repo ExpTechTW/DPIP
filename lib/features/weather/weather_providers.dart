@@ -16,11 +16,13 @@ import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 /// Weather providers: radar / satellite / QPESUMS overlays, meteor weather /
-/// rain / lightning, and the next-hour rain trend.
+/// rain / lightning, the next-hour rain trend, and the wind forecast models.
 ///
 /// The raster overlays each get **their own** warmer: cancelling one layer's
 /// warm on a layer switch must not abandon the other's. A null tile cache (the
@@ -54,6 +56,19 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
           channel: FrameTileRepositoryImpl(
             FrameTileApi(deps.apiClient, 'satellite', channel: channel.key),
             deps.mapTileWarmer(),
+          ),
+      },
+    ),
+    // One repository per wind forecast model — each needs its own `?model=` on
+    // both the frame list and every tile URL, and its own warmer. The 0.25°
+    // grids stop publishing at z7.
+    Provider<Map<WindForecastModel, WindForecastRepository>>.value(
+      value: {
+        for (final model in WindForecastModel.values)
+          model: FrameTileRepositoryImpl(
+            FrameTileApi(deps.apiClient, 'wind', model: model.key),
+            deps.mapTileWarmer(),
+            maxZoom: 7,
           ),
       },
     ),

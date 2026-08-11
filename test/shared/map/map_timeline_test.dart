@@ -34,7 +34,46 @@ Widget _wrap({
   ),
 );
 
+/// A forecast's frames straddle the present: six hours of history and sixteen
+/// ahead, hourly, so index 6 is now. Anchored on the real clock because the
+/// widget asks the real clock.
+List<MapFrame> _forecastFrames() {
+  final now = DateTime.now();
+  return [
+    for (var h = -6; h <= 16; h++)
+      MapFrame(id: '$h', time: now.add(Duration(hours: h))),
+  ];
+}
+
 void main() {
+  testWidgets('a forecast labels the present, not its furthest step', (
+    tester,
+  ) async {
+    final frames = _forecastFrames();
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 6, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Now'),
+      findsOneWidget,
+      reason: 'the frame at the present moment is the one that is now',
+    );
+
+    // And the last step — sixteen hours out — must not claim to be now, which
+    // is what left the scrubber parked at the right-hand end with the whole
+    // forecast behind it and nothing ahead.
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: frames.length - 1,
+        onSelected: (_) {},
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Now'), findsNothing);
+  });
+
   testWidgets(
     'labels the newest selected frame as "now" without layout error',
     (tester) async {

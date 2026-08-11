@@ -339,6 +339,8 @@
   "mapLayerHumidity": "습도",
   "mapLayerPressure": "기압",
   "mapLayerWind": "바람",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "강수량",
   "rainIntervalMenu": "누적 구간",
   "rainIntervalNow": "오늘",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "기상 관측",
   "mapLayerCategorySatellite": "위성",
   "mapLayerCategoryRadar": "레이더",
-  "mapLayerCategoryLife": "생활",  "mapOverlaySectionMap": "지도",
+  "mapLayerCategoryLife": "생활",
+  "mapLayerCategoryForecast": "수치 예보",  "mapOverlaySectionMap": "지도",
   "rainIntervalSection": "집계 시간",
 
   "mapTownLabels": "읍면동 이름",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "국경",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "각국 국경선",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "에코 위에 표시",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "바람 예보 레이어 옵션",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "바람장 위에 표시",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "각국 국경선",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "더 촘촘한 망",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

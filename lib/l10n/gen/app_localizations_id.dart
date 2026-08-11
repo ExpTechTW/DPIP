@@ -1243,6 +1243,12 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
@@ -1345,6 +1351,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => 'Kehidupan sehari-hari';
+
+  @override
+  String get mapLayerCategoryForecast => 'Prakiraan numerik';
 
   @override
   String get mapOverlaySectionMap => 'Peta';
@@ -1723,6 +1732,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get radarCountyOutline => 'Batas kabupaten/kota';
 
   @override
+  String get radarGlobalOutline => 'Batas negara';
+
+  @override
+  String get radarGlobalOutlineHint => 'Bingkai luar setiap negara';
+
+  @override
   String get radarCountyOutlineHint => 'Digambar di atas gema';
 
   @override
@@ -1741,4 +1756,16 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => 'Opsi lapisan prakiraan curah hujan';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'Opsi lapisan prakiraan angin';
+
+  @override
+  String get windForecastCountyOutlineHint => 'Digambar di atas bidang angin';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'Bingkai luar setiap negara';
+
+  @override
+  String get windForecastTownOutlineHint => 'Jaring yang lebih halus';
 }

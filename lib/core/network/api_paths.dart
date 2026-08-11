@@ -8,6 +8,10 @@ abstract final class ApiPaths {
   /// v2 raster / disaster overlay tiles root (`/api/v2/tiles/<layer>/…`).
   static const String tiles = '/api/v2/tiles';
 
+  /// v1 wind-field binaries (`/api/v1/wind/<model>/<ts>.bin`) — the WND1
+  /// grids that drive the particle animation over the wind tiles.
+  static const String windV1 = '/api/v1/wind';
+
   /// Disaster-point tiles: `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`.
   static const String dpm = '/api/v2/tiles/dpm';
 

@@ -339,6 +339,8 @@
   "mapLayerHumidity": "Halumigmig",
   "mapLayerPressure": "Presyon",
   "mapLayerWind": "Hangin",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Ulan",
   "rainIntervalMenu": "Bintana ng akumulasyon",
   "rainIntervalNow": "Ngayon",
@@ -405,7 +407,8 @@
   "mapLayerCategoryWeather": "Obserbasyon sa panahon",
   "mapLayerCategorySatellite": "Satellite",
   "mapLayerCategoryRadar": "Radar",
-  "mapLayerCategoryLife": "Pang-araw-araw na buhay",  "mapOverlaySectionMap": "Mapa",
+  "mapLayerCategoryLife": "Pang-araw-araw na buhay",
+  "mapLayerCategoryForecast": "Numerical forecast",  "mapOverlaySectionMap": "Mapa",
   "rainIntervalSection": "Window ng oras",
 
   "mapTownLabels": "Mga pangalan ng bayan",
@@ -604,6 +607,14 @@
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
+  "radarGlobalOutline": "Mga hangganan ng bansa",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
   "radarCountyOutlineHint": "Iginuguhit sa ibabaw ng echo",
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
@@ -627,5 +638,21 @@
   "qpesumsOverlayMenuTooltip": "Mga opsyon sa layer ng pagtataya ng pag-ulan",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Mga opsyon sa layer ng pagtataya ng hangin",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Iginuhit sa itaas ng patlang ng hangin",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Ang mas pinong mesh",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

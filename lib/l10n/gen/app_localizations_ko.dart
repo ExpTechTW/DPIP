@@ -1219,6 +1219,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
@@ -1321,6 +1327,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerCategoryLife => '생활';
+
+  @override
+  String get mapLayerCategoryForecast => '수치 예보';
 
   @override
   String get mapOverlaySectionMap => '지도';
@@ -1698,6 +1707,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get radarCountyOutline => '시·군 경계';
 
   @override
+  String get radarGlobalOutline => '국경';
+
+  @override
+  String get radarGlobalOutlineHint => '각국 국경선';
+
+  @override
   String get radarCountyOutlineHint => '에코 위에 표시';
 
   @override
@@ -1714,4 +1729,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get qpesumsOverlayMenuTooltip => '정량 강수 예보 레이어 옵션';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '바람 예보 레이어 옵션';
+
+  @override
+  String get windForecastCountyOutlineHint => '바람장 위에 표시';
+
+  @override
+  String get windForecastGlobalOutlineHint => '각국 국경선';
+
+  @override
+  String get windForecastTownOutlineHint => '더 촘촘한 망';
 }

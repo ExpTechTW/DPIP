@@ -1,14 +1,17 @@
 /// Shared frame-keyed tile API for the v2 raster overlays (radar, satellite,
-/// QPESUMS).
+/// QPESUMS, wind forecast).
 library;
+
+import 'dart:typed_data';
 
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/meteor_decode.dart';
 
-/// Tile endpoints for one v2 raster overlay — radar / satellite / QPESUMS all
-/// share the same shape, differing only in the URL path segment ([path]).
+/// Tile endpoints for one v2 raster overlay — radar / satellite / QPESUMS /
+/// wind all share the same shape, differing only in the URL path segment
+/// ([path]).
 ///
 /// Everything is keyed by a Unix timestamp (seconds for radar/satellite,
 /// milliseconds for QPESUMS); a frame id *is* the timestamp. The frame list is
@@ -17,11 +20,12 @@ import 'package:dpip/core/network/meteor_decode.dart';
 /// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
 /// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
 class FrameTileApi {
-  FrameTileApi(this._client, this.path, {this.channel, this.style});
+  FrameTileApi(this._client, this.path, {this.channel, this.style, this.model});
 
   final ApiClient _client;
 
-  /// The overlay's URL path segment: `radar`, `satellite`, or `qpesums`.
+  /// The overlay's URL path segment: `radar`, `satellite`, `qpesums`, or
+  /// `wind`.
   final String path;
 
   /// Optional `?channel=` for the satellite overlay — selects which band or
@@ -34,6 +38,11 @@ class FrameTileApi {
   /// menu switches it live (via `SatelliteRepository.setStyle`); named-product
   /// channels ignore it.
   String? style;
+
+  /// Optional `?model=` for the wind forecast overlay — which numerical
+  /// weather prediction model (`gfs` / `ecmwf`) a frame renders. Null keeps the
+  /// URL model-free; radar / satellite / qpesums never set it.
+  final String? model;
 
   /// The v2 frame list lives on `api.core-tnn1` (no region failover).
   static const ApiTier _listTier = ApiTier.coreExclusiveApi;
@@ -58,10 +67,12 @@ class FrameTileApi {
   String get _query {
     final channel = this.channel;
     final style = this.style;
-    if (channel == null && style == null) return '';
+    final model = this.model;
+    if (channel == null && style == null && model == null) return '';
     final parts = <String>[
       if (channel != null) 'channel=$channel',
       if (style != null) 'style=$style',
+      if (model != null) 'model=$model',
     ];
     return '?${parts.join('&')}';
   }
@@ -72,4 +83,12 @@ class FrameTileApi {
   static List<String> framesFromList(List<dynamic> deltas) => [
     for (final v in MeteorDecode.deltaSeconds(deltas).reversed) v.toString(),
   ];
+
+  /// The raw WND1 wind-field bytes for [frame] — the v1 endpoint parallels the
+  /// v2 tiles (`/api/v1/wind/<model>/<frame>.bin` on the same static host),
+  /// keyed by the model [tileUrl] renders.
+  Future<Uint8List> fetchWindBin(String frame) async => (await _client.getBytes(
+    _tileTier,
+    '${ApiPaths.windV1}/$model/$frame.bin',
+  )).bytes;
 }

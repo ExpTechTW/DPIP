@@ -31,9 +31,14 @@ void main() {
       expect(categoryOf('satellite'), MapLayerCategory.satellite);
     });
 
-    test('radar and the precipitation forecast share a group', () {
+    test('numerical weather prediction is its own group', () {
+      expect(categoryOf('qpesums'), MapLayerCategory.forecast);
+      expect(categoryOf('wind-gfs'), MapLayerCategory.forecast);
+      expect(categoryOf('wind-ecmwf'), MapLayerCategory.forecast);
+    });
+
+    test('radar is its own group', () {
       expect(categoryOf('radar'), MapLayerCategory.radar);
-      expect(categoryOf('qpesums'), MapLayerCategory.radar);
     });
 
     test('the disaster-prevention map is the daily-life group', () {

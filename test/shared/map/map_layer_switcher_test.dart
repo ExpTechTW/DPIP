@@ -36,10 +36,12 @@ void main() {
 
   final radar = _FakeLayer('radar', 'Radar echo');
   final qpesums = _FakeLayer('qpesums', 'Precip');
+  final ecmwf = _FakeLayer('wind-ecmwf', 'ECMWF', '0.25° · 3 h');
+  final gfs = _FakeLayer('wind-gfs', 'GFS', '0.25° · 1 h');
   final satellite = _FakeLayer('satellite', 'Satellite IR', 'B13 · 10.4 µm');
   final rain = _FakeLayer('rain', 'Rain');
   final typhoon = _FakeLayer('typhoon', 'Typhoon path');
-  final layers = [radar, qpesums, satellite, rain, typhoon];
+  final layers = [radar, qpesums, ecmwf, gfs, satellite, rain, typhoon];
 
   Future<MapLayerOrderController> pumpSwitcher(
     WidgetTester tester,
@@ -114,10 +116,15 @@ void main() {
       centreX(tester, find.text(l10n.mapLayers)),
       closeTo(screenWidth(tester) / 2, 1),
     );
-    // Group order: radar → typhoon → weather → satellite; the two radar-group
-    // layers keep their saved relative order (radar echo before precip).
+    // Group order: radar → forecast → typhoon → weather → satellite. The
+    // numerical-forecast group (QPESUMS, then the unsaved wind models appended
+    // in declared order) sits right under radar.
     expect(
       topOf(tester, l10n.mapLayerCategoryRadar),
+      lessThan(topOf(tester, l10n.mapLayerCategoryForecast)),
+    );
+    expect(
+      topOf(tester, l10n.mapLayerCategoryForecast),
       lessThan(topOf(tester, l10n.mapLayerCategoryTyphoon)),
     );
     expect(
@@ -128,12 +135,22 @@ void main() {
       topOf(tester, l10n.mapLayerCategoryWeather),
       lessThan(topOf(tester, l10n.mapLayerCategorySatellite)),
     );
-    expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
+    // Within the forecast group the saved precip keeps its place above the
+    // wind models, which follow the declared order (ECMWF before GFS).
+    expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
+    expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
     // A layer's subtitle sits under its label in the same tile.
     expect(
       find.descendant(
         of: find.byType(ListView),
         matching: find.text('B13 · 10.4 µm'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(ListView),
+        matching: find.text('0.25° · 3 h'),
       ),
       findsOneWidget,
     );
@@ -150,11 +167,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Unsaved layers keep the declared order within their groups: Radar
-      // group (radar echo, precip) at the top, then weather (rain) above
-      // satellite (satellite IR).
+      // group (radar echo) at the top, then forecast (precip, ECMWF, GFS)
+      // above weather (rain) and satellite (satellite IR).
       expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Rain')));
       expect(topOf(tester, 'Rain'), lessThan(topOf(tester, 'Satellite IR')));
-      expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
+      expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'GFS')));
     },
   );
 
@@ -175,19 +192,20 @@ void main() {
       closeTo(screenWidth(tester) / 2, 1),
     );
     // Level 1 is the category list: one drag handle per category, no layer
-    // rows, no chevron on a single-layer category (typhoon).
-    expect(find.byIcon(Icons.drag_handle), findsNWidgets(4));
+    // rows, no chevron on a single-layer category (radar, typhoon).
+    expect(find.byIcon(Icons.drag_handle), findsNWidgets(5));
     Finder inEditor(String text) => find.descendant(
       of: find.byType(ReorderableListView),
       matching: find.text(text),
     );
+    expect(inEditor(l10n.mapLayerCategoryRadar), findsOneWidget);
+    expect(inEditor(l10n.mapLayerCategoryForecast), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategoryTyphoon), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategoryWeather), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategorySatellite), findsOneWidget);
-    expect(inEditor(l10n.mapLayerCategoryRadar), findsOneWidget);
     // The picker behind still shows the active layer's tile — the editor's
-    // level-1 list must not. Only radar holds more than one layer, so just one
-    // category is drill-in-able.
+    // level-1 list must not. Only forecast holds more than one layer, so just
+    // one category is drill-in-able.
     expect(inEditor('Radar echo'), findsNothing);
     expect(find.byIcon(Icons.chevron_right), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
@@ -209,25 +227,26 @@ void main() {
       of: find.byType(ReorderableListView),
       matching: find.text(text),
     );
-    final radarCategory = find.descendant(
+    final forecastCategory = find.descendant(
       of: find.byType(ReorderableListView),
-      matching: find.text(l10n.mapLayerCategoryRadar),
+      matching: find.text(l10n.mapLayerCategoryForecast),
     );
-    await tester.tap(radarCategory);
+    await tester.tap(forecastCategory);
     await tester.pumpAndSettle();
 
-    // Level 2 shows just the radar-group layers, each with a drag handle.
-    expect(editorText('Radar echo'), findsOneWidget);
+    // Level 2 shows just the forecast-group layers, each with a drag handle.
     expect(editorText('Precip'), findsOneWidget);
+    expect(editorText('ECMWF'), findsOneWidget);
+    expect(editorText('GFS'), findsOneWidget);
     expect(editorText('Rain'), findsNothing);
-    expect(find.byIcon(Icons.drag_handle), findsNWidgets(2));
+    expect(find.byIcon(Icons.drag_handle), findsNWidgets(3));
     // The back affordance appears only on level 2.
     expect(find.byIcon(Icons.arrow_back), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
-    expect(editorText('Radar echo'), findsNothing);
-    expect(editorText(l10n.mapLayerCategoryTyphoon), findsOneWidget);
+    expect(editorText('Precip'), findsNothing);
+    expect(editorText(l10n.mapLayerCategoryRadar), findsOneWidget);
   });
 
   testWidgets('dragging a category reorders the categories', (tester) async {
@@ -250,6 +269,7 @@ void main() {
     expect(controller.categoryOrder, [
       'satellite',
       'radar',
+      'forecast',
       'typhoon',
       'weather',
     ]);
@@ -257,6 +277,8 @@ void main() {
       'satellite',
       'radar',
       'qpesums',
+      'wind-ecmwf',
+      'wind-gfs',
       'typhoon',
       'rain',
     ]);
@@ -275,12 +297,12 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(ReorderableListView),
-        matching: find.text(l10n.mapLayerCategoryRadar),
+        matching: find.text(l10n.mapLayerCategoryForecast),
       ),
     );
     await tester.pumpAndSettle();
 
-    // Precip sits below radar echo. Drag its handle far up to flip them.
+    // GFS sits below ECMWF. Drag its handle far up to flip them.
     final handles = find.descendant(
       of: find.byType(ReorderableListView),
       matching: find.byIcon(Icons.drag_handle),
@@ -288,12 +310,14 @@ void main() {
     await tester.drag(handles.last, const Offset(0, -300));
     await tester.pumpAndSettle();
 
-    // Only the layer ids changed — precip now before radar echo within the
-    // radar group; the category order is untouched (declared order, so the
-    // flattened snapshot leads with the radar block).
+    // Only the layer ids changed — GFS now first in the forecast group; the
+    // category order is untouched (declared order, so the flattened snapshot
+    // leads with the radar block).
     expect(controller.order, [
-      'qpesums',
       'radar',
+      'wind-gfs',
+      'qpesums',
+      'wind-ecmwf',
       'typhoon',
       'rain',
       'satellite',
@@ -304,7 +328,7 @@ void main() {
   testWidgets('reset restores the grouped default and clears both preferences', (
     tester,
   ) async {
-    // A saved order that flips the radar pair and moves a category — a
+    // A saved order that flips the forecast pair and moves a category — a
     // grouped-default order would disable the reset button (nothing to restore).
     final controller = await pumpSwitcher(tester, {
       'map.layerOrder': ['qpesums', 'satellite', 'rain', 'typhoon', 'radar'],
@@ -324,12 +348,13 @@ void main() {
     // The category list falls back to the grouped default…
     final inEditor = find.descendant(
       of: find.byType(ReorderableListView),
-      matching: find.text(l10n.mapLayerCategoryRadar),
+      matching: find.text(l10n.mapLayerCategoryForecast),
     );
     await tester.tap(inEditor);
     await tester.pumpAndSettle();
-    // …and radar echo is back before precip within the radar group.
-    expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
+    // …and precip is back before the wind models within the forecast group.
+    expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
+    expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
     // Both preferences are cleared.
     expect(controller.order, isEmpty);
     expect(controller.categoryOrder, isEmpty);
