@@ -8,15 +8,17 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/format.dart';
 import 'package:dpip/core/geo/geo_math.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 /// A trend series to plot: absolute Unix-second [times] aligned index-wise to
@@ -112,9 +114,6 @@ class StationSheet extends StatefulWidget {
   static const double peekExtent = 0.14;
   static const double _rest = 0.42;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<StationSheet> createState() => _StationSheetState();
@@ -150,8 +149,6 @@ class _StationSheetState extends State<StationSheet> {
   @override
   Widget build(BuildContext context) {
     final source = widget.source;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return ValueListenableBuilder<int>(
       valueListenable: source.selectionRevision,
       builder: (context, revision, _) => ValueListenableBuilder<String?>(
@@ -170,68 +167,26 @@ class _StationSheetState extends State<StationSheet> {
               if (mounted) _extent.value = initial;
             });
           }
-          return NotificationListener<DraggableScrollableNotification>(
-            onNotification: (notification) {
-              _extent.value = notification.extent;
-              return false;
-            },
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: DraggableScrollableSheet(
-                key: ValueKey(selected ? 'sel-$revision' : 'peek'),
-                expand: false,
-                initialChildSize: initial,
-                minChildSize: StationSheet.peekExtent,
-                maxChildSize: StationSheet._expanded,
-                snap: true,
-                snapSizes: const [StationSheet._rest],
-                builder: (context, scrollController) {
-                  // Body is the VLB child — extent ticks only restyle chrome.
-                  final body = stationId == null
-                      ? _EmptyBody(
-                          scrollController: scrollController,
-                          extent: _extent,
-                        )
-                      : _SheetBody(
-                          source: source,
-                          stationId: stationId,
-                          scrollController: scrollController,
-                          loadTrend: _trend,
-                          invalidateTrend: _invalidateTrend,
-                          extent: _extent,
-                        );
-                  return ValueListenableBuilder<double>(
-                    valueListenable: _extent,
-                    child: body,
-                    builder: (context, extent, child) {
-                      final atTop = StationSheet._isAtTop(extent);
-                      final topInset = MediaQuery.paddingOf(context).top;
-                      return AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          statusBarColor: atTop
-                              ? colors.surface
-                              : Colors.transparent,
-                          statusBarIconBrightness:
-                              theme.brightness == Brightness.dark
-                              ? Brightness.light
-                              : Brightness.dark,
-                          statusBarBrightness: theme.brightness,
-                        ),
-                        child: _SheetSurface(
-                          flushTop: atTop,
-                          // Sheet paints under the status bar; pad content so
-                          // titles clear the island. Mid-height: no top gap.
-                          child: Padding(
-                            padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                            child: child!,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+          return ExtentSheetChrome(
+            extent: _extent,
+            keyValue: selected ? 'sel-$revision' : 'peek',
+            initial: initial,
+            min: StationSheet.peekExtent,
+            max: StationSheet._expanded,
+            snapSizes: const [StationSheet._rest],
+            content: (context, scrollController) => stationId == null
+                ? _EmptyBody(
+                    scrollController: scrollController,
+                    extent: _extent,
+                  )
+                : _SheetBody(
+                    source: source,
+                    stationId: stationId,
+                    scrollController: scrollController,
+                    loadTrend: _trend,
+                    invalidateTrend: _invalidateTrend,
+                    extent: _extent,
+                  ),
           );
         },
       ),
@@ -257,7 +212,7 @@ class _EmptyBody extends StatelessWidget {
       // status-bar-sized gap above the grip even with no SafeArea wrapper.
       padding: EdgeInsets.zero,
       children: [
-        _SheetGrip(extent: extent),
+        SheetGrip(extent: extent),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -281,103 +236,6 @@ class _EmptyBody extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// The sheet's grab handle — hidden once the sheet is flush with the top.
-class _SheetGrip extends StatefulWidget {
-  const _SheetGrip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_SheetGrip> createState() => _SheetGripState();
-}
-
-class _SheetGripState extends State<_SheetGrip> {
-  late bool _show = !StationSheet._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_SheetGrip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !StationSheet._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    // Defer — flipping grip mid-DSS-layout dirties parentData for semantics.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !StationSheet._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
-  }
-}
-
-/// The frosted, rounded sheet panel.
-class _SheetSurface extends StatelessWidget {
-  const _SheetSurface({required this.child, this.flushTop = false});
-
-  final Widget child;
-
-  /// Full-bleed under the status bar — drop top radius / shadow so it reads as
-  /// one panel with the safe-area band, not a floating card.
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
     );
   }
 }
@@ -447,7 +305,7 @@ class _SheetBodyState extends State<_SheetBody> {
       controller: widget.scrollController,
       padding: EdgeInsets.zero,
       children: [
-        _SheetGrip(extent: widget.extent),
+        SheetGrip(extent: widget.extent),
         _StationHero(
           extent: widget.extent,
           name: widget.source.stationName(id),
@@ -558,53 +416,26 @@ class _StationHero extends StatefulWidget {
   State<_StationHero> createState() => _StationHeroState();
 }
 
-class _StationHeroState extends State<_StationHero> {
-  late bool _expanded = StationSheet._isAtTop(widget.extent.value);
+class _StationHeroState extends State<_StationHero> with SheetExtentFlag {
+  @override
+  ValueListenable<double> get sheetExtent => widget.extent;
 
   @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_StationHero old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = StationSheet._isAtTop(widget.extent.value);
-    if (next == _expanded) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final expanded = StationSheet._isAtTop(widget.extent.value);
-      if (expanded != _expanded) setState(() => _expanded = expanded);
-    });
-  }
+  bool sheetFlagFrom(double extent) => sheetExtentIsAtTop(extent);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final nameStyle = _expanded
+    final expanded = sheetFlag;
+    final nameStyle = expanded
         ? theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700)
         : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
     final subStyle =
-        (_expanded ? theme.textTheme.bodyMedium : theme.textTheme.bodySmall)
+        (expanded ? theme.textTheme.bodyMedium : theme.textTheme.bodySmall)
             ?.copyWith(color: colors.onSurfaceVariant);
-    final readingStyle = _expanded
+    final readingStyle = expanded
         ? theme.textTheme.displayMedium?.copyWith(
             color: colors.onSurface,
             fontWeight: FontWeight.w600,
@@ -615,15 +446,15 @@ class _StationHeroState extends State<_StationHero> {
             fontWeight: FontWeight.w600,
             height: 1,
           );
-    final dotSize = _expanded ? 14.0 : 10.0;
+    final dotSize = expanded ? 14.0 : 10.0;
 
     // No AnimatedSize here — it + DSS resize trips semantics.parentDataDirty.
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        _expanded ? AppSpacing.md : 0,
+        expanded ? AppSpacing.md : 0,
         AppSpacing.sm,
-        _expanded ? AppSpacing.md : AppSpacing.sm,
+        expanded ? AppSpacing.md : AppSpacing.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,7 +465,7 @@ class _StationHeroState extends State<_StationHero> {
               if (widget.valueColor case final dot?) ...[
                 Padding(
                   padding: EdgeInsets.only(
-                    top: _expanded ? 8 : 5,
+                    top: expanded ? 8 : 5,
                     right: AppSpacing.sm,
                   ),
                   child: AnimatedContainer(
@@ -679,7 +510,7 @@ class _StationHeroState extends State<_StationHero> {
             ],
           ),
           if (widget.reading case final reading?) ...[
-            SizedBox(height: _expanded ? AppSpacing.md : AppSpacing.xs),
+            SizedBox(height: expanded ? AppSpacing.md : AppSpacing.xs),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -916,10 +747,9 @@ class _TrendChart extends StatelessWidget {
     if (maxY <= minY) maxY = minY + yInterval;
 
     String timeLabel(double x) {
-      final t = DateTime.fromMillisecondsSinceEpoch(
-        x.toInt() * 1000,
-        isUtc: true,
-      ).add(const Duration(hours: 8));
+      final t = AppTime.taipei(
+        DateTime.fromMillisecondsSinceEpoch(x.toInt() * 1000, isUtc: true),
+      );
       final hourMark = l10n.chartHourLabel(t.hour);
       // Daily-or-wider: date only. Sub-daily 7d: date + hour. 24h: compact hour.
       if (labelStep >= 24 * hourSec) return DateFormat('M/d').format(t);
@@ -1635,8 +1465,7 @@ double niceAxisStep(double span, int targetTicks) {
 /// "1007.0" stays "1007" and fits the left gutter.
 String _axisLabel(double value, double step) {
   if (step >= 1) return value.toStringAsFixed(0);
-  final label = value.toStringAsFixed(1);
-  return label.endsWith('.0') ? label.substring(0, label.length - 2) : label;
+  return trimTrailingZero(value);
 }
 
 /// fl_chart reserves a shown side's `reservedSize` as canvas margin

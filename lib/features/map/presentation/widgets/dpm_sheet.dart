@@ -3,7 +3,6 @@
 /// panels. The body adapts to whichever sub-layer is selected.
 library;
 
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
 import 'package:dpip/features/disaster_map/domain/dpm_categories.dart';
@@ -12,9 +11,10 @@ import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/maps_launcher.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Peek / rest / full sheet for DPM detail.
 class DpmSheet extends StatefulWidget {
@@ -34,9 +34,6 @@ class DpmSheet extends StatefulWidget {
   static const double peekExtent = 0.24;
   static const double _rest = 0.42;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<DpmSheet> createState() => _DpmSheetState();
@@ -62,8 +59,6 @@ class _DpmSheetState extends State<DpmSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final allState = Listenable.merge([
       for (final s in _subs)
         Listenable.merge([
@@ -97,76 +92,26 @@ class _DpmSheetState extends State<DpmSheet> {
             if (mounted) _extent.value = initial;
           });
         }
-        return NotificationListener<DraggableScrollableNotification>(
-          onNotification: (notification) {
-            _extent.value = notification.extent;
-            return false;
-          },
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: DraggableScrollableSheet(
-              key: ValueKey(
-                selected ? 'dpm-${active.id}-$revision' : 'dpm-peek',
-              ),
-              expand: false,
-              initialChildSize: initial,
-              minChildSize: DpmSheet.peekExtent,
-              maxChildSize: DpmSheet._expanded,
-              snap: true,
-              snapSizes: const [DpmSheet._rest],
-              builder: (context, scrollController) {
-                // Built once — only `atTop` below needs the live extent;
-                // handing the list down via the `ValueListenableBuilder`'s
-                // `child` keeps it out of the per-frame rebuild that would
-                // otherwise redo it on every pixel of the drag.
-                final content = ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                    bottom:
-                        MediaQuery.viewPaddingOf(context).bottom +
-                        AppSpacing.md,
-                  ),
-                  children: [
-                    _Grip(extent: _extent),
-                    if (!selected) ...[
-                      _Hint(),
-                      _Filters(
-                        restroom: widget.restroom,
-                        shelter: widget.shelter,
-                      ),
-                    ] else
-                      _dispatchBody(active!),
-                  ],
-                );
-                return ValueListenableBuilder<double>(
-                  valueListenable: _extent,
-                  child: content,
-                  builder: (context, extent, content) {
-                    final atTop = DpmSheet._isAtTop(extent);
-                    final topInset = MediaQuery.viewPaddingOf(context).top;
-                    return AnnotatedRegion<SystemUiOverlayStyle>(
-                      value: SystemUiOverlayStyle(
-                        statusBarColor: atTop
-                            ? colors.surface
-                            : Colors.transparent,
-                        statusBarIconBrightness:
-                            theme.brightness == Brightness.dark
-                            ? Brightness.light
-                            : Brightness.dark,
-                        statusBarBrightness: theme.brightness,
-                      ),
-                      child: _Surface(
-                        flushTop: atTop,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                          child: content!,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+        return ExtentSheetChrome(
+          extent: _extent,
+          keyValue: selected ? 'dpm-${active.id}-$revision' : 'dpm-peek',
+          initial: initial,
+          min: DpmSheet.peekExtent,
+          max: DpmSheet._expanded,
+          snapSizes: const [DpmSheet._rest],
+          content: (context, scrollController) => ListView(
+            controller: scrollController,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.viewPaddingOf(context).bottom + AppSpacing.md,
             ),
+            children: [
+              SheetGrip(extent: _extent),
+              if (!selected) ...[
+                _Hint(),
+                _Filters(restroom: widget.restroom, shelter: widget.shelter),
+              ] else
+                _dispatchBody(active!),
+            ],
           ),
         );
       },
@@ -195,97 +140,6 @@ class _DpmSheetState extends State<DpmSheet> {
       previewName: widget.shelter.previewName,
       previewPlace: widget.shelter.previewPlace,
       onClose: widget.onClose,
-    );
-  }
-}
-
-class _Surface extends StatelessWidget {
-  const _Surface({required this.child, this.flushTop = false});
-
-  final Widget child;
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
-    );
-  }
-}
-
-class _Grip extends StatefulWidget {
-  const _Grip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_Grip> createState() => _GripState();
-}
-
-class _GripState extends State<_Grip> {
-  late bool _show = !DpmSheet._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Grip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !DpmSheet._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !DpmSheet._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
     );
   }
 }
@@ -745,13 +599,7 @@ class _Loading extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-      child: Center(
-        child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
+      child: Center(child: InlineLoading()),
     );
   }
 }

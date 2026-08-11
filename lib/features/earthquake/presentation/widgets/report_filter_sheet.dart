@@ -12,7 +12,8 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/foundation.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
+import 'package:dpip/shared/widgets/sheet_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -55,9 +56,6 @@ Future<ReportFilterSheetResult?> showReportFilterSheet(
 const double _restExtent = 0.72;
 const double _minExtent = 0.45;
 const double _maxExtent = 1.0;
-const double _atTopEpsilon = 0.02;
-
-bool _isAtTop(double extent) => extent >= _maxExtent - _atTopEpsilon;
 
 const double _magMin = 0;
 const double _magMax = 8;
@@ -310,11 +308,8 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
             ReportFilterSheetResult(query: _build(), search: false),
           );
         },
-        child: NotificationListener<DraggableScrollableNotification>(
-          onNotification: (notification) {
-            _extent.value = notification.extent;
-            return false;
-          },
+        child: SheetExtentListener(
+          extent: _extent,
           child: DraggableScrollableSheet(
             expand: true,
             initialChildSize: _restExtent,
@@ -332,7 +327,7 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
               // make dragging this sheet janky.
               final content = Column(
                 children: [
-                  _SheetGrip(extent: _extent),
+                  SheetGrip(extent: _extent),
                   Expanded(
                     child: ListView(
                       controller: scrollController,
@@ -613,7 +608,7 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
                 valueListenable: _extent,
                 child: content,
                 builder: (context, extent, content) {
-                  final atTop = _isAtTop(extent);
+                  final atTop = sheetExtentIsAtTop(extent);
                   final viewInsets = MediaQuery.viewInsetsOf(context);
                   final topInset = widget.systemPadding.top;
                   return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -629,7 +624,7 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
                     ),
                     // Sheet paints under the status bar; pad content only when
                     // flush so mid-height has no top gap (same as StationSheet).
-                    child: _SheetSurface(
+                    child: SheetSurface(
                       flushTop: atTop,
                       child: Padding(
                         padding: EdgeInsets.only(
@@ -660,100 +655,6 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
       valueIndicatorColor: colors.primary,
       rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 10),
       showValueIndicator: ShowValueIndicator.onlyForContinuous,
-    );
-  }
-}
-
-/// Rounded panel mid-height; flush (no radius / shadow) when at the top.
-class _SheetSurface extends StatelessWidget {
-  const _SheetSurface({required this.child, this.flushTop = false});
-
-  final Widget child;
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
-    );
-  }
-}
-
-/// Grab handle — hidden once the sheet is flush with the top.
-class _SheetGrip extends StatefulWidget {
-  const _SheetGrip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_SheetGrip> createState() => _SheetGripState();
-}
-
-class _SheetGripState extends State<_SheetGrip> {
-  late bool _show = !_isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_SheetGrip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !_isAtTop(widget.extent.value);
-    if (next == _show) return;
-    // Defer — flipping grip mid-DSS-layout dirties parentData for semantics.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !_isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
     );
   }
 }

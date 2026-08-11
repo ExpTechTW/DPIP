@@ -7,6 +7,8 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/format.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/typhoon/domain/compass_direction.dart';
 import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
@@ -14,9 +16,9 @@ import 'package:dpip/features/typhoon/domain/storm_circle.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class TyphoonPanel extends StatefulWidget {
   const TyphoonPanel({super.key, required this.layer});
@@ -27,9 +29,6 @@ class TyphoonPanel extends StatefulWidget {
   static const double peekExtent = 0.22;
   static const double _rest = 0.55;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<TyphoonPanel> createState() => _TyphoonPanelState();
@@ -49,8 +48,6 @@ class _TyphoonPanelState extends State<TyphoonPanel> {
   @override
   Widget build(BuildContext context) {
     final layer = widget.layer;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return ValueListenableBuilder<int>(
       valueListenable: layer.tapRevision,
       builder: (context, revision, _) => ValueListenableBuilder<String?>(
@@ -65,159 +62,27 @@ class _TyphoonPanelState extends State<TyphoonPanel> {
               if (mounted) _extent.value = initial;
             });
           }
-          return NotificationListener<DraggableScrollableNotification>(
-            onNotification: (notification) {
-              _extent.value = notification.extent;
-              return false;
-            },
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: DraggableScrollableSheet(
-                key: ValueKey(popped ? 'wp-$revision' : 'peek'),
-                expand: false,
-                initialChildSize: initial,
-                minChildSize: TyphoonPanel.peekExtent,
-                maxChildSize: TyphoonPanel._expanded,
-                snap: true,
-                snapSizes: const [TyphoonPanel._rest],
-                builder: (context, scrollController) {
-                  final body = ListView(
-                    controller: scrollController,
-                    padding: EdgeInsets.only(
-                      bottom:
-                          MediaQuery.paddingOf(context).bottom + AppSpacing.md,
-                    ),
-                    children: [
-                      _Grip(extent: _extent),
-                      _Bulletin(layer: layer, extent: _extent),
-                      _WarningBlock(layer: layer),
-                      _TappedWaypoint(layer: layer),
-                    ],
-                  );
-                  return ValueListenableBuilder<double>(
-                    valueListenable: _extent,
-                    child: body,
-                    builder: (context, extent, child) {
-                      final atTop = TyphoonPanel._isAtTop(extent);
-                      final topInset = MediaQuery.paddingOf(context).top;
-                      return AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          statusBarColor: atTop
-                              ? colors.surface
-                              : Colors.transparent,
-                          statusBarIconBrightness:
-                              theme.brightness == Brightness.dark
-                              ? Brightness.light
-                              : Brightness.dark,
-                          statusBarBrightness: theme.brightness,
-                        ),
-                        child: _Surface(
-                          flushTop: atTop,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                            child: child!,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+          return ExtentSheetChrome(
+            extent: _extent,
+            keyValue: popped ? 'wp-$revision' : 'peek',
+            initial: initial,
+            min: TyphoonPanel.peekExtent,
+            max: TyphoonPanel._expanded,
+            snapSizes: const [TyphoonPanel._rest],
+            content: (context, scrollController) => ListView(
+              controller: scrollController,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.md,
               ),
+              children: [
+                SheetGrip(extent: _extent),
+                _Bulletin(layer: layer, extent: _extent),
+                _WarningBlock(layer: layer),
+                _TappedWaypoint(layer: layer),
+              ],
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _Surface extends StatelessWidget {
-  const _Surface({required this.child, this.flushTop = false});
-
-  final Widget child;
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
-    );
-  }
-}
-
-/// Grab handle — hidden once the sheet is flush with the top.
-class _Grip extends StatefulWidget {
-  const _Grip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_Grip> createState() => _GripState();
-}
-
-class _GripState extends State<_Grip> {
-  late bool _show = !TyphoonPanel._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Grip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !TyphoonPanel._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !TyphoonPanel._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
       ),
     );
   }
@@ -266,42 +131,12 @@ class _Bulletin extends StatefulWidget {
 /// actually read `atTop`. `setState` only runs when the derived boolean
 /// changes, so the bulletin now rebuilds on data updates plus the (rare) top
 /// threshold crossing — not on every drag tick.
-class _BulletinState extends State<_Bulletin> {
-  late bool _atTop = TyphoonPanel._isAtTop(widget.extent.value);
+class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
+  @override
+  ValueListenable<double> get sheetExtent => widget.extent;
 
   @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Bulletin old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = TyphoonPanel._isAtTop(widget.extent.value);
-    if (next == _atTop) return;
-    // Defer — flipping mid-DSS-layout dirties parentData for semantics (see
-    // `_Grip`'s identical guard above).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final atTop = TyphoonPanel._isAtTop(widget.extent.value);
-      if (atTop != _atTop) setState(() => _atTop = atTop);
-    });
-  }
+  bool sheetFlagFrom(double extent) => sheetExtentIsAtTop(extent);
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +171,7 @@ class _BulletinState extends State<_Bulletin> {
             ? track.analysis.last
             : null;
         final now = track?.now;
-        final atTop = _atTop;
+        final atTop = sheetFlag;
 
         if (track == null && summary == null) {
           return Padding(
@@ -399,10 +234,12 @@ class _BulletinState extends State<_Bulletin> {
         final dataSec = layer.bulletinSecond;
         final dataTime = dataSec == null
             ? null
-            : DateTime.fromMillisecondsSinceEpoch(
-                dataSec * 1000,
-                isUtc: true,
-              ).add(const Duration(hours: 8));
+            : AppTime.taipei(
+                DateTime.fromMillisecondsSinceEpoch(
+                  dataSec * 1000,
+                  isUtc: true,
+                ),
+              );
 
         final options = <({String key, String title})>[
           for (final t in layer.track.value?.cyclones ?? const <TyphoonTrack>[])
@@ -630,10 +467,7 @@ class _BulletinState extends State<_Bulletin> {
     );
   }
 
-  static String _fmt1(double v) {
-    final s = v.toStringAsFixed(1);
-    return s.endsWith('.0') ? v.toStringAsFixed(0) : s;
-  }
+  static String _fmt1(double v) => trimTrailingZero(v);
 
   static TextStyle? _valueStyle(ThemeData theme) =>
       theme.textTheme.bodyMedium?.copyWith(
