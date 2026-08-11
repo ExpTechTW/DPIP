@@ -465,7 +465,7 @@ class _MapScaffoldState extends State<MapScaffold> {
         if (frames.isNotEmpty) {
           // Register the set, then reveal the present (a layer adds tiles
           // lazily). For observed data that is the newest frame; a forecast
-          // opens in the middle of its own range, with the future to the right.
+          // opens on the newest already-due step, future steps to the right.
           final controller = _controller!;
           final layer = _active;
           _queue(() => layer.prepare(controller, frames));

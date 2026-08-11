@@ -26,8 +26,8 @@ class MapFrame {
   int get hashCode => Object.hash(id, time);
 }
 
-/// Index of the frame nearest the present moment in a chronological [frames]
-/// list, or 0 when it is empty.
+/// Index of the newest frame that is not in the future, or 0 when the list is
+/// empty or entirely forecast.
 ///
 /// Observed data only ever reaches the present, so for radar or satellite this
 /// is the last frame and saying "the last one" would have done. A forecast runs
@@ -38,20 +38,20 @@ class MapFrame {
 /// point, it is just all to the left of a scrubber that claims to be at the
 /// present.
 ///
-/// So: ask the clock, not the list. For observations the answer is unchanged.
+/// So: ask the clock, not the list. The present is the newest frame **at or
+/// before** now — never a future step. At 21:43 with 3-hourly ECMWF steps
+/// landing on 20:00 and 23:00, the present is 20:00; labelling the 23:00
+/// forecast as now would present a prediction as though it had already
+/// happened. For observations the answer is unchanged.
 int nowFrameIndex(List<MapFrame> frames, {DateTime? now}) {
   if (frames.isEmpty) return 0;
   final at = now ?? DateTime.now();
-  var best = 0;
-  var bestGap = Duration.zero;
-  for (var i = 0; i < frames.length; i++) {
-    final gap = frames[i].time.difference(at).abs();
-    if (i == 0 || gap < bestGap) {
-      best = i;
-      bestGap = gap;
-    }
+  // Frames are chronological, so scan from the newest backwards.
+  for (var i = frames.length - 1; i >= 0; i--) {
+    if (!frames[i].time.isAfter(at)) return i;
   }
-  return best;
+  // Everything is in the future — the forecast opens on its first step.
+  return 0;
 }
 
 /// A pluggable overlay on the shared map — radar today, rain / lightning /

@@ -12,8 +12,9 @@ import 'package:intl/intl.dart';
 /// live and reports each crossed frame via [onSelected]. [onScrubbing] is true
 /// while the finger is down / the fling is in flight and false on settle — raster
 /// layers use that to opacity-GIF among residents without mounting cold frames.
-/// The frame nearest the present is labelled "now" — the newest one for
-/// observed data, and somewhere in the middle for a forecast.
+/// The frame labelled "now" is the newest one at or before the present — the
+/// last frame for observed data, and the latest already-due step of a forecast.
+/// Forecast steps after it are "future", never presented as current.
 ///
 /// Stateless about the map — it only turns [frames] + [selectedIndex] into a
 /// scrub gesture, so `MapScaffold` can drive any layer's frames through it.

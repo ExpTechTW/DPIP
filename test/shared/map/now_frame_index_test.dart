@@ -20,7 +20,7 @@ void main() {
     expect(nowFrameIndex(frames, now: _now), frames.length - 1);
   });
 
-  test('a forecast puts the present in the middle of its own range', () {
+  test('a forecast puts the present on the newest step that has arrived', () {
     // GFS as served: two days back, sixteen days forward.
     final frames = _span(-48, 384, stepHours: 3);
     final i = nowFrameIndex(frames, now: _now);
@@ -33,14 +33,27 @@ void main() {
     );
   });
 
-  test('picks the nearest step when none lands exactly on now', () {
-    // Three-hourly ECMWF steps straddling a present that falls between two.
+  test('a forecast step in the future is never the present', () {
+    // 21:43 with 3-hourly steps on 20:00 / 23:00: the present is the already-
+    // due 20:00, not the nearer-in-absolute-terms 23:00 — a prediction must
+    // not read as current before it has happened.
+    final now = DateTime(2026, 8, 11, 21, 43);
+    final frames = [
+      MapFrame(id: 'a', time: DateTime(2026, 8, 11, 20, 0)),
+      MapFrame(id: 'b', time: DateTime(2026, 8, 11, 23, 0)),
+    ];
+    expect(nowFrameIndex(frames, now: now), 0);
+  });
+
+  test('picks the newest frame at or before now', () {
+    // Nearest in absolute terms is b (+1 h), but the present is the newest
+    // frame that has actually arrived — a (−2 h).
     final frames = [
       MapFrame(id: 'a', time: _now.subtract(const Duration(hours: 2))),
       MapFrame(id: 'b', time: _now.add(const Duration(hours: 1))),
       MapFrame(id: 'c', time: _now.add(const Duration(hours: 4))),
     ];
-    expect(nowFrameIndex(frames, now: _now), 1);
+    expect(nowFrameIndex(frames, now: _now), 0);
   });
 
   test('an entirely future set answers with its first step', () {
