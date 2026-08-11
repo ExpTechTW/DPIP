@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 
@@ -26,7 +27,7 @@ class DpmTilePrefetcher {
   }) => _warmer.warmViewport(
     client: _client,
     tier: _tier,
-    pathFor: (z, x, y) => '/api/v2/tiles/dpm/$layer/$z/$x/$y.mvt',
+    pathFor: (z, x, y) => '${ApiPaths.dpm}/$layer/$z/$x/$y.mvt',
     south: south,
     west: west,
     north: north,

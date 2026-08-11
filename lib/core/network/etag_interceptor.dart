@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 
@@ -47,10 +48,10 @@ class EtagInterceptor extends Interceptor {
 
   /// Paths that must never enter the ETag store (live / unique / personal).
   static bool isUncacheablePath(String path) {
-    if (path == '/api/v2/eq/eew' || path == '/api/v2/trem/rts') return true;
-    if (path.startsWith('/api/v2/location/')) return true;
+    if (path == ApiPaths.eew || path == ApiPaths.rts) return true;
+    if (path.startsWith(ApiPaths.location)) return true;
     // getNotify + setNotify — token-keyed, must not stick in SQLite.
-    return path.startsWith('/api/v2/notify/');
+    return path.startsWith(ApiPaths.notify);
   }
 
   static bool _isBytes(RequestOptions o) =>
@@ -59,7 +60,7 @@ class EtagInterceptor extends Interceptor {
   /// Bare-host basemap vector tiles (no server ETag).
   static bool isBasemapPbf(Uri uri) =>
       uri.host == 'lb.exptech.dev' &&
-      uri.path.contains('/api/v1/map/tiles/') &&
+      uri.path.contains(ApiPaths.mapTilesV1) &&
       uri.path.endsWith('.pbf');
 
   /// URL fragments marking a **content-addressed** asset: the URL fully
@@ -76,10 +77,10 @@ class EtagInterceptor extends Interceptor {
   /// MapLibre's own ambient database, which meant they were invisible to the
   /// app's usage accounting.
   static const List<String> immutableAssetMarkers = [
-    '/api/v1/map/tiles/', // basemap vector tiles
-    '/api/v2/tiles/radar/',
-    '/api/v2/tiles/satellite/',
-    '/api/v2/tiles/dpm/',
+    ApiPaths.mapTilesV1, // basemap vector tiles
+    '${ApiPaths.tiles}/radar/',
+    '${ApiPaths.tiles}/satellite/',
+    '${ApiPaths.dpm}/',
     '/gh/exptechtw/map-assets/', // glyph PBFs (jsDelivr)
   ];
 

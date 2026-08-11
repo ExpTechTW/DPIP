@@ -4,6 +4,7 @@ library;
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
@@ -107,7 +108,7 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
   int get maxZoom => 11;
 
   @override
-  String get tilePathPrefix => '/api/v2/tiles/${_api.path}/';
+  String get tilePathPrefix => '${ApiPaths.tiles}/${_api.path}/';
 
   @override
   Future<Result<List<String>>> frames() => guardResult(_api.getFrames);

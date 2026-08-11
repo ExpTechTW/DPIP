@@ -1,4 +1,5 @@
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 
 /// Device-location endpoint on the region-aware [ApiClient].
@@ -24,6 +25,6 @@ class LocationApi {
     required double lng,
   }) => _client.get(
     ApiTier.coreExclusiveApi,
-    '/api/v2/location/$platform/$token/$version/$lat,$lng',
+    '${ApiPaths.location}$platform/$token/$version/$lat,$lng',
   );
 }

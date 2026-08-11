@@ -6,6 +6,8 @@ library;
 
 import 'dart:ui' show Brightness;
 
+import 'package:dpip/core/network/api_paths.dart';
+
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
 ///
 /// Do not invent map hexes at call sites; resolve via [MapColors.of].
@@ -101,7 +103,7 @@ const String dpmShelterPointsLayerId = 'dpm-shelter-points';
 /// store through the Dart bridge, and warmed by `MapTileWarmer` — the same
 /// three tiers as every other ExpTech tile.
 const String basemapOriginTileUrl =
-    'https://lb.exptech.dev/api/v1/map/tiles/{z}/{x}/{y}.pbf';
+    'https://lb.exptech.dev${ApiPaths.mapTilesV1}{z}/{x}/{y}.pbf';
 
 /// Origin glyph template — MapLibre HTTPS.
 const String glyphsOriginUrl =
