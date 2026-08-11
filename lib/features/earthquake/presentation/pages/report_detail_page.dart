@@ -412,6 +412,10 @@ class _ReportSheetState extends State<_ReportSheet> {
   final DraggableScrollableController _dragController =
       DraggableScrollableController();
 
+  /// [_onNotification]
+  ScrollController? _scrollController;
+  bool _wasExpanded = false;
+
   @override
   void dispose() {
     _extent.dispose();
@@ -437,11 +441,12 @@ class _ReportSheetState extends State<_ReportSheet> {
       child: NotificationListener<DraggableScrollableNotification>(
         onNotification: (notification) {
           _extent.value = notification.extent;
-          // Runs from the scroll-notification dispatch, not mid-build, so
-          // it's safe to update the page-level notifier the floating back
-          // button listens to.
-          widget.expandedNotifier.value =
-              notification.extent >= _ReportSheet._switchThreshold;
+          final expanded = notification.extent >= _ReportSheet._switchThreshold;
+          widget.expandedNotifier.value = expanded;
+          if (_wasExpanded && !expanded) {
+            _scrollController?.jumpTo(0);
+          }
+          _wasExpanded = expanded;
           return false;
         },
         child: DraggableScrollableSheet(
@@ -451,6 +456,7 @@ class _ReportSheetState extends State<_ReportSheet> {
           maxChildSize: _ReportSheet._expanded,
           snap: true,
           builder: (context, scrollController) {
+            _scrollController = scrollController;
             return DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.surface,
@@ -469,17 +475,14 @@ class _ReportSheetState extends State<_ReportSheet> {
                   valueListenable: _extent,
                   builder: (context, extent, _) {
                     final expanded = extent >= _ReportSheet._switchThreshold;
-                    // Flush with the screen top at full extent — the status
-                    // bar/notch inset has to come back as padding on the
-                    // expanded header, or it renders underneath it.
                     final atTop = extent >= _ReportSheet._expanded - 0.02;
+                    final revealProgress =
+                        ((extent - _ReportSheet.peek) /
+                                (_ReportSheet._expanded - _ReportSheet.peek))
+                            .clamp(0.0, 1.0);
+                    final peekOpacity = 1 - revealProgress;
                     return Column(
                       children: [
-                        // Pinned above the scroll body, not a scrolling item:
-                        // the "地震報告" bar (back button + title) stays while
-                        // the 詳細資訊 content scrolls underneath it. Keep the
-                        // ListView's horizontal inset on the header too, so it
-                        // sits where it did when it was the list's first child.
                         if (expanded)
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -500,9 +503,28 @@ class _ReportSheetState extends State<_ReportSheet> {
                               AppSpacing.xl +
                                   MediaQuery.paddingOf(context).bottom,
                             ),
-                            children: expanded
-                                ? _expandedContent(context, report)
-                                : _peekContent(context, report),
+                            children: [
+                              Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  Opacity(
+                                    opacity: revealProgress,
+                                    child: IgnorePointer(
+                                      ignoring: !expanded,
+                                      child: _expandedContent(context, report),
+                                    ),
+                                  ),
+                                  if (peekOpacity > 0)
+                                    Opacity(
+                                      opacity: peekOpacity,
+                                      child: IgnorePointer(
+                                        ignoring: expanded,
+                                        child: _peekContent(context, report),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -517,30 +539,27 @@ class _ReportSheetState extends State<_ReportSheet> {
     );
   }
 
-  List<Widget> _peekContent(BuildContext context, EarthquakeReport report) => [
-    _ReportPeekSummary(report: report),
-  ];
+  Widget _peekContent(BuildContext context, EarthquakeReport report) =>
+      _ReportPeekSummary(report: report);
 
-  List<Widget> _expandedContent(BuildContext context, EarthquakeReport report) {
+  Widget _expandedContent(BuildContext context, EarthquakeReport report) {
     final l10n = AppLocalizations.of(context);
-    return [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _ReportHeader(report: report),
-            const SizedBox(height: AppSpacing.lg),
-            SectionHeader(l10n.reportDetailInfo),
-            _ReportInfoCard(report: report),
-            _LocalIntensitySection(report: report),
-            if (report.list.isNotEmpty) _AreaIntensitySection(report: report),
-            SectionHeader(l10n.reportDetailImage),
-            _ReportImageCard(report: report),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _ReportHeader(report: report),
+          const SizedBox(height: AppSpacing.lg),
+          SectionHeader(l10n.reportDetailInfo),
+          _ReportInfoCard(report: report),
+          _LocalIntensitySection(report: report),
+          if (report.list.isNotEmpty) _AreaIntensitySection(report: report),
+          SectionHeader(l10n.reportDetailImage),
+          _ReportImageCard(report: report),
+        ],
       ),
-    ];
+    );
   }
 }
 
@@ -698,8 +717,8 @@ class _PeekStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -707,6 +726,7 @@ class _PeekStat extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: theme.textTheme.bodyLarge?.copyWith(
