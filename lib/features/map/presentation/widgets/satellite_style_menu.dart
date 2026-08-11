@@ -36,11 +36,17 @@ class SatelliteStyleMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([layer.style, showTownLabels]),
+      listenable: Listenable.merge([
+        layer.style,
+        layer.showGlobalOutline,
+        showTownLabels,
+      ]),
       builder: (context, _) {
         final style = layer.style.value;
+        final showGlobal = layer.showGlobalOutline.value;
         final showLabels = showTownLabels.value;
-        final active = style != SatelliteStyle.gray || !showLabels;
+        final active =
+            style != SatelliteStyle.gray || showGlobal || !showLabels;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -91,6 +97,80 @@ class SatelliteStyleMenu extends StatelessWidget {
                     SatelliteStyle.bd,
                     onReloadActive: onReloadActive,
                   ),
+                ),
+                const MapMenuDivider(),
+                SectionHeader(l10n.mapOverlaySectionReference),
+                MapMenuToggleRow(
+                  selected: showGlobal,
+                  icon: Icons.public_outlined,
+                  title: l10n.radarGlobalOutline,
+                  subtitle: l10n.radarGlobalOutlineHint,
+                  tooltip: l10n.radarGlobalOutlineHint,
+                  onTap: () => layer.setShowGlobalOutline(!showGlobal),
+                ),
+                const MapMenuDivider(),
+                SectionHeader(l10n.mapOverlaySectionMap),
+                MapTownLabelsRow(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// The satellite layer's settings dropdown for channels with no colour style
+/// (named products and the reflectance bands, whose only rendering is
+/// grayscale): the 國界 toggle plus the shared township-name setting — the
+/// same "overlay options" affordance as every other layer, so B01 needs no
+/// special-casing in the scaffold.
+class SatelliteReferenceMenu extends StatelessWidget {
+  const SatelliteReferenceMenu({
+    super.key,
+    required this.layer,
+    required this.showTownLabels,
+    required this.onShowTownLabelsChanged,
+  });
+
+  final SatelliteMapLayer layer;
+  final ValueListenable<bool> showTownLabels;
+  final ValueChanged<bool> onShowTownLabelsChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: Listenable.merge([layer.showGlobalOutline, showTownLabels]),
+      builder: (context, _) {
+        final showGlobal = layer.showGlobalOutline.value;
+        final showLabels = showTownLabels.value;
+        return MenuAnchor(
+          alignmentOffset: const Offset(0, 4),
+          style: MapChipButton.menuStyle(context),
+          builder: (context, controller, _) => MapChipButton(
+            icon: Icons.tune,
+            tooltip: l10n.mapOverlaySectionReference,
+            // The dot marks "not the defaults". 國界 ships off and labels on,
+            // so it lights up when either has moved.
+            active: showGlobal || !showLabels,
+            onTap: () =>
+                controller.isOpen ? controller.close() : controller.open(),
+          ),
+          menuChildren: [
+            MapMenuScrollView(
+              children: [
+                SectionHeader(l10n.mapOverlaySectionReference),
+                MapMenuToggleRow(
+                  selected: showGlobal,
+                  icon: Icons.public_outlined,
+                  title: l10n.radarGlobalOutline,
+                  subtitle: l10n.radarGlobalOutlineHint,
+                  tooltip: l10n.radarGlobalOutlineHint,
+                  onTap: () => layer.setShowGlobalOutline(!showGlobal),
                 ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),

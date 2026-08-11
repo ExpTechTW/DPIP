@@ -52,7 +52,7 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
-  testWidgets('the chip opens a menu carrying all four overlay toggles', (
+  testWidgets('the chip opens a menu carrying all five overlay toggles', (
     tester,
   ) async {
     _useTallSurface(tester);
@@ -66,6 +66,7 @@ void main() {
     await tester.tap(find.byType(MapChipButton));
     await tester.pumpAndSettle();
 
+    expect(find.text(l10n.radarGlobalOutline), findsOneWidget);
     expect(find.text(l10n.radarScanRange), findsOneWidget);
     expect(find.text(l10n.radarCountyOutline), findsOneWidget);
     expect(find.text(l10n.radarTownOutline), findsOneWidget);
@@ -74,9 +75,28 @@ void main() {
     // chrome first, then the base-map settings.
     expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
     expect(find.text(l10n.mapOverlaySectionMap), findsOneWidget);
-    // All four ship on, so every box starts ticked.
+    // Reference chrome (scan range, county, town) and the name toggle ship
+    // on; the national border ships off.
     expect(find.byIcon(Icons.check_box), findsNWidgets(4));
-    expect(find.byIcon(Icons.check_box_outline_blank), findsNothing);
+    expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+  });
+
+  testWidgets('tapping the national-border row turns it on', (tester) async {
+    _useTallSurface(tester);
+    final layer = RadarMapLayer(_FakeRadarRepository());
+    await tester.pumpWidget(_wrap(layer));
+
+    final l10n = await _l10n();
+    expect(layer.showGlobalOutline.value, isFalse);
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.radarGlobalOutline));
+    await tester.pumpAndSettle();
+
+    expect(layer.showGlobalOutline.value, isTrue);
+    // Independent controls: one must not drag the others with it.
+    expect(layer.showCountyOutline.value, isTrue);
+    expect(layer.showTownOutline.value, isTrue);
   });
 
   testWidgets('tapping the coverage row turns it off', (tester) async {

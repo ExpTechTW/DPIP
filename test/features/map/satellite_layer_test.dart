@@ -74,7 +74,47 @@ void main() {
     },
   );
 
-  test('bright yellow outlines are added once and removed on clear', () async {
+  test(
+    'bright yellow county and town outlines are added once and removed on clear',
+    () async {
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(_ids(5)),
+        channel: SatelliteChannel.irClean,
+      );
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[2]);
+      await layer.show(controller, frames[0]);
+
+      expect(
+        controller.calls
+            .where((c) => c == 'addLineLayer:$satelliteCountyOutlineLayerId')
+            .length,
+        1,
+        reason: 'a second settle must not re-add the outlines',
+      );
+      expect(
+        controller.calls,
+        isNot(contains('addLineLayer:$satelliteGlobalOutlineLayerId')),
+        reason: 'the 國界 border ships off by default',
+      );
+
+      controller.calls.clear();
+      await layer.clear(controller);
+      expect(
+        controller.calls,
+        containsAll([
+          'removeLayer:$satelliteTownOutlineLayerId',
+          'removeLayer:$satelliteCountyOutlineLayerId',
+          'removeLayer:$satelliteGlobalOutlineLayerId',
+        ]),
+      );
+    },
+  );
+
+  test('the 國界 border draws only when asked', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
@@ -84,25 +124,25 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[2]);
-    await layer.show(controller, frames[0]);
+    controller.calls.clear();
 
+    layer.setShowGlobalOutline(true);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
     expect(
-      controller.calls
-          .where((c) => c == 'addLineLayer:$satelliteGlobalOutlineLayerId')
-          .length,
-      1,
-      reason: 'a second settle must not re-add the outlines',
+      controller.calls,
+      contains('addLineLayer:$satelliteGlobalOutlineLayerId'),
     );
 
     controller.calls.clear();
-    await layer.clear(controller);
+    layer.setShowGlobalOutline(false);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
     expect(
       controller.calls,
-      containsAll([
-        'removeLayer:$satelliteTownOutlineLayerId',
-        'removeLayer:$satelliteCountyOutlineLayerId',
-        'removeLayer:$satelliteGlobalOutlineLayerId',
-      ]),
+      contains('removeLayer:$satelliteGlobalOutlineLayerId'),
     );
   });
 

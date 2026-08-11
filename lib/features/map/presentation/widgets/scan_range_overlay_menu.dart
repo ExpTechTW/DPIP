@@ -43,6 +43,7 @@ class ScanRangeOverlayMenu extends StatelessWidget {
       listenable: Listenable.merge([layer.chromeListenable, showTownLabels]),
       builder: (context, _) {
         final showRange = layer.showScanRange.value;
+        final showGlobal = layer.showGlobalOutline.value;
         final showCounty = layer.showCountyOutline.value;
         final showTown = layer.showTownOutline.value;
         final showLabels = showTownLabels.value;
@@ -52,9 +53,15 @@ class ScanRangeOverlayMenu extends StatelessWidget {
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,
             tooltip: tooltip,
-            // The dot marks "not the defaults". All four ship on, so it
-            // lights up when one has been switched *off*.
-            active: !showRange || !showCounty || !showTown || !showLabels,
+            // The dot marks "not the defaults". The reference toggles ship on
+            // and 國界 ships off, so it lights up when one has moved from its
+            // default.
+            active:
+                !showRange ||
+                showGlobal ||
+                !showCounty ||
+                !showTown ||
+                !showLabels,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -62,6 +69,14 @@ class ScanRangeOverlayMenu extends StatelessWidget {
             MapMenuScrollView(
               children: [
                 SectionHeader(l10n.mapOverlaySectionReference),
+                MapMenuToggleRow(
+                  selected: showGlobal,
+                  icon: Icons.public_outlined,
+                  title: l10n.radarGlobalOutline,
+                  subtitle: l10n.radarGlobalOutlineHint,
+                  tooltip: l10n.radarGlobalOutlineHint,
+                  onTap: () => layer.setShowGlobalOutline(!showGlobal),
+                ),
                 MapMenuToggleRow(
                   selected: showRange,
                   icon: Icons.crop_free_outlined,

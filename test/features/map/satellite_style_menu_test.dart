@@ -112,7 +112,7 @@ void main() {
     },
   );
 
-  testWidgets('a named product offers no style menu (scaffold falls back)', (
+  testWidgets('a named product offers the reference menu, not the style menu', (
     tester,
   ) async {
     useTallSurface(tester);
@@ -127,26 +127,27 @@ void main() {
       onShowTownLabelsChanged: (_) {},
       onReloadActive: () async {},
     );
-    expect(chrome, isA<SizedBox>());
+    expect(chrome, isA<SatelliteReferenceMenu>());
   });
 
-  testWidgets('a reflectance band offers no style menu (grayscale only)', (
-    tester,
-  ) async {
-    useTallSurface(tester);
-    final layer = SatelliteMapLayer(
-      _FakeSatelliteRepository(),
-      channel: SatelliteChannel.visibleBlue,
-    );
-    await tester.pumpWidget(const MaterialApp(home: Scaffold()));
-    final chrome = layer.buildTopTrailingChrome(
-      tester.element(find.byType(Scaffold)),
-      showTownLabels: ValueNotifier(true),
-      onShowTownLabelsChanged: (_) {},
-      onReloadActive: () async {},
-    );
-    expect(chrome, isA<SizedBox>());
-  });
+  testWidgets(
+    'a reflectance band offers the reference menu, not the style menu',
+    (tester) async {
+      useTallSurface(tester);
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(),
+        channel: SatelliteChannel.visibleBlue,
+      );
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+      final chrome = layer.buildTopTrailingChrome(
+        tester.element(find.byType(Scaffold)),
+        showTownLabels: ValueNotifier(true),
+        onShowTownLabelsChanged: (_) {},
+        onReloadActive: () async {},
+      );
+      expect(chrome, isA<SatelliteReferenceMenu>());
+    },
+  );
 
   testWidgets('a thermal band offers the style menu', (tester) async {
     useTallSurface(tester);

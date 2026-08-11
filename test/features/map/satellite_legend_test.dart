@@ -28,9 +28,11 @@ void main() {
       );
 
       final l10n = await _l10n();
-      // JMA convention: 190 K cold (white) → 320 K warm (black).
-      expect(find.text('190 K'), findsOneWidget);
-      expect(find.text('320 K'), findsOneWidget);
+      // JMA convention: 190 K cold (white) → 320 K warm (black); the unit
+      // sits below the scale, not after every value.
+      expect(find.text('190'), findsOneWidget);
+      expect(find.text('320'), findsOneWidget);
+      expect(find.text(l10n.mapLegendUnit('K')), findsOneWidget);
       // Every channel shares the bright-yellow country/county and dark-yellow
       // township frame key.
       expect(find.text(l10n.mapLayerSatelliteGlobalOutline), findsOneWidget);
@@ -44,15 +46,15 @@ void main() {
     await tester.pumpWidget(
       _wrap(SatelliteLegend(channel: SatelliteChannel.irClean, style: style)),
     );
-    expect(find.text('190 K'), findsOneWidget);
+    expect(find.text('190'), findsOneWidget);
 
     style.value = SatelliteStyle.jma;
     await tester.pumpAndSettle();
 
     // The cloud-top enhancement colours only the coldest tops (below −40 °C).
-    expect(find.text('190 K'), findsNothing);
-    expect(find.text('-45 °C'), findsOneWidget);
-    expect(find.text('-92 °C'), findsOneWidget);
+    expect(find.text('190'), findsNothing);
+    expect(find.text('-45'), findsOneWidget);
+    expect(find.text('-92'), findsOneWidget);
   });
 
   testWidgets('cloud mask legend lists the four categories', (tester) async {

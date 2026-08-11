@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/widgets/satellite_legend.dart';
 import 'package:dpip/features/map/presentation/widgets/satellite_style_menu.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
@@ -33,6 +34,52 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   final ValueNotifier<SatelliteStyle> style = ValueNotifier(
     SatelliteStyle.gray,
   );
+
+  /// Whether 國界 (world country borders) are redrawn above the imagery. Off
+  /// by default: on a Taiwan-focused surface the neighbours' outlines are
+  /// usually noise, and a reader who wants them can ask — the same default as
+  /// the radar / wind frame ([AdminOutlineChrome.showGlobalOutline]).
+  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(false);
+
+  bool _globalShown = false;
+
+  /// The live map controller, set on attach and cleared on detach — needed to
+  /// sync the 國界 toggle straight onto a mounted map.
+  @protected
+  MapLibreMapController? controller;
+
+  /// Turns the 國界 borders on/off, applying it to a live map immediately.
+  void setShowGlobalOutline(bool value) {
+    if (showGlobalOutline.value == value) return;
+    showGlobalOutline.value = value;
+    unawaited(_syncGlobalOutline());
+  }
+
+  /// Adds or removes the 國界 line to match [showGlobalOutline].
+  Future<void> _syncGlobalOutline() async {
+    final controller = this.controller;
+    if (controller == null) return;
+    final wanted = showGlobalOutline.value;
+    if (wanted == _globalShown) return;
+    _globalShown = wanted;
+    try {
+      if (wanted) {
+        await controller.addLineLayer(
+          'exptech',
+          satelliteGlobalOutlineLayerId,
+          LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
+          sourceLayer: 'global',
+          enableInteraction: false,
+        );
+      } else {
+        await controller.removeLayer(satelliteGlobalOutlineLayerId);
+      }
+    } catch (error, stackTrace) {
+      // A style reload can race the toggle; the next sync recovers.
+      _globalShown = !wanted;
+      Log.handle(error, stackTrace, 'Failed to sync the satellite outlines');
+    }
+  }
 
   /// Switches [style] and re-mounts the layer so the map picks up the new
   /// `?style=` tiles. The reload is the scaffold's job ([onReloadActive]); a
@@ -80,7 +127,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   /// Thermal bands offer the colour-style menu (and the township-label
   /// toggle); everything else — named products and the reflectance bands
   /// (B01–B06, whose only rendering is grayscale) — has no style to pick and
-  /// gets the scaffold's standalone labels menu instead.
+  /// gets the reference menu (國界 toggle + township labels) instead.
   @override
   Widget buildTopTrailingChrome(
     BuildContext context, {
@@ -88,10 +135,16 @@ class SatelliteMapLayer extends RasterTimelineLayer {
     required ValueChanged<bool> onShowTownLabelsChanged,
     required Future<void> Function() onReloadActive,
   }) {
-    if (!channel.isBand || !channel.isThermal) return const SizedBox.shrink();
-    return SatelliteStyleMenu(
+    if (channel.isBand && channel.isThermal) {
+      return SatelliteStyleMenu(
+        layer: this,
+        onReloadActive: onReloadActive,
+        showTownLabels: showTownLabels,
+        onShowTownLabelsChanged: onShowTownLabelsChanged,
+      );
+    }
+    return SatelliteReferenceMenu(
       layer: this,
-      onReloadActive: onReloadActive,
       showTownLabels: showTownLabels,
       onShowTownLabelsChanged: onShowTownLabelsChanged,
     );
@@ -99,24 +152,30 @@ class SatelliteMapLayer extends RasterTimelineLayer {
 
   @override
   Future<void> onAttached(MapLibreMapController controller) async {
+    this.controller = controller;
     try {
-      // Country/global edges + county frame in bright yellow, township mesh in
-      // dark yellow — the hue set that stays legible on imagery which is
-      // overall dark. Country + county share the same colour because both are
-      // the "which administrative unit" frame.
-      for (final (layerId, sourceLayer, color, width) in const [
-        (satelliteGlobalOutlineLayerId, 'global', satelliteOutlineColor, 1.0),
-        (satelliteCountyOutlineLayerId, 'city', satelliteOutlineColor, 1.0),
-        (satelliteTownOutlineLayerId, 'town', satelliteTownOutlineColor, 0.7),
-      ]) {
-        await controller.addLineLayer(
-          'exptech',
-          layerId,
-          LineLayerProperties(lineColor: color, lineWidth: width),
-          sourceLayer: sourceLayer,
-          enableInteraction: false,
-        );
-      }
+      // County frame in bright yellow, township mesh in dark yellow — the hue
+      // set that stays legible on imagery which is overall dark. The 國界
+      // border is the [showGlobalOutline] toggle (off by default), so only the
+      // two admin frames are drawn unconditionally.
+      await controller.addLineLayer(
+        'exptech',
+        satelliteCountyOutlineLayerId,
+        LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
+        sourceLayer: 'city',
+        enableInteraction: false,
+      );
+      await controller.addLineLayer(
+        'exptech',
+        satelliteTownOutlineLayerId,
+        LineLayerProperties(
+          lineColor: satelliteTownOutlineColor,
+          lineWidth: 0.7,
+        ),
+        sourceLayer: 'town',
+        enableInteraction: false,
+      );
+      await _syncGlobalOutline();
     } catch (_) {
       // Half-added outlines are worse than none — roll back and carry on.
       await onDetached(controller);
@@ -125,10 +184,12 @@ class SatelliteMapLayer extends RasterTimelineLayer {
 
   @override
   Future<void> onDetached(MapLibreMapController controller) async {
+    this.controller = null;
+    _globalShown = false;
     for (final layerId in const [
-      satelliteTownOutlineLayerId,
-      satelliteCountyOutlineLayerId,
       satelliteGlobalOutlineLayerId,
+      satelliteCountyOutlineLayerId,
+      satelliteTownOutlineLayerId,
     ]) {
       try {
         await controller.removeLayer(layerId);
@@ -137,8 +198,11 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   }
 
   @override
-  Widget buildLegend(BuildContext context) =>
-      SatelliteLegend(channel: channel, style: style);
+  Widget buildLegend(BuildContext context) => SatelliteLegend(
+    channel: channel,
+    style: style,
+    showGlobal: showGlobalOutline,
+  );
 }
 
 /// Localised picker label for a satellite [channel] — the `ひまわり <name>`(B##)

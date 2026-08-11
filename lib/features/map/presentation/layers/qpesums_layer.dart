@@ -1,3 +1,4 @@
+import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/scan_range_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
@@ -18,7 +19,8 @@ import 'package:flutter/material.dart';
 /// the radar's scan-range geometry — and, like radar, it redraws its own
 /// scan-range outline plus county/town borders **over** the raster
 /// ([ScanRangeOverlayChrome]), switchable from its options chip.
-class QpesumsMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
+class QpesumsMapLayer extends RasterTimelineLayer
+    with AdminOutlineChrome, ScanRangeOverlayChrome {
   QpesumsMapLayer(QpesumsRepository super.repository);
 
   /// Distinct from radar's ids: both layers can be on the map at once, and each

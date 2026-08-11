@@ -1,3 +1,4 @@
+import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/radar_overlay_menu.dart';
@@ -19,7 +20,8 @@ import 'package:flutter/material.dart';
 /// layers ([ScanRangeOverlayChrome]). That is what makes them switchable at
 /// all: while they came through from underneath there was no way to get an
 /// uninterrupted raster.
-class RadarMapLayer extends RasterTimelineLayer with ScanRangeOverlayChrome {
+class RadarMapLayer extends RasterTimelineLayer
+    with AdminOutlineChrome, ScanRangeOverlayChrome {
   RadarMapLayer(RadarRepository super.repository);
 
   /// The radar composite's own ids — the default geometry and layer naming.

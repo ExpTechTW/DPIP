@@ -19,24 +19,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The satellite layer's legend card, rebuilt when the band's [style] changes
-/// (grayscale vs cloud-top vs Dvorak are three different keys).
+/// (grayscale vs cloud-top vs Dvorak are three different keys) or the 國界
+/// toggle flips (its legend row follows the map line).
 class SatelliteLegend extends StatelessWidget {
   const SatelliteLegend({
     super.key,
     required this.channel,
     required this.style,
+    this.showGlobal,
   });
 
   final SatelliteChannel channel;
   final ValueListenable<SatelliteStyle> style;
+
+  /// Whether 國界 borders are currently on the map — null keeps the row shown
+  /// (a standalone legend with no live toggle).
+  final ValueListenable<bool>? showGlobal;
 
   static const Color _county = Color(0xFFFFD400);
   static const Color _town = Color(0xFFB79A00);
 
   @override
   Widget build(BuildContext context) {
+    final showGlobal = this.showGlobal;
     return ListenableBuilder(
-      listenable: style,
+      listenable: Listenable.merge([style, ?showGlobal]),
       builder: (context, _) {
         final transparency = _transparencyNote(context);
         return MapLegendCard(
@@ -140,7 +147,6 @@ class SatelliteLegend extends StatelessWidget {
       SatelliteChannel.nirPhase ||
       SatelliteChannel.nirCloud => const ColorScaleLegend(
         unit: '%',
-        appendUnit: true,
         stops: [(0, '#000000'), (50, '#808080'), (100, '#FFFFFF')],
       ),
       // Thermal bands (B07–B16) take the selected [style].
@@ -170,7 +176,6 @@ class SatelliteLegend extends StatelessWidget {
       ),
       SatelliteChannel.watervapor => const ColorScaleLegend(
         unit: 'K',
-        appendUnit: true,
         stops: [(190, '#FFFFFF'), (235, '#7F7F7F'), (280, '#000000')],
       ),
       // Brightness-temperature differences: negative blue, zero transparent
@@ -183,13 +188,11 @@ class SatelliteLegend extends StatelessWidget {
       SatelliteChannel.btdOzone => _diverging(-41.5, 4.3),
       SatelliteChannel.cloudtop => const ColorScaleLegend(
         unit: 'K',
-        appendUnit: true,
         stops: [(190, '#FFFFFF'), (245, '#7F7F7F'), (300, '#000000')],
       ),
       SatelliteChannel.cloudmask => _cloudMask(l10n),
       SatelliteChannel.sst => const ColorScaleLegend(
         unit: '°C',
-        appendUnit: true,
         stops: [
           (-2, '#3C1478'),
           (3, '#2846C8'),
@@ -203,17 +206,14 @@ class SatelliteLegend extends StatelessWidget {
       ),
       SatelliteChannel.ndvi => const ColorScaleLegend(
         unit: 'NDVI',
-        appendUnit: true,
         stops: [(0, '#C8AF6E'), (0.5, '#5F8A3A'), (1, '#196A23')],
       ),
       SatelliteChannel.ndwi => const ColorScaleLegend(
         unit: 'NDWI',
-        appendUnit: true,
         stops: [(0, '#78BEE8'), (0.5, '#3C7FD0'), (1, '#0A3CB8')],
       ),
       SatelliteChannel.mndwi => const ColorScaleLegend(
         unit: 'MNDWI',
-        appendUnit: true,
         stops: [(0, '#78BEE8'), (0.5, '#3C7FD0'), (1, '#0A3CB8')],
       ),
     };
@@ -225,12 +225,10 @@ class SatelliteLegend extends StatelessWidget {
     return switch (style.value) {
       SatelliteStyle.gray => const ColorScaleLegend(
         unit: 'K',
-        appendUnit: true,
         stops: [(190, '#FFFFFF'), (255, '#7F7F7F'), (320, '#000000')],
       ),
       SatelliteStyle.jma => const ColorScaleLegend(
         unit: '°C',
-        appendUnit: true,
         stops: [
           (-45, '#7891D2'),
           (-52, '#2D55CD'),
@@ -272,7 +270,6 @@ class SatelliteLegend extends StatelessWidget {
   /// negative, near-zero the basemap, red positive.
   ColorScaleLegend _diverging(double lo, double hi) => ColorScaleLegend(
     unit: 'K',
-    appendUnit: true,
     stops: [(lo, '#1E5AEB'), (0, '#E8ECF2'), (hi, '#E61E14')],
   );
 
@@ -300,15 +297,17 @@ class SatelliteLegend extends StatelessWidget {
 
   /// The border reference every channel shares — bright-yellow country and
   /// county frame, dark-yellow township mesh, matching [SatelliteMapLayer]'s
-  /// runtime line layers exactly.
+  /// runtime line layers exactly. The 國界 row hides when the toggle is off, so
+  /// the legend never names a line that is not on the map.
   Widget _boundaries(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return SymbolLegend(
       items: [
-        SymbolLegendItem(
-          swatch: const LineSwatch(color: _county, width: 1.0),
-          label: l10n.mapLayerSatelliteGlobalOutline,
-        ),
+        if (showGlobal?.value ?? true)
+          SymbolLegendItem(
+            swatch: const LineSwatch(color: _county, width: 1.0),
+            label: l10n.mapLayerSatelliteGlobalOutline,
+          ),
         SymbolLegendItem(
           swatch: const LineSwatch(color: _county, width: 1.0),
           label: l10n.radarCountyOutline,
