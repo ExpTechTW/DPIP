@@ -657,6 +657,72 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteMndwi => 'ひまわり MNDWI';
 
   @override
+  String get mapLayerSatelliteGlobalOutline => '国境線';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA レシピ)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴れ';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => 'おそらく晴れ';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => 'おそらく雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴れ(暖域) = 透明、地図が透ける';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率・夜間 = 透明、地図が透ける';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '差ゼロ = 透明(信号なし)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明、地図が透ける';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => 'データなし(陸上) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(植生なし)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(水域なし)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴れ = 透明、地図が透ける';
+
+  @override
+  String get mapLayerStyleSection => '色調';
+
+  @override
+  String get mapLayerStyleTooltip => '色調';
+
+  @override
+  String get mapLayerStyleGray => 'グレースケール（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '気象庁の赤外画像の慣例：温度が低いほど白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => 'グレースケールをベースに −40 °C 以下を着色し、雲頂高度を強調';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD カーブ——熱帯低気圧の強度解析に使う階段グレースケール';
+
+  @override
   String get mapLayerQpesums => '1時間降水量予報';
 
   @override

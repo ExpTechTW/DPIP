@@ -1311,6 +1311,138 @@ abstract class AppLocalizations {
   /// **'Himawari MNDWI'**
   String get mapLayerSatelliteMndwi;
 
+  /// Satellite legend row: the country/global border, drawn bright yellow over the imagery
+  ///
+  /// In en, this message translates to:
+  /// **'Country border'**
+  String get mapLayerSatelliteGlobalOutline;
+
+  /// Satellite legend note for the RGB-recipe products (True Color, Ash, …) that carry no single numerical scale
+  ///
+  /// In en, this message translates to:
+  /// **'RGB composite (JMA recipe)'**
+  String get mapLayerSatelliteRgbComposite;
+
+  /// Cloud-mask category: clear sky, transparent on the map
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get mapLayerSatelliteCloudClear;
+
+  /// Cloud-mask category: probably clear
+  ///
+  /// In en, this message translates to:
+  /// **'Probably clear'**
+  String get mapLayerSatelliteCloudProbablyClear;
+
+  /// Cloud-mask category: probably cloudy
+  ///
+  /// In en, this message translates to:
+  /// **'Probably cloudy'**
+  String get mapLayerSatelliteCloudProbablyCloudy;
+
+  /// Cloud-mask category: cloudy
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get mapLayerSatelliteCloudCloudy;
+
+  /// Satellite legend note: on the IR grayscale/enhancements the warm end is clear sky, drawn transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky (warm end) = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentWarm;
+
+  /// Satellite legend note: on the reflectance bands a dark or night pixel is transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Low reflectance / night = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentReflectance;
+
+  /// Satellite legend note: on the brightness-temperature-difference layers a near-zero difference is transparent — no absorber is present
+  ///
+  /// In en, this message translates to:
+  /// **'Zero difference = transparent (no signal)'**
+  String get mapLayerSatelliteTransparentZero;
+
+  /// Satellite legend note: the daytime RGB recipes fade out across the terminator and are transparent at night
+  ///
+  /// In en, this message translates to:
+  /// **'Night = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentNight;
+
+  /// Satellite legend note: the SST retrieval has no value over land, drawn transparent
+  ///
+  /// In en, this message translates to:
+  /// **'No data (land) = transparent'**
+  String get mapLayerSatelliteTransparentNoData;
+
+  /// Satellite legend note: NDVI below the bare-soil threshold is transparent
+  ///
+  /// In en, this message translates to:
+  /// **'Below 0.1 = transparent (no vegetation)'**
+  String get mapLayerSatelliteTransparentNoVegetation;
+
+  /// Satellite legend note: NDWI/MNDWI at zero or below is transparent — no water signal
+  ///
+  /// In en, this message translates to:
+  /// **'≤ 0 = transparent (no water)'**
+  String get mapLayerSatelliteTransparentNoWater;
+
+  /// Satellite legend note: the cloud-mask clear category is transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentClear;
+
+  /// Section header of the satellite band colour-style menu on the map
+  ///
+  /// In en, this message translates to:
+  /// **'Colour style'**
+  String get mapLayerStyleSection;
+
+  /// Tooltip of the colour-style chip beside the layer switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Colour style'**
+  String get mapLayerStyleTooltip;
+
+  /// Colour-style option: JMA grayscale, the default radar-image convention
+  ///
+  /// In en, this message translates to:
+  /// **'Grayscale (JMA)'**
+  String get mapLayerStyleGray;
+
+  /// Explains the JMA grayscale band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'JMA grayscale — colder is whiter'**
+  String get mapLayerStyleGrayTooltip;
+
+  /// Colour-style option: JMA cloud-top enhancement, tinted below −40 °C
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-top enhancement (JMA)'**
+  String get mapLayerStyleJma;
+
+  /// Explains the JMA cloud-top enhancement band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'Grayscale base, tinted below −40 °C to highlight cloud-top height'**
+  String get mapLayerStyleJmaTooltip;
+
+  /// Colour-style option: Dvorak BD curve stepped grayscale
+  ///
+  /// In en, this message translates to:
+  /// **'Dvorak BD'**
+  String get mapLayerStyleBd;
+
+  /// Explains the Dvorak BD band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis'**
+  String get mapLayerStyleBdTooltip;
+
   /// Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker
   ///
   /// In en, this message translates to:

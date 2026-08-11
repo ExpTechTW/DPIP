@@ -551,13 +551,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
 
   @override
-  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
 
   @override
-  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
 
   @override
-  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
 
   @override
   String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
@@ -653,7 +653,73 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
 
   @override
-  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';
@@ -2182,13 +2248,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 红外线(B13)';
 
   @override
-  String get mapLayerSatelliteB01 => 'ひまわり 可见光蓝(B01)';
+  String get mapLayerSatelliteB01 => 'ひまわり 可见光-蓝(B01)';
 
   @override
-  String get mapLayerSatelliteB02 => 'ひまわり 可见光绿(B02)';
+  String get mapLayerSatelliteB02 => 'ひまわり 可见光-绿(B02)';
 
   @override
-  String get mapLayerSatelliteB03 => 'ひまわり 可见光红(B03)';
+  String get mapLayerSatelliteB03 => 'ひまわり 可见光-红(B03)';
 
   @override
   String get mapLayerSatelliteB04 => 'ひまわり 近红外(B04)';
@@ -2284,7 +2350,73 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerSatelliteNdwi => 'ひまわり 水体指数';
 
   @override
-  String get mapLayerSatelliteMndwi => 'ひまわり 水体指数';
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水体指数';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '国界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有云';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有云';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜间 = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(无信号)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜间 = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '无资料(陆地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(无植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(无水体)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,显示底图';
+
+  @override
+  String get mapLayerStyleSection => '显示样式';
+
+  @override
+  String get mapLayerStyleTooltip => '显示样式';
+
+  @override
+  String get mapLayerStyleGray => '灰度（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '气象厅灰度惯例：温度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '云顶强调（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰阶为底，−40 °C 以下上色，凸显云顶高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲线——热带气旋强度分析的阶梯灰度';
 
   @override
   String get mapLayerQpesums => '未来 1 小时降水预报';
@@ -3813,13 +3945,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
 
   @override
-  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
 
   @override
-  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
 
   @override
-  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
 
   @override
   String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
@@ -3915,7 +4047,73 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
 
   @override
-  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';
@@ -5444,13 +5642,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
 
   @override
-  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
 
   @override
-  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
 
   @override
-  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
 
   @override
   String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
@@ -5546,7 +5744,73 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
 
   @override
-  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';

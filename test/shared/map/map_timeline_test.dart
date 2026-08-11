@@ -100,4 +100,31 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'switching to another layer\u0027s frames re-centres on its newest frame',
+    (tester) async {
+      final first = _frames(10);
+      await tester.pumpWidget(
+        _wrap(frames: first, selectedIndex: 9, onSelected: (_) {}),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('08:30'), findsWidgets); // newest of the first set
+
+      // The scaffold hands a brand-new list instance (the newly selected
+      // layer's frames) plus that layer's newest index.
+      final second = _frames(6);
+      await tester.pumpWidget(
+        _wrap(frames: second, selectedIndex: 5, onSelected: (_) {}),
+      );
+      await tester.pumpAndSettle();
+
+      // The ruler re-labelled and re-centred — the old set is gone and the
+      // new newest frame sits under the scrubber as "now".
+      expect(find.text('Now'), findsOneWidget);
+      expect(find.text('07:50'), findsWidgets); // 07:00 + 5×10 min
+      expect(find.text('08:30'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

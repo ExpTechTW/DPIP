@@ -926,6 +926,94 @@
   "@mapLayerSatelliteMndwi": {
     "description": "Himawari modified normalised-difference water-index layer name"
   },
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "@mapLayerSatelliteGlobalOutline": {
+    "description": "Satellite legend row: the country/global border, drawn bright yellow over the imagery"
+  },
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "@mapLayerSatelliteRgbComposite": {
+    "description": "Satellite legend note for the RGB-recipe products (True Color, Ash, …) that carry no single numerical scale"
+  },
+  "mapLayerSatelliteCloudClear": "Clear",
+  "@mapLayerSatelliteCloudClear": {
+    "description": "Cloud-mask category: clear sky, transparent on the map"
+  },
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "@mapLayerSatelliteCloudProbablyClear": {
+    "description": "Cloud-mask category: probably clear"
+  },
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "@mapLayerSatelliteCloudProbablyCloudy": {
+    "description": "Cloud-mask category: probably cloudy"
+  },
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "@mapLayerSatelliteCloudCloudy": {
+    "description": "Cloud-mask category: cloudy"
+  },
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentWarm": {
+    "description": "Satellite legend note: on the IR grayscale/enhancements the warm end is clear sky, drawn transparent so the basemap shows"
+  },
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentReflectance": {
+    "description": "Satellite legend note: on the reflectance bands a dark or night pixel is transparent so the basemap shows"
+  },
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "@mapLayerSatelliteTransparentZero": {
+    "description": "Satellite legend note: on the brightness-temperature-difference layers a near-zero difference is transparent — no absorber is present"
+  },
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentNight": {
+    "description": "Satellite legend note: the daytime RGB recipes fade out across the terminator and are transparent at night"
+  },
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "@mapLayerSatelliteTransparentNoData": {
+    "description": "Satellite legend note: the SST retrieval has no value over land, drawn transparent"
+  },
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "@mapLayerSatelliteTransparentNoVegetation": {
+    "description": "Satellite legend note: NDVI below the bare-soil threshold is transparent"
+  },
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "@mapLayerSatelliteTransparentNoWater": {
+    "description": "Satellite legend note: NDWI/MNDWI at zero or below is transparent — no water signal"
+  },
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentClear": {
+    "description": "Satellite legend note: the cloud-mask clear category is transparent so the basemap shows"
+  },
+  "mapLayerStyleSection": "Colour style",
+  "@mapLayerStyleSection": {
+    "description": "Section header of the satellite band colour-style menu on the map"
+  },
+  "mapLayerStyleTooltip": "Colour style",
+  "@mapLayerStyleTooltip": {
+    "description": "Tooltip of the colour-style chip beside the layer switcher"
+  },
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "@mapLayerStyleGray": {
+    "description": "Colour-style option: JMA grayscale, the default radar-image convention"
+  },
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "@mapLayerStyleGrayTooltip": {
+    "description": "Explains the JMA grayscale band rendering"
+  },
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "@mapLayerStyleJma": {
+    "description": "Colour-style option: JMA cloud-top enhancement, tinted below −40 °C"
+  },
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "@mapLayerStyleJmaTooltip": {
+    "description": "Explains the JMA cloud-top enhancement band rendering"
+  },
+  "mapLayerStyleBd": "Dvorak BD",
+  "@mapLayerStyleBd": {
+    "description": "Colour-style option: Dvorak BD curve stepped grayscale"
+  },
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "@mapLayerStyleBdTooltip": {
+    "description": "Explains the Dvorak BD band rendering"
+  },
   "mapLayerQpesums": "1h Precipitation Forecast",
   "@mapLayerQpesums": {
     "description": "Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker"

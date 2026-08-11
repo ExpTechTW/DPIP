@@ -13,6 +13,9 @@ class _FakeSatelliteRepository extends FakeRasterFrameSource
   @override
   String tileUrl(String frame) =>
       'https://host/api/v2/tiles/satellite/$frame/{z}/{x}/{y}.webp';
+
+  @override
+  void setStyle(String? style) {}
 }
 
 void main() {
@@ -71,7 +74,7 @@ void main() {
     },
   );
 
-  test('dark boundary outlines are added once and removed on clear', () async {
+  test('bright yellow outlines are added once and removed on clear', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
@@ -96,6 +99,7 @@ void main() {
     expect(
       controller.calls,
       containsAll([
+        'removeLayer:$satelliteTownOutlineLayerId',
         'removeLayer:$satelliteCountyOutlineLayerId',
         'removeLayer:$satelliteGlobalOutlineLayerId',
       ]),

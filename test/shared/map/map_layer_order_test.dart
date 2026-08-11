@@ -1,6 +1,7 @@
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_category.dart';
 import 'package:dpip/shared/map/map_layer_order.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Minimal [MapLayer] for ordering tests — only [id] matters.
@@ -9,6 +10,9 @@ class _FakeLayer implements MapLayer {
 
   @override
   final String id;
+
+  @override
+  String? subtitle(BuildContext context) => null;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -657,6 +657,73 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteMndwi => '히마와리 MNDWI';
 
   @override
+  String get mapLayerSatelliteGlobalOutline => '국경선';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 합성(JMA 레시피)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '맑음';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '아마 맑음';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '아마 구름';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '구름';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '맑음(고온부) = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance =>
+      '낮은 반사율/야간 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '차이 0 = 투명(신호 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '야간 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '데이터 없음(육지) = 투명';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 투명(식생 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 투명(수역 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '맑음 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerStyleSection => '색상 스타일';
+
+  @override
+  String get mapLayerStyleTooltip => '색상 스타일';
+
+  @override
+  String get mapLayerStyleGray => '그레이스케일（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '기상청 적외 영상 관례：온도가 낮을수록 흰색';
+
+  @override
+  String get mapLayerStyleJma => '운정 강조（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일';
+
+  @override
   String get mapLayerQpesums => '1시간 강수 예보';
 
   @override

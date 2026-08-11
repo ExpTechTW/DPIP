@@ -8,16 +8,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Minimal [MapLayer] for switcher tests — identity + label only.
+/// Minimal [MapLayer] for switcher tests — identity + label (+ optional
+/// subtitle) only.
 class _FakeLayer implements MapLayer {
-  _FakeLayer(this.id, this._label);
+  _FakeLayer(this.id, this._label, [this._subtitle]);
 
   @override
   final String id;
   final String _label;
+  final String? _subtitle;
 
   @override
   String label(BuildContext context) => _label;
+
+  @override
+  String? subtitle(BuildContext context) => _subtitle;
 
   @override
   IconData get icon => Icons.layers_outlined;
@@ -31,7 +36,7 @@ void main() {
 
   final radar = _FakeLayer('radar', 'Radar echo');
   final qpesums = _FakeLayer('qpesums', 'Precip');
-  final satellite = _FakeLayer('satellite', 'Satellite IR');
+  final satellite = _FakeLayer('satellite', 'Satellite IR', 'B13 · 10.4 µm');
   final rain = _FakeLayer('rain', 'Rain');
   final typhoon = _FakeLayer('typhoon', 'Typhoon path');
   final layers = [radar, qpesums, satellite, rain, typhoon];
@@ -124,6 +129,14 @@ void main() {
       lessThan(topOf(tester, l10n.mapLayerCategorySatellite)),
     );
     expect(topOf(tester, 'Radar echo'), lessThan(topOf(tester, 'Precip')));
+    // A layer's subtitle sits under its label in the same tile.
+    expect(
+      find.descendant(
+        of: find.byType(ListView),
+        matching: find.text('B13 · 10.4 µm'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
