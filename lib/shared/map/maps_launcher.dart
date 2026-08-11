@@ -71,6 +71,24 @@ Future<bool> openInMapApp(MapApp app, MapLaunchTarget target) => launchUrl(
   mode: LaunchMode.externalApplication,
 );
 
+/// Dials [phone] in the platform's phone app via a `tel:` URI. Returns false
+/// when the device has no handler (no SIM / a desktop).
+///
+/// The string is a raw display number (`02-12345678`, `+886 9xx`), so it is
+/// stripped down to the characters a phone dialler accepts rather than handed
+/// to the OS verbatim — an encoded space or stray bracket is what turns a tap
+/// into "no app can open this".
+Future<bool> callPhoneNumber(String phone) {
+  final digits = phone.replaceAll(RegExp(r'[^\d+#*]'), '');
+  if (digits.isEmpty) return Future.value(false);
+  // `Uri.parse` keeps the extension marker (`#`/`*`) and `+` verbatim —
+  // `Uri(scheme: 'tel', path: …)` would percent-encode `#` into `%23`.
+  return launchUrl(
+    Uri.parse('tel:$digits'),
+    mode: LaunchMode.externalApplication,
+  );
+}
+
 /// One-tap open in the platform's home map app.
 Future<bool> openInDefaultMapApp(MapLaunchTarget target) =>
     openInMapApp(MapApp.ofPlatform(), target);
@@ -138,6 +156,28 @@ Future<MapApp?> showMapAppPicker(BuildContext context, MapLaunchTarget target) {
       ),
     ),
   );
+}
+
+/// The whole "open in a map app" flow: picker, then open, then report.
+///
+/// [showMapAppPicker] only *returns* the chosen app — opening it is this
+/// function's job, because a picker that forgets to open (as callers did when
+/// the sheet was first wired up) reads as "maps don't work" to a user who just
+/// picked one. Returns when the sheet was dismissed, the coordinates were
+/// copied, the app opened, or the open failed with a snackbar.
+Future<void> pickAndOpenMapApp(
+  BuildContext context,
+  MapLaunchTarget target,
+) async {
+  final app = await showMapAppPicker(context, target);
+  if (app == null || !context.mounted) return;
+  final opened = await openInMapApp(app, target);
+  if (!opened && context.mounted) {
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.mapAppOpenFailed(app.label(l10n)))),
+    );
+  }
 }
 
 String _enc(String s) => Uri.encodeComponent(s);
