@@ -275,13 +275,14 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   /// carrying information.
   Future<void> _restackOverlays(
     MapLibreMapController controller, {
-    String? code,
+    required String? code,
   }) async {
-    // The caller passes the *effective* code (GPS-aware). A radar refresh has no
-    // selection context, so it falls back to the last applied one — the outline
-    // must match what the camera is framing, never drift back to a stale code.
-    final subject = code ?? _appliedCode;
-    final wanted = backdropBoundaries(subject);
+    // The subject the frame is drawn for. Callers pass the *effective* code
+    // (GPS-aware): a deliberate `null` (GPS lost, or the nationwide view) must
+    // reach the outline layers unchanged — falling back to a stale code here
+    // would re-draw the previous township's mesh and purple frame. A radar
+    // refresh has no selection context, so it passes the last applied one.
+    final wanted = backdropBoundaries(code);
     // Bottom-up, so a later add lands above an earlier one: the coarse county
     // frame should win where the two run together along a coastline.
     for (final boundary in [AdminBoundary.town, AdminBoundary.county]) {
@@ -291,7 +292,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       }
     }
     // The selection is the point of the backdrop — always last, always on top.
-    await _addSelectedLayers(controller, _filterFor(_townCode(subject)));
+    await _addSelectedLayers(controller, _filterFor(_townCode(code)));
   }
 
   /// (Re)adds the purple selection outline on the vector `town` layer (filtered
@@ -348,7 +349,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         // are hairlines tuned for a bare basemap and they wash out under the
         // echo. [_restackOverlays] puts a legible set back over it.
       );
-      await _restackOverlays(controller);
+      // Re-stack the admin frame + selection over the fresh echo, keeping the
+      // subject that was last applied (a radar refresh has no selection context).
+      await _restackOverlays(controller, code: _appliedCode);
       _radarFrameOnMap = latest;
       _radarFrameEpoch = styleEpoch;
     });
