@@ -5,6 +5,7 @@ library;
 /// the matching `MapLayer.id` (`radar`, `monitor`, `dpm`, …).
 enum DefaultMapLayer {
   radar,
+  qpesums,
   satellite,
   lightning,
   typhoon,

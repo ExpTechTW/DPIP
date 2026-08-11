@@ -11,13 +11,11 @@ import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:dpip/core/error/result.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -25,7 +23,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// station dots (coloured by raw intensity `i`) on every ~1 Hz snapshot. Not
 /// tap- or timeline-driven; its "sheet" is a compact monitor panel showing the
 /// feed's freshness, and [buildLegend] shows the intensity scale.
-class RtsMapLayer implements MapLayer {
+class RtsMapLayer with MapLayerDefaults implements MapLayer {
   RtsMapLayer(this._feed, this._stationRepository);
 
   final RealtimeNotifier<Rts> _feed;
@@ -70,25 +68,6 @@ class RtsMapLayer implements MapLayer {
 
   @override
   double get bottomChromeFraction => RtsMonitorPanel.bottomStripFraction;
-
-  @override
-  double get mapMinZoom => 4;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -174,32 +153,7 @@ class RtsMapLayer implements MapLayer {
   );
 
   @override
-  Future<void> onMapTap(
-    LatLng latLng,
-    MapLibreMapController controller,
-  ) async {}
-
-  @override
   Widget buildSheet(BuildContext context) => RtsMonitorPanel(feed: _feed);
-
-  @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
-
-  @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
 
   @override
   Widget buildLegend(BuildContext context) => const MapLegendCard(
@@ -215,9 +169,6 @@ class RtsMapLayer implements MapLayer {
     await _removeFromMap(controller);
     _controller = null;
   }
-
-  @override
-  void selectFeature(String id) {}
 
   @override
   void onStyleReset() => _added = false;

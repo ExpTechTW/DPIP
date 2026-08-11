@@ -1,7 +1,7 @@
 {
   "@@locale": "zh_Hans",
   "languageName": "简体中文",
-  "navHome": "首页",
+  "navHome": "主页",
   "navEvents": "事件",
   "navMap": "地图",
   "navData": "资料",
@@ -150,15 +150,89 @@
   "homeForecastEmpty": "目前没有预报数据",
   "homeActiveEventsTitle": "生效中事件",
   "homeActiveEventsEmpty": "目前没有生效中的事件",
-  "homeRainTrendTitle": "近 1 小时降雨趋势",
+  "homeRainTrendTitle": "近 1 小时降水趋势",
+  "homeRainTrendMinute": "{minute}分",
+  "homeRainTrendUpdated": "更新 {time}",
+  "homeRainTrendNoData": "无资料",
+
+  "homeRainTrendScattered": "可能会有零星降雨",
+  "homeRainTrendLightSustained": "未来 1 小时会有持续小雨",
+  "homeRainTrendLightStopping": "预计 {minutes} 分钟后停止下小雨",
+  "homeRainTrendHeavySustained": "未来 1 小时会有持续大雨",
+  "homeRainTrendHeavyStopping": "预计 {minutes} 分钟后停止下大雨",
   "mapLayers": "图层",
+  "mapLayerOrderTitle": "调整图层顺序",
+  "mapLayerOrderReset": "恢复默认顺序",
   "mapLayerRadar": "雷达合成回波图",
-  "mapLayerSatellite": "ひまわり 红外线图",
+  "mapLayerSatellite": "ひまわり 红外线(B13)",
+  "mapLayerSatelliteB01": "ひまわり 可见光-蓝(B01)",
+  "mapLayerSatelliteB02": "ひまわり 可见光-绿(B02)",
+  "mapLayerSatelliteB03": "ひまわり 可见光-红(B03)",
+  "mapLayerSatelliteB04": "ひまわり 近红外(B04)",
+  "mapLayerSatelliteB05": "ひまわり 近红外(B05)",
+  "mapLayerSatelliteB06": "ひまわり 近红外(B06)",
+  "mapLayerSatelliteB07": "ひまわり 短波红外(B07)",
+  "mapLayerSatelliteB08": "ひまわり 上层水气(B08)",
+  "mapLayerSatelliteB09": "ひまわり 中层水气(B09)",
+  "mapLayerSatelliteB10": "ひまわり 低层水气(B10)",
+  "mapLayerSatelliteB11": "ひまわり 二氧化硫/云相(B11)",
+  "mapLayerSatelliteB12": "ひまわり 臭氧(B12)",
+  "mapLayerSatelliteB13": "ひまわり 红外线(B13)",
+  "mapLayerSatelliteB14": "ひまわり 长波红外线(B14)",
+  "mapLayerSatelliteB15": "ひまわり 长波红外线(B15)",
+  "mapLayerSatelliteB16": "ひまわり 二氧化碳(B16)",
+  "mapLayerSatelliteTruecolor": "ひまわり 真彩色",
+  "mapLayerSatelliteNaturalcolor": "ひまわり 自然色",
+  "mapLayerSatelliteAsh": "ひまわり 火山灰",
+  "mapLayerSatelliteDust": "ひまわり 沙尘",
+  "mapLayerSatelliteAirmass": "ひまわり 气团",
+  "mapLayerSatelliteNightmicrophysics": "ひまわり 夜间微物理",
+  "mapLayerSatelliteWatervapor": "ひまわり 水气",
+  "mapLayerSatelliteBtdSplit": "ひまわり 分割视窗",
+  "mapLayerSatelliteBtdFog": "ひまわり 夜间雾",
+  "mapLayerSatelliteBtdWvirw": "ひまわり 过冲云顶",
+  "mapLayerSatelliteBtdSo2": "ひまわり 二氧化硫/云相",
+  "mapLayerSatelliteBtdCo2": "ひまわり 卷云/云高",
+  "mapLayerSatelliteBtdOzone": "ひまわり 对流层顶",
+  "mapLayerSatelliteCloudtop": "ひまわり 云顶温度",
+  "mapLayerSatelliteCloudmask": "ひまわり 云遮罩",
+  "mapLayerSatelliteSst": "ひまわり 海表温度",
+  "mapLayerSatelliteNdvi": "ひまわり 植被指数",
+  "mapLayerSatelliteNdwi": "ひまわり 水体指数",
+  "mapLayerSatelliteMndwi": "ひまわり 改良水体指数",
+  "mapLayerSatelliteGlobalOutline": "国界",
+  "mapLayerSatelliteRgbComposite": "RGB 合成(JMA 配方)",
+  "mapLayerSatelliteCloudClear": "晴空",
+  "mapLayerSatelliteCloudProbablyClear": "可能晴空",
+  "mapLayerSatelliteCloudProbablyCloudy": "可能有云",
+  "mapLayerSatelliteCloudCloudy": "有云",
+  "mapLayerSatelliteTransparentWarm": "晴空(暖端) = 透明,显示底图",
+  "mapLayerSatelliteTransparentReflectance": "低反射率/夜间 = 透明,显示底图",
+  "mapLayerSatelliteTransparentZero": "零差值 = 透明(无信号)",
+  "mapLayerSatelliteTransparentNight": "夜间 = 透明,显示底图",
+  "mapLayerSatelliteTransparentNoData": "无资料(陆地) = 透明",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(无植被)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 透明(无水体)",
+  "mapLayerSatelliteTransparentClear": "晴空 = 透明,显示底图",
+  "mapLayerStyleSection": "显示样式",
+  "mapLayerStyleTooltip": "显示样式",
+  "mapLayerStyleGray": "灰度（JMA）",
+  "mapLayerStyleGrayTooltip": "气象厅灰度惯例：温度越低越白",
+  "mapLayerStyleJma": "云顶强调（JMA）",
+  "mapLayerStyleJmaTooltip": "灰阶为底，−40 °C 以下上色，凸显云顶高度",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD 曲线——热带气旋强度分析的阶梯灰度",
+  "mapLayerQpesums": "未来 1 小时降水预报",
   "mapLayerLightning": "闪电",
   "lightningLegendCg": "对地 · {minutes} 分钟内",
   "lightningLegendCc": "云间 · {minutes} 分钟内",
   "mapTimelineNow": "现在",
+  "mapTimelinePast": "历史",
+  "mapTimelineFuture": "未来",
   "mapTimelineObserved": "观测",
+  "mapTimelineForecast": "预报",
+  "mapTimelineDataTime": "资料时间 {time}",
+  "mapTimelineDataTime": "资料时间 {time}",
   "notifySettingsMenu": "通知设置",
   "notifyTitle": "通知",
   "notifyUnavailable": "推送通知尚未就绪，请稍后再试。",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "地图默认图层",
   "defaultMapLayerSubtitle": "打开地图标签页时显示此图层，底部导航栏图标与文字会一并更新。",
   "mapNavRadar": "雷达",
+  "mapNavQpesums": "预报",
   "mapNavSatellite": "卫星",
   "mapNavLightning": "闪电",
   "mapNavTyphoon": "台风",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "湿度",
   "mapLayerPressure": "气压",
   "mapLayerWind": "风向",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "雨量",
   "rainIntervalMenu": "累积时段",
   "rainIntervalNow": "今日",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "避难收容场所",
   "disasterMapOverlayRestroomTooltip": "显示公厕",
   "disasterMapOverlayShelterTooltip": "显示避难收容场所",
+  "dpmOpenInMaps": "打开地图",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app}（默认）",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "复制坐标",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "已复制坐标",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "无法打开 {app}",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "此设备无法拨打电话",
+
+  "mapOverlaySectionReference": "参考图层",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryTyphoon": "台风",
+  "mapLayerCategoryWeather": "气象观测",
+  "mapLayerCategorySatellite": "卫星",
+  "mapLayerCategoryRadar": "雷达",
+  "mapLayerCategoryLife": "生活",
+  "mapLayerCategoryForecast": "数值预报",  "mapOverlaySectionMap": "地图",
+  "rainIntervalSection": "统计时间",
+
+  "mapTownLabels": "乡镇名称",
+  "mapTownLabelsHint": "放大时显示乡镇名称",
+
   "dpmSheetEmpty": "点击地图上的标记查看详情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "厕所类型",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "图例",
   "mapLegendCollapse": "收起图例",
   "mapMyLocation": "我的位置",
+  "mapResetNorth": "回到正北",
   "typhoonLegendCircle15": "七级风暴风圈",
   "typhoonLegendCircle25": "十级风暴风圈",
   "typhoonLegendProbability": "侵袭概率",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "热带性低气压",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "热带性低气压 TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "过去移动方向",
   "typhoonLabelGaleAvg": "七级风平均暴风半径",
   "typhoonLabelGust": "瞬间最大阵风",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "土石流",
   "dpmDisasterTsunami": "海啸",
   "dpmDisasterSlope": "坡地灾害",
-  "dpmDisasterNuclear": "核子事故"
+  "dpmDisasterNuclear": "核子事故",
+  "skyTime": "天空时间",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "自动",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "黎明",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "日出",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "上午",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "正午",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "下午",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "黄金时刻",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "日落",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "暮色",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "夜晚",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "多云",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "阴天",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "下雪",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "沙尘",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "显示扫描范围",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "标示四座雷达实际观测到的范围。",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "框外空白代表未观测",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "雷达图层选项",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "县市界线",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "国界",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "各国国界外框",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "画在回波之上",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "让县市界线在雷达回波下仍然清楚。",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "乡镇界线",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "较细的分区",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "让乡镇界线在雷达回波下仍然清楚。",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "定量降水预报图层选项",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "风场预报图层选项",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "绘制于风场之上",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "各国国界外框",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "更细的网格",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

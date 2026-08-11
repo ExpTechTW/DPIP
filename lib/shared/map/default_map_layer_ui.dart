@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 /// Icons / labels shared by the bottom-nav Map tab and the settings picker.
 ///
 /// Lives in `shared/` so `app/shell` and `features/settings` don't each hardcode
-/// the 11-way switch (and so `core` stays Flutter-l10n free beyond ChangeNotifier).
+/// the per-layer switch (and so `core` stays Flutter-l10n free beyond
+/// ChangeNotifier).
 extension DefaultMapLayerUi on DefaultMapLayer {
   /// Outlined icon for inactive bottom-nav / list leading.
   IconData get icon => switch (this) {
     DefaultMapLayer.radar => Icons.radar_outlined,
+    DefaultMapLayer.qpesums => Icons.cloud_outlined,
     DefaultMapLayer.satellite => Icons.satellite_alt_outlined,
     DefaultMapLayer.lightning => Icons.bolt_outlined,
     DefaultMapLayer.typhoon => Icons.cyclone_outlined,
@@ -28,6 +30,7 @@ extension DefaultMapLayerUi on DefaultMapLayer {
   /// Filled icon for the selected bottom-nav destination.
   IconData get selectedIcon => switch (this) {
     DefaultMapLayer.radar => Icons.radar,
+    DefaultMapLayer.qpesums => Icons.cloud,
     DefaultMapLayer.satellite => Icons.satellite_alt,
     DefaultMapLayer.lightning => Icons.bolt,
     DefaultMapLayer.typhoon => Icons.cyclone,
@@ -43,6 +46,7 @@ extension DefaultMapLayerUi on DefaultMapLayer {
   /// Short bottom-nav / settings-picker label (not the long layer-switcher name).
   String label(AppLocalizations l10n) => switch (this) {
     DefaultMapLayer.radar => l10n.mapNavRadar,
+    DefaultMapLayer.qpesums => l10n.mapNavQpesums,
     DefaultMapLayer.satellite => l10n.mapNavSatellite,
     DefaultMapLayer.lightning => l10n.mapNavLightning,
     DefaultMapLayer.typhoon => l10n.mapNavTyphoon,

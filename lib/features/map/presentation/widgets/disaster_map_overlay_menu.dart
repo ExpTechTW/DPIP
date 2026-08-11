@@ -6,15 +6,24 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Compact icon chip that opens the DPM overlay menu (same chrome as typhoon).
 class DisasterMapOverlayMenu extends StatelessWidget {
-  const DisasterMapOverlayMenu({super.key, required this.layer});
+  const DisasterMapOverlayMenu({
+    super.key,
+    required this.layer,
+    required this.showTownLabels,
+    required this.onShowTownLabelsChanged,
+  });
 
   final DisasterMapLayer layer;
+  final ValueListenable<bool> showTownLabels;
+  final ValueChanged<bool> onShowTownLabelsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +31,13 @@ class DisasterMapOverlayMenu extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([
         for (final s in layer.subLayers) s.visible,
+        showTownLabels,
       ]),
       builder: (context, _) {
         // Highlight the chip when the default set is altered (a layer off).
-        final active = layer.subLayers.any((s) => !s.visible.value);
+        final active =
+            layer.subLayers.any((s) => !s.visible.value) ||
+            !showTownLabels.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -44,16 +56,27 @@ class DisasterMapOverlayMenu extends StatelessWidget {
             );
           },
           menuChildren: [
-            SectionHeader(l10n.disasterMapOverlaySectionLayers),
-            for (final sub in layer.subLayers)
-              _ToggleRow(
-                selected: sub.visible.value,
-                icon: sub.icon,
-                color: colorFromHexRgb(sub.color),
-                title: DisasterMapLayer.layerLabel(l10n, sub.id),
-                tooltip: DisasterMapLayer.layerTooltip(l10n, sub.id),
-                onTap: () => layer.setSubLayerVisible(sub, !sub.visible.value),
-              ),
+            MapMenuScrollView(
+              children: [
+                SectionHeader(l10n.disasterMapOverlaySectionLayers),
+                for (final sub in layer.subLayers)
+                  _ToggleRow(
+                    selected: sub.visible.value,
+                    icon: sub.icon,
+                    color: colorFromHexRgb(sub.color),
+                    title: DisasterMapLayer.layerLabel(l10n, sub.id),
+                    tooltip: DisasterMapLayer.layerTooltip(l10n, sub.id),
+                    onTap: () =>
+                        layer.setSubLayerVisible(sub, !sub.visible.value),
+                  ),
+                const MapMenuDivider(),
+                SectionHeader(l10n.mapOverlaySectionMap),
+                MapTownLabelsRow(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+              ],
+            ),
           ],
         );
       },

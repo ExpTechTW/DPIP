@@ -506,13 +506,237 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeRainTrendTitle => 'ฝนชั่วโมงถัดไป';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute นาที';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return 'อัปเดต $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => 'ไม่มีข้อมูล';
+
+  @override
+  String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
+
+  @override
+  String get homeRainTrendLightSustained =>
+      'ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'คาดว่าฝนจะหยุดในอีก $minutes นาที';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => 'ฝนตกหนักต่อเนื่องตลอดชั่วโมงหน้า';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'คาดว่าฝนตกหนักจะหยุดในอีก $minutes นาที';
+  }
+
+  @override
   String get mapLayers => 'ชั้นข้อมูล';
+
+  @override
+  String get mapLayerOrderTitle => 'จัดเรียงเลเยอร์';
+
+  @override
+  String get mapLayerOrderReset => 'รีเซ็ตลำดับ';
 
   @override
   String get mapLayerRadar => 'เรดาร์สะท้อนสังเคราะห์';
 
   @override
-  String get mapLayerSatellite => 'ฮิมาวาริ อินฟราเรด';
+  String get mapLayerSatellite => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'Himawari Blue (B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'Himawari Near-Infrared (B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'Himawari Near-Infrared (B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'Himawari Upper Water Vapour (B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'Himawari Mid Water Vapour (B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'Himawari Lower Water Vapour (B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'Himawari SO₂ / Cloud Phase (B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'Himawari Longwave Infrared (B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'Himawari Longwave Infrared (B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'Himawari CO₂ (B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'Himawari True Color';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'Himawari Natural Color';
+
+  @override
+  String get mapLayerSatelliteAsh => 'Himawari Ash';
+
+  @override
+  String get mapLayerSatelliteDust => 'Himawari Dust';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'Himawari Airmass';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics =>
+      'Himawari Night Microphysics';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'Himawari Water Vapour';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'Himawari Split Window';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'Himawari Night Fog';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'Himawari Overshooting Top';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'Himawari SO₂ / Cloud Phase';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'Himawari Cirrus / Cloud Height';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'Himawari Tropopause';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'Himawari Cloud Top Temperature';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'Himawari Cloud Mask';
+
+  @override
+  String get mapLayerSatelliteSst => 'Himawari Sea Surface Temperature';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'Himawari NDVI';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'Himawari NDWI';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'Himawari MNDWI';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => 'Country border';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB composite (JMA recipe)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => 'Clear';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => 'Probably clear';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => 'Probably cloudy';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => 'Cloudy';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm =>
+      'Clear sky (warm end) = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance =>
+      'Low reflectance / night = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentZero =>
+      'Zero difference = transparent (no signal)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight =>
+      'Night = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData =>
+      'No data (land) = transparent';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation =>
+      'Below 0.1 = transparent (no vegetation)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater =>
+      '≤ 0 = transparent (no water)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear =>
+      'Clear sky = transparent, the basemap shows';
+
+  @override
+  String get mapLayerStyleSection => 'Colour style';
+
+  @override
+  String get mapLayerStyleTooltip => 'Colour style';
+
+  @override
+  String get mapLayerStyleGray => 'Grayscale (JMA)';
+
+  @override
+  String get mapLayerStyleGrayTooltip => 'JMA grayscale — colder is whiter';
+
+  @override
+  String get mapLayerStyleJma => 'Cloud-top enhancement (JMA)';
+
+  @override
+  String get mapLayerStyleJmaTooltip =>
+      'Grayscale base, tinted below −40 °C to highlight cloud-top height';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip =>
+      'Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis';
+
+  @override
+  String get mapLayerQpesums => 'พยากรณ์ฝน 1 ชั่วโมงข้างหน้า';
 
   @override
   String get mapLayerLightning => 'ฟ้าผ่า';
@@ -531,7 +755,21 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTimelineNow => 'ตอนนี้';
 
   @override
+  String get mapTimelinePast => 'อดีต';
+
+  @override
+  String get mapTimelineFuture => 'อนาคต';
+
+  @override
   String get mapTimelineObserved => 'เวลาตรวจวัด';
+
+  @override
+  String get mapTimelineForecast => 'พยากรณ์';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return 'เวลาข้อมูล $time';
+  }
 
   @override
   String get notifySettingsMenu => 'การตั้งค่าการแจ้งเตือน';
@@ -756,6 +994,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapNavRadar => 'เรดาร์';
+
+  @override
+  String get mapNavQpesums => 'พยากรณ์';
 
   @override
   String get mapNavSatellite => 'ดาวเทียม';
@@ -1008,6 +1249,12 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'เครื่องตรวจแผ่นดินไหว';
 
   @override
@@ -1069,6 +1316,70 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get disasterMapOverlayShelterTooltip => 'แสดงศูนย์อพยพ';
+
+  @override
+  String get dpmOpenInMaps => 'เปิดในแผนที่';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (ค่าเริ่มต้น)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'คัดลอกพิกัด';
+
+  @override
+  String get mapAppCoordinatesCopied => 'คัดลอกพิกัดแล้ว';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return 'ไม่สามารถเปิด $app ได้';
+  }
+
+  @override
+  String get mapAppCallFailed => 'อุปกรณ์นี้ไม่สามารถโทรออกได้';
+
+  @override
+  String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';
+
+  @override
+  String get mapLayerCategoryEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'พายุไต้ฝุ่น';
+
+  @override
+  String get mapLayerCategoryWeather => 'การสังเกตสภาพอากาศ';
+
+  @override
+  String get mapLayerCategorySatellite => 'ดาวเทียม';
+
+  @override
+  String get mapLayerCategoryRadar => 'เรดาร์';
+
+  @override
+  String get mapLayerCategoryLife => 'ชีวิตประจำวัน';
+
+  @override
+  String get mapLayerCategoryForecast => 'การพยากรณ์เชิงตัวเลข';
+
+  @override
+  String get mapOverlaySectionMap => 'แผนที่';
+
+  @override
+  String get rainIntervalSection => 'ช่วงเวลา';
+
+  @override
+  String get mapTownLabels => 'ชื่อตำบล';
+
+  @override
+  String get mapTownLabelsHint => 'แสดงชื่อตำบลเมื่อขยายแผนที่';
 
   @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
@@ -1210,6 +1521,16 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => 'Mild typhoon';
 
   @override
@@ -1238,6 +1559,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapMyLocation => 'ตำแหน่งของฉัน';
+
+  @override
+  String get mapResetNorth => 'กลับไปทางเหนือ';
 
   @override
   String get typhoonLegendCircle15 => 'วงพายุ (แรง)';
@@ -1369,4 +1693,103 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'อุบัติเหตุนิวเคลียร์';
+
+  @override
+  String get skyTime => 'เวลาท้องฟ้า';
+
+  @override
+  String get skyTimeAuto => 'อัตโนมัติ';
+
+  @override
+  String get skyTimeDawn => 'รุ่งอรุณ';
+
+  @override
+  String get skyTimeSunrise => 'พระอาทิตย์ขึ้น';
+
+  @override
+  String get skyTimeMorning => 'ตอนเช้า';
+
+  @override
+  String get skyTimeNoon => 'เที่ยงวัน';
+
+  @override
+  String get skyTimeAfternoon => 'ตอนบ่าย';
+
+  @override
+  String get skyTimeGolden => 'ช่วงเวลาทอง';
+
+  @override
+  String get skyTimeSunset => 'พระอาทิตย์ตก';
+
+  @override
+  String get skyTimeDusk => 'สนธยา';
+
+  @override
+  String get skyTimeNight => 'กลางคืน';
+
+  @override
+  String get weatherModeCloudy => 'มีเมฆมาก';
+
+  @override
+  String get weatherModeOvercast => 'ฟ้าปิด';
+
+  @override
+  String get weatherModeSnow => 'หิมะตก';
+
+  @override
+  String get weatherModeSand => 'ฝุ่นทราย';
+
+  @override
+  String get radarScanRange => 'แสดงขอบเขตการสแกน';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'แสดงพื้นที่ที่เรดาร์ทั้งสี่ตรวจวัดได้จริง';
+
+  @override
+  String get radarScanRangeHint => 'นอกกรอบคือไม่ได้ตรวจวัด';
+
+  @override
+  String get radarOverlayMenuTooltip => 'ตัวเลือกชั้นเรดาร์';
+
+  @override
+  String get radarCountyOutline => 'เส้นแบ่งเขตจังหวัด';
+
+  @override
+  String get radarGlobalOutline => 'เส้นแบ่งเขตประเทศ';
+
+  @override
+  String get radarGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
+
+  @override
+  String get radarCountyOutlineHint => 'วาดทับภาพเอคโค';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์';
+
+  @override
+  String get radarTownOutline => 'เส้นแบ่งเขตอำเภอ';
+
+  @override
+  String get radarTownOutlineHint => 'เส้นแบ่งย่อยกว่า';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์น้ำฝน';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์ลม';
+
+  @override
+  String get windForecastCountyOutlineHint => 'วาดทับบนสนามลม';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
+
+  @override
+  String get windForecastTownOutlineHint => 'ตาข่ายที่ละเอียดกว่า';
 }

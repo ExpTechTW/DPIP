@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "Mga aktibong event",
   "homeActiveEventsEmpty": "Walang aktibong event",
   "homeRainTrendTitle": "Ulan sa susunod na oras",
+  "homeRainTrendMinute": "{minute} min",
+  "homeRainTrendUpdated": "Na-update {time}",
+  "homeRainTrendNoData": "Walang data",
+
+  "homeRainTrendScattered": "Posibleng mahinang ulan",
+  "homeRainTrendLightSustained": "Tuloy-tuloy na mahinang ulan sa susunod na oras",
+  "homeRainTrendLightStopping": "Baka huminto ang mahinang ulan sa loob ng {minutes} minuto",
+  "homeRainTrendHeavySustained": "Tuloy-tuloy na malakas na ulan sa susunod na oras",
+  "homeRainTrendHeavyStopping": "Baka huminto ang malakas na ulan sa loob ng {minutes} minuto",
   "mapLayers": "Mga Layer",
+  "mapLayerOrderTitle": "Ayusin ang ayos ng layer",
+  "mapLayerOrderReset": "I-reset ang ayos",
   "mapLayerRadar": "Composite Radar Reflectivity",
-  "mapLayerSatellite": "Himawari Infrared",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "mapLayerSatelliteCloudClear": "Clear",
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "mapLayerQpesums": "Pagtaya ng ulan sa susunod na 1 oras",
   "mapLayerLightning": "Kidlat",
   "lightningLegendCg": "Ulap–lupa · {minutes} min",
   "lightningLegendCc": "Ulap–ulap · {minutes} min",
   "mapTimelineNow": "Ngayon",
+  "mapTimelinePast": "Nakaraan",
+  "mapTimelineFuture": "Hinaharap",
   "mapTimelineObserved": "Naobserbahan",
+  "mapTimelineForecast": "Pagtaya",
+  "mapTimelineDataTime": "Oras ng data {time}",
+  "mapTimelineDataTime": "Oras ng data {time}",
   "notifySettingsMenu": "Mga setting ng notipikasyon",
   "notifyTitle": "Mga Notipikasyon",
   "notifyUnavailable": "Hindi pa handa ang push notifications — subukan muli mamaya.",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "Default na layer ng mapa",
   "defaultMapLayerSubtitle": "Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Pagtaya",
   "mapNavSatellite": "Satellite",
   "mapNavLightning": "Kidlat",
   "mapNavTyphoon": "Bagyo",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "Halumigmig",
   "mapLayerPressure": "Presyon",
   "mapLayerWind": "Hangin",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Ulan",
   "rainIntervalMenu": "Bintana ng akumulasyon",
   "rainIntervalNow": "Ngayon",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "Silungan",
   "disasterMapOverlayRestroomTooltip": "Ipakita ang mga pampublikong palikuran",
   "disasterMapOverlayShelterTooltip": "Ipakita ang mga silungan",
+  "dpmOpenInMaps": "Buksan sa mapa",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (default)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Kopyahin ang coordinates",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Na-kopya ang coordinates",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "Hindi mabuksan ang {app}",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "Hindi makatawag ang device na ito",
+
+  "mapOverlaySectionReference": "Layer ng sanggunian",
+  "mapLayerCategoryEarthquake": "Lindol",
+  "mapLayerCategoryTyphoon": "Bagyo",
+  "mapLayerCategoryWeather": "Obserbasyon sa panahon",
+  "mapLayerCategorySatellite": "Satellite",
+  "mapLayerCategoryRadar": "Radar",
+  "mapLayerCategoryLife": "Pang-araw-araw na buhay",
+  "mapLayerCategoryForecast": "Numerical forecast",  "mapOverlaySectionMap": "Mapa",
+  "rainIntervalSection": "Window ng oras",
+
+  "mapTownLabels": "Mga pangalan ng bayan",
+  "mapTownLabelsHint": "Ipakita ang mga pangalan ng bayan kapag naka-zoom",
+
   "dpmSheetEmpty": "I-tap ang marker sa mapa para sa detalye",
   "dpmAddress": "Address",
   "restroomTypeLabel": "Uri",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "Alamat",
   "mapLegendCollapse": "Itago ang alamat",
   "mapMyLocation": "Aking lokasyon",
+  "mapResetNorth": "Bumalik sa hilaga",
   "typhoonLegendCircle15": "Gale circle (L7)",
   "typhoonLegendCircle25": "Storm circle (L10)",
   "typhoonLegendProbability": "Strike probability",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "Tropical depression",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "Pagguho ng lupa",
   "dpmDisasterTsunami": "Tsunami",
   "dpmDisasterSlope": "Panganib sa dalisdis",
-  "dpmDisasterNuclear": "Aksidente sa nukleyar"
+  "dpmDisasterNuclear": "Aksidente sa nukleyar",
+  "skyTime": "Oras ng langit",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Awtomatiko",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Bukang-liwayway",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Pagsikat ng araw",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Umaga",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Tanghali",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Hapon",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Gintong oras",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Paglubog ng araw",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Takipsilim",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Gabi",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Maulap",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Makulimlim",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Niyebe",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Alikabok",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Ipakita ang saklaw ng pag-scan",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Ipinapakita ang aktwal na saklaw ng apat na radar.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Sa labas: hindi naoobserbahan",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Mga opsyon sa layer ng radar",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "Mga hangganan ng lalawigan",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "Mga hangganan ng bansa",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Iginuguhit sa ibabaw ng echo",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Nananatiling mababasa ang mga hangganan sa ilalim ng radar echo.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Mga hangganan ng bayan",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "Mas pinong hati",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Nananatiling mababasa ang mga hangganan ng bayan sa ilalim ng radar echo.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Mga opsyon sa layer ng pagtataya ng pag-ulan",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Mga opsyon sa layer ng pagtataya ng hangin",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Iginuhit sa itaas ng patlang ng hangin",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Ang mas pinong mesh",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

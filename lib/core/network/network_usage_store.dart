@@ -60,6 +60,25 @@ class _Pending {
   int misses = 0;
 }
 
+/// One hour's recorded usage — the granularity the Debug page's trend chart
+/// plots.
+class HourUsage {
+  const HourUsage({
+    required this.hour,
+    required this.down,
+    required this.saved,
+    required this.hits,
+    required this.misses,
+  });
+
+  /// UTC epoch hour — the same key the store buckets by.
+  final int hour;
+  final int down;
+  final int saved;
+  final int hits;
+  final int misses;
+}
+
 /// Persisted network-usage accounting backed by the shared SQLite database.
 ///
 /// Everything — bytes downloaded, bytes saved, and cache hits / misses —
@@ -259,6 +278,51 @@ class NetworkUsageStore {
       return const NetworkUsage.empty();
     }
   }
+
+  /// Usage over the trailing window, oldest first — the trend series for the
+  /// Debug page's chart.
+  ///
+  /// [hours] is the window length and [bucketHours] how many hours each sample
+  /// aggregates, so `history()` gives 24 hourly points and
+  /// `history(hours: 24 * 7, bucketHours: 6)` gives 28 six-hour points for the
+  /// 7-day view. Every slot in the window is present: a silent bucket is a
+  /// zero bar, not a gap, so the chart stays continuous. Best-effort: empty on
+  /// error.
+  Future<List<HourUsage>> history({int hours = 24, int bucketHours = 1}) async {
+    await flush();
+    try {
+      final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+      final bucket = hour ~/ bucketHours;
+      final count = hours ~/ bucketHours;
+      final rows = await _db.rawQuery(
+        'SELECT hour / ? AS bucket, '
+        'COALESCE(SUM(down), 0) AS down, '
+        'COALESCE(SUM(saved), 0) AS saved, '
+        'COALESCE(SUM(hits), 0) AS hits, '
+        'COALESCE(SUM(misses), 0) AS misses '
+        'FROM $_buckets WHERE hour >= ? '
+        'GROUP BY bucket ORDER BY bucket',
+        [bucketHours, (bucket - count + 1) * bucketHours],
+      );
+      final byBucket = <int, Map<String, Object?>>{
+        for (final row in rows) row['bucket'] as int: row,
+      };
+      return [
+        for (var b = bucket - count + 1; b <= bucket; b++)
+          HourUsage(
+            hour: b * bucketHours,
+            down: _counter(byBucket[b]?['down']),
+            saved: _counter(byBucket[b]?['saved']),
+            hits: _counter(byBucket[b]?['hits']),
+            misses: _counter(byBucket[b]?['misses']),
+          ),
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static int _counter(Object? value) => (value as num?)?.toInt() ?? 0;
 
   // Update-then-insert instead of UPSERT, so it works on any bundled SQLite.
   Future<void> _addToBucket(DatabaseExecutor db, int hour, _Pending add) async {

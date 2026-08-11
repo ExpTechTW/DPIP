@@ -16,6 +16,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
 import 'package:dpip/features/typhoon/domain/storm_circle.dart';
@@ -401,9 +402,9 @@ List<LatLng> _convexHull(List<LatLng> points) {
 LatLng _destination(LatLng from, double bearingDeg, double distanceKm) {
   const earthKm = 6371.0;
   final angular = distanceKm / earthKm;
-  final bearing = bearingDeg * math.pi / 180;
-  final lat1 = from.latitude * math.pi / 180;
-  final lon1 = from.longitude * math.pi / 180;
+  final bearing = degToRad(bearingDeg);
+  final lat1 = degToRad(from.latitude);
+  final lon1 = degToRad(from.longitude);
   final sinLat1 = math.sin(lat1);
   final cosLat1 = math.cos(lat1);
   final sinAng = math.sin(angular);

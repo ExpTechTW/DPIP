@@ -10,19 +10,25 @@ import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
+import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
+import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +53,22 @@ class _MapPageState extends State<MapPage> {
   // Built once so each layer keeps its own MapLibre state across rebuilds.
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
-    SatelliteMapLayer(context.read<SatelliteRepository>()),
+    // The wind-forecast block sits right after radar: the picker groups by
+    // category in declared order, and the numerical-forecast group (QPESUMS
+    // then ECMWF then GFS) is what radar hands off to.
+    QpesumsMapLayer(context.read<QpesumsRepository>()),
+    for (final model in WindForecastModel.values)
+      WindForecastMapLayer(
+        context.read<Map<WindForecastModel, WindForecastRepository>>()[model]!,
+        model: model,
+      ),
+    // One layer per satellite channel — each fetches its own frame list and
+    // serves its own `?channel=` tiles.
+    for (final channel in SatelliteChannel.values)
+      SatelliteMapLayer(
+        context.read<Map<SatelliteChannel, SatelliteRepository>>()[channel]!,
+        channel: channel,
+      ),
     LightningMapLayer(context.read<MeteorLightningRepository>()),
     TyphoonMapLayer(
       context.read<MeteorTyphoonRepository>(),

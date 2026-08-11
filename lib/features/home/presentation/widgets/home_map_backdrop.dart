@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -37,6 +39,18 @@ import 'package:provider/provider.dart';
 /// mutations run through one serial queue and are guarded by a style **epoch** and
 /// per-concern **generations**; every add is idempotent (tolerant remove-then-add)
 /// so a reload race or a partial failure re-syncs on the next apply instead of
+/// Which administrative borders the home backdrop draws for [code].
+///
+/// The county frame is always there — it is how a reader places what they are
+/// looking at. The township mesh only joins it once a township is the subject:
+/// the nationwide view is framed far enough out that 368 outlines collapse into
+/// a grey wash over the echo, where the coarse frame is the only boundary still
+/// carrying information.
+List<AdminBoundary> backdropBoundaries(String? code) => [
+  if (code != null) AdminBoundary.town,
+  AdminBoundary.county,
+];
+
 /// wedging.
 class HomeMapBackdrop extends StatefulWidget {
   const HomeMapBackdrop({super.key});
@@ -58,6 +72,12 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   /// keeps the zoom device-independent (MapLibre derives it from the box and the
   /// viewport). Raise for a looser frame.
   static const double _frameExpansion = 1;
+
+  /// Half-width (degrees) of the GPS-centred frame for 所在地 — the current
+  /// fix sits at the centre of a small span that [_frameExpansion] then pushes
+  /// out. ~0.05° ≈ 5.5 km, township scale: the point is to show *where the
+  /// user is*, not to frame the whole township like a saved area does.
+  static const double _gpsSpan = 0.05;
 
   MapLibreMapController? _controller;
   bool _styleReady = false;
@@ -139,13 +159,6 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     _refreshRadar();
   }
 
-  /// The selected township code, or null for the nationwide (whole-island) view.
-  String? get _selectedCode => switch (_regions?.selected) {
-    SavedArea(:final code) => code,
-    CurrentArea(:final code) => code,
-    _ => null,
-  };
-
   /// Frames the map on the selected township and highlights it — or fits the
   /// whole island for the nationwide view. Skips unchanged selections.
   Future<void> _applySelection() async {
@@ -159,25 +172,64 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     // ends. Frame into that band, not the whole map.
     final topInset = MediaQuery.paddingOf(context).top + RegionBar.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
-    final code = _selectedCode;
+    final selected = _regions?.selected;
+    final code = switch (selected) {
+      SavedArea(:final code) => code,
+      CurrentArea(:final code) => code,
+      _ => null,
+    };
     final styleEpoch = _styleEpoch;
+    // 所在地 is a *place*, not a region: the current GPS fix is the point, so
+    // the camera centres on it (a fixed span around the fix) instead of framing
+    // the whole township the way a saved area does.
+    final gpsCentred = selected is CurrentArea;
+    final location = context.read<LocationService>();
     // Nothing changed since the last apply (an unrelated RegionStore notify) —
     // don't re-add layers or re-run the camera.
     if (code == _appliedCode && styleEpoch == _appliedCodeEpoch) return;
-    final townCode = code == null ? null : int.tryParse(code);
     final gen = ++_selectionGen;
 
+    // The GPS fix decides 所在地's subject. No fix — services off, permission
+    // denied, or a fix timeout — degrades 所在地 to the nationwide view: the
+    // last-known township is not where the user is, so it must not frame or
+    // outline it. Falls back to the township box — or the whole island when no
+    // code is had — when a fix exists but the township isn't resolved.
+    //
+    // A *cached* fix, never a live read: `currentFix` can wait out a 10s GPS
+    // timeout, and while it did the backdrop sat on the base map's pre-layout
+    // camera (a tiny Taiwan) instead of framing. The cached fix answers
+    // instantly, and the position stream's own updates re-apply this when they
+    // land. A `CurrentArea` whose code is null means 所在地 has no township at
+    // all (GPS lost) — skip the lookup entirely and go nationwide.
+    GpsFix? fix;
+    if (gpsCentred && code != null) {
+      fix = await location.lastKnownFix();
+      if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
+    }
+    final effective = gpsCentred && fix == null ? null : code;
+
     List<double>? bounds;
-    if (code != null) {
+    if (effective != null) {
       final boundaries = await boundariesFuture;
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      bounds = boundaries.boundsFor(code);
+      bounds = boundaries.boundsFor(effective);
     }
 
-    final filter = _filterFor(townCode);
+    LatLngBounds frame;
+    if (gpsCentred && fix != null) {
+      frame = _latLngBounds([
+        fix.lng - _gpsSpan,
+        fix.lat - _gpsSpan,
+        fix.lng + _gpsSpan,
+        fix.lat + _gpsSpan,
+      ]);
+    } else {
+      frame = _latLngBounds(bounds);
+    }
+
     // Normalise the fit box: a degenerate/non-finite township box would make
     // MapLibre's native camera fit abort the app (see camera_fit.dart).
-    final box = safeFitBounds(_latLngBounds(bounds));
+    final box = safeFitBounds(frame);
     if (box == null) return;
     // Hand the framed geography to the map tab; it fits the same box into its
     // own visible band (different chrome, so a different camera).
@@ -189,7 +241,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     final bottomInset = size.height * HomeSheetExtent.rest;
     _queue(() async {
       if (!mounted || gen != _selectionGen || styleEpoch != _styleEpoch) return;
-      await _addSelectedLayers(controller, filter);
+      await _restackOverlays(controller, code: effective);
       // Frame the box in the band above the resting sheet — computed in Dart
       // (boundsFitCamera) and applied as a plain centre+zoom, so a degenerate or
       // not-yet-laid-out viewport can't abort the app the way MapLibre's native
@@ -205,9 +257,42 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
           CameraUpdate.newLatLngZoom(fit.target, fit.zoom),
         );
       }
-      _appliedCode = code;
+      _appliedCode = effective;
       _appliedCodeEpoch = styleEpoch;
     });
+  }
+
+  /// Re-adds everything that belongs **above** the echo, bottom-up.
+  ///
+  /// The radar layer is swapped on every refresh (remove-then-add), which lands
+  /// it back on top of the style — so these cannot simply be added once. Each
+  /// step removes its own copy first, making the whole thing idempotent and
+  /// safe to run from either trigger.
+  ///
+  /// The township mesh is drawn only when a township is the subject. The
+  /// whole-island framing is far enough out that 368 outlines collapse into a
+  /// grey wash over the echo, and there the county frame is the only boundary
+  /// carrying information.
+  Future<void> _restackOverlays(
+    MapLibreMapController controller, {
+    required String? code,
+  }) async {
+    // The subject the frame is drawn for. Callers pass the *effective* code
+    // (GPS-aware): a deliberate `null` (GPS lost, or the nationwide view) must
+    // reach the outline layers unchanged — falling back to a stale code here
+    // would re-draw the previous township's mesh and purple frame. A radar
+    // refresh has no selection context, so it passes the last applied one.
+    final wanted = backdropBoundaries(code);
+    // Bottom-up, so a later add lands above an earlier one: the coarse county
+    // frame should win where the two run together along a coastline.
+    for (final boundary in [AdminBoundary.town, AdminBoundary.county]) {
+      await AdminOutline.remove(controller, boundary);
+      if (wanted.contains(boundary)) {
+        await AdminOutline.add(controller, boundary);
+      }
+    }
+    // The selection is the point of the backdrop — always last, always on top.
+    await _addSelectedLayers(controller, _filterFor(_townCode(code)));
   }
 
   /// (Re)adds the purple selection outline on the vector `town` layer (filtered
@@ -230,7 +315,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     );
   }
 
-  /// Fetches the newest radar frame and swaps it in (below the borders). A
+  /// Fetches the newest radar frame and swaps it in, then restacks the
+  /// borders over it. A
   /// failed fetch, an unchanged frame, or a superseded refresh is a no-op, so
   /// the current echo stays. The swap is idempotent (tolerant remove-then-add)
   /// so a partial failure can't strand or duplicate the source.
@@ -259,8 +345,13 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         _radarSource,
         _radarLayer,
         const RasterLayerProperties(rasterOpacity: _radarOpacity),
-        belowLayerId: outlineLayerId,
+        // On top of the base style's own borders, as on the radar map: those
+        // are hairlines tuned for a bare basemap and they wash out under the
+        // echo. [_restackOverlays] puts a legible set back over it.
       );
+      // Re-stack the admin frame + selection over the fresh echo, keeping the
+      // subject that was last applied (a radar refresh has no selection context).
+      await _restackOverlays(controller, code: _appliedCode);
       _radarFrameOnMap = latest;
       _radarFrameEpoch = styleEpoch;
     });
@@ -289,6 +380,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       // Expected when the source isn't on the map (fresh style / first add).
     }
   }
+
+  /// The selected township as an int, or null for the nationwide view.
+  static int? _townCode(String? code) =>
+      code == null ? null : int.tryParse(code);
 
   /// A `CODE` equality filter — the impossible `-1` matches nothing, hiding the
   /// selection layers for the nationwide view.

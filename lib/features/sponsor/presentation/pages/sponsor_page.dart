@@ -294,11 +294,7 @@ class _Trailing extends StatelessWidget {
       return Icon(Icons.check_circle, color: colors.primary);
     }
     if (purchasing) {
-      return const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
+      return const InlineLoading(size: 20);
     }
     return Container(
       padding: const EdgeInsets.symmetric(

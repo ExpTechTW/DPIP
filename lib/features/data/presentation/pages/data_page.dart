@@ -12,6 +12,10 @@ import 'package:go_router/go_router.dart';
 
 /// Catalogue of in-app data surfaces. The shell's 4th tab; entries push nested
 /// routes under `/data/…` so the bottom nav stays visible.
+///
+/// Laid out as a catalogue rather than a plain list: the seismic entry is a
+/// full-width featured card (the primary hazard surface), and the weather
+/// rankings fill a two-column grid so every metric reads at a glance.
 class DataPage extends StatelessWidget {
   const DataPage({super.key});
 
@@ -44,6 +48,7 @@ class DataPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navData)),
       body: ListView(
@@ -53,24 +58,44 @@ class DataPage extends StatelessWidget {
         ),
         children: [
           SectionHeader(l10n.dataSectionSeismic),
-          _DataGroup(
-            children: [
-              _DataTile(
-                icon: Icons.monitor_heart_outlined,
-                title: l10n.navEarthquake,
-                subtitle: l10n.dataEarthquakeSubtitle,
-                onTap: () => context.pushNamed(AppRoutes.earthquake),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: _SeismicCard(
+              icon: Icons.monitor_heart_outlined,
+              title: l10n.navEarthquake,
+              subtitle: l10n.dataEarthquakeSubtitle,
+              onTap: () => context.pushNamed(AppRoutes.earthquake),
+            ),
           ),
           SectionHeader(l10n.dataSectionWeather),
-          _DataGroup(
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            crossAxisSpacing: AppSpacing.sm,
+            mainAxisSpacing: AppSpacing.sm,
+            childAspectRatio: 1.45,
             children: [
               for (final (tab, icon) in _weatherRankingEntries)
-                _DataTile(
+                _RankingGridTile(
                   icon: icon,
                   title: _weatherRankingLabel(l10n, tab),
-                  subtitle: l10n.dataWeatherRankingSubtitle,
+                  accent: switch (tab) {
+                    'rain' => colors.primary,
+                    'temperature' => colors.tertiary,
+                    _ => colors.secondary,
+                  },
                   onTap: () => context.pushNamed(
                     AppRoutes.weatherRanking,
                     queryParameters: {'tab': tab},
@@ -84,67 +109,134 @@ class DataPage extends StatelessWidget {
   }
 }
 
-/// Tonal card wrapping one or more [_DataTile]s — same Material recipe as More.
-class _DataGroup extends StatelessWidget {
-  const _DataGroup({required this.children});
+/// The seismic entry — a full-width highlighted card so the primary hazard
+/// surface stands out from the ranking grid below it.
+class _SeismicCard extends StatelessWidget {
+  const _SeismicCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
-  final List<Widget> children;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final rows = <Widget>[];
-    for (var i = 0; i < children.length; i++) {
-      if (i > 0) {
-        rows.add(
-          Divider(
-            height: 1,
-            thickness: 1,
-            indent: AppSpacing.xxl + AppSpacing.xl,
-            color: theme.colorScheme.outlineVariant,
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.primaryContainer,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: colors.secondaryContainer,
+                  borderRadius: AppRadius.medium,
+                ),
+                child: Icon(icon, color: colors.onSecondaryContainer),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: colors.onPrimaryContainer,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.onPrimaryContainer.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colors.onPrimaryContainer),
+            ],
           ),
-        );
-      }
-      rows.add(children[i]);
-    }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.sm,
-      ),
-      child: Material(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: AppRadius.medium,
-        clipBehavior: Clip.antiAlias,
-        child: Column(children: rows),
+        ),
       ),
     );
   }
 }
 
-class _DataTile extends StatelessWidget {
-  const _DataTile({
+/// A metric card in the weather-ranking grid — tonal surface, icon badge, and
+/// the ranking label with a forward affordance.
+class _RankingGridTile extends StatelessWidget {
+  const _RankingGridTile({
     required this.icon,
     required this.title,
+    required this.accent,
     required this.onTap,
-    this.subtitle,
   });
 
   final IconData icon;
   final String title;
-  final String? subtitle;
+  final Color accent;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle!),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.medium,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.14),
+                  borderRadius: AppRadius.small,
+                ),
+                child: Icon(icon, size: 22, color: accent),
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 18,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

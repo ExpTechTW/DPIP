@@ -28,7 +28,13 @@ abstract final class AppTime {
   static DateTime get utc => _clock?.now() ?? DateTime.now().toUtc();
 
   /// Calibrated current time at Taiwan's fixed +8 offset.
-  static DateTime get utc8 => utc.add(const Duration(hours: 8));
+  static DateTime get utc8 => taipei(utc);
+
+  /// [utc] at Taiwan's fixed +8 offset — its year/month/day/hour/… fields read
+  /// as Taipei wall time regardless of the device timezone (UTC-flagged). For
+  /// a server timestamp, feed it the UTC instant this calendar moment holds.
+  static DateTime taipei(DateTime utc) =>
+      utc.toUtc().add(const Duration(hours: 8));
 
   /// Whether the clock has completed at least one NTP sync.
   static bool get isSynced => _clock?.isSynced ?? false;

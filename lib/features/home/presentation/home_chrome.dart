@@ -1,11 +1,13 @@
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+
 /// Pure choreography of the Home chrome as the sheet climbs from collapsed (0)
 /// to full (1).
 ///
 /// Every layer that dresses the Home backdrop reads these same thresholds so the
 /// pieces move in step: the feature sheet reveals its weather, the shared region
-/// bar blends then dismisses, and the app shell's bottom nav slides away. Kept in
-/// core (and dependency-free) so `shared/` and `app/` can reach it without
-/// importing the Home feature.
+/// bar blends then dismisses, and the app shell's bottom nav slides away. Lives
+/// in the Home feature but stays free of presentation deps (beyond
+/// [HomeSheetExtent]) so `app/`'s shell can reach it without importing widgets.
 ///
 /// The sequence, by extent, is deliberately staged:
 ///  - the bottom nav clears out first ([navDismiss], as the sheet commits up),
@@ -33,6 +35,14 @@ class HomeChrome {
 
   /// Whether the weather backdrop should be playing (any of it revealed).
   static bool weatherActive(double extent) => extent > _weatherFrom;
+
+  /// Map dim progress, `0` (at rest) → `1` (by the time the weather starts to
+  /// reveal). The consumer scales this onto its own peak — the exposed map
+  /// darkens as the sheet climbs so its cards gain contrast against a quieter
+  /// backdrop; it tops out at [_weatherFrom] so the sky is never dimmed once it
+  /// takes over.
+  static double mapDim(double extent) =>
+      _ramp(extent, HomeSheetExtent.rest, _weatherFrom);
 
   /// Bottom-nav dismissal, `0` (shown) → `1` (slid away) — the first to clear.
   static double navDismiss(double extent) => _ramp(extent, _navFrom, _navTo);

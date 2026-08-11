@@ -3,17 +3,18 @@
 /// panels. The body adapts to whichever sub-layer is selected.
 library;
 
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
-import 'package:dpip/features/disaster_map/domain/dpm_categories.dart';
 import 'package:dpip/features/disaster_map/domain/restroom_detail.dart';
 import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/maps_launcher.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Peek / rest / full sheet for DPM detail.
 class DpmSheet extends StatefulWidget {
@@ -33,9 +34,6 @@ class DpmSheet extends StatefulWidget {
   static const double peekExtent = 0.24;
   static const double _rest = 0.42;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<DpmSheet> createState() => _DpmSheetState();
@@ -61,8 +59,6 @@ class _DpmSheetState extends State<DpmSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final allState = Listenable.merge([
       for (final s in _subs)
         Listenable.merge([
@@ -96,85 +92,34 @@ class _DpmSheetState extends State<DpmSheet> {
             if (mounted) _extent.value = initial;
           });
         }
-        return NotificationListener<DraggableScrollableNotification>(
-          onNotification: (notification) {
-            _extent.value = notification.extent;
-            return false;
-          },
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: DraggableScrollableSheet(
-              key: ValueKey(
-                selected ? 'dpm-${active.id}-$revision' : 'dpm-peek',
-              ),
-              expand: false,
-              initialChildSize: initial,
-              minChildSize: DpmSheet.peekExtent,
-              maxChildSize: DpmSheet._expanded,
-              snap: true,
-              snapSizes: const [DpmSheet._rest],
-              builder: (context, scrollController) {
-                // Built once — only `atTop` below needs the live extent;
-                // handing the list down via the `ValueListenableBuilder`'s
-                // `child` keeps it out of the per-frame rebuild that would
-                // otherwise redo it on every pixel of the drag.
-                final content = ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                    bottom:
-                        MediaQuery.viewPaddingOf(context).bottom +
-                        AppSpacing.md,
-                  ),
-                  children: [
-                    _Grip(extent: _extent),
-                    if (!selected) ...[
-                      _Hint(),
-                      _Filters(
-                        restroom: widget.restroom,
-                        shelter: widget.shelter,
-                      ),
-                    ] else
-                      _dispatchBody(active!),
-                  ],
-                );
-                return ValueListenableBuilder<double>(
-                  valueListenable: _extent,
-                  child: content,
-                  builder: (context, extent, content) {
-                    final atTop = DpmSheet._isAtTop(extent);
-                    final topInset = MediaQuery.viewPaddingOf(context).top;
-                    return AnnotatedRegion<SystemUiOverlayStyle>(
-                      value: SystemUiOverlayStyle(
-                        statusBarColor: atTop
-                            ? colors.surface
-                            : Colors.transparent,
-                        statusBarIconBrightness:
-                            theme.brightness == Brightness.dark
-                            ? Brightness.light
-                            : Brightness.dark,
-                        statusBarBrightness: theme.brightness,
-                      ),
-                      child: _Surface(
-                        flushTop: atTop,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                          child: content!,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+        return ExtentSheetChrome(
+          extent: _extent,
+          keyValue: selected ? 'dpm-${active.id}-$revision' : 'dpm-peek',
+          initial: initial,
+          min: DpmSheet.peekExtent,
+          max: DpmSheet._expanded,
+          snapSizes: const [DpmSheet._rest],
+          content: (context, scrollController) => ListView(
+            controller: scrollController,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.viewPaddingOf(context).bottom + AppSpacing.md,
             ),
+            children: [
+              SheetGrip(extent: _extent),
+              if (!selected) _Hint() else _dispatchBody(context, active!),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _dispatchBody(DpmSubLayerBase sub) {
+  Widget _dispatchBody(BuildContext context, DpmSubLayerBase sub) {
+    final accent =
+        colorFromHexRgb(sub.color) ?? Theme.of(context).colorScheme.primary;
     if (identical(sub, widget.aed)) {
       return _AedBody(
+        accent: accent,
         detail: widget.aed.detail,
         previewName: widget.aed.previewName,
         previewPlace: widget.aed.previewPlace,
@@ -183,6 +128,7 @@ class _DpmSheetState extends State<DpmSheet> {
     }
     if (identical(sub, widget.restroom)) {
       return _RestroomBody(
+        accent: accent,
         detail: widget.restroom.detail,
         previewName: widget.restroom.previewName,
         previewPlace: widget.restroom.previewPlace,
@@ -190,101 +136,11 @@ class _DpmSheetState extends State<DpmSheet> {
       );
     }
     return _ShelterBody(
+      accent: accent,
       detail: widget.shelter.detail,
       previewName: widget.shelter.previewName,
       previewPlace: widget.shelter.previewPlace,
       onClose: widget.onClose,
-    );
-  }
-}
-
-class _Surface extends StatelessWidget {
-  const _Surface({required this.child, this.flushTop = false});
-
-  final Widget child;
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
-    );
-  }
-}
-
-class _Grip extends StatefulWidget {
-  const _Grip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_Grip> createState() => _GripState();
-}
-
-class _GripState extends State<_Grip> {
-  late bool _show = !DpmSheet._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Grip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !DpmSheet._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !DpmSheet._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
     );
   }
 }
@@ -311,139 +167,6 @@ class _Hint extends StatelessWidget {
   }
 }
 
-/// Category filters for the restroom / shelter sub-layers — a chip row per
-/// filterable dimension ([DpmSubLayerBase.filters], which the map layer turns
-/// into a MapLibre layer filter). Shown at peek, next to the hint; a section
-/// hides with its layer.
-class _Filters extends StatelessWidget {
-  const _Filters({required this.restroom, required this.shelter});
-
-  final DpmSubLayer<RestroomDetail> restroom;
-  final DpmSubLayer<ShelterDetail> shelter;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final restroomVenue = restroom.filters['type2']!;
-    final restroomType = restroom.filters['type']!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.md,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (restroom.visible.value) ...[
-            _FilterSection(
-              title: l10n.dpmFilterSectionRestroom,
-              chips: [
-                for (final value in DpmCategories.restroom)
-                  _categoryChip(
-                    context,
-                    active: restroomVenue.values,
-                    value: value,
-                    label: _restroomCategoryLabel(l10n, value),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            _FilterSection(
-              title: l10n.dpmFilterSectionRestroomType,
-              chips: [
-                for (final value in DpmCategories.restroomType)
-                  _categoryChip(
-                    context,
-                    active: restroomType.values,
-                    value: value,
-                    label: DisasterMapLayer.restroomTypeLabel(l10n, value),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
-          if (shelter.visible.value)
-            _FilterSection(
-              title: l10n.dpmFilterSectionShelter,
-              chips: [
-                for (var i = 0; i < DpmCategories.shelter.length; i++)
-                  _categoryChip(
-                    context,
-                    active: shelter.filters['category']!.values,
-                    value: DpmCategories.shelter[i],
-                    label: _shelterDisasterLabel(l10n, i),
-                  ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _categoryChip(
-    BuildContext context, {
-    required ValueNotifier<Set<Object>> active,
-    required Object value,
-    required String label,
-  }) {
-    return FilterChip(
-      selected: active.value.contains(value),
-      label: Text(label),
-      visualDensity: VisualDensity.compact,
-      onSelected: (on) {
-        final next = Set<Object>.from(active.value);
-        if (on) {
-          next.add(value);
-        } else {
-          next.remove(value);
-        }
-        active.value = next;
-      },
-    );
-  }
-}
-
-/// Labelled, horizontally scrollable chip row for one filter group.
-class _FilterSection extends StatelessWidget {
-  const _FilterSection({required this.title, required this.chips});
-
-  final String title;
-  final List<Widget> chips;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var i = 0; i < chips.length; i++) ...[
-                if (i > 0) const SizedBox(width: AppSpacing.xs),
-                chips[i],
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 /// Restroom venue-category label for a `type2` code.
 String _restroomCategoryLabel(AppLocalizations l10n, int type2) =>
     switch (type2) {
@@ -460,26 +183,16 @@ String _restroomCategoryLabel(AppLocalizations l10n, int type2) =>
       _ => '',
     };
 
-/// Shelter disaster-type label for a [DpmCategories.shelter] index.
-String _shelterDisasterLabel(AppLocalizations l10n, int index) =>
-    switch (index) {
-      0 => l10n.dpmDisasterFlood,
-      1 => l10n.dpmDisasterEarthquake,
-      2 => l10n.dpmDisasterLandslide,
-      3 => l10n.dpmDisasterTsunami,
-      4 => l10n.dpmDisasterSlope,
-      5 => l10n.dpmDisasterNuclear,
-      _ => '',
-    };
-
 class _AedBody extends StatelessWidget {
   const _AedBody({
+    required this.accent,
     required this.detail,
     required this.previewName,
     required this.previewPlace,
     required this.onClose,
   });
 
+  final Color accent;
   final ValueListenable<AedDetail?> detail;
   final ValueListenable<String?> previewName;
   final ValueListenable<String?> previewPlace;
@@ -494,43 +207,95 @@ class _AedBody extends StatelessWidget {
         final name = d?.name ?? previewName.value ?? l10n.mapLayerAed;
         final place = d?.place ?? previewPlace.value ?? '';
         return _Header(
+          accent: accent,
           icon: Icons.medical_services,
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(lat: d.lat, lng: d.lng, label: d.name),
           body: d == null
               ? [_Loading()]
               : [
-                  _Row(label: l10n.aedAddress, value: d.address),
                   _Row(
+                    icon: Icons.place_outlined,
+                    label: l10n.aedAddress,
+                    value: d.address,
+                  ),
+                  _Row(
+                    icon: Icons.map_outlined,
                     label: l10n.aedRegion,
                     value: [
                       d.city,
                       d.district,
                     ].where((s) => s.isNotEmpty).join(' '),
                   ),
-                  _Row(label: l10n.aedCategory, value: d.category),
-                  _Row(label: l10n.aedType, value: d.type),
-                  _Row(label: l10n.aedPlaceDesc, value: d.placeDesc),
-                  _Row(label: l10n.aedDescription, value: d.description),
+                  _Divider(),
                   _Row(
+                    icon: Icons.category_outlined,
+                    label: l10n.aedCategory,
+                    value: d.category,
+                  ),
+                  _Row(
+                    icon: Icons.label_outline,
+                    label: l10n.aedType,
+                    value: d.type,
+                  ),
+                  _Row(
+                    icon: Icons.description_outlined,
+                    label: l10n.aedPlaceDesc,
+                    value: d.placeDesc,
+                  ),
+                  _Row(
+                    icon: Icons.notes_outlined,
+                    label: l10n.aedDescription,
+                    value: d.description,
+                  ),
+                  _Divider(),
+                  _Row(
+                    icon: Icons.schedule_outlined,
                     label: l10n.aedHoursWeekday,
                     value: _hours(d.weekdayStart, d.weekdayEnd),
                   ),
                   _Row(
+                    icon: Icons.schedule_outlined,
                     label: l10n.aedHoursSaturday,
                     value: _hours(d.saturdayStart, d.saturdayEnd),
                   ),
                   _Row(
+                    icon: Icons.schedule_outlined,
                     label: l10n.aedHoursSunday,
                     value: _hours(d.sundayStart, d.sundayEnd),
                   ),
-                  _Row(label: l10n.aedOpenRemark, value: d.openRemark),
-                  _Row(label: l10n.aedEmergencyPhone, value: d.emergencyPhone),
+                  _Row(
+                    icon: Icons.info_outline,
+                    label: l10n.aedOpenRemark,
+                    value: d.openRemark,
+                  ),
+                  _Divider(),
+                  _Row(
+                    icon: Icons.phone_outlined,
+                    label: l10n.aedEmergencyPhone,
+                    value: d.emergencyPhone,
+                    emphasized: true,
+                    onTap: () => _dialPhone(context, d.emergencyPhone),
+                  ),
                 ],
         );
       },
     );
+  }
+
+  static void _dialPhone(BuildContext context, String phone) {
+    callPhoneNumber(phone).then((opened) {
+      if (!opened && context.mounted) {
+        final l10n = AppLocalizations.of(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.mapAppCallFailed)));
+      }
+    });
   }
 
   static String _hours(String start, String end) {
@@ -543,12 +308,14 @@ class _AedBody extends StatelessWidget {
 
 class _RestroomBody extends StatelessWidget {
   const _RestroomBody({
+    required this.accent,
     required this.detail,
     required this.previewName,
     required this.previewPlace,
     required this.onClose,
   });
 
+  final Color accent;
   final ValueListenable<RestroomDetail?> detail;
   final ValueListenable<String?> previewName;
   final ValueListenable<String?> previewPlace;
@@ -563,25 +330,37 @@ class _RestroomBody extends StatelessWidget {
         final name = d?.name ?? previewName.value ?? l10n.mapLayerRestroom;
         final place = d?.address ?? previewPlace.value ?? '';
         return _Header(
+          accent: accent,
           icon: Icons.wc,
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(
+                  lat: d.latitude,
+                  lng: d.longitude,
+                  label: d.name,
+                ),
           body: d == null
               ? [_Loading()]
               : [
-                  _Row(label: l10n.dpmAddress, value: d.address),
                   _Row(
+                    icon: Icons.wc_outlined,
                     label: l10n.restroomTypeLabel,
                     value: DisasterMapLayer.restroomTypeLabel(l10n, d.type),
                   ),
                   _Row(
+                    icon: Icons.category_outlined,
                     label: l10n.restroomCategoryLabel,
                     value: _restroomCategoryLabel(l10n, d.type2),
                   ),
+                  _Divider(),
                   _Row(
+                    icon: Icons.star_outline,
                     label: l10n.restroomGradeLabel,
                     value: _restroomGrade(l10n, d.typegrade),
+                    emphasized: true,
                   ),
                 ],
         );
@@ -601,12 +380,14 @@ class _RestroomBody extends StatelessWidget {
 
 class _ShelterBody extends StatelessWidget {
   const _ShelterBody({
+    required this.accent,
     required this.detail,
     required this.previewName,
     required this.previewPlace,
     required this.onClose,
   });
 
+  final Color accent;
   final ValueListenable<ShelterDetail?> detail;
   final ValueListenable<String?> previewName;
   final ValueListenable<String?> previewPlace;
@@ -621,31 +402,41 @@ class _ShelterBody extends StatelessWidget {
         final name = d?.name ?? previewName.value ?? l10n.mapLayerShelter;
         final place = d?.address ?? previewPlace.value ?? '';
         return _Header(
+          accent: accent,
           icon: Icons.home_work,
           name: name,
           place: place,
           onClose: onClose,
+          mapsTarget: d == null
+              ? null
+              : MapLaunchTarget(lat: d.lat, lng: d.lng, label: d.name),
           body: d == null
               ? [_Loading()]
               : [
-                  _Row(label: l10n.shelterAddressLabel, value: d.address),
                   _Row(
+                    icon: Icons.groups_outlined,
                     label: l10n.shelterCapacityLabel,
                     value: l10n.shelterCapacityValue(d.capacity),
+                    emphasized: true,
                   ),
+                  _Divider(),
                   _Row(
+                    icon: Icons.category_outlined,
                     label: l10n.shelterCategoryLabel,
                     value: d.category.join(', '),
                   ),
                   _Row(
+                    icon: Icons.home_outlined,
                     label: l10n.shelterIndoorLabel,
                     value: d.indoor ? l10n.dpmYes : l10n.dpmNo,
                   ),
                   _Row(
+                    icon: Icons.park_outlined,
                     label: l10n.shelterOutdoorLabel,
                     value: d.outdoor ? l10n.dpmYes : l10n.dpmNo,
                   ),
                   _Row(
+                    icon: Icons.favorite_outline,
                     label: l10n.shelterVulnerableOkLabel,
                     value: d.vulnerableOk ? l10n.dpmYes : l10n.dpmNo,
                   ),
@@ -657,42 +448,84 @@ class _ShelterBody extends StatelessWidget {
 }
 
 /// Title row + optional subtitle + detail rows for a DPM point.
+///
+/// The badge echoes the sub-layer's marker colour, so a sheet about an AED
+/// reads as red, a restroom blue, a shelter orange — the header is the one
+/// place on the sheet that names which of the three the point is.
 class _Header extends StatelessWidget {
   const _Header({
+    required this.accent,
     required this.icon,
     required this.name,
     required this.place,
     required this.onClose,
+    this.mapsTarget,
     required this.body,
   });
 
+  final Color accent;
   final IconData icon;
   final String name;
   final String place;
   final VoidCallback onClose;
+  final MapLaunchTarget? mapsTarget;
   final List<Widget> body;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: colors.primary),
-              const SizedBox(width: AppSpacing.sm),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text(
-                  name,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                        ),
+                      ),
+                      if (place.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          place,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
+              if (mapsTarget != null)
+                IconButton.filledTonal(
+                  tooltip: l10n.dpmOpenInMaps,
+                  onPressed: () => pickAndOpenMapApp(context, mapsTarget!),
+                  icon: const Icon(Icons.directions_outlined),
+                ),
               IconButton(
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: onClose,
@@ -700,18 +533,29 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          if (place.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              place,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
           const SizedBox(height: AppSpacing.md),
           ...body,
         ],
+      ),
+    );
+  }
+}
+
+/// A thin rule grouping related detail rows — the only structure the sheets
+/// body gets, so a long AED list reads as address / category / hours / contact
+/// instead of one undifferentiated wall.
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Divider(
+        height: 1,
+        color: Theme.of(
+          context,
+        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
       ),
     );
   }
@@ -722,49 +566,86 @@ class _Loading extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-      child: Center(
-        child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
+      child: Center(child: InlineLoading()),
     );
   }
 }
 
 class _Row extends StatelessWidget {
-  const _Row({required this.label, required this.value});
+  const _Row({
+    required this.label,
+    required this.value,
+    this.icon,
+    this.emphasized = false,
+    this.onTap,
+  });
 
   final String label;
   final String value;
+
+  /// Leading glyph for the row, so a long list scans by picture before text.
+  final IconData? icon;
+
+  /// Draws the value in the theme's primary colour — for the one number a
+  /// reader is actually here for (capacity, grade, emergency phone).
+  final bool emphasized;
+
+  /// Makes the whole row tappable (e.g. dialling the emergency phone) and
+  /// hints at it with a trailing chevron.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     if (value.trim().isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final icon = this.icon;
+    final onTap = this.onTap;
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (icon != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: colors.onSurfaceVariant),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  letterSpacing: 0.4,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: emphasized ? FontWeight.w700 : FontWeight.w600,
+                  color: emphasized ? colors.primary : null,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (onTap != null)
+          Icon(Icons.chevron_right, size: 20, color: colors.onSurfaceVariant),
+      ],
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: colors.onSurfaceVariant,
-              letterSpacing: 0.4,
+      child: onTap == null
+          ? row
+          : InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(AppSpacing.xs),
+              child: row,
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

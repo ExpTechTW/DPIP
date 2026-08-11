@@ -28,7 +28,6 @@
 | `openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `getLatestReports` | `/api/v1/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
@@ -63,14 +62,31 @@ max-age=300`）。`{sec}` 就是解出清單後的 10 位數秒，直接使用�
 
 ### 衛星雲圖（v2）—— `core-tnn1`
 
-Himawari Band-13 IR XYZ WebP。時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），
-在 API 主機上帶 ETag/304；tile 在 **static** 主機。`{sec}` 就是解出清單後的
-10 分鐘秒，直接使用。
+Himawari-9 AHI 的 XYZ WebP,預設是 Band-13 IR。時間清單是差量編碼的
+Unix 秒（`[baseSec, Δ, …]`）,在 API 主機上帶 ETag/304;tile 在 **static**
+主機。`{sec}` 就是解出清單後的 10 分鐘秒,直接使用。
+
+`?channel=` 選取渲染的頻道或產品 —— 單一頻道用數字（`13`）、命名產品用名稱
+（`btd_wvirw`、`cloudtop`…,即 `satellite-tiles-go/docs.md` 的產品目錄）。
+帶 channel 時時間清單為該 channel 的交集（產品需要的頻道缺一就不可渲染,
+`list` 只列齊全的時刻）。App 的圖層選擇器為每個 channel 註冊一個獨立圖層
+（`satellite` 保留給 B13,其餘為 `satellite-<channel>`）。
 
 | 方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/satellite/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `getFrames` | `/api/v2/tiles/satellite/list[?channel=…]` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp[?channel=…]` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+
+### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
+
+QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫秒**
+（`[baseMs, Δ, …]`）；tile 在 **static** 主機。`{ms}` 就是解出清單後的 13 位數
+毫秒，直接使用（時間軸解析已同時支援秒與毫秒）。
+
+| 方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/qpesums/{ms}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
@@ -172,6 +188,7 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 |---|---|
 | `getLocalizationProgress` | `https://exptech.dev/api/v1/dpip/locale` |
 | `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
+| `getRainHourForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
 
 ## curl 可用性（2026-08-02，HTTP 狀態碼）
 

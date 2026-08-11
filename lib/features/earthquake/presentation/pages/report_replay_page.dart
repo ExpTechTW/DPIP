@@ -17,6 +17,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
@@ -32,10 +33,12 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
+import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_style.dart' show landLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -248,6 +251,10 @@ class _ReplayMapState extends State<_ReplayMap> {
   RtsBoxGrid? _boxGrid;
   bool _boxActive = false;
 
+  /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
+  /// north, kept in sync from [BaseMap.onCameraMove].
+  final ValueNotifier<double> _bearing = ValueNotifier(0);
+
   @override
   void initState() {
     super.initState();
@@ -269,11 +276,35 @@ class _ReplayMapState extends State<_ReplayMap> {
   void dispose() {
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
+    _bearing.dispose();
     super.dispose();
   }
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
+  }
+
+  /// Re-points the camera north, keeping centre / zoom. Mirrors
+  /// [MapScaffold._resetNorth]: the needle is settled directly because a
+  /// programmatic move may not emit a final north-up camera event.
+  void _resetNorth() {
+    final controller = _controller;
+    if (controller == null) return;
+    final position = controller.cameraPosition;
+    if (position == null) return;
+    _bearing.value = 0;
+    unawaited(
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position.target,
+            zoom: position.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _onStyleLoaded() async {
@@ -593,10 +624,30 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseMap(
-      showUserLocation: false,
-      onMapCreated: _onMapCreated,
-      onStyleLoaded: () => unawaited(_onStyleLoaded()),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: BaseMap(
+            showUserLocation: false,
+            compassEnabled: false,
+            onMapCreated: _onMapCreated,
+            onStyleLoaded: () => unawaited(_onStyleLoaded()),
+            onCameraMove: (position) => _bearing.value = position.bearing,
+          ),
+        ),
+        // North indicator, matching the map tab's Flutter [MapCompass] —
+        // parked at top-right, level with the page's back button.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -633,7 +684,7 @@ class _ReplayStatusBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final taipeiTime = clock.now().add(const Duration(hours: 8));
+    final taipeiTime = AppTime.taipei(clock.now());
     final timeText = DateFormat('HH:mm:ss').format(taipeiTime);
 
     final (Color dot, String? statusWord) = switch (rts.status) {
@@ -662,11 +713,7 @@ class _ReplayStatusBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-          ),
+          LegendDot(color: dot),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(

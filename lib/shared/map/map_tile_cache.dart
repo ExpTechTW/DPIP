@@ -2,6 +2,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:dpip/core/logging/log.dart';
@@ -45,19 +46,22 @@ class MapTileCache {
   final EtagCacheStore _store;
   final NetworkUsageStore? _usage;
 
-  /// Native's in-process mirror budget — deliberately **small**.
+  /// Native's in-process mirror budget.
   ///
   /// This tier is a staging buffer for the warm path, not a second copy of the
   /// store: the store stays the source of truth for every byte, and anything
-  /// the mirror does not hold is read back from it. Sizing it generously would
-  /// quietly turn it into the real cache and leave [EtagCacheStore] doing
-  /// nothing but the cold start.
+  /// the mirror does not hold is read back from it. Sizing it is a trade-off —
+  /// too small and a warm band ([RasterTimelineLayer.warmRadius]) evicts its
+  /// own earlier tiles mid-injection and re-reads them on every settle; too
+  /// large and the mirror quietly becomes the real cache, leaving
+  /// [EtagCacheStore] doing nothing but the cold start.
   ///
-  /// A few viewports' worth is enough to cover the frames a drag is actually
-  /// crossing. Keep [RasterTimelineLayer.warmRadius] within what this holds —
-  /// warming a band wider than the budget just evicts its own earlier tiles and
-  /// re-reads them on every settle.
-  static const int defaultMemoryBytes = 2 * 1024 * 1024;
+  /// 24 MB holds a full ±12-frame scrub band of webp tiles *plus* the basemap
+  /// viewport, so a fast timeline drag stays on memory hits even while the map
+  /// itself downloads. [warm]'s fill mode ([warm]) tops it up outward from the
+  /// current frame until it is near this cap, then stops — the mirror trims
+  /// LRU beyond it, dropping the frames a scrub swept past.
+  static const int defaultMemoryBytes = 24 * 1024 * 1024;
 
   /// Tiles per `injectTiles` message — roughly one frame's viewport.
   static const int _injectChunk = 24;
@@ -128,7 +132,13 @@ class MapTileCache {
   /// Returns how many tiles were injected. Safe to call often — the
   /// already-resident check is a strings-only round-trip, so a repeat warm of
   /// the same frame costs almost nothing.
-  Future<int> warm(List<String> urls) async {
+  ///
+  /// When [fillUntil] is non-zero, injection runs in [fillUntil]'s **fill
+  /// mode**: [urls] must be ordered most-wanted first, and the loop stops once
+  /// the native mirror is at `fillUntil × limit` — so a timeline can top the
+  /// mirror up outward from the current frame until it is nearly full and then
+  /// stop, instead of over-filling and churning LRU (or re-reading on settle).
+  Future<int> warm(List<String> urls, {double fillUntil = 0}) async {
     final wanted = urls.where(_isTile).toList(growable: false);
     if (wanted.isEmpty) return 0;
     try {
@@ -149,12 +159,18 @@ class MapTileCache {
       ];
       // Chunked: warming a wide band of frames is megabytes of image data, and
       // one giant message would occupy the platform channel long enough to be
-      // felt by whatever gesture is in progress.
+      // felt by whatever gesture is in progress. Each inject echoes the
+      // mirror's post-injection usage, so a fill warm can bail as it nears the
+      // cap — the remaining (more distant) urls simply stay cold.
       for (var i = 0; i < tiles.length; i += _injectChunk) {
-        final end = i + _injectChunk;
-        await injectMapLibreTiles(
-          end < tiles.length ? tiles.sublist(i, end) : tiles.sublist(i),
-        );
+        final end = math.min(i + _injectChunk, tiles.length);
+        final usage = await injectMapLibreTiles(tiles.sublist(i, end));
+        if (fillUntil > 0 &&
+            usage != null &&
+            usage.limit > 0 &&
+            usage.used >= usage.limit * fillUntil) {
+          break;
+        }
       }
       return hits.length;
     } catch (error, stackTrace) {

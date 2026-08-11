@@ -1,15 +1,26 @@
-/// Shared tile plumbing for the frame-keyed raster overlays (radar, satellite).
+/// Shared tile plumbing for the frame-keyed raster overlays (radar, satellite,
+/// QPESUMS).
 library;
 
+import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/network/api_exception.dart';
+import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/features/weather/data/frame_tile_api.dart';
+import 'package:dpip/features/weather/domain/qpesums_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/features/weather/domain/satellite_repository.dart';
+import 'package:dpip/features/weather/domain/wind_field.dart';
+import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
 
 /// Implements the tile half of [RasterFrameSource] once.
 ///
-/// Radar and satellite differ only in endpoint and zoom ceiling: both serve
-/// `…/<frame>/{z}/{x}/{y}.webp`, so warming, abandoning, and releasing are
-/// identical. Subclasses supply [frames], [tileUrl], and the two constants.
+/// Radar, satellite, and QPESUMS differ only in endpoint and zoom ceiling:
+/// all serve `…/<frame>/{z}/{x}/{y}.webp`, so warming, abandoning, and
+/// releasing are identical. Subclasses supply [frames], [tileUrl], and the two
+/// constants.
 ///
 /// Every URL here is built from [tileUrl] itself rather than reassembled from
 /// parts — a warmed key that differs from what MapLibre requests by so much as
@@ -30,6 +41,11 @@ abstract base class FrameTileRepository implements RasterFrameSource {
   @protected
   String get tilePathPrefix;
 
+  /// How close to native's mirror cap a fill warm fills to — a little under the
+  /// cap (native trims only beyond it), so the mirror stays full but never
+  /// churns.
+  static const double _fillTarget = 0.85;
+
   @override
   Future<void> warmFrameTiles({
     required List<String> frames,
@@ -38,6 +54,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     required double north,
     required double east,
     required double zoom,
+    bool fill = false,
   }) {
     if (frames.isEmpty) return Future<void>.value();
     final tiles = viewportTiles(
@@ -49,14 +66,21 @@ abstract base class FrameTileRepository implements RasterFrameSource {
       maxZoom: maxZoom,
     );
     if (tiles.isEmpty) return Future<void>.value();
-    return warmer.warmUrls([
-      for (final frame in frames)
-        for (final tile in tiles)
-          tileUrl(frame)
-              .replaceFirst('{z}', '${tile.z}')
-              .replaceFirst('{x}', '${tile.x}')
-              .replaceFirst('{y}', '${tile.y}'),
-    ], logLabel: '$tilePathPrefix×${frames.length}');
+    return warmer.warmUrls(
+      [
+        // Frame order is preserved, so a fill warm injects nearest-the-finger
+        // frames' tiles first and only the most distant stay cold when the
+        // mirror fills.
+        for (final frame in frames)
+          for (final tile in tiles)
+            tileUrl(frame)
+                .replaceFirst('{z}', '${tile.z}')
+                .replaceFirst('{x}', '${tile.x}')
+                .replaceFirst('{y}', '${tile.y}'),
+      ],
+      logLabel: '$tilePathPrefix×${frames.length}',
+      fillUntil: fill ? _fillTarget : 0,
+    );
   }
 
   @override
@@ -68,4 +92,46 @@ abstract base class FrameTileRepository implements RasterFrameSource {
 
   /// The URL prefix every tile of [frame] shares — the template up to `{z}`.
   String _framePrefix(String frame) => tileUrl(frame).split('{z}').first;
+}
+
+/// [RasterFrameSource] for one v2 tile overlay, backed by [FrameTileApi].
+///
+/// The concrete overlay is selected by the API's [FrameTileApi.path]. The four
+/// per-overlay domain interfaces are empty aliases of [RasterFrameSource], so a
+/// single parameterised impl satisfies them all; the provider layer still
+/// injects each overlay under its own interface.
+final class FrameTileRepositoryImpl extends FrameTileRepository
+    implements
+        RadarRepository,
+        SatelliteRepository,
+        QpesumsRepository,
+        WindForecastRepository {
+  FrameTileRepositoryImpl(this._api, super.warmer, {this.maxZoom = 11});
+
+  final FrameTileApi _api;
+
+  /// Highest zoom this overlay publishes tiles for. Radar / satellite /
+  /// QPESUMS reach 11; the 0.25° wind forecast grids stop at 7 (any deeper is
+  /// upsampled to nothing new).
+  @override
+  final int maxZoom;
+
+  @override
+  String get tilePathPrefix => '${ApiPaths.tiles}/${_api.path}/';
+
+  @override
+  Future<Result<List<String>>> frames() => guardResult(_api.getFrames);
+
+  @override
+  String tileUrl(String frame) => _api.tileUrl(frame);
+
+  @override
+  Future<Result<WindField>> fetchWindField(String frame) =>
+      guardResult(() async {
+        final bytes = await _api.fetchWindBin(frame);
+        return WindField.fromWnd1(bytes);
+      });
+
+  @override
+  void setStyle(String? style) => _api.style = style;
 }

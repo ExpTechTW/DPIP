@@ -3,9 +3,10 @@ import 'dart:ui' show ImageFilter, lerpDouble;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
-import 'package:dpip/features/home/presentation/widgets/weather_sky_background.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,10 @@ class HomeSheet extends StatelessWidget {
     required this.scrollController,
     required this.extent,
     required this.weatherMode,
+    required this.skyTimeMode,
+    this.rainIntensity,
+    this.snowIntensity,
+    this.humidity,
   });
 
   /// The sheet's detents, sourced from [HomeSheetExtent] so the value notifier's
@@ -66,6 +71,20 @@ class HomeSheet extends StatelessWidget {
 
   /// Which weather look the backdrop renders.
   final WeatherMode weatherMode;
+
+  /// Forced time of day for the backdrop, from experimental settings.
+  final SkyTimeMode skyTimeMode;
+
+  /// Live rain intensity override for the backdrop, or null for the look's own
+  /// default — from the station's CWB code ([weatherRainIntensity]).
+  final double? rainIntensity;
+
+  /// Live snow intensity override, or null for the look's default.
+  final double? snowIntensity;
+
+  /// Live relative humidity 0..1 for the atmosphere blend, or null for the
+  /// backdrop's own default.
+  final double? humidity;
 
   // The sheet floors at [restExtent], so surface opacity only ever ramps from
   // its resting translucency up to fully opaque as it climbs to full.
@@ -129,9 +148,32 @@ class HomeSheet extends StatelessWidget {
                 IgnorePointer(
                   child: Opacity(
                     opacity: weatherOpacity,
-                    child: WeatherSkyBackground(
-                      mode: weatherMode,
-                      active: HomeChrome.weatherActive(e),
+                    child: _ScrollBlurredWeather(
+                      scrollController: scrollController,
+                      // The sky freezes the instant the list scrolls: the
+                      // blur/dim it is about to be put under masks the hold,
+                      // and holding the last frame lets the blur layer below
+                      // cache instead of re-rendering the whole backdrop shader
+                      // on every scroll tick. The state's own clock and ticker
+                      // stop together (see `_syncRunning`), so when the list
+                      // returns to the top the animation resumes where it left
+                      // off — no jump.
+                      child: ListenableBuilder(
+                        listenable: scrollController,
+                        builder: (context, _) {
+                          final scrolled =
+                              scrollController.hasClients &&
+                              scrollController.offset > 0;
+                          return WeatherSkyBackground(
+                            mode: weatherMode,
+                            rainIntensity: rainIntensity,
+                            snowIntensity: snowIntensity,
+                            humidity: humidity ?? 0.65,
+                            timeMode: skyTimeMode,
+                            active: HomeChrome.weatherActive(e) && !scrolled,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -150,6 +192,107 @@ class HomeSheet extends StatelessWidget {
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
 }
 
+/// Blurs and dims [child] in step with [scrollController], so the sky reads as
+/// depth of field behind the content once the sheet's list scrolls the hero's
+/// rain trend card up past the fold — the counterpart to `HomeContent`'s hero
+/// block, which leaves the sky untouched (and unblurred) for as long as the
+/// trend card is still the last thing on screen.
+///
+/// The dim rides the same scroll ramp as the blur: scrolling the list is what
+/// shuts the cards' [RainOnGlass] refraction off (their position gate closes a
+/// short distance into the gesture) and what solidifies `HomeContent`'s cards
+/// out of their sky-glass back into solid plates — darkening the backdrop in
+/// step keeps the space between cards quiet so the solid plates they arrive as
+/// carry the reading.
+///
+/// This is a *second*, independent blur from the one [HomeSheet.build] already
+/// ramps off the sheet's `extent` — that one plays only while the sheet itself
+/// is being dragged open and is already at ~0 by the time the content becomes
+/// scrollable (`extent` is pinned at [HomeSheet.maxExtent] for the list to
+/// scroll at all). Driving both off the same value would leave this one dead;
+/// [scrollController] is the only signal that still moves once the sheet does
+/// not.
+///
+/// Listens directly on [scrollController] rather than through `HomeSheetExtent`
+/// so only this small leaf repaints on every scroll tick — not the sheet's
+/// whole frosted-chrome tree, which is the mistake `HomeSheet`'s own class doc
+/// warns against for the drag case.
+class _ScrollBlurredWeather extends StatelessWidget {
+  const _ScrollBlurredWeather({
+    required this.scrollController,
+    required this.child,
+  });
+
+  final ScrollController scrollController;
+  final Widget child;
+
+  /// Scroll distance over which blur reaches its peak. Short on purpose: the
+  /// trend card itself is most of a screen's scroll away, and holding the sky
+  /// crisp for that whole distance would make the blur feel disconnected from
+  /// the gesture that triggered it. This finishes within the first small
+  /// swipe, before the trend card has travelled far at all.
+  static const double _rampExtent = 140;
+
+  /// Peak blur sigma — soft enough to read as out-of-focus depth, not a
+  /// frosted pane; well under the sheet's own drag blur (24, [HomeSheet.build]),
+  /// since this sits behind readable card content rather than standing in for
+  /// the sheet's surface.
+  static const double _maxSigma = 16;
+
+  /// Peak backdrop dim on the same scroll ramp — enough to drop the sky out of
+  /// competition with the cards once the list is actually moving, without
+  /// turning the whole backdrop into a black hole at the top of the gesture.
+  static const double _maxDim = 0.45;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: scrollController,
+      child: child,
+      builder: (context, child) {
+        final offset = scrollController.hasClients
+            ? scrollController.offset
+            : 0.0;
+        final t = (offset / _rampExtent).clamp(0.0, 1.0);
+        // Quantised so the full-screen blur re-renders only on a few level
+        // changes through the gesture, not on every scroll tick — with the
+        // sky frozen behind it (see HomeSheet's build), the blur layer is
+        // cached between steps and reused as long as the list keeps moving.
+        // The dim rides the same ladder; a 4-step ramp reads as the same
+        // smooth fade.
+        final step = (t * 4).round() / 4;
+        final sigma = _maxSigma * step;
+        final dim = _maxDim * step;
+        // The tree's SHAPE never changes — a blur that toggles via `enabled`
+        // and an always-present transparent dim. Returning the bare child at
+        // rest (as an early version did) re-parents the sky's element the
+        // moment t crosses 0, which disposes and recreates the whole
+        // `WeatherSkyBackground` state: its LUT cache is null again, so the
+        // first blurred frame is the flat fallback colour until every shader
+        // re-decodes. That is the flash. RainOnGlass's doc warns about the
+        // same re-parenting for drags; here it cost a visible blink.
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              // No-op at rest, so no offscreen layer is composited — the sheet
+              // spends most of its time here, and ImageFiltered.enabled skips
+              // the filter without touching the tree shape.
+              enabled: step > 0,
+              child: child,
+            ),
+            // Dim sits *above* the blur so the backdrop darkens uniformly; the
+            // content layer renders above this whole stack in HomeSheet, so the
+            // cards are never dimmed with it. Transparent at rest.
+            ColoredBox(color: Colors.black.withValues(alpha: dim)),
+          ],
+        );
+      },
+    );
+  }
+}
+
 /// The scrollable content ([HomeContent]) — forecast chart, sparkline,
 /// active-events list — re-deriving its own inputs from [HomeSheetExtent]
 /// instead of being handed them by the chrome's per-tick rebuild above. Each
@@ -165,6 +308,7 @@ class _HomeContentLayer extends StatelessWidget {
 
   final ScrollController scrollController;
   final WeatherMode weatherMode;
+
   final double regionBarInset;
 
   @override

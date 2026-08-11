@@ -505,13 +505,226 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeRainTrendTitle => '향후 1시간 강수';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute분';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '업데이트 $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => '데이터 없음';
+
+  @override
+  String get homeRainTrendScattered => '약한 비가 올 수 있어요';
+
+  @override
+  String get homeRainTrendLightSustained => '앞으로 1시간 동안 약한 비가 이어질 거예요';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '$minutes분 후에 비가 그칠 것으로 예상돼요';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '앞으로 1시간 동안 강한 비가 이어질 거예요';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '$minutes분 후에 강한 비가 그칠 것으로 예상돼요';
+  }
+
+  @override
   String get mapLayers => '레이어';
+
+  @override
+  String get mapLayerOrderTitle => '레이어 순서';
+
+  @override
+  String get mapLayerOrderReset => '기본 순서로 재설정';
 
   @override
   String get mapLayerRadar => '레이더 합성 에코';
 
   @override
-  String get mapLayerSatellite => '히마와리 적외';
+  String get mapLayerSatellite => '히마와리 적외(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => '히마와리 가시 청색(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => '히마와리 가시 녹색(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => '히마와리 가시 적색(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => '히마와리 근적외(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => '히마와리 근적외(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => '히마와리 근적외(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => '히마와리 단파 적외(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => '히마와리 상층 수증기(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => '히마와리 중층 수증기(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => '히마와리 하층 수증기(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => '히마와리 이산화황/구름상(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => '히마와리 오존(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => '히마와리 적외(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => '히마와리 장파 적외(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => '히마와리 장파 적외(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => '히마와리 이산화탄소(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => '히마와리 트루컬러';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => '히마와리 내추럴컬러';
+
+  @override
+  String get mapLayerSatelliteAsh => '히마와리 화산재';
+
+  @override
+  String get mapLayerSatelliteDust => '히마와리 황사';
+
+  @override
+  String get mapLayerSatelliteAirmass => '히마와리 에어매스';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => '히마와리 야간 미세물리';
+
+  @override
+  String get mapLayerSatelliteWatervapor => '히마와리 수증기';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => '히마와리 스플릿 윈도우';
+
+  @override
+  String get mapLayerSatelliteBtdFog => '히마와리 야간 안개';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => '히마와리 오버슈팅 탑';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => '히마와리 이산화황/구름상';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => '히마와리 권운/운고';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => '히마와리 대류권계면';
+
+  @override
+  String get mapLayerSatelliteCloudtop => '히마와리 운정 온도';
+
+  @override
+  String get mapLayerSatelliteCloudmask => '히마와리 구름 마스크';
+
+  @override
+  String get mapLayerSatelliteSst => '히마와리 해수면 온도';
+
+  @override
+  String get mapLayerSatelliteNdvi => '히마와리 NDVI';
+
+  @override
+  String get mapLayerSatelliteNdwi => '히마와리 NDWI';
+
+  @override
+  String get mapLayerSatelliteMndwi => '히마와리 MNDWI';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '국경선';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 합성(JMA 레시피)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '맑음';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '아마 맑음';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '아마 구름';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '구름';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '맑음(고온부) = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance =>
+      '낮은 반사율/야간 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '차이 0 = 투명(신호 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '야간 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '데이터 없음(육지) = 투명';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 투명(식생 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 투명(수역 없음)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '맑음 = 투명,배경 지도 표시';
+
+  @override
+  String get mapLayerStyleSection => '색상 스타일';
+
+  @override
+  String get mapLayerStyleTooltip => '색상 스타일';
+
+  @override
+  String get mapLayerStyleGray => '그레이스케일（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '기상청 적외 영상 관례：온도가 낮을수록 흰색';
+
+  @override
+  String get mapLayerStyleJma => '운정 강조（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일';
+
+  @override
+  String get mapLayerQpesums => '1시간 강수 예보';
 
   @override
   String get mapLayerLightning => '번개';
@@ -530,7 +743,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTimelineNow => '현재';
 
   @override
+  String get mapTimelinePast => '과거';
+
+  @override
+  String get mapTimelineFuture => '미래';
+
+  @override
   String get mapTimelineObserved => '관측';
+
+  @override
+  String get mapTimelineForecast => '예보';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return '자료 시간 $time';
+  }
 
   @override
   String get notifySettingsMenu => '알림 설정';
@@ -749,6 +976,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapNavRadar => '레이더';
+
+  @override
+  String get mapNavQpesums => '예보';
 
   @override
   String get mapNavSatellite => '위성';
@@ -1000,6 +1230,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '실시간 지진 모니터';
 
   @override
@@ -1061,6 +1297,70 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get disasterMapOverlayShelterTooltip => '대피소 표시';
+
+  @override
+  String get dpmOpenInMaps => '지도에서 열기';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (기본)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '좌표 복사';
+
+  @override
+  String get mapAppCoordinatesCopied => '좌표가 복사되었습니다';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '$app을(를) 열 수 없습니다';
+  }
+
+  @override
+  String get mapAppCallFailed => '이 기기에서는 전화를 걸 수 없습니다';
+
+  @override
+  String get mapOverlaySectionReference => '참조 레이어';
+
+  @override
+  String get mapLayerCategoryEarthquake => '지진';
+
+  @override
+  String get mapLayerCategoryTyphoon => '태풍';
+
+  @override
+  String get mapLayerCategoryWeather => '기상 관측';
+
+  @override
+  String get mapLayerCategorySatellite => '위성';
+
+  @override
+  String get mapLayerCategoryRadar => '레이더';
+
+  @override
+  String get mapLayerCategoryLife => '생활';
+
+  @override
+  String get mapLayerCategoryForecast => '수치 예보';
+
+  @override
+  String get mapOverlaySectionMap => '지도';
+
+  @override
+  String get rainIntervalSection => '집계 시간';
+
+  @override
+  String get mapTownLabels => '읍면동 이름';
+
+  @override
+  String get mapTownLabelsHint => '확대하면 읍면동 이름 표시';
 
   @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
@@ -1202,6 +1502,16 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => 'Mild typhoon';
 
   @override
@@ -1230,6 +1540,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapMyLocation => '내 위치';
+
+  @override
+  String get mapResetNorth => '북쪽으로 되돌리기';
 
   @override
   String get typhoonLegendCircle15 => '강풍권 (7급)';
@@ -1361,4 +1674,100 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => '핵 사고';
+
+  @override
+  String get skyTime => '하늘 시각';
+
+  @override
+  String get skyTimeAuto => '자동';
+
+  @override
+  String get skyTimeDawn => '여명';
+
+  @override
+  String get skyTimeSunrise => '일출';
+
+  @override
+  String get skyTimeMorning => '오전';
+
+  @override
+  String get skyTimeNoon => '정오';
+
+  @override
+  String get skyTimeAfternoon => '오후';
+
+  @override
+  String get skyTimeGolden => '골든아워';
+
+  @override
+  String get skyTimeSunset => '일몰';
+
+  @override
+  String get skyTimeDusk => '땅거미';
+
+  @override
+  String get skyTimeNight => '밤';
+
+  @override
+  String get weatherModeCloudy => '구름 많음';
+
+  @override
+  String get weatherModeOvercast => '흐림';
+
+  @override
+  String get weatherModeSnow => '눈';
+
+  @override
+  String get weatherModeSand => '황사';
+
+  @override
+  String get radarScanRange => '스캔 범위 표시';
+
+  @override
+  String get radarScanRangeSubtitle => '레이더 4기가 실제로 관측하는 범위를 표시합니다.';
+
+  @override
+  String get radarScanRangeHint => '범위 밖 공백은 미관측';
+
+  @override
+  String get radarOverlayMenuTooltip => '레이더 레이어 옵션';
+
+  @override
+  String get radarCountyOutline => '시·군 경계';
+
+  @override
+  String get radarGlobalOutline => '국경';
+
+  @override
+  String get radarGlobalOutlineHint => '각국 국경선';
+
+  @override
+  String get radarCountyOutlineHint => '에코 위에 표시';
+
+  @override
+  String get radarCountyOutlineSubtitle => '레이더 에코 아래에서도 경계가 보이도록 합니다.';
+
+  @override
+  String get radarTownOutline => '읍·면·동 경계';
+
+  @override
+  String get radarTownOutlineHint => '더 세밀한 구획';
+
+  @override
+  String get radarTownOutlineSubtitle => '레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '정량 강수 예보 레이어 옵션';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '바람 예보 레이어 옵션';
+
+  @override
+  String get windForecastCountyOutlineHint => '바람장 위에 표시';
+
+  @override
+  String get windForecastGlobalOutlineHint => '각국 국경선';
+
+  @override
+  String get windForecastTownOutlineHint => '더 촘촘한 망';
 }

@@ -8,13 +8,17 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/format.dart';
+import 'package:dpip/core/geo/geo_math.dart';
+import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 /// A trend series to plot: absolute Unix-second [times] aligned index-wise to
@@ -54,6 +58,10 @@ abstract interface class StationSheetSource {
 
   /// The current reading text for [id] (e.g. "27.8°C"), or null if unknown.
   String? reading(String id);
+
+  /// An icon rendered beside [reading] (e.g. a rotated wind arrow tinted by the
+  /// station's current speed), or null for layers without one.
+  Widget? readingIcon(String id);
 
   /// The colour this station's value has on the map, or null when it has no
   /// reading. Shown as a small mark beside the name so the sheet is visibly the
@@ -106,9 +114,6 @@ class StationSheet extends StatefulWidget {
   static const double peekExtent = 0.14;
   static const double _rest = 0.42;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<StationSheet> createState() => _StationSheetState();
@@ -144,8 +149,6 @@ class _StationSheetState extends State<StationSheet> {
   @override
   Widget build(BuildContext context) {
     final source = widget.source;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return ValueListenableBuilder<int>(
       valueListenable: source.selectionRevision,
       builder: (context, revision, _) => ValueListenableBuilder<String?>(
@@ -164,68 +167,26 @@ class _StationSheetState extends State<StationSheet> {
               if (mounted) _extent.value = initial;
             });
           }
-          return NotificationListener<DraggableScrollableNotification>(
-            onNotification: (notification) {
-              _extent.value = notification.extent;
-              return false;
-            },
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: DraggableScrollableSheet(
-                key: ValueKey(selected ? 'sel-$revision' : 'peek'),
-                expand: false,
-                initialChildSize: initial,
-                minChildSize: StationSheet.peekExtent,
-                maxChildSize: StationSheet._expanded,
-                snap: true,
-                snapSizes: const [StationSheet._rest],
-                builder: (context, scrollController) {
-                  // Body is the VLB child — extent ticks only restyle chrome.
-                  final body = stationId == null
-                      ? _EmptyBody(
-                          scrollController: scrollController,
-                          extent: _extent,
-                        )
-                      : _SheetBody(
-                          source: source,
-                          stationId: stationId,
-                          scrollController: scrollController,
-                          loadTrend: _trend,
-                          invalidateTrend: _invalidateTrend,
-                          extent: _extent,
-                        );
-                  return ValueListenableBuilder<double>(
-                    valueListenable: _extent,
-                    child: body,
-                    builder: (context, extent, child) {
-                      final atTop = StationSheet._isAtTop(extent);
-                      final topInset = MediaQuery.paddingOf(context).top;
-                      return AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          statusBarColor: atTop
-                              ? colors.surface
-                              : Colors.transparent,
-                          statusBarIconBrightness:
-                              theme.brightness == Brightness.dark
-                              ? Brightness.light
-                              : Brightness.dark,
-                          statusBarBrightness: theme.brightness,
-                        ),
-                        child: _SheetSurface(
-                          flushTop: atTop,
-                          // Sheet paints under the status bar; pad content so
-                          // titles clear the island. Mid-height: no top gap.
-                          child: Padding(
-                            padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                            child: child!,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+          return ExtentSheetChrome(
+            extent: _extent,
+            keyValue: selected ? 'sel-$revision' : 'peek',
+            initial: initial,
+            min: StationSheet.peekExtent,
+            max: StationSheet._expanded,
+            snapSizes: const [StationSheet._rest],
+            content: (context, scrollController) => stationId == null
+                ? _EmptyBody(
+                    scrollController: scrollController,
+                    extent: _extent,
+                  )
+                : _SheetBody(
+                    source: source,
+                    stationId: stationId,
+                    scrollController: scrollController,
+                    loadTrend: _trend,
+                    invalidateTrend: _invalidateTrend,
+                    extent: _extent,
+                  ),
           );
         },
       ),
@@ -251,7 +212,7 @@ class _EmptyBody extends StatelessWidget {
       // status-bar-sized gap above the grip even with no SafeArea wrapper.
       padding: EdgeInsets.zero,
       children: [
-        _SheetGrip(extent: extent),
+        SheetGrip(extent: extent),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -275,103 +236,6 @@ class _EmptyBody extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// The sheet's grab handle — hidden once the sheet is flush with the top.
-class _SheetGrip extends StatefulWidget {
-  const _SheetGrip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_SheetGrip> createState() => _SheetGripState();
-}
-
-class _SheetGripState extends State<_SheetGrip> {
-  late bool _show = !StationSheet._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_SheetGrip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !StationSheet._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    // Defer — flipping grip mid-DSS-layout dirties parentData for semantics.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !StationSheet._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
-  }
-}
-
-/// The frosted, rounded sheet panel.
-class _SheetSurface extends StatelessWidget {
-  const _SheetSurface({required this.child, this.flushTop = false});
-
-  final Widget child;
-
-  /// Full-bleed under the status bar — drop top radius / shadow so it reads as
-  /// one panel with the safe-area band, not a floating card.
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
     );
   }
 }
@@ -441,12 +305,13 @@ class _SheetBodyState extends State<_SheetBody> {
       controller: widget.scrollController,
       padding: EdgeInsets.zero,
       children: [
-        _SheetGrip(extent: widget.extent),
+        SheetGrip(extent: widget.extent),
         _StationHero(
           extent: widget.extent,
           name: widget.source.stationName(id),
           subtitle: widget.source.stationSubtitle(id),
           reading: reading,
+          readingIcon: widget.source.readingIcon(id),
           valueColor: widget.source.valueColor(id),
           onClose: widget.source.close,
         ),
@@ -535,6 +400,7 @@ class _StationHero extends StatefulWidget {
     required this.onClose,
     this.subtitle,
     this.reading,
+    this.readingIcon,
     this.valueColor,
   });
 
@@ -542,6 +408,7 @@ class _StationHero extends StatefulWidget {
   final String name;
   final String? subtitle;
   final String? reading;
+  final Widget? readingIcon;
   final Color? valueColor;
   final VoidCallback onClose;
 
@@ -549,53 +416,26 @@ class _StationHero extends StatefulWidget {
   State<_StationHero> createState() => _StationHeroState();
 }
 
-class _StationHeroState extends State<_StationHero> {
-  late bool _expanded = StationSheet._isAtTop(widget.extent.value);
+class _StationHeroState extends State<_StationHero> with SheetExtentFlag {
+  @override
+  ValueListenable<double> get sheetExtent => widget.extent;
 
   @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_StationHero old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = StationSheet._isAtTop(widget.extent.value);
-    if (next == _expanded) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final expanded = StationSheet._isAtTop(widget.extent.value);
-      if (expanded != _expanded) setState(() => _expanded = expanded);
-    });
-  }
+  bool sheetFlagFrom(double extent) => sheetExtentIsAtTop(extent);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final nameStyle = _expanded
+    final expanded = sheetFlag;
+    final nameStyle = expanded
         ? theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700)
         : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
     final subStyle =
-        (_expanded ? theme.textTheme.bodyMedium : theme.textTheme.bodySmall)
+        (expanded ? theme.textTheme.bodyMedium : theme.textTheme.bodySmall)
             ?.copyWith(color: colors.onSurfaceVariant);
-    final readingStyle = _expanded
+    final readingStyle = expanded
         ? theme.textTheme.displayMedium?.copyWith(
             color: colors.onSurface,
             fontWeight: FontWeight.w600,
@@ -606,15 +446,15 @@ class _StationHeroState extends State<_StationHero> {
             fontWeight: FontWeight.w600,
             height: 1,
           );
-    final dotSize = _expanded ? 14.0 : 10.0;
+    final dotSize = expanded ? 14.0 : 10.0;
 
     // No AnimatedSize here — it + DSS resize trips semantics.parentDataDirty.
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        _expanded ? AppSpacing.md : 0,
+        expanded ? AppSpacing.md : 0,
         AppSpacing.sm,
-        _expanded ? AppSpacing.md : AppSpacing.sm,
+        expanded ? AppSpacing.md : AppSpacing.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -625,7 +465,7 @@ class _StationHeroState extends State<_StationHero> {
               if (widget.valueColor case final dot?) ...[
                 Padding(
                   padding: EdgeInsets.only(
-                    top: _expanded ? 8 : 5,
+                    top: expanded ? 8 : 5,
                     right: AppSpacing.sm,
                   ),
                   child: AnimatedContainer(
@@ -670,12 +510,23 @@ class _StationHeroState extends State<_StationHero> {
             ],
           ),
           if (widget.reading case final reading?) ...[
-            SizedBox(height: _expanded ? AppSpacing.md : AppSpacing.xs),
-            AnimatedDefaultTextStyle(
-              duration: AppMotion.medium,
-              curve: Curves.easeOutCubic,
-              style: readingStyle ?? const TextStyle(),
-              child: Text(reading),
+            SizedBox(height: expanded ? AppSpacing.md : AppSpacing.xs),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (widget.readingIcon case final icon?) ...[
+                  icon,
+                  const SizedBox(width: AppSpacing.sm),
+                ],
+                Flexible(
+                  child: AnimatedDefaultTextStyle(
+                    duration: AppMotion.medium,
+                    curve: Curves.easeOutCubic,
+                    style: readingStyle ?? const TextStyle(),
+                    child: Text(reading),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -896,10 +747,9 @@ class _TrendChart extends StatelessWidget {
     if (maxY <= minY) maxY = minY + yInterval;
 
     String timeLabel(double x) {
-      final t = DateTime.fromMillisecondsSinceEpoch(
-        x.toInt() * 1000,
-        isUtc: true,
-      ).add(const Duration(hours: 8));
+      final t = AppTime.taipei(
+        DateTime.fromMillisecondsSinceEpoch(x.toInt() * 1000, isUtc: true),
+      );
       final hourMark = l10n.chartHourLabel(t.hour);
       // Daily-or-wider: date only. Sub-daily 7d: date + hour. 24h: compact hour.
       if (labelStep >= 24 * hourSec) return DateFormat('M/d').format(t);
@@ -913,31 +763,45 @@ class _TrendChart extends StatelessWidget {
 
     bool onLabelStep(double value) => _isOnStep(value, labelAnchor, labelStep);
 
-    int? directionForSpot(int spotIndex) {
-      final directions = series.directions;
-      if (directions == null || spotIndex < 0 || spotIndex >= sampleAt.length) {
-        return null;
+    /// Sample index (into [series.values]/[directions]) nearest chart-x [x] —
+    /// works across the per-bucket segment bars, whose `spotIndex` is relative
+    /// to each segment's own list and so can't index back into the series.
+    ///
+    /// Spots are ordered by time, so this is a binary search — a 7 d series is
+    /// ~170 points, and this runs for every axis tick and tooltip.
+    int nearestSample(double x) {
+      var lo = 0, hi = spots.length;
+      while (lo < hi) {
+        final mid = (lo + hi) >> 1;
+        if (spots[mid].x < x) {
+          lo = mid + 1;
+        } else {
+          hi = mid;
+        }
       }
-      final sample = sampleAt[spotIndex];
-      if (sample >= directions.length) return null;
-      return directions[sample];
+      if (lo == 0) return sampleAt[0];
+      if (lo == spots.length) return sampleAt[lo - 1];
+      // Tie → the earlier index, matching the old scan's strict `<`.
+      return (spots[lo].x - x).abs() < (x - spots[lo - 1].x).abs()
+          ? sampleAt[lo]
+          : sampleAt[lo - 1];
     }
 
     /// Nearest sample's meteorological "from" at chart-x [x] (for axis ticks).
-    int? directionNear(double x) {
+    int? nearestDirection(double x) {
       final directions = series.directions;
-      if (directions == null || spots.isEmpty) return null;
-      var best = 0;
-      var bestDist = (spots.first.x - x).abs();
-      for (var i = 1; i < spots.length; i++) {
-        final d = (spots[i].x - x).abs();
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      }
-      return directionForSpot(best);
+      if (directions == null) return null;
+      return directions[nearestSample(x)];
     }
+
+    /// Nearest sample's wind speed at chart-x [x], or null when the series has
+    /// no value there.
+    double? nearestSpeed(double x) => series.values[nearestSample(x)];
+
+    /// The ramp colour at chart-x [x] — used for the tooltip, so a tooltip over
+    /// a strong reading is as coloured as the curve.
+    Color speedColorAt(double x) =>
+        isWind ? windSpeedColor(series.values[nearestSample(x)]!) : lineColor;
 
     // Bottom axis: wind needs a second row for arrows above the clock labels.
     final bottomReserved = isWind ? 40.0 : 22.0;
@@ -1010,28 +874,26 @@ class _TrendChart extends StatelessWidget {
                 child: UnconstrainedBox(child: time),
               );
             }
-            final from = directionNear(x);
+            final from = nearestDirection(x);
+            final speed = nearestSpeed(x);
+            final Widget arrow;
+            if (from != null && speed != null) {
+              arrow = Transform.rotate(
+                angle: degToRad(from + 180),
+                child: WindArrowIcon(size: 12, color: windSpeedColor(speed)),
+              );
+            } else {
+              // Matches the arrow box height (glyph + outline) so the clock
+              // labels stay aligned whether or not this tick has an arrow.
+              arrow = const SizedBox(height: 16);
+            }
             return SideTitleWidget(
               meta: meta,
               space: 2,
               child: UnconstrainedBox(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (from != null)
-                      Transform.rotate(
-                        angle: (from + 180) * math.pi / 180,
-                        child: Icon(
-                          Icons.navigation,
-                          size: 12,
-                          color: lineColor,
-                        ),
-                      )
-                    else
-                      const SizedBox(height: 12),
-                    const SizedBox(height: 2),
-                    time,
-                  ],
+                  children: [arrow, const SizedBox(height: 2), time],
                 ),
               ),
             );
@@ -1300,6 +1162,55 @@ class _TrendChart extends StatelessWidget {
       );
     }
 
+    // Wind: the speed curve is drawn in per-bucket runs (white → pink, the same
+    // ramp as the map arrows), so crossing a threshold visibly changes colour —
+    // one colour for the whole line hides how strong the wind is.
+    final windSegments = isWind ? _windSegments(spots, sampleAt, series) : null;
+    LineChartBarData lineBar(List<FlSpot> barSpots, Color color) {
+      final isWholeSeries = identical(barSpots, spots);
+      final isSeriesEnd =
+          windSegments != null &&
+          barSpots.isNotEmpty &&
+          identical(barSpots.last, spots.last);
+      return LineChartBarData(
+        spots: barSpots,
+        isCurved: true,
+        preventCurveOverShooting: true,
+        color: color,
+        barWidth: 2.5,
+        isStrokeCapRound: true,
+        isStrokeJoinRound: true,
+        shadow: Shadow(
+          color: color.withValues(alpha: 0.28),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+        // End marker for the whole series only — a per-segment marker would
+        // dot every threshold crossing.
+        dotData: FlDotData(
+          checkToShowDot: (spot, bar) =>
+              (isWholeSeries || isSeriesEnd) && spot == bar.spots.last,
+          getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+            radius: 4.5,
+            color: color,
+            strokeColor: colors.surface,
+            strokeWidth: 2,
+          ),
+        ),
+        belowBarData: BarAreaData(
+          show: true,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              color.withValues(alpha: 0.22),
+              color.withValues(alpha: 0.02),
+            ],
+          ),
+        ),
+      );
+    }
+
     return LineChart(
       LineChartData(
         minX: minX,
@@ -1307,41 +1218,11 @@ class _TrendChart extends StatelessWidget {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          LineChartBarData(
-            spots: spots,
-            isCurved: true,
-            preventCurveOverShooting: true,
-            color: lineColor,
-            barWidth: 2.5,
-            isStrokeCapRound: true,
-            isStrokeJoinRound: true,
-            shadow: Shadow(
-              color: lineColor.withValues(alpha: 0.28),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-            // End marker only — wind direction lives on the bottom axis.
-            dotData: FlDotData(
-              checkToShowDot: (spot, bar) => spot == bar.spots.last,
-              getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-                radius: 4.5,
-                color: lineColor,
-                strokeColor: colors.surface,
-                strokeWidth: 2,
-              ),
-            ),
-            belowBarData: BarAreaData(
-              show: true,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  lineColor.withValues(alpha: 0.22),
-                  lineColor.withValues(alpha: 0.02),
-                ],
-              ),
-            ),
-          ),
+          if (windSegments != null)
+            for (final segment in windSegments)
+              lineBar(segment.spots, segment.color)
+          else
+            lineBar(spots, lineColor),
         ],
         gridData: FlGridData(
           drawVerticalLine: true,
@@ -1374,7 +1255,7 @@ class _TrendChart extends StatelessWidget {
             for (final _ in indices)
               TouchedSpotIndicatorData(
                 FlLine(
-                  color: lineColor.withValues(alpha: 0.35),
+                  color: (bar.color ?? lineColor).withValues(alpha: 0.35),
                   strokeWidth: 1,
                   dashArray: const [4, 3],
                 ),
@@ -1382,7 +1263,7 @@ class _TrendChart extends StatelessWidget {
                   getDotPainter: (spot, percent, bar, index) =>
                       FlDotCirclePainter(
                         radius: 5,
-                        color: lineColor,
+                        color: bar.color ?? lineColor,
                         strokeColor: colors.surface,
                         strokeWidth: 2,
                       ),
@@ -1404,18 +1285,15 @@ class _TrendChart extends StatelessWidget {
               color: lineColor.withValues(alpha: 0.55),
               width: 1,
             ),
-            getTooltipItems: (touched) => [
-              for (final spot in touched)
-                _tooltipItem(
-                  spot: spot,
-                  unit: unit,
-                  time: timeLabel(spot.x),
-                  direction: directionForSpot(spot.spotIndex),
-                  colors: colors,
-                  textTheme: theme.textTheme,
-                  accent: lineColor,
-                ),
-            ],
+            getTooltipItems: (touched) => windTooltipItems(
+              touched: touched,
+              unit: unit,
+              timeLabel: timeLabel,
+              directionAt: nearestDirection,
+              accentAt: speedColorAt,
+              colors: colors,
+              textTheme: theme.textTheme,
+            ),
           ),
         ),
       ),
@@ -1424,6 +1302,73 @@ class _TrendChart extends StatelessWidget {
       duration: Duration.zero,
     );
   }
+}
+
+/// Splits [spots] into contiguous same-bucket runs of the wind ramp, so the
+/// chart can draw each run in its bucket colour.
+///
+/// Each run after the first starts at the previous run's last spot (a shared
+/// endpoint), so the curve never gaps at a threshold crossing — the shared
+/// point renders in the new bucket's colour, which reads as the step happening
+/// exactly there. A leading run shorter than two spots is dropped: the next
+/// run already draws it (it starts at that spot), and fl_chart can't stroke a
+/// one-point bar.
+List<({List<FlSpot> spots, Color color})> _windSegments(
+  List<FlSpot> spots,
+  List<int> sampleAt,
+  TrendSeries series,
+) {
+  final buckets = [
+    for (final i in sampleAt) windSpeedBucket(series.values[i]!),
+  ];
+  final segments = <({List<FlSpot> spots, Color color})>[];
+  var start = 0;
+  while (start < spots.length) {
+    final bucket = buckets[start];
+    var end = start + 1;
+    while (end < spots.length && buckets[end] == bucket) {
+      end++;
+    }
+    final from = segments.isEmpty ? start : start - 1;
+    final run = [for (var i = from; i < end; i++) spots[i]];
+    if (run.length >= 2) {
+      segments.add((spots: run, color: windBuckets[bucket].$2));
+    }
+    start = end;
+  }
+  return segments;
+}
+
+/// Builds the wind-chart tooltip items for [touched].
+///
+/// fl_chart hard-requires **one item per touched spot** (`drawTouchTooltip`
+/// throws on a length mismatch). The wind curve is drawn as per-bucket segment
+/// bars that share their boundary spots, so a single touch near a threshold
+/// crossing can land on two bars at the same x — every item must be returned,
+/// and the duplicates (same value, same time) render perfectly overlapping, so
+/// a boundary touch still reads as a single card. Do **not** dedupe here.
+@visibleForTesting
+List<LineTooltipItem> windTooltipItems({
+  required List<LineBarSpot> touched,
+  required String unit,
+  required String Function(double x) timeLabel,
+  required int? Function(double x) directionAt,
+  required Color Function(double x) accentAt,
+  required ColorScheme colors,
+  required TextTheme textTheme,
+}) {
+  return [
+    for (final spot in touched)
+      _tooltipItem(
+        spot: spot,
+        unit: unit,
+        time: timeLabel(spot.x),
+        direction: directionAt(spot.x),
+        colors: colors,
+        textTheme: textTheme,
+        accent: accentAt(spot.x),
+      ),
+  ];
 }
 
 /// Chart touch tooltip: value emphasized, meta (direction / time) muted.
@@ -1520,8 +1465,7 @@ double niceAxisStep(double span, int targetTicks) {
 /// "1007.0" stays "1007" and fits the left gutter.
 String _axisLabel(double value, double step) {
   if (step >= 1) return value.toStringAsFixed(0);
-  final label = value.toStringAsFixed(1);
-  return label.endsWith('.0') ? label.substring(0, label.length - 2) : label;
+  return trimTrailingZero(value);
 }
 
 /// fl_chart reserves a shown side's `reservedSize` as canvas margin

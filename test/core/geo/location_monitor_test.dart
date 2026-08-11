@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,7 +49,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = Prefs(await SharedPreferences.getInstance());
     regions = RegionStore(prefs);
-    positions = StreamController<GpsFix>();
+    // Broadcast so a recovery-driven `reporter.restart()` can re-subscribe (a
+    // single-subscription stream throws on the second listen).
+    positions = StreamController<GpsFix>.broadcast();
     reporter = DeviceLocationReporter(
       positions: () => positions.stream,
       prefs: prefs,
@@ -132,5 +136,67 @@ void main() {
     positions.add((lat: _taipeiFix.lat, lng: _taipeiFix.lng));
     await pumpEventQueue();
     expect(regions.currentCode, _tainanCode);
+  });
+
+  test('GPS loss clears the township so 所在地 degrades to nationwide', () async {
+    var available = true;
+    final location = LocationService(
+      _directory(),
+      isAvailable: () async => available,
+      fix: () async => _tainanFix,
+      status: () async =>
+          available ? LocationStatus.ready : LocationStatus.serviceOff,
+    );
+    final monitor = LocationMonitor(
+      location: location,
+      reporter: reporter,
+      regions: regions,
+    )..start();
+    reporter.start();
+    await pumpEventQueue();
+
+    positions.add((lat: _tainanFix.lat, lng: _tainanFix.lng));
+    await pumpEventQueue();
+    expect(regions.currentCode, _tainanCode);
+
+    // Services off → the monitor re-checks on resume and must not keep the
+    // last-known township as the current one (the backdrop would frame it).
+    available = false;
+    WidgetsBinding.instance.handleAppLifecycleStateChanged(
+      AppLifecycleState.resumed,
+    );
+    await pumpEventQueue();
+    expect(regions.currentCode, isNull);
+
+    monitor.dispose();
+  });
+
+  test('GPS returning re-resolves the current township', () async {
+    var available = false;
+    final location = LocationService(
+      _directory(),
+      isAvailable: () async => available,
+      fix: () async => _taipeiFix,
+      status: () async =>
+          available ? LocationStatus.ready : LocationStatus.serviceOff,
+    );
+    final monitor = LocationMonitor(
+      location: location,
+      reporter: reporter,
+      regions: regions,
+    )..start();
+    reporter.start();
+    await pumpEventQueue();
+    expect(regions.currentCode, isNull);
+
+    // Recovery re-resolves 所在地 instead of leaving it nationwide.
+    available = true;
+    WidgetsBinding.instance.handleAppLifecycleStateChanged(
+      AppLifecycleState.resumed,
+    );
+    await pumpEventQueue();
+    expect(regions.currentCode, _taipeiCode);
+
+    monitor.dispose();
   });
 }

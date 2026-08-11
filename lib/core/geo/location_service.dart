@@ -26,8 +26,12 @@ class LocationService {
     this._boundaries,
     Future<bool> Function()? isAvailable,
     Future<GpsFix?> Function()? fix,
+    Future<GpsFix?> Function()? lastKnown,
+    Future<LocationStatus> Function()? status,
   }) : _isAvailable = isAvailable ?? _geolocatorAvailable,
-       _fix = fix ?? _geolocatorFix;
+       _fix = fix ?? _geolocatorFix,
+       _lastKnownFix = lastKnown ?? _geolocatorLastKnown,
+       _status = status ?? _geolocatorStatus;
 
   final TownDirectory _directory;
 
@@ -37,21 +41,14 @@ class LocationService {
 
   final Future<bool> Function() _isAvailable;
   final Future<GpsFix?> Function() _fix;
+  final Future<GpsFix?> Function() _lastKnownFix;
+  final Future<LocationStatus> Function() _status;
 
   /// The combined location-availability [LocationStatus] (services + permission).
   /// Never throws — a fault degrades to [LocationStatus.denied].
   Future<LocationStatus> status() async {
     try {
-      if (!await Geolocator.isLocationServiceEnabled()) {
-        return LocationStatus.serviceOff;
-      }
-      return switch (await Geolocator.checkPermission()) {
-        LocationPermission.always => LocationStatus.ready,
-        LocationPermission.whileInUse => LocationStatus.whileInUseOnly,
-        LocationPermission.deniedForever => LocationStatus.deniedForever,
-        LocationPermission.denied ||
-        LocationPermission.unableToDetermine => LocationStatus.denied,
-      };
+      return await _status();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'location status');
       return LocationStatus.denied;
@@ -182,6 +179,22 @@ class LocationService {
     }
   }
 
+  /// The most recent cached fix if it's fresh enough ([_maxLastKnownAge]),
+  /// else null — never a live read, so it returns immediately.
+  ///
+  /// For surfaces that must frame instantly (the home backdrop) and would
+  /// otherwise wait out a GPS timeout: on a simulator with no location the
+  /// cached fix is null, so it can fall back to the nationwide view right away
+  /// instead of holding the previous frame for the live-read window.
+  Future<GpsFix?> lastKnownFix() async {
+    try {
+      return await _lastKnownFix();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'last-known GPS fix');
+      return null;
+    }
+  }
+
   /// The current township from GPS, or null if unavailable / no fix.
   Future<Town?> currentTown() async {
     try {
@@ -222,6 +235,27 @@ class LocationService {
     final permission = await Geolocator.checkPermission();
     return permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse;
+  }
+
+  static Future<GpsFix?> _geolocatorLastKnown() async {
+    final cached = await Geolocator.getLastKnownPosition();
+    if (cached != null && _isFresh(cached.timestamp)) {
+      return (lat: cached.latitude, lng: cached.longitude);
+    }
+    return null;
+  }
+
+  static Future<LocationStatus> _geolocatorStatus() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return LocationStatus.serviceOff;
+    }
+    return switch (await Geolocator.checkPermission()) {
+      LocationPermission.always => LocationStatus.ready,
+      LocationPermission.whileInUse => LocationStatus.whileInUseOnly,
+      LocationPermission.deniedForever => LocationStatus.deniedForever,
+      LocationPermission.denied ||
+      LocationPermission.unableToDetermine => LocationStatus.denied,
+    };
   }
 
   /// How old a cached OS fix may be and still stand in for a live one. The

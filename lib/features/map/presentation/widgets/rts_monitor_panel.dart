@@ -10,6 +10,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -65,10 +66,9 @@ class _StatusBar extends StatelessWidget {
     // immune. Latency floored at 0 against sub-sync jitter.
     final dataTime = hasData
         ? DateFormat('HH:mm:ss').format(
-            DateTime.fromMillisecondsSinceEpoch(
-              time,
-              isUtc: true,
-            ).add(const Duration(hours: 8)),
+            AppTime.taipei(
+              DateTime.fromMillisecondsSinceEpoch(time, isUtc: true),
+            ),
           )
         : null;
     final raw = AppTime.utc.millisecondsSinceEpoch - time;
@@ -115,7 +115,7 @@ class _StatusBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _StatusDot(color: dot),
+          LegendDot(color: dot),
           const SizedBox(width: AppSpacing.sm),
           // Yields to the trailing readouts so a long locale or large text scale
           // ellipsises the title instead of overflowing the row.
@@ -162,21 +162,5 @@ class _StatusBar extends StatelessWidget {
     if (ms < 1000) return Colors.green;
     if (ms < 2000) return Colors.orange;
     return Colors.red;
-  }
-}
-
-/// A freshness dot in the [color] chosen for the feed status.
-class _StatusDot extends StatelessWidget {
-  const _StatusDot({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
   }
 }

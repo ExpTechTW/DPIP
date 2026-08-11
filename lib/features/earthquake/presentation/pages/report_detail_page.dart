@@ -4,7 +4,6 @@
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
@@ -13,6 +12,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
@@ -21,12 +21,15 @@ import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
+import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
+import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -111,22 +114,11 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
 /// The report's epicentre + station bounds, in the map library's coordinate
 /// type — computed here (not on the domain model) so the domain layer stays
 /// free of a `maplibre_gl` dependency.
-LatLngBounds _reportBounds(EarthquakeReport report) {
-  var minLat = report.latitude, maxLat = report.latitude;
-  var minLon = report.longitude, maxLon = report.longitude;
-  for (final area in report.list.values) {
-    for (final town in area.town.values) {
-      minLat = math.min(minLat, town.latitude);
-      maxLat = math.max(maxLat, town.latitude);
-      minLon = math.min(minLon, town.longitude);
-      maxLon = math.max(maxLon, town.longitude);
-    }
-  }
-  return LatLngBounds(
-    southwest: LatLng(minLat, minLon),
-    northeast: LatLng(maxLat, maxLon),
-  );
-}
+LatLngBounds _reportBounds(EarthquakeReport report) => boundsFromPoints([
+  LatLng(report.latitude, report.longitude),
+  for (final area in report.list.values)
+    for (final town in area.town.values) LatLng(town.latitude, town.longitude),
+])!;
 
 /// One 震度 level's counties (縣市) and, per county, the felt area/town names —
 /// grouping by intensity first (highest first), not by county, mirrors the
@@ -219,8 +211,42 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   MapLibreMapController? _controller;
   bool _iconsLoaded = false;
 
+  /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
+  /// north. Kept in sync from [BaseMap.onCameraMove] so the needle tracks
+  /// rotation live, matching the map tab's compass.
+  final ValueNotifier<double> _bearing = ValueNotifier(0);
+
+  @override
+  void dispose() {
+    _bearing.dispose();
+    super.dispose();
+  }
+
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
+  }
+
+  /// Re-points the camera north, keeping centre / zoom. Mirrors
+  /// [MapScaffold._resetNorth]: the needle is settled directly because a
+  /// programmatic move may not emit a final north-up camera event.
+  void _resetNorth() {
+    final controller = _controller;
+    if (controller == null) return;
+    final position = controller.cameraPosition;
+    if (position == null) return;
+    _bearing.value = 0;
+    unawaited(
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position.target,
+            zoom: position.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _onStyleLoaded() async {
@@ -321,14 +347,28 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
         Positioned.fill(
           child: BaseMap(
             showUserLocation: false,
+            compassEnabled: false,
             onMapCreated: _onMapCreated,
             onStyleLoaded: () => unawaited(_onStyleLoaded()),
+            onCameraMove: (position) => _bearing.value = position.bearing,
           ),
         ),
         Positioned.fill(
           child: _ReportSheet(
             report: widget.report,
             expandedNotifier: widget.sheetExpanded,
+          ),
+        ),
+        // North indicator above the sheet so a dragged-up sheet can never hide
+        // it — same Flutter [MapCompass] the map tab uses, parked at top-right.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+            ),
           ),
         ),
       ],
@@ -576,7 +616,7 @@ class _ReportPeekSummary extends StatelessWidget {
       report.maxIntensity,
       report.originTimeUtc,
     );
-    final taipei = report.originTimeUtc.add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(report.originTimeUtc);
     final time = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
 
     return Column(
@@ -789,7 +829,7 @@ class _ReportInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final taipei = report.originTimeUtc.add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(report.originTimeUtc);
     final originTime = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
     final coordinates =
         '${report.latitude.toStringAsFixed(2)}°N・'
@@ -850,14 +890,7 @@ class _InfoRow extends StatelessWidget {
           ),
           const Spacer(),
           if (dotColor != null) ...[
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
-              ),
-            ),
+            LegendDot(color: dotColor!),
             const SizedBox(width: AppSpacing.sm),
           ],
           Text(
@@ -1407,7 +1440,7 @@ class _ReportImageCardState extends State<_ReportImageCard> {
             width: double.infinity,
             color: colors.surfaceContainer,
             alignment: Alignment.center,
-            child: const CircularProgressIndicator(),
+            child: const InlineLoading(size: 36),
           );
         },
         errorBuilder: (context, error, stackTrace) {

@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "Peristiwa aktif",
   "homeActiveEventsEmpty": "Tidak ada peristiwa aktif",
   "homeRainTrendTitle": "Hujan 1 jam ke depan",
+  "homeRainTrendMinute": "{minute} mnt",
+  "homeRainTrendUpdated": "Diperbarui {time}",
+  "homeRainTrendNoData": "Tidak ada data",
+
+  "homeRainTrendScattered": "Kemungkinan hujan ringan",
+  "homeRainTrendLightSustained": "Hujan ringan berlanjut selama 1 jam ke depan",
+  "homeRainTrendLightStopping": "Hujan ringan diperkirakan berhenti dalam {minutes} menit",
+  "homeRainTrendHeavySustained": "Hujan deras berlanjut selama 1 jam ke depan",
+  "homeRainTrendHeavyStopping": "Hujan deras diperkirakan berhenti dalam {minutes} menit",
   "mapLayers": "Lapisan",
+  "mapLayerOrderTitle": "Urutkan lapisan",
+  "mapLayerOrderReset": "Atur ulang urutan",
   "mapLayerRadar": "Radar Komposit",
-  "mapLayerSatellite": "Himawari Inframerah",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "mapLayerSatelliteCloudClear": "Clear",
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "mapLayerQpesums": "Prakiraan hujan 1 jam ke depan",
   "mapLayerLightning": "Petir",
   "lightningLegendCg": "Awan–tanah · {minutes} mnt",
   "lightningLegendCc": "Awan–awan · {minutes} mnt",
   "mapTimelineNow": "Sekarang",
+  "mapTimelinePast": "Lampau",
+  "mapTimelineFuture": "Mendatang",
   "mapTimelineObserved": "Diamati",
+  "mapTimelineForecast": "Prakiraan",
+  "mapTimelineDataTime": "Waktu data {time}",
+  "mapTimelineDataTime": "Waktu data {time}",
   "notifySettingsMenu": "Pengaturan notifikasi",
   "notifyTitle": "Notifikasi",
   "notifyUnavailable": "Notifikasi push belum siap — coba lagi sebentar lagi.",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "Lapisan peta bawaan",
   "defaultMapLayerSubtitle": "Tab Peta membuka lapisan ini. Ikon dan label navigasi bawah ikut pilihan ini.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Prakiraan",
   "mapNavSatellite": "Satelit",
   "mapNavLightning": "Petir",
   "mapNavTyphoon": "Topan",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "Kelembapan",
   "mapLayerPressure": "Tekanan",
   "mapLayerWind": "Angin",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Curah hujan",
   "rainIntervalMenu": "Jendela akumulasi",
   "rainIntervalNow": "Hari ini",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "Tempat Evakuasi",
   "disasterMapOverlayRestroomTooltip": "Tampilkan toilet umum",
   "disasterMapOverlayShelterTooltip": "Tampilkan tempat evakuasi",
+  "dpmOpenInMaps": "Buka di peta",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (bawaan)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Salin koordinat",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Koordinat disalin",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "Tidak dapat membuka {app}",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "Perangkat ini tidak dapat melakukan panggilan telepon",
+
+  "mapOverlaySectionReference": "Lapisan referensi",
+  "mapLayerCategoryEarthquake": "Gempa",
+  "mapLayerCategoryTyphoon": "Topan",
+  "mapLayerCategoryWeather": "Pengamatan cuaca",
+  "mapLayerCategorySatellite": "Satelit",
+  "mapLayerCategoryRadar": "Radar",
+  "mapLayerCategoryLife": "Kehidupan sehari-hari",
+  "mapLayerCategoryForecast": "Prakiraan numerik",  "mapOverlaySectionMap": "Peta",
+  "rainIntervalSection": "Jendela waktu",
+
+  "mapTownLabels": "Nama kecamatan",
+  "mapTownLabelsHint": "Tampilkan nama kecamatan saat diperbesar",
+
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "dpmAddress": "Alamat",
   "restroomTypeLabel": "Jenis",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "Legenda",
   "mapLegendCollapse": "Sembunyikan legenda",
   "mapMyLocation": "Lokasi saya",
+  "mapResetNorth": "Kembali ke utara",
   "typhoonLegendCircle15": "Lingkar angin kencang",
   "typhoonLegendCircle25": "Lingkar badai",
   "typhoonLegendProbability": "Probabilitas serangan",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "Tropical depression",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "Tanah longsor",
   "dpmDisasterTsunami": "Tsunami",
   "dpmDisasterSlope": "Bencana lereng",
-  "dpmDisasterNuclear": "Kecelakaan nuklir"
+  "dpmDisasterNuclear": "Kecelakaan nuklir",
+  "skyTime": "Waktu langit",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Otomatis",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Fajar",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Matahari terbit",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Pagi",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Siang",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Sore",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Jam emas",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Matahari terbenam",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Senja",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Malam",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Berawan",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Mendung",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Salju",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Debu",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Tampilkan jangkauan pindai",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Menandai area yang benar-benar dipantau keempat radar.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Di luar kotak berarti tak terpantau",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Opsi lapisan radar",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "Batas kabupaten/kota",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "Batas negara",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Bingkai luar setiap negara",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Digambar di atas gema",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Menjaga batas wilayah tetap terbaca di bawah gema radar.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Batas kecamatan",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "Kisi yang lebih rapat",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Menjaga batas kecamatan tetap terbaca di bawah gema radar.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Opsi lapisan prakiraan curah hujan",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Opsi lapisan prakiraan angin",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Digambar di atas bidang angin",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Bingkai luar setiap negara",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Jaring yang lebih halus",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

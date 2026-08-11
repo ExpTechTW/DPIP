@@ -6,6 +6,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ class HomeSheetHeader extends StatelessWidget {
     this.reveal = 0,
     this.expanded = false,
     this.weatherMode = WeatherMode.auto,
+    this.sky,
   });
 
   /// Weather-backdrop reveal (0→1) — drives sky-aware ink.
@@ -36,15 +38,23 @@ class HomeSheetHeader extends StatelessWidget {
   /// Sheet is at (or past) the full-screen detent — drive larger type + layout.
   final bool expanded;
 
-  /// Which sky the backdrop is rendering — picks dark vs white ink.
+  /// Which sky the backdrop is rendering — the fallback [skyIsLightFrom] uses
+  /// before [sky] exists.
   final WeatherMode weatherMode;
+
+  /// The sky colour the header sits on — `SkyLutCache.panelAmbient`, or null
+  /// before the first bake. The header sits directly on the raw sky with no
+  /// card behind it, so this is the one place a wrong light/dark call is most
+  /// visible: a clear night sky and a clear noon sky are the same [weatherMode]
+  /// but opposite ends of the ink decision.
+  final Color? sky;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final skyIsLight = weatherSkyIsLight(weatherMode);
+    final skyIsLight = skyIsLightFrom(sky, weatherMode);
     // Directly on the weather sky — not inside a glass card. Dark theme's
     // onSurface is white; on clear/fog daylight that must go dark with reveal.
     final foreground = inkOverWeather(colors, reveal, skyIsLight: skyIsLight);
@@ -67,6 +77,13 @@ class HomeSheetHeader extends StatelessWidget {
     final temp = data?.temperature;
     final humidity = data?.humidity;
     final rain = data?.rain;
+    // The condition icon follows the station's code via the shared table; the
+    // cloud placeholder only shows before the first reading arrives.
+    final weather = data == null
+        ? null
+        : weatherVisual(data.weather, data.weatherCode, colors);
+    final conditionIcon = weather?.$1 ?? Icons.cloud_outlined;
+    final conditionAccent = weather?.$2 ?? secondary;
 
     // 全國 has no township weather — name only. 所在地 without GPS: say so
     // instead of a dashed reading row.
@@ -140,9 +157,9 @@ class HomeSheetHeader extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.cloud_outlined,
+                        conditionIcon,
                         size: iconSize,
-                        color: secondary,
+                        color: conditionAccent,
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Text.rich(
@@ -195,9 +212,9 @@ class HomeSheetHeader extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          Icons.cloud_outlined,
+                          conditionIcon,
                           size: iconSize,
-                          color: secondary,
+                          color: conditionAccent,
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text.rich(

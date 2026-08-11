@@ -1,12 +1,14 @@
 /// The wind layer — rotated arrows pointing where the wind blows toward,
 /// coloured by wind speed (legacy look). The tap reading carries the exact
-/// degrees + an 8-point arrow.
+/// degrees and the sheet chart colours the curve by the same speed ramp.
 library;
 
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
+import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
@@ -16,16 +18,23 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-class WindMapLayer extends WeatherStationLayer {
+class WindMapLayer
+    extends
+        WeatherStationLayer<WeatherSnapshot, WeatherObservation, WeatherTrend> {
   WindMapLayer(super.repository);
 
-  /// Shared arrow image id (registered once per render) and the arrow layer id.
+  /// Shared arrow image ids (registered once per render) and the arrow layer
+  /// id. One pre-coloured PNG per speed bucket — the black outline is baked
+  /// into each (see [_renderArrow]), because MapLibre's `icon-halo-*` only
+  /// works on *true* SDF images and this glyph is a plain bitmap.
   static const String _arrowImageId = 'wind-arrow';
   String get _arrowLayerId => 'wx-$id-arrow';
 
-  /// The rendered arrow PNG, cached — the glyph never changes; its colour and
-  /// rotation are applied at runtime by the layer, not baked into the image.
-  Uint8List? _arrowBytes;
+  /// The rendered arrow PNGs, cached — the glyph never changes; each bucket's
+  /// colour + black outline are baked in at render time.
+  List<Uint8List>? _arrowBytes;
+
+  String _arrowImageFor(int bucket) => '$_arrowImageId-$bucket';
 
   @override
   String get id => 'wind';
@@ -84,15 +93,20 @@ class WindMapLayer extends WeatherStationLayer {
     String sourceId,
   ) async {
     final bytes = _arrowBytes ??= await _renderArrow();
-    // sdf: true so `iconColor` can tint the white glyph by wind speed.
-    await controller.addImage(_arrowImageId, bytes, true);
+    // One coloured, outline-baked PNG per bucket (no SDF — see [_renderArrow]).
+    for (var i = 0; i < windBuckets.length; i++) {
+      await controller.addImage(_arrowImageFor(i), bytes[i], false);
+    }
     await controller.addSymbolLayer(
       sourceId,
       _arrowLayerId,
       SymbolLayerProperties(
-        iconImage: _arrowImageId,
+        // Pick the pre-coloured glyph by speed; rotation is still applied at
+        // runtime. (A single SDF tinted via iconColor was tried first, but
+        // MapLibre's icon halo — the only outline SDF supports — renders ~0 on
+        // a plain bitmap marked `sdf`, so the arrows had no readable edge.)
+        iconImage: _arrowIconExpression(),
         iconRotate: <Object>['get', 'blow_to'],
-        iconColor: _colorExpression(),
         // Size scales with wind speed (bigger = stronger) and with zoom. Zoom
         // must be the OUTERMOST interpolate input (MapLibre only allows [zoom]
         // at the top level), with the speed interpolate nested per zoom stop.
@@ -147,32 +161,33 @@ class WindMapLayer extends WeatherStationLayer {
     );
   }
 
-  /// Discrete speed → colour, matching legacy's 5 wind buckets (white / cyan /
-  /// blue / purple / pink) on the same 3.4 / 8.0 / 13.9 / 32.7 m/s thresholds —
-  /// a `step`, not a continuous ramp.
-  List<Object> _colorExpression() => <Object>[
+  /// Speed → pre-coloured arrow image, a `step` over the same 3.4 / 8.0 /
+  /// 13.9 / 32.7 m/s thresholds as the legend (weakest first).
+  List<Object> _arrowIconExpression() => <Object>[
     'step',
     <Object>['get', 'value'],
-    '#FFFFFF',
-    3.4,
-    '#00FFF0',
-    8.0,
-    '#0085FF',
-    13.9,
-    '#8000FF',
-    32.7,
-    '#FF006B',
+    _arrowImageFor(0),
+    for (var i = 1; i < windBuckets.length; i++) ...[
+      windBuckets[i].$1,
+      _arrowImageFor(i),
+    ],
   ];
 
-  /// Renders [Icons.navigation] (points north at 0°) to a white PNG for use as
-  /// an SDF icon: MapLibre tints it via `iconColor` and spins it via
-  /// `iconRotate`, so one image serves every speed and bearing.
-  Future<Uint8List> _renderArrow() async {
+  /// Renders [Icons.navigation] (points north at 0°) as five PNGs, one per
+  /// speed bucket: each is the bucket colour with a black offset-outline baked
+  /// in, so the arrow silhouette stays readable over pale tiles.
+  ///
+  /// These are plain bitmaps — **not** SDF. MapLibre's SDF halos only work on
+  /// true signed-distance-field images (which require a blurred source),
+  /// and treating this glyph as one made `icon-halo-width` paint ~nothing.
+  Future<List<Uint8List>> _renderArrow() async {
     // 96 px base so iconSize ≈ 0.5–1.5 reads as a clear arrow (48 px + the
     // old 0.18 floors was sub-10 px on calm stations).
     const size = 96;
     const icon = Icons.navigation;
-    final painter = TextPainter(
+    // Outline thickness on the 96 px canvas — 8 offset copies around the glyph.
+    const halo = 5.5;
+    final outline = TextPainter(
       textDirection: TextDirection.ltr,
       text: TextSpan(
         text: String.fromCharCode(icon.codePoint),
@@ -180,22 +195,65 @@ class WindMapLayer extends WeatherStationLayer {
           fontSize: 80,
           fontFamily: icon.fontFamily,
           package: icon.fontPackage,
-          color: const Color(0xFFFFFFFF),
+          color: const Color(0xFF000000),
+        ),
+      ),
+    )..layout();
+    final center = Offset(
+      (size - outline.width) / 2,
+      (size - outline.height) / 2,
+    );
+    final glyph = String.fromCharCode(icon.codePoint);
+    return [
+      for (final (_, fill) in windBuckets)
+        await _renderOne(
+          outline,
+          fill,
+          glyph: glyph,
+          fontFamily: icon.fontFamily,
+          fontPackage: icon.fontPackage,
+          center: center,
+          size: size,
+          halo: halo,
+        ),
+    ];
+  }
+
+  Future<Uint8List> _renderOne(
+    TextPainter outline,
+    Color fill, {
+    required String glyph,
+    required String? fontFamily,
+    required String? fontPackage,
+    required Offset center,
+    required int size,
+    required double halo,
+  }) async {
+    final fillPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        text: glyph,
+        style: TextStyle(
+          fontSize: 80,
+          fontFamily: fontFamily,
+          package: fontPackage,
+          color: fill,
         ),
       ),
     )..layout();
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    painter.paint(
-      canvas,
-      Offset((size - painter.width) / 2, (size - painter.height) / 2),
-    );
+    for (final (dx, dy) in windOutlineDirs) {
+      outline.paint(canvas, center + Offset(dx * halo, dy * halo));
+    }
+    fillPainter.paint(canvas, center);
     final image = await recorder.endRecording().toImage(size, size);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   }
 
-  /// Speed reading plus the direction it blows from (degrees + 8-point arrow).
+  /// Speed reading plus the direction it blows from (degrees). The arrow is
+  /// drawn as a rotated glyph by [readingIcon], not as a text arrow.
   @override
   String? reading(String id) {
     final observation = observationOf(id);
@@ -204,27 +262,42 @@ class WindMapLayer extends WeatherStationLayer {
     final text = '${speed.toStringAsFixed(decimals)} $unit';
     final direction = observation!.windDirection;
     if (direction == null) return text;
-    return '$text  $direction° ${_arrow(direction)}';
+    return '$text  $direction°';
   }
 
-  /// The arrow the wind blows *towards* (meteorological direction is where it
-  /// comes from, so + 180°), snapped to 8 points.
-  static String _arrow(int fromDegrees) {
-    const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
-    final index = ((fromDegrees % 360) / 45).round() % 8;
-    return arrows[index];
-  }
-
-  // Legacy's 5 discrete wind-speed colours (white → pink). Not used for the
-  // arrow tint (that's the [step] in _colorExpression), but kept as the layer's
-  // declared ramp for the base contract.
+  /// A navigation glyph rotated to where the wind blows *towards*, tinted by
+  /// the same speed ramp as the map arrows (with a baked-on black outline so a
+  /// calm white arrow stays visible on the sheet).
   @override
-  List<(double, String)> get colorStops => const [
-    (0, '#FFFFFF'),
-    (3.4, '#00FFF0'),
-    (8.0, '#0085FF'),
-    (13.9, '#8000FF'),
-    (32.7, '#FF006B'),
+  Widget? readingIcon(String id) {
+    final observation = observationOf(id);
+    final speed = observation?.windSpeed;
+    final from = observation?.windDirection;
+    if (speed == null || from == null) return null;
+    return Transform.rotate(
+      angle: degToRad(from + 180),
+      child: WindArrowIcon(
+        size: 26,
+        outline: 1.5,
+        color: windSpeedColor(speed),
+      ),
+    );
+  }
+
+  /// The hero dot beside the name uses the discrete ramp colour — the same the
+  /// arrow, the curve, and the X-axis glyphs carry, so the sheet reads one
+  /// consistent speed colour rather than an interpolation between buckets.
+  @override
+  Color? valueColor(String id) {
+    final speed = observationOf(id)?.windSpeed;
+    return speed == null ? null : windSpeedColor(speed);
+  }
+
+  // The shared discrete ramp (white → pink), declared here so the base
+  // contract's dot/legend machinery reads the same colours the arrows use.
+  @override
+  List<(double, String)> get colorStops => [
+    for (final (at, color) in windBuckets) (at, color.toHexRgb()),
   ];
 
   /// Discrete speed buckets (strongest first) — same thresholds / colours as
@@ -245,8 +318,9 @@ class WindMapLayer extends WeatherStationLayer {
         items: [
           for (final (label, hex) in rows)
             SymbolLegendItem(
-              // Dark disc behind pale / white glyphs so they stay readable on
-              // the frosted card (map arrows sit on tiles, not surface).
+              // The arrow carries the same black outline as the map; the dark
+              // disc behind pale / white glyphs keeps them readable on the
+              // frosted card.
               swatch: Container(
                 width: 18,
                 height: 18,
@@ -255,9 +329,9 @@ class WindMapLayer extends WeatherStationLayer {
                   color: outline.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.navigation,
+                child: WindArrowIcon(
                   size: 14,
+                  outline: 1.5,
                   color: colorFromHexRgb(hex) ?? Colors.white,
                 ),
               ),

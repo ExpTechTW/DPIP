@@ -3,6 +3,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
@@ -79,11 +80,14 @@ class MorePage extends StatelessWidget {
           SectionHeader(l10n.moreSectionAdvanced),
           _MoreGroup(
             children: [
-              _MoreTile(
-                icon: Icons.science_outlined,
-                title: l10n.experimentalFeatures,
-                onTap: () => context.pushNamed(AppRoutes.experimental),
-              ),
+              // Hidden until ten taps on the Developer page's version row
+              // (ExperimentalSettings.unlocked).
+              if (context.watch<ExperimentalSettings>().unlocked)
+                _MoreTile(
+                  icon: Icons.science_outlined,
+                  title: l10n.experimentalFeatures,
+                  onTap: () => context.pushNamed(AppRoutes.experimental),
+                ),
               _MoreTile(
                 icon: Icons.history_outlined,
                 title: l10n.changelogTitle,

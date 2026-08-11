@@ -4,7 +4,6 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/error/result.dart';
@@ -20,6 +19,7 @@ import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -35,7 +35,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// hits several overlapping markers zooms in to spread them apart instead of
 /// guessing which one was meant (see [onMapTap]); detail on a single-hit tap
 /// comes from [DisasterMapRepository].
-class DisasterMapLayer implements MapLayer {
+class DisasterMapLayer with MapLayerDefaults implements MapLayer {
   DisasterMapLayer(this._repository);
 
   final DisasterMapRepository _repository;
@@ -169,25 +169,9 @@ class DisasterMapLayer implements MapLayer {
   double get bottomChromeFraction => DpmSheet.peekExtent;
 
   @override
-  double get mapMinZoom => 4;
-
-  @override
   double get mapMaxZoom => 16;
 
   /// DPM MVT is added at runtime — never bake into the base style JSON.
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   /// Toggle a sub-layer; clears its selection when turned off and stops
   /// prefetching when no sub-layer remains visible.
@@ -623,17 +607,16 @@ class DisasterMapLayer implements MapLayer {
   }
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      DisasterMapOverlayMenu(layer: this);
-
-  @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
+  }) => DisasterMapOverlayMenu(
+    layer: this,
+    showTownLabels: showTownLabels,
+    onShowTownLabelsChanged: onShowTownLabelsChanged,
+  );
 
   @override
   Future<void> onCameraIdle(MapLibreMapController controller) =>
@@ -678,9 +661,6 @@ class DisasterMapLayer implements MapLayer {
     _styleReady = false;
     close();
   }
-
-  @override
-  void selectFeature(String id) {}
 
   @override
   void onStyleReset() {

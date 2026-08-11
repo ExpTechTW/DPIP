@@ -14,8 +14,11 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
+import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +114,15 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
 
+  /// Current camera heading — drives the Flutter compass needle. A notifier so
+  /// only the compass rebuilds while the map rotates.
+  final ValueNotifier<double> _bearing = ValueNotifier(0);
+
+  /// Whether the base map's township-name labels are shown. A base-map
+  /// property, not a layer's, so it lives here (shared by every layer's menu)
+  /// instead of on one chrome mixin. Defaults on, per the layer docs.
+  final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
+
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
   LatLngBounds? _target;
@@ -118,6 +130,14 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// Measured height of the timeline panel (0 when the active layer has none).
   double _timelineHeight = 0;
   final GlobalKey _timelineKey = GlobalKey();
+
+  /// A deliberate framing ([_frameBounds] — a nav-bar / Home entry, the first
+  /// load, a station focus) ran while the timeline's height was still zero —
+  /// switching into a timeline layer zeroes it and the fit placed the subject
+  /// behind the scrubber. Set by [_frameBounds], cleared once the measured
+  /// height re-fits the camera, and never set by a bare layer switch (which
+  /// must not move the camera at all).
+  bool _reframeOnMeasure = false;
 
   @override
   void didChangeDependencies() {
@@ -136,6 +156,8 @@ class _MapScaffoldState extends State<MapScaffold> {
 
   @override
   void dispose() {
+    _bearing.dispose();
+    _showTownLabels.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
@@ -211,6 +233,11 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// Adopts [bounds] as the framing target and applies it.
   void _frameBounds(LatLngBounds bounds, {bool northUp = false}) {
     _target = safeFitBounds(bounds);
+    // The active layer's chrome height is measured, not predicted — a timeline
+    // layer's panel only exists after its frames load. A deliberate framing
+    // that runs before then fits against a zero-height band, so remember to
+    // re-fit once [_measureTimeline] learns the real height.
+    _reframeOnMeasure = _active.usesTimeline;
     _applyFraming(northUp: northUp);
   }
 
@@ -268,8 +295,15 @@ class _MapScaffoldState extends State<MapScaffold> {
   double _bottomInset(Size size) =>
       size.height * _active.bottomChromeFraction + _timelineHeight;
 
-  /// Measures the timeline panel after layout and re-frames if it changed, so a
-  /// timeline layer frames into the band above the scrubber rather than behind it.
+  /// Measures the timeline panel after layout.
+  ///
+  /// The height feeds [_bottomInset] for the *next* deliberate framing (a nav-bar
+  /// / Home entry), so that framing avoids the scrubber. It never moves the
+  /// camera on its own — re-framing on a layer switch is exactly what was
+  /// removed: switching overlays keeps the user's camera untouched. The one
+  /// exception is a deferred deliberate framing ([_reframeOnMeasure]): it ran
+  /// before this panel existed, so once the real height lands it re-fits the
+  /// same target into the corrected band.
   void _measureTimeline() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -277,7 +311,10 @@ class _MapScaffoldState extends State<MapScaffold> {
       final height = (box != null && box.hasSize) ? box.size.height : 0.0;
       if ((height - _timelineHeight).abs() < 0.5) return;
       _timelineHeight = height;
-      _applyFraming();
+      if (_reframeOnMeasure) {
+        _reframeOnMeasure = false;
+        _applyFraming();
+      }
     });
   }
 
@@ -285,6 +322,58 @@ class _MapScaffoldState extends State<MapScaffold> {
     _controller = controller;
     _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
     unawaited(const MapCache().setMaximumSize());
+  }
+
+  /// Feeds the compass needle — camera heading, ° clockwise from north.
+  void _onCameraMove(CameraPosition position) {
+    _bearing.value = position.bearing;
+  }
+
+  /// Re-points the camera north, keeping centre / zoom — the native compass's
+  /// tap action, reproduced for the Flutter replacement.
+  void _resetNorth() {
+    final controller = _controller;
+    if (controller == null) return;
+    final position = controller.cameraPosition;
+    if (position == null) return;
+    // The camera stream may not deliver a final north-up event for a
+    // programmatic move (a no-op bearing change can skip region updates), so
+    // settle the needle directly instead of waiting on it — the compass must
+    // hide the instant the map faces north.
+    _bearing.value = 0;
+    unawaited(
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position.target,
+            zoom: position.zoom,
+            bearing: 0,
+            tilt: 0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _setShowTownLabels(bool value) {
+    if (_showTownLabels.value == value) return;
+    _showTownLabels.value = value;
+    _applyTownLabelVisibility();
+  }
+
+  /// Pushes the township-label setting onto a live map. The base style's
+  /// `town-label` layer survives style reloads, which reset it to visible, so
+  /// this also runs after every [_onStyleLoaded] to re-assert the choice.
+  void _applyTownLabelVisibility() {
+    final controller = _controller;
+    if (controller == null) return;
+    unawaited(
+      controller
+          .setLayerVisibility(townLabelLayerId, _showTownLabels.value)
+          .catchError((Object e, StackTrace st) {
+            Log.handle(e, st, 'Failed to sync the township labels');
+          }),
+    );
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {
@@ -340,6 +429,8 @@ class _MapScaffoldState extends State<MapScaffold> {
     unawaited(_applyStationHandoff());
     // Home/nav camera handoff that arrived before the style was ready.
     unawaited(_applyCameraHandoff());
+    // A reload resets the base style's township-label layer to visible.
+    _applyTownLabelVisibility();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -369,10 +460,12 @@ class _MapScaffoldState extends State<MapScaffold> {
       ok: (frames) {
         setState(() {
           _frames = frames;
-          _selectedIndex = frames.isEmpty ? 0 : frames.length - 1; // newest
+          _selectedIndex = nowFrameIndex(frames);
         });
         if (frames.isNotEmpty) {
-          // Register the set, then reveal the newest (a layer adds tiles lazily).
+          // Register the set, then reveal the present (a layer adds tiles
+          // lazily). For observed data that is the newest frame; a forecast
+          // opens on the newest already-due step, future steps to the right.
           final controller = _controller!;
           final layer = _active;
           _queue(() => layer.prepare(controller, frames));
@@ -478,11 +571,29 @@ class _MapScaffoldState extends State<MapScaffold> {
       _timelineHeight = 0;
     });
     if (controller != null) _queue(() => previous.clear(controller));
-    // Re-frame the same target into the new layer's band — switching to radar
-    // after picking a township keeps the township framed, and each layer's
-    // different chrome height is accounted for instead of reusing the old one.
-    _applyFraming();
+    // A bare switch is never a deliberate framing — the camera stays exactly as
+    // the user left it, and the [_reframeOnMeasure] deferred re-fit must not
+    // fire off it either (the height will change as the new layer's frames
+    // load, and that is a reason to *not* move the camera).
+    _reframeOnMeasure = false;
+    // Keep the camera exactly as the user left it — switching overlays must not
+    // zoom, re-centre, or rotate the map. Only a deliberate framing entry (the
+    // nav bar / Home hand-off, or a ranking station focus) moves the camera.
     _loadActive();
+  }
+
+  /// Re-loads the active layer from scratch: clear its on-map state (sources
+  /// mounted under the old URLs), then re-fetch frames and re-mount. A chrome
+  /// option that changes what a layer renders (e.g. the satellite colour style)
+  /// calls this after mutating its source.
+  Future<void> _reloadActive() async {
+    final controller = _controller;
+    if (controller == null || !_styleLoaded) return;
+    final layer = _active;
+    // Clear first — the queued re-mount ops below land after it on the serial
+    // chain, so the map never shows new-style tiles over old ones.
+    _queue(() => layer.clear(controller));
+    await _loadActive();
   }
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
@@ -534,6 +645,7 @@ class _MapScaffoldState extends State<MapScaffold> {
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),
+              onCameraMove: _onCameraMove,
               onCameraIdle: () {
                 _active.onMapGestureEnd();
                 final controller = _controller;
@@ -544,6 +656,10 @@ class _MapScaffoldState extends State<MapScaffold> {
                 if (!mounted) return;
                 setState(() => _cameraEpoch++);
               },
+              // The native compass lives inside the platform view, so any
+              // Flutter overlay paints over it — MapScaffold draws its own
+              // [MapCompass] at the top of the stack instead.
+              compassEnabled: false,
             ),
           ),
         ),
@@ -581,14 +697,28 @@ class _MapScaffoldState extends State<MapScaffold> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Builder(
                 builder: (context) {
-                  // Non-typhoon layers return [SizedBox.shrink] — skip the gap.
-                  final chrome = _active.buildTopTrailingChrome(context);
+                  // Layers with a settings menu (radar / QPESUMS / DPM / typhoon
+                  // / rain) receive the shared township-label toggle to carry;
+                  // the rest return [SizedBox.shrink], so show the standalone
+                  // township-label menu instead — every layer can set it.
+                  final chrome = _active.buildTopTrailingChrome(
+                    context,
+                    showTownLabels: _showTownLabels,
+                    onShowTownLabelsChanged: _setShowTownLabels,
+                    onReloadActive: _reloadActive,
+                  );
                   final hasChrome = chrome is! SizedBox;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (hasChrome) ...[
                         chrome,
+                        const SizedBox(width: AppSpacing.sm),
+                      ] else ...[
+                        MapTownLabelsMenu(
+                          showTownLabels: _showTownLabels,
+                          onShowTownLabelsChanged: _setShowTownLabels,
+                        ),
                         const SizedBox(width: AppSpacing.sm),
                       ],
                       MapLayerSwitcher(
@@ -621,6 +751,22 @@ class _MapScaffoldState extends State<MapScaffold> {
                   : const SizedBox.shrink(),
             ),
           ),
+        // Compass on top of *everything* — a screen-space callout (typhoon
+        // forecast tips) or an expanded sheet must never hide north. Parked
+        // just under the layer switcher chip, with a touch of breathing room.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: layerChipBand + AppSpacing.sm,
+                right: AppSpacing.lg,
+              ),
+              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -667,6 +813,16 @@ class _MapScaffoldState extends State<MapScaffold> {
   }
 
   Widget _timelinePanel(BuildContext context) {
+    // Only raster-timeline layers reach here (the usesTimeline gate); the
+    // caption is theirs to say — observed vs forecast — so forecast frames are
+    // never read as measurements. Anything else falls back to "observed".
+    final active = _active;
+    final isRaster = active is RasterTimelineLayer;
+    final caption = isRaster
+        ? active.timelineCaption(context)
+        : AppLocalizations.of(context).mapTimelineObserved;
+    final framePeriod = isRaster ? active.framePeriod : null;
+    final dataTime = isRaster ? active.modelRunTime : null;
     return FrostedSurface(
       borderRadius: AppRadius.large,
       child: Padding(
@@ -678,6 +834,9 @@ class _MapScaffoldState extends State<MapScaffold> {
           selectedIndex: _selectedIndex,
           onSelected: _onFrameSelected,
           onScrubbing: _onScrubbing,
+          caption: caption,
+          framePeriod: framePeriod,
+          dataTime: dataTime,
         ),
       ),
     );

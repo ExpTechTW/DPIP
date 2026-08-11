@@ -1,4 +1,6 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/shared/map/base_map.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -24,6 +26,34 @@ class MapFrame {
   int get hashCode => Object.hash(id, time);
 }
 
+/// Index of the newest frame that is not in the future, or 0 when the list is
+/// empty or entirely forecast.
+///
+/// Observed data only ever reaches the present, so for radar or satellite this
+/// is the last frame and saying "the last one" would have done. A forecast runs
+/// past it — GFS by sixteen days — and there the two answers are nothing alike:
+/// treating the last frame as now opens the map on next week, labels it 現在,
+/// and leaves the scrubber pinned at the right-hand end with the entire
+/// forecast behind it and nothing ahead. The forecast is not missing at that
+/// point, it is just all to the left of a scrubber that claims to be at the
+/// present.
+///
+/// So: ask the clock, not the list. The present is the newest frame **at or
+/// before** now — never a future step. At 21:43 with 3-hourly ECMWF steps
+/// landing on 20:00 and 23:00, the present is 20:00; labelling the 23:00
+/// forecast as now would present a prediction as though it had already
+/// happened. For observations the answer is unchanged.
+int nowFrameIndex(List<MapFrame> frames, {DateTime? now}) {
+  if (frames.isEmpty) return 0;
+  final at = now ?? DateTime.now();
+  // Frames are chronological, so scan from the newest backwards.
+  for (var i = frames.length - 1; i >= 0; i--) {
+    if (!frames[i].time.isAfter(at)) return i;
+  }
+  // Everything is in the future — the forecast opens on its first step.
+  return 0;
+}
+
 /// A pluggable overlay on the shared map — radar today, rain / lightning /
 /// typhoon / … as they land.
 ///
@@ -44,6 +74,10 @@ abstract interface class MapLayer {
 
   /// The switcher label (localised by the implementation via [context]).
   String label(BuildContext context);
+
+  /// Secondary switcher line under [label] — formula, band composition, or
+  /// anything that differentiates the layer at a glance. `null` hides it.
+  String? subtitle(BuildContext context);
 
   /// The switcher icon — outlined, per the app's icon convention.
   IconData get icon;
@@ -102,7 +136,22 @@ abstract interface class MapLayer {
   ///
   /// Use for layer-specific toggles (e.g. typhoon overlay menu). Default is
   /// empty — most layers only need the shared switcher.
-  Widget buildTopTrailingChrome(BuildContext context);
+  ///
+  /// [showTownLabels] / [onShowTownLabelsChanged] expose the base map's shared
+  /// township-label setting, so a layer's menu can carry it alongside its own
+  /// options (one affordance, not a second chip). Layers whose chrome is not a
+  /// settings menu may ignore them — [MapScaffold] shows a standalone
+  /// township-label menu for layers that return no chrome.
+  ///
+  /// [onReloadActive] re-loads this layer from scratch — a chrome option that
+  /// changes what the layer renders (e.g. the satellite colour style) calls it
+  /// after mutating its source so the already-mounted tiles re-fetch.
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
+  });
 
   /// Flutter widgets painted over the map (screen-space callouts, etc.).
   ///
@@ -153,4 +202,82 @@ abstract interface class MapLayer {
   /// NOT touch the controller — the map is already wiped — so the next [prepare]
   /// re-adds from scratch instead of no-oping on stale "already added" state.
   void onStyleReset();
+}
+
+/// No-op bodies for the [MapLayer] members a given layer type doesn't use.
+///
+/// Timeline layers (radar, satellite, QPESUMS) draw nothing in [MapLayer.render]
+/// and open no [MapLayer.buildSheet]; sheet layers (stations, typhoon) publish
+/// no [MapLayer.frames]. A layer mixes this in and overrides only what it does —
+/// the scaffold can then call the whole [MapLayer] surface without a chain of
+/// empty implementations per layer.
+mixin MapLayerDefaults implements MapLayer {
+  @override
+  String? subtitle(BuildContext context) => null;
+
+  @override
+  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
+
+  @override
+  Future<void> prepare(
+    MapLibreMapController controller,
+    List<MapFrame> frames,
+  ) async {}
+
+  @override
+  Future<void> show(
+    MapLibreMapController controller,
+    MapFrame frame, {
+    bool scrubbing = false,
+  }) async {}
+
+  @override
+  Future<void> render(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onMapTap(
+    LatLng latLng,
+    MapLibreMapController controller,
+  ) async {}
+
+  @override
+  void selectFeature(String id) {}
+
+  @override
+  Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildLegend(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
+  }) => const SizedBox.shrink();
+
+  @override
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
+
+  @override
+  void onMapGestureStart() {}
+
+  @override
+  void onMapGestureEnd() {}
+
+  @override
+  double get mapMinZoom => BaseMap.defaultMinZoom;
+
+  @override
+  double get mapMaxZoom => BaseMap.maxZoom;
+
+  @override
+  void onStyleReset() {}
 }

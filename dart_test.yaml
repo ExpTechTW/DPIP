@@ -1,0 +1,4 @@
+# Development-only previews (they write PNGs); excluded from the default run.
+tags:
+  preview:
+    skip: "development preview — run with: flutter test --tags preview"

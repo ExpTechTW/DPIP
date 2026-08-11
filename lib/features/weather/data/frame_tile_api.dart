@@ -1,0 +1,94 @@
+/// Shared frame-keyed tile API for the v2 raster overlays (radar, satellite,
+/// QPESUMS, wind forecast).
+library;
+
+import 'dart:typed_data';
+
+import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/meteor_decode.dart';
+
+/// Tile endpoints for one v2 raster overlay — radar / satellite / QPESUMS /
+/// wind all share the same shape, differing only in the URL path segment
+/// ([path]).
+///
+/// Everything is keyed by a Unix timestamp (seconds for radar/satellite,
+/// milliseconds for QPESUMS); a frame id *is* the timestamp. The frame list is
+/// delta-encoded (`[base, Δ, Δ, …]`) and served from `api.core-tnn1` with
+/// ETag/304. Tiles are WebP on `static.core-tnn1`
+/// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
+/// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
+class FrameTileApi {
+  FrameTileApi(this._client, this.path, {this.channel, this.style, this.model});
+
+  final ApiClient _client;
+
+  /// The overlay's URL path segment: `radar`, `satellite`, `qpesums`, or
+  /// `wind`.
+  final String path;
+
+  /// Optional `?channel=` for the satellite overlay — selects which band or
+  /// derived product a frame renders. Null keeps the server default (B13) and
+  /// the URL channel-free; radar / qpesums never set it.
+  final String? channel;
+
+  /// Optional `?style=` for a **single-band** satellite channel — which colour
+  /// rendering to use (`gray` / `jma` / `bd`). Mutable because the map's style
+  /// menu switches it live (via `SatelliteRepository.setStyle`); named-product
+  /// channels ignore it.
+  String? style;
+
+  /// Optional `?model=` for the wind forecast overlay — which numerical
+  /// weather prediction model (`gfs` / `ecmwf`) a frame renders. Null keeps the
+  /// URL model-free; radar / satellite / qpesums never set it.
+  final String? model;
+
+  /// The v2 frame list lives on `api.core-tnn1` (no region failover).
+  static const ApiTier _listTier = ApiTier.coreExclusiveApi;
+
+  /// v2 tiles live on `static.core-tnn1` (no region failover).
+  static const ApiTier _tileTier = ApiTier.coreStaticExclusive;
+
+  /// Available frame timestamps, **newest first**.
+  ///
+  /// `https://api.core-tnn1.exptech.dev/api/v2/tiles/<path>/list[?channel=…]`
+  Future<List<String>> getFrames() async => framesFromList(
+    await _client.get(_listTier, '${ApiPaths.tiles}/$path/list$_query') as List,
+  );
+
+  /// XYZ WebP raster tile URL template for a [frame] (a Unix timestamp).
+  ///
+  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp[?channel=…][&style=…]`
+  String tileUrl(String frame) =>
+      '${_client.hostsFor(_tileTier).first}'
+      '${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp$_query';
+
+  String get _query {
+    final channel = this.channel;
+    final style = this.style;
+    final model = this.model;
+    if (channel == null && style == null && model == null) return '';
+    final parts = <String>[
+      if (channel != null) 'channel=$channel',
+      if (style != null) 'style=$style',
+      if (model != null) 'model=$model',
+    ];
+    return '?${parts.join('&')}';
+  }
+
+  /// Restores the delta-encoded list `[base, Δ, Δ, …]` to absolute timestamps
+  /// and returns them **newest first** as strings (the frame id used by
+  /// [tileUrl]). Empty in → empty out. Exposed for unit testing.
+  static List<String> framesFromList(List<dynamic> deltas) => [
+    for (final v in MeteorDecode.deltaSeconds(deltas).reversed) v.toString(),
+  ];
+
+  /// The raw WND1 wind-field bytes for [frame] — the v1 endpoint parallels the
+  /// v2 tiles (`/api/v1/wind/<model>/<frame>.bin` on the same static host),
+  /// keyed by the model [tileUrl] renders.
+  Future<Uint8List> fetchWindBin(String frame) async => (await _client.getBytes(
+    _tileTier,
+    '${ApiPaths.windV1}/$model/$frame.bin',
+  )).bytes;
+}

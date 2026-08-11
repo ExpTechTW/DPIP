@@ -54,6 +54,19 @@ abstract final class PreferenceKeys {
     'map.defaultLayer',
   );
 
+  /// User-customised layer order in the map layer picker (layer ids,
+  /// most-preferred first; empty = the surface's declared order). See
+  /// `MapLayerOrderController`.
+  static const PrefKey<List<String>> mapLayerOrder = PrefKey<List<String>>._(
+    'map.layerOrder',
+  );
+
+  /// User-customised category order in the map layer picker (category names,
+  /// most-preferred first; empty = the declared category order). See
+  /// `MapLayerOrderController`.
+  static const PrefKey<List<String>> mapLayerCategoryOrder =
+      PrefKey<List<String>>._('map.layerCategoryOrder');
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const PrefKey<List<String>> savedRegionCodes = PrefKey<List<String>>._(
     'home.savedRegionCodes',
@@ -62,6 +75,19 @@ abstract final class PreferenceKeys {
   /// Experimental weather-animation override. See `ExperimentalSettings`.
   static const PrefKey<String> weatherMode = PrefKey<String>._(
     'experimental.weatherMode',
+  );
+
+  /// Experimental time-of-day override for the backdrop. See
+  /// `ExperimentalSettings`.
+  static const PrefKey<String> skyTimeMode = PrefKey<String>._(
+    'experimental.skyTimeMode',
+  );
+
+  /// Whether the experimental-features menu is unlocked. Hidden behind ten taps
+  /// on the Developer page's version row so accidental users never see it. See
+  /// `ExperimentalSettings`.
+  static const PrefKey<bool> experimentalUnlocked = PrefKey<bool>._(
+    'experimental.unlocked',
   );
 
   /// Last push token — the FCM registration token on Android, the raw APNs

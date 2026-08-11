@@ -2,15 +2,18 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show lerpDouble;
 
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
-import 'package:dpip/features/home/presentation/widgets/forecast_weather_visual.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,12 +24,40 @@ import 'package:provider/provider.dart';
 /// rain chance %, [WeatherForecastPoint.temperature] = air temp °C. Layout is
 /// new: sparkline + selectable hour chips + a detail band for feels-like /
 /// humidity / wind (fields the final legacy strip hid).
+///
+/// [expansion] animates between the one-glance summary (title + hour chips)
+/// and the full card (with the temperature sparkline and detail band). The
+/// hero block's card slot uses it to grow the single forecast card into its
+/// complete form as the sheet is pulled up — the summary and the full card are
+/// one widget, not two.
 class HomeForecastSection extends StatefulWidget {
-  const HomeForecastSection({super.key, this.reveal = 0});
+  const HomeForecastSection({
+    super.key,
+    this.reveal = 0,
+    this.sky,
+    this.weatherMode = WeatherMode.auto,
+    this.expansion = 1,
+  });
 
   /// Weather-backdrop reveal (0→1) — drives glass card opacity only; ink stays
   /// theme on-surface (cards are light plates).
   final double reveal;
+
+  /// The sky colour the card tints itself from — `SkyLutCache.panelAmbient`, or
+  /// null when no backdrop is running. The reference's card is a 20 % pane of the sky,
+  /// so without one there is nothing for it to be a pane *of* and it falls back
+  /// to an opaque plate.
+  final Color? sky;
+
+  /// Backdrop sky mode — decides whether card ink goes dark or white as the
+  /// card dissolves into the sky.
+  final WeatherMode weatherMode;
+
+  /// How fully the card is revealed, `0` (title + hour chips only) → `1` (the
+  /// full card, with the temperature sparkline and the feels-like detail
+  /// band). The hero slot drives this from the sheet's scroll; cards outside
+  /// the hero sit at 1.
+  final double expansion;
 
   @override
   State<HomeForecastSection> createState() => _HomeForecastSectionState();
@@ -40,11 +71,21 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final expansion = widget.expansion.clamp(0.0, 1.0);
     final controller = context.watch<HomeWeatherController>();
     final reveal = widget.reveal;
-    final foreground = glassOnSurface(colors);
-    final secondary = glassOnSurfaceVariant(colors);
-    final cardColor = glassSurface(colors, reveal);
+    final skyIsLight = skyIsLightFrom(widget.sky, widget.weatherMode);
+    final foreground = glassOnSurface(
+      colors,
+      reveal: reveal,
+      skyIsLight: skyIsLight,
+    );
+    final secondary = glassOnSurfaceVariant(
+      colors,
+      reveal: reveal,
+      skyIsLight: skyIsLight,
+    );
+    final cardColor = glassSurface(colors, reveal, sky: widget.sky);
 
     final code = controller.areaCode;
 
@@ -64,17 +105,8 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
         return _Shell(
           color: cardColor,
           child: SizedBox(
-            height: 168,
-            child: Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: secondary,
-                ),
-              ),
-            ),
+            height: lerpDouble(120, 168, expansion)!,
+            child: Center(child: InlineLoading(color: secondary)),
           ),
         );
       }
@@ -145,20 +177,34 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          SizedBox(
-            height: 36,
-            child: CustomPaint(
-              painter: _TempSparklinePainter(
-                temps: temps,
-                selected: selected,
-                line: colors.primary,
-                fill: colors.primary.withValues(alpha: 0.18),
-                mark: foreground,
+          // The sparkline and detail band reveal with [expansion] — the summary
+          // card shows only the title + hour chips, and pulling the sheet up
+          // grows this same card into its full height. Clipped so the not-yet-
+          // revealed parts never bleed over the hour chips below.
+          ClipRect(
+            child: Align(
+              alignment: Alignment.topCenter,
+              heightFactor: expansion,
+              child: Opacity(
+                opacity: expansion,
+                child: SizedBox(
+                  height: 36,
+                  width: double.infinity,
+                  child: CustomPaint(
+                    painter: _TempSparklinePainter(
+                      temps: temps,
+                      selected: selected,
+                      line: colors.primary,
+                      fill: colors.primary.withValues(alpha: 0.18),
+                      mark: foreground,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                ),
               ),
-              child: const SizedBox.expand(),
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: AppSpacing.md * expansion),
           SizedBox(
             height: 108,
             child: ListView.separated(
@@ -167,7 +213,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final p = points[index];
-                final (icon, accent) = forecastWeatherVisual(
+                final (icon, accent) = weatherVisual(
                   p.weather,
                   p.weatherCode,
                   colors,
@@ -188,21 +234,31 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               },
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          _DetailBand(
-            weather: point.weather,
-            time: point.time,
-            feelsLike: l10n.homeForecastFeelsLike(
-              point.apparentTemp.round().toString(),
+          ClipRect(
+            child: Align(
+              alignment: Alignment.topCenter,
+              heightFactor: expansion,
+              child: Opacity(
+                opacity: expansion,
+                child: _DetailBand(
+                  weather: point.weather,
+                  time: point.time,
+                  feelsLike: l10n.homeForecastFeelsLike(
+                    point.apparentTemp.round().toString(),
+                  ),
+                  humidity: l10n.homeForecastHumidity(
+                    point.humidity.toString(),
+                  ),
+                  wind: l10n.homeForecastWind(
+                    point.wind.direction,
+                    point.wind.beaufort.toString(),
+                  ),
+                  foreground: foreground,
+                  secondary: secondary,
+                  divider: secondary.withValues(alpha: 0.35),
+                ),
+              ),
             ),
-            humidity: l10n.homeForecastHumidity(point.humidity.toString()),
-            wind: l10n.homeForecastWind(
-              point.wind.direction,
-              point.wind.beaufort.toString(),
-            ),
-            foreground: foreground,
-            secondary: secondary,
-            divider: secondary.withValues(alpha: 0.35),
           ),
         ],
       ),

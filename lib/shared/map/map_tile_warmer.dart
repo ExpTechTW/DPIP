@@ -70,7 +70,15 @@ class MapTileWarmer {
 
   /// Warms absolute tile [urls] (already resolved, e.g. from a layer's
   /// `tileUrl` template).
-  Future<void> warmUrls(Iterable<String> urls, {String? logLabel}) async {
+  ///
+  /// [fillUntil] (0 = off) puts the cache in fill mode: [urls] must be ordered
+  /// most-wanted first, and injection stops once the native mirror is near its
+  /// cap — the caller tops it up outward from the current frame.
+  Future<void> warmUrls(
+    Iterable<String> urls, {
+    String? logLabel,
+    double fillUntil = 0,
+  }) async {
     final cache = _cache;
     if (cache == null) return;
     final list = urls.toList(growable: false);
@@ -78,7 +86,7 @@ class MapTileWarmer {
     final gen = ++_generation;
     await Future<void>.delayed(settleDelay);
     if (gen != _generation) return;
-    final injected = await cache.warm(list);
+    final injected = await cache.warm(list, fillUntil: fillUntil);
     if (gen == _generation && logLabel != null && injected > 0) {
       Log.debug('MapTileWarmer $logLabel injected=$injected/${list.length}');
     }

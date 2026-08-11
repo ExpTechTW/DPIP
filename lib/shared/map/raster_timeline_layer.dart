@@ -6,10 +6,12 @@ import 'dart:collection';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -68,13 +70,21 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// How many frames either side have their tiles pushed into MapLibre's
   /// memory ahead of demand.
   ///
-  /// Costs nothing to draw — it only decides how far a drag can go before a
-  /// reveal has to read back from the store. Bounded by
-  /// [MapTileCache.defaultMemoryBytes], not by taste: warming a band wider than
-  /// that mirror holds evicts its own earlier tiles mid-injection and re-reads
-  /// the same bytes on every settle, which is worse than not warming them.
+  /// This is the **guaranteed** band: [fill] warm always covers it. Beyond it,
+  /// [MapTileCache.warm]'s fill mode keeps topping the mirror up outward from
+  /// the current frame until it is nearly full — the actual reach is set by
+  /// the memory cap, not by taste, so a 24 MB mirror easily covers far more.
   @protected
   int get warmRadius => 4;
+
+  /// Farthest a fill warm reaches from the current frame, in either direction.
+  ///
+  /// A cap on the spread, not a target: a fill warm injects centre → ±1 → ±2 …
+  /// and stops at the native mirror's cap ([MapTileCache.defaultMemoryBytes]),
+  /// so beyond this only the most distant frames stay cold. Kept finite so a
+  /// hundreds-of-frames history never unfolds into one giant URL list.
+  @protected
+  int get maxWarmRadius => 24;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast
@@ -85,6 +95,47 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Hook for extra style work once this layer's first frame is on the map
   /// (e.g. an outline layer that only makes sense over this overlay).
   @protected
+  /// Where this layer's frames are anchored in the style.
+  ///
+  /// Defaults to under the base style's county borders, which keeps them legible
+  /// through the raster. A layer that supplies its **own** borders on top should
+  /// return null instead: leaving the base ones showing through as well draws
+  /// every boundary twice, at two weights, and the pair reads as a smear.
+  @protected
+  String? get rasterBelowLayerId => outlineLayerId;
+
+  /// What the frame times *are*, for the timeline caption above the date.
+  ///
+  /// Observed data (radar, satellite) keeps the shared "observed" label; a
+  /// forecast layer says so instead, so its frames are never read as
+  /// measurements.
+  String timelineCaption(BuildContext context) =>
+      AppLocalizations.of(context).mapTimelineObserved;
+
+  /// How long one frame's data represents, when a frame is a period rather
+  /// than a point — `null` keeps the shared point-in-time timeline label.
+  ///
+  /// A next-hour forecast's frame at 21:00 estimates the 21:00–22:00 window,
+  /// so a layer like QPESUMS returns the hour and the timeline renders the
+  /// selected frame as a range instead of a bare instant.
+  Duration? get framePeriod => null;
+
+  /// Whether [frames] are all one forecast-model run — the API serves only the
+  /// latest run, so the oldest frame is that run's issue time (資料時間).
+  ///
+  /// Observed layers (radar, satellite) leave this false; a wind-forecast
+  /// layer opts in so the timeline can name when the model was run.
+  @protected
+  bool get framesAreOneRun => false;
+
+  /// The model-run issue time behind these frames, when they are one run — the
+  /// oldest frame *is* the run start. `null` before [prepare] fills the list.
+  DateTime? get modelRunTime {
+    final run = framesAreOneRun;
+    if (!run || _orderedIds.isEmpty) return null;
+    return parseFrameTime(_orderedIds.first);
+  }
+
   Future<void> onAttached(MapLibreMapController controller) async {}
 
   /// Undoes [onAttached]. Called from [clear].
@@ -95,6 +146,9 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   bool get usesTimeline => true;
+
+  @override
+  String? subtitle(BuildContext context) => null;
 
   @override
   double get bottomChromeFraction => 0;
@@ -118,8 +172,12 @@ abstract class RasterTimelineLayer implements MapLayer {
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+  Widget buildTopTrailingChrome(
+    BuildContext context, {
+    required ValueListenable<bool> showTownLabels,
+    required ValueChanged<bool> onShowTownLabelsChanged,
+    required Future<void> Function() onReloadActive,
+  }) => const SizedBox.shrink();
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
@@ -148,6 +206,13 @@ abstract class RasterTimelineLayer implements MapLayer {
   String? _shownFrameId;
   bool _attached = false;
 
+  /// The frame index the warm band is currently centred on — the gate that
+  /// keeps a scrub from re-warming (or re-fetching the visible region) for
+  /// every frame it crosses. Set synchronously by [_warmBand] before its first
+  /// await, so concurrent scrub reveals past the band edge coalesce onto one
+  /// re-warm instead of one per frame.
+  int? _warmCentre;
+
   String _sourceId(String frameId) => '$id-src-$frameId';
   String _layerId(String frameId) => '$id-lyr-$frameId';
 
@@ -157,27 +222,42 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// smear: `raster-opacity` is an animated paint property whose style-spec
   /// default is a **300 ms** cross-fade, so every swap used to blend two frames
   /// for longer than the finger takes to cross the next one — the map could
-  /// never catch up, however fast the tiles resolved. Declared once at mount, it
-  /// governs every later opacity change for free.
+  /// never catch up, however fast the tiles resolved.
   static RasterLayerProperties _mountPaint(double value) =>
       RasterLayerProperties(
         visibility: 'visible',
         rasterOpacity: value,
-        rasterOpacityTransition: const {'duration': 0, 'delay': 0},
+        rasterOpacityTransition: _instantTransition,
       );
 
-  /// Scrub-path paint: opacity only.
+  /// The zero cross-fade every opacity write must carry.
   ///
-  /// Sent with `skipNulls` so the platform call carries this one property
-  /// instead of every raster property the layer type has — the full form makes
-  /// the platform side re-assign eight values that did not change, on a path
-  /// that runs for every frame the finger crosses.
-  static RasterLayerProperties _opacity(double value) =>
-      RasterLayerProperties(rasterOpacity: value);
+  /// Declared at mount, `raster-opacity-transition` usually governs later
+  /// changes for free — but only while the native layer keeps it. Some paths
+  /// (a style reload, the platform's layer re-add, an update that only carries
+  /// the changed property) can lose it, which silently restores the 300 ms
+  /// style-spec default and ghosts every old frame behind a fast scrub. Sending
+  /// it with every write makes the zero fade explicit instead of remembered.
+  static const Map<String, Object> _instantTransition = {
+    'duration': 0,
+    'delay': 0,
+  };
+
+  /// Scrub-path paint: opacity + its zero transition.
+  ///
+  /// Sent with `skipNulls` so the platform call carries just these two
+  /// properties instead of every raster property the layer type has — the full
+  /// form makes the platform side re-assign eight values that did not change,
+  /// on a path that runs for every frame the finger crosses.
+  static RasterLayerProperties _opacity(double value) => RasterLayerProperties(
+    rasterOpacity: value,
+    rasterOpacityTransition: _instantTransition,
+  );
 
   static const RasterLayerProperties _hidden = RasterLayerProperties(
     visibility: 'none',
     rasterOpacity: 0,
+    rasterOpacityTransition: _instantTransition,
   );
 
   @override
@@ -254,26 +334,41 @@ abstract class RasterTimelineLayer implements MapLayer {
       _mount(controller, frameId, opacity),
     ]);
     await _evictOverflow(controller, keep: {..._ring, frameId});
+
+    // The warm band follows the finger: revealing a frame the last-warmed band
+    // did not cover re-warms around it, so the rest of a long drag stays on
+    // memory hits instead of re-reading every mount from the store. Warmed
+    // frames only cost the debounced local read + push in [warmFrameTiles] —
+    // nothing drawn, nothing loaded — so this is the cheap tier to keep ahead
+    // of the finger.
+    final index = _indexById[frameId];
+    if (index != null && !_warmCovers(index)) {
+      unawaited(_warmBand(controller, index));
+    }
   }
 
-  /// Scrub hot path — never mounts, never cancels, never touches `visibility`.
+  /// Scrub hot path — never mounts, never cancels, rarely touches `visibility`.
   ///
   /// The two writes go out **together**. Awaiting the hide before sending the
   /// show cost two serial platform round-trips per frame, which is the budget
   /// for the whole frame; pipelined they cost one, and MapLibre applies them in
   /// order within a single render pass, so no in-between state is ever drawn.
+  ///
+  /// The previous frame is hidden either way. A ring member only fades out —
+  /// dropping it to `none` would evict its tiles and make scrubbing back a
+  /// reload — but a frame revealed mid-drag sits **outside** the ring, and
+  /// leaving it at full opacity while the scrub bounces back over it ghosts
+  /// the old frame behind the ring (`visibility: none` hides it outright).
   Future<void> _flip(MapLibreMapController controller, String frameId) async {
     final previous = _shownFrameId;
     _shownFrameId = frameId;
     _touch(frameId);
 
     await Future.wait([
-      if (previous != null && previous != frameId && _ring.contains(previous))
-        // Stays `visible` at zero opacity: dropping it to `none` would evict
-        // its tiles and make scrubbing back a reload.
+      if (previous != null && previous != frameId)
         controller.setLayerProperties(
           _layerId(previous),
-          _opacity(0),
+          _ring.contains(previous) ? _opacity(0) : _hidden,
           skipNulls: true,
         ),
       controller.setLayerProperties(
@@ -330,7 +425,11 @@ abstract class RasterTimelineLayer implements MapLayer {
       // Back into the ring from `none`: restore visibility *and* the opacity.
       await controller.setLayerProperties(
         _layerId(id),
-        RasterLayerProperties(visibility: 'visible', rasterOpacity: value),
+        RasterLayerProperties(
+          visibility: 'visible',
+          rasterOpacity: value,
+          rasterOpacityTransition: _instantTransition,
+        ),
         skipNulls: true,
       );
       return;
@@ -343,7 +442,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       _sourceId(id),
       _layerId(id),
       _mountPaint(value),
-      belowLayerId: outlineLayerId,
+      belowLayerId: rasterBelowLayerId,
     );
     _resident.add(id);
   }
@@ -367,30 +466,66 @@ abstract class RasterTimelineLayer implements MapLayer {
     await source.abandonFrames(retired);
   }
 
-  /// Pushes the viewport tiles of every frame within [warmRadius] of [centre]
-  /// out of the app's store and into MapLibre's memory.
-  ///
-  /// Deliberately wider than the mounted ring: warming costs one local read and
-  /// a memory push — no draw call, no tile pass, no network — so the band that
-  /// a drag can cross **without touching disk** is far cheaper to widen than the
-  /// band kept mounted.
-  Future<void> _warmBand(MapLibreMapController controller, int centre) async {
-    if (_orderedIds.isEmpty) return;
+  /// Whether [index] falls inside the band last warmed around [_warmCentre].
+  bool _warmCovers(int index) {
+    final centre = _warmCentre;
+    if (centre == null || _orderedIds.isEmpty) return false;
     final low = (centre - warmRadius).clamp(0, _orderedIds.length - 1);
     final high = (centre + warmRadius).clamp(0, _orderedIds.length - 1);
+    return index >= low && index <= high;
+  }
+
+  /// Pushes the viewport tiles of every frame from [centre] outward into
+  /// MapLibre's memory, in **fill** mode: nearest-the-finger frames first, then
+  /// ±1, ±2, … until the mirror is nearly full.
+  ///
+  /// Deliberately far wider than the mounted ring: warming costs one local read
+  /// and a memory push — no draw call, no tile pass, no network — so the band
+  /// that a drag can cross **without touching disk** is far cheaper to widen
+  /// than the band kept mounted. The mirror's LRU evicts the frames the scrub
+  /// left behind (a fill warm reads without bumping recency, so old frames
+  /// lose to new ones), which keeps the memory budget full of *nearby* tiles.
+  Future<void> _warmBand(MapLibreMapController controller, int centre) async {
+    if (_orderedIds.isEmpty) return;
+    // Adopt the new centre before the first await: concurrent scrub reveals
+    // that cross the old band edge coalesce onto this one re-warm instead of
+    // each firing its own visible-region round-trip.
+    _warmCentre = centre;
+    final frames = _spreadFrames(centre);
+    if (frames.length <= 1) return;
     try {
       final bounds = await controller.getVisibleRegion();
       await source.warmFrameTiles(
-        frames: [for (var i = low; i <= high; i++) _orderedIds[i]],
+        frames: frames,
         south: bounds.southwest.latitude,
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
         east: bounds.northeast.longitude,
         zoom: controller.cameraPosition?.zoom ?? 8,
+        fill: true,
       );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, '$id band warm');
     }
+  }
+
+  /// Frame ids ordered nearest-the-finger first: the centre, then ±1, ±2, …
+  /// out to [maxWarmRadius] (or the series edge). Fill warm injects in this
+  /// order and stops at the mirror cap, so when memory is tight the most
+  /// distant frames are exactly the ones that stay cold.
+  List<String> _spreadFrames(int centre) {
+    final n = _orderedIds.length;
+    final result = <String>[];
+    void add(int i) {
+      if (i >= 0 && i < n) result.add(_orderedIds[i]);
+    }
+
+    add(centre);
+    for (var r = 1; r <= maxWarmRadius; r++) {
+      add(centre + r);
+      add(centre - r);
+    }
+    return result;
   }
 
   Future<void> _evictOverflow(
@@ -468,6 +603,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     _orderedIds = const [];
     _indexById = const {};
     _shownFrameId = null;
+    _warmCentre = null;
     _attached = false;
   }
 }

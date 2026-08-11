@@ -1020,14 +1020,74 @@ abstract class AppLocalizations {
   /// Section title for the home sheet 1-hour per-minute rainfall bar chart
   ///
   /// In en, this message translates to:
-  /// **'Next hour rain'**
+  /// **'Next hour precipitation'**
   String get homeRainTrendTitle;
+
+  /// X-axis tick label on the home rain trend chart, minutes from now
+  ///
+  /// In en, this message translates to:
+  /// **'{minute} min'**
+  String homeRainTrendMinute(int minute);
+
+  /// Data-update time beside the home rain trend title, Taipei wall clock HH:mm
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String homeRainTrendUpdated(String time);
+
+  /// Label on the home rain trend chart for minutes beyond the forecast window, and the empty-card hint
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get homeRainTrendNoData;
+
+  /// Home rain trend subtitle: peak intensity below the light-rain threshold
+  ///
+  /// In en, this message translates to:
+  /// **'Light showers possible'**
+  String get homeRainTrendScattered;
+
+  /// Home rain trend subtitle: light rain that keeps up through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Light rain continuing for the next hour'**
+  String get homeRainTrendLightSustained;
+
+  /// Home rain trend subtitle: light rain forecast to stop partway through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Light rain likely to stop in {minutes} minutes'**
+  String homeRainTrendLightStopping(int minutes);
+
+  /// Home rain trend subtitle: heavy rain that keeps up through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain continuing for the next hour'**
+  String get homeRainTrendHeavySustained;
+
+  /// Home rain trend subtitle: heavy rain forecast to stop partway through the hour
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain likely to stop in {minutes} minutes'**
+  String homeRainTrendHeavyStopping(int minutes);
 
   /// Title of the map layer-picker sheet
   ///
   /// In en, this message translates to:
   /// **'Layers'**
   String get mapLayers;
+
+  /// Title of the layer-order editor, also the tooltip of the reorder button in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder layers'**
+  String get mapLayerOrderTitle;
+
+  /// Button that restores the layer picker's default order
+  ///
+  /// In en, this message translates to:
+  /// **'Reset order'**
+  String get mapLayerOrderReset;
 
   /// Name of the composite radar reflectivity layer in the layer picker
   ///
@@ -1038,8 +1098,356 @@ abstract class AppLocalizations {
   /// Name of the Himawari infrared layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'Himawari Infrared'**
+  /// **'Himawari Infrared (B13)'**
   String get mapLayerSatellite;
+
+  /// Himawari visible-blue channel (B01, 0.47 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Blue (B01)'**
+  String get mapLayerSatelliteB01;
+
+  /// Himawari visible-green channel (B02, 0.51 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Green (B02)'**
+  String get mapLayerSatelliteB02;
+
+  /// Himawari visible-red channel (B03, 0.64 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Red (B03)'**
+  String get mapLayerSatelliteB03;
+
+  /// Himawari near-infrared channel (B04, 0.86 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B04)'**
+  String get mapLayerSatelliteB04;
+
+  /// Himawari near-infrared channel (B05, 1.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B05)'**
+  String get mapLayerSatelliteB05;
+
+  /// Himawari near-infrared channel (B06, 2.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B06)'**
+  String get mapLayerSatelliteB06;
+
+  /// Himawari shortwave-infrared channel (B07, 3.9 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Shortwave Infrared (B07)'**
+  String get mapLayerSatelliteB07;
+
+  /// Himawari upper-level water-vapour channel (B08, 6.2 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Upper Water Vapour (B08)'**
+  String get mapLayerSatelliteB08;
+
+  /// Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Mid Water Vapour (B09)'**
+  String get mapLayerSatelliteB09;
+
+  /// Himawari lower-level water-vapour channel (B10, 7.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Lower Water Vapour (B10)'**
+  String get mapLayerSatelliteB10;
+
+  /// Himawari SO₂ absorption channel (B11, 8.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari SO₂ / Cloud Phase (B11)'**
+  String get mapLayerSatelliteB11;
+
+  /// Himawari ozone-band channel (B12, 9.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Ozone (B12)'**
+  String get mapLayerSatelliteB12;
+
+  /// Himawari clean-infrared window channel (B13, 10.4 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Infrared (B13)'**
+  String get mapLayerSatelliteB13;
+
+  /// Himawari longwave-infrared channel (B14, 11.2 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Longwave Infrared (B14)'**
+  String get mapLayerSatelliteB14;
+
+  /// Himawari longwave-infrared channel (B15, 12.4 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Longwave Infrared (B15)'**
+  String get mapLayerSatelliteB15;
+
+  /// Himawari CO₂-band channel (B16, 13.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari CO₂ (B16)'**
+  String get mapLayerSatelliteB16;
+
+  /// Himawari True Color RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari True Color'**
+  String get mapLayerSatelliteTruecolor;
+
+  /// Himawari Natural Color RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Natural Color'**
+  String get mapLayerSatelliteNaturalcolor;
+
+  /// Himawari Ash RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Ash'**
+  String get mapLayerSatelliteAsh;
+
+  /// Himawari Dust RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Dust'**
+  String get mapLayerSatelliteDust;
+
+  /// Himawari Airmass RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Airmass'**
+  String get mapLayerSatelliteAirmass;
+
+  /// Himawari Night Microphysics RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Night Microphysics'**
+  String get mapLayerSatelliteNightmicrophysics;
+
+  /// Himawari water-vapour layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Water Vapour'**
+  String get mapLayerSatelliteWatervapor;
+
+  /// Himawari split-window brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Split Window'**
+  String get mapLayerSatelliteBtdSplit;
+
+  /// Himawari night fog / low-cloud brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Night Fog'**
+  String get mapLayerSatelliteBtdFog;
+
+  /// Himawari overshooting-cloud-top brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Overshooting Top'**
+  String get mapLayerSatelliteBtdWvirw;
+
+  /// Himawari SO₂ / cloud-phase brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari SO₂ / Cloud Phase'**
+  String get mapLayerSatelliteBtdSo2;
+
+  /// Himawari cirrus / cloud-height brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cirrus / Cloud Height'**
+  String get mapLayerSatelliteBtdCo2;
+
+  /// Himawari tropopause brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Tropopause'**
+  String get mapLayerSatelliteBtdOzone;
+
+  /// Himawari cloud-top-temperature (Level-2 retrieval) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cloud Top Temperature'**
+  String get mapLayerSatelliteCloudtop;
+
+  /// Himawari cloud-mask (Level-2 retrieval) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cloud Mask'**
+  String get mapLayerSatelliteCloudmask;
+
+  /// Himawari sea-surface-temperature (ACSPO L3C) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Sea Surface Temperature'**
+  String get mapLayerSatelliteSst;
+
+  /// Himawari normalised-difference vegetation-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari NDVI'**
+  String get mapLayerSatelliteNdvi;
+
+  /// Himawari normalised-difference water-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari NDWI'**
+  String get mapLayerSatelliteNdwi;
+
+  /// Himawari modified normalised-difference water-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari MNDWI'**
+  String get mapLayerSatelliteMndwi;
+
+  /// Satellite legend row: the country/global border, drawn bright yellow over the imagery
+  ///
+  /// In en, this message translates to:
+  /// **'Country border'**
+  String get mapLayerSatelliteGlobalOutline;
+
+  /// Satellite legend note for the RGB-recipe products (True Color, Ash, …) that carry no single numerical scale
+  ///
+  /// In en, this message translates to:
+  /// **'RGB composite (JMA recipe)'**
+  String get mapLayerSatelliteRgbComposite;
+
+  /// Cloud-mask category: clear sky, transparent on the map
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get mapLayerSatelliteCloudClear;
+
+  /// Cloud-mask category: probably clear
+  ///
+  /// In en, this message translates to:
+  /// **'Probably clear'**
+  String get mapLayerSatelliteCloudProbablyClear;
+
+  /// Cloud-mask category: probably cloudy
+  ///
+  /// In en, this message translates to:
+  /// **'Probably cloudy'**
+  String get mapLayerSatelliteCloudProbablyCloudy;
+
+  /// Cloud-mask category: cloudy
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get mapLayerSatelliteCloudCloudy;
+
+  /// Satellite legend note: on the IR grayscale/enhancements the warm end is clear sky, drawn transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky (warm end) = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentWarm;
+
+  /// Satellite legend note: on the reflectance bands a dark or night pixel is transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Low reflectance / night = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentReflectance;
+
+  /// Satellite legend note: on the brightness-temperature-difference layers a near-zero difference is transparent — no absorber is present
+  ///
+  /// In en, this message translates to:
+  /// **'Zero difference = transparent (no signal)'**
+  String get mapLayerSatelliteTransparentZero;
+
+  /// Satellite legend note: the daytime RGB recipes fade out across the terminator and are transparent at night
+  ///
+  /// In en, this message translates to:
+  /// **'Night = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentNight;
+
+  /// Satellite legend note: the SST retrieval has no value over land, drawn transparent
+  ///
+  /// In en, this message translates to:
+  /// **'No data (land) = transparent'**
+  String get mapLayerSatelliteTransparentNoData;
+
+  /// Satellite legend note: NDVI below the bare-soil threshold is transparent
+  ///
+  /// In en, this message translates to:
+  /// **'Below 0.1 = transparent (no vegetation)'**
+  String get mapLayerSatelliteTransparentNoVegetation;
+
+  /// Satellite legend note: NDWI/MNDWI at zero or below is transparent — no water signal
+  ///
+  /// In en, this message translates to:
+  /// **'≤ 0 = transparent (no water)'**
+  String get mapLayerSatelliteTransparentNoWater;
+
+  /// Satellite legend note: the cloud-mask clear category is transparent so the basemap shows
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky = transparent, the basemap shows'**
+  String get mapLayerSatelliteTransparentClear;
+
+  /// Section header of the satellite band colour-style menu on the map
+  ///
+  /// In en, this message translates to:
+  /// **'Colour style'**
+  String get mapLayerStyleSection;
+
+  /// Tooltip of the colour-style chip beside the layer switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Colour style'**
+  String get mapLayerStyleTooltip;
+
+  /// Colour-style option: JMA grayscale, the default radar-image convention
+  ///
+  /// In en, this message translates to:
+  /// **'Grayscale (JMA)'**
+  String get mapLayerStyleGray;
+
+  /// Explains the JMA grayscale band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'JMA grayscale — colder is whiter'**
+  String get mapLayerStyleGrayTooltip;
+
+  /// Colour-style option: JMA cloud-top enhancement, tinted below −40 °C
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-top enhancement (JMA)'**
+  String get mapLayerStyleJma;
+
+  /// Explains the JMA cloud-top enhancement band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'Grayscale base, tinted below −40 °C to highlight cloud-top height'**
+  String get mapLayerStyleJmaTooltip;
+
+  /// Colour-style option: Dvorak BD curve stepped grayscale
+  ///
+  /// In en, this message translates to:
+  /// **'Dvorak BD'**
+  String get mapLayerStyleBd;
+
+  /// Explains the Dvorak BD band rendering
+  ///
+  /// In en, this message translates to:
+  /// **'Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis'**
+  String get mapLayerStyleBdTooltip;
+
+  /// Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker
+  ///
+  /// In en, this message translates to:
+  /// **'1h Precipitation Forecast'**
+  String get mapLayerQpesums;
 
   /// Map layer switcher label for the lightning strike timeline
   ///
@@ -1065,11 +1473,35 @@ abstract class AppLocalizations {
   /// **'Now'**
   String get mapTimelineNow;
 
+  /// Label on the map timeline when the selected frame predates the present
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get mapTimelinePast;
+
+  /// Label on the map timeline when the selected frame postdates the present
+  ///
+  /// In en, this message translates to:
+  /// **'Future'**
+  String get mapTimelineFuture;
+
   /// Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14
   ///
   /// In en, this message translates to:
   /// **'Observed'**
   String get mapTimelineObserved;
+
+  /// Label above the map timeline's date when the frame times are forecast times, e.g. Forecast / 2026/07/14
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get mapTimelineForecast;
+
+  /// Model-run issue time shown on the map timeline under a forecast layer's caption, e.g. Data 8/11 14:00
+  ///
+  /// In en, this message translates to:
+  /// **'Data {time}'**
+  String mapTimelineDataTime(String time);
 
   /// More-menu entry that opens the notification-settings page
   ///
@@ -1490,6 +1922,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Radar'**
   String get mapNavRadar;
+
+  /// Short Map-tab bottom-nav / default-layer picker label for the 1h QPESUMS precipitation forecast
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get mapNavQpesums;
 
   /// Short Map-tab bottom-nav / default-layer picker label for satellite
   ///
@@ -1947,6 +2385,18 @@ abstract class AppLocalizations {
   /// **'Data time\n{time}'**
   String typhoonDataTime(String time);
 
+  /// Map layer switcher label for the ECMWF wind-forecast layer
+  ///
+  /// In en, this message translates to:
+  /// **'ECMWF'**
+  String get mapLayerWindForecastEcmwf;
+
+  /// Map layer switcher label for the GFS wind-forecast layer
+  ///
+  /// In en, this message translates to:
+  /// **'GFS'**
+  String get mapLayerWindForecastGfs;
+
   /// Map layer switcher label for the real-time seismic monitor (RTS)
   ///
   /// In en, this message translates to:
@@ -2072,6 +2522,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show evacuation shelters'**
   String get disasterMapOverlayShelterTooltip;
+
+  /// Action in the disaster-map detail sheet: open the point in an external map app
+  ///
+  /// In en, this message translates to:
+  /// **'Open in maps'**
+  String get dpmOpenInMaps;
+
+  /// External map app choice: Google Maps
+  ///
+  /// In en, this message translates to:
+  /// **'Google Maps'**
+  String get mapAppGoogleMaps;
+
+  /// External map app choice: Apple Maps
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Maps'**
+  String get mapAppAppleMaps;
+
+  /// Choice-sheet label suffix marking the platform home map app, with the app name
+  ///
+  /// In en, this message translates to:
+  /// **'{app} (default)'**
+  String mapAppDefault(String app);
+
+  /// Choice-sheet action: copy the point's coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'Copy coordinates'**
+  String get mapAppCopyCoordinates;
+
+  /// Snackbar confirming the coordinates were copied
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates copied'**
+  String get mapAppCoordinatesCopied;
+
+  /// Snackbar when the chosen map app cannot be opened on this device
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open {app}'**
+  String mapAppOpenFailed(String app);
+
+  /// Snackbar when tapping the emergency phone and the device has no phone handler
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot make phone calls'**
+  String get mapAppCallFailed;
+
+  /// Section title in map overlay settings menus: the reference overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Reference layers'**
+  String get mapOverlaySectionReference;
+
+  /// Section title in map overlay lists: the seismic-monitor overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get mapLayerCategoryEarthquake;
+
+  /// Section title in map overlay lists: typhoon overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get mapLayerCategoryTyphoon;
+
+  /// Section title in map overlay lists: the weather-observation overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Weather observations'**
+  String get mapLayerCategoryWeather;
+
+  /// Section title in map overlay lists: satellite-imagery overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get mapLayerCategorySatellite;
+
+  /// Section title in map overlay lists: radar and precipitation-forecast overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get mapLayerCategoryRadar;
+
+  /// Section title in map overlay lists: everyday-life facility overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Daily life'**
+  String get mapLayerCategoryLife;
+
+  /// Section title in map overlay lists: numerical weather prediction (ECMWF/GFS) wind-field overlays
+  ///
+  /// In en, this message translates to:
+  /// **'Numerical forecast'**
+  String get mapLayerCategoryForecast;
+
+  /// Section title in map overlay settings menus: base-map settings
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get mapOverlaySectionMap;
+
+  /// Section title in the rainfall menu: the accumulation-interval choices
+  ///
+  /// In en, this message translates to:
+  /// **'Time window'**
+  String get rainIntervalSection;
+
+  /// Map setting: show township-name labels when the map is zoomed in
+  ///
+  /// In en, this message translates to:
+  /// **'Township names'**
+  String get mapTownLabels;
+
+  /// Hint under the township-names setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show township names when zoomed in'**
+  String get mapTownLabelsHint;
 
   /// Hint in the disaster-map detail sheet when nothing is selected
   ///
@@ -2331,6 +2901,18 @@ abstract class AppLocalizations {
   /// **'Tropical depression TD {no}'**
   String typhoonPickerTd(String no);
 
+  /// Secondary badge on the typhoon sheet hero: the CWA typhoon serial number, e.g. TY 4
+  ///
+  /// In en, this message translates to:
+  /// **'TY {no}'**
+  String typhoonTyNo(String no);
+
+  /// Secondary badge on the typhoon sheet hero: the CWA tropical-depression serial number, e.g. TD 14
+  ///
+  /// In en, this message translates to:
+  /// **'TD {no}'**
+  String typhoonTdNo(String no);
+
   /// CWA class: mild typhoon (past-track colour)
   ///
   /// In en, this message translates to:
@@ -2390,6 +2972,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My location'**
   String get mapMyLocation;
+
+  /// Map compass tooltip: re-points the camera to north-up
+  ///
+  /// In en, this message translates to:
+  /// **'Reset north'**
+  String get mapResetNorth;
 
   /// Typhoon UI: typhoonLegendCircle15
   ///
@@ -2624,6 +3212,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nuclear accident'**
   String get dpmDisasterNuclear;
+
+  /// Label for the experimental sky time-of-day override.
+  ///
+  /// In en, this message translates to:
+  /// **'Sky time'**
+  String get skyTime;
+
+  /// Label for the skyTimeAuto option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get skyTimeAuto;
+
+  /// Label for the skyTimeDawn option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dawn'**
+  String get skyTimeDawn;
+
+  /// Label for the skyTimeSunrise option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get skyTimeSunrise;
+
+  /// Label for the skyTimeMorning option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get skyTimeMorning;
+
+  /// Label for the skyTimeNoon option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Noon'**
+  String get skyTimeNoon;
+
+  /// Label for the skyTimeAfternoon option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get skyTimeAfternoon;
+
+  /// Label for the skyTimeGolden option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden hour'**
+  String get skyTimeGolden;
+
+  /// Label for the skyTimeSunset option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get skyTimeSunset;
+
+  /// Label for the skyTimeDusk option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dusk'**
+  String get skyTimeDusk;
+
+  /// Label for the skyTimeNight option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get skyTimeNight;
+
+  /// Label for the weatherModeCloudy option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get weatherModeCloudy;
+
+  /// Label for the weatherModeOvercast option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weatherModeOvercast;
+
+  /// Label for the weatherModeSnow option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weatherModeSnow;
+
+  /// Label for the weatherModeSand option in the experimental backdrop settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Dust'**
+  String get weatherModeSand;
+
+  /// Radar scan-range overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Show scan range'**
+  String get radarScanRange;
+
+  /// Radar scan-range overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlines the area the four radars actually observe.'**
+  String get radarScanRangeSubtitle;
+
+  /// Hint under the radar scan-range toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Blank outside means unobserved'**
+  String get radarScanRangeHint;
+
+  /// Tooltip for the radar overlay-options chip beside the layer switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Radar overlay options'**
+  String get radarOverlayMenuTooltip;
+
+  /// County-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'County borders'**
+  String get radarCountyOutline;
+
+  /// World-country-border overlay toggle in the map's reference-layer overlay menus.
+  ///
+  /// In en, this message translates to:
+  /// **'National borders'**
+  String get radarGlobalOutline;
+
+  /// Hint under the national-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Every country\'s outer frame'**
+  String get radarGlobalOutlineHint;
+
+  /// Hint under the county-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Drawn over the echo'**
+  String get radarCountyOutlineHint;
+
+  /// County-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps county borders legible under the radar echo.'**
+  String get radarCountyOutlineSubtitle;
+
+  /// Township-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Township borders'**
+  String get radarTownOutline;
+
+  /// Hint under the township-border toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'The finer mesh'**
+  String get radarTownOutlineHint;
+
+  /// Township-border overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps township borders legible under the radar echo.'**
+  String get radarTownOutlineSubtitle;
+
+  /// Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'QPESUMS overlay options'**
+  String get qpesumsOverlayMenuTooltip;
+
+  /// Tooltip for the wind-forecast overlay-options chip beside the layer switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind forecast overlay options'**
+  String get windForecastOverlayMenuTooltip;
+
+  /// Hint under the county-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Drawn over the wind field'**
+  String get windForecastCountyOutlineHint;
+
+  /// Hint under the national-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Every country\'s outer frame'**
+  String get windForecastGlobalOutlineHint;
+
+  /// Hint under the township-border toggle in the wind-forecast overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'The finer mesh'**
+  String get windForecastTownOutlineHint;
 }
 
 class _AppLocalizationsDelegate

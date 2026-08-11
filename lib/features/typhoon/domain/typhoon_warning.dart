@@ -2,6 +2,7 @@
 /// (dataset 001).
 library;
 
+import 'package:dpip/features/typhoon/domain/typhoon_decode.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'typhoon_warning.freezed.dart';
@@ -133,20 +134,15 @@ abstract class WarningPayload with _$WarningPayload {
   }) = _WarningPayload;
 
   /// Decodes `{ updated, cyclones: [...] }`.
-  factory WarningPayload.decode(Map<String, dynamic> json) {
-    final raw = json['cyclones'];
-    if (raw is! List) {
-      return WarningPayload(
-        updated: (json['updated'] as num?)?.toInt() ?? 0,
-        cyclones: const [],
+  factory WarningPayload.decode(Map<String, dynamic> json) =>
+      decodeCyclonesPayload(
+        json,
+        (updated, raw) => WarningPayload(
+          updated: updated,
+          cyclones: [
+            for (final c in raw)
+              if (c is Map<String, dynamic>) TyphoonWarning.fromJson(c),
+          ],
+        ),
       );
-    }
-    return WarningPayload(
-      updated: (json['updated'] as num?)?.toInt() ?? 0,
-      cyclones: [
-        for (final c in raw)
-          if (c is Map<String, dynamic>) TyphoonWarning.fromJson(c),
-      ],
-    );
-  }
 }

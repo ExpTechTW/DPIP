@@ -12,7 +12,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageName => '繁體中文(臺灣)';
 
   @override
-  String get navHome => '主頁';
+  String get navHome => '首頁';
 
   @override
   String get navEvents => '事件';
@@ -501,16 +501,228 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => '無資料';
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';
 
   @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
+
+  @override
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
+
+  @override
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';
@@ -529,7 +741,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
+
+  @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -743,6 +969,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavQpesums => '預報';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -994,6 +1223,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -1055,6 +1290,70 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
+
+  @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
@@ -1196,6 +1495,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '輕度颱風';
 
   @override
@@ -1224,6 +1533,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到北方';
 
   @override
   String get typhoonLegendCircle15 => '七級風暴風圈';
@@ -1347,6 +1659,102 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1357,7 +1765,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get languageName => '简体中文';
 
   @override
-  String get navHome => '首页';
+  String get navHome => '主页';
 
   @override
   String get navEvents => '事件';
@@ -1846,16 +2254,228 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前没有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小时降雨趋势';
+  String get homeRainTrendTitle => '近 1 小时降水趋势';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => '无资料';
+
+  @override
+  String get homeRainTrendScattered => '可能会有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未来 1 小时会有持续小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '预计 $minutes 分钟后停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未来 1 小时会有持续大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '预计 $minutes 分钟后停止下大雨';
+  }
 
   @override
   String get mapLayers => '图层';
 
   @override
+  String get mapLayerOrderTitle => '调整图层顺序';
+
+  @override
+  String get mapLayerOrderReset => '恢复默认顺序';
+
+  @override
   String get mapLayerRadar => '雷达合成回波图';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 红外线图';
+  String get mapLayerSatellite => 'ひまわり 红外线(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可见光-蓝(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可见光-绿(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可见光-红(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近红外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近红外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近红外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波红外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上层水气(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中层水气(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低层水气(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/云相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 红外线(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 长波红外线(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 长波红外线(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙尘';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 气团';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜间微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水气';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割视窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜间雾';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 过冲云顶';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/云相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷云/云高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 对流层顶';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 云顶温度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 云遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表温度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植被指数';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水体指数';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水体指数';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '国界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有云';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有云';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜间 = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(无信号)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜间 = 透明,显示底图';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '无资料(陆地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(无植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(无水体)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,显示底图';
+
+  @override
+  String get mapLayerStyleSection => '显示样式';
+
+  @override
+  String get mapLayerStyleTooltip => '显示样式';
+
+  @override
+  String get mapLayerStyleGray => '灰度（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '气象厅灰度惯例：温度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '云顶强调（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰阶为底，−40 °C 以下上色，凸显云顶高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲线——热带气旋强度分析的阶梯灰度';
+
+  @override
+  String get mapLayerQpesums => '未来 1 小时降水预报';
 
   @override
   String get mapLayerLightning => '闪电';
@@ -1874,7 +2494,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapTimelineNow => '现在';
 
   @override
+  String get mapTimelinePast => '历史';
+
+  @override
+  String get mapTimelineFuture => '未来';
+
+  @override
   String get mapTimelineObserved => '观测';
+
+  @override
+  String get mapTimelineForecast => '预报';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return '资料时间 $time';
+  }
 
   @override
   String get notifySettingsMenu => '通知设置';
@@ -2088,6 +2722,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapNavRadar => '雷达';
+
+  @override
+  String get mapNavQpesums => '预报';
 
   @override
   String get mapNavSatellite => '卫星';
@@ -2339,6 +2976,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '强震监视器';
 
   @override
@@ -2400,6 +3043,70 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get disasterMapOverlayShelterTooltip => '显示避难收容场所';
+
+  @override
+  String get dpmOpenInMaps => '打开地图';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（默认）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '复制坐标';
+
+  @override
+  String get mapAppCoordinatesCopied => '已复制坐标';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '无法打开 $app';
+  }
+
+  @override
+  String get mapAppCallFailed => '此设备无法拨打电话';
+
+  @override
+  String get mapOverlaySectionReference => '参考图层';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '台风';
+
+  @override
+  String get mapLayerCategoryWeather => '气象观测';
+
+  @override
+  String get mapLayerCategorySatellite => '卫星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷达';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '数值预报';
+
+  @override
+  String get mapOverlaySectionMap => '地图';
+
+  @override
+  String get rainIntervalSection => '统计时间';
+
+  @override
+  String get mapTownLabels => '乡镇名称';
+
+  @override
+  String get mapTownLabelsHint => '放大时显示乡镇名称';
 
   @override
   String get dpmSheetEmpty => '点击地图上的标记查看详情';
@@ -2541,6 +3248,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '轻度台风';
 
   @override
@@ -2569,6 +3286,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到正北';
 
   @override
   String get typhoonLegendCircle15 => '七级风暴风圈';
@@ -2692,6 +3412,102 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空时间';
+
+  @override
+  String get skyTimeAuto => '自动';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黄金时刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多云';
+
+  @override
+  String get weatherModeOvercast => '阴天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙尘';
+
+  @override
+  String get radarScanRange => '显示扫描范围';
+
+  @override
+  String get radarScanRangeSubtitle => '标示四座雷达实际观测到的范围。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未观测';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷达图层选项';
+
+  @override
+  String get radarCountyOutline => '县市界线';
+
+  @override
+  String get radarGlobalOutline => '国界';
+
+  @override
+  String get radarGlobalOutlineHint => '各国国界外框';
+
+  @override
+  String get radarCountyOutlineHint => '画在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '让县市界线在雷达回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '乡镇界线';
+
+  @override
+  String get radarTownOutlineHint => '较细的分区';
+
+  @override
+  String get radarTownOutlineSubtitle => '让乡镇界线在雷达回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水预报图层选项';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '风场预报图层选项';
+
+  @override
+  String get windForecastCountyOutlineHint => '绘制于风场之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各国国界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更细的网格';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -3191,16 +4007,228 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => '無資料';
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';
 
   @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
+
+  @override
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
+
+  @override
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';
@@ -3219,7 +4247,21 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
+
+  @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -3433,6 +4475,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavQpesums => '預報';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -3684,6 +4729,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -3745,6 +4796,70 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
+
+  @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
@@ -3886,6 +5001,16 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '輕度颱風';
 
   @override
@@ -3914,6 +5039,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到北方';
 
   @override
   String get typhoonLegendCircle15 => '七級風暴風圈';
@@ -4037,6 +5165,102 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4047,7 +5271,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get languageName => '繁體中文(臺灣)';
 
   @override
-  String get navHome => '主頁';
+  String get navHome => '首頁';
 
   @override
   String get navEvents => '事件';
@@ -4536,16 +5760,228 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get homeActiveEventsEmpty => '目前沒有生效中的事件';
 
   @override
-  String get homeRainTrendTitle => '近 1 小時降雨趨勢';
+  String get homeRainTrendTitle => '近 1 小時降水趨勢';
+
+  @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute分';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return '更新 $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => '無資料';
+
+  @override
+  String get homeRainTrendScattered => '可能會有零星降雨';
+
+  @override
+  String get homeRainTrendLightSustained => '未來 1 小時會有持續小雨';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下小雨';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained => '未來 1 小時會有持續大雨';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return '預計 $minutes 分鐘後停止下大雨';
+  }
 
   @override
   String get mapLayers => '圖層';
 
   @override
+  String get mapLayerOrderTitle => '調整圖層順序';
+
+  @override
+  String get mapLayerOrderReset => '回復預設順序';
+
+  @override
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光-藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光-綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光-紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 改良水體指數';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => '國界';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA 配方)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => '晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => '可能晴空';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => '可能有雲';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => '有雲';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm => '晴空(暖端) = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance => '低反射率/夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentZero => '零差值 = 透明(無訊號)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight => '夜間 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation => '< 0.1 = 透明(無植被)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater => '≤ 0 = 透明(無水體)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
+
+  @override
+  String get mapLayerStyleSection => '顯示樣式';
+
+  @override
+  String get mapLayerStyleTooltip => '顯示樣式';
+
+  @override
+  String get mapLayerStyleGray => '灰階（JMA）';
+
+  @override
+  String get mapLayerStyleGrayTooltip => '氣象廳灰階慣例：溫度越低越白';
+
+  @override
+  String get mapLayerStyleJma => '雲頂強調（JMA）';
+
+  @override
+  String get mapLayerStyleJmaTooltip => '灰階為底，−40 °C 以下上色，凸顯雲頂高度';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip => 'Dvorak BD 曲線——熱帶氣旋強度分析的階梯灰階';
+
+  @override
+  String get mapLayerQpesums => '未來 1 小時降水預報';
 
   @override
   String get mapLayerLightning => '閃電';
@@ -4564,7 +6000,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapTimelineNow => '現在';
 
   @override
+  String get mapTimelinePast => '歷史';
+
+  @override
+  String get mapTimelineFuture => '未來';
+
+  @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineForecast => '預報';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
 
   @override
   String get notifySettingsMenu => '通知設定';
@@ -4778,6 +6228,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapNavRadar => '雷達';
+
+  @override
+  String get mapNavQpesums => '預報';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -5029,6 +6482,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => '強震監視器';
 
   @override
@@ -5090,6 +6549,70 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get disasterMapOverlayShelterTooltip => '顯示避難收容場所';
+
+  @override
+  String get dpmOpenInMaps => '開啟地圖';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app（預設）';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => '複製座標';
+
+  @override
+  String get mapAppCoordinatesCopied => '已複製座標';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return '無法開啟 $app';
+  }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
+
+  @override
+  String get mapOverlaySectionReference => '參考圖層';
+
+  @override
+  String get mapLayerCategoryEarthquake => '地震';
+
+  @override
+  String get mapLayerCategoryTyphoon => '颱風';
+
+  @override
+  String get mapLayerCategoryWeather => '氣象觀測';
+
+  @override
+  String get mapLayerCategorySatellite => '衛星';
+
+  @override
+  String get mapLayerCategoryRadar => '雷達';
+
+  @override
+  String get mapLayerCategoryLife => '生活';
+
+  @override
+  String get mapLayerCategoryForecast => '數值預報';
+
+  @override
+  String get mapOverlaySectionMap => '地圖';
+
+  @override
+  String get rainIntervalSection => '統計時間';
+
+  @override
+  String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
@@ -5231,6 +6754,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => '輕度颱風';
 
   @override
@@ -5259,6 +6792,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapMyLocation => '我的位置';
+
+  @override
+  String get mapResetNorth => '回到北方';
 
   @override
   String get typhoonLegendCircle15 => '七級風暴風圈';
@@ -5382,4 +6918,100 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get dpmDisasterNuclear => '核子事故';
+
+  @override
+  String get skyTime => '天空時間';
+
+  @override
+  String get skyTimeAuto => '自動';
+
+  @override
+  String get skyTimeDawn => '黎明';
+
+  @override
+  String get skyTimeSunrise => '日出';
+
+  @override
+  String get skyTimeMorning => '上午';
+
+  @override
+  String get skyTimeNoon => '正午';
+
+  @override
+  String get skyTimeAfternoon => '下午';
+
+  @override
+  String get skyTimeGolden => '黃金時刻';
+
+  @override
+  String get skyTimeSunset => '日落';
+
+  @override
+  String get skyTimeDusk => '暮色';
+
+  @override
+  String get skyTimeNight => '夜晚';
+
+  @override
+  String get weatherModeCloudy => '多雲';
+
+  @override
+  String get weatherModeOvercast => '陰天';
+
+  @override
+  String get weatherModeSnow => '下雪';
+
+  @override
+  String get weatherModeSand => '沙塵';
+
+  @override
+  String get radarScanRange => '顯示掃描範圍';
+
+  @override
+  String get radarScanRangeSubtitle => '標示四座雷達實際觀測到的範圍。';
+
+  @override
+  String get radarScanRangeHint => '框外空白代表未觀測';
+
+  @override
+  String get radarOverlayMenuTooltip => '雷達圖層選項';
+
+  @override
+  String get radarCountyOutline => '縣市界線';
+
+  @override
+  String get radarGlobalOutline => '國界';
+
+  @override
+  String get radarGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get radarCountyOutlineHint => '畫在回波之上';
+
+  @override
+  String get radarCountyOutlineSubtitle => '讓縣市界線在雷達回波下仍然清楚。';
+
+  @override
+  String get radarTownOutline => '鄉鎮界線';
+
+  @override
+  String get radarTownOutlineHint => '較細的分區';
+
+  @override
+  String get radarTownOutlineSubtitle => '讓鄉鎮界線在雷達回波下仍然清楚。';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => '定量降水預報圖層選項';
+
+  @override
+  String get windForecastOverlayMenuTooltip => '風場預報圖層選項';
+
+  @override
+  String get windForecastCountyOutlineHint => '繪製於風場之上';
+
+  @override
+  String get windForecastGlobalOutlineHint => '各國國界外框';
+
+  @override
+  String get windForecastTownOutlineHint => '更細的網格';
 }

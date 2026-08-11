@@ -709,21 +709,314 @@
   "@homeActiveEventsEmpty": {
     "description": "Empty state when the realtime event feed has nothing in effect"
   },
-  "homeRainTrendTitle": "Next hour rain",
+  "homeRainTrendTitle": "Next hour precipitation",
   "@homeRainTrendTitle": {
     "description": "Section title for the home sheet 1-hour per-minute rainfall bar chart"
+  },
+  "homeRainTrendMinute": "{minute} min",
+  "@homeRainTrendMinute": {
+    "description": "X-axis tick label on the home rain trend chart, minutes from now",
+    "placeholders": {
+      "minute": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRainTrendUpdated": "Updated {time}",
+  "@homeRainTrendUpdated": {
+    "description": "Data-update time beside the home rain trend title, Taipei wall clock HH:mm",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRainTrendNoData": "No data",
+  "@homeRainTrendNoData": {
+    "description": "Label on the home rain trend chart for minutes beyond the forecast window, and the empty-card hint"
+  },
+
+  "homeRainTrendScattered": "Light showers possible",
+  "@homeRainTrendScattered": {
+    "description": "Home rain trend subtitle: peak intensity below the light-rain threshold"
+  },
+  "homeRainTrendLightSustained": "Light rain continuing for the next hour",
+  "@homeRainTrendLightSustained": {
+    "description": "Home rain trend subtitle: light rain that keeps up through the hour"
+  },
+  "homeRainTrendLightStopping": "Light rain likely to stop in {minutes} minutes",
+  "@homeRainTrendLightStopping": {
+    "description": "Home rain trend subtitle: light rain forecast to stop partway through the hour",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeRainTrendHeavySustained": "Heavy rain continuing for the next hour",
+  "@homeRainTrendHeavySustained": {
+    "description": "Home rain trend subtitle: heavy rain that keeps up through the hour"
+  },
+  "homeRainTrendHeavyStopping": "Heavy rain likely to stop in {minutes} minutes",
+  "@homeRainTrendHeavyStopping": {
+    "description": "Home rain trend subtitle: heavy rain forecast to stop partway through the hour",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "mapLayers": "Layers",
   "@mapLayers": {
     "description": "Title of the map layer-picker sheet"
   },
+  "mapLayerOrderTitle": "Reorder layers",
+  "@mapLayerOrderTitle": {
+    "description": "Title of the layer-order editor, also the tooltip of the reorder button in the layer picker"
+  },
+  "mapLayerOrderReset": "Reset order",
+  "@mapLayerOrderReset": {
+    "description": "Button that restores the layer picker's default order"
+  },
   "mapLayerRadar": "Composite Radar Reflectivity",
   "@mapLayerRadar": {
     "description": "Name of the composite radar reflectivity layer in the layer picker"
   },
-  "mapLayerSatellite": "Himawari Infrared",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
   "@mapLayerSatellite": {
     "description": "Name of the Himawari infrared layer in the layer picker"
+  },
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "@mapLayerSatelliteB01": {
+    "description": "Himawari visible-blue channel (B01, 0.47 µm) layer name"
+  },
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "@mapLayerSatelliteB02": {
+    "description": "Himawari visible-green channel (B02, 0.51 µm) layer name"
+  },
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "@mapLayerSatelliteB03": {
+    "description": "Himawari visible-red channel (B03, 0.64 µm) layer name"
+  },
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "@mapLayerSatelliteB04": {
+    "description": "Himawari near-infrared channel (B04, 0.86 µm) layer name"
+  },
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "@mapLayerSatelliteB05": {
+    "description": "Himawari near-infrared channel (B05, 1.6 µm) layer name"
+  },
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "@mapLayerSatelliteB06": {
+    "description": "Himawari near-infrared channel (B06, 2.3 µm) layer name"
+  },
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "@mapLayerSatelliteB07": {
+    "description": "Himawari shortwave-infrared channel (B07, 3.9 µm) layer name"
+  },
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "@mapLayerSatelliteB08": {
+    "description": "Himawari upper-level water-vapour channel (B08, 6.2 µm) layer name"
+  },
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "@mapLayerSatelliteB09": {
+    "description": "Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name"
+  },
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "@mapLayerSatelliteB10": {
+    "description": "Himawari lower-level water-vapour channel (B10, 7.3 µm) layer name"
+  },
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "@mapLayerSatelliteB11": {
+    "description": "Himawari SO₂ absorption channel (B11, 8.6 µm) layer name"
+  },
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "@mapLayerSatelliteB12": {
+    "description": "Himawari ozone-band channel (B12, 9.6 µm) layer name"
+  },
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "@mapLayerSatelliteB13": {
+    "description": "Himawari clean-infrared window channel (B13, 10.4 µm) layer name"
+  },
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "@mapLayerSatelliteB14": {
+    "description": "Himawari longwave-infrared channel (B14, 11.2 µm) layer name"
+  },
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "@mapLayerSatelliteB15": {
+    "description": "Himawari longwave-infrared channel (B15, 12.4 µm) layer name"
+  },
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "@mapLayerSatelliteB16": {
+    "description": "Himawari CO₂-band channel (B16, 13.3 µm) layer name"
+  },
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "@mapLayerSatelliteTruecolor": {
+    "description": "Himawari True Color RGB composite layer name"
+  },
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "@mapLayerSatelliteNaturalcolor": {
+    "description": "Himawari Natural Color RGB composite layer name"
+  },
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "@mapLayerSatelliteAsh": {
+    "description": "Himawari Ash RGB composite layer name"
+  },
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "@mapLayerSatelliteDust": {
+    "description": "Himawari Dust RGB composite layer name"
+  },
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "@mapLayerSatelliteAirmass": {
+    "description": "Himawari Airmass RGB composite layer name"
+  },
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "@mapLayerSatelliteNightmicrophysics": {
+    "description": "Himawari Night Microphysics RGB composite layer name"
+  },
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "@mapLayerSatelliteWatervapor": {
+    "description": "Himawari water-vapour layer name"
+  },
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "@mapLayerSatelliteBtdSplit": {
+    "description": "Himawari split-window brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "@mapLayerSatelliteBtdFog": {
+    "description": "Himawari night fog / low-cloud brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "@mapLayerSatelliteBtdWvirw": {
+    "description": "Himawari overshooting-cloud-top brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "@mapLayerSatelliteBtdSo2": {
+    "description": "Himawari SO₂ / cloud-phase brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "@mapLayerSatelliteBtdCo2": {
+    "description": "Himawari cirrus / cloud-height brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "@mapLayerSatelliteBtdOzone": {
+    "description": "Himawari tropopause brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "@mapLayerSatelliteCloudtop": {
+    "description": "Himawari cloud-top-temperature (Level-2 retrieval) layer name"
+  },
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "@mapLayerSatelliteCloudmask": {
+    "description": "Himawari cloud-mask (Level-2 retrieval) layer name"
+  },
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "@mapLayerSatelliteSst": {
+    "description": "Himawari sea-surface-temperature (ACSPO L3C) layer name"
+  },
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "@mapLayerSatelliteNdvi": {
+    "description": "Himawari normalised-difference vegetation-index layer name"
+  },
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "@mapLayerSatelliteNdwi": {
+    "description": "Himawari normalised-difference water-index layer name"
+  },
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "@mapLayerSatelliteMndwi": {
+    "description": "Himawari modified normalised-difference water-index layer name"
+  },
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "@mapLayerSatelliteGlobalOutline": {
+    "description": "Satellite legend row: the country/global border, drawn bright yellow over the imagery"
+  },
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "@mapLayerSatelliteRgbComposite": {
+    "description": "Satellite legend note for the RGB-recipe products (True Color, Ash, …) that carry no single numerical scale"
+  },
+  "mapLayerSatelliteCloudClear": "Clear",
+  "@mapLayerSatelliteCloudClear": {
+    "description": "Cloud-mask category: clear sky, transparent on the map"
+  },
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "@mapLayerSatelliteCloudProbablyClear": {
+    "description": "Cloud-mask category: probably clear"
+  },
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "@mapLayerSatelliteCloudProbablyCloudy": {
+    "description": "Cloud-mask category: probably cloudy"
+  },
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "@mapLayerSatelliteCloudCloudy": {
+    "description": "Cloud-mask category: cloudy"
+  },
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentWarm": {
+    "description": "Satellite legend note: on the IR grayscale/enhancements the warm end is clear sky, drawn transparent so the basemap shows"
+  },
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentReflectance": {
+    "description": "Satellite legend note: on the reflectance bands a dark or night pixel is transparent so the basemap shows"
+  },
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "@mapLayerSatelliteTransparentZero": {
+    "description": "Satellite legend note: on the brightness-temperature-difference layers a near-zero difference is transparent — no absorber is present"
+  },
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentNight": {
+    "description": "Satellite legend note: the daytime RGB recipes fade out across the terminator and are transparent at night"
+  },
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "@mapLayerSatelliteTransparentNoData": {
+    "description": "Satellite legend note: the SST retrieval has no value over land, drawn transparent"
+  },
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "@mapLayerSatelliteTransparentNoVegetation": {
+    "description": "Satellite legend note: NDVI below the bare-soil threshold is transparent"
+  },
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "@mapLayerSatelliteTransparentNoWater": {
+    "description": "Satellite legend note: NDWI/MNDWI at zero or below is transparent — no water signal"
+  },
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "@mapLayerSatelliteTransparentClear": {
+    "description": "Satellite legend note: the cloud-mask clear category is transparent so the basemap shows"
+  },
+  "mapLayerStyleSection": "Colour style",
+  "@mapLayerStyleSection": {
+    "description": "Section header of the satellite band colour-style menu on the map"
+  },
+  "mapLayerStyleTooltip": "Colour style",
+  "@mapLayerStyleTooltip": {
+    "description": "Tooltip of the colour-style chip beside the layer switcher"
+  },
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "@mapLayerStyleGray": {
+    "description": "Colour-style option: JMA grayscale, the default radar-image convention"
+  },
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "@mapLayerStyleGrayTooltip": {
+    "description": "Explains the JMA grayscale band rendering"
+  },
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "@mapLayerStyleJma": {
+    "description": "Colour-style option: JMA cloud-top enhancement, tinted below −40 °C"
+  },
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "@mapLayerStyleJmaTooltip": {
+    "description": "Explains the JMA cloud-top enhancement band rendering"
+  },
+  "mapLayerStyleBd": "Dvorak BD",
+  "@mapLayerStyleBd": {
+    "description": "Colour-style option: Dvorak BD curve stepped grayscale"
+  },
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "@mapLayerStyleBdTooltip": {
+    "description": "Explains the Dvorak BD band rendering"
+  },
+  "mapLayerQpesums": "1h Precipitation Forecast",
+  "@mapLayerQpesums": {
+    "description": "Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker"
   },
   "mapLayerLightning": "Lightning",
   "@mapLayerLightning": {
@@ -751,9 +1044,30 @@
   "@mapTimelineNow": {
     "description": "Label on the map timeline when the newest (latest) frame is selected"
   },
+  "mapTimelinePast": "Past",
+  "@mapTimelinePast": {
+    "description": "Label on the map timeline when the selected frame predates the present"
+  },
+  "mapTimelineFuture": "Future",
+  "@mapTimelineFuture": {
+    "description": "Label on the map timeline when the selected frame postdates the present"
+  },
   "mapTimelineObserved": "Observed",
   "@mapTimelineObserved": {
     "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"
+  },
+  "mapTimelineForecast": "Forecast",
+  "@mapTimelineForecast": {
+    "description": "Label above the map timeline's date when the frame times are forecast times, e.g. Forecast / 2026/07/14"
+  },
+  "mapTimelineDataTime": "Data {time}",
+  "@mapTimelineDataTime": {
+    "description": "Model-run issue time shown on the map timeline under a forecast layer's caption, e.g. Data 8/11 14:00",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "notifySettingsMenu": "Notification settings",
   "@notifySettingsMenu": {
@@ -1034,6 +1348,10 @@
   "mapNavRadar": "Radar",
   "@mapNavRadar": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for radar"
+  },
+  "mapNavQpesums": "Forecast",
+  "@mapNavQpesums": {
+    "description": "Short Map-tab bottom-nav / default-layer picker label for the 1h QPESUMS precipitation forecast"
   },
   "mapNavSatellite": "Satellite",
   "@mapNavSatellite": {
@@ -1334,6 +1652,14 @@
   "@mapLayerWind": {
     "description": "Map layer switcher label for the wind-direction layer"
   },
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "@mapLayerWindForecastEcmwf": {
+    "description": "Map layer switcher label for the ECMWF wind-forecast layer"
+  },
+  "mapLayerWindForecastGfs": "GFS",
+  "@mapLayerWindForecastGfs": {
+    "description": "Map layer switcher label for the GFS wind-forecast layer"
+  },
   "mapLayerMonitor": "Seismic Monitor",
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
@@ -1418,6 +1744,100 @@
   "@disasterMapOverlayShelterTooltip": {
     "description": "Tooltip for the shelter toggle in the disaster-map overlay menu"
   },
+  "dpmOpenInMaps": "Open in maps",
+  "@dpmOpenInMaps": {
+    "description": "Action in the disaster-map detail sheet: open the point in an external map app"
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+    "description": "External map app choice: Google Maps"
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+    "description": "External map app choice: Apple Maps"
+  },
+  "mapAppDefault": "{app} (default)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    },
+    "description": "Choice-sheet label suffix marking the platform home map app, with the app name"
+  },
+  "mapAppCopyCoordinates": "Copy coordinates",
+  "@mapAppCopyCoordinates": {
+    "description": "Choice-sheet action: copy the point's coordinates"
+  },
+  "mapAppCoordinatesCopied": "Coordinates copied",
+  "@mapAppCoordinatesCopied": {
+    "description": "Snackbar confirming the coordinates were copied"
+  },
+  "mapAppOpenFailed": "Could not open {app}",
+  "@mapAppOpenFailed": {
+    "placeholders": {
+      "app": {"type": "String"}
+    },
+    "description": "Snackbar when the chosen map app cannot be opened on this device"
+  },
+  "mapAppCallFailed": "This device cannot make phone calls",
+  "@mapAppCallFailed": {
+    "description": "Snackbar when tapping the emergency phone and the device has no phone handler"
+  },
+
+  "mapOverlaySectionReference": "Reference layers",
+  "@mapOverlaySectionReference": {
+    "description": "Section title in map overlay settings menus: the reference overlays"
+  },
+  "mapLayerCategoryEarthquake": "Earthquake",
+  "@mapLayerCategoryEarthquake": {
+    "description": "Section title in map overlay lists: the seismic-monitor overlays"
+  },
+
+  "mapLayerCategoryTyphoon": "Typhoon",
+  "@mapLayerCategoryTyphoon": {
+    "description": "Section title in map overlay lists: typhoon overlays"
+  },
+
+  "mapLayerCategoryWeather": "Weather observations",
+  "@mapLayerCategoryWeather": {
+    "description": "Section title in map overlay lists: the weather-observation overlays"
+  },
+
+  "mapLayerCategorySatellite": "Satellite",
+  "@mapLayerCategorySatellite": {
+    "description": "Section title in map overlay lists: satellite-imagery overlays"
+  },
+
+  "mapLayerCategoryRadar": "Radar",
+  "@mapLayerCategoryRadar": {
+    "description": "Section title in map overlay lists: radar and precipitation-forecast overlays"
+  },
+
+  "mapLayerCategoryLife": "Daily life",
+  "@mapLayerCategoryLife": {
+    "description": "Section title in map overlay lists: everyday-life facility overlays"
+  },
+
+  "mapLayerCategoryForecast": "Numerical forecast",
+  "@mapLayerCategoryForecast": {
+    "description": "Section title in map overlay lists: numerical weather prediction (ECMWF/GFS) wind-field overlays"
+  },  "mapOverlaySectionMap": "Map",
+  "@mapOverlaySectionMap": {
+    "description": "Section title in map overlay settings menus: base-map settings"
+  },
+  "rainIntervalSection": "Time window",
+  "@rainIntervalSection": {
+    "description": "Section title in the rainfall menu: the accumulation-interval choices"
+  },
+
+  "mapTownLabels": "Township names",
+  "@mapTownLabels": {
+    "description": "Map setting: show township-name labels when the map is zoomed in"
+  },
+  "mapTownLabelsHint": "Show township names when zoomed in",
+  "@mapTownLabelsHint": {
+    "description": "Hint under the township-names setting"
+  },
+
   "dpmSheetEmpty": "Tap a marker on the map for details",
   "@dpmSheetEmpty": {
     "description": "Hint in the disaster-map detail sheet when nothing is selected"
@@ -1601,15 +2021,39 @@
   "@typhoonPickerNamed": {
     "description": "Sheet picker: named typhoon (CWA name + TY tyNo)",
     "placeholders": {
-      "no": { "type": "String" },
-      "name": { "type": "String" }
+      "no": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typhoonPickerTd": "Tropical depression TD {no}",
   "@typhoonPickerTd": {
     "description": "Sheet picker: unnamed tropical depression (CWA tdNo)",
     "placeholders": {
-      "no": { "type": "String" }
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonTyNo": "TY {no}",
+  "@typhoonTyNo": {
+    "description": "Secondary badge on the typhoon sheet hero: the CWA typhoon serial number, e.g. TY 4",
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonTdNo": "TD {no}",
+  "@typhoonTdNo": {
+    "description": "Secondary badge on the typhoon sheet hero: the CWA tropical-depression serial number, e.g. TD 14",
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
     }
   },
   "typhoonIntensityMild": "Mild typhoon",
@@ -1651,6 +2095,10 @@
   "mapMyLocation": "My location",
   "@mapMyLocation": {
     "description": "Map control that centers the camera on the device GPS fix"
+  },
+  "mapResetNorth": "Reset north",
+  "@mapResetNorth": {
+    "description": "Map compass tooltip: re-points the camera to north-up"
   },
   "typhoonLegendCircle15": "Gale circle (L7)",
   "typhoonLegendCircleAvg": "Average circle",
@@ -1834,5 +2282,133 @@
   "dpmDisasterNuclear": "Nuclear accident",
   "@dpmDisasterNuclear": {
     "description": "Shelter disaster-type filter chip: nuclear accident"
+  },
+  "skyTime": "Sky time",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Auto",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Dawn",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Sunrise",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Morning",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Noon",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Afternoon",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Golden hour",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Sunset",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Dusk",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Night",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Cloudy",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Overcast",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Snow",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Dust",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Show scan range",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Outlines the area the four radars actually observe.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Blank outside means unobserved",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Radar overlay options",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "County borders",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "National borders",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Every country's outer frame",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Drawn over the echo",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Keeps county borders legible under the radar echo.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Township borders",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "The finer mesh",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Keeps township borders legible under the radar echo.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "QPESUMS overlay options",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Wind forecast overlay options",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Drawn over the wind field",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Every country's outer frame",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "The finer mesh",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   }
 }

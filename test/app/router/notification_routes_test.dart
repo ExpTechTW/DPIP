@@ -1,5 +1,6 @@
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -69,5 +70,36 @@ void main() {
   test('an unknown or null channel falls back to home', () {
     expect(routeForNotificationChannel('does-not-exist'), AppRoutes.home);
     expect(routeForNotificationChannel(null), AppRoutes.home);
+  });
+
+  test('routeNotificationTap navigates to the resolved route', () {
+    final named = <String>[];
+    void record(
+      String name, {
+      Map<String, String> pathParameters = const {},
+      Map<String, dynamic> queryParameters = const {},
+      String? fragment,
+      Object? extra,
+    }) {
+      named.add(name);
+    }
+
+    // EEW channel → the live monitor tab.
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'eew_alert-important-v2'),
+      navigate: record,
+    );
+    // Report family → the report list tab.
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'report-general-v2'),
+      navigate: record,
+    );
+    // An unmapped channel falls back to home rather than throwing.
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'does-not-exist'),
+      navigate: record,
+    );
+
+    expect(named, [AppRoutes.eew, AppRoutes.earthquake, AppRoutes.home]);
   });
 }

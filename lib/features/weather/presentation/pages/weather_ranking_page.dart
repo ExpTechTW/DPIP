@@ -1,10 +1,10 @@
 /// Weather observation ranking — rain / temp / wind / pressure / humidity.
 library;
 
-import 'dart:math' as math;
-
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_interval.dart';
@@ -315,19 +315,17 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
 }
 
 String _formatSnapshotTime(int unixSeconds) {
-  final taipei = DateTime.fromMillisecondsSinceEpoch(
-    unixSeconds * 1000,
-    isUtc: true,
-  ).add(const Duration(hours: 8));
+  final taipei = AppTime.taipei(
+    DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000, isUtc: true),
+  );
   return DateFormat('yyyy/MM/dd HH:mm').format(taipei);
 }
 
 /// Taipei wall-clock `HH:mm` for an occurrence timestamp.
 String _formatClock(int unixSeconds) {
-  final taipei = DateTime.fromMillisecondsSinceEpoch(
-    unixSeconds * 1000,
-    isUtc: true,
-  ).add(const Duration(hours: 8));
+  final taipei = AppTime.taipei(
+    DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000, isUtc: true),
+  );
   return DateFormat('HH:mm').format(taipei);
 }
 
@@ -647,7 +645,7 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                       final dir = item.windDirection;
                       if (dir != null) {
                         // Meteorological "from" → blow-to for Icons.navigation.
-                        final radians = (dir + 180) * math.pi / 180;
+                        final radians = degToRad(dir + 180);
                         windArrow = Transform.rotate(
                           angle: radians,
                           child: Icon(

@@ -508,13 +508,238 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeRainTrendTitle => 'Hujan 1 jam ke depan';
 
   @override
+  String homeRainTrendMinute(int minute) {
+    return '$minute mnt';
+  }
+
+  @override
+  String homeRainTrendUpdated(String time) {
+    return 'Diperbarui $time';
+  }
+
+  @override
+  String get homeRainTrendNoData => 'Tidak ada data';
+
+  @override
+  String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
+
+  @override
+  String get homeRainTrendLightSustained =>
+      'Hujan ringan berlanjut selama 1 jam ke depan';
+
+  @override
+  String homeRainTrendLightStopping(int minutes) {
+    return 'Hujan ringan diperkirakan berhenti dalam $minutes menit';
+  }
+
+  @override
+  String get homeRainTrendHeavySustained =>
+      'Hujan deras berlanjut selama 1 jam ke depan';
+
+  @override
+  String homeRainTrendHeavyStopping(int minutes) {
+    return 'Hujan deras diperkirakan berhenti dalam $minutes menit';
+  }
+
+  @override
   String get mapLayers => 'Lapisan';
+
+  @override
+  String get mapLayerOrderTitle => 'Urutkan lapisan';
+
+  @override
+  String get mapLayerOrderReset => 'Atur ulang urutan';
 
   @override
   String get mapLayerRadar => 'Radar Komposit';
 
   @override
-  String get mapLayerSatellite => 'Himawari Inframerah';
+  String get mapLayerSatellite => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'Himawari Blue (B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'Himawari Near-Infrared (B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'Himawari Near-Infrared (B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'Himawari Upper Water Vapour (B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'Himawari Mid Water Vapour (B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'Himawari Lower Water Vapour (B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'Himawari SO₂ / Cloud Phase (B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'Himawari Longwave Infrared (B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'Himawari Longwave Infrared (B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'Himawari CO₂ (B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'Himawari True Color';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'Himawari Natural Color';
+
+  @override
+  String get mapLayerSatelliteAsh => 'Himawari Ash';
+
+  @override
+  String get mapLayerSatelliteDust => 'Himawari Dust';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'Himawari Airmass';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics =>
+      'Himawari Night Microphysics';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'Himawari Water Vapour';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'Himawari Split Window';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'Himawari Night Fog';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'Himawari Overshooting Top';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'Himawari SO₂ / Cloud Phase';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'Himawari Cirrus / Cloud Height';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'Himawari Tropopause';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'Himawari Cloud Top Temperature';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'Himawari Cloud Mask';
+
+  @override
+  String get mapLayerSatelliteSst => 'Himawari Sea Surface Temperature';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'Himawari NDVI';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'Himawari NDWI';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'Himawari MNDWI';
+
+  @override
+  String get mapLayerSatelliteGlobalOutline => 'Country border';
+
+  @override
+  String get mapLayerSatelliteRgbComposite => 'RGB composite (JMA recipe)';
+
+  @override
+  String get mapLayerSatelliteCloudClear => 'Clear';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyClear => 'Probably clear';
+
+  @override
+  String get mapLayerSatelliteCloudProbablyCloudy => 'Probably cloudy';
+
+  @override
+  String get mapLayerSatelliteCloudCloudy => 'Cloudy';
+
+  @override
+  String get mapLayerSatelliteTransparentWarm =>
+      'Clear sky (warm end) = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentReflectance =>
+      'Low reflectance / night = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentZero =>
+      'Zero difference = transparent (no signal)';
+
+  @override
+  String get mapLayerSatelliteTransparentNight =>
+      'Night = transparent, the basemap shows';
+
+  @override
+  String get mapLayerSatelliteTransparentNoData =>
+      'No data (land) = transparent';
+
+  @override
+  String get mapLayerSatelliteTransparentNoVegetation =>
+      'Below 0.1 = transparent (no vegetation)';
+
+  @override
+  String get mapLayerSatelliteTransparentNoWater =>
+      '≤ 0 = transparent (no water)';
+
+  @override
+  String get mapLayerSatelliteTransparentClear =>
+      'Clear sky = transparent, the basemap shows';
+
+  @override
+  String get mapLayerStyleSection => 'Colour style';
+
+  @override
+  String get mapLayerStyleTooltip => 'Colour style';
+
+  @override
+  String get mapLayerStyleGray => 'Grayscale (JMA)';
+
+  @override
+  String get mapLayerStyleGrayTooltip => 'JMA grayscale — colder is whiter';
+
+  @override
+  String get mapLayerStyleJma => 'Cloud-top enhancement (JMA)';
+
+  @override
+  String get mapLayerStyleJmaTooltip =>
+      'Grayscale base, tinted below −40 °C to highlight cloud-top height';
+
+  @override
+  String get mapLayerStyleBd => 'Dvorak BD';
+
+  @override
+  String get mapLayerStyleBdTooltip =>
+      'Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis';
+
+  @override
+  String get mapLayerQpesums => 'Prakiraan hujan 1 jam ke depan';
 
   @override
   String get mapLayerLightning => 'Petir';
@@ -533,7 +758,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTimelineNow => 'Sekarang';
 
   @override
+  String get mapTimelinePast => 'Lampau';
+
+  @override
+  String get mapTimelineFuture => 'Mendatang';
+
+  @override
   String get mapTimelineObserved => 'Diamati';
+
+  @override
+  String get mapTimelineForecast => 'Prakiraan';
+
+  @override
+  String mapTimelineDataTime(String time) {
+    return 'Waktu data $time';
+  }
 
   @override
   String get notifySettingsMenu => 'Pengaturan notifikasi';
@@ -760,6 +999,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapNavRadar => 'Radar';
+
+  @override
+  String get mapNavQpesums => 'Prakiraan';
 
   @override
   String get mapNavSatellite => 'Satelit';
@@ -1012,6 +1254,12 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get mapLayerWindForecastEcmwf => 'ECMWF';
+
+  @override
+  String get mapLayerWindForecastGfs => 'GFS';
+
+  @override
   String get mapLayerMonitor => 'Monitor Seismik';
 
   @override
@@ -1073,6 +1321,71 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get disasterMapOverlayShelterTooltip => 'Tampilkan tempat evakuasi';
+
+  @override
+  String get dpmOpenInMaps => 'Buka di peta';
+
+  @override
+  String get mapAppGoogleMaps => 'Google Maps';
+
+  @override
+  String get mapAppAppleMaps => 'Apple Maps';
+
+  @override
+  String mapAppDefault(String app) {
+    return '$app (bawaan)';
+  }
+
+  @override
+  String get mapAppCopyCoordinates => 'Salin koordinat';
+
+  @override
+  String get mapAppCoordinatesCopied => 'Koordinat disalin';
+
+  @override
+  String mapAppOpenFailed(String app) {
+    return 'Tidak dapat membuka $app';
+  }
+
+  @override
+  String get mapAppCallFailed =>
+      'Perangkat ini tidak dapat melakukan panggilan telepon';
+
+  @override
+  String get mapOverlaySectionReference => 'Lapisan referensi';
+
+  @override
+  String get mapLayerCategoryEarthquake => 'Gempa';
+
+  @override
+  String get mapLayerCategoryTyphoon => 'Topan';
+
+  @override
+  String get mapLayerCategoryWeather => 'Pengamatan cuaca';
+
+  @override
+  String get mapLayerCategorySatellite => 'Satelit';
+
+  @override
+  String get mapLayerCategoryRadar => 'Radar';
+
+  @override
+  String get mapLayerCategoryLife => 'Kehidupan sehari-hari';
+
+  @override
+  String get mapLayerCategoryForecast => 'Prakiraan numerik';
+
+  @override
+  String get mapOverlaySectionMap => 'Peta';
+
+  @override
+  String get rainIntervalSection => 'Jendela waktu';
+
+  @override
+  String get mapTownLabels => 'Nama kecamatan';
+
+  @override
+  String get mapTownLabelsHint => 'Tampilkan nama kecamatan saat diperbesar';
 
   @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
@@ -1214,6 +1527,16 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String typhoonTyNo(String no) {
+    return 'TY $no';
+  }
+
+  @override
+  String typhoonTdNo(String no) {
+    return 'TD $no';
+  }
+
+  @override
   String get typhoonIntensityMild => 'Mild typhoon';
 
   @override
@@ -1242,6 +1565,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapMyLocation => 'Lokasi saya';
+
+  @override
+  String get mapResetNorth => 'Kembali ke utara';
 
   @override
   String get typhoonLegendCircle15 => 'Lingkar angin kencang';
@@ -1373,4 +1699,103 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get dpmDisasterNuclear => 'Kecelakaan nuklir';
+
+  @override
+  String get skyTime => 'Waktu langit';
+
+  @override
+  String get skyTimeAuto => 'Otomatis';
+
+  @override
+  String get skyTimeDawn => 'Fajar';
+
+  @override
+  String get skyTimeSunrise => 'Matahari terbit';
+
+  @override
+  String get skyTimeMorning => 'Pagi';
+
+  @override
+  String get skyTimeNoon => 'Siang';
+
+  @override
+  String get skyTimeAfternoon => 'Sore';
+
+  @override
+  String get skyTimeGolden => 'Jam emas';
+
+  @override
+  String get skyTimeSunset => 'Matahari terbenam';
+
+  @override
+  String get skyTimeDusk => 'Senja';
+
+  @override
+  String get skyTimeNight => 'Malam';
+
+  @override
+  String get weatherModeCloudy => 'Berawan';
+
+  @override
+  String get weatherModeOvercast => 'Mendung';
+
+  @override
+  String get weatherModeSnow => 'Salju';
+
+  @override
+  String get weatherModeSand => 'Debu';
+
+  @override
+  String get radarScanRange => 'Tampilkan jangkauan pindai';
+
+  @override
+  String get radarScanRangeSubtitle =>
+      'Menandai area yang benar-benar dipantau keempat radar.';
+
+  @override
+  String get radarScanRangeHint => 'Di luar kotak berarti tak terpantau';
+
+  @override
+  String get radarOverlayMenuTooltip => 'Opsi lapisan radar';
+
+  @override
+  String get radarCountyOutline => 'Batas kabupaten/kota';
+
+  @override
+  String get radarGlobalOutline => 'Batas negara';
+
+  @override
+  String get radarGlobalOutlineHint => 'Bingkai luar setiap negara';
+
+  @override
+  String get radarCountyOutlineHint => 'Digambar di atas gema';
+
+  @override
+  String get radarCountyOutlineSubtitle =>
+      'Menjaga batas wilayah tetap terbaca di bawah gema radar.';
+
+  @override
+  String get radarTownOutline => 'Batas kecamatan';
+
+  @override
+  String get radarTownOutlineHint => 'Kisi yang lebih rapat';
+
+  @override
+  String get radarTownOutlineSubtitle =>
+      'Menjaga batas kecamatan tetap terbaca di bawah gema radar.';
+
+  @override
+  String get qpesumsOverlayMenuTooltip => 'Opsi lapisan prakiraan curah hujan';
+
+  @override
+  String get windForecastOverlayMenuTooltip => 'Opsi lapisan prakiraan angin';
+
+  @override
+  String get windForecastCountyOutlineHint => 'Digambar di atas bidang angin';
+
+  @override
+  String get windForecastGlobalOutlineHint => 'Bingkai luar setiap negara';
+
+  @override
+  String get windForecastTownOutlineHint => 'Jaring yang lebih halus';
 }

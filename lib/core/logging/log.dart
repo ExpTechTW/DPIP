@@ -1,5 +1,6 @@
 import 'package:dpip/core/logging/crash_sink.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 /// Application-wide logging facade.
@@ -56,6 +57,15 @@ abstract final class Log {
   /// Call once during start-up (see `bootstrap`).
   static void installErrorHandlers() {
     FlutterError.onError = (details) {
+      // iOS hot-restart race, not a crash: the engine can still own the
+      // previous isolate's platform views, so a fresh isolate re-issues the
+      // same view id and UiKitView creation fails with `recreating_view`.
+      // [BaseMap] remounts itself with a fresh id (readiness retry), so the
+      // map recovers — report it as neither a log entry nor a fatal crash.
+      if (details.exception is PlatformException &&
+          (details.exception as PlatformException).code == 'recreating_view') {
+        return;
+      }
       // Overriding onError replaces the framework's own console presentation,
       // whose dump carries the diagnostics our summary drops — for a layout
       // fault (e.g. a RenderFlex overflow) that includes *which* widget and its

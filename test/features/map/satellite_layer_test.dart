@@ -1,4 +1,5 @@
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
+import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,19 +13,26 @@ class _FakeSatelliteRepository extends FakeRasterFrameSource
   @override
   String tileUrl(String frame) =>
       'https://host/api/v2/tiles/satellite/$frame/{z}/{x}/{y}.webp';
+
+  @override
+  void setStyle(String? style) {}
 }
 
 void main() {
   test('frames chronological', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(['1700000600', '1700000000']),
+      channel: SatelliteChannel.irClean,
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
   });
 
   test('the shown frame is fully opaque', () async {
-    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(_ids(5)),
+      channel: SatelliteChannel.irClean,
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -37,7 +45,10 @@ void main() {
   test(
     'scrubbing inside the ring is two opacity writes, nothing else',
     () async {
-      final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(9)));
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(_ids(9)),
+        channel: SatelliteChannel.irClean,
+      );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -54,45 +65,90 @@ void main() {
       ]);
       expect(
         controller.sentKeys,
-        everyElement(equals({'raster-opacity'})),
+        everyElement(equals({'raster-opacity', 'raster-opacity-transition'})),
         reason:
             'the scrub path must not re-send visibility or the seven other '
-            'raster properties the layer type has',
+            'raster properties the layer type has — only the opacity and the '
+            'zero cross-fade that keeps a scrub a loop instead of a smear',
       );
     },
   );
 
-  test('dark boundary outlines are added once and removed on clear', () async {
-    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
+  test(
+    'bright yellow county and town outlines are added once and removed on clear',
+    () async {
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(_ids(5)),
+        channel: SatelliteChannel.irClean,
+      );
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[2]);
+      await layer.show(controller, frames[0]);
+
+      expect(
+        controller.calls
+            .where((c) => c == 'addLineLayer:$satelliteCountyOutlineLayerId')
+            .length,
+        1,
+        reason: 'a second settle must not re-add the outlines',
+      );
+      expect(
+        controller.calls,
+        isNot(contains('addLineLayer:$satelliteGlobalOutlineLayerId')),
+        reason: 'the 國界 border ships off by default',
+      );
+
+      controller.calls.clear();
+      await layer.clear(controller);
+      expect(
+        controller.calls,
+        containsAll([
+          'removeLayer:$satelliteTownOutlineLayerId',
+          'removeLayer:$satelliteCountyOutlineLayerId',
+          'removeLayer:$satelliteGlobalOutlineLayerId',
+        ]),
+      );
+    },
+  );
+
+  test('the 國界 border draws only when asked', () async {
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(_ids(5)),
+      channel: SatelliteChannel.irClean,
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[2]);
-    await layer.show(controller, frames[0]);
+    controller.calls.clear();
 
+    layer.setShowGlobalOutline(true);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
     expect(
-      controller.calls
-          .where((c) => c == 'addLineLayer:$satelliteGlobalOutlineLayerId')
-          .length,
-      1,
-      reason: 'a second settle must not re-add the outlines',
+      controller.calls,
+      contains('addLineLayer:$satelliteGlobalOutlineLayerId'),
     );
 
     controller.calls.clear();
-    await layer.clear(controller);
+    layer.setShowGlobalOutline(false);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
     expect(
       controller.calls,
-      containsAll([
-        'removeLayer:$satelliteCountyOutlineLayerId',
-        'removeLayer:$satelliteGlobalOutlineLayerId',
-      ]),
+      contains('removeLayer:$satelliteGlobalOutlineLayerId'),
     );
   });
 
   test('clear releases tiles', () async {
     final source = _FakeSatelliteRepository(_ids(5));
-    final layer = SatelliteMapLayer(source);
+    final layer = SatelliteMapLayer(source, channel: SatelliteChannel.irClean);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 

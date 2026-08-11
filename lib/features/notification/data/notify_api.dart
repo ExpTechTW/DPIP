@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 
 /// The `notify` endpoints, migrated from the legacy `api-1` host to
@@ -16,7 +17,7 @@ class NotifyApi {
   ///
   /// `GET https://api.core-tnn1.exptech.dev/api/v2/notify/{token}`
   Future<List<dynamic>> getNotify(String token) async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '/api/v2/notify/$token'))
+      (await _client.get(ApiTier.coreExclusiveApi, '${ApiPaths.notify}$token'))
           as List<dynamic>;
 
   /// Sets one [channel] to option [status]; the server returns the full updated
@@ -30,7 +31,7 @@ class NotifyApi {
   ) async =>
       (await _client.get(
             ApiTier.coreExclusiveApi,
-            '/api/v2/notify/$token/$channel/$status',
+            '${ApiPaths.notify}$token/$channel/$status',
           ))
           as List<dynamic>;
 }

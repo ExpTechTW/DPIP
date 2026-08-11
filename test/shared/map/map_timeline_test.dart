@@ -16,6 +16,8 @@ Widget _wrap({
   required List<MapFrame> frames,
   required int selectedIndex,
   required ValueChanged<int> onSelected,
+  Duration? framePeriod,
+  DateTime? dataTime,
 }) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
@@ -28,13 +30,76 @@ Widget _wrap({
           frames: frames,
           selectedIndex: selectedIndex,
           onSelected: onSelected,
+          framePeriod: framePeriod,
+          dataTime: dataTime,
         ),
       ),
     ),
   ),
 );
 
+/// A forecast's frames straddle the present: six hours of history and sixteen
+/// ahead, hourly, so index 6 is now. Anchored on the real clock because the
+/// widget asks the real clock.
+List<MapFrame> _forecastFrames() {
+  final now = DateTime.now();
+  return [
+    for (var h = -6; h <= 16; h++)
+      MapFrame(
+        id: '$h',
+        time: now.add(Duration(hours: h)),
+      ),
+  ];
+}
+
 void main() {
+  testWidgets('a forecast labels the present, not its furthest step', (
+    tester,
+  ) async {
+    final frames = _forecastFrames();
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 6, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Now'),
+      findsOneWidget,
+      reason: 'the frame at the present moment is the one that is now',
+    );
+
+    // And the last step — sixteen hours out — must not claim to be now, which
+    // is what left the scrubber parked at the right-hand end with the whole
+    // forecast behind it and nothing ahead.
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: frames.length - 1,
+        onSelected: (_) {},
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Now'), findsNothing);
+  });
+
+  testWidgets('history and future frames carry their own era labels', (
+    tester,
+  ) async {
+    final frames = _forecastFrames(); // 6 hours back, 16 ahead; index 6 is now
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 2, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Past'), findsOneWidget);
+
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 12, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Future'), findsOneWidget);
+    expect(find.text('Past'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'labels the newest selected frame as "now" without layout error',
     (tester) async {
@@ -97,6 +162,74 @@ void main() {
 
       expect(reported.last, 9);
       expect(find.text('Now'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'a frame period renders the big label as a range, ticks stay start times',
+    (tester) async {
+      final frames = _frames(10); // 07:00 + 9×10 min → newest 08:30
+      await tester.pumpWidget(
+        _wrap(
+          frames: frames,
+          selectedIndex: 9,
+          onSelected: (_) {},
+          framePeriod: const Duration(hours: 1),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The selected frame starts at 08:30 and covers the following hour.
+      expect(find.text('08:30 – 09:30'), findsOneWidget);
+      // Ticks keep their bare start times (every fourth slot is labelled).
+      expect(find.text('08:20'), findsOneWidget);
+      expect(find.text('08:30'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a data time renders as a line under the caption', (
+    tester,
+  ) async {
+    final frames = _frames(10);
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: 9,
+        onSelected: (_) {},
+        dataTime: DateTime(2026, 7, 13, 6, 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Data 7/13 06:00'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'switching to another layer\u0027s frames re-centres on its newest frame',
+    (tester) async {
+      final first = _frames(10);
+      await tester.pumpWidget(
+        _wrap(frames: first, selectedIndex: 9, onSelected: (_) {}),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('08:30'), findsWidgets); // newest of the first set
+
+      // The scaffold hands a brand-new list instance (the newly selected
+      // layer's frames) plus that layer's newest index.
+      final second = _frames(6);
+      await tester.pumpWidget(
+        _wrap(frames: second, selectedIndex: 5, onSelected: (_) {}),
+      );
+      await tester.pumpAndSettle();
+
+      // The ruler re-labelled and re-centred — the old set is gone and the
+      // new newest frame sits under the scrubber as "now".
+      expect(find.text('Now'), findsOneWidget);
+      expect(find.text('07:50'), findsWidgets); // 07:00 + 5×10 min
+      expect(find.text('08:30'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 
 /// Tile templates + JSON detail for `/api/v2/tiles/dpm/…`.
@@ -20,21 +21,20 @@ class DisasterMapApi {
   /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
   String tileUrl(String layer) =>
       '${_client.hostsFor(_tier).first}'
-      '/api/v2/tiles/dpm/$layer/{z}/{x}/{y}.mvt';
+      '${ApiPaths.dpm}/$layer/{z}/{x}/{y}.mvt';
 
-  /// `GET /api/v2/tiles/dpm/aed/{id}`
-  Future<Map<String, dynamic>> getAedDetail(int id) async {
-    final raw = await _client.get(_tier, '/api/v2/tiles/dpm/aed/$id');
-    return Map<String, dynamic>.from(raw as Map);
-  }
+  Future<Map<String, dynamic>> getAedDetail(int id) => _detail('aed', id);
 
-  Future<Map<String, dynamic>> getRestroomDetail(int id) async {
-    final raw = await _client.get(_tier, '/api/v2/tiles/dpm/restroom/$id');
-    return Map<String, dynamic>.from(raw as Map);
-  }
+  Future<Map<String, dynamic>> getRestroomDetail(int id) =>
+      _detail('restroom', id);
 
-  Future<Map<String, dynamic>> getShelterDetail(int id) async {
-    final raw = await _client.get(_tier, '/api/v2/tiles/dpm/shelter/$id');
+  Future<Map<String, dynamic>> getShelterDetail(int id) =>
+      _detail('shelter', id);
+
+  /// `GET /api/v2/tiles/dpm/<kind>/{id}` — the three venue detail endpoints
+  /// share shape and response decoding.
+  Future<Map<String, dynamic>> _detail(String kind, int id) async {
+    final raw = await _client.get(_tier, '${ApiPaths.dpm}/$kind/$id');
     return Map<String, dynamic>.from(raw as Map);
   }
 }

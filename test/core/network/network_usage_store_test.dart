@@ -163,4 +163,62 @@ void main() {
     expect(stats.saved24h, 250);
     expect(stats.last24h, 500);
   });
+
+  test('history returns every hour of the window, zero-filled', () async {
+    now = DateTime.utc(2026, 1, 10, 12, 30); // current hour bucket = 12
+    final s = store();
+    await s.record(down: 1000, hit: false, saved: 0); // hour 12
+    now = now.subtract(const Duration(hours: 3)); // 09:30 → hour 9
+    await s.record(down: 0, hit: true, saved: 800); // hour 9
+    now = now.add(const Duration(hours: 3));
+
+    final history = await s.history(hours: 4);
+    expect(history, hasLength(4));
+    expect(history[0].saved, 800, reason: 'the 09:00 hit lands in its slot');
+    expect(history[0].down, 0);
+    expect(history[1].down, 0, reason: 'the 10:00 gap hour is a zero bar');
+    expect(history[1].saved, 0);
+    expect(history[2].down, 0, reason: 'the 11:00 gap hour is a zero bar');
+    expect(history[3].down, 1000, reason: 'the 12:00 miss lands in its slot');
+    expect(history[3].saved, 0);
+    // Oldest first, ascending UTC epoch hours.
+    expect([
+      for (final h in history) h.hour,
+    ], List.generate(4, (i) => history.first.hour + i));
+  });
+
+  test('history aggregates into coarser buckets for the 7-day view', () async {
+    now = DateTime.utc(2026, 1, 10, 12, 30); // current hour bucket = 12
+    final s = store();
+    await s.record(down: 300, hit: false, saved: 0); // hour 12
+    await s.record(down: 100, hit: true, saved: 50); // hour 12 → same 6h slot
+    now = now.subtract(const Duration(hours: 2)); // 10:30 → hour 10
+    await s.record(down: 600, hit: false, saved: 0); // hour 10 → 6h slot 6
+    now = now.add(const Duration(hours: 2));
+
+    // A 12-hour window bucketed by 6: two samples per slot boundary.
+    final epochHour = now.millisecondsSinceEpoch ~/ 3600000;
+    final history = await s.history(hours: 12, bucketHours: 6);
+    expect(history, hasLength(2));
+    expect(
+      history[0].hour,
+      (epochHour - 2) ~/ 6 * 6,
+      reason: 'slot starts at the epoch hour its record falls into',
+    );
+    expect(
+      history[0].down,
+      600,
+      reason: 'hour-10 bytes land in the first slot',
+    );
+    expect(history[0].saved, 0);
+    expect(
+      history[1].hour,
+      epochHour ~/ 6 * 6,
+      reason: 'slot starts at the epoch hour now falls into',
+    );
+    expect(history[1].down, 400, reason: 'both hour-12 records aggregate');
+    expect(history[1].saved, 50);
+    expect(history[1].hits, 1);
+    expect(history[1].misses, 1);
+  });
 }

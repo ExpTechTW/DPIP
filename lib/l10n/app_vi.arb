@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "Sự kiện đang hiệu lực",
   "homeActiveEventsEmpty": "Không có sự kiện đang hiệu lực",
   "homeRainTrendTitle": "Mưa 1 giờ tới",
+  "homeRainTrendMinute": "{minute} phút",
+  "homeRainTrendUpdated": "Cập nhật {time}",
+  "homeRainTrendNoData": "Không có dữ liệu",
+
+  "homeRainTrendScattered": "Có thể có mưa rào nhẹ",
+  "homeRainTrendLightSustained": "Mưa nhỏ tiếp diễn trong 1 giờ tới",
+  "homeRainTrendLightStopping": "Mưa nhỏ có thể tạnh trong {minutes} phút nữa",
+  "homeRainTrendHeavySustained": "Mưa lớn tiếp diễn trong 1 giờ tới",
+  "homeRainTrendHeavyStopping": "Mưa lớn có thể tạnh trong {minutes} phút nữa",
   "mapLayers": "Lớp bản đồ",
+  "mapLayerOrderTitle": "Sắp xếp thứ tự lớp",
+  "mapLayerOrderReset": "Đặt lại thứ tự mặc định",
   "mapLayerRadar": "Radar phản xạ tổng hợp",
-  "mapLayerSatellite": "Himawari hồng ngoại",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "mapLayerSatelliteCloudClear": "Clear",
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "mapLayerQpesums": "Dự báo mưa 1 giờ tới",
   "mapLayerLightning": "Sét",
   "lightningLegendCg": "Mây–đất · {minutes} phút",
   "lightningLegendCc": "Mây–mây · {minutes} phút",
   "mapTimelineNow": "Bây giờ",
+  "mapTimelinePast": "Quá khứ",
+  "mapTimelineFuture": "Tương lai",
   "mapTimelineObserved": "Quan trắc",
+  "mapTimelineForecast": "Dự báo",
+  "mapTimelineDataTime": "Thời gian dữ liệu {time}",
+  "mapTimelineDataTime": "Thời điểm dữ liệu {time}",
   "notifySettingsMenu": "Cài đặt thông báo",
   "notifyTitle": "Thông báo",
   "notifyUnavailable": "Thông báo đẩy chưa sẵn sàng — vui lòng thử lại sau giây lát.",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "Lớp bản đồ mặc định",
   "defaultMapLayerSubtitle": "Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.",
   "mapNavRadar": "Radar",
+  "mapNavQpesums": "Dự báo",
   "mapNavSatellite": "Vệ tinh",
   "mapNavLightning": "Sét",
   "mapNavTyphoon": "Bão",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "Độ ẩm",
   "mapLayerPressure": "Áp suất",
   "mapLayerWind": "Gió",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "Lượng mưa",
   "rainIntervalMenu": "Khung tích lũy",
   "rainIntervalNow": "Hôm nay",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "Nơi trú ẩn",
   "disasterMapOverlayRestroomTooltip": "Hiển thị nhà vệ sinh công cộng",
   "disasterMapOverlayShelterTooltip": "Hiển thị nơi trú ẩn",
+  "dpmOpenInMaps": "Mở trong bản đồ",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (mặc định)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "Sao chép tọa độ",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "Đã sao chép tọa độ",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "Không thể mở {app}",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "Thiết bị này không thể thực hiện cuộc gọi",
+
+  "mapOverlaySectionReference": "Lớp tham chiếu",
+  "mapLayerCategoryEarthquake": "Động đất",
+  "mapLayerCategoryTyphoon": "Bão",
+  "mapLayerCategoryWeather": "Quan sát thời tiết",
+  "mapLayerCategorySatellite": "Vệ tinh",
+  "mapLayerCategoryRadar": "Ra đa",
+  "mapLayerCategoryLife": "Đời sống",
+  "mapLayerCategoryForecast": "Dự báo số",  "mapOverlaySectionMap": "Bản đồ",
+  "rainIntervalSection": "Khoảng thời gian",
+
+  "mapTownLabels": "Tên hương trấn",
+  "mapTownLabelsHint": "Hiển thị tên hương trấn khi phóng to",
+
   "dpmSheetEmpty": "Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết",
   "dpmAddress": "Địa chỉ",
   "restroomTypeLabel": "Loại",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "Chú giải",
   "mapLegendCollapse": "Ẩn chú giải",
   "mapMyLocation": "Vị trí của tôi",
+  "mapResetNorth": "Về hướng bắc",
   "typhoonLegendCircle15": "Vòng gió mạnh",
   "typhoonLegendCircle25": "Vòng bão",
   "typhoonLegendProbability": "Xác suất đổ bộ",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "Tropical depression",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "Sạt lở đất",
   "dpmDisasterTsunami": "Sóng thần",
   "dpmDisasterSlope": "Thiên tai sườn dốc",
-  "dpmDisasterNuclear": "Sự cố hạt nhân"
+  "dpmDisasterNuclear": "Sự cố hạt nhân",
+  "skyTime": "Thời gian bầu trời",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "Tự động",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "Rạng đông",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "Bình minh",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "Buổi sáng",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "Buổi trưa",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "Buổi chiều",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "Giờ vàng",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "Hoàng hôn",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "Chạng vạng",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "Ban đêm",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "Nhiều mây",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "Trời âm u",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "Tuyết rơi",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "Bụi cát",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "Hiện phạm vi quét",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "Đánh dấu vùng bốn radar thực sự quan trắc.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "Ngoài khung là chưa quan trắc",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "Tùy chọn lớp radar",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "Ranh giới huyện thị",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "Biên giới quốc gia",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "Vẽ đè lên tiếng vọng",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "Giữ ranh giới rõ ràng dưới lớp phản hồi radar.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "Ranh giới xã phường",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "Lưới chi tiết hơn",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "Giữ ranh giới xã phường rõ ràng dưới lớp phản hồi radar.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "Tùy chọn lớp dự báo mưa định lượng",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "Tùy chọn lớp dự báo gió",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "Vẽ trên trường gió",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "Lưới mịn hơn",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

@@ -6,7 +6,6 @@ import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
-import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
@@ -75,8 +74,8 @@ class DpipApp extends StatelessWidget {
 
 /// Owns app-level service wiring that needs a [State]/lifecycle:
 /// - the realtime spine's start/pause/resume (via [RealtimeLifecycleObserver]);
-/// - routing a tapped notification to the right tab (the channel-key → route
-///   mapping lives here because this layer owns the router);
+/// - registering the notification tap → route handler ([routeNotificationTap],
+///   whose channel→screen table lives in `notification_routes.dart`);
 /// - requesting notification permission once, after the first frame;
 /// - resolving the current GPS township into the [RegionStore] so 所在地 shows
 ///   the real location (and the "can't get location" state when GPS is off).
@@ -117,7 +116,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     super.initState();
     _observer = RealtimeLifecycleObserver(widget.realtimeService);
     WidgetsBinding.instance.addObserver(this);
-    NotificationTaps.onTap = _routeNotificationTap;
+    NotificationTaps.onTap = routeNotificationTap;
     widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.realtimeService.startAll();
@@ -186,13 +185,6 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();
-  }
-
-  /// Sends a tapped notification to a screen. The destination is resolved by the
-  /// declarative channel→route table; the tap's [NotificationTap.id] is carried
-  /// for the per-item detail routes to come.
-  void _routeNotificationTap(NotificationTap tap) {
-    appRouter.goNamed(routeForNotificationChannel(tap.channelKey));
   }
 
   @override

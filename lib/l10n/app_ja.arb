@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "発生中の事象",
   "homeActiveEventsEmpty": "発生中の事象はありません",
   "homeRainTrendTitle": "今後1時間の雨",
+  "homeRainTrendMinute": "{minute}分",
+  "homeRainTrendUpdated": "更新 {time}",
+  "homeRainTrendNoData": "データなし",
+
+  "homeRainTrendScattered": "にわか雨の可能性があります",
+  "homeRainTrendLightSustained": "今後1時間は小雨が続きます",
+  "homeRainTrendLightStopping": "{minutes}分後に小雨が止む見込みです",
+  "homeRainTrendHeavySustained": "今後1時間は大雨が続きます",
+  "homeRainTrendHeavyStopping": "{minutes}分後に大雨が止む見込みです",
   "mapLayers": "レイヤー",
+  "mapLayerOrderTitle": "レイヤーの順番",
+  "mapLayerOrderReset": "既定の順序に戻す",
   "mapLayerRadar": "レーダー合成エコー図",
-  "mapLayerSatellite": "ひまわり 赤外線図",
+  "mapLayerSatellite": "ひまわり 赤外線(B13)",
+  "mapLayerSatelliteB01": "ひまわり 可視青(B01)",
+  "mapLayerSatelliteB02": "ひまわり 可視緑(B02)",
+  "mapLayerSatelliteB03": "ひまわり 可視赤(B03)",
+  "mapLayerSatelliteB04": "ひまわり 近赤外(B04)",
+  "mapLayerSatelliteB05": "ひまわり 近赤外(B05)",
+  "mapLayerSatelliteB06": "ひまわり 近赤外(B06)",
+  "mapLayerSatelliteB07": "ひまわり 短波長赤外(B07)",
+  "mapLayerSatelliteB08": "ひまわり 上層水蒸気(B08)",
+  "mapLayerSatelliteB09": "ひまわり 中層水蒸気(B09)",
+  "mapLayerSatelliteB10": "ひまわり 下層水蒸気(B10)",
+  "mapLayerSatelliteB11": "ひまわり 二酸化硫黄/雲相(B11)",
+  "mapLayerSatelliteB12": "ひまわり オゾン(B12)",
+  "mapLayerSatelliteB13": "ひまわり 赤外線(B13)",
+  "mapLayerSatelliteB14": "ひまわり 長波長赤外線(B14)",
+  "mapLayerSatelliteB15": "ひまわり 長波長赤外線(B15)",
+  "mapLayerSatelliteB16": "ひまわり 二酸化炭素(B16)",
+  "mapLayerSatelliteTruecolor": "ひまわり トゥルーカラー",
+  "mapLayerSatelliteNaturalcolor": "ひまわり ナチュラルカラー",
+  "mapLayerSatelliteAsh": "ひまわり 火山灰",
+  "mapLayerSatelliteDust": "ひまわり 黄砂",
+  "mapLayerSatelliteAirmass": "ひまわり エアマス",
+  "mapLayerSatelliteNightmicrophysics": "ひまわり 夜間微物理",
+  "mapLayerSatelliteWatervapor": "ひまわり 水蒸気",
+  "mapLayerSatelliteBtdSplit": "ひまわり スプリットウィンドウ",
+  "mapLayerSatelliteBtdFog": "ひまわり 夜間霧",
+  "mapLayerSatelliteBtdWvirw": "ひまわり オーバーシューティングトップ",
+  "mapLayerSatelliteBtdSo2": "ひまわり 二酸化硫黄/雲相",
+  "mapLayerSatelliteBtdCo2": "ひまわり 巻雲/雲頂高度",
+  "mapLayerSatelliteBtdOzone": "ひまわり 対流圏界面",
+  "mapLayerSatelliteCloudtop": "ひまわり 雲頂温度",
+  "mapLayerSatelliteCloudmask": "ひまわり 雲マスク",
+  "mapLayerSatelliteSst": "ひまわり 海面水温",
+  "mapLayerSatelliteNdvi": "ひまわり NDVI",
+  "mapLayerSatelliteNdwi": "ひまわり NDWI",
+  "mapLayerSatelliteMndwi": "ひまわり MNDWI",
+  "mapLayerSatelliteGlobalOutline": "国境線",
+  "mapLayerSatelliteRgbComposite": "RGB 合成(JMA レシピ)",
+  "mapLayerSatelliteCloudClear": "晴れ",
+  "mapLayerSatelliteCloudProbablyClear": "おそらく晴れ",
+  "mapLayerSatelliteCloudProbablyCloudy": "おそらく雲",
+  "mapLayerSatelliteCloudCloudy": "雲",
+  "mapLayerSatelliteTransparentWarm": "晴れ(暖域) = 透明、地図が透ける",
+  "mapLayerSatelliteTransparentReflectance": "低反射率・夜間 = 透明、地図が透ける",
+  "mapLayerSatelliteTransparentZero": "差ゼロ = 透明(信号なし)",
+  "mapLayerSatelliteTransparentNight": "夜間 = 透明、地図が透ける",
+  "mapLayerSatelliteTransparentNoData": "データなし(陸上) = 透明",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(植生なし)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 透明(水域なし)",
+  "mapLayerSatelliteTransparentClear": "晴れ = 透明、地図が透ける",
+  "mapLayerStyleSection": "色調",
+  "mapLayerStyleTooltip": "色調",
+  "mapLayerStyleGray": "グレースケール（JMA）",
+  "mapLayerStyleGrayTooltip": "気象庁の赤外画像の慣例：温度が低いほど白",
+  "mapLayerStyleJma": "雲頂強調（JMA）",
+  "mapLayerStyleJmaTooltip": "グレースケールをベースに −40 °C 以下を着色し、雲頂高度を強調",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD カーブ——熱帯低気圧の強度解析に使う階段グレースケール",
+  "mapLayerQpesums": "1時間降水量予報",
   "mapLayerLightning": "雷",
   "lightningLegendCg": "対地 · {minutes} 分以内",
   "lightningLegendCc": "雲間 · {minutes} 分以内",
   "mapTimelineNow": "現在",
+  "mapTimelinePast": "過去",
+  "mapTimelineFuture": "未来",
   "mapTimelineObserved": "観測",
+  "mapTimelineForecast": "予報",
+  "mapTimelineDataTime": "データ時刻 {time}",
+  "mapTimelineDataTime": "データ時刻 {time}",
   "notifySettingsMenu": "通知設定",
   "notifyTitle": "通知",
   "notifyUnavailable": "プッシュ通知はまだ準備できていません。しばらくしてから再度お試しください。",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "地図の初期レイヤー",
   "defaultMapLayerSubtitle": "地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。",
   "mapNavRadar": "レーダー",
+  "mapNavQpesums": "予報",
   "mapNavSatellite": "衛星",
   "mapNavLightning": "稲妻",
   "mapNavTyphoon": "台風",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "湿度",
   "mapLayerPressure": "気圧",
   "mapLayerWind": "風向",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "降水量",
   "rainIntervalMenu": "累積期間",
   "rainIntervalNow": "今日",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "避難所",
   "disasterMapOverlayRestroomTooltip": "トイレを表示",
   "disasterMapOverlayShelterTooltip": "避難所を表示",
+  "dpmOpenInMaps": "地図アプリで開く",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app}（デフォルト）",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "座標をコピー",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "座標をコピーしました",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "{app} を開けませんでした",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "この端末では通話できません",
+
+  "mapOverlaySectionReference": "参照レイヤー",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryTyphoon": "台風",
+  "mapLayerCategoryWeather": "気象観測",
+  "mapLayerCategorySatellite": "衛星",
+  "mapLayerCategoryRadar": "レーダー",
+  "mapLayerCategoryLife": "生活",
+  "mapLayerCategoryForecast": "数値予報",  "mapOverlaySectionMap": "地図",
+  "rainIntervalSection": "集計時間",
+
+  "mapTownLabels": "郷鎮名",
+  "mapTownLabelsHint": "拡大すると郷鎮名を表示",
+
   "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
   "dpmAddress": "住所",
   "restroomTypeLabel": "種別",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "凡例",
   "mapLegendCollapse": "凡例を閉じる",
   "mapMyLocation": "現在地",
+  "mapResetNorth": "北を上にする",
   "typhoonLegendCircle15": "強風域（30kt）",
   "typhoonLegendCircle25": "暴風域（50kt）",
   "typhoonLegendProbability": "接近確率",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "熱帯低気圧",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "熱帯低気圧 TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "これまでの進行方向",
   "typhoonLabelGaleAvg": "強風域の平均半径",
   "typhoonLabelGust": "最大瞬間風速",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "土石流",
   "dpmDisasterTsunami": "津波",
   "dpmDisasterSlope": "斜面災害",
-  "dpmDisasterNuclear": "原子力事故"
+  "dpmDisasterNuclear": "原子力事故",
+  "skyTime": "空の時刻",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "自動",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "夜明け前",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "日の出",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "午前",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "正午",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "午後",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "ゴールデンアワー",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "日の入り",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "薄暮",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "夜",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "曇り",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "本曇り",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "雪",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "砂じん",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "走査範囲を表示",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "4基のレーダーが実際に観測する範囲を示します。",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "枠外の空白は未観測",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "レーダーレイヤー設定",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "県市境界",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "国境線",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "各国の国境外枠",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "エコーの上に描画",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "レーダーエコーの下でも県市境界が見えるようにします。",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "市町村境界",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "より細かい区分",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "レーダーエコーの下でも市町村境界が見えるようにします。",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "定量降水予報レイヤー設定",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "風予報レイヤー設定",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "風場の上に描画",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "各国の国境外枠",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "より細かいメッシュ",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

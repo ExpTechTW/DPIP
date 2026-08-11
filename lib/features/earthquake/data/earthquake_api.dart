@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
@@ -19,8 +20,7 @@ class EarthquakeApi {
   /// Latest real-time station (RTS) shaking data (one-shot snapshot).
   ///
   /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts`
-  Future<dynamic> getRtsRealtime() =>
-      _client.get(ApiTier.lbApi, '/api/v2/trem/rts');
+  Future<dynamic> getRtsRealtime() => _client.get(ApiTier.lbApi, ApiPaths.rts);
 
   /// Opens the **live** RTS feed as a Server-Sent Events stream — the transport
   /// the realtime channel runs on. A continuous ~1 Hz snapshot stream.
@@ -32,7 +32,7 @@ class EarthquakeApi {
   /// A fresh stream per call, so the source can reconnect by calling again.
   Stream<SseEvent> openRtsSse() => HttpSseClient(_client).connect(
     ApiTier.lbApi,
-    '/api/v2/trem/rts',
+    ApiPaths.rts,
     query: const {'sse': 1, 'compress': 1},
   );
 
@@ -50,7 +50,7 @@ class EarthquakeApi {
   Future<dynamic> getRtsAt(int seconds) async {
     final data = await _client.get(
       ApiTier.legacyApi,
-      '/api/v2/trem/rts/$seconds',
+      '${ApiPaths.rts}/$seconds',
     );
     // Verified 2026-08-09: unlike every other endpoint here (including the
     // bare `/trem/rts` and `/trem/station` on this same host), api-1 serves
@@ -65,7 +65,7 @@ class EarthquakeApi {
   ///
   /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/eq/eew`
   Future<List<dynamic>> getEewRealtime() async =>
-      (await _client.get(ApiTier.lbApi, '/api/v2/eq/eew')) as List<dynamic>;
+      (await _client.get(ApiTier.lbApi, ApiPaths.eew)) as List<dynamic>;
 
   /// Opens the **live** EEW feed as a Server-Sent Events stream — the transport
   /// the realtime channel runs on, replacing per-second polling with one
@@ -78,7 +78,7 @@ class EarthquakeApi {
   /// A fresh stream per call, so the source can reconnect by calling again.
   Stream<SseEvent> openEewSse() => HttpSseClient(_client).connect(
     ApiTier.lbApi,
-    '/api/v2/eq/eew',
+    ApiPaths.eew,
     query: const {'sse': 1, 'compress': 1},
   );
 
@@ -87,18 +87,7 @@ class EarthquakeApi {
   ///
   /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/eew/{seconds}`
   Future<List<dynamic>> getEewAt(int seconds) async =>
-      (await _client.get(ApiTier.coreApi, '/api/v2/eq/eew/$seconds'))
-          as List<dynamic>;
-
-  /// Latest earthquake reports including area `list` (no pagination filters).
-  ///
-  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v1/eq/report?limit=`
-  Future<List<dynamic>> getLatestReports({int limit = 1}) async =>
-      (await _client.get(
-            ApiTier.coreApi,
-            '/api/v1/eq/report',
-            query: {'limit': limit},
-          ))
+      (await _client.get(ApiTier.coreApi, '${ApiPaths.eew}/$seconds'))
           as List<dynamic>;
 
   /// Paginated earthquake report list (no area `list`; includes `md5` / `int`).

@@ -59,8 +59,10 @@ class HomeActiveEventsController extends ChangeNotifier {
     _loadedKey = key;
     if (key == 'none') {
       // 所在地 selected but no GPS — nothing local to show; clear rather than
-      // silently substituting the national feed (Events tab does that fallback;
-      // home keeps the distinction visible).
+      // silently substituting the national feed, which would read as "these are
+      // the events where you are". (Home drops the section entirely in this
+      // state and the Events tab shows a notice; this keeps the data honest for
+      // whoever reads it.)
       _events = const [];
       _failure = null;
       notifyListeners();

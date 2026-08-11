@@ -17,6 +17,8 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/features/settings/presentation/widgets/network_usage_chart.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -61,7 +63,14 @@ class DeveloperPage extends StatefulWidget {
 
 class _DeveloperPageState extends State<DeveloperPage> {
   List<({String title, List<_Field> fields})>? _sections;
+  List<HourUsage>? _usageHistory;
+  List<HourUsage>? _usageWeek;
   bool _clearing = false;
+
+  /// Version-row taps toward the experimental unlock. Deliberately not
+  /// persisted — a fresh app start re-arms the easter egg.
+  static const int _unlockVersionTaps = 10;
+  int _versionTaps = 0;
 
   @override
   void initState() {
@@ -78,6 +87,11 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final info = await PackageInfo.fromPlatform();
     final cacheStats = await etagCache?.stats();
     final usage = await networkUsage?.stats();
+    final usageHistory = await networkUsage?.history();
+    final usageWeek = await networkUsage?.history(
+      hours: 24 * 7,
+      bucketHours: 6,
+    );
     final device = await DeviceInfoService.load();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
@@ -172,7 +186,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
         ],
       ),
     ];
-    if (mounted) setState(() => _sections = sections);
+    if (mounted) {
+      setState(() {
+        _sections = sections;
+        _usageHistory = usageHistory;
+        _usageWeek = usageWeek;
+      });
+    }
   }
 
   String get _osName => Platform.isIOS
@@ -278,6 +298,36 @@ class _DeveloperPageState extends State<DeveloperPage> {
       ..showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
   }
 
+  /// Version-row taps: count to [_unlockVersionTaps], then unlock the
+  /// experimental-features menu (see `ExperimentalSettings.unlock`). Shows the
+  /// remaining count so the easter egg is discoverable, and confirms once it
+  /// flips.
+  void _onVersionTap() {
+    final settings = context.read<ExperimentalSettings>();
+    if (settings.unlocked) {
+      _showHint('Experimental features are already unlocked');
+      return;
+    }
+    _versionTaps++;
+    final remaining = _unlockVersionTaps - _versionTaps;
+    if (remaining > 0) {
+      _showHint(
+        '$remaining more tap${remaining == 1 ? '' : 's'} to unlock '
+        'experimental features',
+      );
+      return;
+    }
+    _versionTaps = 0;
+    settings.unlock();
+    _showHint('Experimental features unlocked');
+  }
+
+  void _showHint(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void _copyAll() {
     final sections = _sections;
     if (sections == null) return;
@@ -316,14 +366,22 @@ class _DeveloperPageState extends State<DeveloperPage> {
           : ListView(
               padding: const EdgeInsets.only(bottom: AppSpacing.xl),
               children: [
-                for (final section in sections) ...[
-                  SectionHeader(section.title),
-                  for (final field in section.fields)
+                for (var i = 0; i < sections.length; i++) ...[
+                  SectionHeader(sections[i].title),
+                  for (final field in sections[i].fields)
                     _DiagRow(
                       field: field,
+                      onTap: field.label == 'Version' ? _onVersionTap : null,
                       onCopy: _individuallyCopyableLabels.contains(field.label)
                           ? _copy
                           : null,
+                    ),
+                  if (sections[i].title == 'Network usage' &&
+                      _usageHistory != null &&
+                      _usageWeek != null)
+                    NetworkUsageChart(
+                      history: _usageHistory!,
+                      week: _usageWeek!,
                     ),
                 ],
                 const SectionHeader('Maintenance'),
@@ -341,12 +399,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   subtitle: const Text(
                     'Removes stored tiles, API responses, and usage stats',
                   ),
-                  trailing: _clearing
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : null,
+                  trailing: _clearing ? const InlineLoading(size: 18) : null,
                   onTap: _clearing ? null : _confirmClearCache,
                 ),
               ],
@@ -359,10 +412,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
 /// app-bar's "Copy all"); [onCopy] adds a per-row copy button for the few that
 /// are worth lifting out on their own (see [_DeveloperPageState._individuallyCopyableLabels]).
 class _DiagRow extends StatelessWidget {
-  const _DiagRow({required this.field, this.onCopy});
+  const _DiagRow({required this.field, this.onCopy, this.onTap});
 
   final _Field field;
   final ValueChanged<String>? onCopy;
+
+  /// Tap handler — used by the version row to arm the experimental unlock.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -370,6 +426,7 @@ class _DiagRow extends StatelessWidget {
     final value = field.value;
     final hasValue = value != null && value.isNotEmpty;
     return ListTile(
+      onTap: onTap,
       title: Text(field.label, style: theme.textTheme.bodyMedium),
       subtitle: Text(
         hasValue ? value : '—',

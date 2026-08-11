@@ -4,6 +4,7 @@
 library;
 
 import 'package:dpip/core/models/lat_lng.dart';
+import 'package:dpip/features/typhoon/domain/typhoon_decode.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'typhoon_probability.freezed.dart';
@@ -25,7 +26,7 @@ abstract class ProbabilityLevel with _$ProbabilityLevel {
   factory ProbabilityLevel.decode(Map<String, dynamic> json) =>
       ProbabilityLevel(
         p: (json['p'] as num).toInt(),
-        coords: _coords(json['coords']),
+        coords: latLngsFromPairs(json['coords']),
       );
 }
 
@@ -40,7 +41,7 @@ abstract class CycloneProbability with _$CycloneProbability {
 
   factory CycloneProbability.decode(Map<String, dynamic> json) =>
       CycloneProbability(
-        tdNo: _blankToNull(json['tdNo'] as String?),
+        tdNo: trimToNull(json['tdNo'] as String?),
         levels: [
           for (final level in (json['levels'] as List? ?? const []))
             ProbabilityLevel.decode(level as Map<String, dynamic>),
@@ -57,30 +58,15 @@ abstract class TyphoonProbability with _$TyphoonProbability {
   }) = _TyphoonProbability;
 
   /// Decodes `{ updated, cyclones: [{ tdNo, levels }] }`.
-  factory TyphoonProbability.decode(Map<String, dynamic> json) {
-    final updated = (json['updated'] as num?)?.toInt() ?? 0;
-    final raw = json['cyclones'];
-    if (raw is! List) {
-      return TyphoonProbability(updated: updated, cyclones: const []);
-    }
-    return TyphoonProbability(
-      updated: updated,
-      cyclones: [
-        for (final c in raw)
-          if (c is Map<String, dynamic>) CycloneProbability.decode(c),
-      ],
-    );
-  }
+  factory TyphoonProbability.decode(Map<String, dynamic> json) =>
+      decodeCyclonesPayload(
+        json,
+        (updated, raw) => TyphoonProbability(
+          updated: updated,
+          cyclones: [
+            for (final c in raw)
+              if (c is Map<String, dynamic>) CycloneProbability.decode(c),
+          ],
+        ),
+      );
 }
-
-String? _blankToNull(String? value) {
-  final t = value?.trim();
-  return (t == null || t.isEmpty) ? null : t;
-}
-
-/// Maps a list of `[lng, lat]` pairs to [LatLng]s (mind the GeoJSON axis order);
-/// empty/absent in → empty out.
-List<LatLng> _coords(Object? raw) => [
-  for (final p in (raw as List? ?? const []))
-    LatLng(((p as List)[1] as num).toDouble(), (p[0] as num).toDouble()),
-];

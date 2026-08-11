@@ -26,6 +26,7 @@ import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
+import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -85,6 +86,7 @@ Future<void> bootstrap() async {
   final locale = LocaleController(prefs);
   final theme = ThemeController(prefs);
   final defaultMapLayer = DefaultMapLayerController(prefs);
+  final mapLayerOrder = MapLayerOrderController(prefs);
   final cache = await _openCache();
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
@@ -184,6 +186,7 @@ Future<void> bootstrap() async {
     locale: locale,
     theme: theme,
     defaultMapLayer: defaultMapLayer,
+    mapLayerOrder: mapLayerOrder,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,

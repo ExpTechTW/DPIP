@@ -1,17 +1,20 @@
-/// Base for the weather-family station value layers (temperature, humidity,
-/// pressure, wind) — station dots coloured by value, tap → trend sheet.
+/// Base for the station-value map layers (temperature, humidity, pressure,
+/// wind, rain): station dots coloured by value, tap → trend sheet.
+///
+/// Generic over the snapshot/observation/trend types so the weather family and
+/// the rainfall layer share one implementation; concrete layers supply only
+/// which value to read ([valueOf], [trendOf]), the unit, and the colour ramp.
 library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
-import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
-import 'package:dpip/features/weather/domain/weather_snapshot.dart';
+import 'package:dpip/features/weather/domain/station_value_repository.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
-import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -23,21 +26,22 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// current value (a MapLibre `interpolate` on the `value` property), and a tap
 /// selects the nearest station, opening the shared [StationSheet] with its
 /// reading and 24h/7d trend chart.
-///
-/// Concrete layers (temperature, humidity, …) supply only which value to read
-/// from an observation ([valueOf]) and from the trend series ([trendOf]), plus
-/// the unit and the colour ramp. All share one [MeteorWeatherRepository].
-abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
+abstract class WeatherStationLayer<
+  S extends StationSnapshot<O>,
+  O extends StationObservation,
+  T extends TrendTimeAxis
+>
+    with MapLayerDefaults
+    implements MapLayer, StationSheetSource {
   WeatherStationLayer(this._repository);
 
-  final MeteorWeatherRepository _repository;
+  final StationValueRepository<S, T> _repository;
 
-  /// The observation value this layer plots (°C, %, hPa, m/s), or null if
-  /// missing for a station.
-  double? valueOf(WeatherObservation observation);
+  /// The observation value this layer plots, or null if missing for a station.
+  double? valueOf(O observation);
 
   /// The matching series from a station's trend payload.
-  List<double?> trendOf(WeatherTrend trend);
+  List<double?> trendOf(T trend);
 
   /// Decimal places for the reading text.
   int get decimals;
@@ -53,8 +57,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   /// Extra per-feature GeoJSON properties a subclass needs on the map — merged
   /// into each feature's `properties`.
   @protected
-  Map<String, Object?> extraProperties(WeatherObservation observation) =>
-      const {};
+  Map<String, Object?> extraProperties(O observation) => const {};
 
   /// Hook for a subclass to add its own layer(s) on [sourceId] after the base
   /// dot + labels. Any layer id added here must be listed in [extraLayerIds] so
@@ -69,6 +72,25 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   @protected
   List<String> get extraLayerIds => const [];
 
+  /// Optional MapLibre filter for the dot + label layers — e.g. rain hides
+  /// dry stations until the map is zoomed in.
+  @protected
+  List<Object>? get featureFilter => null;
+
+  /// Whether a station with [value] is a tap target at [zoom] — e.g. rain
+  /// ignores ~0 readings when zoomed out.
+  @protected
+  bool includeInSelection(O observation, double value, double zoom) => true;
+
+  /// Optional listenable whose change rebuilds the sheet + legend chrome
+  /// (rain listens to its accumulation-window switch).
+  @protected
+  Listenable? get chromeListenable => null;
+
+  /// Optional header rendered above the colour scale in the legend.
+  @protected
+  Widget? legendHeader(BuildContext context) => null;
+
   final ValueNotifier<String?> _selected = ValueNotifier<String?>(null);
 
   /// Bumped on every tap that (re-)selects a station — even the same one — so the
@@ -76,37 +98,33 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   /// wouldn't notify on its own).
   final ValueNotifier<int> _selectionRevision = ValueNotifier<int>(0);
   Map<String, WeatherStation> _stations = const {};
-  Map<String, WeatherObservation> _observations = const {};
+  Map<String, O> _observations = const {};
   bool _loaded = false;
+  MapLibreMapController? _controller;
+
+  /// The controller from the last [render], for a subclass to poke the map
+  /// (e.g. rain's window switch re-pushes the source).
+  @protected
+  MapLibreMapController? get controller => _controller;
 
   String get _sourceId => 'wx-$id-src';
   String get _circleId => 'wx-$id-circle';
   String get _labelId => 'wx-$id-label';
+
+  /// The source id this layer's dots + labels live on.
+  @protected
+  String get sourceId => _sourceId;
+
+  /// The current dot/label GeoJSON, re-pushable by a subclass that mutates its
+  /// value source in place (e.g. rain's accumulation-window switch).
+  @protected
+  Map<String, dynamic> get geoJson => _geoJson();
 
   @override
   bool get usesTimeline => false;
 
   @override
   double get bottomChromeFraction => StationSheet.peekExtent;
-
-  @override
-  double get mapMinZoom => 4;
-
-  @override
-  double get mapMaxZoom => BaseMap.maxZoom;
-
-  @override
-  Future<Result<List<MapFrame>>> frames() async => const Ok([]);
-
-  @override
-  Future<void> prepare(MapLibreMapController c, List<MapFrame> frames) async {}
-
-  @override
-  Future<void> show(
-    MapLibreMapController c,
-    MapFrame frame, {
-    bool scrubbing = false,
-  }) async {}
 
   @override
   Future<void> render(MapLibreMapController controller) async {
@@ -130,6 +148,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
         // Non-interactive: we do our own nearest-station math in onMapTap and
         // want EVERY tap via map#onMapClick — an interactive layer would eat an
         // on-dot tap as feature#onTap (unhandled) so the station never selects.
+        filter: featureFilter,
         enableInteraction: false,
       );
     }
@@ -140,8 +159,10 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
       _labelId,
       stationLabelProps(textField: const <Object>['get', 'label']),
       minzoom: 9,
+      filter: featureFilter,
       enableInteraction: false,
     );
+    _controller = controller;
     // Let a subclass add its own symbology (e.g. wind arrows) on the source.
     await decorate(controller, _sourceId);
   }
@@ -151,12 +172,17 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     // Nearest station within ~0.18° (lon scaled by latitude), so a tap in empty
     // sea doesn't select anything.
     const threshold = 0.18 * 0.18;
-    final cosLat = math.cos(latLng.latitude * math.pi / 180);
+    final cosLat = math.cos(degToRad(latLng.latitude));
+    final zoom = controller.cameraPosition?.zoom ?? 0;
     String? best;
     var bestDistance = threshold;
     for (final entry in _stations.entries) {
       final observation = _observations[entry.key];
-      if (observation == null || valueOf(observation) == null) continue;
+      if (observation == null) continue;
+      final value = valueOf(observation);
+      if (value == null || !includeInSelection(observation, value, zoom)) {
+        continue;
+      }
       final station = entry.value;
       final dLat = station.latitude - latLng.latitude;
       final dLon = (station.longitude - latLng.longitude) * cosLat;
@@ -173,38 +199,41 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   }
 
   @override
-  Widget buildTopTrailingChrome(BuildContext context) =>
-      const SizedBox.shrink();
+  Widget buildSheet(BuildContext context) {
+    final sheet = StationSheet(key: ValueKey(id), source: this);
+    final listenable = chromeListenable;
+    return listenable == null
+        ? sheet
+        : ListenableBuilder(listenable: listenable, builder: (_, _) => sheet);
+  }
 
+  /// Colour scale from [colorStops] + [unit], with an optional [legendHeader].
   @override
-  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
-
-  @override
-  void onMapGestureStart() {}
-
-  @override
-  void onMapGestureEnd() {}
-
-  @override
-  Future<void> onCameraIdle(MapLibreMapController controller) async {}
-
-  @override
-  Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
-
-  @override
-  Widget buildSheet(BuildContext context) =>
-      StationSheet(key: ValueKey(id), source: this);
-
-  /// Colour scale from [colorStops] + [unit] — one legend for every station
-  /// value layer (temperature / humidity / pressure); wind overrides.
-  @override
-  Widget buildLegend(BuildContext context) => MapLegendCard(
-    child: ColorScaleLegend(stops: colorStops, unit: unit, appendUnit: true),
-  );
+  Widget buildLegend(BuildContext context) {
+    final header = legendHeader(context);
+    final scale = ColorScaleLegend(stops: colorStops, unit: unit);
+    final child = header == null
+        ? scale
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              header,
+              const SizedBox(height: AppSpacing.xs),
+              scale,
+            ],
+          );
+    final card = MapLegendCard(child: child);
+    final listenable = chromeListenable;
+    return listenable == null
+        ? card
+        : ListenableBuilder(listenable: listenable, builder: (_, _) => card);
+  }
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
     await _removeFromMap(controller);
+    _controller = null;
     _selected.value = null;
   }
 
@@ -212,10 +241,7 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   void selectFeature(String id) => select(id);
 
   @override
-  void onStyleReset() {}
-
   // --- StationSheetSource ---
-
   @override
   ValueListenable<String?> get selection => _selected;
 
@@ -237,35 +263,13 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
   /// The station's latest observation — for a subclass to read extra fields
   /// (e.g. wind direction) in an overridden [reading].
   @protected
-  WeatherObservation? observationOf(String id) => _observations[id];
+  O? observationOf(String id) => _observations[id];
 
   @override
   Color? valueColor(String id) {
     final observation = observationOf(id);
     final value = observation == null ? null : valueOf(observation);
-    return value == null ? null : rampColor(value);
-  }
-
-  /// [value] interpolated on [colorStops] — the Dart twin of the `interpolate`
-  /// expression handed to MapLibre, so the dot and the sheet agree by
-  /// construction rather than by two hand-kept colour tables.
-  @protected
-  Color? rampColor(double value) {
-    final stops = colorStops;
-    if (stops.isEmpty) return null;
-    if (value <= stops.first.$1) return colorFromHexRgb(stops.first.$2);
-    if (value >= stops.last.$1) return colorFromHexRgb(stops.last.$2);
-    for (var i = 0; i < stops.length - 1; i++) {
-      final (lowAt, lowHex) = stops[i];
-      final (highAt, highHex) = stops[i + 1];
-      if (value < lowAt || value > highAt) continue;
-      final low = colorFromHexRgb(lowHex);
-      final high = colorFromHexRgb(highHex);
-      if (low == null || high == null) return low ?? high;
-      final span = highAt - lowAt;
-      return Color.lerp(low, high, span == 0 ? 0 : (value - lowAt) / span);
-    }
-    return colorFromHexRgb(stops.last.$2);
+    return value == null ? null : rampColor(colorStops, value);
   }
 
   @override
@@ -275,6 +279,9 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     final value = valueOf(observation);
     return value == null ? null : '${value.toStringAsFixed(decimals)} $unit';
   }
+
+  @override
+  Widget? readingIcon(String id) => null;
 
   @override
   double? get chartMinY => null;
@@ -291,10 +298,10 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     return result.map(seriesOf);
   }
 
-  /// Builds the sheet's trend payload from a decoded [WeatherTrend]. Wind
-  /// overrides to attach the parallel direction series.
+  /// Builds the sheet's trend payload from a decoded trend. Wind overrides to
+  /// attach the parallel direction series.
   @protected
-  TrendSeries seriesOf(WeatherTrend trend) =>
+  TrendSeries seriesOf(T trend) =>
       TrendSeries(times: trend.times, values: trendOf(trend));
 
   @override
@@ -313,11 +320,15 @@ abstract class WeatherStationLayer implements MapLayer, StationSheetSource {
     final stations = (await _repository.stations()).valueOrNull;
     final snapshot = (await _repository.latest()).valueOrNull;
     if (stations != null) _stations = stations;
-    if (snapshot != null) {
-      _observations = {for (final o in snapshot.stations) o.id: o};
-    }
+    if (snapshot != null) _observations = observationsOf(snapshot);
     _loaded = stations != null && snapshot != null;
   }
+
+  /// Latest snapshot → per-station observations keyed by station id.
+  @protected
+  Map<String, O> observationsOf(S snapshot) => {
+    for (final o in snapshot.stations) o.id: o,
+  };
 
   Map<String, dynamic> _geoJson() {
     final features = <Map<String, dynamic>>[];

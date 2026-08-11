@@ -7,7 +7,9 @@ import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class HumidityMapLayer extends WeatherStationLayer {
+class HumidityMapLayer
+    extends
+        WeatherStationLayer<WeatherSnapshot, WeatherObservation, WeatherTrend> {
   HumidityMapLayer(super.repository);
 
   @override

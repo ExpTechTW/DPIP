@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "발효 중 이벤트",
   "homeActiveEventsEmpty": "발효 중인 이벤트가 없습니다",
   "homeRainTrendTitle": "향후 1시간 강수",
+  "homeRainTrendMinute": "{minute}분",
+  "homeRainTrendUpdated": "업데이트 {time}",
+  "homeRainTrendNoData": "데이터 없음",
+
+  "homeRainTrendScattered": "약한 비가 올 수 있어요",
+  "homeRainTrendLightSustained": "앞으로 1시간 동안 약한 비가 이어질 거예요",
+  "homeRainTrendLightStopping": "{minutes}분 후에 비가 그칠 것으로 예상돼요",
+  "homeRainTrendHeavySustained": "앞으로 1시간 동안 강한 비가 이어질 거예요",
+  "homeRainTrendHeavyStopping": "{minutes}분 후에 강한 비가 그칠 것으로 예상돼요",
   "mapLayers": "레이어",
+  "mapLayerOrderTitle": "레이어 순서",
+  "mapLayerOrderReset": "기본 순서로 재설정",
   "mapLayerRadar": "레이더 합성 에코",
-  "mapLayerSatellite": "히마와리 적외",
+  "mapLayerSatellite": "히마와리 적외(B13)",
+  "mapLayerSatelliteB01": "히마와리 가시 청색(B01)",
+  "mapLayerSatelliteB02": "히마와리 가시 녹색(B02)",
+  "mapLayerSatelliteB03": "히마와리 가시 적색(B03)",
+  "mapLayerSatelliteB04": "히마와리 근적외(B04)",
+  "mapLayerSatelliteB05": "히마와리 근적외(B05)",
+  "mapLayerSatelliteB06": "히마와리 근적외(B06)",
+  "mapLayerSatelliteB07": "히마와리 단파 적외(B07)",
+  "mapLayerSatelliteB08": "히마와리 상층 수증기(B08)",
+  "mapLayerSatelliteB09": "히마와리 중층 수증기(B09)",
+  "mapLayerSatelliteB10": "히마와리 하층 수증기(B10)",
+  "mapLayerSatelliteB11": "히마와리 이산화황/구름상(B11)",
+  "mapLayerSatelliteB12": "히마와리 오존(B12)",
+  "mapLayerSatelliteB13": "히마와리 적외(B13)",
+  "mapLayerSatelliteB14": "히마와리 장파 적외(B14)",
+  "mapLayerSatelliteB15": "히마와리 장파 적외(B15)",
+  "mapLayerSatelliteB16": "히마와리 이산화탄소(B16)",
+  "mapLayerSatelliteTruecolor": "히마와리 트루컬러",
+  "mapLayerSatelliteNaturalcolor": "히마와리 내추럴컬러",
+  "mapLayerSatelliteAsh": "히마와리 화산재",
+  "mapLayerSatelliteDust": "히마와리 황사",
+  "mapLayerSatelliteAirmass": "히마와리 에어매스",
+  "mapLayerSatelliteNightmicrophysics": "히마와리 야간 미세물리",
+  "mapLayerSatelliteWatervapor": "히마와리 수증기",
+  "mapLayerSatelliteBtdSplit": "히마와리 스플릿 윈도우",
+  "mapLayerSatelliteBtdFog": "히마와리 야간 안개",
+  "mapLayerSatelliteBtdWvirw": "히마와리 오버슈팅 탑",
+  "mapLayerSatelliteBtdSo2": "히마와리 이산화황/구름상",
+  "mapLayerSatelliteBtdCo2": "히마와리 권운/운고",
+  "mapLayerSatelliteBtdOzone": "히마와리 대류권계면",
+  "mapLayerSatelliteCloudtop": "히마와리 운정 온도",
+  "mapLayerSatelliteCloudmask": "히마와리 구름 마스크",
+  "mapLayerSatelliteSst": "히마와리 해수면 온도",
+  "mapLayerSatelliteNdvi": "히마와리 NDVI",
+  "mapLayerSatelliteNdwi": "히마와리 NDWI",
+  "mapLayerSatelliteMndwi": "히마와리 MNDWI",
+  "mapLayerSatelliteGlobalOutline": "국경선",
+  "mapLayerSatelliteRgbComposite": "RGB 합성(JMA 레시피)",
+  "mapLayerSatelliteCloudClear": "맑음",
+  "mapLayerSatelliteCloudProbablyClear": "아마 맑음",
+  "mapLayerSatelliteCloudProbablyCloudy": "아마 구름",
+  "mapLayerSatelliteCloudCloudy": "구름",
+  "mapLayerSatelliteTransparentWarm": "맑음(고온부) = 투명,배경 지도 표시",
+  "mapLayerSatelliteTransparentReflectance": "낮은 반사율/야간 = 투명,배경 지도 표시",
+  "mapLayerSatelliteTransparentZero": "차이 0 = 투명(신호 없음)",
+  "mapLayerSatelliteTransparentNight": "야간 = 투명,배경 지도 표시",
+  "mapLayerSatelliteTransparentNoData": "데이터 없음(육지) = 투명",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 투명(식생 없음)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 투명(수역 없음)",
+  "mapLayerSatelliteTransparentClear": "맑음 = 투명,배경 지도 표시",
+  "mapLayerStyleSection": "색상 스타일",
+  "mapLayerStyleTooltip": "색상 스타일",
+  "mapLayerStyleGray": "그레이스케일（JMA）",
+  "mapLayerStyleGrayTooltip": "기상청 적외 영상 관례：온도가 낮을수록 흰색",
+  "mapLayerStyleJma": "운정 강조（JMA）",
+  "mapLayerStyleJmaTooltip": "그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일",
+  "mapLayerQpesums": "1시간 강수 예보",
   "mapLayerLightning": "번개",
   "lightningLegendCg": "대지로 · {minutes}분 이내",
   "lightningLegendCc": "구름 사이 · {minutes}분 이내",
   "mapTimelineNow": "현재",
+  "mapTimelinePast": "과거",
+  "mapTimelineFuture": "미래",
   "mapTimelineObserved": "관측",
+  "mapTimelineForecast": "예보",
+  "mapTimelineDataTime": "데이터 시간 {time}",
+  "mapTimelineDataTime": "자료 시간 {time}",
   "notifySettingsMenu": "알림 설정",
   "notifyTitle": "알림",
   "notifyUnavailable": "푸시 알림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "지도 기본 레이어",
   "defaultMapLayerSubtitle": "지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.",
   "mapNavRadar": "레이더",
+  "mapNavQpesums": "예보",
   "mapNavSatellite": "위성",
   "mapNavLightning": "번개",
   "mapNavTyphoon": "태풍",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "습도",
   "mapLayerPressure": "기압",
   "mapLayerWind": "바람",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "강수량",
   "rainIntervalMenu": "누적 구간",
   "rainIntervalNow": "오늘",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "대피소",
   "disasterMapOverlayRestroomTooltip": "공중화장실 표시",
   "disasterMapOverlayShelterTooltip": "대피소 표시",
+  "dpmOpenInMaps": "지도에서 열기",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (기본)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "좌표 복사",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "좌표가 복사되었습니다",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "{app}을(를) 열 수 없습니다",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "이 기기에서는 전화를 걸 수 없습니다",
+
+  "mapOverlaySectionReference": "참조 레이어",
+  "mapLayerCategoryEarthquake": "지진",
+  "mapLayerCategoryTyphoon": "태풍",
+  "mapLayerCategoryWeather": "기상 관측",
+  "mapLayerCategorySatellite": "위성",
+  "mapLayerCategoryRadar": "레이더",
+  "mapLayerCategoryLife": "생활",
+  "mapLayerCategoryForecast": "수치 예보",  "mapOverlaySectionMap": "지도",
+  "rainIntervalSection": "집계 시간",
+
+  "mapTownLabels": "읍면동 이름",
+  "mapTownLabelsHint": "확대하면 읍면동 이름 표시",
+
   "dpmSheetEmpty": "지도에서 마커를 눌러 상세 보기",
   "dpmAddress": "주소",
   "restroomTypeLabel": "유형",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "범례",
   "mapLegendCollapse": "범례 숨기기",
   "mapMyLocation": "내 위치",
+  "mapResetNorth": "북쪽으로 되돌리기",
   "typhoonLegendCircle15": "강풍권 (7급)",
   "typhoonLegendCircle25": "폭풍권 (10급)",
   "typhoonLegendProbability": "내습 확률",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "Tropical depression",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "산사태",
   "dpmDisasterTsunami": "쓰나미",
   "dpmDisasterSlope": "사면 재해",
-  "dpmDisasterNuclear": "핵 사고"
+  "dpmDisasterNuclear": "핵 사고",
+  "skyTime": "하늘 시각",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "자동",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "여명",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "일출",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "오전",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "정오",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "오후",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "골든아워",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "일몰",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "땅거미",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "밤",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "구름 많음",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "흐림",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "눈",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "황사",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "스캔 범위 표시",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "레이더 4기가 실제로 관측하는 범위를 표시합니다.",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "범위 밖 공백은 미관측",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "레이더 레이어 옵션",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "시·군 경계",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "국경",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "각국 국경선",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "에코 위에 표시",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "레이더 에코 아래에서도 경계가 보이도록 합니다.",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "읍·면·동 경계",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "더 세밀한 구획",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "바람 예보 레이어 옵션",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "바람장 위에 표시",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "각국 국경선",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "더 촘촘한 망",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

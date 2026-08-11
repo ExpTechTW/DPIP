@@ -5,6 +5,8 @@
 /// Matches the RTS intensity legend's density so every layer reads the same.
 library;
 
+import 'dart:math' as math;
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -37,23 +39,17 @@ class MapLegendCard extends StatelessWidget {
 
 /// Vertical colour scale built from ascending [stops] — strongest (last stop)
 /// at the top, matching legacy `ColorLegend(reverse: true)`.
+///
+/// The unit, when present, is always shown **below** the scale ([unit]); it is
+/// never appended to every value label — a number column stays numbers.
 class ColorScaleLegend extends StatelessWidget {
-  const ColorScaleLegend({
-    super.key,
-    required this.stops,
-    this.unit,
-    this.appendUnit = false,
-  });
+  const ColorScaleLegend({super.key, required this.stops, this.unit});
 
   /// Ascending value → hex colour pairs (same order as MapLibre ramps).
   final List<ColorStop> stops;
 
-  /// Optional unit shown below the scale, or appended to each label when
-  /// [appendUnit] is true.
+  /// Unit shown below the scale, e.g. `m/s` or `°C`.
   final String? unit;
-
-  /// When true, append [unit] after each value instead of under the scale.
-  final bool appendUnit;
 
   static const double _cell = 14;
   static const double _swatch = 8;
@@ -102,18 +98,13 @@ class ColorScaleLegend extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (final stop in rows)
-                    Expanded(
-                      child: Text(
-                        _label(stop.$1, unit, appendUnit),
-                        style: labelStyle,
-                      ),
-                    ),
+                    Expanded(child: Text(_label(stop.$1), style: labelStyle)),
                 ],
               ),
             ),
           ],
         ),
-        if (unit != null && !appendUnit) ...[
+        if (unit != null) ...[
           const SizedBox(height: AppSpacing.xs),
           Text(l10n.mapLegendUnit(unit!), style: labelStyle),
         ],
@@ -121,12 +112,10 @@ class ColorScaleLegend extends StatelessWidget {
     );
   }
 
-  static String _label(double value, String? unit, bool appendUnit) {
-    final number = value == value.roundToDouble()
+  static String _label(double value) {
+    return value == value.roundToDouble()
         ? value.toInt().toString()
         : value.toString();
-    if (appendUnit && unit != null) return '$number $unit';
-    return number;
   }
 }
 
@@ -179,4 +168,156 @@ class SymbolLegend extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A solid circular colour swatch for a [SymbolLegendItem] — the dot mark for
+/// discrete categories (feed status, storm intensity, station type). Drawn the
+/// same way as the layer's map markers where applicable.
+class LegendDot extends StatelessWidget {
+  const LegendDot({
+    super.key,
+    required this.color,
+    this.size = 10,
+    this.borderWidth = 0,
+  });
+
+  final Color color;
+  final double size;
+
+  /// White ring width — `1` matches a marker that's ringed on the map.
+  final double borderWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: borderWidth > 0
+            ? Border.all(color: Colors.white, width: borderWidth)
+            : null,
+      ),
+    );
+  }
+}
+
+/// A short line sample for a [SymbolLegendItem] — the swatch for an outline
+/// overlay (an administrative border, a coverage boundary).
+///
+/// Draws the *same* construction the map does, casing included, so the key can
+/// be matched to the line on screen rather than merely described.
+class LineSwatch extends StatelessWidget {
+  const LineSwatch({
+    super.key,
+    required this.color,
+    this.width = 1.2,
+    this.opacity = 1,
+    this.casingColor,
+    this.casingWidth = 0,
+    this.casingOpacity = 1,
+    this.dash,
+  });
+
+  /// The core stroke.
+  final Color color;
+  final double width;
+  final double opacity;
+
+  /// Optional wider stroke drawn beneath [color].
+  final Color? casingColor;
+  final double casingWidth;
+  final double casingOpacity;
+
+  /// `[dash, gap]` in logical pixels; null draws a solid line.
+  final List<double>? dash;
+
+  static const Size _size = Size(20, 12);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: _size,
+      painter: _LineSwatchPainter(
+        color: color,
+        width: width,
+        opacity: opacity,
+        casingColor: casingColor,
+        casingWidth: casingWidth,
+        casingOpacity: casingOpacity,
+        dash: dash,
+      ),
+    );
+  }
+}
+
+class _LineSwatchPainter extends CustomPainter {
+  _LineSwatchPainter({
+    required this.color,
+    required this.width,
+    required this.opacity,
+    required this.casingColor,
+    required this.casingWidth,
+    required this.casingOpacity,
+    required this.dash,
+  });
+
+  final Color color;
+  final double width;
+  final double opacity;
+  final Color? casingColor;
+  final double casingWidth;
+  final double casingOpacity;
+  final List<double>? dash;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    final casing = casingColor;
+    if (casing != null && casingWidth > 0) {
+      _stroke(
+        canvas,
+        size,
+        y,
+        casing.withValues(alpha: casingOpacity),
+        casingWidth,
+      );
+    }
+    _stroke(canvas, size, y, color.withValues(alpha: opacity), width);
+  }
+
+  void _stroke(Canvas canvas, Size size, double y, Color c, double w) {
+    final paint = Paint()
+      ..color = c
+      ..strokeWidth = w
+      ..strokeCap = StrokeCap.round;
+    final pattern = dash;
+    if (pattern == null || pattern.length < 2) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+      return;
+    }
+    // Dash lengths are in line-width multiples on the map, as MapLibre defines
+    // `line-dasharray`, so scale them the same way here.
+    final on = pattern[0] * w;
+    final off = pattern[1] * w;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + on, size.width), y),
+        paint,
+      );
+      x += on + off;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _LineSwatchPainter old) =>
+      old.color != color ||
+      old.width != width ||
+      old.opacity != opacity ||
+      old.casingColor != casingColor ||
+      old.casingWidth != casingWidth ||
+      old.dash != dash;
 }

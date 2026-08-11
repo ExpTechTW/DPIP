@@ -26,7 +26,7 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge.
+  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix.
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   # https://github.com/ExpTechTW/flutter-maplibre-gl
   # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
@@ -36,7 +36,7 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 2c515a3feaa7fee565e1ae03971aade841bec54f
+      ref: 7c2e249149ff3023c54c86a1f4c0dca5fb43d6a1
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1
@@ -53,6 +53,7 @@ dev_dependencies:
   freezed: ^3.1.0
   json_serializable: ^6.14.0
   sqflite_common_ffi: ^2.4.2
+  url_launcher_platform_interface: ^2.3.2
 
 flutter:
   config:
@@ -60,12 +61,23 @@ flutter:
   uses-material-design: true
   generate: true
   shaders:
-    - shaders/fog.frag
-    - shaders/thunderstorm.frag
-    - shaders/weather_sky.frag
+    - shaders/sky/transmittance.frag
+    - shaders/sky/sky_lut.frag
+    - shaders/sky/sky_view.frag
+    - shaders/cloud/clouds.frag
+    - shaders/weather/sun_flare.frag
+    - shaders/weather/galaxy.frag
+    - shaders/weather/night.frag
+    - shaders/weather/rain_on_glass.frag
+    - shaders/weather/lightning.frag
+    - shaders/weather/rainbow.frag
+    - shaders/weather/card_water.frag
   assets:
     - assets/DPIP.png
     - assets/box.json
+    - assets/weather/clouds/
+    - assets/weather/particles/
+    - assets/weather/sky/
     - assets/location.json.gz
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz

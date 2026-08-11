@@ -151,14 +151,88 @@
   "homeActiveEventsTitle": "เหตุการณ์ที่ยังมีผล",
   "homeActiveEventsEmpty": "ไม่มีเหตุการณ์ที่ยังมีผล",
   "homeRainTrendTitle": "ฝนชั่วโมงถัดไป",
+  "homeRainTrendMinute": "{minute} นาที",
+  "homeRainTrendUpdated": "อัปเดต {time}",
+  "homeRainTrendNoData": "ไม่มีข้อมูล",
+
+  "homeRainTrendScattered": "อาจมีฝนตกประปราย",
+  "homeRainTrendLightSustained": "ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า",
+  "homeRainTrendLightStopping": "คาดว่าฝนจะหยุดในอีก {minutes} นาที",
+  "homeRainTrendHeavySustained": "ฝนตกหนักต่อเนื่องตลอดชั่วโมงหน้า",
+  "homeRainTrendHeavyStopping": "คาดว่าฝนตกหนักจะหยุดในอีก {minutes} นาที",
   "mapLayers": "ชั้นข้อมูล",
+  "mapLayerOrderTitle": "จัดเรียงเลเยอร์",
+  "mapLayerOrderReset": "รีเซ็ตลำดับ",
   "mapLayerRadar": "เรดาร์สะท้อนสังเคราะห์",
-  "mapLayerSatellite": "ฮิมาวาริ อินฟราเรด",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "mapLayerSatelliteGlobalOutline": "Country border",
+  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "mapLayerSatelliteCloudClear": "Clear",
+  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
+  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleGray": "Grayscale (JMA)",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleBd": "Dvorak BD",
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
+  "mapLayerQpesums": "พยากรณ์ฝน 1 ชั่วโมงข้างหน้า",
   "mapLayerLightning": "ฟ้าผ่า",
   "lightningLegendCg": "เมฆสู่พื้น · {minutes} นาที",
   "lightningLegendCc": "เมฆสู่เมฆ · {minutes} นาที",
   "mapTimelineNow": "ตอนนี้",
+  "mapTimelinePast": "อดีต",
+  "mapTimelineFuture": "อนาคต",
   "mapTimelineObserved": "เวลาตรวจวัด",
+  "mapTimelineForecast": "พยากรณ์",
+  "mapTimelineDataTime": "เวลาข้อมูล {time}",
+  "mapTimelineDataTime": "เวลาข้อมูล {time}",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
   "notifyTitle": "การแจ้งเตือน",
   "notifyUnavailable": "การแจ้งเตือนแบบพุชยังไม่พร้อม — โปรดลองอีกครั้งในภายหลัง",
@@ -229,6 +303,7 @@
   "defaultMapLayerSettings": "ชั้นแผนที่เริ่มต้น",
   "defaultMapLayerSubtitle": "แท็บแผนที่จะเปิดชั้นนี้ ไอคอนและป้ายนำทางด้านล่างจะเปลี่ยนตาม",
   "mapNavRadar": "เรดาร์",
+  "mapNavQpesums": "พยากรณ์",
   "mapNavSatellite": "ดาวเทียม",
   "mapNavLightning": "ฟ้าผ่า",
   "mapNavTyphoon": "ไต้ฝุ่น",
@@ -268,6 +343,8 @@
   "mapLayerHumidity": "ความชื้น",
   "mapLayerPressure": "ความกดอากาศ",
   "mapLayerWind": "ลม",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "mapLayerWindForecastGfs": "GFS",
   "mapLayerRain": "ปริมาณฝน",
   "rainIntervalMenu": "ช่วงสะสม",
   "rainIntervalNow": "วันนี้",
@@ -306,6 +383,46 @@
   "mapLayerShelter": "ศูนย์อพยพ",
   "disasterMapOverlayRestroomTooltip": "แสดงห้องน้ำสาธารณะ",
   "disasterMapOverlayShelterTooltip": "แสดงศูนย์อพยพ",
+  "dpmOpenInMaps": "เปิดในแผนที่",
+  "@dpmOpenInMaps": {
+  },
+  "mapAppGoogleMaps": "Google Maps",
+  "@mapAppGoogleMaps": {
+  },
+  "mapAppAppleMaps": "Apple Maps",
+  "@mapAppAppleMaps": {
+  },
+  "mapAppDefault": "{app} (ค่าเริ่มต้น)",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {"type": "String"}
+    }
+  },
+  "mapAppCopyCoordinates": "คัดลอกพิกัด",
+  "@mapAppCopyCoordinates": {
+  },
+  "mapAppCoordinatesCopied": "คัดลอกพิกัดแล้ว",
+  "@mapAppCoordinatesCopied": {
+  },
+  "mapAppOpenFailed": "ไม่สามารถเปิด {app} ได้",
+  "@mapAppOpenFailed": {
+  },
+
+  "mapAppCallFailed": "อุปกรณ์นี้ไม่สามารถโทรออกได้",
+
+  "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
+  "mapLayerCategoryEarthquake": "แผ่นดินไหว",
+  "mapLayerCategoryTyphoon": "พายุไต้ฝุ่น",
+  "mapLayerCategoryWeather": "การสังเกตสภาพอากาศ",
+  "mapLayerCategorySatellite": "ดาวเทียม",
+  "mapLayerCategoryRadar": "เรดาร์",
+  "mapLayerCategoryLife": "ชีวิตประจำวัน",
+  "mapLayerCategoryForecast": "การพยากรณ์เชิงตัวเลข",  "mapOverlaySectionMap": "แผนที่",
+  "rainIntervalSection": "ช่วงเวลา",
+
+  "mapTownLabels": "ชื่อตำบล",
+  "mapTownLabelsHint": "แสดงชื่อตำบลเมื่อขยายแผนที่",
+
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "dpmAddress": "ที่อยู่",
   "restroomTypeLabel": "ประเภท",
@@ -353,6 +470,7 @@
   "mapLegendExpand": "คำอธิบาย",
   "mapLegendCollapse": "ซ่อนคำอธิบาย",
   "mapMyLocation": "ตำแหน่งของฉัน",
+  "mapResetNorth": "กลับไปทางเหนือ",
   "typhoonLegendCircle15": "วงพายุ (แรง)",
   "typhoonLegendCircle25": "วงพายุ (รุนแรง)",
   "typhoonLegendProbability": "โอกาสกระทบ",
@@ -371,6 +489,8 @@
   "typhoonIntensityTd": "Tropical depression",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "Past movement direction",
   "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
   "typhoonLabelGust": "Peak gust",
@@ -417,5 +537,133 @@
   "dpmDisasterLandslide": "ดินถล่ม",
   "dpmDisasterTsunami": "สึนามิ",
   "dpmDisasterSlope": "ภัยพิบัติลาดชัน",
-  "dpmDisasterNuclear": "อุบัติเหตุนิวเคลียร์"
+  "dpmDisasterNuclear": "อุบัติเหตุนิวเคลียร์",
+  "skyTime": "เวลาท้องฟ้า",
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "skyTimeAuto": "อัตโนมัติ",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "skyTimeDawn": "รุ่งอรุณ",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "skyTimeSunrise": "พระอาทิตย์ขึ้น",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "skyTimeMorning": "ตอนเช้า",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "skyTimeNoon": "เที่ยงวัน",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "skyTimeAfternoon": "ตอนบ่าย",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "skyTimeGolden": "ช่วงเวลาทอง",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "skyTimeSunset": "พระอาทิตย์ตก",
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "skyTimeDusk": "สนธยา",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "skyTimeNight": "กลางคืน",
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "weatherModeCloudy": "มีเมฆมาก",
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "weatherModeOvercast": "ฟ้าปิด",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "weatherModeSnow": "หิมะตก",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "weatherModeSand": "ฝุ่นทราย",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "radarScanRange": "แสดงขอบเขตการสแกน",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeSubtitle": "แสดงพื้นที่ที่เรดาร์ทั้งสี่ตรวจวัดได้จริง",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "radarScanRangeHint": "นอกกรอบคือไม่ได้ตรวจวัด",
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "radarOverlayMenuTooltip": "ตัวเลือกชั้นเรดาร์",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "radarCountyOutline": "เส้นแบ่งเขตจังหวัด",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarGlobalOutline": "เส้นแบ่งเขตประเทศ",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "radarGlobalOutlineHint": "กรอบนอกของทุกประเทศ",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineHint": "วาดทับภาพเอคโค",
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "radarCountyOutlineSubtitle": "ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutline": "เส้นแบ่งเขตอำเภอ",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "radarTownOutlineHint": "เส้นแบ่งย่อยกว่า",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "radarTownOutlineSubtitle": "ทำให้เส้นแบ่งเขตอำเภอยังอ่านออกใต้ภาพเอคโคเรดาร์",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "qpesumsOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์น้ำฝน",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์ลม",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "windForecastCountyOutlineHint": "วาดทับบนสนามลม",
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastGlobalOutlineHint": "กรอบนอกของทุกประเทศ",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "windForecastTownOutlineHint": "ตาข่ายที่ละเอียดกว่า",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  }
 }

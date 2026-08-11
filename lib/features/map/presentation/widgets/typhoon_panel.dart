@@ -7,6 +7,8 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/format.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/typhoon/domain/compass_direction.dart';
 import 'package:dpip/features/typhoon/domain/cyclone_identity.dart';
@@ -14,9 +16,9 @@ import 'package:dpip/features/typhoon/domain/storm_circle.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class TyphoonPanel extends StatefulWidget {
   const TyphoonPanel({super.key, required this.layer});
@@ -27,9 +29,6 @@ class TyphoonPanel extends StatefulWidget {
   static const double peekExtent = 0.22;
   static const double _rest = 0.55;
   static const double _expanded = 1.0;
-  static const double _atTopEpsilon = 0.02;
-
-  static bool _isAtTop(double extent) => extent >= _expanded - _atTopEpsilon;
 
   @override
   State<TyphoonPanel> createState() => _TyphoonPanelState();
@@ -49,8 +48,6 @@ class _TyphoonPanelState extends State<TyphoonPanel> {
   @override
   Widget build(BuildContext context) {
     final layer = widget.layer;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return ValueListenableBuilder<int>(
       valueListenable: layer.tapRevision,
       builder: (context, revision, _) => ValueListenableBuilder<String?>(
@@ -65,159 +62,27 @@ class _TyphoonPanelState extends State<TyphoonPanel> {
               if (mounted) _extent.value = initial;
             });
           }
-          return NotificationListener<DraggableScrollableNotification>(
-            onNotification: (notification) {
-              _extent.value = notification.extent;
-              return false;
-            },
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: DraggableScrollableSheet(
-                key: ValueKey(popped ? 'wp-$revision' : 'peek'),
-                expand: false,
-                initialChildSize: initial,
-                minChildSize: TyphoonPanel.peekExtent,
-                maxChildSize: TyphoonPanel._expanded,
-                snap: true,
-                snapSizes: const [TyphoonPanel._rest],
-                builder: (context, scrollController) {
-                  final body = ListView(
-                    controller: scrollController,
-                    padding: EdgeInsets.only(
-                      bottom:
-                          MediaQuery.paddingOf(context).bottom + AppSpacing.md,
-                    ),
-                    children: [
-                      _Grip(extent: _extent),
-                      _Bulletin(layer: layer, extent: _extent),
-                      _WarningBlock(layer: layer),
-                      _TappedWaypoint(layer: layer),
-                    ],
-                  );
-                  return ValueListenableBuilder<double>(
-                    valueListenable: _extent,
-                    child: body,
-                    builder: (context, extent, child) {
-                      final atTop = TyphoonPanel._isAtTop(extent);
-                      final topInset = MediaQuery.paddingOf(context).top;
-                      return AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          statusBarColor: atTop
-                              ? colors.surface
-                              : Colors.transparent,
-                          statusBarIconBrightness:
-                              theme.brightness == Brightness.dark
-                              ? Brightness.light
-                              : Brightness.dark,
-                          statusBarBrightness: theme.brightness,
-                        ),
-                        child: _Surface(
-                          flushTop: atTop,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: atTop ? topInset : 0),
-                            child: child!,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+          return ExtentSheetChrome(
+            extent: _extent,
+            keyValue: popped ? 'wp-$revision' : 'peek',
+            initial: initial,
+            min: TyphoonPanel.peekExtent,
+            max: TyphoonPanel._expanded,
+            snapSizes: const [TyphoonPanel._rest],
+            content: (context, scrollController) => ListView(
+              controller: scrollController,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.md,
               ),
+              children: [
+                SheetGrip(extent: _extent),
+                _Bulletin(layer: layer, extent: _extent),
+                _WarningBlock(layer: layer),
+                _TappedWaypoint(layer: layer),
+              ],
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _Surface extends StatelessWidget {
-  const _Surface({required this.child, this.flushTop = false});
-
-  final Widget child;
-  final bool flushTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final radius = flushTop ? BorderRadius.zero : AppRadius.topSheet;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: radius,
-        boxShadow: flushTop
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-      ),
-      child: ClipRRect(borderRadius: radius, child: child),
-    );
-  }
-}
-
-/// Grab handle — hidden once the sheet is flush with the top.
-class _Grip extends StatefulWidget {
-  const _Grip({required this.extent});
-
-  final ValueListenable<double> extent;
-
-  @override
-  State<_Grip> createState() => _GripState();
-}
-
-class _GripState extends State<_Grip> {
-  late bool _show = !TyphoonPanel._isAtTop(widget.extent.value);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Grip old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = !TyphoonPanel._isAtTop(widget.extent.value);
-    if (next == _show) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final show = !TyphoonPanel._isAtTop(widget.extent.value);
-      if (show != _show) setState(() => _show = show);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_show) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(2),
-        ),
       ),
     );
   }
@@ -266,42 +131,12 @@ class _Bulletin extends StatefulWidget {
 /// actually read `atTop`. `setState` only runs when the derived boolean
 /// changes, so the bulletin now rebuilds on data updates plus the (rare) top
 /// threshold crossing — not on every drag tick.
-class _BulletinState extends State<_Bulletin> {
-  late bool _atTop = TyphoonPanel._isAtTop(widget.extent.value);
+class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
+  @override
+  ValueListenable<double> get sheetExtent => widget.extent;
 
   @override
-  void initState() {
-    super.initState();
-    widget.extent.addListener(_onExtent);
-  }
-
-  @override
-  void didUpdateWidget(_Bulletin old) {
-    super.didUpdateWidget(old);
-    if (old.extent != widget.extent) {
-      old.extent.removeListener(_onExtent);
-      widget.extent.addListener(_onExtent);
-      _onExtent();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.extent.removeListener(_onExtent);
-    super.dispose();
-  }
-
-  void _onExtent() {
-    final next = TyphoonPanel._isAtTop(widget.extent.value);
-    if (next == _atTop) return;
-    // Defer — flipping mid-DSS-layout dirties parentData for semantics (see
-    // `_Grip`'s identical guard above).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final atTop = TyphoonPanel._isAtTop(widget.extent.value);
-      if (atTop != _atTop) setState(() => _atTop = atTop);
-    });
-  }
+  bool sheetFlagFrom(double extent) => sheetExtentIsAtTop(extent);
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +171,7 @@ class _BulletinState extends State<_Bulletin> {
             ? track.analysis.last
             : null;
         final now = track?.now;
-        final atTop = _atTop;
+        final atTop = sheetFlag;
 
         if (track == null && summary == null) {
           return Padding(
@@ -355,24 +190,37 @@ class _BulletinState extends State<_Bulletin> {
           );
         }
 
-        final title = cycloneSheetTitle(
-          l10n,
-          name: track?.name ?? summary?.name,
-          cwaName: track?.cwaName ?? summary?.cwaName,
-          tyNo: track?.tyNo ?? summary?.tyNo,
-          tdNo: track?.tdNo ?? summary?.tdNo,
+        final name = track?.name ?? summary?.name;
+        final cwaName = track?.cwaName ?? summary?.cwaName;
+        final tyNo = track?.tyNo ?? summary?.tyNo;
+        final tdNo = track?.tdNo ?? summary?.tdNo;
+        final spec = cycloneTitleSpec(
+          name: name,
+          cwaName: cwaName,
+          tyNo: tyNo,
+          tdNo: tdNo,
         );
-        final engName = presentText(track?.name ?? summary?.name);
-        // Hide the English line when the hero already embeds that name, or when
-        // the picker title is the TD form (no separate international name).
+        // The CWA name is the hero; the TY/TD serial is secondary and sits in
+        // its own badge, never appended to the name. A TD has no name of its
+        // own, so the hero falls back to the bare "tropical depression" class —
+        // the serial (TD 19) already lives in the badge.
+        final title =
+            spec.displayName ??
+            (spec.isTyphoon
+                ? cycloneSheetTitle(l10n, name: name)
+                : l10n.typhoonIntensityTd);
+        final serialBadge = switch ((spec.isTyphoon, spec.number)) {
+          (true, final n?) => l10n.typhoonTyNo(n),
+          (false, final n?) => l10n.typhoonTdNo(n),
+          _ => null,
+        };
+        final engName = presentText(name);
+        // The English line shows when it adds information the hero lacks (it
+        // has no name of its own, or carries a different one).
         final showEng =
             engName != null &&
-            !title.contains(engName) &&
-            cycloneDisplayName(
-                  cwaName: track?.cwaName ?? summary?.cwaName,
-                  name: track?.name ?? summary?.name,
-                ) !=
-                null;
+            engName != title &&
+            cycloneDisplayName(cwaName: cwaName, name: name) != null;
         final lat = fix?.latitude ?? summary?.latitude;
         final lon = fix?.longitude ?? summary?.longitude;
         final wind = fix?.wind ?? summary?.wind;
@@ -386,51 +234,63 @@ class _BulletinState extends State<_Bulletin> {
             : (useZh ? compass.zh : compass.en);
         final intensity = typhoonIntensityFromWind(wind);
 
-        // Name is the hero — large at peek, larger when full-bleed.
-        final nameStyle =
-            (atTop
-                    ? theme.textTheme.displayMedium
-                    : theme.textTheme.displaySmall)
-                ?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  height: 1.05,
-                  letterSpacing: -0.5,
-                );
+        // The name is the sheet's title — bold and compact, never display-grade:
+        // a long CWA name must not wrap the hero or squeeze the badges out.
+        final nameStyle = theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+          letterSpacing: -0.3,
+        );
         final dataSec = layer.bulletinSecond;
         final dataTime = dataSec == null
             ? null
-            : DateTime.fromMillisecondsSinceEpoch(
-                dataSec * 1000,
-                isUtc: true,
-              ).add(const Duration(hours: 8));
+            : AppTime.taipei(
+                DateTime.fromMillisecondsSinceEpoch(
+                  dataSec * 1000,
+                  isUtc: true,
+                ),
+              );
 
-        final options = <({String key, String title})>[
+        ({String key, String label}) optionOf({
+          String? name,
+          String? cwaName,
+          String? tyNo,
+          String? tdNo,
+        }) {
+          final spec = cycloneTitleSpec(
+            name: name,
+            cwaName: cwaName,
+            tyNo: tyNo,
+            tdNo: tdNo,
+          );
+          final label =
+              spec.displayName ??
+              (spec.number == null
+                  ? l10n.typhoonIntensityTd
+                  : l10n.typhoonTdNo(spec.number!));
+          return (
+            key: cycloneKeyOf(name: name, cwaName: cwaName, tdNo: tdNo),
+            label: label,
+          );
+        }
+
+        final options = <({String key, String label})>[
           for (final t in layer.track.value?.cyclones ?? const <TyphoonTrack>[])
-            (
-              key: cycloneKeyOf(name: t.name, cwaName: t.cwaName, tdNo: t.tdNo),
-              title: cycloneSheetTitle(
-                l10n,
-                name: t.name,
-                cwaName: t.cwaName,
-                tyNo: t.tyNo,
-                tdNo: t.tdNo,
-              ),
+            optionOf(
+              name: t.name,
+              cwaName: t.cwaName,
+              tyNo: t.tyNo,
+              tdNo: t.tdNo,
             ),
-        ];
-        if (options.isEmpty) {
-          for (final c in layer.activeCyclones) {
-            options.add((
-              key: cycloneKey(c),
-              title: cycloneSheetTitle(
-                l10n,
+          if ((layer.track.value?.cyclones ?? const []).isEmpty)
+            for (final c in layer.activeCyclones)
+              optionOf(
                 name: c.name,
                 cwaName: c.cwaName,
                 tyNo: c.tyNo,
                 tdNo: c.tdNo,
               ),
-            ));
-          }
-        }
+        ];
         final selectedKey = layer.selectedCycloneKey.value;
         final multi = options.length > 1;
 
@@ -447,100 +307,99 @@ class _BulletinState extends State<_Bulletin> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: colors.primaryContainer.withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.cyclone, color: colors.primary, size: 24),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (multi)
-                          PopupMenuButton<String>(
-                            initialValue: selectedKey,
-                            tooltip: title,
-                            padding: EdgeInsets.zero,
-                            onSelected: layer.selectCyclone,
-                            itemBuilder: (context) => [
-                              for (final o in options)
-                                PopupMenuItem(
-                                  value: o.key,
-                                  child: Text(
-                                    o.title,
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(
-                                          fontWeight: o.key == selectedKey
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
-                                        ),
-                                  ),
-                                ),
-                            ],
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: Text(title, style: nameStyle)),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: AppSpacing.sm,
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: colors.onSurface,
-                                    size: atTop ? 36 : 32,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          Text(title, style: nameStyle),
-                        if (showEng)
-                          Padding(
-                            padding: const EdgeInsets.only(top: AppSpacing.xs),
-                            child: Text(
-                              engName,
-                              style:
-                                  (atTop
-                                          ? theme.textTheme.titleMedium
-                                          : theme.textTheme.titleSmall)
-                                      ?.copyWith(
-                                        color: colors.onSurfaceVariant,
-                                        letterSpacing: 0.4,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                            ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: nameStyle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      ],
+                          if (showEng)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: AppSpacing.xs,
+                              ),
+                              child: Text(
+                                engName,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  letterSpacing: 0.4,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      if (serialBadge != null) ...[
+                        _SerialBadge(label: serialBadge),
+                        if (intensity != null)
+                          const SizedBox(height: AppSpacing.xs),
+                      ],
                       if (intensity != null)
                         _IntensityChip(intensity: intensity),
-                      if (dataTime != null)
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: intensity != null ? AppSpacing.xs : 0,
-                          ),
-                          child: Text(
-                            l10n.typhoonDataTime(
-                              '${dataTime.month.toString().padLeft(2, '0')}/'
-                              '${dataTime.day.toString().padLeft(2, '0')} '
-                              '${dataTime.hour.toString().padLeft(2, '0')}:'
-                              '${dataTime.minute.toString().padLeft(2, '0')}',
-                            ),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                            ),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
                     ],
                   ),
                 ],
               ),
+              if (dataTime != null || multi) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: multi
+                          ? Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.xs,
+                              children: [
+                                for (final o in options)
+                                  _CyclonePill(
+                                    label: o.label,
+                                    selected: o.key == selectedKey,
+                                    onTap: () => layer.selectCyclone(o.key),
+                                  ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    if (dataTime != null)
+                      Text(
+                        l10n.typhoonDataTime(
+                          '${dataTime.month.toString().padLeft(2, '0')}/'
+                          '${dataTime.day.toString().padLeft(2, '0')} '
+                          '${dataTime.hour.toString().padLeft(2, '0')}:'
+                          '${dataTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               DecoratedBox(
                 decoration: BoxDecoration(
@@ -554,6 +413,7 @@ class _BulletinState extends State<_Bulletin> {
                   children: [
                     if (lat != null && lon != null)
                       _TableRow(
+                        icon: Icons.place_outlined,
                         label: l10n.typhoonLabelPosition,
                         value: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -571,11 +431,13 @@ class _BulletinState extends State<_Bulletin> {
                       ),
                     if (dirLabel != null && dirLabel.isNotEmpty)
                       _TableRow(
+                        icon: Icons.explore_outlined,
                         label: l10n.typhoonLabelDirection,
                         value: Text(dirLabel, style: _valueStyle(theme)),
                       ),
                     if (speed != null)
                       _TableRow(
+                        icon: Icons.navigation_outlined,
                         label: l10n.typhoonLabelSpeed,
                         value: Text(
                           l10n.typhoonValueKm(speed.toStringAsFixed(0)),
@@ -584,6 +446,7 @@ class _BulletinState extends State<_Bulletin> {
                       ),
                     if (pressure != null)
                       _TableRow(
+                        icon: Icons.compress_outlined,
                         label: l10n.typhoonLabelPressure,
                         value: Text(
                           l10n.typhoonValueHpa(pressure.toStringAsFixed(0)),
@@ -592,6 +455,7 @@ class _BulletinState extends State<_Bulletin> {
                       ),
                     if (wind != null)
                       _TableRow(
+                        icon: Icons.air_outlined,
                         label: l10n.typhoonLabelWind,
                         value: Text(
                           l10n.typhoonValueMs(wind.toStringAsFixed(0)),
@@ -600,6 +464,7 @@ class _BulletinState extends State<_Bulletin> {
                       ),
                     if (gust != null)
                       _TableRow(
+                        icon: Icons.air,
                         label: l10n.typhoonLabelGust,
                         value: Text(
                           l10n.typhoonValueMs(gust.toStringAsFixed(0)),
@@ -630,10 +495,7 @@ class _BulletinState extends State<_Bulletin> {
     );
   }
 
-  static String _fmt1(double v) {
-    final s = v.toStringAsFixed(1);
-    return s.endsWith('.0') ? v.toStringAsFixed(0) : s;
-  }
+  static String _fmt1(double v) => trimTrailingZero(v);
 
   static TextStyle? _valueStyle(ThemeData theme) =>
       theme.textTheme.bodyMedium?.copyWith(
@@ -642,22 +504,123 @@ class _BulletinState extends State<_Bulletin> {
       );
 }
 
+/// One storm in the sheet's cyclone selector — a quiet pill that marks the
+/// focused storm and switches on tap. Only rendered when more than one storm
+/// is active, so a single-storm season shows no chrome at all.
+class _CyclonePill extends StatelessWidget {
+  const _CyclonePill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected
+                ? colors.primaryContainer.withValues(alpha: 0.55)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppSpacing.lg),
+            border: Border.all(
+              color: selected
+                  ? Colors.transparent
+                  : colors.outlineVariant.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs + 1,
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: selected
+                    ? colors.onPrimaryContainer
+                    : colors.onSurfaceVariant,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Low-key CWA serial badge (TY 4 / TD 14) on the sheet hero — the storm's
+/// catalogue number is secondary to its name, so it renders as a quiet pill
+/// rather than part of the display typography.
+class _SerialBadge extends StatelessWidget {
+  const _SerialBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Label | value row with a hairline divider — table-like bulletin layout.
 class _TableRow extends StatelessWidget {
   const _TableRow({
     required this.label,
     required this.value,
+    this.icon,
     this.showDivider = true,
   });
 
   final String label;
   final Widget value;
+
+  /// Leading glyph, so the fact sheet scans by picture (position → place pin,
+  /// motion → heading, pressure → gauge) instead of by caption.
+  final IconData? icon;
+
   final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final icon = this.icon;
     return DecoratedBox(
       decoration: BoxDecoration(
         border: showDivider
@@ -674,8 +637,12 @@ class _TableRow extends StatelessWidget {
           vertical: AppSpacing.sm + 2,
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (icon != null) ...[
+              Icon(icon, size: 16, color: colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+            ],
             Expanded(
               flex: 5,
               child: Text(
@@ -925,18 +892,33 @@ class _WarningBlock extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors.errorContainer.withValues(alpha: 0.45),
               borderRadius: AppRadius.small,
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.45),
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.typhoonWarningTitle,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: colors.onErrorContainer,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: colors.onErrorContainer,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          l10n.typhoonWarningTitle,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.onErrorContainer,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
@@ -1017,107 +999,280 @@ class _TappedWaypoint extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
             0,
-            AppSpacing.sm,
+            AppSpacing.lg,
             AppSpacing.md,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: colors.primaryContainer.withValues(alpha: 0.35),
               borderRadius: AppRadius.small,
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.45),
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.md,
                     AppSpacing.md,
-                    0,
-                    AppSpacing.md,
+                    AppSpacing.xs,
+                    AppSpacing.sm,
                   ),
-                  child: Icon(
-                    Icons.place_outlined,
-                    size: 20,
-                    color: colors.primary,
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.place,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                label,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                ),
+                              ),
+                              if (forecast != null) ...[
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  l10n.typhoonForecastLead(
+                                    forecast.tau.toString(),
+                                  ),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        if (forecast != null) ...[
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            l10n.typhoonForecastLead(forecast.tau.toString()),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w600,
+                      ),
+                      IconButton(
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: layer.clearForecastSelection,
+                      ),
+                    ],
+                  ),
+                ),
+                if (forecast != null) ...[
+                  const _WaypointDivider(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                      AppSpacing.md,
+                      AppSpacing.md,
+                    ),
+                    child: Column(
+                      children: [
+                        if (forecast.pressure != null)
+                          _WaypointRow(
+                            icon: Icons.compress_outlined,
+                            label: l10n.typhoonLabelPressure,
+                            value: l10n.typhoonValueHpa(
+                              forecast.pressure!.toStringAsFixed(0),
                             ),
                           ),
-                          if (forecast.pressure != null)
-                            Text(
-                              '${l10n.typhoonLabelPressure}  '
-                              '${l10n.typhoonValueHpa(forecast.pressure!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                        if (forecast.wind != null)
+                          _WaypointRow(
+                            icon: Icons.air_outlined,
+                            label: l10n.typhoonLabelWind,
+                            value: l10n.typhoonValueMs(
+                              forecast.wind!.toStringAsFixed(0),
                             ),
-                          if (forecast.wind != null)
-                            Text(
-                              '${l10n.typhoonLabelWind}  '
-                              '${l10n.typhoonValueMs(forecast.wind!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.gust != null)
+                          _WaypointRow(
+                            icon: Icons.air,
+                            label: l10n.typhoonLabelGust,
+                            value: l10n.typhoonValueMs(
+                              forecast.gust!.toStringAsFixed(0),
                             ),
-                          if (forecast.gust != null)
-                            Text(
-                              '${l10n.typhoonLabelGust}  '
-                              '${l10n.typhoonValueMs(forecast.gust!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.speed != null)
+                          _WaypointRow(
+                            icon: Icons.navigation_outlined,
+                            label: l10n.typhoonLabelSpeed,
+                            value: l10n.typhoonValueKm(
+                              forecast.speed!.toStringAsFixed(0),
                             ),
-                          if (forecast.speed != null)
-                            Text(
-                              '${l10n.typhoonLabelSpeed}  '
-                              '${l10n.typhoonValueKm(forecast.speed!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (dirLabel != null && dirLabel.isNotEmpty)
+                          _WaypointRow(
+                            icon: Icons.explore_outlined,
+                            label: l10n.typhoonLabelDirection,
+                            value: dirLabel,
+                          ),
+                        if (forecast.r15 != null || forecast.r70 != null)
+                          const _WaypointDivider(indented: true),
+                        if (forecast.r15 != null)
+                          _WaypointRow(
+                            icon: Icons.radio_button_unchecked,
+                            label: l10n.typhoonLabelGaleAvg,
+                            value: l10n.typhoonValueKm(
+                              forecast.r15!.toStringAsFixed(0),
                             ),
-                          if (dirLabel != null && dirLabel.isNotEmpty)
-                            Text(
-                              '${l10n.typhoonLabelDirection}  $dirLabel',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        if (forecast.r70 != null)
+                          _WaypointRow(
+                            icon: Icons.radio_button_checked,
+                            label: l10n.typhoonLabelProbCircle,
+                            value: l10n.typhoonValueKm(
+                              forecast.r70!.toStringAsFixed(0),
                             ),
-                          if (forecast.r15 != null)
-                            Text(
-                              '${l10n.typhoonLabelGaleAvg}  '
-                              '${l10n.typhoonValueKm(forecast.r15!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          if (forecast.r70 != null)
-                            Text(
-                              '${l10n.typhoonLabelProbCircle}  '
-                              '${l10n.typhoonValueKm(forecast.r70!.toStringAsFixed(0))}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          if (stateNote != null && stateNote.isNotEmpty)
-                            Text(stateNote, style: theme.textTheme.bodySmall),
+                          ),
+                        if (stateNote != null && stateNote.isNotEmpty) ...[
+                          const _WaypointDivider(indented: true),
+                          _WaypointNote(text: stateNote),
                         ],
                       ],
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 18),
-                  onPressed: layer.clearForecastSelection,
-                ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// A thin rule grouping the waypoint rows; [indented] aligns it under the text
+/// column (right of the leading icon), so the groups read as subdivisions.
+class _WaypointDivider extends StatelessWidget {
+  const _WaypointDivider({this.indented = false});
+
+  final bool indented;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: indented ? AppSpacing.lg + AppSpacing.md : 0,
+        top: AppSpacing.sm,
+        bottom: AppSpacing.sm,
+      ),
+      child: Divider(
+        height: 1,
+        color: Theme.of(
+          context,
+        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+      ),
+    );
+  }
+}
+
+/// Label | value row for a forecast metric — same icon hierarchy as the DPM
+/// sheet: small grey caption over a weighted value, scanning by picture.
+class _WaypointRow extends StatelessWidget {
+  const _WaypointRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: colors.onSurfaceVariant),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Free-form note (the CWA forecast-state sentence) under the metric rows.
+class _WaypointNote extends StatelessWidget {
+  const _WaypointNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              Icons.info_outline,
+              size: 18,
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

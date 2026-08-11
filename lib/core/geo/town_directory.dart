@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -64,7 +65,7 @@ class TownDirectory {
   /// directory is empty. Distance is cos-weighted planar (fine at Taiwan's
   /// extent) so no per-town trig is needed.
   Town? nearest(double lat, double lng) {
-    final cosLat = math.cos(lat * math.pi / 180);
+    final cosLat = math.cos(degToRad(lat));
     Town? best;
     var bestSq = double.infinity;
     for (final town in _byCode.values) {

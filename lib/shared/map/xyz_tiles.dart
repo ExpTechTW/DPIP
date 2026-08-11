@@ -3,6 +3,8 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/core/geo/geo_math.dart';
+
 /// One Web-Mercator tile at zoom [z].
 typedef XyzTile = ({int z, int x, int y});
 
@@ -15,7 +17,7 @@ int lngToTileX(double lng, int z) {
 /// Integer tile Y for [lat] at zoom [z] (Web Mercator; north → smaller y).
 int latToTileY(double lat, int z) {
   final n = 1 << z;
-  final latRad = lat.clamp(-85.05112878, 85.05112878) * math.pi / 180.0;
+  final latRad = degToRad(lat.clamp(-85.05112878, 85.05112878));
   final y =
       ((1.0 - math.log(math.tan(latRad) + 1.0 / math.cos(latRad)) / math.pi) /
           2.0) *

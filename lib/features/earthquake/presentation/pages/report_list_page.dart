@@ -163,13 +163,7 @@ class _ReportListPageState extends State<ReportListPage> {
           if (c.loadingMore) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
+              child: Center(child: InlineLoading()),
             );
           }
           return Padding(
@@ -228,7 +222,7 @@ List<ReportDaySection> groupReportsByTaipeiDay(
 /// Taipei calendar date of a UTC instant (date-only, comparable with `==`).
 @visibleForTesting
 DateTime taipeiCalendarDay(DateTime utc) {
-  final t = utc.toUtc().add(const Duration(hours: 8));
+  final t = AppTime.taipei(utc);
   return DateTime(t.year, t.month, t.day);
 }
 
@@ -327,7 +321,7 @@ class _ReportTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
-    final taipei = report.originTimeUtc.toUtc().add(const Duration(hours: 8));
+    final taipei = AppTime.taipei(report.originTimeUtc);
     final stamp = DateFormat('HH:mm:ss').format(taipei);
     final intensity = Intensity.displayForReport(
       report.intensity,

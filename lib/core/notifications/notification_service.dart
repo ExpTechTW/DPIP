@@ -185,7 +185,13 @@ class NotificationService {
         await _prefs.setString(PreferenceKeys.pushToken, pushToken);
       }
     } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'getToken (APNs may not be ready)');
+      // The failure mode is platform-specific: on iOS an unready APNs token is
+      // the usual cause, on Android getToken() fails at FCM registration (e.g.
+      // the app's signing SHA-1 not registered in the Firebase console).
+      final title = defaultTargetPlatform == TargetPlatform.iOS
+          ? 'getToken (APNs may not be ready)'
+          : 'getToken (FCM registration failed)';
+      Log.handle(error, stackTrace, title);
     }
   }
 

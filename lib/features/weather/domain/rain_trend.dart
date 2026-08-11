@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/meteor_decode.dart';
+import 'package:dpip/features/weather/domain/station_value_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'rain_trend.freezed.dart';
@@ -11,7 +12,7 @@ part 'rain_trend.freezed.dart';
 /// by index to [rain] (rolling 1-hour rainfall, mm; `-99` → null). Built from a
 /// field-array payload, so it has no `fromJson`.
 @freezed
-abstract class RainTrend with _$RainTrend {
+abstract class RainTrend with _$RainTrend implements TrendTimeAxis {
   const factory RainTrend({
     /// 6-char station code (the `/station` directory key).
     required String id,

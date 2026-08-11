@@ -14,6 +14,7 @@ import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
+import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -48,6 +49,7 @@ class SharedDeps {
     required this.locale,
     required this.theme,
     required this.defaultMapLayer,
+    required this.mapLayerOrder,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
@@ -112,6 +114,9 @@ class SharedDeps {
 
   /// Default Map-tab overlay (also provided; drives nav chrome + map open).
   final DefaultMapLayerController defaultMapLayer;
+
+  /// User-customised map layer-picker order (also provided).
+  final MapLayerOrderController mapLayerOrder;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.
