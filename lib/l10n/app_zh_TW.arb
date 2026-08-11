@@ -485,6 +485,8 @@
   "typhoonIntensityTd": "熱帶性低氣壓",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "熱帶性低氣壓 TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonIntensityMild": "輕度颱風",
   "typhoonIntensityModerate": "中度颱風",
   "typhoonIntensityIntense": "強烈颱風",

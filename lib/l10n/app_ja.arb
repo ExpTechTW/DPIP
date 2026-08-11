@@ -489,6 +489,8 @@
   "typhoonIntensityTd": "熱帯低気圧",
   "typhoonPickerNamed": "{name} TY {no}",
   "typhoonPickerTd": "熱帯低気圧 TD {no}",
+  "typhoonTyNo": "TY {no}",
+  "typhoonTdNo": "TD {no}",
   "typhoonLabelDirection": "これまでの進行方向",
   "typhoonLabelGaleAvg": "強風域の平均半径",
   "typhoonLabelGust": "最大瞬間風速",

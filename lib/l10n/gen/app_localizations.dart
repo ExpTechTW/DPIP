@@ -2901,6 +2901,18 @@ abstract class AppLocalizations {
   /// **'Tropical depression TD {no}'**
   String typhoonPickerTd(String no);
 
+  /// Secondary badge on the typhoon sheet hero: the CWA typhoon serial number, e.g. TY 4
+  ///
+  /// In en, this message translates to:
+  /// **'TY {no}'**
+  String typhoonTyNo(String no);
+
+  /// Secondary badge on the typhoon sheet hero: the CWA tropical-depression serial number, e.g. TD 14
+  ///
+  /// In en, this message translates to:
+  /// **'TD {no}'**
+  String typhoonTdNo(String no);
+
   /// CWA class: mild typhoon (past-track colour)
   ///
   /// In en, this message translates to:

@@ -2038,6 +2038,24 @@
       }
     }
   },
+  "typhoonTyNo": "TY {no}",
+  "@typhoonTyNo": {
+    "description": "Secondary badge on the typhoon sheet hero: the CWA typhoon serial number, e.g. TY 4",
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
+  "typhoonTdNo": "TD {no}",
+  "@typhoonTdNo": {
+    "description": "Secondary badge on the typhoon sheet hero: the CWA tropical-depression serial number, e.g. TD 14",
+    "placeholders": {
+      "no": {
+        "type": "String"
+      }
+    }
+  },
   "typhoonIntensityMild": "Mild typhoon",
   "@typhoonIntensityMild": {
     "description": "CWA class: mild typhoon (past-track colour)"

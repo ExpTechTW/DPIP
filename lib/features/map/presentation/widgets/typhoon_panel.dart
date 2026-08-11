@@ -190,24 +190,37 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
           );
         }
 
-        final title = cycloneSheetTitle(
-          l10n,
-          name: track?.name ?? summary?.name,
-          cwaName: track?.cwaName ?? summary?.cwaName,
-          tyNo: track?.tyNo ?? summary?.tyNo,
-          tdNo: track?.tdNo ?? summary?.tdNo,
+        final name = track?.name ?? summary?.name;
+        final cwaName = track?.cwaName ?? summary?.cwaName;
+        final tyNo = track?.tyNo ?? summary?.tyNo;
+        final tdNo = track?.tdNo ?? summary?.tdNo;
+        final spec = cycloneTitleSpec(
+          name: name,
+          cwaName: cwaName,
+          tyNo: tyNo,
+          tdNo: tdNo,
         );
-        final engName = presentText(track?.name ?? summary?.name);
-        // Hide the English line when the hero already embeds that name, or when
-        // the picker title is the TD form (no separate international name).
+        // The CWA name is the hero; the TY/TD serial is secondary and sits in
+        // its own badge, never appended to the name. A TD has no name of its
+        // own, so the hero falls back to the bare "tropical depression" class —
+        // the serial (TD 19) already lives in the badge.
+        final title =
+            spec.displayName ??
+            (spec.isTyphoon
+                ? cycloneSheetTitle(l10n, name: name)
+                : l10n.typhoonIntensityTd);
+        final serialBadge = switch ((spec.isTyphoon, spec.number)) {
+          (true, final n?) => l10n.typhoonTyNo(n),
+          (false, final n?) => l10n.typhoonTdNo(n),
+          _ => null,
+        };
+        final engName = presentText(name);
+        // The English line shows when it adds information the hero lacks (it
+        // has no name of its own, or carries a different one).
         final showEng =
             engName != null &&
-            !title.contains(engName) &&
-            cycloneDisplayName(
-                  cwaName: track?.cwaName ?? summary?.cwaName,
-                  name: track?.name ?? summary?.name,
-                ) !=
-                null;
+            engName != title &&
+            cycloneDisplayName(cwaName: cwaName, name: name) != null;
         final lat = fix?.latitude ?? summary?.latitude;
         final lon = fix?.longitude ?? summary?.longitude;
         final wind = fix?.wind ?? summary?.wind;
@@ -221,16 +234,13 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
             : (useZh ? compass.zh : compass.en);
         final intensity = typhoonIntensityFromWind(wind);
 
-        // Name is the hero — large at peek, larger when full-bleed.
-        final nameStyle =
-            (atTop
-                    ? theme.textTheme.displayMedium
-                    : theme.textTheme.displaySmall)
-                ?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  height: 1.05,
-                  letterSpacing: -0.5,
-                );
+        // The name is the sheet's title — bold and compact, never display-grade:
+        // a long CWA name must not wrap the hero or squeeze the badges out.
+        final nameStyle = theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+          height: 1.15,
+          letterSpacing: -0.3,
+        );
         final dataSec = layer.bulletinSecond;
         final dataTime = dataSec == null
             ? null
@@ -241,33 +251,46 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                 ),
               );
 
-        final options = <({String key, String title})>[
+        ({String key, String label}) optionOf({
+          String? name,
+          String? cwaName,
+          String? tyNo,
+          String? tdNo,
+        }) {
+          final spec = cycloneTitleSpec(
+            name: name,
+            cwaName: cwaName,
+            tyNo: tyNo,
+            tdNo: tdNo,
+          );
+          final label =
+              spec.displayName ??
+              (spec.number == null
+                  ? l10n.typhoonIntensityTd
+                  : l10n.typhoonTdNo(spec.number!));
+          return (
+            key: cycloneKeyOf(name: name, cwaName: cwaName, tdNo: tdNo),
+            label: label,
+          );
+        }
+
+        final options = <({String key, String label})>[
           for (final t in layer.track.value?.cyclones ?? const <TyphoonTrack>[])
-            (
-              key: cycloneKeyOf(name: t.name, cwaName: t.cwaName, tdNo: t.tdNo),
-              title: cycloneSheetTitle(
-                l10n,
-                name: t.name,
-                cwaName: t.cwaName,
-                tyNo: t.tyNo,
-                tdNo: t.tdNo,
-              ),
+            optionOf(
+              name: t.name,
+              cwaName: t.cwaName,
+              tyNo: t.tyNo,
+              tdNo: t.tdNo,
             ),
-        ];
-        if (options.isEmpty) {
-          for (final c in layer.activeCyclones) {
-            options.add((
-              key: cycloneKey(c),
-              title: cycloneSheetTitle(
-                l10n,
+          if ((layer.track.value?.cyclones ?? const []).isEmpty)
+            for (final c in layer.activeCyclones)
+              optionOf(
                 name: c.name,
                 cwaName: c.cwaName,
                 tyNo: c.tyNo,
                 tdNo: c.tdNo,
               ),
-            ));
-          }
-        }
+        ];
         final selectedKey = layer.selectedCycloneKey.value;
         final multi = options.length > 1;
 
@@ -285,86 +308,54 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: atTop ? 56 : 46,
-                    height: atTop ? 56 : 46,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
                       color: colors.primaryContainer.withValues(alpha: 0.6),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.cyclone,
-                      color: colors.primary,
-                      size: atTop ? 32 : 26,
-                    ),
+                    child: Icon(Icons.cyclone, color: colors.primary, size: 24),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (multi)
-                          PopupMenuButton<String>(
-                            initialValue: selectedKey,
-                            tooltip: title,
-                            padding: EdgeInsets.zero,
-                            onSelected: layer.selectCyclone,
-                            itemBuilder: (context) => [
-                              for (final o in options)
-                                PopupMenuItem(
-                                  value: o.key,
-                                  child: Text(
-                                    o.title,
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(
-                                          fontWeight: o.key == selectedKey
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
-                                        ),
-                                  ),
-                                ),
-                            ],
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: Text(title, style: nameStyle)),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: AppSpacing.sm,
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: colors.onSurface,
-                                    size: atTop ? 36 : 32,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          Text(title, style: nameStyle),
-                        if (showEng)
-                          Padding(
-                            padding: const EdgeInsets.only(top: AppSpacing.xs),
-                            child: Text(
-                              engName,
-                              style:
-                                  (atTop
-                                          ? theme.textTheme.titleMedium
-                                          : theme.textTheme.titleSmall)
-                                      ?.copyWith(
-                                        color: colors.onSurfaceVariant,
-                                        letterSpacing: 0.4,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                            ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: nameStyle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      ],
+                          if (showEng)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: AppSpacing.xs,
+                              ),
+                              child: Text(
+                                engName,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  letterSpacing: 0.4,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      if (serialBadge != null) ...[
+                        _SerialBadge(label: serialBadge),
+                        if (intensity != null || dataTime != null)
+                          const SizedBox(height: AppSpacing.xs),
+                      ],
                       if (intensity != null)
                         _IntensityChip(intensity: intensity),
                       if (dataTime != null)
@@ -392,6 +383,21 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                   ),
                 ],
               ),
+              if (multi) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    for (final o in options)
+                      _CyclonePill(
+                        label: o.label,
+                        selected: o.key == selectedKey,
+                        onTap: () => layer.selectCyclone(o.key),
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               DecoratedBox(
                 decoration: BoxDecoration(
@@ -494,6 +500,100 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
         fontWeight: FontWeight.w600,
         fontFeatures: const [FontFeature.tabularFigures()],
       );
+}
+
+/// One storm in the sheet's cyclone selector — a quiet pill that marks the
+/// focused storm and switches on tap. Only rendered when more than one storm
+/// is active, so a single-storm season shows no chrome at all.
+class _CyclonePill extends StatelessWidget {
+  const _CyclonePill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected
+                ? colors.primaryContainer.withValues(alpha: 0.55)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppSpacing.lg),
+            border: Border.all(
+              color: selected
+                  ? Colors.transparent
+                  : colors.outlineVariant.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs + 1,
+            ),
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: selected
+                    ? colors.onPrimaryContainer
+                    : colors.onSurfaceVariant,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Low-key CWA serial badge (TY 4 / TD 14) on the sheet hero — the storm's
+/// catalogue number is secondary to its name, so it renders as a quiet pill
+/// rather than part of the display typography.
+class _SerialBadge extends StatelessWidget {
+  const _SerialBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(AppSpacing.lg),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.45),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Label | value row with a hairline divider — table-like bulletin layout.
