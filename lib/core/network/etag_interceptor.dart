@@ -80,6 +80,7 @@ class EtagInterceptor extends Interceptor {
     ApiPaths.mapTilesV1, // basemap vector tiles
     '${ApiPaths.tiles}/radar/',
     '${ApiPaths.tiles}/satellite/',
+    '${ApiPaths.tiles}/wind/',
     '${ApiPaths.dpm}/',
     '/gh/exptechtw/map-assets/', // glyph PBFs (jsDelivr)
   ];
