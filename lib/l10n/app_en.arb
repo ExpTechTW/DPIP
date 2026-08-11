@@ -782,9 +782,149 @@
   "@mapLayerRadar": {
     "description": "Name of the composite radar reflectivity layer in the layer picker"
   },
-  "mapLayerSatellite": "Himawari Infrared",
+  "mapLayerSatellite": "Himawari Infrared (B13)",
   "@mapLayerSatellite": {
     "description": "Name of the Himawari infrared layer in the layer picker"
+  },
+  "mapLayerSatelliteB01": "Himawari Blue (B01)",
+  "@mapLayerSatelliteB01": {
+    "description": "Himawari visible-blue channel (B01, 0.47 µm) layer name"
+  },
+  "mapLayerSatelliteB02": "Himawari Green (B02)",
+  "@mapLayerSatelliteB02": {
+    "description": "Himawari visible-green channel (B02, 0.51 µm) layer name"
+  },
+  "mapLayerSatelliteB03": "Himawari Red (B03)",
+  "@mapLayerSatelliteB03": {
+    "description": "Himawari visible-red channel (B03, 0.64 µm) layer name"
+  },
+  "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
+  "@mapLayerSatelliteB04": {
+    "description": "Himawari near-infrared channel (B04, 0.86 µm) layer name"
+  },
+  "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
+  "@mapLayerSatelliteB05": {
+    "description": "Himawari near-infrared channel (B05, 1.6 µm) layer name"
+  },
+  "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
+  "@mapLayerSatelliteB06": {
+    "description": "Himawari near-infrared channel (B06, 2.3 µm) layer name"
+  },
+  "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
+  "@mapLayerSatelliteB07": {
+    "description": "Himawari shortwave-infrared channel (B07, 3.9 µm) layer name"
+  },
+  "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
+  "@mapLayerSatelliteB08": {
+    "description": "Himawari upper-level water-vapour channel (B08, 6.2 µm) layer name"
+  },
+  "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
+  "@mapLayerSatelliteB09": {
+    "description": "Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name"
+  },
+  "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
+  "@mapLayerSatelliteB10": {
+    "description": "Himawari lower-level water-vapour channel (B10, 7.3 µm) layer name"
+  },
+  "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
+  "@mapLayerSatelliteB11": {
+    "description": "Himawari SO₂ absorption channel (B11, 8.6 µm) layer name"
+  },
+  "mapLayerSatelliteB12": "Himawari Ozone (B12)",
+  "@mapLayerSatelliteB12": {
+    "description": "Himawari ozone-band channel (B12, 9.6 µm) layer name"
+  },
+  "mapLayerSatelliteB13": "Himawari Infrared (B13)",
+  "@mapLayerSatelliteB13": {
+    "description": "Himawari clean-infrared window channel (B13, 10.4 µm) layer name"
+  },
+  "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
+  "@mapLayerSatelliteB14": {
+    "description": "Himawari longwave-infrared channel (B14, 11.2 µm) layer name"
+  },
+  "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
+  "@mapLayerSatelliteB15": {
+    "description": "Himawari longwave-infrared channel (B15, 12.4 µm) layer name"
+  },
+  "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
+  "@mapLayerSatelliteB16": {
+    "description": "Himawari CO₂-band channel (B16, 13.3 µm) layer name"
+  },
+  "mapLayerSatelliteTruecolor": "Himawari True Color",
+  "@mapLayerSatelliteTruecolor": {
+    "description": "Himawari True Color RGB composite layer name"
+  },
+  "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
+  "@mapLayerSatelliteNaturalcolor": {
+    "description": "Himawari Natural Color RGB composite layer name"
+  },
+  "mapLayerSatelliteAsh": "Himawari Ash",
+  "@mapLayerSatelliteAsh": {
+    "description": "Himawari Ash RGB composite layer name"
+  },
+  "mapLayerSatelliteDust": "Himawari Dust",
+  "@mapLayerSatelliteDust": {
+    "description": "Himawari Dust RGB composite layer name"
+  },
+  "mapLayerSatelliteAirmass": "Himawari Airmass",
+  "@mapLayerSatelliteAirmass": {
+    "description": "Himawari Airmass RGB composite layer name"
+  },
+  "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
+  "@mapLayerSatelliteNightmicrophysics": {
+    "description": "Himawari Night Microphysics RGB composite layer name"
+  },
+  "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
+  "@mapLayerSatelliteWatervapor": {
+    "description": "Himawari water-vapour layer name"
+  },
+  "mapLayerSatelliteBtdSplit": "Himawari Split Window",
+  "@mapLayerSatelliteBtdSplit": {
+    "description": "Himawari split-window brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdFog": "Himawari Night Fog",
+  "@mapLayerSatelliteBtdFog": {
+    "description": "Himawari night fog / low-cloud brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
+  "@mapLayerSatelliteBtdWvirw": {
+    "description": "Himawari overshooting-cloud-top brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
+  "@mapLayerSatelliteBtdSo2": {
+    "description": "Himawari SO₂ / cloud-phase brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdCo2": "Himawari Cirrus / Cloud Height",
+  "@mapLayerSatelliteBtdCo2": {
+    "description": "Himawari cirrus / cloud-height brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
+  "@mapLayerSatelliteBtdOzone": {
+    "description": "Himawari tropopause brightness-temperature-difference layer name"
+  },
+  "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
+  "@mapLayerSatelliteCloudtop": {
+    "description": "Himawari cloud-top-temperature (Level-2 retrieval) layer name"
+  },
+  "mapLayerSatelliteCloudmask": "Himawari Cloud Mask",
+  "@mapLayerSatelliteCloudmask": {
+    "description": "Himawari cloud-mask (Level-2 retrieval) layer name"
+  },
+  "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
+  "@mapLayerSatelliteSst": {
+    "description": "Himawari sea-surface-temperature (ACSPO L3C) layer name"
+  },
+  "mapLayerSatelliteNdvi": "Himawari NDVI",
+  "@mapLayerSatelliteNdvi": {
+    "description": "Himawari normalised-difference vegetation-index layer name"
+  },
+  "mapLayerSatelliteNdwi": "Himawari NDWI",
+  "@mapLayerSatelliteNdwi": {
+    "description": "Himawari normalised-difference water-index layer name"
+  },
+  "mapLayerSatelliteMndwi": "Himawari MNDWI",
+  "@mapLayerSatelliteMndwi": {
+    "description": "Himawari modified normalised-difference water-index layer name"
   },
   "mapLayerQpesums": "1h Precipitation Forecast",
   "@mapLayerQpesums": {

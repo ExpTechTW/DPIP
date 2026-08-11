@@ -548,7 +548,112 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';
@@ -2074,7 +2179,112 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerRadar => '雷达合成回波图';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 红外线图';
+  String get mapLayerSatellite => 'ひまわり 红外线(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可见光蓝(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可见光绿(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可见光红(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近红外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近红外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近红外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波红外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上层水气(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中层水气(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低层水气(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/云相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 红外线(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 长波红外线(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 长波红外线(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙尘';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 气团';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜间微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水气';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割视窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜间雾';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 过冲云顶';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/云相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷云/云高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 对流层顶';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 云顶温度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 云遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表温度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植被指数';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水体指数';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 水体指数';
 
   @override
   String get mapLayerQpesums => '未来 1 小时降水预报';
@@ -3600,7 +3810,112 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';
@@ -5126,7 +5441,112 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerRadar => '雷達合成回波圖';
 
   @override
-  String get mapLayerSatellite => 'ひまわり 紅外線圖';
+  String get mapLayerSatellite => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'ひまわり 可見光藍(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'ひまわり 可見光綠(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'ひまわり 可見光紅(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'ひまわり 近紅外(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'ひまわり 近紅外(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'ひまわり 近紅外(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'ひまわり 上層水氣(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'ひまわり 中層水氣(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'ひまわり 低層水氣(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'ひまわり 二氧化硫/雲相(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'ひまわり 紅外線(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'ひまわり 長波紅外線(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'ひまわり 長波紅外線(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'ひまわり 二氧化碳(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'ひまわり 真彩色';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'ひまわり 自然色';
+
+  @override
+  String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
+
+  @override
+  String get mapLayerSatelliteDust => 'ひまわり 沙塵';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'ひまわり 氣團';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'ひまわり 水氣';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'ひまわり 分割視窗';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'ひまわり 夜間霧';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'ひまわり 過衝雲頂';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'ひまわり 二氧化硫/雲相';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'ひまわり 卷雲/雲高';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'ひまわり 對流層頂';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂溫度';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'ひまわり 雲遮罩';
+
+  @override
+  String get mapLayerSatelliteSst => 'ひまわり 海表溫度';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'ひまわり 植生指數';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'ひまわり 水體指數';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'ひまわり 水體指數';
 
   @override
   String get mapLayerQpesums => '未來 1 小時降水預報';

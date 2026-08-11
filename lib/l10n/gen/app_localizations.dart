@@ -1098,8 +1098,218 @@ abstract class AppLocalizations {
   /// Name of the Himawari infrared layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'Himawari Infrared'**
+  /// **'Himawari Infrared (B13)'**
   String get mapLayerSatellite;
+
+  /// Himawari visible-blue channel (B01, 0.47 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Blue (B01)'**
+  String get mapLayerSatelliteB01;
+
+  /// Himawari visible-green channel (B02, 0.51 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Green (B02)'**
+  String get mapLayerSatelliteB02;
+
+  /// Himawari visible-red channel (B03, 0.64 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Red (B03)'**
+  String get mapLayerSatelliteB03;
+
+  /// Himawari near-infrared channel (B04, 0.86 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B04)'**
+  String get mapLayerSatelliteB04;
+
+  /// Himawari near-infrared channel (B05, 1.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B05)'**
+  String get mapLayerSatelliteB05;
+
+  /// Himawari near-infrared channel (B06, 2.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Near-Infrared (B06)'**
+  String get mapLayerSatelliteB06;
+
+  /// Himawari shortwave-infrared channel (B07, 3.9 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Shortwave Infrared (B07)'**
+  String get mapLayerSatelliteB07;
+
+  /// Himawari upper-level water-vapour channel (B08, 6.2 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Upper Water Vapour (B08)'**
+  String get mapLayerSatelliteB08;
+
+  /// Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Mid Water Vapour (B09)'**
+  String get mapLayerSatelliteB09;
+
+  /// Himawari lower-level water-vapour channel (B10, 7.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Lower Water Vapour (B10)'**
+  String get mapLayerSatelliteB10;
+
+  /// Himawari SO₂ absorption channel (B11, 8.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari SO₂ / Cloud Phase (B11)'**
+  String get mapLayerSatelliteB11;
+
+  /// Himawari ozone-band channel (B12, 9.6 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Ozone (B12)'**
+  String get mapLayerSatelliteB12;
+
+  /// Himawari clean-infrared window channel (B13, 10.4 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Infrared (B13)'**
+  String get mapLayerSatelliteB13;
+
+  /// Himawari longwave-infrared channel (B14, 11.2 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Longwave Infrared (B14)'**
+  String get mapLayerSatelliteB14;
+
+  /// Himawari longwave-infrared channel (B15, 12.4 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Longwave Infrared (B15)'**
+  String get mapLayerSatelliteB15;
+
+  /// Himawari CO₂-band channel (B16, 13.3 µm) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari CO₂ (B16)'**
+  String get mapLayerSatelliteB16;
+
+  /// Himawari True Color RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari True Color'**
+  String get mapLayerSatelliteTruecolor;
+
+  /// Himawari Natural Color RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Natural Color'**
+  String get mapLayerSatelliteNaturalcolor;
+
+  /// Himawari Ash RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Ash'**
+  String get mapLayerSatelliteAsh;
+
+  /// Himawari Dust RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Dust'**
+  String get mapLayerSatelliteDust;
+
+  /// Himawari Airmass RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Airmass'**
+  String get mapLayerSatelliteAirmass;
+
+  /// Himawari Night Microphysics RGB composite layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Night Microphysics'**
+  String get mapLayerSatelliteNightmicrophysics;
+
+  /// Himawari water-vapour layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Water Vapour'**
+  String get mapLayerSatelliteWatervapor;
+
+  /// Himawari split-window brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Split Window'**
+  String get mapLayerSatelliteBtdSplit;
+
+  /// Himawari night fog / low-cloud brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Night Fog'**
+  String get mapLayerSatelliteBtdFog;
+
+  /// Himawari overshooting-cloud-top brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Overshooting Top'**
+  String get mapLayerSatelliteBtdWvirw;
+
+  /// Himawari SO₂ / cloud-phase brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari SO₂ / Cloud Phase'**
+  String get mapLayerSatelliteBtdSo2;
+
+  /// Himawari cirrus / cloud-height brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cirrus / Cloud Height'**
+  String get mapLayerSatelliteBtdCo2;
+
+  /// Himawari tropopause brightness-temperature-difference layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Tropopause'**
+  String get mapLayerSatelliteBtdOzone;
+
+  /// Himawari cloud-top-temperature (Level-2 retrieval) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cloud Top Temperature'**
+  String get mapLayerSatelliteCloudtop;
+
+  /// Himawari cloud-mask (Level-2 retrieval) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Cloud Mask'**
+  String get mapLayerSatelliteCloudmask;
+
+  /// Himawari sea-surface-temperature (ACSPO L3C) layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari Sea Surface Temperature'**
+  String get mapLayerSatelliteSst;
+
+  /// Himawari normalised-difference vegetation-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari NDVI'**
+  String get mapLayerSatelliteNdvi;
+
+  /// Himawari normalised-difference water-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari NDWI'**
+  String get mapLayerSatelliteNdwi;
+
+  /// Himawari modified normalised-difference water-index layer name
+  ///
+  /// In en, this message translates to:
+  /// **'Himawari MNDWI'**
+  String get mapLayerSatelliteMndwi;
 
   /// Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker
   ///

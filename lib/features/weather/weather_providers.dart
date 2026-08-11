@@ -14,6 +14,7 @@ import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
+import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -43,6 +44,18 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
         FrameTileApi(deps.apiClient, 'satellite'),
         deps.mapTileWarmer(),
       ),
+    ),
+    // One repository per channel the satellite layer picker offers — each needs
+    // its own `?channel=` on both the frame list and every tile URL, and its
+    // own warmer so switching channels never abandons another channel's warm.
+    Provider<Map<SatelliteChannel, SatelliteRepository>>.value(
+      value: {
+        for (final channel in SatelliteChannel.values)
+          channel: FrameTileRepositoryImpl(
+            FrameTileApi(deps.apiClient, 'satellite', channel: channel.key),
+            deps.mapTileWarmer(),
+          ),
+      },
     ),
     Provider<MeteorWeatherRepository>.value(
       value: MeteorWeatherRepositoryImpl(MeteorWeatherApi(deps.apiClient)),

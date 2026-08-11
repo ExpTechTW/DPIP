@@ -30,21 +30,27 @@ enum MapLayerCategory {
 ///
 /// A switch (not a lookup table) so an id added after this function — a future
 /// layer — still resolves deterministically to [MapLayerCategory.weather]
-/// instead of throwing.
-MapLayerCategory categoryOf(String layerId) => switch (layerId) {
-  'monitor' => MapLayerCategory.earthquake,
-  'typhoon' => MapLayerCategory.typhoon,
-  'temperature' ||
-  'humidity' ||
-  'pressure' ||
-  'wind' ||
-  'rain' ||
-  'lightning' => MapLayerCategory.weather,
-  'satellite' => MapLayerCategory.satellite,
-  'radar' || 'qpesums' => MapLayerCategory.radar,
-  'dpm' => MapLayerCategory.life,
-  _ => MapLayerCategory.weather,
-};
+/// instead of throwing. The satellite split namespaced the single IR layer
+/// into `satellite-<channel>` ids, so those match by prefix off the historical
+/// `satellite` id.
+MapLayerCategory categoryOf(String layerId) {
+  if (layerId == 'satellite' || layerId.startsWith('satellite-')) {
+    return MapLayerCategory.satellite;
+  }
+  return switch (layerId) {
+    'monitor' => MapLayerCategory.earthquake,
+    'typhoon' => MapLayerCategory.typhoon,
+    'temperature' ||
+    'humidity' ||
+    'pressure' ||
+    'wind' ||
+    'rain' ||
+    'lightning' => MapLayerCategory.weather,
+    'radar' || 'qpesums' => MapLayerCategory.radar,
+    'dpm' => MapLayerCategory.life,
+    _ => MapLayerCategory.weather,
+  };
+}
 
 /// Localised header for a group.
 String categoryLabel(MapLayerCategory category, AppLocalizations l10n) =>

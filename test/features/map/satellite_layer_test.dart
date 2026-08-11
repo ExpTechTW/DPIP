@@ -1,4 +1,5 @@
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
+import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,13 +19,17 @@ void main() {
   test('frames chronological', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(['1700000600', '1700000000']),
+      channel: SatelliteChannel.irClean,
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
   });
 
   test('the shown frame is fully opaque', () async {
-    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(_ids(5)),
+      channel: SatelliteChannel.irClean,
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -37,7 +42,10 @@ void main() {
   test(
     'scrubbing inside the ring is two opacity writes, nothing else',
     () async {
-      final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(9)));
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(_ids(9)),
+        channel: SatelliteChannel.irClean,
+      );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -64,7 +72,10 @@ void main() {
   );
 
   test('dark boundary outlines are added once and removed on clear', () async {
-    final layer = SatelliteMapLayer(_FakeSatelliteRepository(_ids(5)));
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(_ids(5)),
+      channel: SatelliteChannel.irClean,
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -93,7 +104,7 @@ void main() {
 
   test('clear releases tiles', () async {
     final source = _FakeSatelliteRepository(_ids(5));
-    final layer = SatelliteMapLayer(source);
+    final layer = SatelliteMapLayer(source, channel: SatelliteChannel.irClean);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 

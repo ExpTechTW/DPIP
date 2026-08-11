@@ -62,14 +62,20 @@ max-age=300`）。`{sec}` 就是解出清單後的 10 位數秒，直接使用�
 
 ### 衛星雲圖（v2）—— `core-tnn1`
 
-Himawari Band-13 IR XYZ WebP。時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），
-在 API 主機上帶 ETag/304；tile 在 **static** 主機。`{sec}` 就是解出清單後的
-10 分鐘秒，直接使用。
+Himawari-9 AHI 的 XYZ WebP,預設是 Band-13 IR。時間清單是差量編碼的
+Unix 秒（`[baseSec, Δ, …]`）,在 API 主機上帶 ETag/304;tile 在 **static**
+主機。`{sec}` 就是解出清單後的 10 分鐘秒,直接使用。
+
+`?channel=` 選取渲染的頻道或產品 —— 單一頻道用數字（`13`）、命名產品用名稱
+（`btd_wvirw`、`cloudtop`…,即 `satellite-tiles-go/docs.md` 的產品目錄）。
+帶 channel 時時間清單為該 channel 的交集（產品需要的頻道缺一就不可渲染,
+`list` 只列齊全的時刻）。App 的圖層選擇器為每個 channel 註冊一個獨立圖層
+（`satellite` 保留給 B13,其餘為 `satellite-<channel>`）。
 
 | 方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/satellite/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `getFrames` | `/api/v2/tiles/satellite/list[?channel=…]` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp[?channel=…]` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
 

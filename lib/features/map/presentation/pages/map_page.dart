@@ -24,6 +24,7 @@ import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
@@ -50,7 +51,13 @@ class _MapPageState extends State<MapPage> {
   late final List<MapLayer> _layers = [
     RadarMapLayer(context.read<RadarRepository>()),
     QpesumsMapLayer(context.read<QpesumsRepository>()),
-    SatelliteMapLayer(context.read<SatelliteRepository>()),
+    // One layer per satellite channel — each fetches its own frame list and
+    // serves its own `?channel=` tiles.
+    for (final channel in SatelliteChannel.values)
+      SatelliteMapLayer(
+        context.read<Map<SatelliteChannel, SatelliteRepository>>()[channel]!,
+        channel: channel,
+      ),
     LightningMapLayer(context.read<MeteorLightningRepository>()),
     TyphoonMapLayer(
       context.read<MeteorTyphoonRepository>(),

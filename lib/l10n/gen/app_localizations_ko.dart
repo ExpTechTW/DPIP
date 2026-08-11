@@ -549,7 +549,112 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerRadar => '레이더 합성 에코';
 
   @override
-  String get mapLayerSatellite => '히마와리 적외';
+  String get mapLayerSatellite => '히마와리 적외(B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => '히마와리 가시 청색(B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => '히마와리 가시 녹색(B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => '히마와리 가시 적색(B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => '히마와리 근적외(B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => '히마와리 근적외(B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => '히마와리 근적외(B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => '히마와리 단파 적외(B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => '히마와리 상층 수증기(B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => '히마와리 중층 수증기(B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => '히마와리 하층 수증기(B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => '히마와리 이산화황/구름상(B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => '히마와리 오존(B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => '히마와리 적외(B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => '히마와리 장파 적외(B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => '히마와리 장파 적외(B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => '히마와리 이산화탄소(B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => '히마와리 트루컬러';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => '히마와리 내추럴컬러';
+
+  @override
+  String get mapLayerSatelliteAsh => '히마와리 화산재';
+
+  @override
+  String get mapLayerSatelliteDust => '히마와리 황사';
+
+  @override
+  String get mapLayerSatelliteAirmass => '히마와리 에어매스';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics => '히마와리 야간 미세물리';
+
+  @override
+  String get mapLayerSatelliteWatervapor => '히마와리 수증기';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => '히마와리 스플릿 윈도우';
+
+  @override
+  String get mapLayerSatelliteBtdFog => '히마와리 야간 안개';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => '히마와리 오버슈팅 탑';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => '히마와리 이산화황/구름상';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => '히마와리 권운/운고';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => '히마와리 대류권계면';
+
+  @override
+  String get mapLayerSatelliteCloudtop => '히마와리 운정 온도';
+
+  @override
+  String get mapLayerSatelliteCloudmask => '히마와리 구름 마스크';
+
+  @override
+  String get mapLayerSatelliteSst => '히마와리 해수면 온도';
+
+  @override
+  String get mapLayerSatelliteNdvi => '히마와리 NDVI';
+
+  @override
+  String get mapLayerSatelliteNdwi => '히마와리 NDWI';
+
+  @override
+  String get mapLayerSatelliteMndwi => '히마와리 MNDWI';
 
   @override
   String get mapLayerQpesums => '1시간 강수 예보';

@@ -17,12 +17,17 @@ import 'package:dpip/core/network/meteor_decode.dart';
 /// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
 /// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
 class FrameTileApi {
-  const FrameTileApi(this._client, this.path);
+  const FrameTileApi(this._client, this.path, {this.channel});
 
   final ApiClient _client;
 
   /// The overlay's URL path segment: `radar`, `satellite`, or `qpesums`.
   final String path;
+
+  /// Optional `?channel=` for the satellite overlay — selects which band or
+  /// derived product a frame renders. Null keeps the server default (B13) and
+  /// the URL channel-free; radar / qpesums never set it.
+  final String? channel;
 
   /// The v2 frame list lives on `api.core-tnn1` (no region failover).
   static const ApiTier _listTier = ApiTier.coreExclusiveApi;
@@ -32,17 +37,22 @@ class FrameTileApi {
 
   /// Available frame timestamps, **newest first**.
   ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/tiles/<path>/list`
+  /// `https://api.core-tnn1.exptech.dev/api/v2/tiles/<path>/list[?channel=…]`
   Future<List<String>> getFrames() async => framesFromList(
-    await _client.get(_listTier, '${ApiPaths.tiles}/$path/list') as List,
+    await _client.get(_listTier, '${ApiPaths.tiles}/$path/list$_query') as List,
   );
 
   /// XYZ WebP raster tile URL template for a [frame] (a Unix timestamp).
   ///
-  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp`
+  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp[?channel=…]`
   String tileUrl(String frame) =>
       '${_client.hostsFor(_tileTier).first}'
-      '${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp';
+      '${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp$_query';
+
+  String get _query {
+    final channel = this.channel;
+    return channel == null ? '' : '?channel=$channel';
+  }
 
   /// Restores the delta-encoded list `[base, Δ, Δ, …]` to absolute timestamps
   /// and returns them **newest first** as strings (the frame id used by

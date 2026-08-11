@@ -558,7 +558,113 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerRadar => 'Composite Radar Reflectivity';
 
   @override
-  String get mapLayerSatellite => 'Himawari Infrared';
+  String get mapLayerSatellite => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB01 => 'Himawari Blue (B01)';
+
+  @override
+  String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
+
+  @override
+  String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
+
+  @override
+  String get mapLayerSatelliteB04 => 'Himawari Near-Infrared (B04)';
+
+  @override
+  String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
+
+  @override
+  String get mapLayerSatelliteB06 => 'Himawari Near-Infrared (B06)';
+
+  @override
+  String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
+
+  @override
+  String get mapLayerSatelliteB08 => 'Himawari Upper Water Vapour (B08)';
+
+  @override
+  String get mapLayerSatelliteB09 => 'Himawari Mid Water Vapour (B09)';
+
+  @override
+  String get mapLayerSatelliteB10 => 'Himawari Lower Water Vapour (B10)';
+
+  @override
+  String get mapLayerSatelliteB11 => 'Himawari SO₂ / Cloud Phase (B11)';
+
+  @override
+  String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
+
+  @override
+  String get mapLayerSatelliteB13 => 'Himawari Infrared (B13)';
+
+  @override
+  String get mapLayerSatelliteB14 => 'Himawari Longwave Infrared (B14)';
+
+  @override
+  String get mapLayerSatelliteB15 => 'Himawari Longwave Infrared (B15)';
+
+  @override
+  String get mapLayerSatelliteB16 => 'Himawari CO₂ (B16)';
+
+  @override
+  String get mapLayerSatelliteTruecolor => 'Himawari True Color';
+
+  @override
+  String get mapLayerSatelliteNaturalcolor => 'Himawari Natural Color';
+
+  @override
+  String get mapLayerSatelliteAsh => 'Himawari Ash';
+
+  @override
+  String get mapLayerSatelliteDust => 'Himawari Dust';
+
+  @override
+  String get mapLayerSatelliteAirmass => 'Himawari Airmass';
+
+  @override
+  String get mapLayerSatelliteNightmicrophysics =>
+      'Himawari Night Microphysics';
+
+  @override
+  String get mapLayerSatelliteWatervapor => 'Himawari Water Vapour';
+
+  @override
+  String get mapLayerSatelliteBtdSplit => 'Himawari Split Window';
+
+  @override
+  String get mapLayerSatelliteBtdFog => 'Himawari Night Fog';
+
+  @override
+  String get mapLayerSatelliteBtdWvirw => 'Himawari Overshooting Top';
+
+  @override
+  String get mapLayerSatelliteBtdSo2 => 'Himawari SO₂ / Cloud Phase';
+
+  @override
+  String get mapLayerSatelliteBtdCo2 => 'Himawari Cirrus / Cloud Height';
+
+  @override
+  String get mapLayerSatelliteBtdOzone => 'Himawari Tropopause';
+
+  @override
+  String get mapLayerSatelliteCloudtop => 'Himawari Cloud Top Temperature';
+
+  @override
+  String get mapLayerSatelliteCloudmask => 'Himawari Cloud Mask';
+
+  @override
+  String get mapLayerSatelliteSst => 'Himawari Sea Surface Temperature';
+
+  @override
+  String get mapLayerSatelliteNdvi => 'Himawari NDVI';
+
+  @override
+  String get mapLayerSatelliteNdwi => 'Himawari NDWI';
+
+  @override
+  String get mapLayerSatelliteMndwi => 'Himawari MNDWI';
 
   @override
   String get mapLayerQpesums => 'Pagtaya ng ulan sa susunod na 1 oras';
