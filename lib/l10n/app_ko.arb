@@ -231,6 +231,8 @@
   "mapTimelineFuture": "미래",
   "mapTimelineObserved": "관측",
   "mapTimelineForecast": "예보",
+  "mapTimelineDataTime": "데이터 시간 {time}",
+  "mapTimelineDataTime": "자료 시간 {time}",
   "notifySettingsMenu": "알림 설정",
   "notifyTitle": "알림",
   "notifyUnavailable": "푸시 알림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "{app}을(를) 열 수 없습니다",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "이 기기에서는 전화를 걸 수 없습니다",
 
   "mapOverlaySectionReference": "참조 레이어",
   "mapLayerCategoryEarthquake": "지진",

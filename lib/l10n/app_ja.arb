@@ -231,6 +231,8 @@
   "mapTimelineFuture": "未来",
   "mapTimelineObserved": "観測",
   "mapTimelineForecast": "予報",
+  "mapTimelineDataTime": "データ時刻 {time}",
+  "mapTimelineDataTime": "データ時刻 {time}",
   "notifySettingsMenu": "通知設定",
   "notifyTitle": "通知",
   "notifyUnavailable": "プッシュ通知はまだ準備できていません。しばらくしてから再度お試しください。",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "{app} を開けませんでした",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "この端末では通話できません",
 
   "mapOverlaySectionReference": "参照レイヤー",
   "mapLayerCategoryEarthquake": "地震",

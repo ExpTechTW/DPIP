@@ -231,6 +231,8 @@
   "mapTimelineFuture": "อนาคต",
   "mapTimelineObserved": "เวลาตรวจวัด",
   "mapTimelineForecast": "พยากรณ์",
+  "mapTimelineDataTime": "เวลาข้อมูล {time}",
+  "mapTimelineDataTime": "เวลาข้อมูล {time}",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
   "notifyTitle": "การแจ้งเตือน",
   "notifyUnavailable": "การแจ้งเตือนแบบพุชยังไม่พร้อม — โปรดลองอีกครั้งในภายหลัง",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "ไม่สามารถเปิด {app} ได้",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "อุปกรณ์นี้ไม่สามารถโทรออกได้",
 
   "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
   "mapLayerCategoryEarthquake": "แผ่นดินไหว",

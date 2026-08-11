@@ -754,6 +754,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTimelineForecast => '予報';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'データ時刻 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -1316,6 +1321,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return '$app を開けませんでした';
   }
+
+  @override
+  String get mapAppCallFailed => 'この端末では通話できません';
 
   @override
   String get mapOverlaySectionReference => '参照レイヤー';

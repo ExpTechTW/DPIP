@@ -130,6 +130,12 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   String timelineCaption(BuildContext context) =>
       AppLocalizations.of(context).mapTimelineForecast;
 
+  /// The wind endpoints serve one model run at a time (older runs' frames 404),
+  /// so the oldest frame is the run's issue time — the timeline can name when
+  /// this forecast was actually produced.
+  @override
+  bool get framesAreOneRun => true;
+
   /// Basin-wide framing — the wind view starts a level below radar's floor so
   /// a whole typhoon-scale system fits.
   @override

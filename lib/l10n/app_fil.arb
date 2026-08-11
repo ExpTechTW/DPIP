@@ -231,6 +231,8 @@
   "mapTimelineFuture": "Hinaharap",
   "mapTimelineObserved": "Naobserbahan",
   "mapTimelineForecast": "Pagtaya",
+  "mapTimelineDataTime": "Oras ng data {time}",
+  "mapTimelineDataTime": "Oras ng data {time}",
   "notifySettingsMenu": "Mga setting ng notipikasyon",
   "notifyTitle": "Mga Notipikasyon",
   "notifyUnavailable": "Hindi pa handa ang push notifications — subukan muli mamaya.",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "Hindi mabuksan ang {app}",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "Hindi makatawag ang device na ito",
 
   "mapOverlaySectionReference": "Layer ng sanggunian",
   "mapLayerCategoryEarthquake": "Lindol",

@@ -231,6 +231,7 @@
   "mapTimelineFuture": "未來",
   "mapTimelineObserved": "觀測",
   "mapTimelineForecast": "預報",
+  "mapTimelineDataTime": "資料時間 {time}",
   "notifySettingsMenu": "通知設定",
   "notifyTitle": "通知",
   "notifyUnavailable": "推播尚未就緒，請稍後再試。",
@@ -425,6 +426,8 @@
   "mapAppOpenFailed": "無法開啟 {app}",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "此裝置無法撥打電話",
 
   "mapOverlaySectionReference": "參考圖層",
   "mapLayerCategoryEarthquake": "地震",

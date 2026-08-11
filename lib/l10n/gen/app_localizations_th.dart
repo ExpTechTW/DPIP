@@ -767,6 +767,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTimelineForecast => 'พยากรณ์';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'เวลาข้อมูล $time';
+  }
+
+  @override
   String get notifySettingsMenu => 'การตั้งค่าการแจ้งเตือน';
 
   @override
@@ -1336,6 +1341,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return 'ไม่สามารถเปิด $app ได้';
   }
+
+  @override
+  String get mapAppCallFailed => 'อุปกรณ์นี้ไม่สามารถโทรออกได้';
 
   @override
   String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';

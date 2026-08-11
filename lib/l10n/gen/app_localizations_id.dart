@@ -770,6 +770,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTimelineForecast => 'Prakiraan';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'Waktu data $time';
+  }
+
+  @override
   String get notifySettingsMenu => 'Pengaturan notifikasi';
 
   @override
@@ -1341,6 +1346,10 @@ class AppLocalizationsId extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return 'Tidak dapat membuka $app';
   }
+
+  @override
+  String get mapAppCallFailed =>
+      'Perangkat ini tidak dapat melakukan panggilan telepon';
 
   @override
   String get mapOverlaySectionReference => 'Lapisan referensi';

@@ -1060,6 +1060,15 @@
   "@mapTimelineForecast": {
     "description": "Label above the map timeline's date when the frame times are forecast times, e.g. Forecast / 2026/07/14"
   },
+  "mapTimelineDataTime": "Data {time}",
+  "@mapTimelineDataTime": {
+    "description": "Model-run issue time shown on the map timeline under a forecast layer's caption, e.g. Data 8/11 14:00",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "notifySettingsMenu": "Notification settings",
   "@notifySettingsMenu": {
     "description": "More-menu entry that opens the notification-settings page"
@@ -1768,6 +1777,10 @@
       "app": {"type": "String"}
     },
     "description": "Snackbar when the chosen map app cannot be opened on this device"
+  },
+  "mapAppCallFailed": "This device cannot make phone calls",
+  "@mapAppCallFailed": {
+    "description": "Snackbar when tapping the emergency phone and the device has no phone handler"
   },
 
   "mapOverlaySectionReference": "Reference layers",

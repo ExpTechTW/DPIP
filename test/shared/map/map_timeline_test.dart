@@ -16,6 +16,8 @@ Widget _wrap({
   required List<MapFrame> frames,
   required int selectedIndex,
   required ValueChanged<int> onSelected,
+  Duration? framePeriod,
+  DateTime? dataTime,
 }) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
@@ -28,6 +30,8 @@ Widget _wrap({
           frames: frames,
           selectedIndex: selectedIndex,
           onSelected: onSelected,
+          framePeriod: framePeriod,
+          dataTime: dataTime,
         ),
       ),
     ),
@@ -161,6 +165,47 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'a frame period renders the big label as a range, ticks stay start times',
+    (tester) async {
+      final frames = _frames(10); // 07:00 + 9×10 min → newest 08:30
+      await tester.pumpWidget(
+        _wrap(
+          frames: frames,
+          selectedIndex: 9,
+          onSelected: (_) {},
+          framePeriod: const Duration(hours: 1),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The selected frame starts at 08:30 and covers the following hour.
+      expect(find.text('08:30 – 09:30'), findsOneWidget);
+      // Ticks keep their bare start times (every fourth slot is labelled).
+      expect(find.text('08:20'), findsOneWidget);
+      expect(find.text('08:30'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('a data time renders as a line under the caption', (
+    tester,
+  ) async {
+    final frames = _frames(10);
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: 9,
+        onSelected: (_) {},
+        dataTime: DateTime(2026, 7, 13, 6, 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Data 7/13 06:00'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'switching to another layer\u0027s frames re-centres on its newest frame',

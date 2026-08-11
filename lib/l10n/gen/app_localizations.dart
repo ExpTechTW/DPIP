@@ -1497,6 +1497,12 @@ abstract class AppLocalizations {
   /// **'Forecast'**
   String get mapTimelineForecast;
 
+  /// Model-run issue time shown on the map timeline under a forecast layer's caption, e.g. Data 8/11 14:00
+  ///
+  /// In en, this message translates to:
+  /// **'Data {time}'**
+  String mapTimelineDataTime(String time);
+
   /// More-menu entry that opens the notification-settings page
   ///
   /// In en, this message translates to:
@@ -2558,6 +2564,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open {app}'**
   String mapAppOpenFailed(String app);
+
+  /// Snackbar when tapping the emergency phone and the device has no phone handler
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot make phone calls'**
+  String get mapAppCallFailed;
 
   /// Section title in map overlay settings menus: the reference overlays
   ///

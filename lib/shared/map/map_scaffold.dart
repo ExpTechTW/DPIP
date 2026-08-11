@@ -817,9 +817,12 @@ class _MapScaffoldState extends State<MapScaffold> {
     // caption is theirs to say — observed vs forecast — so forecast frames are
     // never read as measurements. Anything else falls back to "observed".
     final active = _active;
-    final caption = active is RasterTimelineLayer
+    final isRaster = active is RasterTimelineLayer;
+    final caption = isRaster
         ? active.timelineCaption(context)
         : AppLocalizations.of(context).mapTimelineObserved;
+    final framePeriod = isRaster ? active.framePeriod : null;
+    final dataTime = isRaster ? active.modelRunTime : null;
     return FrostedSurface(
       borderRadius: AppRadius.large,
       child: Padding(
@@ -832,6 +835,8 @@ class _MapScaffoldState extends State<MapScaffold> {
           onSelected: _onFrameSelected,
           onScrubbing: _onScrubbing,
           caption: caption,
+          framePeriod: framePeriod,
+          dataTime: dataTime,
         ),
       ),
     );

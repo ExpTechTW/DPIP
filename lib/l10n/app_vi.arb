@@ -231,6 +231,8 @@
   "mapTimelineFuture": "Tương lai",
   "mapTimelineObserved": "Quan trắc",
   "mapTimelineForecast": "Dự báo",
+  "mapTimelineDataTime": "Thời gian dữ liệu {time}",
+  "mapTimelineDataTime": "Thời điểm dữ liệu {time}",
   "notifySettingsMenu": "Cài đặt thông báo",
   "notifyTitle": "Thông báo",
   "notifyUnavailable": "Thông báo đẩy chưa sẵn sàng — vui lòng thử lại sau giây lát.",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "Không thể mở {app}",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "Thiết bị này không thể thực hiện cuộc gọi",
 
   "mapOverlaySectionReference": "Lớp tham chiếu",
   "mapLayerCategoryEarthquake": "Động đất",

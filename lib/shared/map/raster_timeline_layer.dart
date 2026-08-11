@@ -112,6 +112,30 @@ abstract class RasterTimelineLayer implements MapLayer {
   String timelineCaption(BuildContext context) =>
       AppLocalizations.of(context).mapTimelineObserved;
 
+  /// How long one frame's data represents, when a frame is a period rather
+  /// than a point — `null` keeps the shared point-in-time timeline label.
+  ///
+  /// A next-hour forecast's frame at 21:00 estimates the 21:00–22:00 window,
+  /// so a layer like QPESUMS returns the hour and the timeline renders the
+  /// selected frame as a range instead of a bare instant.
+  Duration? get framePeriod => null;
+
+  /// Whether [frames] are all one forecast-model run — the API serves only the
+  /// latest run, so the oldest frame is that run's issue time (資料時間).
+  ///
+  /// Observed layers (radar, satellite) leave this false; a wind-forecast
+  /// layer opts in so the timeline can name when the model was run.
+  @protected
+  bool get framesAreOneRun => false;
+
+  /// The model-run issue time behind these frames, when they are one run — the
+  /// oldest frame *is* the run start. `null` before [prepare] fills the list.
+  DateTime? get modelRunTime {
+    final run = framesAreOneRun;
+    if (!run || _orderedIds.isEmpty) return null;
+    return parseFrameTime(_orderedIds.first);
+  }
+
   Future<void> onAttached(MapLibreMapController controller) async {}
 
   /// Undoes [onAttached]. Called from [clear].

@@ -26,6 +26,8 @@ class MapTimeline extends StatefulWidget {
     required this.onSelected,
     this.onScrubbing,
     this.caption,
+    this.framePeriod,
+    this.dataTime,
   });
 
   /// Frames in chronological order (oldest first); must be non-empty.
@@ -44,6 +46,17 @@ class MapTimeline extends StatefulWidget {
   /// "forecast" for a forecast layer.
   final String? caption;
 
+  /// How long one frame's data represents, when it is a period rather than a
+  /// point. A next-hour forecast's frame at 21:00 covers 21:00–22:00, so the
+  /// big time label renders that range instead of a bare instant. `null` keeps
+  /// the point-in-time label.
+  final Duration? framePeriod;
+
+  /// When the frames behind this timeline were produced — a forecast model
+  /// run's issue time (資料時間), distinct from the valid times the ruler
+  /// scrubs. `null` hides the data-time line.
+  final DateTime? dataTime;
+
   @override
   State<MapTimeline> createState() => _MapTimelineState();
 }
@@ -52,6 +65,8 @@ class _MapTimelineState extends State<MapTimeline> {
   static final DateFormat _time = DateFormat('HH:mm');
   // Numeric so no locale symbol data is needed (as with [_time]).
   static final DateFormat _date = DateFormat('yyyy/MM/dd');
+  // The data-time line: the model run's issue time, `8/11 14:00`.
+  static final DateFormat _data = DateFormat('M/d HH:mm');
 
   /// Slot width per frame — the scroll offset that centres frame `i` is
   /// `i * _slotWidth` (the leading/trailing pads are symmetric).
@@ -70,6 +85,17 @@ class _MapTimelineState extends State<MapTimeline> {
   void _cacheLabels() {
     _times = [for (final frame in widget.frames) _time.format(frame.time)];
     _dates = [for (final frame in widget.frames) _date.format(frame.time)];
+  }
+
+  /// The big time label: the selected instant, or — when the layer's frames
+  /// each cover a period — the range that instant starts, so "21:00" is read
+  /// as "21:00–22:00" rather than a point measurement.
+  String get _bigLabel {
+    final start = _times[_liveIndex];
+    final period = widget.framePeriod;
+    if (period == null) return start;
+    final end = _time.format(widget.frames[_liveIndex].time.add(period));
+    return '$start – $end';
   }
 
   @override
@@ -198,6 +224,14 @@ class _MapTimelineState extends State<MapTimeline> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  if (widget.dataTime case final dataTime?)
+                    Text(
+                      l10n.mapTimelineDataTime(_data.format(dataTime)),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.tertiary,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
                   Text(
                     _dates[_liveIndex],
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -225,7 +259,7 @@ class _MapTimelineState extends State<MapTimeline> {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
-                    _times[_liveIndex],
+                    _bigLabel,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: _eraColor(era, theme.brightness),
                       fontFeatures: const [FontFeature.tabularFigures()],

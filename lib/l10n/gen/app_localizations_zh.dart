@@ -753,6 +753,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTimelineForecast => '預報';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -1310,6 +1315,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return '無法開啟 $app';
   }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
 
   @override
   String get mapOverlaySectionReference => '參考圖層';
@@ -2488,6 +2496,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapTimelineForecast => '预报';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return '资料时间 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '通知设置';
 
   @override
@@ -3045,6 +3058,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String mapAppOpenFailed(String app) {
     return '无法打开 $app';
   }
+
+  @override
+  String get mapAppCallFailed => '此设备无法拨打电话';
 
   @override
   String get mapOverlaySectionReference => '参考图层';
@@ -4223,6 +4239,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTimelineForecast => '預報';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -4780,6 +4801,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String mapAppOpenFailed(String app) {
     return '無法開啟 $app';
   }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
 
   @override
   String get mapOverlaySectionReference => '參考圖層';
@@ -5958,6 +5982,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapTimelineForecast => '預報';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return '資料時間 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -6515,6 +6544,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String mapAppOpenFailed(String app) {
     return '無法開啟 $app';
   }
+
+  @override
+  String get mapAppCallFailed => '此裝置無法撥打電話';
 
   @override
   String get mapOverlaySectionReference => '參考圖層';

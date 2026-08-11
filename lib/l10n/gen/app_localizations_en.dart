@@ -769,6 +769,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapTimelineForecast => 'Forecast';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'Data $time';
+  }
+
+  @override
   String get notifySettingsMenu => 'Notification settings';
 
   @override
@@ -1338,6 +1343,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return 'Could not open $app';
   }
+
+  @override
+  String get mapAppCallFailed => 'This device cannot make phone calls';
 
   @override
   String get mapOverlaySectionReference => 'Reference layers';

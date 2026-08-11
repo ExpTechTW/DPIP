@@ -755,6 +755,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTimelineForecast => '예보';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return '자료 시간 $time';
+  }
+
+  @override
   String get notifySettingsMenu => '알림 설정';
 
   @override
@@ -1317,6 +1322,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return '$app을(를) 열 수 없습니다';
   }
+
+  @override
+  String get mapAppCallFailed => '이 기기에서는 전화를 걸 수 없습니다';
 
   @override
   String get mapOverlaySectionReference => '참조 레이어';

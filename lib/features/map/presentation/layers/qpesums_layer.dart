@@ -59,6 +59,12 @@ class QpesumsMapLayer extends RasterTimelineLayer
   String timelineCaption(BuildContext context) =>
       AppLocalizations.of(context).mapTimelineForecast;
 
+  /// Each frame is a one-hour forecast window: the tile at 21:00 estimates
+  /// rain for 21:00–22:00, so the timeline shows that range rather than a bare
+  /// instant the user could read as a point measurement.
+  @override
+  Duration? get framePeriod => const Duration(hours: 1);
+
   @override
   Widget buildTopTrailingChrome(
     BuildContext context, {

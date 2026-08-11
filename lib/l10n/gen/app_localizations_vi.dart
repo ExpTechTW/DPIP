@@ -767,6 +767,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapTimelineForecast => 'Dự báo';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'Thời điểm dữ liệu $time';
+  }
+
+  @override
   String get notifySettingsMenu => 'Cài đặt thông báo';
 
   @override
@@ -1338,6 +1343,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return 'Không thể mở $app';
   }
+
+  @override
+  String get mapAppCallFailed => 'Thiết bị này không thể thực hiện cuộc gọi';
 
   @override
   String get mapOverlaySectionReference => 'Lớp tham chiếu';

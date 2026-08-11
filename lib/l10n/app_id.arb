@@ -231,6 +231,8 @@
   "mapTimelineFuture": "Mendatang",
   "mapTimelineObserved": "Diamati",
   "mapTimelineForecast": "Prakiraan",
+  "mapTimelineDataTime": "Waktu data {time}",
+  "mapTimelineDataTime": "Waktu data {time}",
   "notifySettingsMenu": "Pengaturan notifikasi",
   "notifyTitle": "Notifikasi",
   "notifyUnavailable": "Notifikasi push belum siap — coba lagi sebentar lagi.",
@@ -405,6 +407,8 @@
   "mapAppOpenFailed": "Tidak dapat membuka {app}",
   "@mapAppOpenFailed": {
   },
+
+  "mapAppCallFailed": "Perangkat ini tidak dapat melakukan panggilan telepon",
 
   "mapOverlaySectionReference": "Lapisan referensi",
   "mapLayerCategoryEarthquake": "Gempa",

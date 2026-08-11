@@ -774,6 +774,11 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapTimelineForecast => 'Pagtaya';
 
   @override
+  String mapTimelineDataTime(String time) {
+    return 'Oras ng data $time';
+  }
+
+  @override
   String get notifySettingsMenu => 'Mga setting ng notipikasyon';
 
   @override
@@ -1345,6 +1350,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String mapAppOpenFailed(String app) {
     return 'Hindi mabuksan ang $app';
   }
+
+  @override
+  String get mapAppCallFailed => 'Hindi makatawag ang device na ito';
 
   @override
   String get mapOverlaySectionReference => 'Layer ng sanggunian';
