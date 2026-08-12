@@ -97,8 +97,8 @@ void main() {
       );
       expect(
         controller.calls,
-        isNot(contains('addLineLayer:$satelliteGlobalOutlineLayerId')),
-        reason: 'the 國界 border ships off by default',
+        contains('addLineLayer:$satelliteGlobalOutlineLayerId'),
+        reason: 'the 國界 border ships on by default',
       );
 
       controller.calls.clear();
@@ -114,7 +114,7 @@ void main() {
     },
   );
 
-  test('the 國界 border draws only when asked', () async {
+  test('the 國界 border toggles on and off', () async {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
@@ -126,16 +126,6 @@ void main() {
     await layer.show(controller, frames[2]);
     controller.calls.clear();
 
-    layer.setShowGlobalOutline(true);
-    for (var i = 0; i < 5; i++) {
-      await Future<void>.delayed(Duration.zero);
-    }
-    expect(
-      controller.calls,
-      contains('addLineLayer:$satelliteGlobalOutlineLayerId'),
-    );
-
-    controller.calls.clear();
     layer.setShowGlobalOutline(false);
     for (var i = 0; i < 5; i++) {
       await Future<void>.delayed(Duration.zero);
@@ -143,6 +133,16 @@ void main() {
     expect(
       controller.calls,
       contains('removeLayer:$satelliteGlobalOutlineLayerId'),
+    );
+
+    controller.calls.clear();
+    layer.setShowGlobalOutline(true);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    expect(
+      controller.calls,
+      contains('addLineLayer:$satelliteGlobalOutlineLayerId'),
     );
   });
 

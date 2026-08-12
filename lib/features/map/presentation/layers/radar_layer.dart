@@ -41,8 +41,15 @@ class RadarMapLayer extends RasterTimelineLayer
   /// The echo covers the base style's borders instead of passing under them —
   /// this layer supplies its own on top, and showing both would draw every
   /// boundary twice at two weights.
+  ///
+  /// The frame mounts **below the topmost admin line**
+  /// ([adminBaseLayerId]) once those are on the map, like the wind forecast:
+  /// the first frame is mounted before [AdminOutlineChrome.onAttached] adds
+  /// the borders (so it falls back to the top and the borders land above it),
+  /// but every later frame would otherwise stack over the borders — and the
+  /// scan-range outline — and hide them the moment the timeline is scrubbed.
   @override
-  String? get rasterBelowLayerId => null;
+  String? get rasterBelowLayerId => adminBaseLayerId;
 
   @override
   Widget buildTopTrailingChrome(

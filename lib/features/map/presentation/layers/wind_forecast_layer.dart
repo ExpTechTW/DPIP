@@ -121,8 +121,18 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
 
   /// The field covers the base style's borders, so this layer supplies its own
   /// on top — same reasoning as radar.
+  ///
+  /// The frame raster mounts **below the topmost admin line**
+  /// ([adminBaseLayerId]) once those are on the map, rather than
+  /// unconditionally on top: the first frame is mounted before
+  /// [AdminOutlineChrome.onAttached] adds the borders (so it falls back to the
+  /// top and the borders land above it), but every later frame would otherwise
+  /// stack over the borders and hide them the moment the timeline is scrubbed.
+  /// The topmost line — not the bottommost — is the anchor, because with 國界
+  /// on the global frame sits lowest and a raster under its casing would still
+  /// cover the county and town lines above it.
   @override
-  String? get rasterBelowLayerId => null;
+  String? get rasterBelowLayerId => adminBaseLayerId;
 
   /// The frame times are forecast valid times, not observations — the timeline
   /// caption must say so instead of the shared "observed" default.

@@ -91,6 +91,7 @@ class RecordingMapController implements MapLibreMapController {
     double? maxzoom,
   }) async {
     calls.add('addRasterLayer:$layerId');
+    below[layerId] = belowLayerId;
     mountTransitions[layerId] = properties
         .toJson()['raster-opacity-transition'];
     _record(layerId, properties);
@@ -197,5 +198,5 @@ class RecordingMapController implements MapLibreMapController {
       const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => null;
+  dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
 }

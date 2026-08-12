@@ -55,7 +55,7 @@ class SatelliteStyleMenu extends StatelessWidget {
         final showRelief = showTerrain.value;
         final active =
             style != SatelliteStyle.gray ||
-            showGlobal ||
+            !showGlobal ||
             !showLabels ||
             !showRelief;
         return MenuAnchor(
@@ -179,9 +179,9 @@ class SatelliteReferenceMenu extends StatelessWidget {
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,
             tooltip: l10n.mapOverlaySectionReference,
-            // The dot marks "not the defaults". 國界 ships off and labels on,
-            // so it lights up when either has moved.
-            active: showGlobal || !showLabels || !showRelief,
+            // The dot marks "not the defaults". 國界 and labels ship on, so it
+            // lights up when either has moved.
+            active: !showGlobal || !showLabels || !showRelief,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),

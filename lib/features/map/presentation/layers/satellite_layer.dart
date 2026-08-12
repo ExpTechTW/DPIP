@@ -35,11 +35,11 @@ class SatelliteMapLayer extends RasterTimelineLayer {
     SatelliteStyle.gray,
   );
 
-  /// Whether 國界 (world country borders) are redrawn above the imagery. Off
-  /// by default: on a Taiwan-focused surface the neighbours' outlines are
-  /// usually noise, and a reader who wants them can ask — the same default as
-  /// the radar / wind frame ([AdminOutlineChrome.showGlobalOutline]).
-  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(false);
+  /// Whether 國界 (world country borders) are redrawn above the imagery. On by
+  /// default — the same default as the radar / wind frame
+  /// ([AdminOutlineChrome.showGlobalOutline]): the neighbours' outlines are
+  /// the frame a reader navigates by on a basin-wide view.
+  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(true);
 
   bool _globalShown = false;
 
@@ -162,7 +162,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
     try {
       // County frame in bright yellow, township mesh in dark yellow — the hue
       // set that stays legible on imagery which is overall dark. The 國界
-      // border is the [showGlobalOutline] toggle (off by default), so only the
+      // border is the [showGlobalOutline] toggle (on by default), so only the
       // two admin frames are drawn unconditionally.
       await controller.addLineLayer(
         'exptech',

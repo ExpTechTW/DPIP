@@ -1,4 +1,5 @@
 import 'package:dpip/shared/map/admin_outline.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,55 @@ void main() {
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
   });
+
+  test(
+    'frames revealed after the first mount anchor below the admin lines',
+    () async {
+      final layer = RadarMapLayer(_FakeRadarRepository(_ids(12)));
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[6]);
+
+      expect(
+        controller.belowOf('radar-lyr-${frames[6].id}'),
+        isNull,
+        reason: 'the first frame has no anchor yet — borders add above it',
+      );
+      expect(controller.calls, contains('addLineLayer:admin-county-outline'));
+
+      // Every later reveal — mid-scrub or settle — anchors under the topmost
+      // admin line, so a fresh frame can never cover the borders (or the
+      // scan-range outline).
+      await layer.show(controller, frames[10], scrubbing: true);
+      expect(
+        controller.belowOf('radar-lyr-${frames[10].id}'),
+        AdminBoundary.town.lineLayerId,
+        reason:
+            'county + township borders ship on, so the township line is the '
+            'topmost admin stroke the frame must mount below',
+      );
+
+      // 國界 ships on, so its frame is already on the map — the anchor must
+      // not follow it (the global frame sits lowest, so a raster hung under
+      // its casing would cover the county and town lines above it).
+      expect(
+        controller.calls,
+        contains('addLineLayer:admin-global-outline'),
+        reason: '國界 ships on by default',
+      );
+
+      await layer.show(controller, frames[2], scrubbing: true);
+      expect(
+        controller.belowOf('radar-lyr-${frames[2].id}'),
+        AdminBoundary.town.lineLayerId,
+        reason:
+            'the topmost admin line stays the township line — the anchor must '
+            'not move onto the global frame just because it is on',
+      );
+    },
+  );
 
   test('a settle mounts the preload ring around the target', () async {
     final source = _FakeRadarRepository(_ids(9));
@@ -315,7 +365,11 @@ void main() {
       for (final call in controller.calls.where(
         (c) => c.startsWith('addRasterLayer:'),
       )) {
-        expect(controller.belowOf(call.split(':').last), isNull, reason: call);
+        final below = controller.belowOf(call.split(':').last);
+        // The first frame mounts before attach adds the borders (below null);
+        // every later frame hangs under the topmost admin line instead. Either
+        // way it never hangs under the base style's own county border.
+        expect(below, isNot(outlineLayerId), reason: call);
       }
     });
 

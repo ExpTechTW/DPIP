@@ -36,8 +36,12 @@ class QpesumsMapLayer extends RasterTimelineLayer
 
   /// The forecast covers the base style's borders, so this layer supplies its
   /// own on top — same reasoning as radar, and the same chrome.
+  ///
+  /// Like radar and the wind forecast, later timeline frames mount below the
+  /// admin lines ([adminBaseLayerId]); without that, scrubbing would stack
+  /// each new frame over the borders and the scan-range outline.
   @override
-  String? get rasterBelowLayerId => null;
+  String? get rasterBelowLayerId => adminBaseLayerId;
 
   @override
   String get id => 'qpesums';
