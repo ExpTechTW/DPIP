@@ -88,14 +88,20 @@ Future<void> bootstrap() async {
   final defaultMapLayer = DefaultMapLayerController(prefs);
   final mapLayerOrder = MapLayerOrderController(prefs);
   final cache = await _openCache();
-  // MapLibre asks Dart for every ExpTech tile before it asks the network, so
-  // this must be bound before the first map is built.
-  final mapTileCache = cache == null
-      ? null
-      : MapTileCache(cache.etag, usage: cache.usage);
-  await mapTileCache?.install();
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
+  // MapLibre asks Dart for every ExpTech tile before it asks the network, so
+  // this must be bound before the first map is built. The fetcher lets the
+  // cache download terrain tiles itself — MapLibre's own fetch would keep the
+  // unconverted Mapbox.com encoding (see `terrain_tile_codec.dart`).
+  final mapTileCache = cache == null
+      ? null
+      : MapTileCache(
+          cache.etag,
+          usage: cache.usage,
+          fetcher: (url) async => (await apiClient.getBytesAbsolute(url)).bytes,
+        );
+  await mapTileCache?.install();
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
   // anchored to a monotonic clock, exposed globally via `AppTime` and resynced

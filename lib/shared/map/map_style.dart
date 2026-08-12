@@ -99,11 +99,20 @@ const String dpmRestroomPointsLayerId = 'dpm-restroom-points';
 const String dpmShelterSourceId = 'dpm-shelter-src';
 const String dpmShelterPointsLayerId = 'dpm-shelter-points';
 
-/// Origin basemap XYZ (LB). Fetched by MapLibre, served from the app's tile
-/// store through the Dart bridge, and warmed by `MapTileWarmer` — the same
-/// three tiers as every other ExpTech tile.
+/// Origin basemap XYZ (static LB CDN). Fetched by MapLibre, served from the
+/// app's tile store through the Dart bridge, and warmed by `MapTileWarmer` —
+/// the same three tiers as every other ExpTech tile.
 const String basemapOriginTileUrl =
-    'https://lb.exptech.dev${ApiPaths.mapTilesV1}{z}/{x}/{y}.pbf';
+    'https://static.lb.exptech.dev${ApiPaths.mapTilesV1}{z}/{x}/{y}.pbf';
+
+/// Origin terrain XYZ (static LB CDN) — the elevation mesh backing the
+/// base map's hillshade relief.
+///
+/// The tiles are **Mapbox.com terrain-RGB PNGs** (see `terrain_tile_codec.dart`
+/// for the encoding rewrite that lets MapLibre read them) — never point a
+/// `raster-dem` source at the raw server bytes.
+const String terrainOriginTileUrl =
+    'https://static.lb.exptech.dev${ApiPaths.mapTerrainV1}{z}/{x}/{y}.png';
 
 /// Origin glyph template — MapLibre HTTPS.
 const String glyphsOriginUrl =
@@ -119,11 +128,15 @@ const String glyphsOriginUrl =
 /// borders stay legible.
 ///
 /// [basemapTileUrl] / [glyphsUrl] are origin HTTPS templates fetched by
-/// MapLibre and served from the app's tile store through the Dart bridge.
+/// MapLibre and served from the app's tile store through the Dart bridge. When
+/// [terrainTileUrl] is given, a `raster-dem` source (terrarium encoding — see
+/// `terrain_tile_codec.dart`) and a translucent hillshade layer sit between the
+/// land fills and the borders, giving the base map a shaded-relief depth.
 String exptechVectorStyle(
   MapPalette palette, {
   required String basemapTileUrl,
   required String glyphsUrl,
+  String? terrainTileUrl,
 }) {
   final background = palette.background;
   final fill = palette.fill;
@@ -131,18 +144,31 @@ String exptechVectorStyle(
   final townOutline = palette.townOutline;
   final label = palette.label;
   final labelHalo = palette.labelHalo;
+  final terrain = terrainTileUrl == null
+      ? ''
+      : '''
+  ,"terrain": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "terrarium", "tileSize": 512, "minzoom": 7, "maxzoom": 12 }''';
+  final hillshade = terrainTileUrl == null
+      ? ''
+      : '''
+  ,{ "id": "terrain-hillshade", "type": "hillshade", "source": "terrain", "paint": {
+      "hillshade-exaggeration": 0.6,
+      "hillshade-highlight-color": "#FFFFFF",
+      "hillshade-shadow-color": "rgba(0, 0, 0, 0.5)",
+      "hillshade-accent-color": "rgba(0, 0, 0, 0.35)"
+    } }''';
   return '''
 {
   "version": 8,
   "glyphs": "$glyphsUrl",
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }
+    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }$terrain
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },
     { "id": "$landLayerId", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "$fill" } },
     { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$fill" } },
-    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } },
+    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } }$hillshade,
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },
     { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } },
     { "id": "$townLabelLayerId", "type": "symbol", "source": "exptech", "source-layer": "town", "minzoom": $townLabelMinZoom, "layout": {

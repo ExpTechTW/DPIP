@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/core/network/terrain_tile_codec.dart';
 
 /// Dio interceptor implementing HTTP ETag revalidation against an
 /// [EtagCacheStore].
@@ -59,7 +60,7 @@ class EtagInterceptor extends Interceptor {
 
   /// Bare-host basemap vector tiles (no server ETag).
   static bool isBasemapPbf(Uri uri) =>
-      uri.host == 'lb.exptech.dev' &&
+      uri.host == 'static.lb.exptech.dev' &&
       uri.path.contains(ApiPaths.mapTilesV1) &&
       uri.path.endsWith('.pbf');
 
@@ -78,6 +79,7 @@ class EtagInterceptor extends Interceptor {
   /// app's usage accounting.
   static const List<String> immutableAssetMarkers = [
     ApiPaths.mapTilesV1, // basemap vector tiles
+    ApiPaths.mapTerrainV1, // terrain vector tiles
     '${ApiPaths.tiles}/radar/',
     '${ApiPaths.tiles}/satellite/',
     '${ApiPaths.tiles}/wind/',
@@ -235,11 +237,14 @@ class EtagInterceptor extends Interceptor {
         if (etag != null && response.data != null) {
           if (binary) {
             final bytes = _asBytes(response.data);
+            final converted = isTerrainPng(options.uri)
+                ? ensureTerrarium(bytes)
+                : null;
             unawaited(
               _store.writeBytes(
                 url,
                 etag: etag,
-                bytes: bytes,
+                bytes: converted ?? bytes,
                 contentType: response.headers.value(Headers.contentTypeHeader),
                 size: down,
               ),

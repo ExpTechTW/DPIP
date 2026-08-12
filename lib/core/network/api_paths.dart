@@ -18,6 +18,10 @@ abstract final class ApiPaths {
   /// v1 basemap vector tiles (`/api/v1/map/tiles/…`).
   static const String mapTilesV1 = '/api/v1/map/tiles/';
 
+  /// v1 terrain vector tiles (`/api/v1/map/terrain/…`) — the static CDN's
+  /// elevation mesh, same XYZ shape as [mapTilesV1].
+  static const String mapTerrainV1 = '/api/v1/map/terrain/';
+
   /// Live EEW feed (with `?sse=1&compress=1` for the stream).
   static const String eew = '/api/v2/eq/eew';
 

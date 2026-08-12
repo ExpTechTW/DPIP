@@ -28,6 +28,46 @@ void main() {
     ]);
   });
 
+  test(
+    'terrain adds a terrarium raster-dem source and hillshade between fills and borders',
+    () {
+      final style =
+          jsonDecode(
+                exptechVectorStyle(
+                  MapColors.dark,
+                  basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
+                  glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
+                  terrainTileUrl:
+                      'https://static.lb.exptech.dev/api/v1/map/terrain/{z}/{x}/{y}.png',
+                ),
+              )
+              as Map<String, dynamic>;
+
+      final terrain = style['sources']['terrain'] as Map<String, dynamic>;
+      expect(terrain['type'], 'raster-dem');
+      expect(terrain['encoding'], 'terrarium');
+      expect(terrain['tileSize'], 512);
+      expect(
+        terrain['minzoom'],
+        7,
+        reason: 'the server 204s below z7 — don\'t ask',
+      );
+
+      final layers = style['layers'] as List<dynamic>;
+      final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
+      expect(ids, [
+        'bg',
+        'land',
+        'county',
+        'town',
+        'terrain-hillshade',
+        'town-outline',
+        'county-outline',
+        'town-label',
+      ]);
+    },
+  );
+
   group('town-label layer', () {
     Map<String, dynamic> townLabel() {
       final style =

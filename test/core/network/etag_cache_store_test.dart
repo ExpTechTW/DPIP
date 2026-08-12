@@ -134,7 +134,7 @@ void main() {
       ...List.filled(600, 0x41),
     ]);
     await store.writeBytes(
-      'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
       etag: 'W/"u1"',
       bytes: pbf,
       contentType: 'application/octet-stream',
@@ -143,7 +143,9 @@ void main() {
       'http_cache',
       columns: ['kind', 'body'],
       where: 'key = ?',
-      whereArgs: ['https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf'],
+      whereArgs: [
+        'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      ],
     );
     expect(pbfRows.first['kind'], EtagCacheStore.kindBinaryGzip);
 
@@ -151,7 +153,7 @@ void main() {
     expect((await cold.readBytes('https://x/a.mvt'))!.bytes, mvt);
     expect(
       (await cold.readBytes(
-        'https://lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+        'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
       ))!.bytes,
       pbf,
     );
