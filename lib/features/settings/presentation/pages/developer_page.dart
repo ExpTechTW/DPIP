@@ -18,7 +18,9 @@ import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/features/settings/presentation/widgets/network_usage_chart.dart';
+import 'package:dpip/features/settings/presentation/widgets/storage_breakdown.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -36,19 +38,6 @@ typedef _Field = ({String label, String? value});
 /// Shared by the row, the dialog title, and its confirm button.
 const String _clearCacheTitle = 'Clear cache';
 
-/// Formats a byte count as a compact human string (B / KB / MB / GB).
-String _formatBytes(int bytes) {
-  if (bytes < 1024) return '$bytes B';
-  const units = ['KB', 'MB', 'GB', 'TB'];
-  var value = bytes / 1024;
-  var unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit++;
-  }
-  return '${value.toStringAsFixed(value < 10 ? 1 : 0)} ${units[unit]}';
-}
-
 /// Formats a cache hit rate as `NN% (hits/total)`, or a dash when the window
 /// saw no cacheable request at all — 0% would read as "the cache is failing".
 String _formatRate(double rate, int hits, int total) =>
@@ -65,6 +54,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
   List<({String title, List<_Field> fields})>? _sections;
   List<HourUsage>? _usageHistory;
   List<HourUsage>? _usageWeek;
+  StorageScan? _storage;
   bool _clearing = false;
 
   /// Version-row taps toward the experimental unlock. Deliberately not
@@ -92,6 +82,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
       hours: 24 * 7,
       bucketHours: 6,
     );
+    final storage = await const StorageScanner().scan();
     final device = await DeviceInfoService.load();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
@@ -146,8 +137,25 @@ class _DeveloperPageState extends State<DeveloperPage> {
           ),
           (
             label: 'Size on disk',
-            value: cacheStats == null ? '—' : _formatBytes(cacheStats.bytes),
+            value: cacheStats == null ? '—' : formatBytes(cacheStats.bytes),
           ),
+        ],
+      ),
+      // What iOS Settings ("文件與資料") and Android Settings report, split
+      // into the app's own categories. The SQLite body budget (150 MB) is not
+      // the whole story — the DB file carries page overhead and the OS-level
+      // caches are separate.
+      (
+        title: 'Storage',
+        fields: [
+          (label: 'Total on disk', value: formatBytes(storage.totalBytes)),
+          for (final slice in storageBreakdown(storage))
+            (
+              label: slice.label,
+              value:
+                  '${formatBytes(slice.bytes)} '
+                  '(${(slice.bytes / storage.totalBytes * 100).toStringAsFixed(1)}%)',
+            ),
         ],
       ),
       // Every figure here is the same pair of trailing windows, so they can be
@@ -157,19 +165,19 @@ class _DeveloperPageState extends State<DeveloperPage> {
         fields: [
           (
             label: 'Downloaded · last 24h',
-            value: usage == null ? '—' : _formatBytes(usage.last24h),
+            value: usage == null ? '—' : formatBytes(usage.last24h),
           ),
           (
             label: 'Downloaded · last 7d',
-            value: usage == null ? '—' : _formatBytes(usage.last7d),
+            value: usage == null ? '—' : formatBytes(usage.last7d),
           ),
           (
             label: 'Traffic saved · last 24h',
-            value: usage == null ? '—' : _formatBytes(usage.saved24h),
+            value: usage == null ? '—' : formatBytes(usage.saved24h),
           ),
           (
             label: 'Traffic saved · last 7d',
-            value: usage == null ? '—' : _formatBytes(usage.saved7d),
+            value: usage == null ? '—' : formatBytes(usage.saved7d),
           ),
           (
             label: 'Hit rate · last 24h',
@@ -191,6 +199,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
         _sections = sections;
         _usageHistory = usageHistory;
         _usageWeek = usageWeek;
+        _storage = storage;
       });
     }
   }
@@ -240,8 +249,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
         title: const Text(_clearCacheTitle),
         content: const Text(
           'Stored map tiles and API responses will be deleted and downloaded '
-          'again next time they are needed. Traffic and hit-rate figures reset '
-          'to zero.',
+          'again next time they are needed. The database file is compacted '
+          'and the OS-level HTTP cache is cleared as well. Traffic and '
+          'hit-rate figures reset to zero.',
         ),
         actions: [
           TextButton(
@@ -263,6 +273,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
     setState(() => _clearing = true);
     try {
       await etagCache?.clear();
+      // SQLite keeps free pages after a delete, so the file stays fat until
+      // compacted — the user asked to reclaim space, not just to empty rows.
+      await etagCache?.compact();
       await networkUsage?.clear();
       // The mirror would otherwise keep serving bytes the store no longer has,
       // so "cleared" would not look cleared until the app restarted.
@@ -270,6 +283,9 @@ class _DeveloperPageState extends State<DeveloperPage> {
       // MapLibre's own ambient DB is separate — poisoned immutable tiles
       // (e.g. bad Content-Encoding) survive SQLite clears otherwise.
       await clearAmbientCache();
+      // The OS-level HTTP cache is invisible to every clear above — iOS
+      // NSURLCache keeps its own copy of responses behind the app's back.
+      await const StorageScanner().clearSystemHttpCache();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'dev: clear cache');
     }
@@ -382,6 +398,11 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     NetworkUsageChart(
                       history: _usageHistory!,
                       week: _usageWeek!,
+                    ),
+                  if (sections[i].title == 'Storage' && _storage != null)
+                    StorageBreakdown(
+                      slices: storageBreakdown(_storage!),
+                      total: _storage!.totalBytes,
                     ),
                 ],
                 const SectionHeader('Maintenance'),

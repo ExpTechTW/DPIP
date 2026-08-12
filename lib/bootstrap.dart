@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/app/app.dart';
@@ -11,6 +12,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -96,6 +98,9 @@ Future<void> bootstrap() async {
       ? null
       : MapTileCache(cache.etag, usage: cache.usage);
   await mapTileCache?.install();
+  // Bound the OS-level HTTP cache (iOS NSURLCache) so total disk usage cannot
+  // grow without bound. Fire-and-forget: it never delays launch.
+  unawaited(const StorageScanner().configure());
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
   // anchored to a monotonic clock, exposed globally via `AppTime` and resynced

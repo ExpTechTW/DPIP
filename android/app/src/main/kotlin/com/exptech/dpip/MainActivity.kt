@@ -35,6 +35,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, MapCacheChannel.NAME)
             .setMethodCallHandler(MapCacheChannel(applicationContext))
 
+        MethodChannel(messenger, StorageScanChannel.NAME)
+            .setMethodCallHandler(StorageScanChannel(applicationContext))
+
         MethodChannel(messenger, BackgroundLocationChannel.NAME)
             .setMethodCallHandler(BackgroundLocationChannel(applicationContext))
 

@@ -516,6 +516,15 @@ class EtagCacheStore {
     } catch (_) {}
   }
 
+  /// Shrinks the database file back to its contents (free pages from cleared
+  /// rows return to the OS — a body budget of 150 MB does not shrink the file
+  /// on its own). Costly: only call after a full [clear], never per-write.
+  Future<void> compact() async {
+    try {
+      await _db.execute('VACUUM');
+    } catch (_) {}
+  }
+
   /// Row count and total stored body bytes — for the Debug page.
   Future<EtagCacheStats> stats() async {
     try {
