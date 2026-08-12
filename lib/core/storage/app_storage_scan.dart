@@ -1,7 +1,7 @@
 /// Sandbox disk-usage scan: what is actually on disk, where, and why.
 ///
 /// iOS Settings reports the whole sandbox, which is routinely far larger than
-/// the ETag-cache budget (150 MB of *body* blobs) — the SQLite file carries
+/// the ETag-cache budget (350 MB of *body* blobs) — the SQLite file carries
 /// page/free-space overhead, the system URL cache keeps its own copy of HTTP
 /// responses, and MapLibre's ambient database (usually disabled here) can
 /// linger from older builds. The Debug page needs real numbers, so this scans
@@ -21,6 +21,15 @@ class StorageEntry {
 
   /// File name (or last path component) — what the Debug page shows.
   String get name => path.split('/').last;
+
+  /// The last two path components (`tmp/main.dart.dill`) — enough to tell
+  /// which sandbox tree a file lives in when several share a name.
+  String get shortPath {
+    final parts = path.split('/');
+    return parts.length >= 2
+        ? '${parts[parts.length - 2]}/${parts.last}'
+        : name;
+  }
 }
 
 /// Result of a sandbox scan.
@@ -98,7 +107,13 @@ List<StorageSlice> storageBreakdown(StorageScan scan) {
     'MapLibre',
     (f) => f.path.contains('MapLibre') || f.path.contains('mapbox'),
   );
-  known('Flutter engine', (f) => f.path.contains('io.flutter'));
+  known(
+    'Flutter engine',
+    // `io.flutter` covers the engine's own caches; `*.dill` covers the
+    // debug-mode kernel snapshots flutter run leaves in tmp on every launch
+    // (tens of MB each, and they pile up — they are not app data).
+    (f) => f.path.contains('io.flutter') || f.name.endsWith('.dill'),
+  );
   known(
     'System HTTP cache',
     (f) => f.path.contains('HTTPCache') || f.path.contains('URLCache'),
@@ -185,6 +200,24 @@ class StorageScanner {
       // Platform without the handler.
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'clear system HTTP cache');
+    }
+  }
+
+  /// Empties the sandbox's temporary directory. iOS-only: Android has no
+  /// separate tmp tree — `cacheDir` is the whole story and is covered by the
+  /// cache clear already.
+  ///
+  /// Nothing the app owns lives in tmp permanently, so this is always safe;
+  /// it exists because some native path (historically MapLibre's transient
+  /// tile work, aborted snapshot writes) can pile up hundreds of MB there
+  /// that no other clear reaches.
+  Future<void> clearTmp() async {
+    try {
+      await _channel.invokeMethod<void>('clearTmp');
+    } on MissingPluginException {
+      // Platform without the handler (Android — no-op by design).
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'clear tmp');
     }
   }
 }

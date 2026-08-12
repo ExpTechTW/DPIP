@@ -27,6 +27,9 @@ class StorageScanChannel(private val context: Context) : MethodChannel.MethodCal
             "scan" -> result.success(scan())
             "configure" -> result.success(null)
             "clearSystemHttpCache" -> result.success(null)
+            // No separate tmp tree on Android — cacheDir is the whole story
+            // and is covered by the app-side cache clears.
+            "clearTmp" -> result.success(null)
             else -> result.notImplemented()
         }
     }

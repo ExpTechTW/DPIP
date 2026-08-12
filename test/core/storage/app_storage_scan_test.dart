@@ -109,6 +109,29 @@ void main() {
         30 * 1024 * 1024,
       );
     });
+
+    test('debug kernel snapshots (*.dill) count as engine, not tmp', () {
+      final s = scan(
+        totalBytes: 190 * 1024 * 1024,
+        dirs: const [StorageEntry(path: '/tmp', bytes: 190 * 1024 * 1024)],
+        files: const [
+          StorageEntry(path: '/tmp/main.dart.dill', bytes: 90 * 1024 * 1024),
+          StorageEntry(
+            path: '/tmp/main.dart.swap.dill',
+            bytes: 90 * 1024 * 1024,
+          ),
+        ],
+      );
+      final slices = storageBreakdown(s);
+      expect(
+        slices.firstWhere((s) => s.label == 'Flutter engine').bytes,
+        180 * 1024 * 1024,
+      );
+      expect(
+        slices.firstWhere((s) => s.label == 'tmp').bytes,
+        10 * 1024 * 1024,
+      );
+    });
   });
 
   group('formatBytes', () {
@@ -118,6 +141,16 @@ void main() {
       expect(formatBytes(1024), '1.0 KB');
       expect(formatBytes(5 * 1024 * 1024), '5.0 MB');
       expect(formatBytes(700 * 1024 * 1024), '700 MB');
+    });
+  });
+
+  group('StorageEntry.shortPath', () {
+    test('keeps the containing directory', () {
+      const entry = StorageEntry(
+        path: '/var/mobile/.../tmp/main.dart.dill',
+        bytes: 1,
+      );
+      expect(entry.shortPath, 'tmp/main.dart.dill');
     });
   });
 }

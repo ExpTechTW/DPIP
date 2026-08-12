@@ -45,6 +45,22 @@ public class StorageScanPlugin: NSObject, FlutterPlugin {
     case "clearSystemHttpCache":
       URLCache.shared.removeAllCachedResponses()
       result(nil)
+    case "clearTmp":
+      // The app's own caches never touch tmp — anything in there is either a
+      // leftover from an aborted native operation or MapLibre's transient
+      // tile work. Both are safe to drop at any time; iOS purges tmp on its
+      // own when space runs low anyway, so this is just reclaiming early.
+      let tmp = URL(fileURLWithPath: NSTemporaryDirectory())
+      if let contents = try? FileManager.default.contentsOfDirectory(
+        at: tmp,
+        includingPropertiesForKeys: nil,
+        options: [.skipsHiddenFiles]
+      ) {
+        for url in contents {
+          try? FileManager.default.removeItem(at: url)
+        }
+      }
+      result(nil)
     default:
       result(FlutterMethodNotImplemented)
     }

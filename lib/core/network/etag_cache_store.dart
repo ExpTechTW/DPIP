@@ -16,12 +16,14 @@
 /// gzip work for the whole batch done in a single isolate hop rather than one
 /// per row.
 ///
-/// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
-/// [maxBytes]. Age expiry is one indexed `DELETE` per write (a batch counts as
-/// one); the byte budget is **amortized**, because knowing the total means
-/// summing every blob in the table — running that per tile written made a scrub
-/// quadratic on the UI isolate. Last-used bumps are likewise **buffered** and
-/// flushed in batches (same idea as [NetworkUsageStore]). All ops best-effort.
+/// Eviction: byte budget only. Entries live until the store's total body size
+/// passes [maxBytes]; then the least-recently-used rows drop, oldest (`time`)
+/// first, until the total is back under the ceiling. Nothing expires by age —
+/// a 30-day-old map tile that is still being hit keeps its slot. The byte
+/// budget is **amortized**, because knowing the total means summing every blob
+/// in the table — running that per tile written made a scrub quadratic on the
+/// UI isolate. Last-used bumps are likewise **buffered** and flushed in
+/// batches (same idea as [NetworkUsageStore]). All ops best-effort.
 ///
 /// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
 /// records one hit + saved wire bytes — callers must not also meter those
@@ -93,12 +95,7 @@ typedef _EncodedWrite = ({
 
 /// See library doc.
 class EtagCacheStore {
-  EtagCacheStore(
-    this._db, {
-    this.maxAge = const Duration(days: 7),
-    this.maxBytes = defaultMaxBytes,
-    this._usage,
-  });
+  EtagCacheStore(this._db, {this.maxBytes = defaultMaxBytes, this._usage});
 
   final Database _db;
 
@@ -107,14 +104,13 @@ class EtagCacheStore {
   /// at the interceptor / MapLibre put path.
   final NetworkUsageStore? _usage;
 
-  /// Entries whose **last-used** is older than this are swept on the next write.
-  final Duration maxAge;
-
-  /// Soft ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first.
+  /// Ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first,
+  /// oldest (`time`) first, only once the store is over it. Entries never
+  /// expire by age.
   final int maxBytes;
 
-  /// Default size budget (~150 MB of body blobs on disk).
-  static const int defaultMaxBytes = 150 * 1024 * 1024;
+  /// Default size budget (~350 MB of body blobs on disk).
+  static const int defaultMaxBytes = 350 * 1024 * 1024;
 
   /// SQLite page-cache size in kibibytes (negative PRAGMA = KiB, not pages).
   static const int defaultPageCacheKiB = 25 * 1024;
@@ -433,14 +429,12 @@ class EtagCacheStore {
 
   /// Post-write maintenance, split by what it actually costs.
   ///
-  /// **Age expiry** is one indexed `DELETE` and normally removes nothing, so it
-  /// runs every write — and because tile traffic goes through
-  /// [writeBytesBatch], "every write" already means once per burst.
-  ///
   /// **The byte budget** is the expensive half: knowing the total means summing
   /// every blob in the table. That is amortized over [_sweepEvery] writes, or
   /// forced the moment the running total says the store is over budget. Doing
-  /// it per write made a viewport of tiles a full-table scan per tile.
+  /// it per write made a viewport of tiles a full-table scan per tile. Nothing
+  /// expires by age — only the budget trims, and only once the store is over
+  /// it.
   Future<void> _noteWrite(int addedBytes, int rows) async {
     _writesSinceSweep += rows;
     final tracked = _trackedBytes;
@@ -453,16 +447,9 @@ class EtagCacheStore {
       return;
     }
 
-    // Eviction orders by `time` (last-used) — land buffered bumps first, or a
+    // Trim orders by `time` (last-used) — land buffered bumps first, or a
     // just-read entry would look untouched and be swept.
     await _flushTouches();
-    await _db.delete(
-      _table,
-      where: 'time < ?',
-      whereArgs: [
-        DateTime.now().millisecondsSinceEpoch - maxAge.inMilliseconds,
-      ],
-    );
 
     if (tracked != null &&
         _trackedBytes! <= maxBytes &&
@@ -472,8 +459,10 @@ class EtagCacheStore {
     await _trimToBudget();
   }
 
-  /// Recounts stored bytes and drops least-recently-used rows until the total
-  /// is within [maxBytes].
+  /// Recounts stored bytes and drops least-recently-used rows — oldest
+  /// (`time`) first — until the total is within [maxBytes]. A no-op (beyond
+  /// the recount) when the store is under the ceiling: the budget trims only
+  /// when it is actually over.
   Future<void> _trimToBudget() async {
     _writesSinceSweep = 0;
     var total = await _measureBytes();
@@ -517,7 +506,7 @@ class EtagCacheStore {
   }
 
   /// Shrinks the database file back to its contents (free pages from cleared
-  /// rows return to the OS — a body budget of 150 MB does not shrink the file
+  /// rows return to the OS — a body budget of 350 MB does not shrink the file
   /// on its own). Costly: only call after a full [clear], never per-write.
   Future<void> compact() async {
     try {

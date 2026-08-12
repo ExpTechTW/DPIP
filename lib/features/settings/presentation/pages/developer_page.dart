@@ -142,7 +142,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
         ],
       ),
       // What iOS Settings ("文件與資料") and Android Settings report, split
-      // into the app's own categories. The SQLite body budget (150 MB) is not
+      // into the app's own categories. The SQLite body budget (350 MB) is not
       // the whole story — the DB file carries page overhead and the OS-level
       // caches are separate.
       (
@@ -156,6 +156,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   '${formatBytes(slice.bytes)} '
                   '(${(slice.bytes / storage.totalBytes * 100).toStringAsFixed(1)}%)',
             ),
+          // Why the total is what it is: the biggest individual files. A
+          // runaway in tmp (MapLibre's transient tile work, aborted native
+          // writes) shows up here by name long before the pie chart explains
+          // anything.
+          if (storage.files.isNotEmpty) ...[
+            (label: 'Largest files', value: null),
+            for (final file in storage.files.take(8))
+              (label: file.shortPath, value: formatBytes(file.bytes)),
+          ],
         ],
       ),
       // Every figure here is the same pair of trailing windows, so they can be
@@ -286,6 +295,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
       // The OS-level HTTP cache is invisible to every clear above — iOS
       // NSURLCache keeps its own copy of responses behind the app's back.
       await const StorageScanner().clearSystemHttpCache();
+      // iOS tmp is where transient native work (MapLibre tile handling,
+      // aborted snapshot writes) accumulates — nothing the app owns lives
+      // there, so it can be dropped wholesale.
+      await const StorageScanner().clearTmp();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'dev: clear cache');
     }
