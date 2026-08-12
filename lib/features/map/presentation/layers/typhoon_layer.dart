@@ -879,18 +879,14 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
         if (wantBoundaries.contains(boundary) == shown) continue;
         if (shown) {
           _boundariesShown.remove(boundary);
-          await AdminOutline.remove(controller, boundary);
+          await _removeBoundaryFrame(controller, boundary);
         } else {
           _boundariesShown.add(boundary);
-          await AdminOutline.add(
+          await _addBoundaryFrame(
             controller,
             boundary,
-            lineColor: isRadar
-                ? AdminOutline.lineColor
-                : boundary == AdminBoundary.town
-                ? satelliteTownOutlineColor
-                : satelliteOutlineColor,
-            belowLayerId: below,
+            isRadar: isRadar,
+            below: below,
           );
         }
       }
@@ -906,6 +902,60 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
         'Failed to sync the typhoon weather chrome',
       );
     }
+  }
+
+  /// Adds [boundary]'s frame in the look the current underlay wants.
+  ///
+  /// The satellite underlay draws the county frame exactly like the standalone
+  /// B13 layer does — a bare bright-yellow line. The shared cased stroke reads
+  /// as a *black* border over opaque IR: the dark casing dominates the thin
+  /// yellow core, which is the look the user did not ask for.
+  Future<void> _addBoundaryFrame(
+    MapLibreMapController controller,
+    AdminBoundary boundary, {
+    required bool isRadar,
+    required String below,
+  }) async {
+    if (!isRadar && boundary == AdminBoundary.county) {
+      await controller.addLineLayer(
+        AdminOutline.sourceId,
+        satelliteCountyOutlineLayerId,
+        LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
+        sourceLayer: 'city',
+        belowLayerId: below,
+        enableInteraction: false,
+      );
+      return;
+    }
+    await AdminOutline.add(
+      controller,
+      boundary,
+      lineColor: isRadar
+          ? AdminOutline.lineColor
+          : boundary == AdminBoundary.town
+          ? satelliteTownOutlineColor
+          : satelliteOutlineColor,
+      belowLayerId: below,
+    );
+  }
+
+  /// Removes [boundary]'s frame, undoing whichever look [_addBoundaryFrame]
+  /// drew — the satellite county line lives under its own layer id.
+  ///
+  /// Both looks are removed unconditionally: [setWeatherOverlay] flips
+  /// `weatherOverlay` *before* the queued sync runs, so a teardown cannot know
+  /// which look a boundary was drawn with — guessing leaves one of them behind
+  /// over the other underlay.
+  Future<void> _removeBoundaryFrame(
+    MapLibreMapController controller,
+    AdminBoundary boundary,
+  ) async {
+    if (boundary == AdminBoundary.county) {
+      try {
+        await controller.removeLayer(satelliteCountyOutlineLayerId);
+      } catch (_) {}
+    }
+    await AdminOutline.remove(controller, boundary);
   }
 
   Future<void> _syncWeatherOverlay(MapLibreMapController controller) async {
@@ -994,7 +1044,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     }
     for (final boundary in _boundariesShown.toList()) {
       _boundariesShown.remove(boundary);
-      await AdminOutline.remove(controller, boundary);
+      await _removeBoundaryFrame(controller, boundary);
     }
     try {
       await controller.removeLayer(_wxLyr);
