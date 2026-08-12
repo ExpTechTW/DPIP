@@ -463,6 +463,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherHumidity => 'ความชื้น';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · เวลาข้อมูล $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'ดูบนแผนที่';
+
+  @override
   String get homeForecastTitle => 'พยากรณ์ 24 ชั่วโมง';
 
   @override
@@ -1380,6 +1388,12 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => 'แสดงชื่อตำบลเมื่อขยายแผนที่';
+
+  @override
+  String get mapTerrainRelief => 'ความนูนของภูมิประเทศ';
+
+  @override
+  String get mapTerrainReliefHint => 'แสดงความนูนของภูมิประเทศบนแผนที่ฐาน';
 
   @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';

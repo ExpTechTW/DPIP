@@ -138,10 +138,11 @@ abstract interface class MapLayer {
   /// empty — most layers only need the shared switcher.
   ///
   /// [showTownLabels] / [onShowTownLabelsChanged] expose the base map's shared
-  /// township-label setting, so a layer's menu can carry it alongside its own
-  /// options (one affordance, not a second chip). Layers whose chrome is not a
-  /// settings menu may ignore them — [MapScaffold] shows a standalone
-  /// township-label menu for layers that return no chrome.
+  /// township-label setting, and [showTerrain] / [onShowTerrainChanged] the
+  /// shared terrain-relief setting, so a layer's menu can carry them alongside
+  /// its own options (one affordance, not extra chips). Layers whose chrome is
+  /// not a settings menu may ignore them — [MapScaffold] shows a standalone
+  /// base-map menu for layers that return no chrome.
   ///
   /// [onReloadActive] re-loads this layer from scratch — a chrome option that
   /// changes what the layer renders (e.g. the satellite colour style) calls it
@@ -150,6 +151,8 @@ abstract interface class MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   });
 
@@ -254,6 +257,8 @@ mixin MapLayerDefaults implements MapLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) => const SizedBox.shrink();
 

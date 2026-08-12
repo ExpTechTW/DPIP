@@ -462,6 +462,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherHumidity => '湿度';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · データ時刻 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '地図で見る';
+
+  @override
   String get homeForecastTitle => '24時間予報';
 
   @override
@@ -1360,6 +1368,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => '拡大すると郷鎮名を表示';
+
+  @override
+  String get mapTerrainRelief => '地形の立体感';
+
+  @override
+  String get mapTerrainReliefHint => 'ベースマップに地形の陰影を表示';
 
   @override
   String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';

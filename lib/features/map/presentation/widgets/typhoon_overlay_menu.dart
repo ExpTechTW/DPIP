@@ -7,6 +7,7 @@ import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_storm_band.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_weather_overlay.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -21,11 +22,16 @@ class TyphoonOverlayMenu extends StatelessWidget {
     required this.layer,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final TyphoonMapLayer layer;
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
+
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
 
   static const Color _l7 = Color(0xFF9C27B0);
   static const Color _l10 = Color(0xFFFFC107);
@@ -44,6 +50,7 @@ class TyphoonOverlayMenu extends StatelessWidget {
         layer.showCountyOutline,
         layer.showTownOutline,
         showTownLabels,
+        showTerrain,
       ]),
       builder: (context, _) {
         final band = layer.stormBand.value;
@@ -56,11 +63,13 @@ class TyphoonOverlayMenu extends StatelessWidget {
         final showCounty = layer.showCountyOutline.value;
         final showTown = layer.showTownOutline.value;
         final showLabels = showTownLabels.value;
+        final showRelief = showTerrain.value;
         final active =
             showProb ||
             !showCallouts ||
             showWarn ||
             !showLabels ||
+            !showRelief ||
             band != TyphoonStormBand.level7 ||
             // Any underlay at all is already a deviation, and the radar chrome
             // only exists while there is one — so the marker is on for every
@@ -191,6 +200,10 @@ class TyphoonOverlayMenu extends StatelessWidget {
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

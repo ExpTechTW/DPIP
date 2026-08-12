@@ -638,6 +638,22 @@
   "@weatherHumidity": {
     "description": "Label for the humidity metric in the home weather header"
   },
+  "weatherDataTime": "{station} · Data {time}",
+  "@weatherDataTime": {
+    "description": "Nearest-station name and observation time shown as small text under the home weather header name",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "homeViewOnMap": "View on map",
+  "@homeViewOnMap": {
+    "description": "Small home-header link that opens the map tab on the temperature layer at the nearest station"
+  },
   "homeForecastTitle": "24-hour forecast",
   "@homeForecastTitle": {
     "description": "Section title for the home sheet township hourly forecast"
@@ -1836,6 +1852,15 @@
   "mapTownLabelsHint": "Show township names when zoomed in",
   "@mapTownLabelsHint": {
     "description": "Hint under the township-names setting"
+  },
+
+  "mapTerrainRelief": "Terrain relief",
+  "@mapTerrainRelief": {
+    "description": "Map setting: show the base map's hillshade relief"
+  },
+  "mapTerrainReliefHint": "Show shaded terrain relief on the base map",
+  "@mapTerrainReliefHint": {
+    "description": "Hint under the terrain-relief setting"
   },
 
   "dpmSheetEmpty": "Tap a marker on the map for details",

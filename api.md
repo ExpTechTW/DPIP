@@ -49,6 +49,24 @@
 
 ## 沒多活備援 (single host, no failover)
 
+### Basemap / Terrain（全域 static LB，無區域）
+
+Basemap 與 terrain 都由 MapLibre 直接抓（app 的 tile bridge 會以 URL 為鍵快取），
+不經 `ApiClient` 的區域 failover。
+
+| 用途 | 路徑 | 主機 |
+|---|---|---|
+| basemap | `/api/v1/map/tiles/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
+| terrain | `/api/v1/map/terrain/{z}/{x}/{y}.png` | `static.lb.exptech.dev` |
+
+> **Terrain 是 Mapbox terrain-RGB，MapLibre 原生讀得懂。** 每個像素編碼
+> `height = (R·65536 + G·256 + B)/10 − 10000` 公尺，正是 MapLibre
+> `raster-dem` 的 `encoding: 'mapbox'` —— style 直接以該 encoding 使用原始
+> PNG，**不需要任何 app 端轉換**（參照 `satellite-tiles-go/web` 的底圖處理）。
+> 底圖以 `encoding: 'mapbox'`、`tileSize: 512`、`bounds: [110, 10, 132, 35]`
+> 註冊 `raster-dem` source，疊半透明 `hillshade` layer 呈現立體感；`bounds`
+> 刻意大於真實 DEM bbox，讓 hillshade 邊緣永遠不會在畫面上碰到純背景。
+
 ### 雷達（v2）—— `core-tnn1`
 
 時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），在 API 主機上帶 ETag/304；

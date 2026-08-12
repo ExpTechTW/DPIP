@@ -461,6 +461,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherHumidity => '濕度';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
+
+  @override
   String get homeForecastTitle => '24小時預報';
 
   @override
@@ -1356,6 +1364,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
+  String get mapTerrainRelief => '地形立體感';
+
+  @override
+  String get mapTerrainReliefHint => '在底圖上顯示立體地形陰影';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -2212,6 +2226,14 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '湿度';
+
+  @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 资料时间 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地图察看';
 
   @override
   String get homeForecastTitle => '24小时预报';
@@ -3109,6 +3131,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapTownLabelsHint => '放大时显示乡镇名称';
 
   @override
+  String get mapTerrainRelief => '地形立体感';
+
+  @override
+  String get mapTerrainReliefHint => '在底图上显示立体地形阴影';
+
+  @override
   String get dpmSheetEmpty => '点击地图上的标记查看详情';
 
   @override
@@ -3965,6 +3993,14 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '濕度';
+
+  @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
 
   @override
   String get homeForecastTitle => '24小時預報';
@@ -4862,6 +4898,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
 
   @override
+  String get mapTerrainRelief => '地形立體感';
+
+  @override
+  String get mapTerrainReliefHint => '在底圖上顯示立體地形陰影';
+
+  @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';
 
   @override
@@ -5718,6 +5760,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherHumidity => '濕度';
+
+  @override
+  String weatherDataTime(String station, String time) {
+    return '$station ∙ 資料時間 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '前往地圖察看';
 
   @override
   String get homeForecastTitle => '24小時預報';
@@ -6613,6 +6663,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTownLabelsHint => '放大時顯示鄉鎮名稱';
+
+  @override
+  String get mapTerrainRelief => '地形立體感';
+
+  @override
+  String get mapTerrainReliefHint => '在底圖上顯示立體地形陰影';
 
   @override
   String get dpmSheetEmpty => '點選地圖上的標記查看詳情';

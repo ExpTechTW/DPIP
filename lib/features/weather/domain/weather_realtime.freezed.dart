@@ -15,8 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WeatherRealtime {
 
-/// Full 6-char station code (the `/station` directory key).
- String get id; WeatherRealtimeStation get station;/// Observation time, Unix seconds.
+/// Full 6-char station code — the `/station` directory key. The API returns
+/// the 5-char form (e.g. `C0X16`); it is padded to the directory's 6-char
+/// key (`C0X160`) so the id matches `WeatherStation`'s key space wherever a
+/// station sheet or `trend/{id}` is addressed by it.
+@JsonKey(fromJson: WeatherRealtime._stationKey) String get id; WeatherRealtimeStation get station;/// Observation time, Unix seconds.
  int get time; WeatherRealtimeData get data;
 /// Create a copy of WeatherRealtime
 /// with the given fields replaced by the non-null parameter values.
@@ -50,7 +53,7 @@ abstract mixin class $WeatherRealtimeCopyWith<$Res>  {
   factory $WeatherRealtimeCopyWith(WeatherRealtime value, $Res Function(WeatherRealtime) _then) = _$WeatherRealtimeCopyWithImpl;
 @useResult
 $Res call({
- String id, WeatherRealtimeStation station, int time, WeatherRealtimeData data
+@JsonKey(fromJson: WeatherRealtime._stationKey) String id, WeatherRealtimeStation station, int time, WeatherRealtimeData data
 });
 
 
@@ -176,7 +179,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: WeatherRealtime._stationKey)  String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WeatherRealtime() when $default != null:
 return $default(_that.id,_that.station,_that.time,_that.data);case _:
@@ -197,7 +200,7 @@ return $default(_that.id,_that.station,_that.time,_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: WeatherRealtime._stationKey)  String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)  $default,) {final _that = this;
 switch (_that) {
 case _WeatherRealtime():
 return $default(_that.id,_that.station,_that.time,_that.data);case _:
@@ -217,7 +220,7 @@ return $default(_that.id,_that.station,_that.time,_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: WeatherRealtime._stationKey)  String id,  WeatherRealtimeStation station,  int time,  WeatherRealtimeData data)?  $default,) {final _that = this;
 switch (_that) {
 case _WeatherRealtime() when $default != null:
 return $default(_that.id,_that.station,_that.time,_that.data);case _:
@@ -232,11 +235,14 @@ return $default(_that.id,_that.station,_that.time,_that.data);case _:
 @JsonSerializable()
 
 class _WeatherRealtime implements WeatherRealtime {
-  const _WeatherRealtime({required this.id, required this.station, required this.time, required this.data});
+  const _WeatherRealtime({@JsonKey(fromJson: WeatherRealtime._stationKey) required this.id, required this.station, required this.time, required this.data});
   factory _WeatherRealtime.fromJson(Map<String, dynamic> json) => _$WeatherRealtimeFromJson(json);
 
-/// Full 6-char station code (the `/station` directory key).
-@override final  String id;
+/// Full 6-char station code — the `/station` directory key. The API returns
+/// the 5-char form (e.g. `C0X16`); it is padded to the directory's 6-char
+/// key (`C0X160`) so the id matches `WeatherStation`'s key space wherever a
+/// station sheet or `trend/{id}` is addressed by it.
+@override@JsonKey(fromJson: WeatherRealtime._stationKey) final  String id;
 @override final  WeatherRealtimeStation station;
 /// Observation time, Unix seconds.
 @override final  int time;
@@ -275,7 +281,7 @@ abstract mixin class _$WeatherRealtimeCopyWith<$Res> implements $WeatherRealtime
   factory _$WeatherRealtimeCopyWith(_WeatherRealtime value, $Res Function(_WeatherRealtime) _then) = __$WeatherRealtimeCopyWithImpl;
 @override @useResult
 $Res call({
- String id, WeatherRealtimeStation station, int time, WeatherRealtimeData data
+@JsonKey(fromJson: WeatherRealtime._stationKey) String id, WeatherRealtimeStation station, int time, WeatherRealtimeData data
 });
 
 

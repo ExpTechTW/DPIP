@@ -140,7 +140,7 @@ void main() {
   });
 
   test('basemap PBF 404 is cached as empty and served locally', () async {
-    const url = 'https://lb.exptech.dev/api/v1/map/tiles/7/114/56.pbf';
+    const url = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/114/56.pbf';
     final adapter = _StatusAdapter(404);
     final dio = dioWith(adapter);
 

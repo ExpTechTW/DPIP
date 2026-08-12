@@ -8,7 +8,7 @@ part of 'weather_realtime.dart';
 
 _WeatherRealtime _$WeatherRealtimeFromJson(Map<String, dynamic> json) =>
     _WeatherRealtime(
-      id: json['id'] as String,
+      id: WeatherRealtime._stationKey(json['id']),
       station: WeatherRealtimeStation.fromJson(
         json['station'] as Map<String, dynamic>,
       ),

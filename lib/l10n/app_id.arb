@@ -140,6 +140,8 @@
   "regionCurrentUnavailable": "Tidak dapat memperoleh lokasi saat ini",
   "weatherPrecipitation": "Curah hujan",
   "weatherHumidity": "Kelembapan",
+  "weatherDataTime": "{station} · Waktu data {time}",
+  "homeViewOnMap": "Lihat di peta",
   "homeForecastTitle": "Prakiraan 24 jam",
   "homeForecastHighLow": "T {high}° · R {low}°",
   "homeForecastPop": "{pop}%",
@@ -231,7 +233,6 @@
   "mapTimelineFuture": "Mendatang",
   "mapTimelineObserved": "Diamati",
   "mapTimelineForecast": "Prakiraan",
-  "mapTimelineDataTime": "Waktu data {time}",
   "mapTimelineDataTime": "Waktu data {time}",
   "notifySettingsMenu": "Pengaturan notifikasi",
   "notifyTitle": "Notifikasi",
@@ -422,6 +423,9 @@
 
   "mapTownLabels": "Nama kecamatan",
   "mapTownLabelsHint": "Tampilkan nama kecamatan saat diperbesar",
+
+  "mapTerrainRelief": "Relief terrain",
+  "mapTerrainReliefHint": "Tampilkan relief terrain di peta dasar",
 
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "dpmAddress": "Alamat",

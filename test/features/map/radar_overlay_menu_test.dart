@@ -21,6 +21,8 @@ Widget _wrap(
   RadarMapLayer layer, {
   ValueListenable<bool>? showTownLabels,
   ValueChanged<bool>? onShowTownLabelsChanged,
+  ValueListenable<bool>? showTerrain,
+  ValueChanged<bool>? onShowTerrainChanged,
 }) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
@@ -33,6 +35,8 @@ Widget _wrap(
         layer: layer,
         showTownLabels: showTownLabels ?? ValueNotifier<bool>(true),
         onShowTownLabelsChanged: onShowTownLabelsChanged ?? (_) {},
+        showTerrain: showTerrain ?? ValueNotifier<bool>(true),
+        onShowTerrainChanged: onShowTerrainChanged ?? (_) {},
       ),
     ),
   ),
@@ -52,7 +56,7 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
-  testWidgets('the chip opens a menu carrying all five overlay toggles', (
+  testWidgets('the chip opens a menu carrying all six overlay toggles', (
     tester,
   ) async {
     _useTallSurface(tester);
@@ -71,14 +75,36 @@ void main() {
     expect(find.text(l10n.radarCountyOutline), findsOneWidget);
     expect(find.text(l10n.radarTownOutline), findsOneWidget);
     expect(find.text(l10n.mapTownLabels), findsOneWidget);
+    expect(find.text(l10n.mapTerrainRelief), findsOneWidget);
     // The menu is sectioned like the typhoon one: the raster's reference
     // chrome first, then the base-map settings.
     expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
     expect(find.text(l10n.mapOverlaySectionMap), findsOneWidget);
-    // Reference chrome (scan range, county, town) and the name toggle ship
-    // on; the national border ships off.
-    expect(find.byIcon(Icons.check_box), findsNWidgets(4));
+    // Reference chrome (scan range, county, town), the name toggle, and the
+    // relief toggle ship on; the national border ships off.
+    expect(find.byIcon(Icons.check_box), findsNWidgets(5));
     expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+  });
+
+  testWidgets('tapping the terrain-relief row reports the flip upward', (
+    tester,
+  ) async {
+    _useTallSurface(tester);
+    final layer = RadarMapLayer(_FakeRadarRepository());
+    final terrain = ValueNotifier<bool>(true);
+    final flipped = <bool>[];
+    await tester.pumpWidget(
+      _wrap(layer, showTerrain: terrain, onShowTerrainChanged: flipped.add),
+    );
+
+    final l10n = await _l10n();
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.mapTerrainRelief));
+    await tester.pumpAndSettle();
+
+    // Same contract as the name toggle: the value lives on the scaffold.
+    expect(flipped, [false]);
   });
 
   testWidgets('tapping the national-border row turns it on', (tester) async {

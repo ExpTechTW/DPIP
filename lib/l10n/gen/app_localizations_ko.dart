@@ -462,6 +462,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherHumidity => '습도';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · 데이터 시간 $time';
+  }
+
+  @override
+  String get homeViewOnMap => '지도에서 보기';
+
+  @override
   String get homeForecastTitle => '24시간 예보';
 
   @override
@@ -756,7 +764,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String mapTimelineDataTime(String time) {
-    return '자료 시간 $time';
+    return '데이터 시간 $time';
   }
 
   @override
@@ -1361,6 +1369,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => '확대하면 읍면동 이름 표시';
+
+  @override
+  String get mapTerrainRelief => '지형 입체감';
+
+  @override
+  String get mapTerrainReliefHint => '기본 지도에 지형 음영 표시';
 
   @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';

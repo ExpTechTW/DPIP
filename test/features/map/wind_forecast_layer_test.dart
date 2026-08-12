@@ -451,6 +451,8 @@ void main() {
       tester.element(find.byType(Scaffold)),
       showTownLabels: ValueNotifier(true),
       onShowTownLabelsChanged: (_) {},
+      showTerrain: ValueNotifier(true),
+      onShowTerrainChanged: (_) {},
       onReloadActive: () async {},
     );
     await tester.pumpWidget(

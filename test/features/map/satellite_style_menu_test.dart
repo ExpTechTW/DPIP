@@ -61,6 +61,8 @@ void main() {
           onReloadActive: () async {},
           showTownLabels: ValueNotifier(true),
           onShowTownLabelsChanged: (_) {},
+          showTerrain: ValueNotifier(true),
+          onShowTerrainChanged: (_) {},
         ),
       ),
     );
@@ -94,6 +96,8 @@ void main() {
             onReloadActive: () async => reloads++,
             showTownLabels: ValueNotifier(true),
             onShowTownLabelsChanged: (_) {},
+            showTerrain: ValueNotifier(true),
+            onShowTerrainChanged: (_) {},
           ),
         ),
       );
@@ -125,6 +129,8 @@ void main() {
       tester.element(find.byType(Scaffold)),
       showTownLabels: ValueNotifier(true),
       onShowTownLabelsChanged: (_) {},
+      showTerrain: ValueNotifier(true),
+      onShowTerrainChanged: (_) {},
       onReloadActive: () async {},
     );
     expect(chrome, isA<SatelliteReferenceMenu>());
@@ -143,6 +149,8 @@ void main() {
         tester.element(find.byType(Scaffold)),
         showTownLabels: ValueNotifier(true),
         onShowTownLabelsChanged: (_) {},
+        showTerrain: ValueNotifier(true),
+        onShowTerrainChanged: (_) {},
         onReloadActive: () async {},
       );
       expect(chrome, isA<SatelliteReferenceMenu>());
@@ -160,6 +168,8 @@ void main() {
       tester.element(find.byType(Scaffold)),
       showTownLabels: ValueNotifier(true),
       onShowTownLabelsChanged: (_) {},
+      showTerrain: ValueNotifier(true),
+      onShowTerrainChanged: (_) {},
       onReloadActive: () async {},
     );
     expect(chrome, isNot(isA<SizedBox>()));

@@ -8,6 +8,7 @@ library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
 import 'package:flutter/foundation.dart';
@@ -44,31 +45,37 @@ class MapTownLabelsRow extends StatelessWidget {
   }
 }
 
-/// Standalone township-label dropdown for layers that ship no other chrome —
-/// same chip affordance as the layer menus, so a map without a tune button
-/// still exposes the map's one optional setting.
-class MapTownLabelsMenu extends StatelessWidget {
-  const MapTownLabelsMenu({
+/// Standalone base-map dropdown for layers that ship no other chrome — same
+/// chip affordance as the layer menus, so a map without a tune button still
+/// exposes the map's optional settings (township names + terrain relief). The
+/// state lives in [MapScaffold]; this just renders it.
+class MapBasemapMenu extends StatelessWidget {
+  const MapBasemapMenu({
     super.key,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
 
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: showTownLabels,
+      listenable: Listenable.merge([showTownLabels, showTerrain]),
       builder: (context, _) => MenuAnchor(
         alignmentOffset: const Offset(0, 4),
         style: MapChipButton.menuStyle(context),
         builder: (context, controller, _) => MapChipButton(
           icon: Icons.tune,
           tooltip: l10n.mapTownLabels,
-          active: !showTownLabels.value,
+          active: !showTownLabels.value || !showTerrain.value,
           onTap: () =>
               controller.isOpen ? controller.close() : controller.open(),
         ),
@@ -78,6 +85,11 @@ class MapTownLabelsMenu extends StatelessWidget {
               MapTownLabelsRow(
                 showTownLabels: showTownLabels,
                 onShowTownLabelsChanged: onShowTownLabelsChanged,
+              ),
+              const MapMenuDivider(),
+              MapTerrainRow(
+                showTerrain: showTerrain,
+                onShowTerrainChanged: onShowTerrainChanged,
               ),
             ],
           ),

@@ -6,6 +6,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -25,12 +26,17 @@ class SatelliteStyleMenu extends StatelessWidget {
     required this.onReloadActive,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final SatelliteMapLayer layer;
   final Future<void> Function() onReloadActive;
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
+
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +46,18 @@ class SatelliteStyleMenu extends StatelessWidget {
         layer.style,
         layer.showGlobalOutline,
         showTownLabels,
+        showTerrain,
       ]),
       builder: (context, _) {
         final style = layer.style.value;
         final showGlobal = layer.showGlobalOutline.value;
         final showLabels = showTownLabels.value;
+        final showRelief = showTerrain.value;
         final active =
-            style != SatelliteStyle.gray || showGlobal || !showLabels;
+            style != SatelliteStyle.gray ||
+            showGlobal ||
+            !showLabels ||
+            !showRelief;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -114,6 +125,10 @@ class SatelliteStyleMenu extends StatelessWidget {
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
                 ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
               ],
             ),
           ],
@@ -134,20 +149,30 @@ class SatelliteReferenceMenu extends StatelessWidget {
     required this.layer,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final SatelliteMapLayer layer;
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
 
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([layer.showGlobalOutline, showTownLabels]),
+      listenable: Listenable.merge([
+        layer.showGlobalOutline,
+        showTownLabels,
+        showTerrain,
+      ]),
       builder: (context, _) {
         final showGlobal = layer.showGlobalOutline.value;
         final showLabels = showTownLabels.value;
+        final showRelief = showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -156,7 +181,7 @@ class SatelliteReferenceMenu extends StatelessWidget {
             tooltip: l10n.mapOverlaySectionReference,
             // The dot marks "not the defaults". 國界 ships off and labels on,
             // so it lights up when either has moved.
-            active: showGlobal || !showLabels,
+            active: showGlobal || !showLabels || !showRelief,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -177,6 +202,10 @@ class SatelliteReferenceMenu extends StatelessWidget {
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

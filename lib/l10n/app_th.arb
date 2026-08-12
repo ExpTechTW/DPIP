@@ -140,6 +140,8 @@
   "regionCurrentUnavailable": "ไม่สามารถระบุตำแหน่งปัจจุบันได้",
   "weatherPrecipitation": "ปริมาณน้ำฝน",
   "weatherHumidity": "ความชื้น",
+  "weatherDataTime": "{station} · เวลาข้อมูล {time}",
+  "homeViewOnMap": "ดูบนแผนที่",
   "homeForecastTitle": "พยากรณ์ 24 ชั่วโมง",
   "homeForecastHighLow": "สูง {high}° · ต่ำ {low}°",
   "homeForecastPop": "{pop}%",
@@ -231,7 +233,6 @@
   "mapTimelineFuture": "อนาคต",
   "mapTimelineObserved": "เวลาตรวจวัด",
   "mapTimelineForecast": "พยากรณ์",
-  "mapTimelineDataTime": "เวลาข้อมูล {time}",
   "mapTimelineDataTime": "เวลาข้อมูล {time}",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
   "notifyTitle": "การแจ้งเตือน",
@@ -422,6 +423,9 @@
 
   "mapTownLabels": "ชื่อตำบล",
   "mapTownLabelsHint": "แสดงชื่อตำบลเมื่อขยายแผนที่",
+
+  "mapTerrainRelief": "ความนูนของภูมิประเทศ",
+  "mapTerrainReliefHint": "แสดงความนูนของภูมิประเทศบนแผนที่ฐาน",
 
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "dpmAddress": "ที่อยู่",

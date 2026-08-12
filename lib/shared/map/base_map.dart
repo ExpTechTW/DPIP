@@ -218,6 +218,7 @@ class _BaseMapState extends State<BaseMap> {
         palette,
         basemapTileUrl: basemapOriginTileUrl,
         glyphsUrl: glyphsOriginUrl,
+        terrainTileUrl: terrainOriginTileUrl,
       ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).

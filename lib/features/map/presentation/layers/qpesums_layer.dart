@@ -70,12 +70,16 @@ class QpesumsMapLayer extends RasterTimelineLayer
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) => ScanRangeOverlayMenu(
     layer: this,
     tooltip: AppLocalizations.of(context).qpesumsOverlayMenuTooltip,
     showTownLabels: showTownLabels,
     onShowTownLabelsChanged: onShowTownLabelsChanged,
+    showTerrain: showTerrain,
+    onShowTerrainChanged: onShowTerrainChanged,
   );
 
   @override

@@ -59,7 +59,7 @@ class EtagInterceptor extends Interceptor {
 
   /// Bare-host basemap vector tiles (no server ETag).
   static bool isBasemapPbf(Uri uri) =>
-      uri.host == 'lb.exptech.dev' &&
+      uri.host == 'static.lb.exptech.dev' &&
       uri.path.contains(ApiPaths.mapTilesV1) &&
       uri.path.endsWith('.pbf');
 
@@ -78,6 +78,7 @@ class EtagInterceptor extends Interceptor {
   /// app's usage accounting.
   static const List<String> immutableAssetMarkers = [
     ApiPaths.mapTilesV1, // basemap vector tiles
+    ApiPaths.mapTerrainV1, // terrain vector tiles
     '${ApiPaths.tiles}/radar/',
     '${ApiPaths.tiles}/satellite/',
     '${ApiPaths.tiles}/wind/',

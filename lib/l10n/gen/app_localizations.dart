@@ -957,6 +957,18 @@ abstract class AppLocalizations {
   /// **'Humidity'**
   String get weatherHumidity;
 
+  /// Nearest-station name and observation time shown as small text under the home weather header name
+  ///
+  /// In en, this message translates to:
+  /// **'{station} · Data {time}'**
+  String weatherDataTime(String station, String time);
+
+  /// Small home-header link that opens the map tab on the temperature layer at the nearest station
+  ///
+  /// In en, this message translates to:
+  /// **'View on map'**
+  String get homeViewOnMap;
+
   /// Section title for the home sheet township hourly forecast
   ///
   /// In en, this message translates to:
@@ -2642,6 +2654,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show township names when zoomed in'**
   String get mapTownLabelsHint;
+
+  /// Map setting: show the base map's hillshade relief
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain relief'**
+  String get mapTerrainRelief;
+
+  /// Hint under the terrain-relief setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show shaded terrain relief on the base map'**
+  String get mapTerrainReliefHint;
 
   /// Hint in the disaster-map detail sheet when nothing is selected
   ///

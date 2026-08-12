@@ -464,6 +464,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherHumidity => 'Humidity';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Data $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'View on map';
+
+  @override
   String get homeForecastTitle => '24-hour forecast';
 
   @override
@@ -1382,6 +1390,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => 'Show township names when zoomed in';
+
+  @override
+  String get mapTerrainRelief => 'Terrain relief';
+
+  @override
+  String get mapTerrainReliefHint =>
+      'Show shaded terrain relief on the base map';
 
   @override
   String get dpmSheetEmpty => 'Tap a marker on the map for details';

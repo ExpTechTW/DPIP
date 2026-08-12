@@ -464,6 +464,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherHumidity => 'Độ ẩm';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Thời gian dữ liệu $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'Xem trên bản đồ';
+
+  @override
   String get homeForecastTitle => 'Dự báo 24 giờ';
 
   @override
@@ -768,7 +776,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String mapTimelineDataTime(String time) {
-    return 'Thời điểm dữ liệu $time';
+    return 'Thời gian dữ liệu $time';
   }
 
   @override
@@ -1382,6 +1390,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => 'Hiển thị tên hương trấn khi phóng to';
+
+  @override
+  String get mapTerrainRelief => 'Độ nổi địa hình';
+
+  @override
+  String get mapTerrainReliefHint => 'Hiển thị địa hình nổi trên bản đồ nền';
 
   @override
   String get dpmSheetEmpty =>

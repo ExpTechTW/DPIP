@@ -5,6 +5,7 @@ library;
 
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -28,12 +29,17 @@ class ForecastOverlayMenu extends StatelessWidget {
     required this.layer,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final AdminOutlineChrome layer;
 
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
+
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +48,14 @@ class ForecastOverlayMenu extends StatelessWidget {
       listenable: Listenable.merge([
         layer.adminChromeListenable,
         showTownLabels,
+        showTerrain,
       ]),
       builder: (context, _) {
         final showGlobal = layer.showGlobalOutline.value;
         final showCounty = layer.showCountyOutline.value;
         final showTown = layer.showTownOutline.value;
         final showLabels = showTownLabels.value;
+        final showRelief = showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -56,7 +64,12 @@ class ForecastOverlayMenu extends StatelessWidget {
             tooltip: l10n.windForecastOverlayMenuTooltip,
             // The dot marks "not the defaults". County and town ship on, 國界
             // and labels off, so it lights up when one has moved.
-            active: showGlobal || !showCounty || !showTown || !showLabels,
+            active:
+                showGlobal ||
+                !showCounty ||
+                !showTown ||
+                !showLabels ||
+                !showRelief,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -93,6 +106,10 @@ class ForecastOverlayMenu extends StatelessWidget {
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

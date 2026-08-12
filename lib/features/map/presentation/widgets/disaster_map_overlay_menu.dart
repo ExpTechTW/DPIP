@@ -6,6 +6,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -19,11 +20,16 @@ class DisasterMapOverlayMenu extends StatelessWidget {
     required this.layer,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final DisasterMapLayer layer;
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
+
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +38,14 @@ class DisasterMapOverlayMenu extends StatelessWidget {
       listenable: Listenable.merge([
         for (final s in layer.subLayers) s.visible,
         showTownLabels,
+        showTerrain,
       ]),
       builder: (context, _) {
         // Highlight the chip when the default set is altered (a layer off).
         final active =
             layer.subLayers.any((s) => !s.visible.value) ||
-            !showTownLabels.value;
+            !showTownLabels.value ||
+            !showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -74,6 +82,10 @@ class DisasterMapOverlayMenu extends StatelessWidget {
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

@@ -2,8 +2,12 @@
 /// next-hour rain trend.
 library;
 
+import 'dart:async';
+
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
@@ -18,13 +22,18 @@ import 'package:flutter/foundation.dart';
 /// [RegionStore] township. 全國 has no point weather — [areaCode] is null and
 /// all feeds stay cleared. Reloads when the area changes; the last values are
 /// kept while a new fetch runs so the sheet never blanks.
+///
+/// [gpsFix] supplies the live GPS coordinate (nullable when unavailable) for
+/// the debug log — the realtime request itself goes to the township centre,
+/// so the fix is logged alongside rather than used to fetch.
 class HomeWeatherController extends ChangeNotifier {
   HomeWeatherController(
     this._repository,
     this._hourTrendRepository,
     this._regions,
-    this._directory,
-  ) {
+    this._directory, {
+    this.gpsFix,
+  }) {
     _regions.addListener(_sync);
     _sync();
   }
@@ -34,7 +43,11 @@ class HomeWeatherController extends ChangeNotifier {
   final RegionStore _regions;
   final TownDirectory _directory;
 
+  /// Live GPS fix for the debug log; null when unavailable.
+  final Future<GpsFix?> Function()? gpsFix;
+
   WeatherRealtime? _weather;
+  String? _weatherCode;
   WeatherForecast? _forecast;
   RainHourTrend? _hourTrend;
   bool _loading = false;
@@ -45,6 +58,12 @@ class HomeWeatherController extends ChangeNotifier {
 
   /// The latest realtime observation, or null before the first load / at sea.
   WeatherRealtime? get weather => _weather;
+
+  /// The township code [weather] belongs to — null before the first load. The
+  /// header shows readings only when this matches the currently selected area,
+  /// so a stale (previous-area) observation never masquerades as the new one
+  /// while its fetch runs.
+  String? get weatherCode => _weatherCode;
 
   /// The latest township 24h forecast, or null before the first load / no code.
   WeatherForecast? get forecast => _forecast;
@@ -89,6 +108,7 @@ class HomeWeatherController extends ChangeNotifier {
     final town = code == null ? null : _directory.byCode(code);
     if (town == null || code == null) {
       _weather = null;
+      _weatherCode = null;
       _forecast = null;
       _hourTrend = null;
       _failure = null;
@@ -107,6 +127,11 @@ class HomeWeatherController extends ChangeNotifier {
     _hourTrendFailure = null;
     notifyListeners();
 
+    // The debug GPS read rides alongside the data fetches, never ahead of
+    // them: a fix without a fresh cache sits in its 10s timeout window, and it
+    // only annotates the log — awaiting it here would hold the sheet's new
+    // readings in limbo for nothing the user can see.
+    final gpsFuture = gpsFix?.call();
     final realtimeFuture = _repository.realtime(lat, lng);
     final forecastFuture = _repository.forecast(code);
     final hourTrendFuture = _hourTrendRepository.hourTrend(code);
@@ -118,10 +143,15 @@ class HomeWeatherController extends ChangeNotifier {
 
     _loading = false;
     realtime.when(
-      ok: (value) => _weather = value,
+      ok: (value) {
+        _weather = value;
+        _weatherCode = value == null ? null : code;
+        if (value != null) unawaited(_logRealtime(code, gpsFuture, value));
+      },
       err: (failure) {
         _failure = failure;
         _weather = null;
+        _weatherCode = null;
       },
     );
     forecast.when(
@@ -139,6 +169,31 @@ class HomeWeatherController extends ChangeNotifier {
       },
     );
     notifyListeners();
+  }
+
+  /// Debug line: the GPS fix (3 decimals) plus the nearest-station realtime
+  /// result the fetch resolved, for verifying what the device saw. The fix may
+  /// still be inside its (up to 10s) timeout window — it only annotates the
+  /// log, so it's awaited here, after the sheet has already updated.
+  Future<void> _logRealtime(
+    String code,
+    Future<GpsFix?>? gpsFuture,
+    WeatherRealtime value,
+  ) async {
+    final gps = await gpsFuture;
+    final coords = gps == null
+        ? 'no-fix'
+        : '${gps.lat.toStringAsFixed(3)},${gps.lng.toStringAsFixed(3)}';
+    final data = value.data;
+    Log.debug(
+      // l10n-ignore: debug log line, not user-facing display text
+      '所在地 code=$code gps=$coords → '
+      '${value.station.name}(${value.station.distance.toStringAsFixed(1)} km) '
+      'weather=${data.weather}(${data.weatherCode}) '
+      'temp=${data.temperature?.toStringAsFixed(1)}°C '
+      'rain=${data.rain?.toStringAsFixed(1)} mm '
+      'wind=${data.wind.speed?.toStringAsFixed(1)} m/s',
+    );
   }
 
   @override

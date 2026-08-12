@@ -88,14 +88,14 @@ Future<void> bootstrap() async {
   final defaultMapLayer = DefaultMapLayerController(prefs);
   final mapLayerOrder = MapLayerOrderController(prefs);
   final cache = await _openCache();
+  final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
+  final apiClient = ApiClient(dio, regions);
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
   final mapTileCache = cache == null
       ? null
       : MapTileCache(cache.etag, usage: cache.usage);
   await mapTileCache?.install();
-  final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
-  final apiClient = ApiClient(dio, regions);
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
   // anchored to a monotonic clock, exposed globally via `AppTime` and resynced

@@ -465,6 +465,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherHumidity => 'Kelembapan';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Waktu data $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'Lihat di peta';
+
+  @override
   String get homeForecastTitle => 'Prakiraan 24 jam';
 
   @override
@@ -1386,6 +1394,12 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapTownLabelsHint => 'Tampilkan nama kecamatan saat diperbesar';
+
+  @override
+  String get mapTerrainRelief => 'Relief terrain';
+
+  @override
+  String get mapTerrainReliefHint => 'Tampilkan relief terrain di peta dasar';
 
   @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';

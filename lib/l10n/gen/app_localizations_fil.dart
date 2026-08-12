@@ -468,6 +468,14 @@ class AppLocalizationsFil extends AppLocalizations {
   String get weatherHumidity => 'Halumigmig';
 
   @override
+  String weatherDataTime(String station, String time) {
+    return '$station · Oras ng datos $time';
+  }
+
+  @override
+  String get homeViewOnMap => 'Tingnan sa mapa';
+
+  @override
   String get homeForecastTitle => '24-oras na forecast';
 
   @override
@@ -1390,6 +1398,12 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get mapTownLabelsHint =>
       'Ipakita ang mga pangalan ng bayan kapag naka-zoom';
+
+  @override
+  String get mapTerrainRelief => 'Rehiyebo ng terrain';
+
+  @override
+  String get mapTerrainReliefHint => 'Ipakita ang anino ng terrain sa base map';
 
   @override
   String get dpmSheetEmpty => 'I-tap ang marker sa mapa para sa detalye';

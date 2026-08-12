@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+const terrainUrl =
+    'https://static.lb.exptech.dev/api/v1/map/terrain/7/107/55.png';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -142,7 +145,7 @@ void main() {
 
   test('an empty body is kept for the basemap but dropped elsewhere', () async {
     await cache.install();
-    const hole = 'https://lb.exptech.dev/api/v1/map/tiles/7/1/2.pbf';
+    const hole = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/1/2.pbf';
     const glyph =
         'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/Noto/0-255.pbf';
 
@@ -168,5 +171,29 @@ void main() {
       isNull,
       reason: 'caching a momentary glyph failure would blank labels for a week',
     );
+  });
+
+  test('a terrain tile is stored and served byte-for-byte', () async {
+    await cache.install();
+    // Arbitrary PNG bytes — the encoding is MapLibre's job now (`encoding:
+    // 'mapbox'` decodes the server's terrain-RGB natively), so the store must
+    // never rewrite them.
+    final bytes = Uint8List.fromList([9, 8, 7, 6, 5]);
+
+    await fromNative('putBatch', {
+      'entries': [
+        {'url': terrainUrl, 'data': bytes, 'contentType': 'image/png'},
+      ],
+    });
+
+    final stored = await store.readBytes(terrainUrl);
+    expect(stored, isNotNull);
+    expect(stored!.bytes, bytes);
+    final served =
+        await fromNative('getBatch', {
+              'urls': [terrainUrl],
+            })
+            as Map;
+    expect((served[terrainUrl] as Map)['data'], bytes);
   });
 }

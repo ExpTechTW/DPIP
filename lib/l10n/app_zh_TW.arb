@@ -140,6 +140,8 @@
   "regionCurrentUnavailable": "無法取得所在地位置資訊",
   "weatherPrecipitation": "降水量",
   "weatherHumidity": "濕度",
+  "weatherDataTime": "{station} ∙ 資料時間 {time}",
+  "homeViewOnMap": "前往地圖察看",
   "homeForecastTitle": "24小時預報",
   "homeForecastHighLow": "高 {high}° · 低 {low}°",
   "homeForecastPop": "{pop}%",
@@ -441,6 +443,9 @@
 
   "mapTownLabels": "鄉鎮名稱",
   "mapTownLabelsHint": "放大時顯示鄉鎮名稱",
+
+  "mapTerrainRelief": "地形立體感",
+  "mapTerrainReliefHint": "在底圖上顯示立體地形陰影",
 
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "dpmAddress": "地址",

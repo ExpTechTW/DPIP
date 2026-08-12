@@ -16,11 +16,16 @@ class RadarOverlayMenu extends StatelessWidget {
     required this.layer,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final RadarMapLayer layer;
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
+
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
 
   @override
   Widget build(BuildContext context) => ScanRangeOverlayMenu(
@@ -28,5 +33,7 @@ class RadarOverlayMenu extends StatelessWidget {
     tooltip: AppLocalizations.of(context).radarOverlayMenuTooltip,
     showTownLabels: showTownLabels,
     onShowTownLabelsChanged: onShowTownLabelsChanged,
+    showTerrain: showTerrain,
+    onShowTerrainChanged: onShowTerrainChanged,
   );
 }

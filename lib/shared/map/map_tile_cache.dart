@@ -40,10 +40,16 @@ class MapTileCache {
   //
   // Not an initializing formal: Dart has no private *named* parameter, and the
   // field must stay private.
-  // ignore: prefer_initializing_formals
-  MapTileCache(this._store, {NetworkUsageStore? usage}) : _usage = usage;
+  MapTileCache(
+    this._store, {
+    NetworkUsageStore? usage,
+    // ignore: prefer_initializing_formals
+  }) : _usage = usage;
 
   final EtagCacheStore _store;
+  // Not initializing formals: Dart has no private *named* parameter, and these
+  // fields must stay private.
+  // ignore: prefer_initializing_formals
   final NetworkUsageStore? _usage;
 
   /// Native's in-process mirror budget.
@@ -80,22 +86,24 @@ class MapTileCache {
     await setMapLibreTileMemoryLimit(memoryBytes);
   }
 
-  /// Native asked for tile bodies — answer the ones we hold.
+  /// Native asked for tile bodies — answer the ones we hold; a store miss
+  /// keeps the native-download path.
   Future<List<MapLibreTile>> _onGetBatch(List<String> urls) async {
     final wanted = urls.where(_isTile).toList(growable: false);
     if (wanted.isEmpty) return const [];
     // Hit metering lives inside [EtagCacheStore.readBytesBatch] — never
     // double-count these serves here.
     final hits = await _store.readBytesBatch(wanted);
-    return [
-      for (final entry in hits.entries)
-        MapLibreTile(
-          url: entry.key,
-          data: entry.value.bytes,
-          contentType: entry.value.contentType,
-          etag: entry.value.etag,
-        ),
-    ];
+    final served = <String, MapLibreTile>{};
+    for (final entry in hits.entries) {
+      served[entry.key] = MapLibreTile(
+        url: entry.key,
+        data: entry.value.bytes,
+        contentType: entry.value.contentType,
+        etag: entry.value.etag,
+      );
+    }
+    return served.values.toList();
   }
 
   /// Native downloaded tiles — persist and meter them.
@@ -110,16 +118,17 @@ class MapTileCache {
       // else — a glyph range that momentarily failed, say — persisting
       // emptiness would serve a blank asset for the next seven days.
       if (tile.data.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
+      final bytes = tile.data;
       writes.add((
         url: tile.url,
         // The URL is content-addressed, so the synthetic tag is the right key —
         // a new frame is a new URL, never a revalidation of this one.
         etag: EtagInterceptor.etagFromUrl(uri),
-        bytes: tile.data,
+        bytes: bytes,
         contentType: tile.contentType,
-        size: tile.data.length,
+        size: bytes.length,
       ));
-      downloaded += tile.data.length;
+      downloaded += bytes.length;
     }
     if (writes.isEmpty) return;
     await _store.writeBytesBatch(writes);

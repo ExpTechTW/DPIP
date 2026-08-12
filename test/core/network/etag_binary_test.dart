@@ -175,7 +175,7 @@ void main() {
     final payload = Uint8List.fromList([0x1a, 0x2b, 0x3c]);
     final adapter = _BinaryAdapter(bytes: payload); // no server etag
     final dio = createDio(etagCache: store)..httpClientAdapter = adapter;
-    const url = 'https://lb.exptech.dev/api/v1/map/tiles/7/109/55.pbf';
+    const url = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/109/55.pbf';
     final expectedEtag = EtagInterceptor.etagFromUrl(Uri.parse(url));
 
     final first = await dio.get<List<int>>(

@@ -49,11 +49,15 @@ class RadarMapLayer extends RasterTimelineLayer
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) => RadarOverlayMenu(
     layer: this,
     showTownLabels: showTownLabels,
     onShowTownLabelsChanged: onShowTownLabelsChanged,
+    showTerrain: showTerrain,
+    onShowTerrainChanged: onShowTerrainChanged,
   );
 
   @override

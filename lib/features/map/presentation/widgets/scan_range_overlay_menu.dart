@@ -5,6 +5,7 @@ library;
 
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -25,6 +26,8 @@ class ScanRangeOverlayMenu extends StatelessWidget {
     required this.tooltip,
     required this.showTownLabels,
     required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
   });
 
   final ScanRangeOverlayChrome layer;
@@ -36,17 +39,25 @@ class ScanRangeOverlayMenu extends StatelessWidget {
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
 
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([layer.chromeListenable, showTownLabels]),
+      listenable: Listenable.merge([
+        layer.chromeListenable,
+        showTownLabels,
+        showTerrain,
+      ]),
       builder: (context, _) {
         final showRange = layer.showScanRange.value;
         final showGlobal = layer.showGlobalOutline.value;
         final showCounty = layer.showCountyOutline.value;
         final showTown = layer.showTownOutline.value;
         final showLabels = showTownLabels.value;
+        final showRelief = showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
@@ -61,7 +72,8 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                 showGlobal ||
                 !showCounty ||
                 !showTown ||
-                !showLabels,
+                !showLabels ||
+                !showRelief,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -106,6 +118,10 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),
