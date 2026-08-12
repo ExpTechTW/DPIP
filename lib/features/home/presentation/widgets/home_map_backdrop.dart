@@ -7,6 +7,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -448,6 +449,9 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
           }
           return BaseMap(
             interactive: false,
+            // The backdrop sits in the home tab — pause its native render loop
+            // when the user is elsewhere (indexedStack keeps it mounted).
+            tabIndex: HomePage.tabIndex,
             onMapCreated: _onMapCreated,
             onStyleLoaded: _onStyleLoaded,
           );

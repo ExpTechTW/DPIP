@@ -45,6 +45,10 @@ import 'package:provider/provider.dart';
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
+  /// Shell branch index of the map tab — [BaseMap] pauses its native render
+  /// loop while this tab is hidden.
+  static const int tabIndex = 2;
+
   @override
   State<MapPage> createState() => _MapPageState();
 }
@@ -94,6 +98,7 @@ class _MapPageState extends State<MapPage> {
       key: ValueKey(initialId),
       layers: _layers,
       initialLayerId: initialId,
+      tabIndex: MapPage.tabIndex,
     );
   }
 }

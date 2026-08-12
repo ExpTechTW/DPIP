@@ -41,8 +41,12 @@ const String _basemapTileUrl = basemapOriginTileUrl;
 /// calls never overlap, and a generation counter drops results from a superseded
 /// layer load so a slow fetch can't render onto the wrong layer.
 class MapScaffold extends StatefulWidget {
-  const MapScaffold({super.key, required this.layers, this.initialLayerId})
-    : assert(layers.length > 0, 'MapScaffold needs at least one layer');
+  const MapScaffold({
+    super.key,
+    required this.layers,
+    this.initialLayerId,
+    this.tabIndex,
+  }) : assert(layers.length > 0, 'MapScaffold needs at least one layer');
 
   /// The layers this surface offers; [initialLayerId] (or the first entry) is
   /// shown initially.
@@ -51,6 +55,10 @@ class MapScaffold extends StatefulWidget {
   /// Preferred overlay id (`MapLayer.id`) when the surface mounts. Unknown /
   /// missing → [layers].first.
   final String? initialLayerId;
+
+  /// Shell tab owning this surface — forwarded to [BaseMap] so the map pauses
+  /// its native render loop while the tab is hidden. `null` never pauses.
+  final int? tabIndex;
 
   @override
   State<MapScaffold> createState() => _MapScaffoldState();
@@ -673,6 +681,9 @@ class _MapScaffoldState extends State<MapScaffold> {
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _active.mapMaxZoom,
+              // The map tab owns this surface — pause native rendering when the
+              // user is on another tab (indexedStack keeps it mounted).
+              tabIndex: widget.tabIndex,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),

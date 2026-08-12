@@ -4,6 +4,7 @@ import 'dart:math' show Point;
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -46,6 +47,7 @@ class BaseMap extends StatefulWidget {
     this.showUserLocation = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
+    this.tabIndex,
   });
 
   /// Bounding box for the nationwide (全國) framing — the Taiwan main island
@@ -135,6 +137,14 @@ class BaseMap extends StatefulWidget {
   /// Per-surface zoom ceiling (DPM AED may go to 16).
   final double maxZoomPreference;
 
+  /// Shell tab that owns this surface, if any — the map pauses its native
+  /// render loop while that tab is hidden and resumes when it comes back.
+  /// A hidden tab keeps its platform view alive (see `StatefulShellRoute.
+  /// indexedStack`), so without this the map would keep producing frames —
+  /// and burning GPU — offstage. `null` (full-screen routes, previews outside
+  /// the shell) never pauses.
+  final int? tabIndex;
+
   @override
   State<BaseMap> createState() => _BaseMapState();
 }
@@ -142,6 +152,13 @@ class BaseMap extends StatefulWidget {
 class _BaseMapState extends State<BaseMap> {
   /// Set once the platform view reports in — the readiness gate for the retry.
   MapLibreMapController? _controller;
+
+  /// The shell's visible-tab notifier ([VisibleTabScope.of] may be null when
+  /// this surface lives outside the shell — then it never pauses).
+  VisibleTab? _visibleTab;
+
+  /// Last-applied pause state, so [setRenderPaused] fires only on transitions.
+  bool _renderPaused = false;
 
   /// Bumped to remount the map's platform view after a failed first attempt
   /// (see [_scheduleReadinessRetry]).
@@ -156,10 +173,38 @@ class _BaseMapState extends State<BaseMap> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_onTabChanged);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_onTabChanged);
+    _syncRender();
+  }
+
+  @override
   void dispose() {
+    _visibleTab?.removeListener(_onTabChanged);
     _readinessTimer?.cancel();
     super.dispose();
   }
+
+  /// A surface can live in only one tab; anything else (or no scope at all)
+  /// counts as visible. The controller may not exist yet — the state is kept
+  /// and applied when the platform view reports in ([_onMapCreated]), so
+  /// `_renderPaused` only records states that actually reached the platform.
+  void _syncRender() {
+    final visible =
+        _visibleTab == null || _visibleTab!.value == widget.tabIndex;
+    final pause = !visible && widget.tabIndex != null;
+    final controller = _controller;
+    if (controller == null || pause == _renderPaused) return;
+    _renderPaused = pause;
+    controller.setRenderPaused(pause);
+  }
+
+  void _onTabChanged() => _syncRender();
 
   /// Forwards map readiness to the caller and stops the retry timer.
   void _onMapCreated(MapLibreMapController controller) {
@@ -168,6 +213,7 @@ class _BaseMapState extends State<BaseMap> {
     // A remount (retry) may have superseded this element — never hand a stale
     // controller, whose native view is being torn down, to the caller.
     if (!mounted) return;
+    _syncRender();
     widget.onMapCreated?.call(controller);
   }
 

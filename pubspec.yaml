@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   awesome_notifications: ^0.12.1
+  cupertino_icons: ^1.0.8
   dio: ^5.10.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
   # breaks older-device compatibility. Do not upgrade without checking that.
@@ -26,17 +27,29 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
-  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix.
+  # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix
+  # + setRenderPaused (pause native render loop for hidden tabs).
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   # https://github.com/ExpTechTW/flutter-maplibre-gl
   # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
   # pubspec.lock. Local path override stays in gitignored
   # `pubspec_overrides.yaml` — after `pub get` with it, discard lock churn.
+  # The fork's controller.dart calls `setRenderPaused`, which exists only in
+  # the fork's interface/web packages — pub.dev's 0.26.2 lacks it. The
+  # overrides below force those two siblings (declared hosted ^0.26.2 inside
+  # the fork) to resolve from the same fork commit, so `setRenderPaused`
+  # exists on every platform.
   maplibre_gl:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 7c2e249149ff3023c54c86a1f4c0dca5fb43d6a1
+      ref: 0674b9be9f4dc2ee7146d528ed9225bb0ce86baf
+  # Direct (not just override) so tests can import the platform interface.
+  maplibre_gl_platform_interface:
+    git:
+      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
+      path: maplibre_gl_platform_interface
+      ref: 0674b9be9f4dc2ee7146d528ed9225bb0ce86baf
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1
@@ -54,6 +67,23 @@ dev_dependencies:
   json_serializable: ^6.14.0
   sqflite_common_ffi: ^2.4.2
   url_launcher_platform_interface: ^2.3.2
+
+dependency_overrides:
+  # Same fork commit as the direct git dependencies above — the fork's web
+  # package declares the interface as hosted ^0.26.2, which would resolve to
+  # pub.dev (no setRenderPaused) and break compilation. Inline overrides live
+  # in pubspec.yaml (not the gitignored pubspec_overrides.yaml) so CI's plain
+  # `pub get` resolves identically and pubspec.lock stays stable.
+  maplibre_gl_platform_interface:
+    git:
+      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
+      path: maplibre_gl_platform_interface
+      ref: 0674b9be9f4dc2ee7146d528ed9225bb0ce86baf
+  maplibre_gl_web:
+    git:
+      url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
+      path: maplibre_gl_web
+      ref: 0674b9be9f4dc2ee7146d528ed9225bb0ce86baf
 
 flutter:
   config:
