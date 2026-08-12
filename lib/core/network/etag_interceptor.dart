@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:dpip/core/network/terrain_tile_codec.dart';
 
 /// Dio interceptor implementing HTTP ETag revalidation against an
 /// [EtagCacheStore].
@@ -237,14 +236,11 @@ class EtagInterceptor extends Interceptor {
         if (etag != null && response.data != null) {
           if (binary) {
             final bytes = _asBytes(response.data);
-            final converted = isTerrainPng(options.uri)
-                ? ensureTerrarium(bytes)
-                : null;
             unawaited(
               _store.writeBytes(
                 url,
                 etag: etag,
-                bytes: converted ?? bytes,
+                bytes: bytes,
                 contentType: response.headers.value(Headers.contentTypeHeader),
                 size: down,
               ),

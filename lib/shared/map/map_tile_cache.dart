@@ -9,7 +9,6 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:dpip/core/network/terrain_tile_codec.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Owns tile bytes for MapLibre: SQLite persistence, traffic metering, and the
@@ -44,23 +43,14 @@ class MapTileCache {
   MapTileCache(
     this._store, {
     NetworkUsageStore? usage,
-    Future<Uint8List?> Function(String url)? fetcher,
     // ignore: prefer_initializing_formals
-  }) : _usage = usage,
-       // ignore: prefer_initializing_formals
-       _fetcher = fetcher;
+  }) : _usage = usage;
 
   final EtagCacheStore _store;
   // Not initializing formals: Dart has no private *named* parameter, and these
   // fields must stay private.
   // ignore: prefer_initializing_formals
   final NetworkUsageStore? _usage;
-
-  /// Fetches a tile body the store doesn't hold yet — the app must be the one
-  /// to download terrain tiles, because MapLibre's own fetch would keep the
-  /// unconverted Mapbox.com encoding (see [_terrainOr]).
-  // ignore: prefer_initializing_formals
-  final Future<Uint8List?> Function(String url)? _fetcher;
 
   /// Native's in-process mirror budget.
   ///
@@ -96,13 +86,8 @@ class MapTileCache {
     await setMapLibreTileMemoryLimit(memoryBytes);
   }
 
-  /// Native asked for tile bodies — answer the ones we hold.
-  ///
-  /// Terrain tiles get extra handling: stored bytes may still be the unconverted
-  /// Mapbox.com encoding (they arrived before [ensureTerrarium] could rewrite
-  /// them), and a tile the store doesn't hold yet is fetched by the app so
-  /// MapLibre never downloads — and renders — the wrong encoding. Every other
-  /// tile keeps the store-miss → native-download path.
+  /// Native asked for tile bodies — answer the ones we hold; a store miss
+  /// keeps the native-download path.
   Future<List<MapLibreTile>> _onGetBatch(List<String> urls) async {
     final wanted = urls.where(_isTile).toList(growable: false);
     if (wanted.isEmpty) return const [];
@@ -111,75 +96,14 @@ class MapTileCache {
     final hits = await _store.readBytesBatch(wanted);
     final served = <String, MapLibreTile>{};
     for (final entry in hits.entries) {
-      final converted = _terrainOr(entry.key, entry.value.bytes);
       served[entry.key] = MapLibreTile(
         url: entry.key,
-        data: converted,
+        data: entry.value.bytes,
         contentType: entry.value.contentType,
         etag: entry.value.etag,
       );
     }
-    await _fetchTerrainMisses(wanted, served);
     return served.values.toList();
-  }
-
-  /// Rewrites [url]'s stored bytes to terrarium when they're a raw terrain PNG,
-  /// persisting the rewrite so the store converges on converted bytes. Returns
-  /// the bytes MapLibre should receive.
-  Uint8List _terrainOr(String url, Uint8List bytes) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || !isTerrainPng(uri)) return bytes;
-    final converted = ensureTerrarium(bytes);
-    if (converted == null) return bytes;
-    unawaited(
-      _store.writeBytesBatch([
-        (
-          url: url,
-          etag: EtagInterceptor.etagFromUrl(uri),
-          bytes: converted,
-          contentType: 'image/png',
-          size: converted.length,
-        ),
-      ]),
-    );
-    return converted;
-  }
-
-  /// Downloads terrain tiles [wanted] doesn't hold, converting them before
-  /// serving — the one place the app fetches a tile MapLibre asked about.
-  Future<void> _fetchTerrainMisses(
-    List<String> wanted,
-    Map<String, MapLibreTile> served,
-  ) async {
-    final fetcher = _fetcher;
-    if (fetcher == null) return;
-    for (final url in wanted) {
-      if (served.containsKey(url)) continue;
-      final uri = Uri.tryParse(url);
-      if (uri == null || !isTerrainPng(uri)) continue;
-      try {
-        final bytes = await fetcher(url);
-        if (bytes == null || bytes.isEmpty) continue;
-        final converted = ensureTerrarium(bytes) ?? bytes;
-        await _store.writeBytesBatch([
-          (
-            url: url,
-            etag: EtagInterceptor.etagFromUrl(uri),
-            bytes: converted,
-            contentType: 'image/png',
-            size: converted.length,
-          ),
-        ]);
-        served[url] = MapLibreTile(
-          url: url,
-          data: converted,
-          contentType: 'image/png',
-          etag: EtagInterceptor.etagFromUrl(uri),
-        );
-      } catch (error, stackTrace) {
-        Log.handle(error, stackTrace, 'MapTileCache terrain fetch');
-      }
-    }
   }
 
   /// Native downloaded tiles — persist and meter them.
@@ -194,9 +118,7 @@ class MapTileCache {
       // else — a glyph range that momentarily failed, say — persisting
       // emptiness would serve a blank asset for the next seven days.
       if (tile.data.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
-      final bytes = isTerrainPng(uri)
-          ? ensureTerrarium(tile.data) ?? tile.data
-          : tile.data;
+      final bytes = tile.data;
       writes.add((
         url: tile.url,
         // The URL is content-addressed, so the synthetic tag is the right key —
@@ -270,14 +192,13 @@ class MapTileCache {
   Future<void> put(String url, Uint8List bytes, {String? contentType}) async {
     final uri = Uri.tryParse(url);
     if (uri == null || !EtagInterceptor.isImmutableTile(uri)) return;
-    final stored = isTerrainPng(uri) ? ensureTerrarium(bytes) ?? bytes : bytes;
     await _store.writeBytesBatch([
       (
         url: url,
         etag: EtagInterceptor.etagFromUrl(uri),
-        bytes: stored,
+        bytes: bytes,
         contentType: contentType,
-        size: stored.length,
+        size: bytes.length,
       ),
     ]);
   }

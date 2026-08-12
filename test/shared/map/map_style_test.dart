@@ -29,7 +29,7 @@ void main() {
   });
 
   test(
-    'terrain adds a terrarium raster-dem source and hillshade between fills and borders',
+    'terrain adds a mapbox-encoded raster-dem source and hillshade between fills and borders',
     () {
       final style =
           jsonDecode(
@@ -45,13 +45,30 @@ void main() {
 
       final terrain = style['sources']['terrain'] as Map<String, dynamic>;
       expect(terrain['type'], 'raster-dem');
-      expect(terrain['encoding'], 'terrarium');
-      expect(terrain['tileSize'], 512);
       expect(
-        terrain['minzoom'],
-        7,
-        reason: 'the server 204s below z7 — don\'t ask',
+        terrain['encoding'],
+        'mapbox',
+        reason:
+            'the server tiles are Mapbox terrain-RGB — MapLibre decodes them '
+            'natively, no app-side rewrite (see satellite-tiles-go/web)',
       );
+      expect(terrain['tileSize'], 512);
+      expect(terrain['minzoom'], 0);
+      expect(terrain['maxzoom'], 12);
+      expect(
+        terrain['bounds'],
+        [110, 10, 132, 35],
+        reason:
+            'the bounds must overshoot the DEM bbox so the hillshade edge '
+            'never meets the plain background on screen',
+      );
+
+      final hillshade = (style['layers'] as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .firstWhere((l) => l['id'] == terrainHillshadeLayerId);
+      final paint = hillshade['paint'] as Map<String, dynamic>;
+      expect(paint['hillshade-illumination-direction'], 335);
+      expect(paint['hillshade-exaggeration'], 0.3);
 
       final layers = style['layers'] as List<dynamic>;
       final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
@@ -60,7 +77,7 @@ void main() {
         'land',
         'county',
         'town',
-        'terrain-hillshade',
+        terrainHillshadeLayerId,
         'town-outline',
         'county-outline',
         'town-label',

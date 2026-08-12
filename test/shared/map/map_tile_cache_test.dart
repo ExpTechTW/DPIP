@@ -1,45 +1,13 @@
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:dpip/core/network/terrain_tile_codec.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image/image.dart' as img;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const terrainUrl =
     'https://static.lb.exptech.dev/api/v1/map/terrain/7/107/55.png';
-
-/// A Mapbox.com terrain-RGB PNG: sea (0 m) and 1000 m pixels.
-Uint8List _mapboxComPng() {
-  final image = img.Image(width: 2, height: 2);
-  for (var i = 0; i < 4; i++) {
-    final num = ((i < 2 ? 0 : 1000) + 10000) * 10;
-    image.setPixelRgb(
-      i % 2,
-      i ~/ 2,
-      (num >> 16) & 0xFF,
-      (num >> 8) & 0xFF,
-      num & 0xFF,
-    );
-  }
-  return Uint8List.fromList(img.encodePng(image));
-}
-
-/// Mean R channel — Mapbox.com terrain-RGB sits near 1, terrarium ≥ 128.
-int _meanR(Uint8List png) {
-  final image = img.decodePng(png)!;
-  var sum = 0;
-  var n = 0;
-  for (var y = 0; y < image.height; y++) {
-    for (var x = 0; x < image.width; x++) {
-      sum += image.getPixel(x, y).r.toInt();
-      n++;
-    }
-  }
-  return sum ~/ n;
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -205,80 +173,27 @@ void main() {
     );
   });
 
-  test(
-    'a raw terrain tile from native is converted before it is stored',
-    () async {
-      await cache.install();
-      final raw = _mapboxComPng();
-
-      await fromNative('putBatch', {
-        'entries': [
-          {'url': terrainUrl, 'data': raw, 'contentType': 'image/png'},
-        ],
-      });
-
-      final stored = await store.readBytes(terrainUrl);
-      expect(stored, isNotNull);
-      expect(
-        _meanR(stored!.bytes),
-        greaterThanOrEqualTo(64),
-        reason: 'the store must hold terrarium, never the raw Mapbox.com bytes',
-      );
-    },
-  );
-
-  test(
-    'a missed terrain tile is fetched by the app and converted before serving',
-    () async {
-      final raw = _mapboxComPng();
-      final fetched = <String>[];
-      final caching = MapTileCache(
-        store,
-        fetcher: (url) async {
-          fetched.add(url);
-          return raw;
-        },
-      );
-      await caching.install();
-
-      final served =
-          await fromNative('getBatch', {
-                'urls': [terrainUrl],
-              })
-              as Map;
-      expect(fetched, [
-        terrainUrl,
-      ], reason: 'the app must fetch — not MapLibre');
-      final data = (served[terrainUrl] as Map)['data'] as Uint8List;
-      expect(
-        _meanR(data),
-        greaterThanOrEqualTo(64),
-        reason: 'MapLibre must never render the unconverted encoding',
-      );
-      final stored = await store.readBytes(terrainUrl);
-      expect(_meanR(stored!.bytes), greaterThanOrEqualTo(64));
-    },
-  );
-
-  test('already-converted terrain is served without re-encoding', () async {
+  test('a terrain tile is stored and served byte-for-byte', () async {
     await cache.install();
-    final converted = ensureTerrarium(_mapboxComPng())!;
-    await store.writeBytes(
-      terrainUrl,
-      etag: EtagInterceptor.etagFromUrl(Uri.parse(terrainUrl)),
-      bytes: converted,
-      contentType: 'image/png',
-    );
+    // Arbitrary PNG bytes — the encoding is MapLibre's job now (`encoding:
+    // 'mapbox'` decodes the server's terrain-RGB natively), so the store must
+    // never rewrite them.
+    final bytes = Uint8List.fromList([9, 8, 7, 6, 5]);
 
+    await fromNative('putBatch', {
+      'entries': [
+        {'url': terrainUrl, 'data': bytes, 'contentType': 'image/png'},
+      ],
+    });
+
+    final stored = await store.readBytes(terrainUrl);
+    expect(stored, isNotNull);
+    expect(stored!.bytes, bytes);
     final served =
         await fromNative('getBatch', {
               'urls': [terrainUrl],
             })
             as Map;
-    expect(
-      (served[terrainUrl] as Map)['data'],
-      converted,
-      reason: 'a warm cache must not pay a decode/re-encode round-trip',
-    );
+    expect((served[terrainUrl] as Map)['data'], bytes);
   });
 }

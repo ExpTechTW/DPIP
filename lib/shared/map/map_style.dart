@@ -108,15 +108,19 @@ const String basemapOriginTileUrl =
 /// Origin terrain XYZ (static LB CDN) — the elevation mesh backing the
 /// base map's hillshade relief.
 ///
-/// The tiles are **Mapbox.com terrain-RGB PNGs** (see `terrain_tile_codec.dart`
-/// for the encoding rewrite that lets MapLibre read them) — never point a
-/// `raster-dem` source at the raw server bytes.
+/// The tiles are **Mapbox.com terrain-RGB PNGs**, which MapLibre's
+/// `encoding: 'mapbox'` decodes natively — no app-side rewrite.
 const String terrainOriginTileUrl =
     'https://static.lb.exptech.dev${ApiPaths.mapTerrainV1}{z}/{x}/{y}.png';
 
 /// Origin glyph template — MapLibre HTTPS.
 const String glyphsOriginUrl =
     'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf';
+
+/// Id of the hillshade layer the base style bakes when [terrainTileUrl] is
+/// given — [MapScaffold] toggles its visibility for the "terrain relief"
+/// switch, so the id must be stable across style reloads.
+const String terrainHillshadeLayerId = 'terrain-hillshade';
 
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
 ///
@@ -129,9 +133,12 @@ const String glyphsOriginUrl =
 ///
 /// [basemapTileUrl] / [glyphsUrl] are origin HTTPS templates fetched by
 /// MapLibre and served from the app's tile store through the Dart bridge. When
-/// [terrainTileUrl] is given, a `raster-dem` source (terrarium encoding — see
-/// `terrain_tile_codec.dart`) and a translucent hillshade layer sit between the
-/// land fills and the borders, giving the base map a shaded-relief depth.
+/// [terrainTileUrl] is given, a `raster-dem` source (`encoding: 'mapbox'` — the
+/// tiles are natively Mapbox terrain-RGB) and a translucent hillshade layer sit
+/// between the land fills and the borders, giving the base map a shaded-relief
+/// depth. The `bounds` deliberately overshoot the DEM's own bbox (≈120–122°E,
+/// 21.9–25.3°N): a hillshade edge on a plain background reads as a line, and
+/// pushing the boundary past anywhere the user can pan hides it.
 String exptechVectorStyle(
   MapPalette palette, {
   required String basemapTileUrl,
@@ -147,15 +154,13 @@ String exptechVectorStyle(
   final terrain = terrainTileUrl == null
       ? ''
       : '''
-  ,"terrain": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "terrarium", "tileSize": 512, "minzoom": 7, "maxzoom": 12 }''';
+  ,"terrain": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
   final hillshade = terrainTileUrl == null
       ? ''
       : '''
-  ,{ "id": "terrain-hillshade", "type": "hillshade", "source": "terrain", "paint": {
-      "hillshade-exaggeration": 0.6,
-      "hillshade-highlight-color": "#FFFFFF",
-      "hillshade-shadow-color": "rgba(0, 0, 0, 0.5)",
-      "hillshade-accent-color": "rgba(0, 0, 0, 0.35)"
+  ,{ "id": "$terrainHillshadeLayerId", "type": "hillshade", "source": "terrain", "paint": {
+      "hillshade-illumination-direction": 335,
+      "hillshade-exaggeration": 0.3
     } }''';
   return '''
 {
