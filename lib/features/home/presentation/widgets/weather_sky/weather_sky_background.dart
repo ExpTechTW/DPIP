@@ -132,6 +132,11 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   /// Wall-clock of the previous frame, for the particle integration step.
   double _lastFrameSeconds = 0;
 
+  /// The painter instance from the last animated frame, reused while the
+  /// animation is stopped so rebuilds of the subtree above don't repaint the
+  /// sky (see the [CustomPaint] construction in build).
+  WeatherSkyPainter? _lastPainter;
+
   /// UTC day of the cached [_sun] / [_moon] (sunrise/sunset move ~1 min
   /// per day; the moon phase by ~2.5 % per day — frame-level recomputation is
   /// pure waste, and day-level caching keeps them exact for a whole session).
@@ -365,19 +370,29 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
             final dt = (frame.time - _lastFrameSeconds).clamp(0.0, 1 / 20);
             _lastFrameSeconds = frame.time;
 
-            return CustomPaint(
-              size: Size.infinite,
-              painter: WeatherSkyPainter(
-                shaders: _shaders,
-                lutCache: cache,
-                cloudSprites: _sprites,
-                sunTextures: _sunTextures,
-                frame: frame,
-                rainField: _rain,
-                snowField: _snow,
-                dt: dt,
-              ),
-            );
+            // While the animation is stopped (`active: false` — the sheet is
+            // collapsed, or the sky sits under the scroll blur), the scene
+            // cannot change, so a rebuilt painter is byte-identical. Handing
+            // the *same* painter instance back lets RenderCustomPaint skip
+            // the repaint on those rebuilds (it compares by identity) — the
+            // scroll-driven rebuilds of the subtree above this widget
+            // (`_ScrollBlurredWeather`) then cost an element update instead
+            // of a full-screen shader stack re-render on every scroll tick.
+            final moving = widget.active && dt > 0;
+            final painter = moving || _lastPainter == null
+                ? WeatherSkyPainter(
+                    shaders: _shaders,
+                    lutCache: cache,
+                    cloudSprites: _sprites,
+                    sunTextures: _sunTextures,
+                    frame: frame,
+                    rainField: _rain,
+                    snowField: _snow,
+                    dt: dt,
+                  )
+                : _lastPainter!;
+            _lastPainter = painter;
+            return CustomPaint(size: Size.infinite, painter: painter);
           },
         );
 

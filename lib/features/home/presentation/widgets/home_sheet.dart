@@ -228,7 +228,7 @@ class HomeSheet extends StatelessWidget {
 /// so only this small leaf repaints on every scroll tick — not the sheet's
 /// whole frosted-chrome tree, which is the mistake `HomeSheet`'s own class doc
 /// warns against for the drag case.
-class _ScrollBlurredWeather extends StatelessWidget {
+class _ScrollBlurredWeather extends StatefulWidget {
   const _ScrollBlurredWeather({
     required this.scrollController,
     required this.child,
@@ -237,6 +237,11 @@ class _ScrollBlurredWeather extends StatelessWidget {
   final ScrollController scrollController;
   final Widget child;
 
+  @override
+  State<_ScrollBlurredWeather> createState() => _ScrollBlurredWeatherState();
+}
+
+class _ScrollBlurredWeatherState extends State<_ScrollBlurredWeather> {
   /// Scroll distance over which blur reaches its peak. Short on purpose: the
   /// trend card itself is most of a screen's scroll away, and holding the sky
   /// crisp for that whole distance would make the blur feel disconnected from
@@ -255,14 +260,25 @@ class _ScrollBlurredWeather extends StatelessWidget {
   /// turning the whole backdrop into a black hole at the top of the gesture.
   static const double _maxDim = 0.45;
 
+  /// The filter instance last handed to the [ImageFiltered] — [ImageFilter]
+  /// has no value equality, so a fresh `blur(...)` every scroll tick would
+  /// make the full-screen blur layer recomposite on **every** tick even though
+  /// the sigma quantises to the same value. Reusing the instance keeps the
+  /// layer cached for the whole 4-step scroll ramp.
+  ImageFilter? _filter;
+
+  /// Sigma the cached [_filter] was built for — the ladder is quantised, so
+  /// this only differs on the handful of step crossings.
+  double _filterSigma = -1;
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: scrollController,
-      child: child,
+      listenable: widget.scrollController,
+      child: widget.child,
       builder: (context, child) {
-        final offset = scrollController.hasClients
-            ? scrollController.offset
+        final offset = widget.scrollController.hasClients
+            ? widget.scrollController.offset
             : 0.0;
         final t = (offset / _rampExtent).clamp(0.0, 1.0);
         // Quantised so the full-screen blur re-renders only on a few level
@@ -274,6 +290,10 @@ class _ScrollBlurredWeather extends StatelessWidget {
         final step = (t * 4).round() / 4;
         final sigma = _maxSigma * step;
         final dim = _maxDim * step;
+        if (sigma != _filterSigma) {
+          _filterSigma = sigma;
+          _filter = ImageFilter.blur(sigmaX: sigma, sigmaY: sigma);
+        }
         // The tree's SHAPE never changes — a blur that toggles via `enabled`
         // and an always-present transparent dim. Returning the bare child at
         // rest (as an early version did) re-parents the sky's element the
@@ -286,7 +306,7 @@ class _ScrollBlurredWeather extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              imageFilter: _filter!,
               // No-op at rest, so no offscreen layer is composited — the sheet
               // spends most of its time here, and ImageFiltered.enabled skips
               // the filter without touching the tree shape.
