@@ -119,6 +119,14 @@ class _RefreshOnAppearState extends State<RefreshOnAppear>
 /// An [InheritedWidget] rather than a provider so a page can be pumped in a test
 /// (or hosted outside the shell) without one: [of] returns null and
 /// [RefreshOnAppear] then treats the page as always visible.
+///
+/// The shell hands the **same** [VisibleTab] instance down for the page's
+/// whole life, so [updateShouldNotify] can never fire (both sides of the
+/// comparison read the same object, and its value has already moved by the
+/// time a rebuild compares them). Consumers must therefore subscribe to the
+/// notifier itself in `didChangeDependencies` — `visibleTab.addListener(...)` —
+/// like [RefreshOnAppear], [BaseMap], and the wind overlay do. Reading the
+/// scope is how a consumer *finds* the notifier; it is not a change signal.
 class VisibleTabScope extends InheritedWidget {
   const VisibleTabScope({
     super.key,

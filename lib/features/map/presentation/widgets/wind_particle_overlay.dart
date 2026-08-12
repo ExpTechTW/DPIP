@@ -58,6 +58,10 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   /// Whether the map tab is the shell's visible one — see [_syncVisibility].
   bool _visible = true;
 
+  /// The shell's visible-tab notifier; `null` outside the shell means the
+  /// overlay is always visible.
+  VisibleTab? _visibleTab;
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +92,14 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Subscribes to the notifier itself, not to an InheritedWidget rebuild:
+    // the shell hands every page the same [VisibleTab] instance, so waiting
+    // for a scope update would never re-run this (see VisibleTabScope's doc).
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_syncVisibility);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_syncVisibility);
     _syncVisibility();
   }
 
@@ -98,8 +110,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   /// no longer looking at.
   void _syncVisibility() {
     final visible =
-        (VisibleTabScope.of(context)?.value ?? MapPage.tabIndex) ==
-        MapPage.tabIndex;
+        (_visibleTab?.value ?? MapPage.tabIndex) == MapPage.tabIndex;
     if (visible == _visible) return;
     _visible = visible;
     _updateTicker();
@@ -182,6 +193,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_syncVisibility);
     widget.layer.field.removeListener(_onField);
     _ticker.dispose();
     _repaint.dispose();

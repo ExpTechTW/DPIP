@@ -48,6 +48,14 @@ class _HomePageState extends State<HomePage> {
   HomeSheetExtent? _extent;
   HomeResetSignal? _resetSignal;
 
+  /// Whether this page is the shell's visible tab — gates the sheet's
+  /// [TickerMode] so its animated backdrop never runs behind another tab.
+  bool _tabVisible = true;
+
+  /// The shell's visible-tab notifier; `null` outside the shell (tests,
+  /// previews) means always visible.
+  VisibleTab? _visibleTab;
+
   /// Peak blur sigma over the exposed map once the sheet is fully up — matches
   /// the sheet's own frosted blur ([HomeSheet] at full opacity) so the map's
   /// edge crossing under the sheet doesn't read as a hard transition.
@@ -67,6 +75,23 @@ class _HomePageState extends State<HomePage> {
       _resetSignal?.removeListener(_resetSheet);
       _resetSignal = signal..addListener(_resetSheet);
     }
+    // Subscribes to the notifier itself: the scope never notifies dependents
+    // (same instance handed down — see VisibleTabScope's doc), so this gate
+    // would otherwise freeze at its first value and the backdrop tickers would
+    // keep running behind every other tab.
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_syncTabVisibility);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_syncTabVisibility);
+    _syncTabVisibility();
+  }
+
+  void _syncTabVisibility() {
+    final visible =
+        (_visibleTab?.value ?? HomePage.tabIndex) == HomePage.tabIndex;
+    if (visible == _tabVisible) return;
+    setState(() => _tabVisible = visible);
   }
 
   /// Publishes the live extent so the chrome (region bar + bottom nav) can
@@ -96,6 +121,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_syncTabVisibility);
     _resetSignal?.removeListener(_resetSheet);
     _sheet.dispose();
     super.dispose();
@@ -123,9 +149,7 @@ class _HomePageState extends State<HomePage> {
     // trying to draw with. [TickerMode] mutes every ticker under the sheet
     // while Home is hidden; they resume on return (the sky's dt clamp absorbs
     // the gap, exactly as a background-resume does).
-    final visible =
-        (VisibleTabScope.of(context)?.value ?? HomePage.tabIndex) ==
-        HomePage.tabIndex;
+    final visible = _tabVisible;
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
       onAppear: _refresh,
