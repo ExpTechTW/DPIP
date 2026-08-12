@@ -1,6 +1,7 @@
 package com.exptech.dpip
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
@@ -28,9 +29,18 @@ class DeviceInfoChannel(private val context: Context) :
                         context.contentResolver,
                         Settings.Secure.ANDROID_ID,
                     ),
+                    "totalMemoryMb" to totalMemoryMb(),
                 ),
             )
             else -> result.notImplemented()
         }
+    }
+
+    /** Total physical RAM in MiB — the cheap proxy for the low-end tier. */
+    private fun totalMemoryMb(): Long {
+        val mem = ActivityManager.MemoryInfo()
+        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+            .getMemoryInfo(mem)
+        return mem.totalMem / 1024 / 1024
     }
 }

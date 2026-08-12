@@ -93,6 +93,11 @@ class HomeSheet extends StatelessWidget {
     return lerpDouble(_restAlpha, 1, t)!;
   }
 
+  /// Quantises a 0..1 ramp into [levels] discrete steps — full-screen blur
+  /// sigmas then only change on level crossings, so the filter isn't fed a
+  /// fresh value on every drag tick.
+  static double _step(double t, int levels) => (t * levels).round() / levels;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -113,10 +118,16 @@ class HomeSheet extends StatelessWidget {
         );
         final surfaceAlpha = _surfaceAlpha(e);
         final weatherOpacity = HomeChrome.weatherReveal(e);
+        // Quantised so the full-screen backdrop blur re-renders on a few level
+        // changes through the drag instead of a fresh sigma every pixel —
+        // same ladder trick as [_ScrollBlurredWeather]'s scroll blur.
         final blur =
             24.0 *
-            (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
-            (1 - weatherOpacity);
+            _step(
+              (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
+                  (1 - weatherOpacity),
+              6,
+            );
         final borderRadius = BorderRadius.vertical(
           top: Radius.circular(lerpDouble(AppRadius.lg, 0, flush)!),
         );

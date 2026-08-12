@@ -25,6 +25,7 @@ public class DeviceInfoPlugin: NSObject, FlutterPlugin {
         "osVersion": UIDevice.current.systemVersion,
         "sdkInt": NSNull(),
         "identifier": UIDevice.current.identifierForVendor?.uuidString as Any,
+        "totalMemoryMb": ProcessInfo.processInfo.physicalMemory / 1024 / 1024,
       ])
     default:
       result(FlutterMethodNotImplemented)

@@ -10,6 +10,7 @@ class DeviceDetails {
     required this.osVersion,
     this.sdkInt,
     this.identifier,
+    this.totalMemoryMb,
   });
 
   /// Device maker / OEM — `Build.MANUFACTURER` (Android) or `Apple` (iOS).
@@ -29,6 +30,9 @@ class DeviceDetails {
 
   /// Vendor identifier (iOS `identifierForVendor`) or Android ID; may be null.
   final String? identifier;
+
+  /// Total physical RAM in MiB; null if the platform couldn't report it.
+  final int? totalMemoryMb;
 }
 
 /// Native device-info accessor backed by a platform [MethodChannel], replacing
@@ -52,6 +56,7 @@ abstract final class DeviceInfoService {
     final osVersion = (raw['osVersion'] as String?) ?? '';
     final sdkInt = (raw['sdkInt'] as num?)?.toInt();
     final identifier = raw['identifier'] as String?;
+    final totalMemoryMb = (raw['totalMemoryMb'] as num?)?.toInt();
 
     return DeviceDetails(
       manufacturer: manufacturer,
@@ -59,6 +64,7 @@ abstract final class DeviceInfoService {
       osVersion: osVersion,
       sdkInt: sdkInt,
       identifier: identifier,
+      totalMemoryMb: totalMemoryMb,
     );
   }
 

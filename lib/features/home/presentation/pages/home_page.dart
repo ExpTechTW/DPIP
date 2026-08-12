@@ -117,6 +117,15 @@ class _HomePageState extends State<HomePage> {
     final humidityPct = backdrop.humidity;
     final humidity = humidityPct == null ? null : humidityPct / 100;
     final extent = context.read<HomeSheetExtent>();
+    // The shell's IndexedStack keeps every tab mounted, so Home's animated
+    // backdrop (weather ticker, particle field, card-water shaders) would keep
+    // running behind any other tab — burning the low-end GPU that page is
+    // trying to draw with. [TickerMode] mutes every ticker under the sheet
+    // while Home is hidden; they resume on return (the sky's dt clamp absorbs
+    // the gap, exactly as a background-resume does).
+    final visible =
+        (VisibleTabScope.of(context)?.value ?? HomePage.tabIndex) ==
+        HomePage.tabIndex;
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
       onAppear: _refresh,
@@ -163,7 +172,9 @@ class _HomePageState extends State<HomePage> {
                     valueListenable: extent,
                     builder: (context, extentValue, _) {
                       final t = HomeChrome.mapDim(extentValue);
-                      final sigma = t * _mapBlurPeak;
+                      // Quantised like the sheet's own blur: the exposed map's
+                      // full-screen blur recomposites on level crossings only.
+                      final sigma = _mapBlurPeak * ((t * 6).round() / 6);
                       final dim = t * _mapDimPeak;
                       // The tree's shape never changes — no SizedBox/ImageFiltered
                       // swap at t=0, which would re-parent the subtree right over
@@ -188,27 +199,30 @@ class _HomePageState extends State<HomePage> {
               // The one weather sheet — full-screen behind the region bar so its
               // weather fills up into (and past) the bar.
               Positioned.fill(
-                child: NotificationListener<DraggableScrollableNotification>(
-                  onNotification: _onExtentChanged,
-                  child: DraggableScrollableSheet(
-                    controller: _sheet,
-                    // Built-in velocity-aware snapping between the two detents, so
-                    // a flick keeps its momentum and settles up. The old manual
-                    // pointer-up settle snapped by position only (no velocity), so
-                    // any short drag up sprang back to rest with no inertia.
-                    snap: true,
-                    // Floor = rest: the sheet is never smaller than its default.
-                    initialChildSize: HomeSheet.restExtent,
-                    minChildSize: HomeSheet.restExtent,
-                    maxChildSize: HomeSheet.maxExtent,
-                    builder: (context, scrollController) => HomeSheet(
-                      scrollController: scrollController,
-                      extent: extent,
-                      weatherMode: weatherMode,
-                      skyTimeMode: skyTimeMode,
-                      rainIntensity: rainIntensity,
-                      snowIntensity: snowIntensity,
-                      humidity: humidity == null ? null : humidity / 100,
+                child: TickerMode(
+                  enabled: visible,
+                  child: NotificationListener<DraggableScrollableNotification>(
+                    onNotification: _onExtentChanged,
+                    child: DraggableScrollableSheet(
+                      controller: _sheet,
+                      // Built-in velocity-aware snapping between the two detents, so
+                      // a flick keeps its momentum and settles up. The old manual
+                      // pointer-up settle snapped by position only (no velocity), so
+                      // any short drag up sprang back to rest with no inertia.
+                      snap: true,
+                      // Floor = rest: the sheet is never smaller than its default.
+                      initialChildSize: HomeSheet.restExtent,
+                      minChildSize: HomeSheet.restExtent,
+                      maxChildSize: HomeSheet.maxExtent,
+                      builder: (context, scrollController) => HomeSheet(
+                        scrollController: scrollController,
+                        extent: extent,
+                        weatherMode: weatherMode,
+                        skyTimeMode: skyTimeMode,
+                        rainIntensity: rainIntensity,
+                        snowIntensity: snowIntensity,
+                        humidity: humidity == null ? null : humidity / 100,
+                      ),
                     ),
                   ),
                 ),

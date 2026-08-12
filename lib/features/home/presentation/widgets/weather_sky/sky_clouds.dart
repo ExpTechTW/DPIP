@@ -170,12 +170,15 @@ List<PlacedCloud> placeClouds(
   // How many instances the current coverage justifies. Below ~0.08 the sky is
   // clear and nothing is drawn at all.
   final visible = (layout.clouds.length * coverage.clamp(0.0, 1.0)).ceil();
+  // Loop-invariant pieces of the per-cloud math: the wind-scaled deck speed
+  // and the depth-dependent size/opacity factors are hoisted out of the loop.
+  final windSpeed = layout.speed * (1.0 + wind * 2.0);
 
   for (var i = 0; i < layout.clouds.length && i < visible; i++) {
     final c = layout.clouds[i];
 
     // Near clouds drift faster — the parallax the reference gets from its 3D layout.
-    final speed = layout.speed * (1.0 + wind * 2.0) * (1.6 - c.depth);
+    final speed = windSpeed * (1.6 - c.depth);
     // Wrap over two screen widths so a sprite is never popped into view.
     final span = 2.4;
     var x = (c.x + time * speed) % span;
