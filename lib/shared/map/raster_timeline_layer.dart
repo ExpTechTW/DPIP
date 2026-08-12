@@ -73,7 +73,7 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// This is the **guaranteed** band: [fill] warm always covers it. Beyond it,
   /// [MapTileCache.warm]'s fill mode keeps topping the mirror up outward from
   /// the current frame until it is nearly full — the actual reach is set by
-  /// the memory cap, not by taste, so a 24 MB mirror easily covers far more.
+  /// the memory cap, not by taste, so a 48 MB mirror easily covers far more.
   @protected
   int get warmRadius => 4;
 
@@ -81,10 +81,12 @@ abstract class RasterTimelineLayer implements MapLayer {
   ///
   /// A cap on the spread, not a target: a fill warm injects centre → ±1 → ±2 …
   /// and stops at the native mirror's cap ([MapTileCache.defaultMemoryBytes]),
-  /// so beyond this only the most distant frames stay cold. Kept finite so a
-  /// hundreds-of-frames history never unfolds into one giant URL list.
+  /// so beyond this only the most distant frames stay cold. Sized to what a
+  /// 48 MB mirror can actually hold — a radar frame's viewport is roughly
+  /// 100–400 KB of webp, so a ±64 band is a believable full-mirror working set
+  /// rather than a number that silently under-fills the new budget.
   @protected
-  int get maxWarmRadius => 24;
+  int get maxWarmRadius => 64;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast

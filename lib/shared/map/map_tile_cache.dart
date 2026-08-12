@@ -62,15 +62,19 @@ class MapTileCache {
   /// large and the mirror quietly becomes the real cache, leaving
   /// [EtagCacheStore] doing nothing but the cold start.
   ///
-  /// 24 MB holds a full ±12-frame scrub band of webp tiles *plus* the basemap
+  /// 48 MB holds a full ±64-frame scrub band of webp tiles *plus* the basemap
   /// viewport, so a fast timeline drag stays on memory hits even while the map
   /// itself downloads. [warm]'s fill mode ([warm]) tops it up outward from the
   /// current frame until it is near this cap, then stops — the mirror trims
   /// LRU beyond it, dropping the frames a scrub swept past.
-  static const int defaultMemoryBytes = 24 * 1024 * 1024;
+  static const int defaultMemoryBytes = 48 * 1024 * 1024;
 
   /// Tiles per `injectTiles` message — roughly one frame's viewport.
   static const int _injectChunk = 24;
+
+  /// The cap [install] sized the mirror with — remembered so a fill warm can
+  /// estimate how much it may inject without overshooting into a trim.
+  int _memoryLimit = defaultMemoryBytes;
 
   /// Binds this store as the tile authority and sizes the native mirror.
   ///
@@ -78,6 +82,7 @@ class MapTileCache {
   /// list [_isTile] gates on — so native can never end up asking about a URL
   /// this store would refuse to keep.
   Future<void> install({int memoryBytes = defaultMemoryBytes}) async {
+    _memoryLimit = memoryBytes;
     await bindMapLibreTileCache(
       cacheablePatterns: EtagInterceptor.immutableAssetMarkers,
       getBatch: _onGetBatch,
@@ -144,9 +149,10 @@ class MapTileCache {
   ///
   /// When [fillUntil] is non-zero, injection runs in [fillUntil]'s **fill
   /// mode**: [urls] must be ordered most-wanted first, and the loop stops once
-  /// the native mirror is at `fillUntil × limit` — so a timeline can top the
-  /// mirror up outward from the current frame until it is nearly full and then
-  /// stop, instead of over-filling and churning LRU (or re-reading on settle).
+  /// the native mirror is estimated to be at `fillUntil × limit` — so a
+  /// timeline can top the mirror up outward from the current frame until it is
+  /// nearly full and then stop, instead of over-filling into a native LRU trim
+  /// (which would evict the very frames just injected).
   Future<int> warm(List<String> urls, {double fillUntil = 0}) async {
     final wanted = urls.where(_isTile).toList(growable: false);
     if (wanted.isEmpty) return 0;
@@ -166,26 +172,67 @@ class MapTileCache {
             etag: entry.value.etag,
           ),
       ];
-      // Chunked: warming a wide band of frames is megabytes of image data, and
-      // one giant message would occupy the platform channel long enough to be
-      // felt by whatever gesture is in progress. Each inject echoes the
-      // mirror's post-injection usage, so a fill warm can bail as it nears the
-      // cap — the remaining (more distant) urls simply stay cold.
-      for (var i = 0; i < tiles.length; i += _injectChunk) {
-        final end = math.min(i + _injectChunk, tiles.length);
-        final usage = await injectMapLibreTiles(tiles.sublist(i, end));
-        if (fillUntil > 0 &&
-            usage != null &&
-            usage.limit > 0 &&
-            usage.used >= usage.limit * fillUntil) {
-          break;
-        }
-      }
-      return hits.length;
+      if (fillUntil > 0) return _injectFill(tiles, fillUntil);
+      return _injectAll(tiles);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'MapTileCache.warm');
       return 0;
     }
+  }
+
+  /// Injects every [tiles] in fixed chunks.
+  ///
+  /// Chunked because warming a wide band of frames is megabytes of image data,
+  /// and one giant message would occupy the platform channel long enough to be
+  /// felt by whatever gesture is in progress.
+  Future<int> _injectAll(List<MapLibreTile> tiles) async {
+    for (var i = 0; i < tiles.length; i += _injectChunk) {
+      final end = math.min(i + _injectChunk, tiles.length);
+      await injectMapLibreTiles(tiles.sublist(i, end));
+    }
+    return tiles.length;
+  }
+
+  /// Injects [tiles] (ordered most-wanted first) until the mirror is estimated
+  /// to hold `fillUntil × cap` bytes, then stops.
+  ///
+  /// The estimate is the last `injectTiles` echo plus the bytes this side is
+  /// about to send — native trims LRU beyond the cap and *down to 85% of it*,
+  /// so overshooting once (a chunk's worth of tiles past the goal) would evict
+  /// exactly the frames that were just injected, which is worse than stopping
+  /// a little short. When a chunk straddles the goal it is split and only the
+  /// fitting prefix is sent.
+  Future<int> _injectFill(List<MapLibreTile> tiles, double fillUntil) async {
+    final cap = (_memoryLimit * fillUntil).floor();
+    if (cap <= 0) return 0;
+    var used = 0; // No pre-inject usage query — start at the optimistic 0.
+    var injected = 0;
+    for (var i = 0; i < tiles.length; i += _injectChunk) {
+      final end = math.min(i + _injectChunk, tiles.length);
+      var chunkBytes = 0;
+      for (var j = i; j < end; j++) {
+        chunkBytes += tiles[j].data.length;
+      }
+      if (used + chunkBytes > cap) {
+        // Split the chunk at the goal — send only the tiles that fit.
+        final fits = <MapLibreTile>[];
+        var size = 0;
+        for (var j = i; j < end; j++) {
+          if (used + size + tiles[j].data.length > cap) break;
+          fits.add(tiles[j]);
+          size += tiles[j].data.length;
+        }
+        if (fits.isEmpty) break;
+        final usage = await injectMapLibreTiles(fits);
+        used = usage?.used ?? used + size;
+        injected += fits.length;
+        break;
+      }
+      final usage = await injectMapLibreTiles(tiles.sublist(i, end));
+      used = usage?.used ?? used + chunkBytes;
+      injected += end - i;
+    }
+    return injected;
   }
 
   /// Stores [bytes] for [url] directly (a body the app fetched itself).
