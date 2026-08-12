@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
+
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
@@ -102,6 +104,14 @@ Future<void> bootstrap() async {
   // residue: every cached byte now lives in the app's own SQLite, so a second
   // disk copy is pure overhead. Fire-and-forget: it never delays launch.
   unawaited(const StorageScanner().configure());
+  // Debug runs leave JIT kernel snapshots (main.dart.dill / .swap.dill) in
+  // tmp — a debug → release switch on a dev device would otherwise carry
+  // hundreds of MB of them around. tmp is scratch space, so wiping it on a
+  // release launch is always safe (release never has anything there of its
+  // own); the debug → release direction is the only one that matters.
+  if (kReleaseMode) {
+    unawaited(const StorageScanner().clearTmp());
+  }
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
   // anchored to a monotonic clock, exposed globally via `AppTime` and resynced
