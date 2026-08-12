@@ -1,3 +1,4 @@
+import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/xyz_tiles.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -56,5 +57,45 @@ void main() {
     expect(latToTileY(0, 0), 0);
     // z=1: eastern hemisphere
     expect(lngToTileX(90, 1), 1);
+  });
+
+  test('viewportTiles bails on a camera that has not settled', () {
+    // MapLibre reports NaN/∞ mid-init or during a transition — a warm must
+    // no-op, not throw on `zoom.floor()`.
+    expect(
+      viewportTiles(
+        south: double.nan,
+        west: 121.5,
+        north: 25.1,
+        east: 121.6,
+        zoom: 10,
+        maxZoom: 12,
+      ),
+      isEmpty,
+      reason: 'a NaN bound means the camera box is not real yet',
+    );
+    expect(
+      viewportTiles(
+        south: 25.0,
+        west: 121.5,
+        north: 25.1,
+        east: 121.6,
+        zoom: double.infinity,
+        maxZoom: 12,
+      ),
+      isEmpty,
+      reason: 'an ∞ zoom must not reach floor()',
+    );
+    expect(
+      viewportTiles(
+        south: 25.0,
+        west: 121.5,
+        north: 25.1,
+        east: 121.6,
+        zoom: 10,
+        maxZoom: 12,
+      ),
+      isNotEmpty,
+    );
   });
 }

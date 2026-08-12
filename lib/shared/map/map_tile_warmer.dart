@@ -170,6 +170,17 @@ List<XyzTile> viewportTiles({
   int pad = 1,
   int maxTiles = 48,
 }) {
+  // A camera that hasn't settled can report NaN/∞ for zoom and bounds —
+  // MapLibre returns these mid-init or during a transition. Nothing to warm
+  // until it's finite; bailing here (instead of letting `zoom.floor()` throw)
+  // makes every warm path a no-op instead of a crash.
+  if (!south.isFinite ||
+      !west.isFinite ||
+      !north.isFinite ||
+      !east.isFinite ||
+      !zoom.isFinite) {
+    return const [];
+  }
   final z = math.min(zoom.floor(), maxZoom);
   final tiles = tilesCovering(
     south: south,
