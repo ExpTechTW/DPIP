@@ -133,6 +133,8 @@ class SatelliteMapLayer extends RasterTimelineLayer {
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) {
     if (channel.isBand && channel.isThermal) {
@@ -141,12 +143,16 @@ class SatelliteMapLayer extends RasterTimelineLayer {
         onReloadActive: onReloadActive,
         showTownLabels: showTownLabels,
         onShowTownLabelsChanged: onShowTownLabelsChanged,
+        showTerrain: showTerrain,
+        onShowTerrainChanged: onShowTerrainChanged,
       );
     }
     return SatelliteReferenceMenu(
       layer: this,
       showTownLabels: showTownLabels,
       onShowTownLabelsChanged: onShowTownLabelsChanged,
+      showTerrain: showTerrain,
+      onShowTerrainChanged: onShowTerrainChanged,
     );
   }
 

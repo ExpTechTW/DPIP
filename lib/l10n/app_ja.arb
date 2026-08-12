@@ -424,6 +424,9 @@
   "mapTownLabels": "郷鎮名",
   "mapTownLabelsHint": "拡大すると郷鎮名を表示",
 
+  "mapTerrainRelief": "地形の立体感",
+  "mapTerrainReliefHint": "ベースマップに地形の陰影を表示",
+
   "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
   "dpmAddress": "住所",
   "restroomTypeLabel": "種別",

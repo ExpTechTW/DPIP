@@ -1392,6 +1392,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapTownLabelsHint => 'Show township names when zoomed in';
 
   @override
+  String get mapTerrainRelief => 'Terrain relief';
+
+  @override
+  String get mapTerrainReliefHint =>
+      'Show shaded terrain relief on the base map';
+
+  @override
   String get dpmSheetEmpty => 'Tap a marker on the map for details';
 
   @override

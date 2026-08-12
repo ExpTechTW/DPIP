@@ -55,6 +55,8 @@ Widget _wrap(TyphoonMapLayer layer) => MaterialApp(
         layer: layer,
         showTownLabels: ValueNotifier<bool>(true),
         onShowTownLabelsChanged: (_) {},
+        showTerrain: ValueNotifier<bool>(true),
+        onShowTerrainChanged: (_) {},
       ),
     ),
   ),

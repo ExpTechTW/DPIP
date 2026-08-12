@@ -1400,6 +1400,12 @@ class AppLocalizationsFil extends AppLocalizations {
       'Ipakita ang mga pangalan ng bayan kapag naka-zoom';
 
   @override
+  String get mapTerrainRelief => 'Rehiyebo ng terrain';
+
+  @override
+  String get mapTerrainReliefHint => 'Ipakita ang anino ng terrain sa base map';
+
+  @override
   String get dpmSheetEmpty => 'I-tap ang marker sa mapa para sa detalye';
 
   @override

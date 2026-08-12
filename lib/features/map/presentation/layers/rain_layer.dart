@@ -7,6 +7,7 @@ import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -138,12 +139,14 @@ class RainMapLayer
     BuildContext context, {
     required ValueListenable<bool> showTownLabels,
     required ValueChanged<bool> onShowTownLabelsChanged,
+    required ValueListenable<bool> showTerrain,
+    required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return ListenableBuilder(
-      listenable: Listenable.merge([interval, showTownLabels]),
+      listenable: Listenable.merge([interval, showTownLabels, showTerrain]),
       builder: (context, _) {
         final current = interval.value;
         return MenuAnchor(
@@ -175,6 +178,10 @@ class RainMapLayer
                 MapTownLabelsRow(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
+                ),
+                MapTerrainRow(
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

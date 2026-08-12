@@ -424,6 +424,9 @@
   "mapTownLabels": "Tên hương trấn",
   "mapTownLabelsHint": "Hiển thị tên hương trấn khi phóng to",
 
+  "mapTerrainRelief": "Độ nổi địa hình",
+  "mapTerrainReliefHint": "Hiển thị địa hình nổi trên bản đồ nền",
+
   "dpmSheetEmpty": "Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết",
   "dpmAddress": "Địa chỉ",
   "restroomTypeLabel": "Loại",

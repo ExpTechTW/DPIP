@@ -2655,6 +2655,18 @@ abstract class AppLocalizations {
   /// **'Show township names when zoomed in'**
   String get mapTownLabelsHint;
 
+  /// Map setting: show the base map's hillshade relief
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain relief'**
+  String get mapTerrainRelief;
+
+  /// Hint under the terrain-relief setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show shaded terrain relief on the base map'**
+  String get mapTerrainReliefHint;
+
   /// Hint in the disaster-map detail sheet when nothing is selected
   ///
   /// In en, this message translates to:

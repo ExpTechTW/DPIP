@@ -123,6 +123,11 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// instead of on one chrome mixin. Defaults on, per the layer docs.
   final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
 
+  /// Whether the base map's terrain-relief (hillshade) is shown. Also a
+  /// base-map property, so it lives beside [_showTownLabels]. Defaults on —
+  /// the relief is the terrain feature's whole point.
+  final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
+
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
   LatLngBounds? _target;
@@ -158,6 +163,7 @@ class _MapScaffoldState extends State<MapScaffold> {
   void dispose() {
     _bearing.dispose();
     _showTownLabels.dispose();
+    _showTerrain.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
@@ -361,6 +367,29 @@ class _MapScaffoldState extends State<MapScaffold> {
     _applyTownLabelVisibility();
   }
 
+  void _setShowTerrain(bool value) {
+    if (_showTerrain.value == value) return;
+    _showTerrain.value = value;
+    _applyTerrainVisibility();
+  }
+
+  /// Pushes the terrain-relief setting onto a live map. Like the township
+  /// labels, the base style's hillshade layer survives style reloads (which
+  /// reset it to visible), so this also runs after every [_onStyleLoaded].
+  void _applyTerrainVisibility() {
+    final controller = _controller;
+    if (controller == null) return;
+    unawaited(
+      controller
+          .setLayerVisibility(terrainHillshadeLayerId, _showTerrain.value)
+          .catchError((Object e, StackTrace st) {
+            // The layer only exists in styles built with terrainTileUrl; a
+            // surface that never baked it has nothing to hide.
+            Log.handle(e, st, 'Failed to sync the terrain relief');
+          }),
+    );
+  }
+
   /// Pushes the township-label setting onto a live map. The base style's
   /// `town-label` layer survives style reloads, which reset it to visible, so
   /// this also runs after every [_onStyleLoaded] to re-assert the choice.
@@ -431,6 +460,8 @@ class _MapScaffoldState extends State<MapScaffold> {
     unawaited(_applyCameraHandoff());
     // A reload resets the base style's township-label layer to visible.
     _applyTownLabelVisibility();
+    // …and so does the hillshade layer — re-assert the user's choice.
+    _applyTerrainVisibility();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -705,6 +736,8 @@ class _MapScaffoldState extends State<MapScaffold> {
                     context,
                     showTownLabels: _showTownLabels,
                     onShowTownLabelsChanged: _setShowTownLabels,
+                    showTerrain: _showTerrain,
+                    onShowTerrainChanged: _setShowTerrain,
                     onReloadActive: _reloadActive,
                   );
                   final hasChrome = chrome is! SizedBox;
@@ -715,9 +748,11 @@ class _MapScaffoldState extends State<MapScaffold> {
                         chrome,
                         const SizedBox(width: AppSpacing.sm),
                       ] else ...[
-                        MapTownLabelsMenu(
+                        MapBasemapMenu(
                           showTownLabels: _showTownLabels,
                           onShowTownLabelsChanged: _setShowTownLabels,
+                          showTerrain: _showTerrain,
+                          onShowTerrainChanged: _setShowTerrain,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                       ],

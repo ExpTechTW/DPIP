@@ -424,6 +424,9 @@
   "mapTownLabels": "ชื่อตำบล",
   "mapTownLabelsHint": "แสดงชื่อตำบลเมื่อขยายแผนที่",
 
+  "mapTerrainRelief": "ความนูนของภูมิประเทศ",
+  "mapTerrainReliefHint": "แสดงความนูนของภูมิประเทศบนแผนที่ฐาน",
+
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "dpmAddress": "ที่อยู่",
   "restroomTypeLabel": "ประเภท",

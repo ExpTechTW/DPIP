@@ -1370,6 +1370,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTownLabelsHint => '拡大すると郷鎮名を表示';
 
   @override
+  String get mapTerrainRelief => '地形の立体感';
+
+  @override
+  String get mapTerrainReliefHint => 'ベースマップに地形の陰影を表示';
+
+  @override
   String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
 
   @override

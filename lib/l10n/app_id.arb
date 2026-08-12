@@ -424,6 +424,9 @@
   "mapTownLabels": "Nama kecamatan",
   "mapTownLabelsHint": "Tampilkan nama kecamatan saat diperbesar",
 
+  "mapTerrainRelief": "Relief terrain",
+  "mapTerrainReliefHint": "Tampilkan relief terrain di peta dasar",
+
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "dpmAddress": "Alamat",
   "restroomTypeLabel": "Jenis",

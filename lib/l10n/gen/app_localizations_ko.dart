@@ -1371,6 +1371,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTownLabelsHint => '확대하면 읍면동 이름 표시';
 
   @override
+  String get mapTerrainRelief => '지형 입체감';
+
+  @override
+  String get mapTerrainReliefHint => '기본 지도에 지형 음영 표시';
+
+  @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
 
   @override

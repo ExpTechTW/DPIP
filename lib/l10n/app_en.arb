@@ -1854,6 +1854,15 @@
     "description": "Hint under the township-names setting"
   },
 
+  "mapTerrainRelief": "Terrain relief",
+  "@mapTerrainRelief": {
+    "description": "Map setting: show the base map's hillshade relief"
+  },
+  "mapTerrainReliefHint": "Show shaded terrain relief on the base map",
+  "@mapTerrainReliefHint": {
+    "description": "Hint under the terrain-relief setting"
+  },
+
   "dpmSheetEmpty": "Tap a marker on the map for details",
   "@dpmSheetEmpty": {
     "description": "Hint in the disaster-map detail sheet when nothing is selected"

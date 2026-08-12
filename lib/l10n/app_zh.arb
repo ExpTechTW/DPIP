@@ -444,6 +444,9 @@
   "mapTownLabels": "鄉鎮名稱",
   "mapTownLabelsHint": "放大時顯示鄉鎮名稱",
 
+  "mapTerrainRelief": "地形立體感",
+  "mapTerrainReliefHint": "在底圖上顯示立體地形陰影",
+
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "廁所類型",

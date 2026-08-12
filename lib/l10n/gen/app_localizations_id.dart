@@ -1396,6 +1396,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTownLabelsHint => 'Tampilkan nama kecamatan saat diperbesar';
 
   @override
+  String get mapTerrainRelief => 'Relief terrain';
+
+  @override
+  String get mapTerrainReliefHint => 'Tampilkan relief terrain di peta dasar';
+
+  @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
 
   @override

@@ -1390,6 +1390,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTownLabelsHint => 'แสดงชื่อตำบลเมื่อขยายแผนที่';
 
   @override
+  String get mapTerrainRelief => 'ความนูนของภูมิประเทศ';
+
+  @override
+  String get mapTerrainReliefHint => 'แสดงความนูนของภูมิประเทศบนแผนที่ฐาน';
+
+  @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
 
   @override

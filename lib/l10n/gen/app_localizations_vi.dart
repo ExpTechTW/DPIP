@@ -1392,6 +1392,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapTownLabelsHint => 'Hiển thị tên hương trấn khi phóng to';
 
   @override
+  String get mapTerrainRelief => 'Độ nổi địa hình';
+
+  @override
+  String get mapTerrainReliefHint => 'Hiển thị địa hình nổi trên bản đồ nền';
+
+  @override
   String get dpmSheetEmpty =>
       'Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết';
 

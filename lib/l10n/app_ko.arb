@@ -424,6 +424,9 @@
   "mapTownLabels": "읍면동 이름",
   "mapTownLabelsHint": "확대하면 읍면동 이름 표시",
 
+  "mapTerrainRelief": "지형 입체감",
+  "mapTerrainReliefHint": "기본 지도에 지형 음영 표시",
+
   "dpmSheetEmpty": "지도에서 마커를 눌러 상세 보기",
   "dpmAddress": "주소",
   "restroomTypeLabel": "유형",
