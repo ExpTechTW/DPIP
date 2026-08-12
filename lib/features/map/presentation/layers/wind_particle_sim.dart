@@ -234,6 +234,11 @@ double _wrapWorld(double dx, double world) =>
 /// its latitude span) so advection is projection-free. Nothing remembers where
 /// the particle has been — the streak behind it is the trail buffer's business,
 /// not the particle's.
+///
+/// Screen position is two plain doubles plus a flag instead of a nullable
+/// [Offset]: the simulation allocates nothing per particle per frame, and the
+/// stamp pass has the coordinates it needs without unwrapping an object the
+/// GC would have to collect.
 class WindParticle {
   WindParticle(this.x, this.y);
 
@@ -244,9 +249,13 @@ class WindParticle {
   /// is stamped, so faster air reads as a brighter streak.
   double speed = 0;
 
-  /// Where the particle is on screen, or null when it is off the field or out
-  /// of view and so has nothing to stamp this frame.
-  Offset? screen;
+  /// Screen x/y of the last step, valid only when [visible].
+  double sx = 0;
+  double sy = 0;
+
+  /// Whether the last step landed the particle inside the viewport, where it
+  /// has something to stamp.
+  bool visible = false;
 }
 
 /// The animation state — a population advected through a [WindField].
@@ -256,11 +265,24 @@ class WindParticleSim {
   /// at z3 down to 1024 at z7 and a fixed number matches neither end.
   WindParticleSim(this.field, {int count = 6400, math.Random? random})
     : _random = random ?? math.Random(),
+      _mercY = _buildMercY(field),
       particles = [for (var i = 0; i < count; i++) WindParticle(0, 0)];
 
   final WindField field;
   final math.Random _random;
   final List<WindParticle> particles;
+
+  /// Field-space y → mercator-y lookup, so the projection per particle per
+  /// frame is two array reads instead of a `log` + `tan`.
+  ///
+  /// The web's GPU shader evaluates the projection per vertex for free; the
+  /// CPU port would spend ~6000 transcendentals a frame on the same thing.
+  /// The LUT is built over this field's own latitude span (y ∈ [0, 1]) with
+  /// linear interpolation; its error stays under a pixel at any zoom this
+  /// layer can show.
+  final Float64List _mercY;
+
+  static const int _mercYEntries = 1024;
 
   bool _seeded = false;
 
@@ -290,6 +312,9 @@ class WindParticleSim {
     final halfWidth = size.width / 2;
     final halfHeight = size.height / 2;
     final latScale = field.dLat * field.height;
+    // `lon0 + x·360` folds into a per-frame constant plus one multiply.
+    final xOffset = (field.lon0 + 180) / 360 * world;
+    final mercY = _mercY;
     const degToRad = math.pi / 180;
 
     for (final p in particles) {
@@ -299,17 +324,24 @@ class WindParticleSim {
       p.x = (p.x + u / math.cos(lat * degToRad) * fieldStep) % 1.0;
       p.y -= v * fieldStep;
 
-      final wx = (field.lon0 + p.x * 360 + 180) / 360 * world;
-      final wy = mercatorY(field.lat0 + p.y * latScale) * world;
-      final dx = _wrapWorld(wx - cx, world);
-      final dy = wy - cy;
-      final screen = Offset(
-        halfWidth + dx * cosR - dy * sinR,
-        halfHeight + dx * sinR + dy * cosR,
-      );
-      final onField = p.y >= 0 && p.y <= 1;
-      final inView = onField && _inView(screen, size);
-      p.screen = inView ? screen : null;
+      // Off the grid is nothing to stamp: mark it invisible and recycle
+      // without paying for a projection nobody will see.
+      if (p.y < 0 || p.y > 1) {
+        p.visible = false;
+        _respawn(p, fieldSpace);
+        continue;
+      }
+
+      final dx = _wrapWorld(xOffset + p.x * world - cx, world);
+      final dy = _mercYAt(mercY, p.y) * world - cy;
+      p.sx = halfWidth + dx * cosR - dy * sinR;
+      p.sy = halfHeight + dx * sinR + dy * cosR;
+      final inView =
+          p.sx >= -0.1 * size.width &&
+          p.sx <= 1.1 * size.width &&
+          p.sy >= -0.1 * size.height &&
+          p.sy <= 1.1 * size.height;
+      p.visible = inView;
 
       // Recycle a particle that has left, and occasionally a healthy one — the
       // field would otherwise empty out of wherever the density weighting is
@@ -338,11 +370,22 @@ class WindParticleSim {
     }
   }
 
-  bool _inView(Offset screen, Size size) =>
-      screen.dx >= -0.1 * size.width &&
-      screen.dx <= 1.1 * size.width &&
-      screen.dy >= -0.1 * size.height &&
-      screen.dy <= 1.1 * size.height;
+  static Float64List _buildMercY(WindField field) {
+    final lut = Float64List(_mercYEntries);
+    final latScale = field.dLat * field.height;
+    for (var i = 0; i < _mercYEntries; i++) {
+      lut[i] = mercatorY(field.lat0 + i / (_mercYEntries - 1) * latScale);
+    }
+    return lut;
+  }
+
+  /// Linear interpolation into [_buildMercY]'s table at field-space [y].
+  static double _mercYAt(Float64List lut, double y) {
+    final t = y * (_mercYEntries - 1);
+    final i = math.min(_mercYEntries - 2, t.floor());
+    final f = t - i;
+    return lut[i] + (lut[i + 1] - lut[i]) * f;
+  }
 
   /// The viewport's rectangle in field space (fractions of the field's
   /// longitude / latitude span), for seeding and respawning.

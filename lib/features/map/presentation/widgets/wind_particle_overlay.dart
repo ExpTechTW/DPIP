@@ -4,10 +4,16 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_particle_sim.dart';
+import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -24,8 +30,10 @@ import 'package:flutter/scheduler.dart';
 /// track pan/zoom/rotate exactly; the trail buffer is screen-space, so it is
 /// dropped on any camera change — a streak drawn for one view is wrong for the
 /// next, and the web renderer's alternative is to smear the old one across the
-/// pan. The ticker only runs while a wind field is loaded, so an empty layer
-/// costs nothing.
+/// pan. The ticker only runs while a wind field is loaded *and* the map tab is
+/// the visible one — the shell keeps hidden tabs mounted, so without the
+/// visibility check a wind field would keep animating (and rasterising full
+/// screen) behind every other tab.
 class WindParticleOverlay extends StatefulWidget {
   const WindParticleOverlay({super.key, required this.layer});
 
@@ -47,6 +55,9 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   WindCamera? _lastCamera;
   final _TrailBuffer _trails = _TrailBuffer();
 
+  /// Whether the map tab is the shell's visible one — see [_syncVisibility].
+  bool _visible = true;
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +65,55 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     // Straight assignment: this runs inside the first build, where asking for
     // another one throws.
     _adoptField();
+    _probeTier();
+  }
+
+  /// Device class decides the trail buffer's internal resolution (see
+  /// [_TrailBuffer.scale]) — the dominant cost of this overlay is rasterising
+  /// that buffer, so the low tier cuts it by ~9× while the soft streaks stay
+  /// visually the same. Fire-and-forget: until the probe lands the high
+  /// setting stands in, and the buffer rebuilds itself at the new size.
+  Future<void> _probeTier() async {
+    RenderTier tier;
+    try {
+      tier = renderTierFor(await DeviceInfoService.load());
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Device tier probe failed');
+      tier = RenderTier.high;
+    }
+    if (!mounted) return;
+    _trails.scale = tier == RenderTier.low ? 0.33 : 0.5;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncVisibility();
+  }
+
+  /// Stops the animation when the map tab is hidden, starts it on return.
+  ///
+  /// The shell's IndexedStack keeps this overlay mounted behind other tabs;
+  /// without this the per-frame raster would keep burning the GPU the user is
+  /// no longer looking at.
+  void _syncVisibility() {
+    final visible =
+        (VisibleTabScope.of(context)?.value ?? MapPage.tabIndex) ==
+        MapPage.tabIndex;
+    if (visible == _visible) return;
+    _visible = visible;
+    _updateTicker();
+  }
+
+  /// Runs the ticker only when there is a field to draw *and* the map tab is
+  /// on screen.
+  void _updateTicker() {
+    final shouldRun = _sim != null && _visible;
+    if (shouldRun && !_ticker.isActive) {
+      _ticker.start();
+    } else if (!shouldRun && _ticker.isActive) {
+      _ticker.stop();
+    }
   }
 
   /// The layer loaded a new field (frame scrub or first show) — swap the
@@ -76,11 +136,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _sim = field == null ? null : WindParticleSim(field);
     // A new frame's streaks must not grow out of the previous frame's.
     _trails.clear();
-    if (field == null) {
-      _ticker.stop();
-    } else if (!_ticker.isActive) {
-      _ticker.start();
-    }
+    _updateTicker();
   }
 
   void _onTick(Duration _) {
@@ -146,17 +202,42 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
 ///
 /// Held by the [State] rather than the painter, because a painter is rebuilt
 /// whenever the widget is and the buffer has to survive that.
+///
+/// The buffer renders at [scale] of the device resolution: every frame it is
+/// rasterised with `toImageSync` (a synchronous GPU round-trip on the UI
+/// thread), so at full resolution it was the dominant cost — and heat — of
+/// this page. Streaks are soft, semi-transparent white, so upscaling the
+/// buffer reads the same; [scale] 0.5 cuts that raster 4× and the low tier's
+/// 0.33 cuts it ~9×.
 class _TrailBuffer {
   ui.Image? _image;
 
-  /// Speed buckets for [_stamp], reused across frames — the stamp path runs
-  /// once a frame, so allocating fresh lists for it (16 × up to 6400 points)
-  /// is garbage the collector pays for on the hottest path in the app.
-  final List<List<Offset>> _buckets = List.generate(
+  /// Speed buckets for [_stamp], reused across frames. Each bucket is an
+  /// interleaved `x,y` [Float32List] for [Canvas.drawRawPoints], so the stamp
+  /// path allocates nothing per frame — `drawPoints` would need a fresh
+  /// [Offset] per visible particle (up to 6400 of them) for the collector to
+  /// chase on the hottest path in the app.
+  ///
+  /// Typed-data lists are fixed-length, so capacity is preallocated (the worst
+  /// case: the whole population in one speed bucket) and [_counts] tracks how
+  /// much of it this frame is live; [drawRawPoints] gets a zero-copy sublist
+  /// view of just that.
+  final List<Float32List> _buckets = List.generate(
     16,
-    (_) => <Offset>[],
+    (_) => Float32List(_bucketCapacity),
     growable: false,
   );
+
+  /// Live point count per bucket this frame.
+  final Uint8List _counts = Uint8List(16);
+
+  /// Floats per bucket: the largest population (6400 at z3) as x,y pairs.
+  static const int _bucketCapacity = 6400 * 2;
+
+  /// Internal render resolution as a fraction of the device's — see the class
+  /// doc. Written by the state's device-tier probe; changing it recreates the
+  /// buffer on the next [advance] (the size check below).
+  double scale = 0.5;
 
   /// Live camera zoom and device pixel ratio, written by the ticker. The
   /// painter needs both at paint time and neither is known at build time —
@@ -174,7 +255,7 @@ class _TrailBuffer {
 
   /// Fades what is there, stamps [particles] over it, and returns the result.
   ui.Image advance(Iterable<WindParticle> particles, Size size) {
-    final dpr = devicePixelRatio;
+    final dpr = devicePixelRatio * scale;
     final w = math.max(1, (size.width * dpr).round());
     final h = math.max(1, (size.height * dpr).round());
     final previous = _image;
@@ -203,7 +284,8 @@ class _TrailBuffer {
     return next;
   }
 
-  /// Stamps one dot per visible particle, in device pixels.
+  /// Stamps one dot per visible particle, in buffer pixels ([dpr] already
+  /// includes the buffer's own [scale]).
   ///
   /// The web gives every point its own alpha from a fragment shader; a
   /// [Canvas] carries one colour per call, so the field is bucketed by speed
@@ -213,24 +295,31 @@ class _TrailBuffer {
   void _stamp(Canvas canvas, Iterable<WindParticle> particles, double dpr) {
     const buckets = 16;
     final points = _buckets;
-    for (final bucket in points) {
-      bucket.clear();
-    }
+    final counts = _counts;
+    counts.fillRange(0, buckets, 0);
     for (final p in particles) {
-      final screen = p.screen;
-      if (screen == null) continue;
+      if (!p.visible) continue;
       final t = (p.speed / kWindSpeedScale).clamp(0.0, 1.0);
-      points[math.min(buckets - 1, (t * buckets).floor())].add(screen * dpr);
+      final bi = math.min(buckets - 1, (t * buckets).floor());
+      final i = counts[bi]++;
+      final b = points[bi];
+      b[i * 2] = p.sx * dpr;
+      b[i * 2 + 1] = p.sy * dpr;
     }
     final paint = Paint()
       ..strokeWidth = pointSizeFor(zoom) * dpr
       ..strokeCap = StrokeCap.round;
     for (var i = 0; i < buckets; i++) {
-      if (points[i].isEmpty) continue;
+      final count = counts[i];
+      if (count == 0) continue;
       // The bucket's midpoint, on the web's ramp: brighter where it is faster.
       final t = (i + 0.5) / buckets;
       paint.color = Color.fromRGBO(255, 255, 255, 0.35 + 0.55 * t);
-      canvas.drawPoints(ui.PointMode.points, points[i], paint);
+      canvas.drawRawPoints(
+        ui.PointMode.points,
+        Float32List.sublistView(points[i], 0, count * 2),
+        paint,
+      );
     }
   }
 }
@@ -255,7 +344,9 @@ class _WindParticlePainter extends CustomPainter {
       image,
       Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
       Offset.zero & size,
-      Paint()..filterQuality = FilterQuality.none,
+      // The buffer is scaled down relative to the screen, so bilinear (not
+      // `none`, which would show the upscale as hard squares on the dots).
+      Paint()..filterQuality = FilterQuality.low,
     );
   }
 

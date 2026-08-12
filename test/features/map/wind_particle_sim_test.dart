@@ -108,7 +108,7 @@ void main() {
       expect(sim.particles.first.x - x0, lessThan(1e-3));
       expect(sim.particles.first.y - y0, lessThan(1e-3));
       expect(
-        sim.particles.every((p) => p.screen != null),
+        sim.particles.every((p) => p.visible),
         isTrue,
         reason: 'every seeded particle sits in the viewport, so all stamp',
       );
@@ -144,8 +144,8 @@ void main() {
         ..y = -1.5; // above the field's north edge, off the grid
       sim.step(_camera, _size);
       expect(
-        out.screen,
-        isNull,
+        out.visible,
+        isFalse,
         reason: 'off the grid is nothing to stamp, whatever happens next',
       );
       // Recycling is rejection-sampled, so a candidate in still air is turned
@@ -180,7 +180,7 @@ void main() {
         for (var i = 0; i < 5; i++) {
           sim.step(_camera, _size);
         }
-        return sim.particles.where((p) => p.screen != null).length;
+        return sim.particles.where((p) => p.visible).length;
       }
 
       expect(streaks(180), streaks(0));
