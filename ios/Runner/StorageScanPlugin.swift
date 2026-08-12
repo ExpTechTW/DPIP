@@ -8,15 +8,10 @@ import UIKit
 /// iOS Settings reports the whole sandbox ("文件與資料"), which is far larger
 /// than the ETag cache budget (150 MB of body blobs): the SQLite file carries
 /// page/free-space overhead on top of the bodies, and the system URL cache
-/// (NSURLCache, shared by every NSURLSession — Dio included) can quietly hold
-/// hundreds of MB of disk. The Debug page needs real numbers, so `scan`
-/// measures every top-level sandbox directory and the biggest files.
+/// (NSURLCache, shared by every NSURLSession) can quietly hold hundreds of MB
+/// of disk. The Debug page needs real numbers, so `scan` measures every
+/// top-level sandbox directory and the biggest files.
 public class StorageScanPlugin: NSObject, FlutterPlugin {
-  /// Upper bound for the system disk HTTP cache. URLs the app controls already
-  /// go through its own SQLite cache; this only caps what NSURLCache keeps
-  /// behind the app's back so total usage cannot grow without bound.
-  static let systemDiskCacheBytes: Int = 64 * 1024 * 1024
-
   /// Files above this size are reported individually by `scan`.
   static let topFileFloor: Int64 = 512 * 1024
 
@@ -37,10 +32,15 @@ public class StorageScanPlugin: NSObject, FlutterPlugin {
     case "scan":
       result(scan())
     case "configure":
-      // Bound the shared URL cache once at startup (see class doc). Memory is
-      // capped too — the default can be many tens of MB on a big device.
+      // The disk URL cache is turned off outright: every byte MapLibre
+      // downloads is persisted in the app's own SQLite store through the Dart
+      // tile bridge, so a second disk copy is pure overhead. The remaining
+      // memory-only cache still lets a SQLite miss short-circuit the network
+      // without costing disk. Any residue from before this ran is dropped so
+      // the change actually takes effect.
       URLCache.shared.memoryCapacity = 16 * 1024 * 1024
-      URLCache.shared.diskCapacity = StorageScanPlugin.systemDiskCacheBytes
+      URLCache.shared.diskCapacity = 0
+      URLCache.shared.removeAllCachedResponses()
       result(nil)
     case "clearSystemHttpCache":
       URLCache.shared.removeAllCachedResponses()

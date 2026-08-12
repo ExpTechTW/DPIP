@@ -2,11 +2,13 @@
 ///
 /// iOS Settings reports the whole sandbox, which is routinely far larger than
 /// the ETag-cache budget (350 MB of *body* blobs) — the SQLite file carries
-/// page/free-space overhead, the system URL cache keeps its own copy of HTTP
-/// responses, and MapLibre's ambient database (usually disabled here) can
-/// linger from older builds. The Debug page needs real numbers, so this scans
-/// the platform's cache/support/document/tmp trees once and splits the result
-/// into the app's own top-level directories plus the biggest individual files.
+/// page/free-space overhead, and debug runs leave JIT kernel snapshots in tmp.
+/// The system URL cache used to keep its own copy of HTTP responses too, but
+/// it is now disabled at startup ([StorageScanner.configure]) so every cached
+/// byte lives in the app's own SQLite; the Debug page needs real numbers, so
+/// this scans the platform's cache/support/document/tmp trees once and splits
+/// the result into the app's own top-level directories plus the biggest
+/// individual files.
 library;
 
 import 'package:dpip/core/logging/log.dart';
@@ -116,6 +118,8 @@ List<StorageSlice> storageBreakdown(StorageScan scan) {
   );
   known(
     'System HTTP cache',
+    // Residue only: [configure] disables the disk cache at startup, so this
+    // slice exists to explain bytes left by older builds until a clear.
     (f) => f.path.contains('HTTPCache') || f.path.contains('URLCache'),
   );
 
@@ -178,8 +182,11 @@ class StorageScanner {
     }
   }
 
-  /// One-shot startup tuning: bounds the system HTTP cache (iOS NSURLCache)
-  /// so it cannot grow without bound. Android has no equivalent to configure.
+  /// One-shot startup tuning: the system disk HTTP cache (iOS NSURLCache) is
+  /// **disabled** — MapLibre's downloads are persisted in the app's own SQLite
+  /// through the tile bridge, so a second disk copy is pure overhead — and any
+  /// residue from before this ran is dropped. Android has no equivalent to
+  /// configure.
   Future<void> configure() async {
     try {
       await _channel.invokeMethod<void>('configure');

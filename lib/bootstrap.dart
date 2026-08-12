@@ -98,8 +98,9 @@ Future<void> bootstrap() async {
       ? null
       : MapTileCache(cache.etag, usage: cache.usage);
   await mapTileCache?.install();
-  // Bound the OS-level HTTP cache (iOS NSURLCache) so total disk usage cannot
-  // grow without bound. Fire-and-forget: it never delays launch.
+  // Turn off the OS-level disk HTTP cache (iOS NSURLCache) and drop its
+  // residue: every cached byte now lives in the app's own SQLite, so a second
+  // disk copy is pure overhead. Fire-and-forget: it never delays launch.
   unawaited(const StorageScanner().configure());
 
   // Calibrated clock: real SNTP (flutter_ntp, ExpTech primary / Apple backup)
