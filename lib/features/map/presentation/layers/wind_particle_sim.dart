@@ -266,6 +266,7 @@ class WindParticleSim {
   WindParticleSim(this.field, {int count = 6400, math.Random? random})
     : _random = random ?? math.Random(),
       _mercY = _buildMercY(field),
+      _secLat = _buildSecLat(field),
       particles = [for (var i = 0; i < count; i++) WindParticle(0, 0)];
 
   final WindField field;
@@ -281,6 +282,11 @@ class WindParticleSim {
   /// linear interpolation; its error stays under a pixel at any zoom this
   /// layer can show.
   final Float64List _mercY;
+
+  /// Field-space y → 1/cos(latitude) — the longitude-step correction
+  /// ([step]'s `u / cos(lat)` term). The latitude axis is the same linear
+  /// span as [_mercY], so the same table shape and interpolant serve it.
+  final Float64List _secLat;
 
   static const int _mercYEntries = 1024;
 
@@ -311,17 +317,17 @@ class WindParticleSim {
     final sinR = math.sin(r);
     final halfWidth = size.width / 2;
     final halfHeight = size.height / 2;
-    final latScale = field.dLat * field.height;
     // `lon0 + x·360` folds into a per-frame constant plus one multiply.
     final xOffset = (field.lon0 + 180) / 360 * world;
     final mercY = _mercY;
-    const degToRad = math.pi / 180;
+    final secLat = _secLat;
 
     for (final p in particles) {
       final (u, v) = _sampleUV(p.x, p.y);
       p.speed = math.sqrt(u * u + v * v);
-      final lat = field.lat0 + p.y * latScale;
-      p.x = (p.x + u / math.cos(lat * degToRad) * fieldStep) % 1.0;
+      // 1/cos(latitude) comes from a LUT (see [_secLat]) — a `cos` per
+      // particle per frame was 6400 transcendentals on this same loop.
+      p.x = (p.x + u * _lutAt(secLat, p.y) * fieldStep) % 1.0;
       p.y -= v * fieldStep;
 
       // Off the grid is nothing to stamp: mark it invisible and recycle
@@ -333,7 +339,7 @@ class WindParticleSim {
       }
 
       final dx = _wrapWorld(xOffset + p.x * world - cx, world);
-      final dy = _mercYAt(mercY, p.y) * world - cy;
+      final dy = _lutAt(mercY, p.y) * world - cy;
       p.sx = halfWidth + dx * cosR - dy * sinR;
       p.sy = halfHeight + dx * sinR + dy * cosR;
       final inView =
@@ -379,10 +385,26 @@ class WindParticleSim {
     return lut;
   }
 
-  /// Linear interpolation into [_buildMercY]'s table at field-space [y].
-  static double _mercYAt(Float64List lut, double y) {
+  static Float64List _buildSecLat(WindField field) {
+    final lut = Float64List(_mercYEntries);
+    final latScale = field.dLat * field.height;
+    const degToRad = math.pi / 180;
+    for (var i = 0; i < _mercYEntries; i++) {
+      lut[i] =
+          1 /
+          math.cos(
+            (field.lat0 + i / (_mercYEntries - 1) * latScale) * degToRad,
+          );
+    }
+    return lut;
+  }
+
+  /// Linear interpolation into a field-space-y LUT ([_buildMercY] /
+  /// [_buildSecLat]). Out-of-range y (a particle about to respawn) extends
+  /// the edge value linearly — the same way the raw trig it replaces behaved.
+  static double _lutAt(Float64List lut, double y) {
     final t = y * (_mercYEntries - 1);
-    final i = math.min(_mercYEntries - 2, t.floor());
+    final i = math.min(_mercYEntries - 2, math.max(0, t.floor()));
     final f = t - i;
     return lut[i] + (lut[i + 1] - lut[i]) * f;
   }
@@ -455,13 +477,14 @@ class WindParticleSim {
     // Columns wrap — the grid's last column neighbours its first, and clamping
     // there flattens the wind along the whole seam. Rows do not: there is no
     // cell north of the north pole.
-    final i0 = fx.floor() % field.width;
+    final fxFloor = fx.floor();
+    final i0 = fxFloor % field.width;
     final i1 = (i0 + 1) % field.width;
     var j0 = fy.floor();
     if (j0 < 0) j0 = 0;
     if (j0 >= field.height) j0 = field.height - 1;
     final j1 = j0 + 1 < field.height ? j0 + 1 : j0;
-    final tx = fx - fx.floorToDouble();
+    final tx = fx - fxFloor.toDouble();
     final ty = (fy - j0).clamp(0.0, 1.0);
     final row0 = j0 * field.width;
     final row1 = j1 * field.width;
@@ -489,8 +512,12 @@ class WindParticleSim {
     final d = plane[row1 + i1];
     final top = a + (b - a) * tx;
     final bottom = c + (d - c) * tx;
-    return lo + (top + (bottom - top) * ty) / 255 * (hi - lo);
+    return lo + (top + (bottom - top) * ty) * _unitScale(hi - lo);
   }
+
+  /// Precomputed `(span) / 255` — the per-call division was one per plane per
+  /// particle per frame.
+  static double _unitScale(double span) => span / 255;
 
   double _lerp(double a, double b, double t) => a + (b - a) * t;
 }

@@ -54,21 +54,24 @@ void main() {
     });
   });
 
-  test('waveRadius returns 0 until the wave reaches the surface (synthetic)', () {
-    final table = SeismicTravelTimeTable(
-      depth: [0, 2],
-      dist: [0, 100],
-      p: [
-        [0, 10],
-        [0.5, 10.5],
-      ],
-      sp: [
-        [0, 2],
-        [0.3, 2.3],
-      ],
-    );
-    final w = table.source(0).waveRadius(Duration.zero);
-    expect(w.p, 0);
-    expect(w.s, 0);
-  });
+  test(
+    'waveRadius returns 0 until the wave reaches the surface (synthetic)',
+    () {
+      final table = SeismicTravelTimeTable(
+        depth: [0, 2],
+        dist: [0, 100],
+        p: [
+          [0, 10],
+          [0.5, 10.5],
+        ],
+        sp: [
+          [0, 2],
+          [0.3, 2.3],
+        ],
+      );
+      final w = table.source(0).waveRadius(Duration.zero);
+      expect(w.p, 0);
+      expect(w.s, 0);
+    },
+  );
 }

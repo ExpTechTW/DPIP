@@ -102,7 +102,10 @@ class _MapScaffoldState extends State<MapScaffold> {
   Future<void> _mapOps = Future<void>.value();
 
   /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
-  int _cameraEpoch = 0;
+  /// A [ValueNotifier], not a `setState` bump: only the overlay subtree (which
+  /// keys off it) rebuilds, instead of the whole scaffold — every pan/zoom
+  /// settle used to rebuild the platform view, chrome and legend too.
+  final ValueNotifier<int> _cameraEpoch = ValueNotifier(0);
 
   /// Basemap tile warm-up. Its own warmer so a layer's cancel can't abort it.
   MapTileWarmer? _basemapWarmer;
@@ -170,6 +173,7 @@ class _MapScaffoldState extends State<MapScaffold> {
   @override
   void dispose() {
     _bearing.dispose();
+    _cameraEpoch.dispose();
     _showTownLabels.dispose();
     _showTerrain.dispose();
     _basemapWarmer?.cancel();
@@ -671,12 +675,12 @@ class _MapScaffoldState extends State<MapScaffold> {
               final c = _controller;
               if (c == null || !c.isCameraMoving) {
                 _active.onMapGestureEnd();
-                if (mounted) setState(() => _cameraEpoch++);
+                _cameraEpoch.value++;
               }
             },
             onPointerCancel: (_) {
               _active.onMapGestureEnd();
-              if (mounted) setState(() => _cameraEpoch++);
+              _cameraEpoch.value++;
             },
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
@@ -695,8 +699,7 @@ class _MapScaffoldState extends State<MapScaffold> {
                   unawaited(_active.onCameraIdle(controller));
                   unawaited(_warmBasemap(controller));
                 }
-                if (!mounted) return;
-                setState(() => _cameraEpoch++);
+                _cameraEpoch.value++;
               },
               // The native compass lives inside the platform view, so any
               // Flutter overlay paints over it — MapScaffold draws its own
@@ -707,11 +710,16 @@ class _MapScaffoldState extends State<MapScaffold> {
         ),
         // Screen-space Flutter overlays (e.g. typhoon forecast tips) — under
         // chrome/sheet so they don't steal taps; IgnorePointer keeps pan/zoom.
+        // Only this subtree rebuilds on a camera settle (ValueListenableBuilder
+        // + keyed reprojection); the map and chrome stay put.
         Positioned.fill(
           child: IgnorePointer(
-            child: KeyedSubtree(
-              key: ValueKey<Object>('${_active.id}-$_cameraEpoch'),
-              child: _active.buildMapOverlay(context),
+            child: ValueListenableBuilder<int>(
+              valueListenable: _cameraEpoch,
+              builder: (context, epoch, _) => KeyedSubtree(
+                key: ValueKey<Object>('${_active.id}-$epoch'),
+                child: _active.buildMapOverlay(context),
+              ),
             ),
           ),
         ),

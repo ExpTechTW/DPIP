@@ -405,11 +405,13 @@ abstract class RasterTimelineLayer implements MapLayer {
     await _retireOutside(controller, ring);
     await _warmBand(controller, index);
 
-    for (final id in ring) {
-      if (id == frameId) continue;
-      await _mount(controller, id, 0);
-      _ring.add(id);
-    }
+    // The neighbours mount on independent ids — parallelise the platform
+    // round trips instead of serialising up to four of them.
+    await Future.wait([
+      for (final id in ring)
+        if (id != frameId) _mount(controller, id, 0),
+    ]);
+    _ring.addAll(ring);
     await _evictOverflow(controller, keep: ring);
   }
 
@@ -615,9 +617,16 @@ abstract class RasterTimelineLayer implements MapLayer {
 /// Decodes a frame id into its instant.
 ///
 /// Ids are Unix seconds (or milliseconds — both are in use across endpoints);
-/// an ISO-8601 string is accepted as a fallback.
+/// an ISO-8601 string is accepted as a fallback. Memoised per id: the ids are
+/// globally unique (timestamps), so a re-parse — every time a layer reloads
+/// its frames — is pure waste.
 @visibleForTesting
-DateTime parseFrameTime(String id) {
+DateTime parseFrameTime(String id) =>
+    _frameTimeCache.putIfAbsent(id, () => _parse(id));
+
+final Map<String, DateTime> _frameTimeCache = {};
+
+DateTime _parse(String id) {
   final epoch = int.tryParse(id);
   if (epoch != null) {
     final ms = epoch >= 1000000000000 ? epoch : epoch * 1000;

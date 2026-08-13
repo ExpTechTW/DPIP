@@ -118,6 +118,10 @@ abstract final class RadarScanRange {
   ///
   /// [step] is the latitude sampling interval; it defaults to the grid's own
   /// resolution, which puts a vertex on every row the data actually has.
+  /// Pure constant function of nothing — memoised (lazily) so re-adding the
+  /// layer never re-runs the ~880-row trig sweep.
+  static final List<List<double>> _cachedRing = ring();
+
   static List<List<double>> ring({double step = gridResolution}) {
     final n = ((north - south) / step).round();
     final left = <List<double>>[];
@@ -170,7 +174,7 @@ abstract final class RadarScanRange {
         },
         'geometry': {
           'type': 'Polygon',
-          'coordinates': [ring()],
+          'coordinates': [_cachedRing],
         },
       },
     ],

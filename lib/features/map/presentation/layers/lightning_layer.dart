@@ -132,6 +132,11 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
     MapFrame frame, {
     bool scrubbing = false,
   }) async {
+    // Same frame already on screen — a scrub settle re-shows the same frame.
+    // The cache check matters: a failed fetch leaves [_shownFrameId] set (with
+    // an empty payload on screen), and the data may land in the cache later —
+    // that frame must still be (re)shown.
+    if (_shownFrameId == frame.id && _cache.containsKey(frame.id)) return;
     await _ensureImages(controller);
     await _ensureSource(controller);
 

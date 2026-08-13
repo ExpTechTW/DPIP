@@ -485,6 +485,12 @@ class _ReplayMapState extends State<_ReplayMap> {
   Future<void> _updateEew() async {
     final controller = _controller;
     if (controller == null || !_ready) return;
+    // The source starts as (and a no-alert payload would be) the empty
+    // collection — skip the pointless per-tick round trip entirely.
+    if (widget.eew.alerts.isEmpty) {
+      _maybeFrameEpicenter();
+      return;
+    }
     try {
       await controller.setGeoJsonSource(_eewSourceId, _eewGeoJson());
     } catch (_) {
@@ -683,13 +689,15 @@ class _ReplayStatusBar extends StatelessWidget {
     );
   }
 
+  static final DateFormat _clockFormat = DateFormat('HH:mm:ss');
+
   Widget _buildContent(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     final taipeiTime = AppTime.taipei(clock.now());
-    final timeText = DateFormat('HH:mm:ss').format(taipeiTime);
+    final timeText = _clockFormat.format(taipeiTime);
 
     final (Color dot, String? statusWord) = switch (rts.status) {
       RealtimeStatus.live => (Colors.green, null),

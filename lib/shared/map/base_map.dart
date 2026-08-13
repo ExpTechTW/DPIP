@@ -238,6 +238,20 @@ class _BaseMapState extends State<BaseMap> {
     });
   }
 
+  /// Style string memoised per palette — all other inputs are const, and
+  /// every [build] used to re-interpolate the full style JSON.
+  static final Map<MapPalette, String> _styleCache = {};
+
+  static String _styleString(MapPalette palette) => _styleCache.putIfAbsent(
+    palette,
+    () => exptechVectorStyle(
+      palette,
+      basemapTileUrl: basemapOriginTileUrl,
+      glyphsUrl: glyphsOriginUrl,
+      terrainTileUrl: terrainOriginTileUrl,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
@@ -260,12 +274,9 @@ class _BaseMapState extends State<BaseMap> {
       ),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
-      styleString: exptechVectorStyle(
-        palette,
-        basemapTileUrl: basemapOriginTileUrl,
-        glyphsUrl: glyphsOriginUrl,
-        terrainTileUrl: terrainOriginTileUrl,
-      ),
+      // The interpolated string only varies by palette (dark/light), so it is
+      // memoised — every rebuild used to re-run the ~2 KB interpolation.
+      styleString: _styleString(palette),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).
       key: ValueKey(_mountAttempt),

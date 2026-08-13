@@ -1067,13 +1067,16 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     _queue(() async {
       final showProb = showProbability.value;
       final showL7 = stormBand.value == TyphoonStormBand.level7;
-      await _setLayerVisibility(controller, _probLyr, showProb);
-      await _setLayerVisibility(controller, _coneLyr, !showProb);
-      await _setLayerVisibility(controller, _warnLyr, showWarningAreas.value);
-      await _setLayerVisibility(controller, _c15Lyr, showL7);
-      await _setLayerVisibility(controller, _avg15Lyr, showL7);
-      await _setLayerVisibility(controller, _c25Lyr, !showL7);
-      await _setLayerVisibility(controller, _avg25Lyr, !showL7);
+      // Each call swallows its own failure — parallelise the round trips.
+      await Future.wait([
+        _setLayerVisibility(controller, _probLyr, showProb),
+        _setLayerVisibility(controller, _coneLyr, !showProb),
+        _setLayerVisibility(controller, _warnLyr, showWarningAreas.value),
+        _setLayerVisibility(controller, _c15Lyr, showL7),
+        _setLayerVisibility(controller, _avg15Lyr, showL7),
+        _setLayerVisibility(controller, _c25Lyr, !showL7),
+        _setLayerVisibility(controller, _avg25Lyr, !showL7),
+      ]);
     });
   }
 

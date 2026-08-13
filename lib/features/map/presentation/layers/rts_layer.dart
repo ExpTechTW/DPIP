@@ -37,6 +37,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _stationsFetching = false;
   int _stationRetries = 0;
 
+  /// Identity of the last payload pushed to the source: `null` when offline
+  /// (empty collection was sent), else the feed's data object — skips the
+  /// per-tick round trip when a status change re-notifies without new data.
+  Object? _lastSent;
+
   static const String _sourceId = 'rts-src';
   static const String _circleId = 'rts-circle';
   static const String _labelId = 'rts-label';
@@ -110,11 +115,18 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     // Never present aged shaking as current: hide the dots when the feed is
     // offline, and dim them while stale (the monitor panel flags the status too).
     final offline = status == RealtimeStatus.offline;
+    // A status-only change (stale→live etc.) re-notifies without new data —
+    // don't re-send the same payload, just re-apply the opacity below.
+    final data = _feed.state.data;
+    final payloadKey = offline ? null : data;
     try {
-      await controller.setGeoJsonSource(
-        _sourceId,
-        offline ? _emptyCollection : _geoJson(),
-      );
+      if (!identical(payloadKey, _lastSent)) {
+        _lastSent = payloadKey;
+        await controller.setGeoJsonSource(
+          _sourceId,
+          offline ? _emptyCollection : _geoJson(),
+        );
+      }
       if (status != _appliedStatus) {
         _appliedStatus = status;
         final opacity = status == RealtimeStatus.live
