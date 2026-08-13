@@ -48,6 +48,12 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
 
 /// Records the MapLibre calls a layer makes, and the last state of each layer.
 class RecordingMapController implements MapLibreMapController {
+  RecordingMapController({CameraPosition? camera})
+    : _camera = camera ?? const CameraPosition(
+        target: LatLng(23.5, 121),
+        zoom: 7,
+      );
+
   final List<String> calls = [];
 
   /// Property keys of each `setLayerProperties` call, in order — what actually
@@ -193,9 +199,13 @@ class RecordingMapController implements MapLibreMapController {
     northeast: const LatLng(25, 122),
   );
 
+  /// Camera the [cameraPosition] getter reports — a wind-overlay test can
+  /// zoom out to put more of the field in view (the default z7 viewport holds
+  /// only a handful of particles, too few to assert anything about).
+  final CameraPosition _camera;
+
   @override
-  CameraPosition? get cameraPosition =>
-      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
+  CameraPosition? get cameraPosition => _camera;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => Future<void>.value();

@@ -241,7 +241,12 @@ class _TrailBuffer {
   );
 
   /// Live point count per bucket this frame.
-  final Uint8List _counts = Uint8List(16);
+  ///
+  /// 16 bits, not 8: the whole population (6400) can land in one speed bucket
+  /// under strong wind, and an 8-bit counter wraps at 255 — the bucket then
+  /// draws the wrong point count (or none at all, when the count wraps to 0),
+  /// which reads as particles vanishing and stale trails outliving a rotation.
+  final Uint16List _counts = Uint16List(16);
 
   /// Floats per bucket: the largest population (6400 at z3) as x,y pairs.
   static const int _bucketCapacity = 6400 * 2;

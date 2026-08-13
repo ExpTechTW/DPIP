@@ -15,6 +15,7 @@ import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'raster_timeline_harness.dart';
 
@@ -340,14 +341,24 @@ void main() {
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
     );
-    await layer.onAttached(RecordingMapController());
+    // Zoom in so the wind field fills the viewport: the default z7 viewport
+    // covers a sliver of the global field (a handful of seeded particles, too
+    // few to assert anything about), while this field spans just the Taiwan
+    // window the camera sits over. A uniform full-speed field then lands the
+    // whole population in one speed bucket — the case that must not lose
+    // points.
+    await layer.onAttached(
+      RecordingMapController(
+        camera: const CameraPosition(target: LatLng(23.5, 121), zoom: 4),
+      ),
+    );
     layer.field.value = WindField(
       width: 2,
       height: 2,
-      lat0: 90,
-      lon0: 0,
-      dLat: -90,
-      dLon: 180,
+      lat0: 25,
+      lon0: 120,
+      dLat: -0.75,
+      dLon: 1.5,
       uMin: -20,
       uMax: 20,
       vMin: -1,
@@ -365,6 +376,7 @@ void main() {
           // background is near-white, so on that a blank overlay counts as
           // bright everywhere and the assertion below means nothing.
           body: RepaintBoundary(
+            key: const ValueKey('overlayBoundary'),
             child: ColoredBox(
               color: Colors.black,
               child: WindParticleOverlay(layer: layer),
@@ -378,8 +390,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
+    // The tree's *first* RepaintBoundary is Scaffold's (white), not the one
+    // the test wraps the black backdrop in — sampling that one would pass on
+    // a blank overlay. The boundary is keyed so the finder stays precise.
     final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byType(RepaintBoundary).first,
+      find.byKey(const ValueKey('overlayBoundary')),
     );
     // toImage is a real engine async — it must run outside the test's fake
     // clock, or the future never completes.
@@ -401,9 +416,14 @@ void main() {
       final b = bytes.getUint8(i + 2);
       if (r > 160 && g > 160 && b > 160) bright++;
     }
+    // The whole population lands in one speed bucket (a uniform full-speed
+    // field), so the bright count is really the bucket's draw — thousands of
+    // points, not a handful: an 8-bit bucket counter wraps at 255 and drops
+    // the bucket (or most of it) entirely, so this threshold is what fails
+    // that bug. A blank overlay paints ~0.
     expect(
       bright,
-      greaterThan(10),
+      greaterThan(300),
       reason: 'the particle trails must paint as visible bright pixels',
     );
     expect(tester.takeException(), isNull);
@@ -426,7 +446,11 @@ void main() {
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
     );
-    await layer.onAttached(RecordingMapController());
+    await layer.onAttached(
+      RecordingMapController(
+        camera: const CameraPosition(target: LatLng(23.5, 121), zoom: 4),
+      ),
+    );
 
     await tester.pumpWidget(
       MaterialApp(
@@ -435,6 +459,7 @@ void main() {
           // background is near-white, so on that a blank overlay counts as
           // bright everywhere and the assertion below means nothing.
           body: RepaintBoundary(
+            key: const ValueKey('overlayBoundary'),
             child: ColoredBox(
               color: Colors.black,
               child: WindParticleOverlay(layer: layer),
@@ -447,10 +472,10 @@ void main() {
     layer.field.value = WindField(
       width: 2,
       height: 2,
-      lat0: 90,
-      lon0: 0,
-      dLat: -90,
-      dLon: 180,
+      lat0: 25,
+      lon0: 120,
+      dLat: -0.75,
+      dLon: 1.5,
       uMin: -20,
       uMax: 20,
       vMin: -1,
@@ -464,8 +489,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
+    // The tree's *first* RepaintBoundary is Scaffold's (white), not the one
+    // the test wraps the black backdrop in — sampling that one would pass on
+    // a blank overlay. The boundary is keyed so the finder stays precise.
     final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byType(RepaintBoundary).first,
+      find.byKey(const ValueKey('overlayBoundary')),
     );
     ByteData? data;
     await tester.runAsync(() async {
@@ -484,7 +512,7 @@ void main() {
     }
     expect(
       bright,
-      greaterThan(10),
+      greaterThan(300),
       reason: 'a field loaded after mount must still start the streaks',
     );
     expect(tester.takeException(), isNull);
