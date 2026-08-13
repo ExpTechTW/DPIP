@@ -36,7 +36,7 @@ logging and localization — is covered at the end.
   outline `#a9b4bc` / town `#6A6B72`. Light: bg `#E0E0E0` / fill `#ADADAD` /
   outline `#6B6B6B` / town `#9A9A9A`.
 - Literal colours are also allowed where no theme role applies: shader
-  fallback/mood colours (`weather_sky.frag` / `weather_sky_background.dart`) and
+  fallback/mood colours (`weather_sky_background.dart`, `_fallbackColour`) and
   the one sheet shadow.
 
 ## Spacing — `AppSpacing`
@@ -85,25 +85,36 @@ leading icon.
 Prefer Material `elevation` / tonal surfaces. The home sheet's custom top-edge
 shadow is the one bespoke shadow; add more only with a clear reason.
 
+## Glass over the weather backdrop
+
+Content layered over the weather sky tints through `lib/app/theme/app_glass.dart`
+(`glassSurface` / `glassOnSurface` / `inkOverWeather` …), driven by a `reveal`
+dial: at rest a translucent theme surface, once revealed a pane of the sky
+itself (sky colour at 20 % alpha, HSL-lightness shifted by time of day — see
+`skyCardTint`). Ink follows the sky, not the theme. Shared surfaces built from
+it: `shared/widgets/frosted_surface.dart`, `sheet_surface.dart`.
+
 ## Shared components — `lib/shared/widgets/`
 
 - `SectionHeader(title)` — the small primary-tinted header above a settings/menu
   group. Use it for every section instead of re-styling a `Text`.
 
-Map foundations live in `lib/shared/map/` (`BaseMap`, `map_style`,
-`map_snapshot`); see `api.md` for the tile/radar endpoints.
+Map foundations live in `lib/shared/map/` (`BaseMap` in `base_map.dart`,
+`map_style.dart` with `MapColors`/`MapPalette`, `map_tile_cache.dart`); see
+`api.md` for the tile/radar endpoints.
 
 ## Logging (infrastructure)
 
 Always log through `Log` (`lib/core/logging/log.dart`):
 `Log.debug / info / warning / error / handle`. **Never** `print` / `debugPrint`
-(`avoid_print` fails analysis). In-app viewer: More → 實驗性功能 is above it; the
-log page is backed by the same `Log` history.
+(`avoid_print` fails analysis). In-app viewer: the **App 日誌** page under the
+More tab (`LogPage`), backed by the same `Log` history.
 
 ## Localization (infrastructure)
 
 Every user-facing string goes through `AppLocalizations`
 (`AppLocalizations.of(context).<key>`). ARB sources in `lib/l10n/`
-(`app_en.arb` template, `app_zh.arb` Traditional Chinese default); generated code
-in `lib/l10n/gen/`. Add a language by dropping in `app_<locale>.arb`. Never
-hardcode display text.
+(`app_en.arb` template, `app_zh.arb` Traditional Chinese default, plus
+`zh_TW` / `zh_Hant_HK` / `zh_Hans` and ja/ko/th/vi/fil/id); generated code
+in `lib/l10n/gen/`. Add a language by dropping in `app_<locale>.arb` (with a
+`languageName` key) — never hardcode display text.

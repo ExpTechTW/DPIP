@@ -12,7 +12,8 @@
 
 > 這是**端點目錄**，不是程式碼對照表。沒有 `lib/api/` 巨石檔：每個端點在其所屬
 > feature 的 `data/`（基礎設施則在 `core/`）裡，各自建成一個輕薄的 datasource，
-> 並帶著自己的 `ApiTier`。
+> 並帶著自己的 `ApiTier`（`core/network/api_region.dart`）；路徑字串集中於
+> `core/network/api_paths.dart`（與 `EtagInterceptor` 共用，不會漂移）。
 >
 > **對時不是 HTTP 端點。** App 的時鐘使用真正的 **SNTP**
 > （`flutter_ntp`，UDP/123），對 `time.exptech.com.tw`（主）/
@@ -28,6 +29,7 @@
 | `openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `getEewAt` | `/api/v2/eq/eew/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
@@ -36,6 +38,7 @@
 > 區間、`startTime`/`endTime` 為 **`YYYY-MM-DD`（Asia/Taipei 當日）**、可選
 > `city`/`cityMinInt`/`cityMaxInt`。`loc` 與經緯度篩選已移除。伺服器會把非正規
 > query **302** 到 canonical（參數字母序、去掉預設值）以利 ETag／快取。
+> `getEewAt` 是**歷史回放**（時間軸），tier 為 `coreApi`。
 
 > **即時串流走 SSE（gzip 壓縮），不是輪詢。** `?sse=1` 把端點切換成
 > `text/event-stream`；再加 `&compress=1`，payload 會以 `event: g` 事件送出，其
@@ -108,16 +111,31 @@ QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫�
 
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
-MapLibre **vector tiles**（gzip MVT）+ 點位詳情 JSON。目前僅 **AED**；未來其他
-類型走同一路徑形狀 `/api/v2/tiles/dpm/{layer}/…`。Tile 與詳情都在 **static**
-主機（`Cache-Control: max-age=60, must-revalidate` + ETag）；tile 由 MapLibre
-直接抓，詳情經 `ApiClient`。Source-layer 名 = `{layer}`（AED 為 `aed`）。單點有
-`id`（內部 PK，打詳情用，非 `aed_id`）；低 zoom 的 cluster 帶 `point_count`。
+MapLibre **vector tiles**（gzip MVT）+ 點位詳情 JSON。目前有 **AED / 無障礙廁所 /
+避難所**三層；其他類型走同一路徑形狀 `/api/v2/tiles/dpm/{layer}/…`。Tile 與詳情都
+在 **static** 主機（`Cache-Control: max-age=60, must-revalidate` + ETag）；
+tile 由 MapLibre 直接抓，詳情經 `ApiClient`。Source-layer 名 = `{layer}`
+（AED 為 `aed`）。單點有 `id`（內部 PK，打詳情用，非 `aed_id`）；低 zoom 的
+cluster 帶 `point_count`。
 
 | 方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
 | `tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 | `getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+
+### 風場 Wind（v2 / v1）—— `core-tnn1`
+
+風場 overlay：XYZ WebP 圖層 + 低 zoom 的 **`.bin` 向量風場**（`WND1` 格式，
+`fetchWindBin`）。時間清單／圖層與其他 tiles 家族同形狀；`.bin` 用 `{model}`
+（`gfs` / `ecmwf`）與 `{frame}` 定址。圖層選擇器把 wind 註冊為獨立圖層。
+
+| 方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `getFrames` | `/api/v2/tiles/wind/list[?model=…]` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `tileUrl` | `/api/v2/tiles/wind/{ts}/{z}/{x}/{y}.webp[?model=…]` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `fetchWindBin` | `/api/v1/wind/{model}/{frame}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 氣象家族（**v5**）—— `core-tnn1`
 
@@ -184,31 +202,22 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 | `getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
 | `getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
 | `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
+| `getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` | 強震波形回放（時間軸） |
 
 尚未接上、但端點存在於 `api-1`：
 
 | 方法 | 路徑 | 層級 |
 |---|---|---|
 | `getEvent` | `/api/v1/dpip/event/{id}` | `legacyApi` |
-| `getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` |
-| `getEewAt` | `/api/v2/eq/eew/{sec}` | `legacyApi` |
-
-## 暫時無 (unavailable)
-
-| 方法 | 說明 |
-|---|---|
-| `getTsunamiList` | 暫時無法使用 —— 會拋出 `UnsupportedError`。 |
-| `getTsunami` | `/api/v1/tsunami/{id}` 於 `api-1` 回 404（2026-08-02 實測）。 |
 
 ## 外部（第三方，無區域）
 
 | 方法 | URL |
 |---|---|
-| `getLocalizationProgress` | `https://exptech.dev/api/v1/dpip/locale` |
 | `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
 | `getRainHourForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
 
-## curl 可用性（2026-08-02，HTTP 狀態碼）
+## curl 可用性（2026-08-02 實測，HTTP 狀態碼）
 
 | 端點 | lb-tpe1 | lb-khh1 | core-tyo1 | core-tnn1 | api-1 |
 |---|:--:|:--:|:--:|:--:|:--:|

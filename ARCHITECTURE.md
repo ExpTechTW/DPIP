@@ -9,30 +9,38 @@ concerns live in exactly one place.
 ```
 lib/
 ├── main.dart              # entry point → bootstrap()
-├── bootstrap.dart         # init platform services (Firebase, DI) then runApp
+├── bootstrap.dart         # init platform services (Firebase, prefs, SNTP, DI) then runApp
 ├── app/                   # app shell: wiring, not features
 │   ├── app.dart           # root MaterialApp.router + providers
 │   ├── router/            # go_router route table (central AppRoutes registry)
 │   ├── shell/             # bottom-nav shell (StatefulShellRoute)
-│   └── theme/             # Material 3 theming + design tokens (spacing/radius/…)
+│   └── theme/             # Material 3 tokens (spacing/radius/motion/colour/glass)
 ├── core/                  # cross-cutting, feature-agnostic building blocks
+│   ├── di/                # SharedDeps assembly + coreProviders (provider wiring)
 │   ├── error/             # Result + Failure hierarchy
-│   ├── geo/               # geometry helpers (point-in-polygon)
+│   ├── geo/               # location services, township directory/boundaries
 │   ├── logging/           # the Log facade
 │   ├── models/            # shared value types (LatLng, …)
-│   ├── network/           # Dio ApiClient, region selection, error→Failure
+│   ├── network/           # ApiClient + ApiTier + ApiPaths, region failover,
+│   │                      # SSE, ETag cache, meteor delta decode
 │   ├── notifications/     # FCM/APNs + awesome channels, tap routing seam
-│   ├── platform/          # native-first device_info / compass
-│   ├── realtime/          # polling spine (channel/state/clock/staleness)
-│   └── settings/          # app-wide persisted/ephemeral state (provider)
+│   ├── platform/          # native-first device_info / compass / battery / tier
+│   ├── realtime/          # polling spine (channel/state/clock/staleness/SSE)
+│   ├── settings/          # typed Prefs facade + persisted/ephemeral controllers
+│   ├── storage/           # SQLite stores (ETag cache, network usage)
+│   └── weather/           # weather-condition / icon mapping
 ├── features/              # one folder per feature, each self-contained
+│   │                      # changelog · disaster_map · earthquake · events ·
+│   │                      # home · location · log · map · more · notification ·
+│   │                      # onboarding · settings · sponsor · typhoon · weather
 │   └── <feature>/
 │       ├── data/          # datasources, repository impls, JSON→model mapping
 │       ├── domain/        # @freezed entities, repository interfaces (pure Dart)
 │       └── presentation/  # pages/, widgets/, controllers (state)
 └── shared/                # reused across ≥2 features
-    ├── map/               # the reusable MapLibre surface (layers, timeline)
+    ├── map/               # the reusable MapLibre surface (BaseMap, layers, timeline)
     ├── navigation/        # AppRoutes (route names/paths)
+    ├── seismic/           # intensity/report colour scales
     └── widgets/           # AsyncView/RealtimeView, region bar, …
 ```
 
@@ -70,6 +78,7 @@ lib/
 ## Native config
 
 Platform integration (Firebase, APNs critical-alerts, signing, permissions) is
-restored per-need in `android/` and `ios/`. Firebase reads native
-`google-services.json` / `GoogleService-Info.plist`; `Firebase.initializeApp()`
-in `bootstrap.dart` needs no generated options file.
+restored per-need in `android/` and `ios/`. Firebase initializes from the
+generated `lib/firebase_options.dart` (`DefaultFirebaseOptions`) — not the
+native plists — so init never depends on a bundle resource; Android also keeps
+`google-services.json` for the GMS plugin.

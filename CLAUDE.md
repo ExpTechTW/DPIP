@@ -4,8 +4,8 @@ Guidance for working in this repository. See `ARCHITECTURE.md` for the folder
 structure, `api.md` for the API/region map, and `DESIGN.md` for the design
 system (colours, spacing, radius, motion, typography, shared components).
 
-DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
-(clean Flutter 3.44 baseline, feature-first architecture).
+DPIP is a Taiwan disaster-prevention app, mid-rewrite (clean Flutter 3.47
+baseline, feature-first architecture).
 
 ## Toolchain
 
@@ -58,14 +58,20 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   (`AppSpacing` / `AppRadius` / `AppMotion`), `ColorScheme` roles, and shared
   components (`shared/widgets/`). Never hardcode spacing, radius, duration, or
   colour where a token/role exists. Full reference: `DESIGN.md`.
-- **State management:** `provider`. App-wide services are provided in
-  `app/app.dart`; feature state lives in the feature's `presentation`.
-- **Networking:** never call hosts directly — use the region-aware API surface
-  (`api/redundant_api.dart`, `api/exclusive_api.dart`, `api/external_api.dart`).
-  No DNS-balanced bare hosts. See `api.md`. `ApiClient` fails over to the next
-  region **only** on transient/server faults (connection drop, timeout, 5xx) and
-  logs each failover; a 4xx or a cancellation throws immediately (it would recur
-  on every region). Pass a `CancelToken` to abort a superseded request. Fatal and
+- **State management:** `provider`. `bootstrap()` assembles the shared
+  infrastructure into a `SharedDeps` (`core/di/shared_deps.dart`) and hands it
+  to each feature's `*Providers(deps)` aggregate (wired through
+  `core/di/core_providers.dart`); feature state lives in the feature's
+  `presentation`.
+- **Networking:** never call hosts directly — use the region-aware `ApiClient`
+  (`core/network/api_client.dart`) with an `ApiTier` from
+  `core/network/api_region.dart` (LB vs Core, exclusive vs multi-active) and
+  path constants from `core/network/api_paths.dart`. No DNS-balanced bare
+  hosts. See `api.md`. `ApiClient` fails over to the next region **only** on
+  transient/server faults (connection drop, timeout, 5xx) and logs each
+  failover; a 4xx or a cancellation throws immediately (it would recur on every
+  region). Pass a `CancelToken` to abort a superseded request. SSE streams go
+  through `ApiClient.openStream` + `core/network/sse_client.dart`. Fatal and
   handled errors forward to an optional `CrashSink` set on `Log` (Crashlytics
   wire-up point).
 - **Data & errors (contract):** models are `@freezed` value types with generated
@@ -127,9 +133,8 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
   APNs auth key to the Firebase console for iOS; push only works on a physical
   device; permission is requested after the first frame for now (move to
-  onboarding); backend token registration (`/v2/location`) needs the not-yet-
-  ported location feature — the token is stored (`NotificationService.token`)
-  meanwhile.
+  onboarding). The push token registers through the location feature
+  (`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
@@ -140,18 +145,20 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 - **Localization (i18n):** every user-facing string goes through
   `AppLocalizations` (`AppLocalizations.of(context).<key>`) — never hardcode
   display text. ARB sources live in `lib/l10n/` (`app_en.arb` is the template,
-  `app_zh.arb` is Traditional Chinese, the Taiwan default; `zh_Hant_HK` /
-  `zh_Hans` cover HK/Simplified); generated code is in `lib/l10n/gen/`. Each ARB
-  **self-describes** with a `languageName` key (the locale's own name), and the
-  language picker (`shared/widgets/language_picker.dart`) is built from
+  `app_zh.arb` is Traditional Chinese, the Taiwan default; `zh_TW`,
+  `zh_Hant_HK` / `zh_Hans` cover HK/Simplified, plus ja/ko/th/vi/fil/id);
+  generated code is in `lib/l10n/gen/`. Each ARB **self-describes** with a
+  `languageName` key (the locale's own name), and the language picker
+  (`shared/widgets/language_picker.dart`) is built from
   `AppLocalizations.supportedLocales` + that key — never a hardcoded list. So a
   language is added by just dropping in `app_<locale>.arb` (with `languageName`);
-  the home/fallback locale is the one constant in `core/settings/locale_config.dart`.
-  Enforced by `tool/check_l10n.sh` (a CI gate, no packages): ARB key-parity with
-  the template + no hardcoded CJK/kana/Hangul/Thai string literals in
-  `features/*/presentation/**` or `shared/widgets/**`. A genuinely non-display or
-  throwaway literal is exempted with `// l10n-ignore: <reason>` (that line/the one
-  above) or `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
+  the home/fallback locale is the one constant in
+  `core/settings/locale_config.dart`. Enforced by `tool/check_l10n.sh` (a CI
+  gate, no packages): ARB key-parity with the template + no hardcoded
+  CJK/kana/Hangul/Thai string literals in `features/*/presentation/**` or
+  `shared/widgets/**`. A genuinely non-display or throwaway literal is exempted
+  with `// l10n-ignore: <reason>` (that line/the one above) or
+  `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
 - **Persistence keys (contract):** all `SharedPreferences` access goes through
   the typed `Prefs` facade (`core/settings/prefs.dart`), keyed by a `PrefKey<T>`
   from the `PreferenceKeys` registry (`core/settings/preference_keys.dart`) —
@@ -170,12 +177,14 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 `.github/workflows/ci.yml` runs on every push/PR and must stay green. It uses
 the mise-pinned toolchain and runs, in order: the layering gate
 (`tool/check_layering.sh`), the localization gate (`tool/check_l10n.sh`), the
-prefs gate (`tool/check_prefs.sh`), `dart format --set-exit-if-changed`, a
-codegen-drift check (`build_runner` + `git diff --exit-code` — committed
-`*.g.dart` / `*.freezed.dart` must match a fresh build), `flutter analyze`, and
-`flutter test`. The three bash gates need only bash + python3 (no toolchain), so
-they fail fast. Run these locally before pushing. Safety-critical seismic math
-is pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
+prefs gate (`tool/check_prefs.sh`), the lockfile gate (`tool/check_pubspec_lock.sh`),
+`dart format --set-exit-if-changed`, a codegen-drift check (`build_runner` +
+`git diff --exit-code` — committed `*.g.dart` / `*.freezed.dart` must match a
+fresh build), `flutter analyze`, and `flutter test`. The four bash gates need
+only bash + python3 (no toolchain), so they fail fast. `android.yml` /
+`ios.yml` build release artifacts, and `review.yml` adds an automated PR
+review. Run these locally before pushing. Safety-critical seismic math is
+pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
 if you change the EEW estimator, update those goldens deliberately.
 
 ## Commits
