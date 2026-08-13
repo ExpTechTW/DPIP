@@ -16,8 +16,8 @@ library;
 /// (time → radius) are cheap 1-D lookups.
 class TravelTimeSource {
   TravelTimeSource(this._table, double depth)
-      : _p = _interpDepth(_table, depth, _table.p),
-        _s = _interpDepth(_table, depth, _table.s);
+    : _p = _interpDepth(_table, depth, _table.p),
+      _s = _interpDepth(_table, depth, _table.s);
 
   final SeismicTravelTimeTable _table;
 
@@ -52,8 +52,8 @@ class TravelTimeSource {
     final i = _bisect(_table.dist, distance);
     final j = i == 0 ? 0 : i - 1;
     if (j >= _table.dist.length - 1) return time.last;
-    final f = (distance - _table.dist[j]) /
-        (_table.dist[j + 1] - _table.dist[j]);
+    final f =
+        (distance - _table.dist[j]) / (_table.dist[j + 1] - _table.dist[j]);
     return time[j] * (1 - f) + time[j + 1] * f;
   }
 
@@ -91,13 +91,10 @@ class TravelTimeSource {
     final i = _bisect(table.depth, depth);
     final j = i == 0 ? 0 : i - 1;
     if (j >= table.depth.length - 1) return grid.last;
-    final f = (depth - table.depth[j]) /
-        (table.depth[j + 1] - table.depth[j]);
+    final f = (depth - table.depth[j]) / (table.depth[j + 1] - table.depth[j]);
     final a = grid[j];
     final b = grid[j + 1];
-    return [
-      for (var k = 0; k < a.length; k++) a[k] * (1 - f) + b[k] * f,
-    ];
+    return [for (var k = 0; k < a.length; k++) a[k] * (1 - f) + b[k] * f];
   }
 }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -17,9 +18,13 @@ class SeismicTravelTimeSource {
 
   Future<SeismicTravelTimeTable> load() async {
     final bytes = await rootBundle.load('assets/travel_time.json.gz');
-    final json = jsonDecode(
-      utf8.decode(gzip.decode(bytes.buffer.asUint8List())),
-    ) as Map<String, dynamic>;
+    // gzip + JSON decode off the UI isolate (a 35 KB asset, but the grid is
+    // 66 × 96 rows of doubles and this runs when the replay map opens).
+    final json = await Isolate.run(
+      () =>
+          jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
+              as Map<String, dynamic>,
+    );
     List<double> row(dynamic value) =>
         (value as List).cast<num>().map((v) => v.toDouble()).toList();
     return SeismicTravelTimeTable(

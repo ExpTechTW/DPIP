@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/realtime/ticker.dart';
@@ -32,9 +34,21 @@ class RealtimeService {
   /// Starts every registered channel and the periodic clock resync (call after
   /// the first frame). The initial sync is kicked off at bootstrap; the ticker
   /// then re-anchors every [_clockSyncInterval].
-  void startAll() {
+  ///
+  /// [stagger] offsets each channel's first poll by one interval, so a burst
+  /// of feeds doesn't all hit the network (and the UI isolate's JSON decode)
+  /// on the same post-first-frame tick — a 250 ms lead on EEW is nothing, but
+  /// it smooths the first seconds on a slow phone. Zero (the default) keeps
+  /// [start] synchronous, which the service tests rely on.
+  void startAll({Duration stagger = Duration.zero}) {
+    var delay = Duration.zero;
     for (final channel in _channels) {
-      channel.start();
+      if (stagger == Duration.zero) {
+        channel.start();
+      } else {
+        unawaited(Future<void>.delayed(delay, channel.start));
+        delay += stagger;
+      }
     }
     _startClockSync();
   }

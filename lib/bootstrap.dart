@@ -70,20 +70,17 @@ Future<void> bootstrap() async {
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
 
-  try {
-    // Hot-restart safe: the native Firebase app survives a Dart hot restart, so
-    // re-initializing then throws — only initialize when no default app exists.
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-    }
-    Log.info('Firebase initialized');
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'Firebase init failed (push unavailable)');
-  }
+  // Kick off every independent resource load in parallel — Firebase, prefs,
+  // the SQLite cache, the town directory and package info never touch each
+  // other, so the serial chain would simply add their latencies. Each is
+  // awaited individually below so failures keep their per-resource handling.
+  unawaited(_initFirebase());
+  final prefsFuture = SharedPreferences.getInstance();
+  final cacheFuture = _openCache();
+  final townDirectoryFuture = TownDirectory.load();
+  final appVersionFuture = PackageInfo.fromPlatform().then((p) => p.version);
 
-  final prefs = Prefs(await SharedPreferences.getInstance());
+  final prefs = Prefs(await prefsFuture);
   final regions = RegionSelection(prefs);
   final experimental = ExperimentalSettings(prefs);
   final onboarding = OnboardingStore(prefs);
@@ -91,7 +88,7 @@ Future<void> bootstrap() async {
   final theme = ThemeController(prefs);
   final defaultMapLayer = DefaultMapLayerController(prefs);
   final mapLayerOrder = MapLayerOrderController(prefs);
-  final cache = await _openCache();
+  final cache = await cacheFuture;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
@@ -126,19 +123,18 @@ Future<void> bootstrap() async {
   serverClock.sync().ignore();
   final realtimeService = RealtimeService(serverClock);
 
-  // Push: best-effort so a missing push environment never blocks launch.
+  // Push: best-effort and off the first frame — a missing push environment or
+  // slow FCM registration must never gate launch. The token is only consumed
+  // by device-location reports, which fire after GPS permission, so it lands
+  // long before it is needed.
   final notificationService = NotificationService(prefs);
-  try {
-    await notificationService.init();
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'Notification init skipped');
-  }
+  unawaited(_initNotifications(notificationService));
 
   // Location: the township directory (centroids) backs Home region labels and
   // the nearest-centroid fallback; the boundary polygons back exact
-  // point-in-polygon GPS resolution and load in the background so they never
-  // delay launch (a fix before they land falls back to nearest-centroid).
-  final townDirectory = await TownDirectory.load();
+  // point-in-polygon GPS resolution and decode in a background isolate (see
+  // `TownBoundaries.load`) so they never delay launch or the first frames.
+  final townDirectory = await townDirectoryFuture;
   final townBoundaries = TownBoundaries.load();
   final regionStore = RegionStore(prefs);
   final locationService = LocationService(
@@ -151,7 +147,7 @@ Future<void> bootstrap() async {
   // after the first frame once GPS permission is granted; a null token (not yet
   // registered) simply skips — it self-heals on the next move.
   final locationApi = LocationApi(apiClient);
-  final appVersion = (await PackageInfo.fromPlatform()).version;
+  final appVersion = await appVersionFuture;
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
@@ -210,6 +206,7 @@ Future<void> bootstrap() async {
 
   // Each feature turns [deps] into its providers (and registers its realtime
   // channels). Adding a feature = one line here + its `*Providers` function.
+  Log.info('bootstrap ready in ${Log.sinceStart.elapsedMilliseconds} ms');
   runApp(
     DpipApp(
       deps: deps,
@@ -254,5 +251,31 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;
+  }
+}
+
+/// Initializes Firebase in parallel with the rest of bootstrap. Hot-restart
+/// safe: the native Firebase app survives a Dart hot restart, so
+/// re-initializing then throws — only initialize when no default app exists.
+/// Best-effort: a failure is logged and the app still launches.
+Future<void> _initFirebase() async {
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+    Log.info('Firebase initialized');
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'Firebase init failed (push unavailable)');
+  }
+}
+
+/// Initializes push after the first frame — never gate launch on FCM.
+Future<void> _initNotifications(NotificationService service) async {
+  try {
+    await service.init();
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'Notification init skipped');
   }
 }

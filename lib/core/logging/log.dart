@@ -9,6 +9,10 @@ import 'package:talker_flutter/talker_flutter.dart';
 /// backed by Talker, which keeps a history for the in-app log screen and
 /// captures uncaught Flutter/async errors.
 abstract final class Log {
+  /// Monotonic stopwatch started when the app boots — lets any code report
+  /// "how long after launch" (e.g. bootstrap-ready and first-frame markers).
+  static final Stopwatch sinceStart = Stopwatch()..start();
+
   /// The underlying Talker instance — used by the log screen and error hooks.
   static final Talker talker = Talker(
     settings: TalkerSettings(useConsoleLogs: kDebugMode),

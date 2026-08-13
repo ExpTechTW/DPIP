@@ -5,6 +5,7 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/platform/background_location.dart';
@@ -119,7 +120,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
     NotificationTaps.onTap = routeNotificationTap;
     widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.realtimeService.startAll();
+      Log.debug(
+        'first frame rendered ${Log.sinceStart.elapsedMilliseconds} ms '
+        'after start',
+      );
+      // Spread the first polls so the post-first-frame burst doesn't hammer
+      // the network and UI isolate at once (EEW leads; the rest follow).
+      widget.realtimeService.startAll(
+        stagger: const Duration(milliseconds: 250),
+      );
       NotificationTaps.drainPending();
       // Permissions belong to onboarding — only run the permission-dependent
       // setup once it's complete (immediately for returning users).

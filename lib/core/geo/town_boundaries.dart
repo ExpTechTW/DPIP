@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
@@ -59,7 +60,27 @@ class TownBoundaries {
   /// Builds from the bundled compact binary (`gzip` → delta-varint; see the
   /// class doc and `tool/build_town_boundaries.dart`). The bounding box is
   /// recomputed from the vertices rather than stored.
-  factory TownBoundaries.fromBinary(Uint8List bytes) {
+  factory TownBoundaries.fromBinary(Uint8List bytes) =>
+      TownBoundaries.fromDecoded(_decodeTable(bytes));
+
+  /// Loads and decodes the bundled boundaries in a **background isolate**
+  /// (`gzip` → delta-varint → plain decoded map), then assembles the index on
+  /// the UI isolate. The binary is ~1.5 MB when inflated and pure Dart to
+  /// parse — doing it on the UI isolate stalls the first frames on a slow
+  /// phone.
+  static Future<TownBoundaries> load() async {
+    final bytes = await rootBundle.load('assets/map/town_boundaries.bin.gz');
+    final decoded = await Isolate.run(
+      () => _decodeTable(
+        Uint8List.fromList(gzip.decode(bytes.buffer.asUint8List())),
+      ),
+    );
+    return TownBoundaries.fromDecoded(decoded);
+  }
+
+  /// Parses the delta + zig-zag varint binary into the plain decoded map
+  /// [fromDecoded] consumes — pure data, so it runs inside [Isolate.run].
+  static Map<String, dynamic> _decodeTable(Uint8List bytes) {
     var pos = 0;
     int readVarint() {
       var result = 0;
@@ -74,7 +95,7 @@ class TownBoundaries {
 
     int unzigzag(int z) => (z & 1) == 0 ? z >> 1 : -((z + 1) >> 1);
 
-    final shapes = <String, _TownShape>{};
+    final towns = <String, dynamic>{};
     final townCount = readVarint();
     for (var t = 0; t < townCount; t++) {
       final codeLen = readVarint();
@@ -106,23 +127,12 @@ class TownBoundaries {
         }
         polygons.add(rings);
       }
-      shapes[code] = _TownShape(
-        minLng: minLng,
-        minLat: minLat,
-        maxLng: maxLng,
-        maxLat: maxLat,
-        polygons: polygons,
-      );
+      towns[code] = {
+        'b': [minLng, minLat, maxLng, maxLat],
+        'p': polygons,
+      };
     }
-    return TownBoundaries._(shapes, _GridIndex.build(shapes));
-  }
-
-  /// Loads and decodes the bundled boundaries (`gzip` → delta-varint binary).
-  static Future<TownBoundaries> load() async {
-    final bytes = await rootBundle.load('assets/map/town_boundaries.bin.gz');
-    return TownBoundaries.fromBinary(
-      Uint8List.fromList(gzip.decode(bytes.buffer.asUint8List())),
-    );
+    return towns;
   }
 
   /// The code of the township containing ([lat], [lng]), or null if the point is
