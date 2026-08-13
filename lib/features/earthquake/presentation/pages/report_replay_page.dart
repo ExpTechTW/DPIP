@@ -28,6 +28,7 @@ import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -40,7 +41,6 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -311,8 +311,8 @@ class _ReplayMapState extends State<_ReplayMap> {
     final controller = _controller;
     if (controller == null) return;
     try {
-      final data = await rootBundle.load('assets/map/icons/cross.png');
-      await controller.addImage(_crossIcon, data.buffer.asUint8List());
+      final data = await IntensityIconRenderer.render('cross');
+      await controller.addImage(_crossIcon, data);
 
       await controller.addSource(
         _rtsSourceId,

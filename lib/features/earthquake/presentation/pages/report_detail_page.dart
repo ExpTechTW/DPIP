@@ -18,6 +18,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -32,7 +33,6 @@ import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -199,15 +199,6 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     1.7,
   ];
 
-  /// `intensity-1`…`intensity-9` (+ `-dark`) and `cross` — the legacy app's
-  /// own map-marker artwork, ported verbatim (same PNGs) so the report map
-  /// looks exactly as it did before, not a new icon style.
-  static final List<String> _iconNames = [
-    'cross',
-    for (var i = 1; i <= 9; i++) 'intensity-$i',
-    for (var i = 1; i <= 9; i++) 'intensity-$i-dark',
-  ];
-
   MapLibreMapController? _controller;
   bool _iconsLoaded = false;
 
@@ -282,9 +273,9 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   /// Registers every marker icon once — cheap enough (19 small PNGs) to load
   /// eagerly rather than lazily per feature.
   Future<void> _loadIcons(MapLibreMapController controller) async {
-    for (final name in _iconNames) {
-      final data = await rootBundle.load('assets/map/icons/$name.png');
-      await controller.addImage(name, data.buffer.asUint8List());
+    final icons = await IntensityIconRenderer.renderAll();
+    for (final entry in icons.entries) {
+      await controller.addImage(entry.key, entry.value);
     }
   }
 
