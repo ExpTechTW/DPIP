@@ -1812,4 +1812,26 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'Jaring yang lebih halus';
+
+  @override
+  String eewSerial(int serial) {
+    return 'Laporan $serial';
+  }
+
+  @override
+  String get eewMaxIntensity => 'Intensitas maks';
+
+  @override
+  String get eewLocalIntensity => 'Perkiraan di lokasi';
+
+  @override
+  String get eewSWave => 'Gelombang S';
+
+  @override
+  String get eewArrived => 'Tiba';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds detik';
+  }
 }

@@ -4,8 +4,10 @@
 /// shared by the live map tab and the home backdrop so both look identical.
 library;
 
+import 'dart:convert';
 import 'dart:ui' show Brightness;
 
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_paths.dart';
 
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
@@ -76,12 +78,49 @@ const String landLayerId = 'land';
 /// county borders stay legible on top.
 const String outlineLayerId = 'county-outline';
 
+/// Id of the base county-fill layer (`city` source-layer) — a runtime overlay
+/// can recolour it to tint each county by a reading, and hide it while a
+/// township-level tint takes over (the replay EEW area-intensity wash).
+const String countyFillLayerId = 'county';
+
+/// Id of the base township-fill layer (`town` source-layer) — recoloured the
+/// same way, keyed per `CODE`, when an EEW wants the whole island tinted by
+/// estimated shaking (legacy monitor behaviour).
+const String townFillLayerId = 'town';
+
 /// Id of the faint township-outline layer (below the county borders).
 const String townOutlineLayerId = 'town-outline';
 
 /// Id of the township-name label layer. Invisible until [townLabelMinZoom]
 /// when the 368-town mesh is dense enough that names can place without a pile-up.
 const String townLabelLayerId = 'town-label';
+
+/// Id of the GeoJSON point source backing [townLabelLayerId] — one point per
+/// township at its official centroid (see [townLabelGeoJson]).
+const String townLabelSourceId = 'town-label-src';
+
+/// Empty GeoJSON FeatureCollection — the [exptechVectorStyle] default when no
+/// directory is supplied (tests), so the baked style always parses.
+const String emptyTownLabelData = '{"type":"FeatureCollection","features":[]}';
+
+/// Builds the township-name label data — a GeoJSON FeatureCollection with one
+/// Point per township at the directory's official centroid.
+///
+/// Labels must NOT come from the vector tiles' `town` polygon layer: a township
+/// polygon that crosses a tile boundary is clipped into several tile pieces,
+/// each with its own centroid, so reading names off the polygons rendered the
+/// same township name more than once after a zoom changed the tile grid. A
+/// directory point is unique per township by construction, so exactly one label
+/// ever places per name.
+String townLabelGeoJson(TownDirectory directory) {
+  final features = [
+    for (final town in directory.all)
+      '{"type":"Feature",'
+          '"geometry":{"type":"Point","coordinates":[${town.lng},${town.lat}]},'
+          '"properties":{"name":${jsonEncode(town.townName)}}}',
+  ];
+  return '{"type":"FeatureCollection","features":[${features.join(',')}]}';
+}
 
 /// Township labels start placing at this zoom; [townLabelFadeZoom] finishes the
 /// fade-in. Below it the layer is not placed at all (a layer of near-invisible
@@ -127,9 +166,12 @@ const String terrainHillshadeLayerId = 'terrain-hillshade';
 /// Pass [MapColors.of] for the active brightness — never ad-hoc hexes. The base
 /// declares a `glyphs` endpoint (the ExpTech map-assets CDN) so overlay layers
 /// can render `text-field` symbols, and draws township names itself once the
-/// map is zoomed in past [townLabelMinZoom] (the [TOWN] property of the `town`
-/// source-layer). Overlays (radar) anchor below [outlineLayerId] so the county
-/// borders stay legible.
+/// map is zoomed in past [townLabelMinZoom]. The names are placed from
+/// [townLabelData] — a GeoJSON point per township (see [townLabelGeoJson]) —
+/// **not** from the `town` source-layer's polygons: a polygon clipped across a
+/// tile boundary yields a centroid per tile piece, so the same name rendered
+/// twice after a zoom. A directory point is unique per township. Overlays
+/// (radar) anchor below [outlineLayerId] so the county borders stay legible.
 ///
 /// [basemapTileUrl] / [glyphsUrl] are origin HTTPS templates fetched by
 /// MapLibre and served from the app's tile store through the Dart bridge. When
@@ -144,6 +186,7 @@ String exptechVectorStyle(
   required String basemapTileUrl,
   required String glyphsUrl,
   String? terrainTileUrl,
+  String townLabelData = emptyTownLabelData,
 }) {
   final background = palette.background;
   final fill = palette.fill;
@@ -167,7 +210,8 @@ String exptechVectorStyle(
   "version": 8,
   "glyphs": "$glyphsUrl",
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 }$terrain
+    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 },
+    "$townLabelSourceId": { "type": "geojson", "data": $townLabelData }$terrain
   },
   "layers": [
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },
@@ -176,8 +220,8 @@ String exptechVectorStyle(
     { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } }$hillshade,
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },
     { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } },
-    { "id": "$townLabelLayerId", "type": "symbol", "source": "exptech", "source-layer": "town", "minzoom": $townLabelMinZoom, "layout": {
-      "text-field": ["get", "TOWN"],
+    { "id": "$townLabelLayerId", "type": "symbol", "source": "$townLabelSourceId", "minzoom": $townLabelMinZoom, "layout": {
+      "text-field": ["get", "name"],
       "text-font": ["Noto Sans TC Regular"],
       "text-size": ["interpolate", ["linear"], ["zoom"], $townLabelMinZoom, 10, 12, 12.5],
       "text-allow-overlap": false,

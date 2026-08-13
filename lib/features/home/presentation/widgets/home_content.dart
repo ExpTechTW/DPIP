@@ -7,6 +7,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
+import 'package:dpip/features/home/presentation/widgets/home_eew_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
@@ -299,6 +300,11 @@ class HomeContent extends StatelessWidget {
                           sky: sky,
                         ),
                       const SizedBox(height: AppSpacing.lg),
+                      // A live EEW alert rides above every card — it is the one
+                      // thing on the dashboard that matters in the seconds it
+                      // exists. Nothing renders when calm, so the sheet's
+                      // ordinary layout is untouched outside an earthquake.
+                      const HomeEewSection(),
                       // Collapsed, or nothing to anchor a hero to: active events
                       // only. Full-screen township: the hero above, then forecast
                       // → events reached by scrolling past it. 全國: events only

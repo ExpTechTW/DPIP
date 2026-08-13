@@ -1809,4 +1809,26 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'Lưới mịn hơn';
+
+  @override
+  String eewSerial(int serial) {
+    return 'Bản tin $serial';
+  }
+
+  @override
+  String get eewMaxIntensity => 'Cường độ tối đa';
+
+  @override
+  String get eewLocalIntensity => 'Ước tính tại vị trí';
+
+  @override
+  String get eewSWave => 'Sóng S';
+
+  @override
+  String get eewArrived => 'Đã đến';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds giây';
+  }
 }

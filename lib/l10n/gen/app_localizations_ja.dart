@@ -1775,4 +1775,26 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'より細かいメッシュ';
+
+  @override
+  String eewSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eewMaxIntensity => '最大震度';
+
+  @override
+  String get eewLocalIntensity => '現在地の推定';
+
+  @override
+  String get eewSWave => 'S波';
+
+  @override
+  String get eewArrived => '到達';
+
+  @override
+  String eewCountdown(int seconds) {
+    return 'あと $seconds 秒';
+  }
 }

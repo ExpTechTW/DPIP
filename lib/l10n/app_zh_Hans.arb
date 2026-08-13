@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "更细的网格",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "第 {serial} 报",
+  "eewMaxIntensity": "最大震度",
+  "eewLocalIntensity": "所在地预估",
+  "eewSWave": "震波",
+  "eewArrived": "已抵达",
+  "eewCountdown": "{seconds} 秒"
 }

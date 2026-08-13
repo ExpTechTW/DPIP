@@ -1820,4 +1820,26 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'Ang mas pinong mesh';
+
+  @override
+  String eewSerial(int serial) {
+    return 'Ulat $serial';
+  }
+
+  @override
+  String get eewMaxIntensity => 'Pinakamataas na intensidad';
+
+  @override
+  String get eewLocalIntensity => 'Tantiya sa lokasyon';
+
+  @override
+  String get eewSWave => 'S wave';
+
+  @override
+  String get eewArrived => 'Dumating';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds segundo';
+  }
 }

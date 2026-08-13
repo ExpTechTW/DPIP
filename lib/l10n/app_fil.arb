@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "Ang mas pinong mesh",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "Ulat {serial}",
+  "eewMaxIntensity": "Pinakamataas na intensidad",
+  "eewLocalIntensity": "Tantiya sa lokasyon",
+  "eewSWave": "S wave",
+  "eewArrived": "Dumating",
+  "eewCountdown": "{seconds} segundo"
 }

@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "ตาข่ายที่ละเอียดกว่า",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "รายงาน {serial}",
+  "eewMaxIntensity": "ความรุนแรงสูงสุด",
+  "eewLocalIntensity": "ประมาณ ณ ตำแหน่ง",
+  "eewSWave": "คลื่น S",
+  "eewArrived": "มาถึงแล้ว",
+  "eewCountdown": "{seconds} วินาที"
 }

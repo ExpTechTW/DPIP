@@ -1,3 +1,4 @@
+import 'package:dpip/core/models/serialization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'rts.freezed.dart';
@@ -25,15 +26,22 @@ abstract class Rts with _$Rts {
 }
 
 /// One station's live shaking: peak ground acceleration / velocity and its
-/// intensity as both the raw float ([intensityRaw], wire `i`) and the rounded
-/// level ([intensity], wire `I`).
+/// intensity as both the raw float ([intensityRaw], wire `i`) and the decayed
+/// intensity ([intensity], wire `I`), plus whether the station is in its
+/// triggered state ([alert]).
 @freezed
 abstract class RtsStation with _$RtsStation {
   const factory RtsStation({
     @Default(0.0) double pga,
     @Default(0.0) double pgv,
     @JsonKey(name: 'i') @Default(0.0) double intensityRaw,
-    @JsonKey(name: 'I') @Default(0) int intensity,
+    @JsonKey(name: 'I') @Default(0.0) double intensity,
+    // The wire carries the trigger flag as 0/1 (absent while calm) — decode it
+    // like the other API bools, or a triggered station would throw on parse
+    // and drop the whole snapshot right when the big-event data matters most.
+    @JsonKey(fromJson: boolishInt, toJson: intFromBool)
+    @Default(false)
+    bool alert,
   }) = _RtsStation;
 
   factory RtsStation.fromJson(Map<String, dynamic> json) =>

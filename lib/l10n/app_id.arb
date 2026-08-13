@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "Jaring yang lebih halus",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "Laporan {serial}",
+  "eewMaxIntensity": "Intensitas maks",
+  "eewLocalIntensity": "Perkiraan di lokasi",
+  "eewSWave": "Gelombang S",
+  "eewArrived": "Tiba",
+  "eewCountdown": "{seconds} detik"
 }

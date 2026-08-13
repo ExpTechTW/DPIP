@@ -1769,6 +1769,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String eewSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eewMaxIntensity => '最大震度';
+
+  @override
+  String get eewLocalIntensity => '所在地預估';
+
+  @override
+  String get eewSWave => '震波';
+
+  @override
+  String get eewArrived => '已抵達';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds 秒';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3536,6 +3558,28 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更细的网格';
+
+  @override
+  String eewSerial(int serial) {
+    return '第 $serial 报';
+  }
+
+  @override
+  String get eewMaxIntensity => '最大震度';
+
+  @override
+  String get eewLocalIntensity => '所在地预估';
+
+  @override
+  String get eewSWave => '震波';
+
+  @override
+  String get eewArrived => '已抵达';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds 秒';
+  }
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -5303,6 +5347,28 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String eewSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eewMaxIntensity => '最大震度';
+
+  @override
+  String get eewLocalIntensity => '所在地預估';
+
+  @override
+  String get eewSWave => '震波';
+
+  @override
+  String get eewArrived => '已抵達';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds 秒';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7070,4 +7136,26 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String eewSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eewMaxIntensity => '最大震度';
+
+  @override
+  String get eewLocalIntensity => '所在地預估';
+
+  @override
+  String get eewSWave => '震波';
+
+  @override
+  String get eewArrived => '已抵達';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds 秒';
+  }
 }

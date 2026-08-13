@@ -28,7 +28,8 @@ _RtsStation _$RtsStationFromJson(Map<String, dynamic> json) => _RtsStation(
   pga: (json['pga'] as num?)?.toDouble() ?? 0.0,
   pgv: (json['pgv'] as num?)?.toDouble() ?? 0.0,
   intensityRaw: (json['i'] as num?)?.toDouble() ?? 0.0,
-  intensity: (json['I'] as num?)?.toInt() ?? 0,
+  intensity: (json['I'] as num?)?.toDouble() ?? 0.0,
+  alert: json['alert'] == null ? false : boolishInt(json['alert']),
 );
 
 Map<String, dynamic> _$RtsStationToJson(_RtsStation instance) =>
@@ -37,4 +38,5 @@ Map<String, dynamic> _$RtsStationToJson(_RtsStation instance) =>
       'pgv': instance.pgv,
       'i': instance.intensityRaw,
       'I': instance.intensity,
+      'alert': intFromBool(instance.alert),
     };
