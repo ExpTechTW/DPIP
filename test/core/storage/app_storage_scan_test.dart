@@ -44,8 +44,49 @@ void main() {
       );
       // The cache directory keeps the leftover after the DB is subtracted.
       expect(
-        slices.firstWhere((s) => s.label == 'caches').bytes,
+        slices.firstWhere((s) => s.label == 'caches (other)').bytes,
         20 * 1024 * 1024,
+      );
+    });
+
+    test('a dir that gave up a known file is labelled with (other)', () {
+      final s = scan(
+        totalBytes: 210 * 1024 * 1024,
+        dirs: const [StorageEntry(path: '/caches', bytes: 210 * 1024 * 1024)],
+        files: const [
+          StorageEntry(
+            path: '/caches/http_etag_cache.db',
+            bytes: 150 * 1024 * 1024,
+          ),
+        ],
+      );
+      final slices = storageBreakdown(s);
+      expect(slices.any((s) => s.label == 'caches (other)'), isTrue);
+      // A directory that kept everything keeps its plain name.
+      expect(slices.any((s) => s.label == 'caches'), isFalse);
+    });
+
+    test('/private/var and /var spellings match the same directory', () {
+      final s = scan(
+        totalBytes: 300 * 1024 * 1024,
+        dirs: const [
+          StorageEntry(path: '/var/.../Caches', bytes: 300 * 1024 * 1024),
+        ],
+        files: const [
+          StorageEntry(
+            path: '/private/var/.../Caches/http_etag_cache.db',
+            bytes: 200 * 1024 * 1024,
+          ),
+        ],
+      );
+      final slices = storageBreakdown(s);
+      expect(
+        slices.firstWhere((s) => s.label == 'ETag cache (SQLite)').bytes,
+        200 * 1024 * 1024,
+      );
+      expect(
+        slices.firstWhere((s) => s.label == 'Caches (other)').bytes,
+        100 * 1024 * 1024,
       );
     });
 
@@ -84,6 +125,7 @@ void main() {
         slices.firstWhere((s) => s.label == 'Other').bytes,
         20 * 1024 * 1024,
       );
+      // Nothing was subtracted, so the directory keeps its plain name.
       expect(
         slices.firstWhere((s) => s.label == 'caches').bytes,
         80 * 1024 * 1024,
@@ -128,7 +170,7 @@ void main() {
         180 * 1024 * 1024,
       );
       expect(
-        slices.firstWhere((s) => s.label == 'tmp').bytes,
+        slices.firstWhere((s) => s.label == 'tmp (other)').bytes,
         10 * 1024 * 1024,
       );
     });

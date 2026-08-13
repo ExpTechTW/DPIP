@@ -73,12 +73,16 @@ public class StorageScanPlugin: NSObject, FlutterPlugin {
 
   private func scan() -> [String: Any] {
     let fileManager = FileManager.default
+    // standardize every root so the walk below reports paths in the same
+    // style (symlinks resolved, e.g. /var vs /private/var) — otherwise the
+    // Dart side can't match a file back to the directory that contains it
+    // and the breakdown double-counts.
     let dirs = [
       fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first,
       fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
       fileManager.urls(for: .documentDirectory, in: .userDomainMask).first,
       URL(fileURLWithPath: NSTemporaryDirectory()),
-    ].compactMap { $0 }
+    ].compactMap { $0?.standardizedFileURL }
 
     var topFiles = [(path: String, bytes: Int64)]()
     var total: Int64 = 0
@@ -123,7 +127,7 @@ public class StorageScanPlugin: NSObject, FlutterPlugin {
       guard fileBytes > 0 else { continue }
       bytes += fileBytes
       if fileBytes >= StorageScanPlugin.topFileFloor {
-        top.append((url.path, fileBytes))
+        top.append((url.standardizedFileURL.path, fileBytes))
       }
     }
     return (bytes, top)

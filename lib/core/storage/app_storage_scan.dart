@@ -86,9 +86,16 @@ List<StorageSlice> storageBreakdown(StorageScan scan) {
   final slices = <String, int>{};
   final dirBytes = {for (final d in scan.dirs) d.path: d.bytes};
 
+  // /var is a symlink to /private/var on iOS; normalize either spelling so a
+  // file always matches the directory that contains it.
+  String varPath(String path) => path.replaceFirst('/private/var', '/var');
+
   String? dirOf(String path) {
     for (final dir in scan.dirs) {
       if (path.startsWith(dir.path)) return dir.path;
+      // iOS can hand one side /private/var and the other /var — treat them
+      // as the same tree so the subtraction still lands.
+      if (varPath(path).startsWith(varPath(dir.path))) return dir.path;
     }
     return null;
   }
@@ -128,7 +135,10 @@ List<StorageSlice> storageBreakdown(StorageScan scan) {
     if (bytes <= 0) {
       continue;
     }
-    slices[dir.name] = (slices[dir.name] ?? 0) + bytes;
+    // A directory that gave up a known file keeps the rest; say so in the
+    // label so the pie reads as ETag being *part of* Caches, not a sibling.
+    final label = bytes < dir.bytes ? '${dir.name} (other)' : dir.name;
+    slices[label] = (slices[label] ?? 0) + bytes;
   }
 
   final accounted = slices.values.fold(0, (a, b) => a + b);
