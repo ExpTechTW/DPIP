@@ -1,81 +1,134 @@
-/// A row of the seismic travel-time table: epicentral radius [r] (km) and the
-/// corresponding P/S travel times (seconds).
-typedef TravelTimeRow = ({double p, double r, double s});
-
-/// Seismic P/S travel-time table keyed by focal depth (km).
+/// Seismic P/S travel-time table as a depth × epicentral-distance grid.
 ///
-/// Converts between elapsed time and wave-front radius. Pure domain data — the
-/// table itself is loaded by the data layer and injected here, replacing the
-/// former reliance on a global.
-class SeismicTravelTimeTable {
-  const SeismicTravelTimeTable(this.rowsByDepth);
+/// Mirrors the reference CWA model (`travel_time.py`): `depth` and `dist` are
+/// the ascending grid axes, `p` holds P-wave times (s) and `sp` the S–P lead
+/// times (s); the S time at a cell is `p + sp`. Pure domain data — loaded by
+/// the data layer and injected here.
+///
+/// A [TravelTimeSource] pre-interpolates the grid down to two 1-D curves for a
+/// single event depth, so every later query (a per-tick wavefront, or per-town
+/// arrival times) is one `bisect` + linear interpolation — the same design the
+/// reference implementation uses for thousands of targets per event.
+library;
 
-  /// Travel-time rows for each tabulated focal depth (km).
-  final Map<int, List<TravelTimeRow>> rowsByDepth;
+/// A query source for one earthquake: [depth] is interpolated once into the
+/// P/S travel-time curves, then [arrival] (distance → time) and [waveRadius]
+/// (time → radius) are cheap 1-D lookups.
+class TravelTimeSource {
+  TravelTimeSource(this._table, double depth)
+      : _p = _interpDepth(_table, depth, _table.p),
+        _s = _interpDepth(_table, depth, _table.s);
 
-  int _closestDepth(double depth) => rowsByDepth.keys.reduce(
-    (a, b) => (b - depth).abs() < (a - depth).abs() ? b : a,
-  );
+  final SeismicTravelTimeTable _table;
 
-  /// P/S wave-front radii (km) and the S arrival time (s) for an event at
-  /// [depth] (km) whose origin was [elapsed] ago.
-  ({double p, double s, double sT}) waveRadius(double depth, Duration elapsed) {
+  /// P-wave travel time (s) at each tabulated epicentral distance.
+  final List<double> _p;
+
+  /// S-wave travel time (s) at each tabulated epicentral distance.
+  final List<double> _s;
+
+  /// P/S arrival times (s) at epicentral [distance] km.
+  ({double p, double s}) arrival(double distance) {
+    final p = _forward(_p, distance);
+    return (p: p, s: _forward(_s, distance));
+  }
+
+  /// P/S wave-front radii (km) [elapsed] after the origin — 0 until the wave
+  /// reaches the surface.
+  ({double p, double s}) waveRadius(Duration elapsed) {
     final t = elapsed.inMilliseconds / 1000.0;
-    final rows = rowsByDepth[_closestDepth(depth)]!;
-
-    double pDist = 0;
-    double sDist = 0;
-    double sT = 0;
-    TravelTimeRow? prev;
-
-    for (final row in rows) {
-      if (pDist == 0 && row.p > t) {
-        pDist = prev == null
-            ? row.r
-            : prev.r + ((t - prev.p) / (row.p - prev.p)) * (row.r - prev.r);
-      }
-      if (sDist == 0 && row.s > t) {
-        if (prev == null) {
-          sDist = row.r;
-          sT = row.s;
-        } else {
-          sDist = prev.r + ((t - prev.s) / (row.s - prev.s)) * (row.r - prev.r);
-        }
-      }
-      if (pDist != 0 && sDist != 0) break;
-      prev = row;
-    }
-
-    return (p: pDist < 0 ? 0 : pDist, s: sDist < 0 ? 0 : sDist, sT: sT);
+    return (p: _invert(_p, t), s: _invert(_s, t));
   }
 
-  /// S-wave travel time (ms) to reach epicentral [distance] (km) at [depth].
-  double sWaveTime(double depth, double distance) =>
-      _timeByDistance(depth, distance, (r) => r.s);
+  /// P-wave travel time in ms (the legacy callers' unit).
+  double pWaveTimeMs(double distance) => _forward(_p, distance) * 1000;
 
-  /// P-wave travel time (ms) to reach epicentral [distance] (km) at [depth].
-  double pWaveTime(double depth, double distance) =>
-      _timeByDistance(depth, distance, (r) => r.p);
+  /// S-wave travel time in ms (the legacy callers' unit).
+  double sWaveTimeMs(double distance) => _forward(_s, distance) * 1000;
 
-  double _timeByDistance(
+  /// Distance → time, clamping to the table edges (reference behaviour).
+  double _forward(List<double> time, double distance) {
+    if (distance <= 0) return time.first;
+    final i = _bisect(_table.dist, distance);
+    final j = i == 0 ? 0 : i - 1;
+    if (j >= _table.dist.length - 1) return time.last;
+    final f = (distance - _table.dist[j]) /
+        (_table.dist[j + 1] - _table.dist[j]);
+    return time[j] * (1 - f) + time[j + 1] * f;
+  }
+
+  /// Time → radius, clamping to the table edges (reference behaviour).
+  double _invert(List<double> time, double t) {
+    if (t <= 0) return 0;
+    final i = _bisect(time, t);
+    final j = i == 0 ? 0 : i - 1;
+    if (j >= time.length - 1) return _table.dist.last;
+    final f = (t - time[j]) / (time[j + 1] - time[j]);
+    return _table.dist[j] * (1 - f) + _table.dist[j + 1] * f;
+  }
+
+  static int _bisect(List<double> list, double value) {
+    var lo = 0;
+    var hi = list.length;
+    while (lo < hi) {
+      final mid = (lo + hi) >> 1;
+      if (list[mid] < value) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
+  }
+
+  /// Linear interpolation between the depth rows bracketing [depth], clamped
+  /// to the first/last row.
+  static List<double> _interpDepth(
+    SeismicTravelTimeTable table,
     double depth,
-    double distance,
-    double Function(TravelTimeRow) pick,
+    List<List<double>> grid,
   ) {
-    final rows = rowsByDepth[_closestDepth(depth)]!;
-    double time = 0;
-    TravelTimeRow? prev;
-    for (final row in rows) {
-      if (time == 0 && row.r >= distance) {
-        time = prev == null
-            ? pick(row)
-            : pick(prev) +
-                  ((distance - prev.r) / (row.r - prev.r)) *
-                      (pick(row) - pick(prev));
-      }
-      if (time != 0) break;
-      prev = row;
-    }
-    return time * 1000;
+    final i = _bisect(table.depth, depth);
+    final j = i == 0 ? 0 : i - 1;
+    if (j >= table.depth.length - 1) return grid.last;
+    final f = (depth - table.depth[j]) /
+        (table.depth[j + 1] - table.depth[j]);
+    final a = grid[j];
+    final b = grid[j + 1];
+    return [
+      for (var k = 0; k < a.length; k++) a[k] * (1 - f) + b[k] * f,
+    ];
   }
+}
+
+/// The bundled CWA travel-time grid: P-wave times plus S–P lead times over
+/// focal [depth] × epicentral [dist] (km).
+class SeismicTravelTimeTable {
+  SeismicTravelTimeTable({
+    required this.depth,
+    required this.dist,
+    required this.p,
+    required this.sp,
+  });
+
+  /// Ascending focal depths (km).
+  final List<double> depth;
+
+  /// Ascending epicentral distances (km).
+  final List<double> dist;
+
+  /// `p[depthRow][distCol]` — P-wave travel time (s).
+  final List<List<double>> p;
+
+  /// `sp[depthRow][distCol]` — S–P lead time (s); S = p + sp.
+  final List<List<double>> sp;
+
+  /// S-wave travel times (s), derived once from [p] + [sp].
+  late final List<List<double>> s = [
+    for (var i = 0; i < p.length; i++)
+      [for (var j = 0; j < p[i].length; j++) p[i][j] + sp[i][j]],
+  ];
+
+  /// A query source for an event at [depth] km.
+  TravelTimeSource source(double depth) => TravelTimeSource(this, depth);
 }

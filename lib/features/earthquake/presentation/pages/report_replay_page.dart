@@ -248,6 +248,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   bool _ready = false;
   String? _framedEewId;
   SeismicTravelTimeTable? _travelTimeTable;
+  final Map<String, TravelTimeSource> _sources = {};
   RtsBoxGrid? _boxGrid;
   bool _boxActive = false;
 
@@ -550,7 +551,10 @@ class _ReplayMapState extends State<_ReplayMap> {
       );
 
       if (table != null && !elapsed.isNegative) {
-        final radius = table.waveRadius(info.depth, elapsed);
+        // One depth-interpolated source per alert (reused across ticks).
+        final radius = _sources
+            .putIfAbsent(eew.id, () => table.source(info.depth))
+            .waveRadius(elapsed);
         if (radius.p > 0) {
           features.add(
             circleFeature(
