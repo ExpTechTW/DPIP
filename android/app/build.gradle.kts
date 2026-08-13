@@ -35,6 +35,17 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = 300909009
         versionName = flutter.versionName
+
+        // Flutter ≥3.35 auto-sets release abiFilters to its 3 supported
+        // architectures (union with whatever defaultConfig declares), so the
+        // map SDK's libmaplibre.so gets copied for ABI-less engines too. Clear
+        // and pin to arm64-v8a: minSdk 26 means no armv7-era devices, and
+        // x86_64 is emulator-only (debug builds, which keep all ABIs). This
+        // drops the dead libmaplibre.so copies (~18MB uncompressed).
+        ndk {
+            abiFilters.clear()
+            abiFilters.addAll(listOf("arm64-v8a"))
+        }
     }
 
     signingConfigs {
