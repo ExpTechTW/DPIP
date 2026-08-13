@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 ///
 /// Ported from the legacy app: 21 alert channels across 5 groups (EEW,
 /// earthquake, weather, tsunami, other) — each with its own importance, critical-
-/// alert flag, sound (`resource://raw/<name>` — Android `.ogg` / iOS `.aiff`),
+/// alert flag, sound (`resource://raw/<name>` — Android `.mp3` / iOS `.aiff`),
 /// and vibration — plus a standalone `background` service channel. Android caches
 /// a channel's settings after first creation, so [version] is bumped whenever a
 /// definition changes to force a re-create on next launch. (Adding a brand-new
