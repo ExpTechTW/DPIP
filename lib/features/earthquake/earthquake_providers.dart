@@ -73,11 +73,16 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     Provider<ReportRepository>.value(value: reports),
     ChangeNotifierProvider<EewRealtimeController>.value(value: eewController),
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),
-    // The RTS feed under its core supertype + the seismic station directory, so
+    // The EEW feed under its core supertype + the seismic station directory, so
     // the map's RTS layer can consume both without importing this feature.
     // ChangeNotifierProvider (not Provider) because RealtimeNotifier is a
     // Listenable — a plain Provider throws the invalid-value-type check.
     ChangeNotifierProvider<RealtimeNotifier<Rts>>.value(value: rtsController),
+    // Same supertype trick for the home sheet's live EEW alert section — home
+    // renders from the core notifier, never this feature's presentation.
+    ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>.value(
+      value: eewController,
+    ),
     Provider<Future<SeismicTravelTimeTable>>.value(value: travelTimeTable),
     Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
     Provider<TremStationRepository>.value(

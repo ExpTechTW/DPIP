@@ -2435,5 +2435,31 @@
   "windForecastTownOutlineHint": "The finer mesh",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  },
+  "eewSerial": "Report {serial}",
+  "@eewSerial": {
+    "description": "The serial (report number) of an EEW alert",
+    "placeholders": {"serial": {"type": "int"}}
+  },
+  "eewMaxIntensity": "Max intensity",
+  "@eewMaxIntensity": {
+    "description": "Label for an EEW alert's maximum felt intensity badge"
+  },
+  "eewLocalIntensity": "Estimated at my location",
+  "@eewLocalIntensity": {
+    "description": "Label for the estimated felt intensity at the user's location"
+  },
+  "eewSWave": "S-wave",
+  "@eewSWave": {
+    "description": "Label for the S-wave arrival countdown tile"
+  },
+  "eewArrived": "Arrived",
+  "@eewArrived": {
+    "description": "S-wave arrival countdown state once the wave has arrived"
+  },
+  "eewCountdown": "{seconds} s",
+  "@eewCountdown": {
+    "description": "S-wave arrival countdown in seconds",
+    "placeholders": {"seconds": {"type": "int"}}
   }
 }

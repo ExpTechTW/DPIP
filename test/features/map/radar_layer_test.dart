@@ -1,4 +1,5 @@
 import 'package:dpip/shared/map/admin_outline.dart';
+import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -359,10 +360,14 @@ void main() {
 
     test('the county border is drawn above the raster', () async {
       final (_, controller) = await attached();
-      // The base style already outlines counties *below* the echo, which is
-      // where they disappear. These must not be anchored under anything.
-      expect(controller.belowOf('admin-county-outline'), isNull);
-      expect(controller.belowOf('admin-county-outline-casing'), isNull);
+      // The base style already outlines counties *below* the echo, where they
+      // disappear. These redraw over the raster, but still under the township
+      // labels — a border line must never cross a place name.
+      expect(controller.belowOf('admin-county-outline'), townLabelLayerId);
+      expect(
+        controller.belowOf('admin-county-outline-casing'),
+        townLabelLayerId,
+      );
     });
 
     test('turning the coverage outline off removes what it added', () async {

@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:math' show Point;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
 
 /// Layer-chip band under the safe-area top: outer pad ([AppSpacing.lg]) + chip
 /// height (~36) + a tight gap. iOS MapLibre already anchors ornaments to the
@@ -214,11 +216,15 @@ class _BaseMapState extends State<BaseMap> {
       ),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
+      // Township-name labels come from the app's own town directory (a unique
+      // GeoJSON point per township), never the tile polygons — see
+      // [townLabelGeoJson].
       styleString: exptechVectorStyle(
         palette,
         basemapTileUrl: basemapOriginTileUrl,
         glyphsUrl: glyphsOriginUrl,
         terrainTileUrl: terrainOriginTileUrl,
+        townLabelData: townLabelGeoJson(context.read<TownDirectory>()),
       ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).

@@ -1809,4 +1809,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'The finer mesh';
+
+  @override
+  String eewSerial(int serial) {
+    return 'Report $serial';
+  }
+
+  @override
+  String get eewMaxIntensity => 'Max intensity';
+
+  @override
+  String get eewLocalIntensity => 'Estimated at my location';
+
+  @override
+  String get eewSWave => 'S-wave';
+
+  @override
+  String get eewArrived => 'Arrived';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds s';
+  }
 }

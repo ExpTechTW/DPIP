@@ -23,7 +23,7 @@ void main() {
 
     final rts = _source().decode(data);
     expect(rts.time, 1783968266383);
-    expect(rts.station['2012144']!.intensity, -3);
+    expect(rts.station['2012144']!.intensity, -3.0);
   });
 
   test('timestampOf is null → event-recency freshness, not payload age', () {

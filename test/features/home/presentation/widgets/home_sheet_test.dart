@@ -1,10 +1,18 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/realtime/clock.dart';
+import 'package:dpip/core/realtime/elapsed.dart';
+import 'package:dpip/core/realtime/realtime_channel.dart';
+import 'package:dpip/core/realtime/realtime_config.dart';
+import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/core/realtime/realtime_source.dart';
+import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
@@ -19,6 +27,7 @@ import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +62,43 @@ class _FakeEventRepository implements EventRepository {
       const Ok([]);
 }
 
+/// A never-started EEW channel (connecting, no data) — the calm state, so the
+/// sheet's EEW section renders nothing and these tests keep passing unchanged.
+class _FakeClock implements Clock {
+  @override
+  DateTime now() => DateTime.utc(2026, 8, 12);
+}
+
+class _FakeElapsed implements Elapsed {
+  @override
+  Duration get elapsed => Duration.zero;
+}
+
+class _FakeTicker implements Ticker {
+  @override
+  TickerHandle start(Duration interval, void Function() onTick) =>
+      _NoopHandle();
+}
+
+class _NoopHandle implements TickerHandle {
+  @override
+  void cancel() {}
+}
+
+class _StaticEewSource extends RealtimeSource<List<Eew>> {
+  _StaticEewSource(this.data);
+  final List<Eew> data;
+
+  @override
+  Future<Result<List<Eew>>> fetch() async => Ok(data);
+
+  @override
+  DateTime? timestampOf(List<Eew> value) => null;
+
+  @override
+  bool sameData(List<Eew>? a, List<Eew>? b) => listEquals(a, b);
+}
+
 /// Pumps [HomeSheet] wired the same way `HomePage` wires it — the [extent]
 /// notifier is both the app-wide provider and the widget's own constructor
 /// argument, so a test can drive it exactly like a real drag would.
@@ -79,6 +125,18 @@ Widget _wrap(RegionStore store, HomeSheetExtent extent) {
         ),
         ChangeNotifierProvider<HomeActiveEventsController>(
           create: (_) => HomeActiveEventsController(events, store),
+        ),
+        ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>(
+          create: (_) => RealtimeNotifier<List<Eew>>(
+            RealtimeChannel<List<Eew>>(
+              source: _StaticEewSource(const []),
+              clock: _FakeClock(),
+              elapsed: _FakeElapsed(),
+              ticker: _FakeTicker(),
+              config: RealtimeConfig.eew,
+              label: 'test-eew',
+            ),
+          ),
         ),
       ],
       child: Scaffold(

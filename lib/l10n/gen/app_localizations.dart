@@ -3428,6 +3428,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The finer mesh'**
   String get windForecastTownOutlineHint;
+
+  /// The serial (report number) of an EEW alert
+  ///
+  /// In en, this message translates to:
+  /// **'Report {serial}'**
+  String eewSerial(int serial);
+
+  /// Label for an EEW alert's maximum felt intensity badge
+  ///
+  /// In en, this message translates to:
+  /// **'Max intensity'**
+  String get eewMaxIntensity;
+
+  /// Label for the estimated felt intensity at the user's location
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated at my location'**
+  String get eewLocalIntensity;
+
+  /// Label for the S-wave arrival countdown tile
+  ///
+  /// In en, this message translates to:
+  /// **'S-wave'**
+  String get eewSWave;
+
+  /// S-wave arrival countdown state once the wave has arrived
+  ///
+  /// In en, this message translates to:
+  /// **'Arrived'**
+  String get eewArrived;
+
+  /// S-wave arrival countdown in seconds
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String eewCountdown(int seconds);
 }
 
 class _AppLocalizationsDelegate

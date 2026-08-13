@@ -1784,4 +1784,26 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => '더 촘촘한 망';
+
+  @override
+  String eewSerial(int serial) {
+    return '제 $serial 보';
+  }
+
+  @override
+  String get eewMaxIntensity => '최대 진도';
+
+  @override
+  String get eewLocalIntensity => '현재 위치 예상';
+
+  @override
+  String get eewSWave => 'S파';
+
+  @override
+  String get eewArrived => '도달';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds초';
+  }
 }

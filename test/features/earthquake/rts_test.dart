@@ -19,7 +19,8 @@ void main() {
       expect(station.pga, 2.79);
       expect(station.pgv, 0.52);
       expect(station.intensityRaw, -2.9); // wire 'i'
-      expect(station.intensity, -3); // wire 'I'
+      expect(station.intensity, -3.0); // wire 'I'
+      expect(station.alert, false);
       expect(rts.box, isEmpty);
       expect(rts.intensities, isEmpty);
     });
@@ -33,6 +34,18 @@ void main() {
       });
       expect(rts.station['x']!.intensityRaw, -3.0);
       expect(rts.station['x']!.pga, 3.0);
+    });
+
+    test('decodes a triggered station alert flag (wire 0/1 int)', () {
+      final rts = Rts.fromJson({
+        'station': {
+          'alerted': {'pga': 30, 'pgv': 12, 'i': 4.8, 'I': 4.2, 'alert': 1},
+          'calm': {'pga': 2, 'pgv': 1, 'i': 2.0, 'I': 1.9, 'alert': 0},
+        },
+        'time': 1,
+      });
+      expect(rts.station['alerted']!.alert, isTrue);
+      expect(rts.station['calm']!.alert, isFalse);
     });
 
     test('round-trips symmetrically through toJson', () {

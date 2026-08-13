@@ -347,7 +347,10 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         const RasterLayerProperties(rasterOpacity: _radarOpacity),
         // On top of the base style's own borders, as on the radar map: those
         // are hairlines tuned for a bare basemap and they wash out under the
-        // echo. [_restackOverlays] puts a legible set back over it.
+        // echo. [_restackOverlays] puts a legible set back over it. Anchored
+        // under the township names so a place name is never buried under the
+        // echo — the labels stay the top-most text (see [AdminOutline]).
+        belowLayerId: townLabelLayerId,
       );
       // Re-stack the admin frame + selection over the fresh echo, keeping the
       // subject that was last applied (a radar refresh has no selection context).

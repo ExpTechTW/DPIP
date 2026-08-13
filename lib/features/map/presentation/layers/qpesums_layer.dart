@@ -3,6 +3,7 @@ import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.
 import 'package:dpip/features/map/presentation/widgets/scan_range_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
@@ -35,9 +36,12 @@ class QpesumsMapLayer extends RasterTimelineLayer
   String get scanRangeColor => '#78909C';
 
   /// The forecast covers the base style's borders, so this layer supplies its
-  /// own on top — same reasoning as radar, and the same chrome.
+  /// own on top — same reasoning as radar, and the same chrome. The raster
+  /// still anchors **under** the township-name labels, so a place name is never
+  /// buried under the forecast; the admin borders redraw between the two (they
+  /// mount after the raster, closer to the labels — see [AdminOutline]).
   @override
-  String? get rasterBelowLayerId => null;
+  String? get rasterBelowLayerId => townLabelLayerId;
 
   @override
   String get id => 'qpesums';

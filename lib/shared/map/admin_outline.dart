@@ -1,3 +1,4 @@
+import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// An administrative boundary set that can be redrawn over a weather raster.
@@ -88,16 +89,16 @@ abstract final class AdminOutline {
   ///
   /// [lineColor] overrides the default light core — the typhoon surface's
   /// satellite underlay passes bright yellow there, because on fully-opaque
-  /// imagery the default white does not survive. [belowLayerId] omitted puts
-  /// them on top, which is what the radar surface wants; the typhoon surface
-  /// passes an anchor instead: there the borders still need to clear the
-  /// echo, but the track and storm bands are the subject and must not be
-  /// crossed by a white line.
+  /// imagery the default white does not survive. [belowLayerId] defaults to
+  /// under the township-name labels — a border line must never cross a place
+  /// name, so the labels stay the top-most text on every surface; the typhoon
+  /// surface passes an explicit anchor instead when its own overlays must not
+  /// be crossed by a line.
   static Future<void> add(
     MapLibreMapController controller,
     AdminBoundary boundary, {
     String lineColor = AdminOutline.lineColor,
-    String? belowLayerId,
+    String? belowLayerId = townLabelLayerId,
   }) async {
     await controller.addLineLayer(
       sourceId,

@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "더 촘촘한 망",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "제 {serial} 보",
+  "eewMaxIntensity": "최대 진도",
+  "eewLocalIntensity": "현재 위치 예상",
+  "eewSWave": "S파",
+  "eewArrived": "도달",
+  "eewCountdown": "{seconds}초"
 }

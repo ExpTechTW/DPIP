@@ -4,6 +4,7 @@ import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.
 import 'package:dpip/features/map/presentation/widgets/radar_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
@@ -40,9 +41,12 @@ class RadarMapLayer extends RasterTimelineLayer
 
   /// The echo covers the base style's borders instead of passing under them —
   /// this layer supplies its own on top, and showing both would draw every
-  /// boundary twice at two weights.
+  /// boundary twice at two weights. The raster still anchors **under** the
+  /// township-name labels, so a place name is never buried under the echo;
+  /// the admin borders this layer redraws sit between the two (they mount
+  /// after the raster, closer to the labels — see [AdminOutline]).
   @override
-  String? get rasterBelowLayerId => null;
+  String? get rasterBelowLayerId => townLabelLayerId;
 
   @override
   Widget buildTopTrailingChrome(

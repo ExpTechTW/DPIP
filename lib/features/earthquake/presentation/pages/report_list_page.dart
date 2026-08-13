@@ -313,9 +313,6 @@ class _ReportTile extends StatelessWidget {
 
   final PartialEarthquakeReport report;
 
-  /// Numbered CWA reports — magnitude in gold to mark the official serial set.
-  static const Color _numberedMagGold = Color(0xFFE8C547);
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -339,7 +336,15 @@ class _ReportTile extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
-            IntensityBadge(label: intensity.label, color: intensityColor),
+            IntensityBadge(
+              label: intensity.label,
+              color: intensityColor,
+              // 小區域 reports (no CWA serial) draw as a hollow ring over the
+              // surface — the legacy `IntensityBox(border: !hasNumber)`
+              // distinction, so numbered reports (solid fill) read apart from
+              // local-felt ones at a glance without leaning on a text hint.
+              outlined: !report.hasNumber,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -369,7 +374,7 @@ class _ReportTile extends StatelessWidget {
             Text(
               l10n.reportListMagnitude(mag),
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: report.hasNumber ? _numberedMagGold : colors.onSurface,
+                color: colors.onSurface,
                 fontWeight: FontWeight.w800,
                 height: 1,
                 letterSpacing: -0.5,

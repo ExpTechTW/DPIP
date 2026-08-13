@@ -669,5 +669,11 @@
   "windForecastTownOutlineHint": "Lưới mịn hơn",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  }
+  },
+  "eewSerial": "Bản tin {serial}",
+  "eewMaxIntensity": "Cường độ tối đa",
+  "eewLocalIntensity": "Ước tính tại vị trí",
+  "eewSWave": "Sóng S",
+  "eewArrived": "Đã đến",
+  "eewCountdown": "{seconds} giây"
 }

@@ -1806,4 +1806,26 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'ตาข่ายที่ละเอียดกว่า';
+
+  @override
+  String eewSerial(int serial) {
+    return 'รายงาน $serial';
+  }
+
+  @override
+  String get eewMaxIntensity => 'ความรุนแรงสูงสุด';
+
+  @override
+  String get eewLocalIntensity => 'ประมาณ ณ ตำแหน่ง';
+
+  @override
+  String get eewSWave => 'คลื่น S';
+
+  @override
+  String get eewArrived => 'มาถึงแล้ว';
+
+  @override
+  String eewCountdown(int seconds) {
+    return '$seconds วินาที';
+  }
 }

@@ -4,7 +4,9 @@ library;
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
+import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
@@ -78,6 +80,8 @@ class _MapPageState extends State<MapPage> {
     RtsMapLayer(
       context.read<RealtimeNotifier<Rts>>(),
       context.read<TremStationRepository>(),
+      eew: context.read<RealtimeNotifier<List<Eew>>>(),
+      travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
     ),
     TemperatureMapLayer(context.read<MeteorWeatherRepository>()),
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),
