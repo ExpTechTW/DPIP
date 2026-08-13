@@ -215,8 +215,10 @@ def main():
         # The star field is the one texture where lossless costs real bytes and
         # buys nothing: it is consumed as a dim background, and near-lossless
         # WebP holds every star while halving the file.
-        ("starmap.webp", starmap(), dict(format="WEBP", quality=86, method=6)),
-        ("sun_rays.webp", sun_rays(), WEBP_LOSSLESS),
+        ("starmap.webp", starmap(), dict(format="WEBP", quality=75, method=6)),
+        # The ray fan is pure visual (the shader multiplies it dim); q85 keeps
+        # every ray edge while shrinking the file ~8x.
+        ("sun_rays.webp", sun_rays(), dict(format="WEBP", quality=85, method=6)),
         ("sun_profile.webp", sun_profile(), WEBP_LOSSLESS),
         ("annulus.webp", annulus(), WEBP_LOSSLESS),
     ):

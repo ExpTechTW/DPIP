@@ -110,7 +110,7 @@ flutter:
     - shaders/weather/card_water.frag
   assets:
     - assets/DPIP.png
-    - assets/box.json
+    - assets/box.json.gz
     - assets/weather/clouds/
     - assets/weather/particles/
     - assets/weather/sky/
