@@ -91,9 +91,9 @@ class HomeContent extends StatelessWidget {
     // overrides it to the bottom-nav bar's reserved height, so this reads
     // straight off the platform view (see the original `_build` doc). Computed
     // once here, not per scroll tick.
-    final bottomSafeArea = MediaQueryData.fromView(
-      View.of(context),
-    ).padding.bottom;
+    final bottomSafeArea = MediaQueryData.fromView(View.of(context))
+        .padding
+        .bottom;
     // The sky re-bakes rarely; the scroll focus dial moves on every tick. The
     // ListView's *shell* rebuilds only when the sky changes — the scroll-driven
     // reveal/focus dial lives one level down, on the panel's own listenable,
@@ -530,9 +530,8 @@ class HomeSheetHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(
-      context,
-    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
+    final color = Theme.of(context).colorScheme.onSurfaceVariant
+        .withValues(alpha: 0.4);
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),

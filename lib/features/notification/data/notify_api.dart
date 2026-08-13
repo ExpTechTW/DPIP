@@ -28,10 +28,8 @@ class NotifyApi {
     String token,
     int channel,
     int status,
-  ) async =>
-      (await _client.get(
-            ApiTier.coreExclusiveApi,
-            '${ApiPaths.notify}$token/$channel/$status',
-          ))
-          as List<dynamic>;
+  ) async => (await _client.get(
+    ApiTier.coreExclusiveApi,
+    '${ApiPaths.notify}$token/$channel/$status',
+  )) as List<dynamic>;
 }

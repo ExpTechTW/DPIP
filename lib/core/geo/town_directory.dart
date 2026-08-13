@@ -32,9 +32,9 @@ class TownDirectory {
   /// Loads and decodes the bundled directory (`gzip` → JSON).
   static Future<TownDirectory> load() async {
     final bytes = await rootBundle.load('assets/location.json.gz');
-    final json =
-        jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
-            as Map<String, dynamic>;
+    final json = jsonDecode(
+      utf8.decode(gzip.decode(bytes.buffer.asUint8List())),
+    ) as Map<String, dynamic>;
     return TownDirectory.fromJson(json);
   }
 

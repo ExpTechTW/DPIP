@@ -27,12 +27,10 @@ class MeteorWeatherApi {
   Future<Map<String, dynamic>> getRealtime(
     double latitude,
     double longitude,
-  ) async =>
-      (await _client.get(
-            _api,
-            '/api/v5/meteor/weather/realtime/$latitude,$longitude',
-          ))
-          as Map<String, dynamic>;
+  ) async => (await _client.get(
+    _api,
+    '/api/v5/meteor/weather/realtime/$latitude,$longitude',
+  )) as Map<String, dynamic>;
 
   /// Township forecast for the 3-digit [code].
   Future<Map<String, dynamic>> getForecast(String code) async =>

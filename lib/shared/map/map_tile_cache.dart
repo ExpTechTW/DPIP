@@ -172,8 +172,8 @@ class MapTileCache {
             etag: entry.value.etag,
           ),
       ];
-      if (fillUntil > 0) return _injectFill(tiles, fillUntil);
-      return _injectAll(tiles);
+      if (fillUntil > 0) return await _injectFill(tiles, fillUntil);
+      return await _injectAll(tiles);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'MapTileCache.warm');
       return 0;

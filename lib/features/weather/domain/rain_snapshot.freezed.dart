@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'rain_snapshot.dart';
@@ -9,6 +9,7 @@ part of 'rain_snapshot.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -73,7 +74,7 @@ class _$RainObservationCopyWithImpl<$Res>
 /// Create a copy of RainObservation
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? now = freezed,Object? min10 = freezed,Object? hour1 = freezed,Object? hour3 = freezed,Object? hour6 = freezed,Object? hour12 = freezed,Object? hour24 = freezed,Object? day2 = freezed,Object? day3 = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(RainObservation(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,now: freezed == now ? _self.now : now // ignore: cast_nullable_to_non_nullable
 as double?,min10: freezed == min10 ? _self.min10 : min10 // ignore: cast_nullable_to_non_nullable
@@ -367,7 +368,7 @@ class _$RainSnapshotCopyWithImpl<$Res>
 /// Create a copy of RainSnapshot
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? stations = null,}) {
-  return _then(_self.copyWith(
+  return _then(RainSnapshot(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,stations: null == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
 as List<RainObservation>,
@@ -511,7 +512,7 @@ return $default(_that.time,_that.stations);case _:
 
 
 class _RainSnapshot implements RainSnapshot {
-  const _RainSnapshot({required this.time, required final  List<RainObservation> stations}): _stations = stations;
+  const _RainSnapshot({required this.time, required  List<RainObservation> stations}): _stations = stations;
   
 
 @override final  int time;

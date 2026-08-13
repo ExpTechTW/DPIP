@@ -5,15 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('the vector style parses and layers stack in order', () {
-    final style =
-        jsonDecode(
-              exptechVectorStyle(
-                MapColors.dark,
-                basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
-                glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
-              ),
-            )
-            as Map<String, dynamic>;
+    final style = jsonDecode(
+      exptechVectorStyle(
+        MapColors.dark,
+        basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
+        glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
+      ),
+    ) as Map<String, dynamic>;
 
     final layers = style['layers'] as List<dynamic>;
     final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
@@ -28,74 +26,67 @@ void main() {
     ]);
   });
 
-  test(
-    'terrain adds a mapbox-encoded raster-dem source and hillshade between fills and borders',
-    () {
-      final style =
-          jsonDecode(
-                exptechVectorStyle(
-                  MapColors.dark,
-                  basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
-                  glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
-                  terrainTileUrl:
-                      'https://static.lb.exptech.dev/api/v1/map/terrain/{z}/{x}/{y}.png',
-                ),
-              )
-              as Map<String, dynamic>;
+  test('terrain adds a mapbox-encoded raster-dem source and hillshade between fills and borders', () {
+    final style = jsonDecode(
+      exptechVectorStyle(
+        MapColors.dark,
+        basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
+        glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
+        terrainTileUrl:
+            'https://static.lb.exptech.dev/api/v1/map/terrain/{z}/{x}/{y}.png',
+      ),
+    ) as Map<String, dynamic>;
 
-      final terrain = style['sources']['terrain'] as Map<String, dynamic>;
-      expect(terrain['type'], 'raster-dem');
-      expect(
-        terrain['encoding'],
-        'mapbox',
-        reason:
-            'the server tiles are Mapbox terrain-RGB — MapLibre decodes them '
-            'natively, no app-side rewrite (see satellite-tiles-go/web)',
-      );
-      expect(terrain['tileSize'], 512);
-      expect(terrain['minzoom'], 0);
-      expect(terrain['maxzoom'], 12);
-      expect(
-        terrain['bounds'],
-        [110, 10, 132, 35],
-        reason:
-            'the bounds must overshoot the DEM bbox so the hillshade edge '
-            'never meets the plain background on screen',
-      );
+    final terrain = style['sources']['terrain'] as Map<String, dynamic>;
+    expect(terrain['type'], 'raster-dem');
+    expect(
+      terrain['encoding'],
+      'mapbox',
+      reason:
+          'the server tiles are Mapbox terrain-RGB — MapLibre decodes them '
+          'natively, no app-side rewrite (see satellite-tiles-go/web)',
+    );
+    expect(terrain['tileSize'], 512);
+    expect(terrain['minzoom'], 0);
+    expect(terrain['maxzoom'], 12);
+    expect(
+      terrain['bounds'],
+      [110, 10, 132, 35],
+      reason:
+          'the bounds must overshoot the DEM bbox so the hillshade edge '
+          'never meets the plain background on screen',
+    );
 
-      final hillshade = (style['layers'] as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .firstWhere((l) => l['id'] == terrainHillshadeLayerId);
-      final paint = hillshade['paint'] as Map<String, dynamic>;
-      expect(paint['hillshade-illumination-direction'], 335);
-      expect(paint['hillshade-exaggeration'], 0.3);
+    final hillshade = (style['layers'] as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .firstWhere((l) => l['id'] == terrainHillshadeLayerId);
+    final paint = hillshade['paint'] as Map<String, dynamic>;
+    expect(paint['hillshade-illumination-direction'], 335);
+    expect(paint['hillshade-exaggeration'], 0.3);
 
-      final layers = style['layers'] as List<dynamic>;
-      final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
-      expect(ids, [
-        'bg',
-        'land',
-        'county',
-        'town',
-        terrainHillshadeLayerId,
-        'town-outline',
-        'county-outline',
-        'town-label',
-      ]);
-    },
-  );
+    final layers = style['layers'] as List<dynamic>;
+    final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
+    expect(ids, [
+      'bg',
+      'land',
+      'county',
+      'town',
+      terrainHillshadeLayerId,
+      'town-outline',
+      'county-outline',
+      'town-label',
+    ]);
+  });
 
   group('town-label layer', () {
     Map<String, dynamic> townLabel() {
-      final style =
-          jsonDecode(
-                exptechVectorStyle(
-                  MapColors.light,
-                  basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
-                  glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
-                ),
-              )
-              as Map<String, dynamic>;
+      final style = jsonDecode(
+        exptechVectorStyle(
+          MapColors.light,
+          basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
+          glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
+        ),
+      ) as Map<String, dynamic>;
       return (style['layers'] as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .firstWhere((l) => l['id'] == townLabelLayerId);

@@ -13,9 +13,9 @@ class RtsBoxGridSource {
   const RtsBoxGridSource();
 
   Future<RtsBoxGrid> load() async {
-    final json =
-        jsonDecode(await rootBundle.loadString('assets/box.json'))
-            as Map<String, dynamic>;
+    final json = jsonDecode(
+      await rootBundle.loadString('assets/box.json'),
+    ) as Map<String, dynamic>;
     final rings = <int, List<List<double>>>{
       for (final feature in json['features'] as List)
         ((feature as Map)['properties'] as Map)['ID'] as int: [

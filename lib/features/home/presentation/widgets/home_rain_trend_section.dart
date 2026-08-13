@@ -429,9 +429,8 @@ class _Chart extends StatelessWidget {
                     final label = minute == 0
                         ? l10n.mapTimelineNow
                         : l10n.homeRainTrendMinute(minute);
-                    final style = Theme.of(
-                      context,
-                    ).textTheme.labelSmall?.copyWith(color: secondary);
+                    final style = Theme.of(context).textTheme.labelSmall
+                        ?.copyWith(color: secondary);
                     // fl_chart centres every title widget on its tick's axis
                     // position, so a bare [tick, label] row would push the tick
                     // left of the bar (X=0's lands off the chart). Mirroring the

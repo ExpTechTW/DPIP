@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'typhoon_potential.dart';
@@ -9,6 +9,7 @@ part of 'typhoon_potential.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -68,7 +69,7 @@ class _$ForecastPointCopyWithImpl<$Res>
 /// Create a copy of ForecastPoint
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? label = null,Object? latitude = null,Object? longitude = null,}) {
-  return _then(_self.copyWith(
+  return _then(ForecastPoint(
 label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
@@ -344,7 +345,7 @@ class _$TyphoonPotentialCopyWithImpl<$Res>
 /// Create a copy of TyphoonPotential
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? name = freezed,Object? past = null,Object? forecast = null,Object? cone = null,Object? circle = freezed,Object? current = freezed,Object? points = null,}) {
-  return _then(_self.copyWith(
+  return _then(TyphoonPotential(
 tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,past: null == past ? _self.past : past // ignore: cast_nullable_to_non_nullable
@@ -494,7 +495,7 @@ return $default(_that.tdNo,_that.name,_that.past,_that.forecast,_that.cone,_that
 
 
 class _TyphoonPotential implements TyphoonPotential {
-  const _TyphoonPotential({this.tdNo, this.name, required final  List<LatLng> past, required final  List<LatLng> forecast, required final  List<LatLng> cone, final  List<LatLng>? circle, this.current, required final  List<ForecastPoint> points}): _past = past,_forecast = forecast,_cone = cone,_circle = circle,_points = points;
+  const _TyphoonPotential({this.tdNo, this.name, required  List<LatLng> past, required  List<LatLng> forecast, required  List<LatLng> cone,  List<LatLng>? circle, this.current, required  List<ForecastPoint> points}): _past = past,_forecast = forecast,_cone = cone,_circle = circle,_points = points;
   
 
 /// CWA tropical-depression number — unique within a snapshot.
@@ -667,7 +668,7 @@ class _$PotentialPayloadCopyWithImpl<$Res>
 /// Create a copy of PotentialPayload
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
-  return _then(_self.copyWith(
+  return _then(PotentialPayload(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
 as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
 as List<TyphoonPotential>,
@@ -811,7 +812,7 @@ return $default(_that.updated,_that.cyclones);case _:
 
 
 class _PotentialPayload implements PotentialPayload {
-  const _PotentialPayload({required this.updated, required final  List<TyphoonPotential> cyclones}): _cyclones = cyclones;
+  const _PotentialPayload({required this.updated, required  List<TyphoonPotential> cyclones}): _cyclones = cyclones;
   
 
 @override final  int updated;

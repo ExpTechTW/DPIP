@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 3.9.9+1
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.13.0
 
 dependencies:
   awesome_notifications: ^0.12.1
@@ -12,8 +12,10 @@ dependencies:
   dio: ^5.10.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
   # breaks older-device compatibility. Do not upgrade without checking that.
-  firebase_core: ^4.11.0
-  firebase_messaging: ^16.4.1
+  # Pinned to the exact version (not `^`) so a plain `pub upgrade` can't drift
+  # the minor either.
+  firebase_core: 4.11.0
+  firebase_messaging: 16.4.1
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -62,9 +64,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  build_runner: ^2.15.0
-  freezed: ^3.1.0
-  json_serializable: ^6.14.0
+  # Dart 3.13 (Flutter 3.47) makes `final` illegal on non-primary-constructor
+  # parameters — freezed 3.2.x emits `required final T x` for collections, so
+  # it can no longer compile. Only the 4.0 line (dev.3 today) supports 3.13;
+  # pinned as prerelease until it goes stable.
+  build_runner: ^2.16.0
+  freezed: ^4.0.0-dev.3
+  json_serializable: ^6.14.1
   sqflite_common_ffi: ^2.4.2
   url_launcher_platform_interface: ^2.3.2
 

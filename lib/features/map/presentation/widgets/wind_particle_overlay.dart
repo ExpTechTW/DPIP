@@ -288,9 +288,8 @@ class _TrailBuffer {
         old,
         Offset.zero,
         Paint()
-          ..color = const Color(
-            0xFFFFFFFF,
-          ).withValues(alpha: fadeOpacityFor(zoom)),
+          ..color = const Color(0xFFFFFFFF)
+              .withValues(alpha: fadeOpacityFor(zoom)),
       );
     }
     _stamp(canvas, particles, dpr);

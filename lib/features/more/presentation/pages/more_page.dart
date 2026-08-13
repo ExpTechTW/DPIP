@@ -172,8 +172,7 @@ class MorePage extends StatelessWidget {
                 icon: Icons.android,
                 title: l10n.moreGooglePlay,
                 host: 'play.google.com',
-                url:
-                    'https://play.google.com/store/apps/details?id=com.exptech.dpip',
+                url: 'https://play.google.com/store/apps/details?id=com.exptech.dpip',
               ),
               _MoreLinkTile(
                 icon: Icons.apple,
@@ -350,9 +349,8 @@ class _SavedRegionsTileState extends State<_SavedRegionsTile> {
                           saved.length,
                           RegionStore.maxSaved,
                         ),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall
+                            ?.copyWith(color: colors.onSurfaceVariant),
                       ),
                     ),
                   ),

@@ -46,13 +46,16 @@ void main() {
       expect(event.description, isNot(contains('三峽')));
     });
 
-    test('a township with no entry of its own gets no borrowed description', () {
-      // 999 is not in the map; `all` is one specific township here, so naming it
-      // would be wrong. The row degrades to its title instead.
-      final event = Event.fromJson(_heavyRain(), regionCode: '999')!;
-      expect(event.description, isNot(contains('永康')));
-      expect(event.title, '大雨特報');
-    });
+    test(
+      'a township with no entry of its own gets no borrowed description',
+      () {
+        // 999 is not in the map; `all` is one specific township here, so naming it
+        // would be wrong. The row degrades to its title instead.
+        final event = Event.fromJson(_heavyRain(), regionCode: '999')!;
+        expect(event.description, isNot(contains('永康')));
+        expect(event.title, '大雨特報');
+      },
+    );
 
     test('a genuinely global entry is still used as the fallback', () {
       final json = _heavyRain();

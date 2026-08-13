@@ -291,9 +291,8 @@ class _AedBody extends StatelessWidget {
     callPhoneNumber(phone).then((opened) {
       if (!opened && context.mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.mapAppCallFailed)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.mapAppCallFailed)));
       }
     });
   }
@@ -553,9 +552,8 @@ class _Divider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Divider(
         height: 1,
-        color: Theme.of(
-          context,
-        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.outlineVariant
+            .withValues(alpha: 0.5),
       ),
     );
   }

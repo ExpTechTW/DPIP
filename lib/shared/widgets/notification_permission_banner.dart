@@ -81,9 +81,8 @@ class _NotificationPermissionBannerState
               Expanded(
                 child: Text(
                   l10n.notifyBannerDisabled,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onErrorContainer,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: colors.onErrorContainer),
                 ),
               ),
               TextButton(

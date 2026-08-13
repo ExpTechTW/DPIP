@@ -325,38 +325,39 @@ void main() {
     expect(controller.categoryOrder, isEmpty);
   });
 
-  testWidgets('reset restores the grouped default and clears both preferences', (
-    tester,
-  ) async {
-    // A saved order that flips the forecast pair and moves a category — a
-    // grouped-default order would disable the reset button (nothing to restore).
-    final controller = await pumpSwitcher(tester, {
-      'map.layerOrder': ['qpesums', 'satellite', 'rain', 'typhoon', 'radar'],
-      'map.layerCategoryOrder': ['radar', 'typhoon'],
-    });
-    await tester.tap(find.text('Radar echo'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.tune));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'reset restores the grouped default and clears both preferences',
+    (tester) async {
+      // A saved order that flips the forecast pair and moves a category — a
+      // grouped-default order would disable the reset button (nothing to restore).
+      final controller = await pumpSwitcher(tester, {
+        'map.layerOrder': ['qpesums', 'satellite', 'rain', 'typhoon', 'radar'],
+        'map.layerCategoryOrder': ['radar', 'typhoon'],
+      });
+      await tester.tap(find.text('Radar echo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.tune));
+      await tester.pumpAndSettle();
 
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(MapLayerSwitcher)),
-    );
-    await tester.tap(find.text(l10n.mapLayerOrderReset));
-    await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(MapLayerSwitcher)),
+      );
+      await tester.tap(find.text(l10n.mapLayerOrderReset));
+      await tester.pumpAndSettle();
 
-    // The category list falls back to the grouped default…
-    final inEditor = find.descendant(
-      of: find.byType(ReorderableListView),
-      matching: find.text(l10n.mapLayerCategoryForecast),
-    );
-    await tester.tap(inEditor);
-    await tester.pumpAndSettle();
-    // …and precip is back before the wind models within the forecast group.
-    expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
-    expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
-    // Both preferences are cleared.
-    expect(controller.order, isEmpty);
-    expect(controller.categoryOrder, isEmpty);
-  });
+      // The category list falls back to the grouped default…
+      final inEditor = find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(l10n.mapLayerCategoryForecast),
+      );
+      await tester.tap(inEditor);
+      await tester.pumpAndSettle();
+      // …and precip is back before the wind models within the forecast group.
+      expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
+      expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
+      // Both preferences are cleared.
+      expect(controller.order, isEmpty);
+      expect(controller.categoryOrder, isEmpty);
+    },
+  );
 }

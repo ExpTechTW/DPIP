@@ -218,9 +218,8 @@ void main() {
       );
 
       final png = await image.toByteData(format: ui.ImageByteFormat.png);
-      File(
-        '${dir.path}/${c.name}.png',
-      ).writeAsBytesSync(png!.buffer.asUint8List());
+      File('${dir.path}/${c.name}.png')
+          .writeAsBytesSync(png!.buffer.asUint8List());
 
       final raw = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
       final px = raw!.buffer.asUint8List();
@@ -443,9 +442,9 @@ Future<ui.Image> _renderScene(
 
   // The base/haze probes are pixel-independent, so — as in production — their
   // colours are read from a CPU LUT readback rather than fetched per pixel.
-  final lutBytes = (await lut.toByteData(
-    format: ui.ImageByteFormat.rawRgba,
-  ))!.buffer.asUint8List();
+  final lutBytes = (await lut.toByteData(format: ui.ImageByteFormat.rawRgba))!
+      .buffer
+      .asUint8List();
   final lutU = sky.sunAngleY.clamp(0.0, 1.0);
   final baseSky = _sampleLut(
     lutBytes,

@@ -49,10 +49,8 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
 /// Records the MapLibre calls a layer makes, and the last state of each layer.
 class RecordingMapController implements MapLibreMapController {
   RecordingMapController({CameraPosition? camera})
-    : _camera = camera ?? const CameraPosition(
-        target: LatLng(23.5, 121),
-        zoom: 7,
-      );
+    : _camera =
+          camera ?? const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
 
   final List<String> calls = [];
 

@@ -552,9 +552,8 @@ class WeatherSkyPainter extends CustomPainter {
     shader.setFloat(1, quarter.height);
 
     final recorder = ui.PictureRecorder();
-    ui.Canvas(
-      recorder,
-    ).drawRect(Offset.zero & quarter, Paint()..shader = shader);
+    ui.Canvas(recorder)
+        .drawRect(Offset.zero & quarter, Paint()..shader = shader);
     final picture = recorder.endRecording();
     final small = picture.toImageSync(
       quarter.width.toInt(),

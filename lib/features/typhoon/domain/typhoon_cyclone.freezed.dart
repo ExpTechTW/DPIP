@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'typhoon_cyclone.dart';
@@ -9,6 +9,7 @@ part of 'typhoon_cyclone.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -76,7 +77,7 @@ class _$TyphoonCycloneCopyWithImpl<$Res>
 /// Create a copy of TyphoonCyclone
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? cwaName = freezed,Object? year = null,Object? tdNo = freezed,Object? tyNo = freezed,Object? time = null,Object? latitude = null,Object? longitude = null,Object? wind = freezed,Object? gust = freezed,Object? pressure = freezed,Object? speed = freezed,Object? direction = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(TyphoonCyclone(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,cwaName: freezed == cwaName ? _self.cwaName : cwaName // ignore: cast_nullable_to_non_nullable
 as String?,year: null == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
@@ -385,7 +386,7 @@ class _$CycloneIndexCopyWithImpl<$Res>
 /// Create a copy of CycloneIndex
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
-  return _then(_self.copyWith(
+  return _then(CycloneIndex(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
 as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
 as List<TyphoonCyclone>,
@@ -529,7 +530,7 @@ return $default(_that.updated,_that.cyclones);case _:
 @JsonSerializable()
 
 class _CycloneIndex implements CycloneIndex {
-  const _CycloneIndex({required this.updated, required final  List<TyphoonCyclone> cyclones}): _cyclones = cyclones;
+  const _CycloneIndex({required this.updated, required  List<TyphoonCyclone> cyclones}): _cyclones = cyclones;
   factory _CycloneIndex.fromJson(Map<String, dynamic> json) => _$CycloneIndexFromJson(json);
 
 @override final  int updated;

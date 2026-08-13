@@ -417,9 +417,8 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Text(
               l10n.weatherRankingMeta(time, ranked.length),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
           Expanded(
@@ -544,9 +543,8 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                   child: Center(
                     child: Text(
                       l10n.weatherRankingBy,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: Theme.of(context).textTheme.labelLarge
+                          ?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   ),
                 ),
@@ -586,9 +584,8 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                   child: Center(
                     child: Text(
                       l10n.weatherRankingMergeTo,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: Theme.of(context).textTheme.labelLarge
+                          ?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   ),
                 ),
@@ -612,9 +609,8 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Text(
               l10n.weatherRankingMeta(time, ranked.length),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
           Expanded(
@@ -651,9 +647,9 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                           child: Icon(
                             Icons.navigation,
                             size: AppSpacing.lg,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                         );
                       }
@@ -793,9 +789,8 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
                   child: Center(
                     child: Text(
                       l10n.weatherRankingMergeTo,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: Theme.of(context).textTheme.labelLarge
+                          ?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   ),
                 ),
@@ -819,9 +814,8 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Text(
               l10n.weatherRankingMeta(time, ranked.length),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
           Expanded(

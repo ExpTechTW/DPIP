@@ -16,6 +16,12 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/*.g.dart"
     - lib/l10n/gen/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     # Logging must go through core/logging Log — never print/debugPrint.
     avoid_print: error

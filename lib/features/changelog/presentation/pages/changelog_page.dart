@@ -154,9 +154,8 @@ class _ReleaseTile extends StatelessWidget {
         ? Icons.science_outlined
         : Icons.verified_outlined;
     final title = note.name.isEmpty ? note.tagName : note.name;
-    final date = DateFormat.yMMMd(
-      Localizations.localeOf(context).toString(),
-    ).format(note.publishedAt.toLocal());
+    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString())
+        .format(note.publishedAt.toLocal());
     final emphasized = isCurrent || expanded;
 
     return CustomPaint(

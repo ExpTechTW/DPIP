@@ -17,9 +17,9 @@ class SeismicTravelTimeSource {
 
   Future<SeismicTravelTimeTable> load() async {
     final bytes = await rootBundle.load('assets/travel_time.json.gz');
-    final json =
-        jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
-            as Map<String, dynamic>;
+    final json = jsonDecode(
+      utf8.decode(gzip.decode(bytes.buffer.asUint8List())),
+    ) as Map<String, dynamic>;
     final rowsByDepth = <int, List<TravelTimeRow>>{
       for (final entry in json.entries)
         int.parse(entry.key): [

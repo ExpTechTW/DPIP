@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'shelter_detail.dart';
@@ -9,6 +9,7 @@ part of 'shelter_detail.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -66,7 +67,7 @@ class _$ShelterDetailCopyWithImpl<$Res>
 /// Create a copy of ShelterDetail
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? capacity = null,Object? category = null,Object? indoor = null,Object? outdoor = null,Object? vulnerableOk = null,Object? lat = null,Object? lng = null,Object? address = null,}) {
-  return _then(_self.copyWith(
+  return _then(ShelterDetail(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,capacity: null == capacity ? _self.capacity : capacity // ignore: cast_nullable_to_non_nullable
@@ -218,7 +219,7 @@ return $default(_that.id,_that.name,_that.capacity,_that.category,_that.indoor,_
 @JsonSerializable()
 
 class _ShelterDetail implements ShelterDetail {
-  const _ShelterDetail({this.id = 0, this.name = '', this.capacity = 0, final  List<String> category = const <String>[], this.indoor = false, this.outdoor = false, @JsonKey(name: 'vulnerable_ok') this.vulnerableOk = false, this.lat = 0, this.lng = 0, this.address = ''}): _category = category;
+  const _ShelterDetail({this.id = 0, this.name = '', this.capacity = 0,  List<String> category = const <String>[], this.indoor = false, this.outdoor = false, @JsonKey(name: 'vulnerable_ok') this.vulnerableOk = false, this.lat = 0, this.lng = 0, this.address = ''}): _category = category;
   factory _ShelterDetail.fromJson(Map<String, dynamic> json) => _$ShelterDetailFromJson(json);
 
 @override@JsonKey() final  int id;
