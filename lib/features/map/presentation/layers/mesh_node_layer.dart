@@ -105,7 +105,16 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
       _sourceId,
       GeojsonSourceProperties(data: _geoJson()),
     );
-    await controller.addCircleLayer(_sourceId, _circleId, _circleProps());
+    await controller.addCircleLayer(
+      _sourceId,
+      _circleId,
+      _circleProps(),
+      // **false on purpose.** An interactive layer fires `feature#onTap`
+      // instead of `map#onMapClick`, and nothing in this app listens to
+      // feature taps — a tap on the dot would go nowhere while a tap on
+      // empty sea still reached onMapTap. Every other layer is false too.
+      enableInteraction: false,
+    );
     // Names only from mid zoom: a dense urban mesh would otherwise be a wall
     // of overlapping labels.
     await controller.addSymbolLayer(
@@ -113,6 +122,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
       _labelId,
       _labelProps(),
       minzoom: 9,
+      enableInteraction: false,
     );
     _added = true;
     if (!_listening) {
@@ -136,37 +146,39 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
 
   /// The node under (or near) a tap.
   ///
-  /// Asks **MapLibre** rather than doing the geometry here: it hit-tests the
-  /// marks it actually rendered, in its own coordinate space, which is the one
-  /// place where "did the finger land on the dot" is answered the same way on
-  /// both platforms. Hand-rolled alternatives kept getting the units wrong —
-  /// degrees don't scale with zoom, and the two platforms' projections don't
-  /// even report the same kind of pixel (iOS logical points, Android device
-  /// pixels), which is why the pad below is scaled per platform.
+  /// Computes screen distances in Dart instead of asking MapLibre to
+  /// hit-test: a rendered-feature query on a **circle** layer is not reliable
+  /// for tapping — the engine's point hit test can shrink the reachable area
+  /// far below the drawn dot (and the two platforms even differ), which is why
+  /// the old 44 px box still felt unhittable while the disaster map's big
+  /// symbol icons never did. Projecting the nodes ourselves makes the target
+  /// exactly the pixel radius it looks like — one batch call for all of them,
+  /// one distance loop, no query semantics to get wrong.
   Future<int?> _nodeNear(
     LatLng latLng,
     MapLibreMapController controller,
   ) async {
     try {
       final tap = await controller.toScreenLocation(latLng);
-      final pad = _tapRadiusPx * _screenScale;
-      final rect = Rect.fromCenter(
-        center: Offset(tap.x.toDouble(), tap.y.toDouble()),
-        width: pad * 2,
-        height: pad * 2,
-      );
-      final features = await controller.queryRenderedFeaturesInRect(rect, [
-        _circleId,
-        _labelId,
-      ], null);
-      for (final feature in features) {
-        if (feature is! Map) continue;
-        final properties = feature['properties'];
-        if (properties is! Map) continue;
-        final value = properties['num'];
-        if (value is int) return value;
-        if (value is double) return value.toInt();
+      final nodes = _store.positioned;
+      final points = await controller.toScreenLocationBatch([
+        // [positioned] already filtered out nulls — the list this mirrors.
+        for (final node in nodes) LatLng(node.latitude!, node.longitude!),
+      ]);
+      final reach = _tapRadiusPx * _screenScale;
+      final reachSquared = reach * reach;
+      int? best;
+      var bestSquared = reachSquared;
+      for (var i = 0; i < points.length; i++) {
+        final dx = points[i].x.toDouble() - tap.x.toDouble();
+        final dy = points[i].y.toDouble() - tap.y.toDouble();
+        final distanceSquared = dx * dx + dy * dy;
+        if (distanceSquared < bestSquared) {
+          bestSquared = distanceSquared;
+          best = nodes[i].num;
+        }
       }
+      return best;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh node hit test');
     }
