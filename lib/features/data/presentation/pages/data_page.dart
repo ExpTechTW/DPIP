@@ -72,6 +72,21 @@ class DataPage extends StatelessWidget {
               onTap: () => context.pushNamed(AppRoutes.earthquake),
             ),
           ),
+          SectionHeader(l10n.dataSectionAstronomy),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: _SeismicCard(
+              icon: Icons.nightlight_outlined,
+              title: l10n.moonTitle,
+              subtitle: l10n.moonSubtitle,
+              onTap: () => context.pushNamed(AppRoutes.moon),
+            ),
+          ),
           SectionHeader(l10n.dataSectionWeather),
           GridView.count(
             crossAxisCount: 2,

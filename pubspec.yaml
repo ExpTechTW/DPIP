@@ -121,6 +121,7 @@ flutter:
     - shaders/weather/galaxy.frag
     - shaders/weather/night.frag
     - shaders/weather/night_field.frag
+    - shaders/weather/moon_display.frag
     - shaders/weather/rain_on_glass.frag
     - shaders/weather/lightning.frag
     - shaders/weather/rainbow.frag
@@ -134,3 +135,4 @@ flutter:
     - assets/location.json.gz
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz
+    - assets/astro/

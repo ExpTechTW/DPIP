@@ -48,6 +48,10 @@ abstract final class AppRoutes {
   static const String weatherRanking = 'weatherRanking';
   static const String weatherRankingPath = 'weather-ranking';
 
+  /// Lunar phase — nested under [dataPath]. Local computation only.
+  static const String moon = 'moon';
+  static const String moonPath = 'moon';
+
   static const String more = 'more';
   static const String morePath = '/more';
 

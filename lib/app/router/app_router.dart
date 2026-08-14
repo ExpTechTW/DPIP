@@ -13,6 +13,7 @@ import 'package:dpip/features/location/presentation/pages/region_select_page.dar
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/features/data/presentation/pages/moon_page.dart';
 import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
@@ -108,6 +109,11 @@ final GoRouter appRouter = GoRouter(
                       state.uri.queryParameters['tab'],
                     ),
                   ),
+                ),
+                GoRoute(
+                  path: AppRoutes.moonPath,
+                  name: AppRoutes.moon,
+                  builder: (_, _) => const MoonPage(),
                 ),
               ],
             ),
