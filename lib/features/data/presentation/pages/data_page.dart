@@ -72,21 +72,6 @@ class DataPage extends StatelessWidget {
               onTap: () => context.pushNamed(AppRoutes.earthquake),
             ),
           ),
-          SectionHeader(l10n.dataSectionAstronomy),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
-            ),
-            child: _SeismicCard(
-              icon: Icons.nightlight_outlined,
-              title: l10n.moonTitle,
-              subtitle: l10n.moonSubtitle,
-              onTap: () => context.pushNamed(AppRoutes.moon),
-            ),
-          ),
           SectionHeader(l10n.dataSectionWeather),
           GridView.count(
             crossAxisCount: 2,
@@ -115,6 +100,50 @@ class DataPage extends StatelessWidget {
                     AppRoutes.weatherRanking,
                     queryParameters: {'tab': tab},
                   ),
+                ),
+            ],
+          ),
+          SectionHeader(l10n.dataSectionAstronomy),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            crossAxisSpacing: AppSpacing.sm,
+            mainAxisSpacing: AppSpacing.sm,
+            childAspectRatio: 1.45,
+            children: [
+              for (final (route, icon, label, accent)
+                  in <(String, IconData, String, Color)>[
+                    (
+                      AppRoutes.moon,
+                      Icons.nightlight_outlined,
+                      l10n.moonTitle,
+                      colors.tertiary,
+                    ),
+                    (
+                      AppRoutes.sun,
+                      Icons.wb_sunny_outlined,
+                      l10n.sunTitle,
+                      colors.primary,
+                    ),
+                    (
+                      AppRoutes.planets,
+                      Icons.blur_circular_outlined,
+                      l10n.planetsTitle,
+                      colors.secondary,
+                    ),
+                  ])
+                _RankingGridTile(
+                  icon: icon,
+                  title: label,
+                  accent: accent,
+                  onTap: () => context.pushNamed(route),
                 ),
             ],
           ),

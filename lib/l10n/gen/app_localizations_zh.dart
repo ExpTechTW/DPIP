@@ -1832,6 +1832,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get meshtasticBattery => '電量';
 
   @override
+  String get meshtasticDistance => '距離';
+
+  @override
+  String get meshtasticSnrTrend => '訊號趨勢 (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => '電量趨勢';
+
+  @override
   String get typhoonOverlayMenuTooltip => '颱風圖層選項';
 
   @override
@@ -2110,6 +2119,201 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moonNoEvent => '當日無';
+
+  @override
+  String get sunTitle => '太陽';
+
+  @override
+  String get sunSubtitle => '日出日沒、曙暮光與節氣';
+
+  @override
+  String get sunSectionDaylight => '日照';
+
+  @override
+  String get sunSectionTwilight => '曙暮光';
+
+  @override
+  String get sunSectionLight => '光線';
+
+  @override
+  String get sunSectionSundial => '日晷';
+
+  @override
+  String get sunSectionTerms => '節氣';
+
+  @override
+  String get sunRise => '日出';
+
+  @override
+  String get sunSet => '日沒';
+
+  @override
+  String get sunNoon => '正午';
+
+  @override
+  String get sunDayLength => '白晝長度';
+
+  @override
+  String get sunTwilightCivil => '民用';
+
+  @override
+  String get sunTwilightNautical => '航海';
+
+  @override
+  String get sunTwilightAstronomical => '天文';
+
+  @override
+  String get sunGoldenHourMorning => '晨間黃金時刻';
+
+  @override
+  String get sunGoldenHourEvening => '昏間黃金時刻';
+
+  @override
+  String get sunBlueHour => '藍調時刻';
+
+  @override
+  String get sunEquationOfTime => '均時差';
+
+  @override
+  String get sunMinutes => '分';
+
+  @override
+  String get solarTermNext => '下一個節氣';
+
+  @override
+  String get planetsTitle => '行星';
+
+  @override
+  String get planetsSubtitle => '今晚在哪、有多亮';
+
+  @override
+  String get planetsSectionTonight => '此刻';
+
+  @override
+  String get planetUp => '地平線上';
+
+  @override
+  String get planetDown => '地平線下';
+
+  @override
+  String get planetInGlare => '太近太陽';
+
+  @override
+  String get planetMagnitude => '亮度';
+
+  @override
+  String get planetElongation => '距日距角';
+
+  @override
+  String get planetSky => '時段';
+
+  @override
+  String get planetEvening => '昏星';
+
+  @override
+  String get planetMorning => '晨星';
+
+  @override
+  String get planetDistance => '距離';
+
+  @override
+  String get planetAu => '天文單位';
+
+  @override
+  String get planetAltitude => '仰角';
+
+  @override
+  String get planetMercury => '水星';
+
+  @override
+  String get planetVenus => '金星';
+
+  @override
+  String get planetMars => '火星';
+
+  @override
+  String get planetJupiter => '木星';
+
+  @override
+  String get planetSaturn => '土星';
+
+  @override
+  String get planetUranus => '天王星';
+
+  @override
+  String get planetNeptune => '海王星';
+
+  @override
+  String get solarTermVernalEquinox => '春分';
+
+  @override
+  String get solarTermPureBrightness => '清明';
+
+  @override
+  String get solarTermGrainRain => '穀雨';
+
+  @override
+  String get solarTermStartOfSummer => '立夏';
+
+  @override
+  String get solarTermGrainFull => '小滿';
+
+  @override
+  String get solarTermGrainInEar => '芒種';
+
+  @override
+  String get solarTermSummerSolstice => '夏至';
+
+  @override
+  String get solarTermMinorHeat => '小暑';
+
+  @override
+  String get solarTermMajorHeat => '大暑';
+
+  @override
+  String get solarTermStartOfAutumn => '立秋';
+
+  @override
+  String get solarTermEndOfHeat => '處暑';
+
+  @override
+  String get solarTermWhiteDew => '白露';
+
+  @override
+  String get solarTermAutumnalEquinox => '秋分';
+
+  @override
+  String get solarTermColdDew => '寒露';
+
+  @override
+  String get solarTermFrostDescent => '霜降';
+
+  @override
+  String get solarTermStartOfWinter => '立冬';
+
+  @override
+  String get solarTermMinorSnow => '小雪';
+
+  @override
+  String get solarTermMajorSnow => '大雪';
+
+  @override
+  String get solarTermWinterSolstice => '冬至';
+
+  @override
+  String get solarTermMinorCold => '小寒';
+
+  @override
+  String get solarTermMajorCold => '大寒';
+
+  @override
+  String get solarTermStartOfSpring => '立春';
+
+  @override
+  String get solarTermRainWater => '雨水';
+
+  @override
+  String get solarTermAwakeningOfInsects => '驚蟄';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3939,6 +4143,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get meshtasticBattery => '电量';
 
   @override
+  String get meshtasticDistance => '距离';
+
+  @override
+  String get meshtasticSnrTrend => '信号趋势 (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => '电量趋势';
+
+  @override
   String get typhoonOverlayMenuTooltip => '台风图层选项';
 
   @override
@@ -4217,6 +4430,201 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moonNoEvent => '当日无';
+
+  @override
+  String get sunTitle => '太阳';
+
+  @override
+  String get sunSubtitle => '日出日落、曙暮光与节气';
+
+  @override
+  String get sunSectionDaylight => '日照';
+
+  @override
+  String get sunSectionTwilight => '曙暮光';
+
+  @override
+  String get sunSectionLight => '光线';
+
+  @override
+  String get sunSectionSundial => '日晷';
+
+  @override
+  String get sunSectionTerms => '节气';
+
+  @override
+  String get sunRise => '日出';
+
+  @override
+  String get sunSet => '日落';
+
+  @override
+  String get sunNoon => '正午';
+
+  @override
+  String get sunDayLength => '白昼长度';
+
+  @override
+  String get sunTwilightCivil => '民用';
+
+  @override
+  String get sunTwilightNautical => '航海';
+
+  @override
+  String get sunTwilightAstronomical => '天文';
+
+  @override
+  String get sunGoldenHourMorning => '晨间黄金时刻';
+
+  @override
+  String get sunGoldenHourEvening => '昏间黄金时刻';
+
+  @override
+  String get sunBlueHour => '蓝调时刻';
+
+  @override
+  String get sunEquationOfTime => '均时差';
+
+  @override
+  String get sunMinutes => '分';
+
+  @override
+  String get solarTermNext => '下一个节气';
+
+  @override
+  String get planetsTitle => '行星';
+
+  @override
+  String get planetsSubtitle => '今晚在哪、有多亮';
+
+  @override
+  String get planetsSectionTonight => '此刻';
+
+  @override
+  String get planetUp => '地平线上';
+
+  @override
+  String get planetDown => '地平线下';
+
+  @override
+  String get planetInGlare => '太近太阳';
+
+  @override
+  String get planetMagnitude => '亮度';
+
+  @override
+  String get planetElongation => '距日距角';
+
+  @override
+  String get planetSky => '时段';
+
+  @override
+  String get planetEvening => '昏星';
+
+  @override
+  String get planetMorning => '晨星';
+
+  @override
+  String get planetDistance => '距离';
+
+  @override
+  String get planetAu => '天文单位';
+
+  @override
+  String get planetAltitude => '仰角';
+
+  @override
+  String get planetMercury => '水星';
+
+  @override
+  String get planetVenus => '金星';
+
+  @override
+  String get planetMars => '火星';
+
+  @override
+  String get planetJupiter => '木星';
+
+  @override
+  String get planetSaturn => '土星';
+
+  @override
+  String get planetUranus => '天王星';
+
+  @override
+  String get planetNeptune => '海王星';
+
+  @override
+  String get solarTermVernalEquinox => '春分';
+
+  @override
+  String get solarTermPureBrightness => '清明';
+
+  @override
+  String get solarTermGrainRain => '谷雨';
+
+  @override
+  String get solarTermStartOfSummer => '立夏';
+
+  @override
+  String get solarTermGrainFull => '小满';
+
+  @override
+  String get solarTermGrainInEar => '芒种';
+
+  @override
+  String get solarTermSummerSolstice => '夏至';
+
+  @override
+  String get solarTermMinorHeat => '小暑';
+
+  @override
+  String get solarTermMajorHeat => '大暑';
+
+  @override
+  String get solarTermStartOfAutumn => '立秋';
+
+  @override
+  String get solarTermEndOfHeat => '处暑';
+
+  @override
+  String get solarTermWhiteDew => '白露';
+
+  @override
+  String get solarTermAutumnalEquinox => '秋分';
+
+  @override
+  String get solarTermColdDew => '寒露';
+
+  @override
+  String get solarTermFrostDescent => '霜降';
+
+  @override
+  String get solarTermStartOfWinter => '立冬';
+
+  @override
+  String get solarTermMinorSnow => '小雪';
+
+  @override
+  String get solarTermMajorSnow => '大雪';
+
+  @override
+  String get solarTermWinterSolstice => '冬至';
+
+  @override
+  String get solarTermMinorCold => '小寒';
+
+  @override
+  String get solarTermMajorCold => '大寒';
+
+  @override
+  String get solarTermStartOfSpring => '立春';
+
+  @override
+  String get solarTermRainWater => '雨水';
+
+  @override
+  String get solarTermAwakeningOfInsects => '惊蛰';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -6046,6 +6454,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get meshtasticBattery => '電量';
 
   @override
+  String get meshtasticDistance => '距離';
+
+  @override
+  String get meshtasticSnrTrend => '訊號趨勢 (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => '電量趨勢';
+
+  @override
   String get typhoonOverlayMenuTooltip => '颱風圖層選項';
 
   @override
@@ -6324,6 +6741,201 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moonNoEvent => '當日無';
+
+  @override
+  String get sunTitle => '太陽';
+
+  @override
+  String get sunSubtitle => '日出日沒、曙暮光與節氣';
+
+  @override
+  String get sunSectionDaylight => '日照';
+
+  @override
+  String get sunSectionTwilight => '曙暮光';
+
+  @override
+  String get sunSectionLight => '光線';
+
+  @override
+  String get sunSectionSundial => '日晷';
+
+  @override
+  String get sunSectionTerms => '節氣';
+
+  @override
+  String get sunRise => '日出';
+
+  @override
+  String get sunSet => '日沒';
+
+  @override
+  String get sunNoon => '正午';
+
+  @override
+  String get sunDayLength => '白晝長度';
+
+  @override
+  String get sunTwilightCivil => '民用';
+
+  @override
+  String get sunTwilightNautical => '航海';
+
+  @override
+  String get sunTwilightAstronomical => '天文';
+
+  @override
+  String get sunGoldenHourMorning => '晨間黃金時刻';
+
+  @override
+  String get sunGoldenHourEvening => '昏間黃金時刻';
+
+  @override
+  String get sunBlueHour => '藍調時刻';
+
+  @override
+  String get sunEquationOfTime => '均時差';
+
+  @override
+  String get sunMinutes => '分';
+
+  @override
+  String get solarTermNext => '下一個節氣';
+
+  @override
+  String get planetsTitle => '行星';
+
+  @override
+  String get planetsSubtitle => '今晚在哪、有多亮';
+
+  @override
+  String get planetsSectionTonight => '此刻';
+
+  @override
+  String get planetUp => '地平線上';
+
+  @override
+  String get planetDown => '地平線下';
+
+  @override
+  String get planetInGlare => '太近太陽';
+
+  @override
+  String get planetMagnitude => '亮度';
+
+  @override
+  String get planetElongation => '距日距角';
+
+  @override
+  String get planetSky => '時段';
+
+  @override
+  String get planetEvening => '昏星';
+
+  @override
+  String get planetMorning => '晨星';
+
+  @override
+  String get planetDistance => '距離';
+
+  @override
+  String get planetAu => '天文單位';
+
+  @override
+  String get planetAltitude => '仰角';
+
+  @override
+  String get planetMercury => '水星';
+
+  @override
+  String get planetVenus => '金星';
+
+  @override
+  String get planetMars => '火星';
+
+  @override
+  String get planetJupiter => '木星';
+
+  @override
+  String get planetSaturn => '土星';
+
+  @override
+  String get planetUranus => '天王星';
+
+  @override
+  String get planetNeptune => '海王星';
+
+  @override
+  String get solarTermVernalEquinox => '春分';
+
+  @override
+  String get solarTermPureBrightness => '清明';
+
+  @override
+  String get solarTermGrainRain => '穀雨';
+
+  @override
+  String get solarTermStartOfSummer => '立夏';
+
+  @override
+  String get solarTermGrainFull => '小滿';
+
+  @override
+  String get solarTermGrainInEar => '芒種';
+
+  @override
+  String get solarTermSummerSolstice => '夏至';
+
+  @override
+  String get solarTermMinorHeat => '小暑';
+
+  @override
+  String get solarTermMajorHeat => '大暑';
+
+  @override
+  String get solarTermStartOfAutumn => '立秋';
+
+  @override
+  String get solarTermEndOfHeat => '處暑';
+
+  @override
+  String get solarTermWhiteDew => '白露';
+
+  @override
+  String get solarTermAutumnalEquinox => '秋分';
+
+  @override
+  String get solarTermColdDew => '寒露';
+
+  @override
+  String get solarTermFrostDescent => '霜降';
+
+  @override
+  String get solarTermStartOfWinter => '立冬';
+
+  @override
+  String get solarTermMinorSnow => '小雪';
+
+  @override
+  String get solarTermMajorSnow => '大雪';
+
+  @override
+  String get solarTermWinterSolstice => '冬至';
+
+  @override
+  String get solarTermMinorCold => '小寒';
+
+  @override
+  String get solarTermMajorCold => '大寒';
+
+  @override
+  String get solarTermStartOfSpring => '立春';
+
+  @override
+  String get solarTermRainWater => '雨水';
+
+  @override
+  String get solarTermAwakeningOfInsects => '驚蟄';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8153,6 +8765,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get meshtasticBattery => '電量';
 
   @override
+  String get meshtasticDistance => '距離';
+
+  @override
+  String get meshtasticSnrTrend => '訊號趨勢 (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => '電量趨勢';
+
+  @override
   String get typhoonOverlayMenuTooltip => '颱風圖層選項';
 
   @override
@@ -8431,4 +9052,199 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moonNoEvent => '當日無';
+
+  @override
+  String get sunTitle => '太陽';
+
+  @override
+  String get sunSubtitle => '日出日沒、曙暮光與節氣';
+
+  @override
+  String get sunSectionDaylight => '日照';
+
+  @override
+  String get sunSectionTwilight => '曙暮光';
+
+  @override
+  String get sunSectionLight => '光線';
+
+  @override
+  String get sunSectionSundial => '日晷';
+
+  @override
+  String get sunSectionTerms => '節氣';
+
+  @override
+  String get sunRise => '日出';
+
+  @override
+  String get sunSet => '日沒';
+
+  @override
+  String get sunNoon => '正午';
+
+  @override
+  String get sunDayLength => '白晝長度';
+
+  @override
+  String get sunTwilightCivil => '民用';
+
+  @override
+  String get sunTwilightNautical => '航海';
+
+  @override
+  String get sunTwilightAstronomical => '天文';
+
+  @override
+  String get sunGoldenHourMorning => '晨間黃金時刻';
+
+  @override
+  String get sunGoldenHourEvening => '昏間黃金時刻';
+
+  @override
+  String get sunBlueHour => '藍調時刻';
+
+  @override
+  String get sunEquationOfTime => '均時差';
+
+  @override
+  String get sunMinutes => '分';
+
+  @override
+  String get solarTermNext => '下一個節氣';
+
+  @override
+  String get planetsTitle => '行星';
+
+  @override
+  String get planetsSubtitle => '今晚在哪、有多亮';
+
+  @override
+  String get planetsSectionTonight => '此刻';
+
+  @override
+  String get planetUp => '地平線上';
+
+  @override
+  String get planetDown => '地平線下';
+
+  @override
+  String get planetInGlare => '太近太陽';
+
+  @override
+  String get planetMagnitude => '亮度';
+
+  @override
+  String get planetElongation => '距日距角';
+
+  @override
+  String get planetSky => '時段';
+
+  @override
+  String get planetEvening => '昏星';
+
+  @override
+  String get planetMorning => '晨星';
+
+  @override
+  String get planetDistance => '距離';
+
+  @override
+  String get planetAu => '天文單位';
+
+  @override
+  String get planetAltitude => '仰角';
+
+  @override
+  String get planetMercury => '水星';
+
+  @override
+  String get planetVenus => '金星';
+
+  @override
+  String get planetMars => '火星';
+
+  @override
+  String get planetJupiter => '木星';
+
+  @override
+  String get planetSaturn => '土星';
+
+  @override
+  String get planetUranus => '天王星';
+
+  @override
+  String get planetNeptune => '海王星';
+
+  @override
+  String get solarTermVernalEquinox => '春分';
+
+  @override
+  String get solarTermPureBrightness => '清明';
+
+  @override
+  String get solarTermGrainRain => '穀雨';
+
+  @override
+  String get solarTermStartOfSummer => '立夏';
+
+  @override
+  String get solarTermGrainFull => '小滿';
+
+  @override
+  String get solarTermGrainInEar => '芒種';
+
+  @override
+  String get solarTermSummerSolstice => '夏至';
+
+  @override
+  String get solarTermMinorHeat => '小暑';
+
+  @override
+  String get solarTermMajorHeat => '大暑';
+
+  @override
+  String get solarTermStartOfAutumn => '立秋';
+
+  @override
+  String get solarTermEndOfHeat => '處暑';
+
+  @override
+  String get solarTermWhiteDew => '白露';
+
+  @override
+  String get solarTermAutumnalEquinox => '秋分';
+
+  @override
+  String get solarTermColdDew => '寒露';
+
+  @override
+  String get solarTermFrostDescent => '霜降';
+
+  @override
+  String get solarTermStartOfWinter => '立冬';
+
+  @override
+  String get solarTermMinorSnow => '小雪';
+
+  @override
+  String get solarTermMajorSnow => '大雪';
+
+  @override
+  String get solarTermWinterSolstice => '冬至';
+
+  @override
+  String get solarTermMinorCold => '小寒';
+
+  @override
+  String get solarTermMajorCold => '大寒';
+
+  @override
+  String get solarTermStartOfSpring => '立春';
+
+  @override
+  String get solarTermRainWater => '雨水';
+
+  @override
+  String get solarTermAwakeningOfInsects => '驚蟄';
 }

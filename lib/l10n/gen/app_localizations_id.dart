@@ -1873,6 +1873,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get meshtasticBattery => 'Battery';
 
   @override
+  String get meshtasticDistance => 'Jarak';
+
+  @override
+  String get meshtasticSnrTrend => 'Tren sinyal (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => 'Tren baterai';
+
+  @override
   String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
 
   @override
@@ -2156,4 +2165,199 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get moonNoEvent => 'Tidak ada hari ini';
+
+  @override
+  String get sunTitle => 'Matahari';
+
+  @override
+  String get sunSubtitle => 'Matahari terbit, senja, dan istilah surya';
+
+  @override
+  String get sunSectionDaylight => 'Cahaya siang';
+
+  @override
+  String get sunSectionTwilight => 'Senja';
+
+  @override
+  String get sunSectionLight => 'Cahaya';
+
+  @override
+  String get sunSectionSundial => 'Jam matahari';
+
+  @override
+  String get sunSectionTerms => 'Istilah surya';
+
+  @override
+  String get sunRise => 'Matahari terbit';
+
+  @override
+  String get sunSet => 'Matahari terbenam';
+
+  @override
+  String get sunNoon => 'Tengah hari surya';
+
+  @override
+  String get sunDayLength => 'Panjang hari';
+
+  @override
+  String get sunTwilightCivil => 'Sipil';
+
+  @override
+  String get sunTwilightNautical => 'Nautika';
+
+  @override
+  String get sunTwilightAstronomical => 'Astronomi';
+
+  @override
+  String get sunGoldenHourMorning => 'Golden hour pagi';
+
+  @override
+  String get sunGoldenHourEvening => 'Golden hour sore';
+
+  @override
+  String get sunBlueHour => 'Blue hour';
+
+  @override
+  String get sunEquationOfTime => 'Persamaan waktu';
+
+  @override
+  String get sunMinutes => 'mnt';
+
+  @override
+  String get solarTermNext => 'Istilah berikutnya';
+
+  @override
+  String get planetsTitle => 'Planet';
+
+  @override
+  String get planetsSubtitle => 'Di mana malam ini, dan seberapa terang';
+
+  @override
+  String get planetsSectionTonight => 'Saat ini';
+
+  @override
+  String get planetUp => 'Di atas ufuk';
+
+  @override
+  String get planetDown => 'Di bawah ufuk';
+
+  @override
+  String get planetInGlare => 'Terlalu dekat Matahari';
+
+  @override
+  String get planetMagnitude => 'Magnitudo';
+
+  @override
+  String get planetElongation => 'Elongasi';
+
+  @override
+  String get planetSky => 'Waktu';
+
+  @override
+  String get planetEvening => 'Petang';
+
+  @override
+  String get planetMorning => 'Pagi';
+
+  @override
+  String get planetDistance => 'Jarak';
+
+  @override
+  String get planetAu => 'au';
+
+  @override
+  String get planetAltitude => 'Ketinggian';
+
+  @override
+  String get planetMercury => 'Merkurius';
+
+  @override
+  String get planetVenus => 'Venus';
+
+  @override
+  String get planetMars => 'Mars';
+
+  @override
+  String get planetJupiter => 'Jupiter';
+
+  @override
+  String get planetSaturn => 'Saturnus';
+
+  @override
+  String get planetUranus => 'Uranus';
+
+  @override
+  String get planetNeptune => 'Neptunus';
+
+  @override
+  String get solarTermVernalEquinox => 'Ekuinoks Musim Semi';
+
+  @override
+  String get solarTermPureBrightness => 'Pure Brightness';
+
+  @override
+  String get solarTermGrainRain => 'Grain Rain';
+
+  @override
+  String get solarTermStartOfSummer => 'Awal Musim Panas';
+
+  @override
+  String get solarTermGrainFull => 'Grain Full';
+
+  @override
+  String get solarTermGrainInEar => 'Grain in Ear';
+
+  @override
+  String get solarTermSummerSolstice => 'Solstis Musim Panas';
+
+  @override
+  String get solarTermMinorHeat => 'Minor Heat';
+
+  @override
+  String get solarTermMajorHeat => 'Major Heat';
+
+  @override
+  String get solarTermStartOfAutumn => 'Awal Musim Gugur';
+
+  @override
+  String get solarTermEndOfHeat => 'End of Heat';
+
+  @override
+  String get solarTermWhiteDew => 'White Dew';
+
+  @override
+  String get solarTermAutumnalEquinox => 'Ekuinoks Musim Gugur';
+
+  @override
+  String get solarTermColdDew => 'Cold Dew';
+
+  @override
+  String get solarTermFrostDescent => 'Frost Descent';
+
+  @override
+  String get solarTermStartOfWinter => 'Awal Musim Dingin';
+
+  @override
+  String get solarTermMinorSnow => 'Minor Snow';
+
+  @override
+  String get solarTermMajorSnow => 'Major Snow';
+
+  @override
+  String get solarTermWinterSolstice => 'Solstis Musim Dingin';
+
+  @override
+  String get solarTermMinorCold => 'Minor Cold';
+
+  @override
+  String get solarTermMajorCold => 'Major Cold';
+
+  @override
+  String get solarTermStartOfSpring => 'Awal Musim Semi';
+
+  @override
+  String get solarTermRainWater => 'Rain Water';
+
+  @override
+  String get solarTermAwakeningOfInsects => 'Awakening of Insects';
 }

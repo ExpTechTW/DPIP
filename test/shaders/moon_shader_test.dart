@@ -40,6 +40,11 @@ Future<ui.Image> _renderPhase(
   shader.setFloat(2, phase);
   shader.setFloat(3, librationLongitude);
   shader.setFloat(4, 0);
+  // Canonical frame: the Moon's pole straight up, the lit limb to the right —
+  // the orientation these luminance pins were written against. The observer's
+  // real tilt is exercised in `moon_orientation_test.dart`.
+  shader.setFloat(5, 0);
+  shader.setFloat(6, 3.14159265 / 2);
   shader.setImageSampler(0, color);
   shader.setImageSampler(1, height);
   final recorder = ui.PictureRecorder();

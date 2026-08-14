@@ -52,6 +52,14 @@ abstract final class AppRoutes {
   static const String moon = 'moon';
   static const String moonPath = 'moon';
 
+  /// Daylight, twilight and the solar terms — nested under [dataPath].
+  static const String sun = 'sun';
+  static const String sunPath = 'sun';
+
+  /// The planets tonight — nested under [dataPath].
+  static const String planets = 'planets';
+  static const String planetsPath = 'planets';
+
   static const String more = 'more';
   static const String morePath = '/more';
 

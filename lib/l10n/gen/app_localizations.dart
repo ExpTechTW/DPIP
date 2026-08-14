@@ -3561,6 +3561,24 @@ abstract class AppLocalizations {
   /// **'Battery'**
   String get meshtasticBattery;
 
+  /// No description provided for @meshtasticDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get meshtasticDistance;
+
+  /// No description provided for @meshtasticSnrTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal trend (SNR)'**
+  String get meshtasticSnrTrend;
+
+  /// No description provided for @meshtasticBatteryTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery trend'**
+  String get meshtasticBatteryTrend;
+
   /// Tooltip for the typhoon overlay-toggle chip beside the layer switcher
   ///
   /// In en, this message translates to:
@@ -4088,6 +4106,396 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None today'**
   String get moonNoEvent;
+
+  /// Sun page title
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get sunTitle;
+
+  /// Sun page one-line summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise, twilight and the solar terms'**
+  String get sunSubtitle;
+
+  /// Section header: sunrise, noon, sunset, day length
+  ///
+  /// In en, this message translates to:
+  /// **'Daylight'**
+  String get sunSectionDaylight;
+
+  /// Section header: the three twilight bands
+  ///
+  /// In en, this message translates to:
+  /// **'Twilight'**
+  String get sunSectionTwilight;
+
+  /// Section header: golden and blue hour
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get sunSectionLight;
+
+  /// Section header: equation of time and the next solar term
+  ///
+  /// In en, this message translates to:
+  /// **'Sundial'**
+  String get sunSectionSundial;
+
+  /// Section header: the year's twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Solar terms'**
+  String get sunSectionTerms;
+
+  /// Time the Sun rises
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get sunRise;
+
+  /// Time the Sun sets
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get sunSet;
+
+  /// Solar noon, the Sun's upper transit
+  ///
+  /// In en, this message translates to:
+  /// **'Solar noon'**
+  String get sunNoon;
+
+  /// How long the Sun is above the horizon, as hours:minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Day length'**
+  String get sunDayLength;
+
+  /// Civil twilight, the Sun 6 degrees below the horizon
+  ///
+  /// In en, this message translates to:
+  /// **'Civil'**
+  String get sunTwilightCivil;
+
+  /// Nautical twilight, 12 degrees below
+  ///
+  /// In en, this message translates to:
+  /// **'Nautical'**
+  String get sunTwilightNautical;
+
+  /// Astronomical twilight, 18 degrees below
+  ///
+  /// In en, this message translates to:
+  /// **'Astronomical'**
+  String get sunTwilightAstronomical;
+
+  /// Morning golden hour span
+  ///
+  /// In en, this message translates to:
+  /// **'Morning golden hour'**
+  String get sunGoldenHourMorning;
+
+  /// Evening golden hour span
+  ///
+  /// In en, this message translates to:
+  /// **'Evening golden hour'**
+  String get sunGoldenHourEvening;
+
+  /// Blue hour span after sunset
+  ///
+  /// In en, this message translates to:
+  /// **'Blue hour'**
+  String get sunBlueHour;
+
+  /// Apparent solar time minus mean solar time
+  ///
+  /// In en, this message translates to:
+  /// **'Equation of time'**
+  String get sunEquationOfTime;
+
+  /// Unit suffix for the equation of time
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get sunMinutes;
+
+  /// The next of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Next term'**
+  String get solarTermNext;
+
+  /// Planets page title
+  ///
+  /// In en, this message translates to:
+  /// **'Planets'**
+  String get planetsTitle;
+
+  /// Planets page one-line summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'Where they are tonight, and how bright'**
+  String get planetsSubtitle;
+
+  /// Section header: the planets right now
+  ///
+  /// In en, this message translates to:
+  /// **'Right now'**
+  String get planetsSectionTonight;
+
+  /// Badge: the planet is above the horizon
+  ///
+  /// In en, this message translates to:
+  /// **'Up'**
+  String get planetUp;
+
+  /// Badge: the planet is below the horizon
+  ///
+  /// In en, this message translates to:
+  /// **'Below'**
+  String get planetDown;
+
+  /// Badge: too close to the Sun to be seen
+  ///
+  /// In en, this message translates to:
+  /// **'In glare'**
+  String get planetInGlare;
+
+  /// Apparent visual magnitude
+  ///
+  /// In en, this message translates to:
+  /// **'Magnitude'**
+  String get planetMagnitude;
+
+  /// Angular distance from the Sun
+  ///
+  /// In en, this message translates to:
+  /// **'Elongation'**
+  String get planetElongation;
+
+  /// Label for whether the planet is an evening or morning object
+  ///
+  /// In en, this message translates to:
+  /// **'Sky'**
+  String get planetSky;
+
+  /// Sets after the Sun, so visible in the evening
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get planetEvening;
+
+  /// Rises before the Sun, so visible before dawn
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get planetMorning;
+
+  /// Distance from the Earth
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get planetDistance;
+
+  /// Unit suffix: astronomical units
+  ///
+  /// In en, this message translates to:
+  /// **'au'**
+  String get planetAu;
+
+  /// Height above the horizon right now
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude'**
+  String get planetAltitude;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Mercury'**
+  String get planetMercury;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Venus'**
+  String get planetVenus;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Mars'**
+  String get planetMars;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Jupiter'**
+  String get planetJupiter;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn'**
+  String get planetSaturn;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Uranus'**
+  String get planetUranus;
+
+  /// Planet name
+  ///
+  /// In en, this message translates to:
+  /// **'Neptune'**
+  String get planetNeptune;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Vernal Equinox'**
+  String get solarTermVernalEquinox;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Pure Brightness'**
+  String get solarTermPureBrightness;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Grain Rain'**
+  String get solarTermGrainRain;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Summer'**
+  String get solarTermStartOfSummer;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Grain Full'**
+  String get solarTermGrainFull;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Grain in Ear'**
+  String get solarTermGrainInEar;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Summer Solstice'**
+  String get solarTermSummerSolstice;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Minor Heat'**
+  String get solarTermMinorHeat;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Major Heat'**
+  String get solarTermMajorHeat;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Autumn'**
+  String get solarTermStartOfAutumn;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'End of Heat'**
+  String get solarTermEndOfHeat;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'White Dew'**
+  String get solarTermWhiteDew;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Autumnal Equinox'**
+  String get solarTermAutumnalEquinox;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Cold Dew'**
+  String get solarTermColdDew;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Frost Descent'**
+  String get solarTermFrostDescent;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Winter'**
+  String get solarTermStartOfWinter;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Minor Snow'**
+  String get solarTermMinorSnow;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Major Snow'**
+  String get solarTermMajorSnow;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Winter Solstice'**
+  String get solarTermWinterSolstice;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Minor Cold'**
+  String get solarTermMinorCold;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Major Cold'**
+  String get solarTermMajorCold;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Spring'**
+  String get solarTermStartOfSpring;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Rain Water'**
+  String get solarTermRainWater;
+
+  /// One of the twenty-four solar terms
+  ///
+  /// In en, this message translates to:
+  /// **'Awakening of Insects'**
+  String get solarTermAwakeningOfInsects;
 }
 
 class _AppLocalizationsDelegate

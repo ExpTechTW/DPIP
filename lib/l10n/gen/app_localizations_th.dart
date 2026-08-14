@@ -1868,6 +1868,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticBattery => 'Battery';
 
   @override
+  String get meshtasticDistance => 'ระยะทาง';
+
+  @override
+  String get meshtasticSnrTrend => 'แนวโน้มสัญญาณ (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => 'แนวโน้มแบตเตอรี่';
+
+  @override
   String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
 
   @override
@@ -2150,4 +2159,199 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moonNoEvent => 'ไม่มีในวันนี้';
+
+  @override
+  String get sunTitle => 'ดวงอาทิตย์';
+
+  @override
+  String get sunSubtitle => 'พระอาทิตย์ขึ้น สนธยา และปักษ์';
+
+  @override
+  String get sunSectionDaylight => 'แสงกลางวัน';
+
+  @override
+  String get sunSectionTwilight => 'สนธยา';
+
+  @override
+  String get sunSectionLight => 'แสง';
+
+  @override
+  String get sunSectionSundial => 'นาฬิกาแดด';
+
+  @override
+  String get sunSectionTerms => 'ปักษ์';
+
+  @override
+  String get sunRise => 'พระอาทิตย์ขึ้น';
+
+  @override
+  String get sunSet => 'พระอาทิตย์ตก';
+
+  @override
+  String get sunNoon => 'เที่ยงสุริยะ';
+
+  @override
+  String get sunDayLength => 'ความยาววัน';
+
+  @override
+  String get sunTwilightCivil => 'พลเรือน';
+
+  @override
+  String get sunTwilightNautical => 'เดินเรือ';
+
+  @override
+  String get sunTwilightAstronomical => 'ดาราศาสตร์';
+
+  @override
+  String get sunGoldenHourMorning => 'โกลเดนอาวร์เช้า';
+
+  @override
+  String get sunGoldenHourEvening => 'โกลเดนอาวร์เย็น';
+
+  @override
+  String get sunBlueHour => 'บลูอาวร์';
+
+  @override
+  String get sunEquationOfTime => 'สมการเวลา';
+
+  @override
+  String get sunMinutes => 'นาที';
+
+  @override
+  String get solarTermNext => 'ปักษ์ถัดไป';
+
+  @override
+  String get planetsTitle => 'ดาวเคราะห์';
+
+  @override
+  String get planetsSubtitle => 'คืนนี้อยู่ไหน สว่างแค่ไหน';
+
+  @override
+  String get planetsSectionTonight => 'ขณะนี้';
+
+  @override
+  String get planetUp => 'เหนือขอบฟ้า';
+
+  @override
+  String get planetDown => 'ใต้ขอบฟ้า';
+
+  @override
+  String get planetInGlare => 'ใกล้ดวงอาทิตย์';
+
+  @override
+  String get planetMagnitude => 'โชติมาตร';
+
+  @override
+  String get planetElongation => 'มุมห่าง';
+
+  @override
+  String get planetSky => 'ช่วงเวลา';
+
+  @override
+  String get planetEvening => 'หัวค่ำ';
+
+  @override
+  String get planetMorning => 'ก่อนรุ่ง';
+
+  @override
+  String get planetDistance => 'ระยะทาง';
+
+  @override
+  String get planetAu => 'au';
+
+  @override
+  String get planetAltitude => 'มุมเงย';
+
+  @override
+  String get planetMercury => 'พุธ';
+
+  @override
+  String get planetVenus => 'ศุกร์';
+
+  @override
+  String get planetMars => 'อังคาร';
+
+  @override
+  String get planetJupiter => 'พฤหัสบดี';
+
+  @override
+  String get planetSaturn => 'เสาร์';
+
+  @override
+  String get planetUranus => 'ยูเรนัส';
+
+  @override
+  String get planetNeptune => 'เนปจูน';
+
+  @override
+  String get solarTermVernalEquinox => 'วสันตวิษุวัต';
+
+  @override
+  String get solarTermPureBrightness => 'เช็งเม้ง';
+
+  @override
+  String get solarTermGrainRain => 'ฝนธัญพืช';
+
+  @override
+  String get solarTermStartOfSummer => 'เริ่มฤดูร้อน';
+
+  @override
+  String get solarTermGrainFull => 'ธัญพืชเต็ม';
+
+  @override
+  String get solarTermGrainInEar => 'ธัญพืชออกรวง';
+
+  @override
+  String get solarTermSummerSolstice => 'ครีษมายัน';
+
+  @override
+  String get solarTermMinorHeat => 'ร้อนน้อย';
+
+  @override
+  String get solarTermMajorHeat => 'ร้อนมาก';
+
+  @override
+  String get solarTermStartOfAutumn => 'เริ่มฤดูใบไม้ร่วง';
+
+  @override
+  String get solarTermEndOfHeat => 'สิ้นสุดความร้อน';
+
+  @override
+  String get solarTermWhiteDew => 'น้ำค้างขาว';
+
+  @override
+  String get solarTermAutumnalEquinox => 'ศารทวิษุวัต';
+
+  @override
+  String get solarTermColdDew => 'น้ำค้างเย็น';
+
+  @override
+  String get solarTermFrostDescent => 'น้ำค้างแข็ง';
+
+  @override
+  String get solarTermStartOfWinter => 'เริ่มฤดูหนาว';
+
+  @override
+  String get solarTermMinorSnow => 'หิมะน้อย';
+
+  @override
+  String get solarTermMajorSnow => 'หิมะมาก';
+
+  @override
+  String get solarTermWinterSolstice => 'เหมายัน';
+
+  @override
+  String get solarTermMinorCold => 'หนาวน้อย';
+
+  @override
+  String get solarTermMajorCold => 'หนาวมาก';
+
+  @override
+  String get solarTermStartOfSpring => 'เริ่มฤดูใบไม้ผลิ';
+
+  @override
+  String get solarTermRainWater => 'ฝนน้ำ';
+
+  @override
+  String get solarTermAwakeningOfInsects => 'แมลงตื่น';
 }

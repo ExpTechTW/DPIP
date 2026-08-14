@@ -1882,6 +1882,15 @@ class AppLocalizationsFil extends AppLocalizations {
   String get meshtasticBattery => 'Battery';
 
   @override
+  String get meshtasticDistance => 'Distansya';
+
+  @override
+  String get meshtasticSnrTrend => 'Trend ng signal (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => 'Trend ng baterya';
+
+  @override
   String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
 
   @override
@@ -2164,4 +2173,199 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get moonNoEvent => 'Wala sa araw na ito';
+
+  @override
+  String get sunTitle => 'Araw';
+
+  @override
+  String get sunSubtitle => 'Pagsikat, takipsilim at solar terms';
+
+  @override
+  String get sunSectionDaylight => 'Liwanag ng araw';
+
+  @override
+  String get sunSectionTwilight => 'Takipsilim';
+
+  @override
+  String get sunSectionLight => 'Liwanag';
+
+  @override
+  String get sunSectionSundial => 'Orasang araw';
+
+  @override
+  String get sunSectionTerms => 'Solar terms';
+
+  @override
+  String get sunRise => 'Pagsikat ng araw';
+
+  @override
+  String get sunSet => 'Paglubog ng araw';
+
+  @override
+  String get sunNoon => 'Tanghaling tapat';
+
+  @override
+  String get sunDayLength => 'Haba ng araw';
+
+  @override
+  String get sunTwilightCivil => 'Sibil';
+
+  @override
+  String get sunTwilightNautical => 'Nautical';
+
+  @override
+  String get sunTwilightAstronomical => 'Astronomical';
+
+  @override
+  String get sunGoldenHourMorning => 'Golden hour sa umaga';
+
+  @override
+  String get sunGoldenHourEvening => 'Golden hour sa hapon';
+
+  @override
+  String get sunBlueHour => 'Blue hour';
+
+  @override
+  String get sunEquationOfTime => 'Equation of time';
+
+  @override
+  String get sunMinutes => 'min';
+
+  @override
+  String get solarTermNext => 'Susunod na termino';
+
+  @override
+  String get planetsTitle => 'Mga planeta';
+
+  @override
+  String get planetsSubtitle => 'Nasaan ngayong gabi, at gaano kaliwanag';
+
+  @override
+  String get planetsSectionTonight => 'Ngayon';
+
+  @override
+  String get planetUp => 'Nasa itaas';
+
+  @override
+  String get planetDown => 'Nasa ibaba';
+
+  @override
+  String get planetInGlare => 'Malapit sa araw';
+
+  @override
+  String get planetMagnitude => 'Magnitude';
+
+  @override
+  String get planetElongation => 'Elongation';
+
+  @override
+  String get planetSky => 'Panahon';
+
+  @override
+  String get planetEvening => 'Gabi';
+
+  @override
+  String get planetMorning => 'Umaga';
+
+  @override
+  String get planetDistance => 'Distansya';
+
+  @override
+  String get planetAu => 'au';
+
+  @override
+  String get planetAltitude => 'Taas';
+
+  @override
+  String get planetMercury => 'Mercury';
+
+  @override
+  String get planetVenus => 'Venus';
+
+  @override
+  String get planetMars => 'Mars';
+
+  @override
+  String get planetJupiter => 'Jupiter';
+
+  @override
+  String get planetSaturn => 'Saturn';
+
+  @override
+  String get planetUranus => 'Uranus';
+
+  @override
+  String get planetNeptune => 'Neptune';
+
+  @override
+  String get solarTermVernalEquinox => 'Vernal Equinox';
+
+  @override
+  String get solarTermPureBrightness => 'Pure Brightness';
+
+  @override
+  String get solarTermGrainRain => 'Grain Rain';
+
+  @override
+  String get solarTermStartOfSummer => 'Simula ng Tag-init';
+
+  @override
+  String get solarTermGrainFull => 'Grain Full';
+
+  @override
+  String get solarTermGrainInEar => 'Grain in Ear';
+
+  @override
+  String get solarTermSummerSolstice => 'Summer Solstice';
+
+  @override
+  String get solarTermMinorHeat => 'Minor Heat';
+
+  @override
+  String get solarTermMajorHeat => 'Major Heat';
+
+  @override
+  String get solarTermStartOfAutumn => 'Simula ng Taglagas';
+
+  @override
+  String get solarTermEndOfHeat => 'End of Heat';
+
+  @override
+  String get solarTermWhiteDew => 'White Dew';
+
+  @override
+  String get solarTermAutumnalEquinox => 'Autumnal Equinox';
+
+  @override
+  String get solarTermColdDew => 'Cold Dew';
+
+  @override
+  String get solarTermFrostDescent => 'Frost Descent';
+
+  @override
+  String get solarTermStartOfWinter => 'Simula ng Taglamig';
+
+  @override
+  String get solarTermMinorSnow => 'Minor Snow';
+
+  @override
+  String get solarTermMajorSnow => 'Major Snow';
+
+  @override
+  String get solarTermWinterSolstice => 'Winter Solstice';
+
+  @override
+  String get solarTermMinorCold => 'Minor Cold';
+
+  @override
+  String get solarTermMajorCold => 'Major Cold';
+
+  @override
+  String get solarTermStartOfSpring => 'Simula ng Tagsibol';
+
+  @override
+  String get solarTermRainWater => 'Rain Water';
+
+  @override
+  String get solarTermAwakeningOfInsects => 'Awakening of Insects';
 }

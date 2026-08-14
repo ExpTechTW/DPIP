@@ -928,6 +928,9 @@
   "reportFilterLocationHint": "例如：花蓮、東部海域",
   "moonSubtitle": "月相與亮度 — 完全本地計算",
   "meshtasticBattery": "電量",
+  "meshtasticDistance": "距離",
+  "meshtasticSnrTrend": "訊號趨勢 (SNR)",
+  "meshtasticBatteryTrend": "電量趨勢",
   "typhoonOverlayMenuTooltip": "颱風圖層選項",
   "mapLayerSatelliteBtdOzone": "ひまわり 對流層頂",
   "meshtasticRegionMismatch": "裝置地區為 {region} — DPIP 需要 TW",
@@ -1092,5 +1095,265 @@
   "moonNoEvent": "當日無",
   "@moonNoEvent": {
     "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "太陽",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSubtitle": "日出日沒、曙暮光與節氣",
+  "@sunSubtitle": {
+    "description": "Sun page one-line summary on the data hub"
+  },
+  "sunSectionDaylight": "日照",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "曙暮光",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "光線",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "日晷",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "節氣",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "日出",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "日沒",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "正午",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "白晝長度",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "民用",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "航海",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "天文",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "晨間黃金時刻",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "昏間黃金時刻",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "藍調時刻",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "均時差",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "分",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "下一個節氣",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "行星",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSubtitle": "今晚在哪、有多亮",
+  "@planetsSubtitle": {
+    "description": "Planets page one-line summary on the data hub"
+  },
+  "planetsSectionTonight": "此刻",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "地平線上",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "地平線下",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "太近太陽",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "亮度",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "距日距角",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "時段",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "昏星",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "晨星",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "距離",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "天文單位",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "仰角",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "水星",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "金星",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "火星",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "木星",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "土星",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "天王星",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "海王星",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "春分",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "清明",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "穀雨",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "立夏",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "小滿",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "芒種",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "夏至",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "小暑",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "大暑",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "立秋",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "處暑",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "白露",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "秋分",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "寒露",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "霜降",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "立冬",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "小雪",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "大雪",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "冬至",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "小寒",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "大寒",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "立春",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "雨水",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "驚蟄",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
   }
 }

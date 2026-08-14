@@ -31,11 +31,20 @@
 //      characteristic.
 //   5. **Earthshine.** The night side is not black: it is lit by a nearly full
 //      Earth, blue-grey, strongest around new moon.
+//   6. **The observer's tilt.** The pole and the terminator are placed by two
+//      *independent* bearings supplied from Dart, not by assuming north is up
+//      and the terminator vertical. Seen from Taiwan the crescent is rolled,
+//      and near the horizon it lies on its back; the two angles also differ
+//      from each other by up to ~30°, because the Sun sits on the ecliptic
+//      while the Moon's axis follows the equator.
 //
 // Uniform contract — slots are float indices in declaration order.
 //   iResolution (0..1)  draw size in pixels
 //   iPhase      (2)     phase angle in radians, 0 = new, π = full
 //   iLibration  (3..4)  sub-earth longitude/latitude offset, radians
+//   iNorthRoll  (5)     screen bearing of the Moon's north pole, radians,
+//                       measured from straight up and increasing clockwise
+//   iLimb       (6)     screen bearing of the lit limb, same convention
 //   iColor      (s0)    equirectangular colour map, 0° longitude centred
 //   iHeight     (s1)    equirectangular elevation map, greyscale
 #include <flutter/runtime_effect.glsl>
@@ -45,6 +54,8 @@ precision highp float;
 uniform vec2 iResolution;
 uniform float iPhase;
 uniform vec2 iLibration;
+uniform float iNorthRoll;
+uniform float iLimb;
 uniform sampler2D iColor;
 uniform sampler2D iHeight;
 
@@ -66,6 +77,22 @@ vec2 sphereUv(vec3 p) {
 
 float heightAt(vec3 p) { return texture(iHeight, sphereUv(p)).r; }
 
+/// Screen space to the Moon's own frame.
+///
+/// Two rotations. The first rolls about the line of sight so the Moon's north
+/// pole ends up where the observer actually sees it. The second is the
+/// libration: the Moon rocks a few degrees each month, showing a little around
+/// each limb in turn, and iLibration is the selenographic point facing Earth —
+/// so this brings that point to the centre of the disc.
+vec3 toMoonFrame(vec3 v) {
+  float cr = cos(iNorthRoll), sr = sin(iNorthRoll);
+  vec3 r = vec3(cr * v.x - sr * v.y, sr * v.x + cr * v.y, v.z);
+  float cl = cos(iLibration.x), sl = sin(iLibration.x);
+  float cb = cos(iLibration.y), sb = sin(iLibration.y);
+  float ex = -sl * r.x + cl * r.z;
+  return vec3(cl * r.x + sl * r.z, cb * r.y + sb * ex, cb * ex - sb * r.y);
+}
+
 void main() {
   vec2 uv = FlutterFragCoord().xy / iResolution;
   vec2 p = uv * 2.0 - 1.0;
@@ -81,29 +108,20 @@ void main() {
     return;
   }
 
-  // View-space normal of the visible hemisphere: the disc *is* the sphere seen
-  // orthographically, so z falls out of x and y.
+  // Screen-space normal of the visible hemisphere: the disc *is* the sphere
+  // seen orthographically, so z falls out of x and y.
   vec3 view = vec3(p, sqrt(max(1.0 - r2, 0.0)));
 
-  // Libration — the Moon rocks a few degrees each month, showing a little
-  // around each edge. Rotating the lookup (not the disc) is what keeps the
-  // same face toward us while the visible edges change. iLibration is the
-  // selenographic point facing Earth, so these rotations are exactly what puts
-  // that point at the centre of the disc.
-  float cl = cos(iLibration.x), sl = sin(iLibration.x);
-  float cb = cos(iLibration.y), sb = sin(iLibration.y);
-  float ex = -sl * view.x + cl * view.z;
-  vec3 surf = vec3(
-    cl * view.x + sl * view.z,
-    cb * view.y + sb * ex,
-    cb * ex - sb * view.y
-  );
-
+  // Everything below is done in the Moon's own frame. Rotating the *light* and
+  // the *eye* into it, rather than rotating a tangent basis back out of it,
+  // keeps one frame in play: dot products are rotation-invariant, so the
+  // shading is identical and there is no half-transformed vector to get wrong.
+  vec3 surf = toMoonFrame(view);
   vec3 albedo = texture(iColor, sphereUv(surf)).rgb;
 
   // Relief: sample the elevation along two tangents of the sphere and tilt the
-  // normal by the slope. Done in surface space so a crater near the limb is
-  // shaded by its own geometry rather than by its screen position.
+  // normal by the slope. In surface space, so a crater near the limb is shaded
+  // by its own geometry rather than by its screen position.
   vec3 tangentU = normalize(cross(vec3(0.0, 1.0, 0.0), surf) + vec3(1e-5));
   vec3 tangentV = cross(surf, tangentU);
   float step = 0.004;
@@ -114,12 +132,18 @@ void main() {
   // Relief is exaggerated: at true scale the Moon is smoother than a billiard
   // ball and would show nothing at this size.
   const float relief = 9.0;
-  vec3 n = normalize(view - relief * (hU * tangentU + hV * tangentV));
+  vec3 n = normalize(surf - relief * (hU * tangentU + hV * tangentV));
 
-  // Sun direction. θ = 0 puts it behind the Moon (new), θ = π in front (full),
-  // θ = π/2 lights the right-hand half (first quarter).
-  vec3 sun = normalize(vec3(sin(iPhase), 0.0, -cos(iPhase)));
-  vec3 eye = vec3(0.0, 0.0, 1.0);
+  // Sun direction, built in screen space and then carried into the Moon's
+  // frame. θ = 0 puts it behind the Moon (new) and θ = π in front (full);
+  // in between, its in-plane direction is the bright limb's screen bearing —
+  // measured from straight up, clockwise, so x = sin and y = cos.
+  vec3 sun = toMoonFrame(normalize(vec3(
+    sin(iPhase) * sin(iLimb),
+    sin(iPhase) * cos(iLimb),
+    -cos(iPhase)
+  )));
+  vec3 eye = toMoonFrame(vec3(0.0, 0.0, 1.0));
 
   float mu0 = dot(n, sun);   // cos(incidence)
   float mu = dot(n, eye);    // cos(emission)

@@ -928,6 +928,9 @@
   "reportFilterLocationHint": "mis. Hualien, lepas pantai",
   "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
+  "meshtasticDistance": "Jarak",
+  "meshtasticSnrTrend": "Tren sinyal (SNR)",
+  "meshtasticBatteryTrend": "Tren baterai",
   "typhoonOverlayMenuTooltip": "Typhoon overlay options",
   "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
   "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
@@ -1092,5 +1095,265 @@
   "moonNoEvent": "Tidak ada hari ini",
   "@moonNoEvent": {
     "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "Matahari",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSubtitle": "Matahari terbit, senja, dan istilah surya",
+  "@sunSubtitle": {
+    "description": "Sun page one-line summary on the data hub"
+  },
+  "sunSectionDaylight": "Cahaya siang",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "Senja",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "Cahaya",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "Jam matahari",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "Istilah surya",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "Matahari terbit",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "Matahari terbenam",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "Tengah hari surya",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "Panjang hari",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "Sipil",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "Nautika",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "Astronomi",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "Golden hour pagi",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "Golden hour sore",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "Blue hour",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "Persamaan waktu",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "mnt",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "Istilah berikutnya",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "Planet",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSubtitle": "Di mana malam ini, dan seberapa terang",
+  "@planetsSubtitle": {
+    "description": "Planets page one-line summary on the data hub"
+  },
+  "planetsSectionTonight": "Saat ini",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "Di atas ufuk",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "Di bawah ufuk",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "Terlalu dekat Matahari",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "Magnitudo",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "Elongasi",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "Waktu",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "Petang",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "Pagi",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "Jarak",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "au",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "Ketinggian",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "Merkurius",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "Venus",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "Mars",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "Jupiter",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "Saturnus",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "Uranus",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "Neptunus",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "Ekuinoks Musim Semi",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "Pure Brightness",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "Grain Rain",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "Awal Musim Panas",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "Grain Full",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "Grain in Ear",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "Solstis Musim Panas",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "Minor Heat",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "Major Heat",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "Awal Musim Gugur",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "End of Heat",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "White Dew",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "Ekuinoks Musim Gugur",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "Cold Dew",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "Frost Descent",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "Awal Musim Dingin",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "Minor Snow",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "Major Snow",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "Solstis Musim Dingin",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "Minor Cold",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "Major Cold",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "Awal Musim Semi",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "Rain Water",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "Awakening of Insects",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
   }
 }

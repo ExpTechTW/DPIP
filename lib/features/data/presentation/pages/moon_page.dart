@@ -23,10 +23,12 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/astro/moon_orientation.dart';
 import 'package:dpip/core/astro/moon_phase.dart';
 import 'package:dpip/core/astro/moon_rise_set.dart';
 import 'package:dpip/core/geo/town.dart';
@@ -215,6 +217,13 @@ class _MoonPageState extends State<MoonPage> {
             latitude: town.lat,
             longitude: town.lng,
           );
+    final orientation = town == null
+        ? null
+        : MoonOrientation.at(
+            _selected,
+            latitude: town.lat,
+            longitude: town.lng,
+          );
     final aboveHorizon =
         town != null &&
         riseSet != null &&
@@ -252,6 +261,7 @@ class _MoonPageState extends State<MoonPage> {
             error: _loadError,
             phase: phase,
             libration: Offset(libration.longitude, libration.latitude),
+            orientation: orientation,
             title: _phaseName(l10n, phase.name),
             // l10n-ignore: percentage readout
             subtitle: '${(phase.brightness * 100).round()}%',
@@ -404,6 +414,7 @@ class _MoonStage extends StatelessWidget {
     required this.error,
     required this.phase,
     required this.libration,
+    required this.orientation,
     required this.title,
     required this.subtitle,
   });
@@ -414,6 +425,11 @@ class _MoonStage extends StatelessWidget {
   final Object? error;
   final MoonPhase phase;
   final Offset libration;
+
+  /// How the globe is tilted for this observer — see `moon_orientation.dart`.
+  /// Null before a place is known, in which case the canonical north-up,
+  /// terminator-vertical view is drawn rather than a guessed one.
+  final MoonOrientation? orientation;
   final String title;
   final String subtitle;
 
@@ -479,6 +495,12 @@ class _MoonStage extends StatelessWidget {
                     height: h,
                     phase: phase.angle,
                     libration: libration,
+                    // Canonical view until a place is known: pole up, lit
+                    // limb to the right. A guessed tilt would look confident
+                    // and be wrong.
+                    northBearing: orientation?.northBearing ?? 0,
+                    brightLimbBearing:
+                        orientation?.brightLimbBearing ?? math.pi / 2,
                   ),
                 ),
               (_, _, _, final Object e) => Padding(
@@ -562,6 +584,8 @@ class _MoonPainter extends CustomPainter {
     required this.height,
     required this.phase,
     required this.libration,
+    required this.northBearing,
+    required this.brightLimbBearing,
   });
 
   final ui.FragmentShader shader;
@@ -574,6 +598,11 @@ class _MoonPainter extends CustomPainter {
   /// The selenographic point facing Earth — the Moon's monthly rocking.
   final Offset libration;
 
+  /// Screen bearing of the Moon's north pole, and of the middle of its lit
+  /// limb — what tilts the globe the way the observer actually sees it.
+  final double northBearing;
+  final double brightLimbBearing;
+
   @override
   void paint(ui.Canvas canvas, ui.Size size) {
     shader.setFloat(0, size.width);
@@ -581,6 +610,8 @@ class _MoonPainter extends CustomPainter {
     shader.setFloat(2, phase);
     shader.setFloat(3, libration.dx);
     shader.setFloat(4, libration.dy);
+    shader.setFloat(5, northBearing);
+    shader.setFloat(6, brightLimbBearing);
     shader.setImageSampler(0, color);
     shader.setImageSampler(1, height);
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
@@ -590,6 +621,8 @@ class _MoonPainter extends CustomPainter {
   bool shouldRepaint(covariant _MoonPainter oldDelegate) =>
       phase != oldDelegate.phase ||
       libration != oldDelegate.libration ||
+      northBearing != oldDelegate.northBearing ||
+      brightLimbBearing != oldDelegate.brightLimbBearing ||
       color != oldDelegate.color ||
       height != oldDelegate.height ||
       !identical(shader, oldDelegate.shader);

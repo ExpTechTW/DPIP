@@ -22,7 +22,9 @@ library;
 
 import 'dart:math' as math;
 
-const double _degrees = math.pi / 180;
+import 'package:dpip/core/astro/astro_time.dart';
+import 'package:dpip/core/astro/sky_position.dart';
+import 'package:dpip/core/astro/sun_ephemeris.dart';
 
 /// Earth's equatorial radius, km — turns distance into horizontal parallax.
 const double _earthRadiusKm = 6378.14;
@@ -64,7 +66,7 @@ class MoonEphemeris {
 
   /// The Moon's position at [utc].
   factory MoonEphemeris.at(DateTime utc) {
-    final t = centuriesFromJ2000(utc);
+    final t = julianCenturies(utc);
 
     // Mean arguments (Meeus 45.1–45.5), degrees. Their quadratic and higher
     // terms are dropped: over 1900–2100 they move λ by well under the
@@ -85,7 +87,7 @@ class MoonEphemeris {
       final row = _longitudeAndRadius;
       final arg =
           (row[i] * d + row[i + 1] * m + row[i + 2] * mp + row[i + 3] * f) *
-          _degrees;
+          degrees;
       final scale = _eccentricityPower(e, row[i + 1]);
       sumL += row[i + 4] * scale * math.sin(arg);
       sumR += row[i + 5] * scale * math.cos(arg);
@@ -96,34 +98,34 @@ class MoonEphemeris {
       final row = _latitude;
       final arg =
           (row[i] * d + row[i + 1] * m + row[i + 2] * mp + row[i + 3] * f) *
-          _degrees;
+          degrees;
       sumB += row[i + 4] * _eccentricityPower(e, row[i + 1]) * math.sin(arg);
     }
 
     // Venus, Jupiter and the Earth's flattening, folded into three fictitious
     // arguments (Meeus, p. 308). Small, but A1 alone is 0.004° — bigger than
     // everything the table truncation drops.
-    final a1 = (119.75 + 131.849 * t) * _degrees;
-    final a2 = (53.09 + 479264.290 * t) * _degrees;
-    final a3 = (313.45 + 481266.484 * t) * _degrees;
+    final a1 = (119.75 + 131.849 * t) * degrees;
+    final a2 = (53.09 + 479264.290 * t) * degrees;
+    final a3 = (313.45 + 481266.484 * t) * degrees;
     sumL +=
         3958 * math.sin(a1) +
-        1962 * math.sin((lp - f) * _degrees) +
+        1962 * math.sin((lp - f) * degrees) +
         318 * math.sin(a2);
     sumB +=
-        -2235 * math.sin(lp * _degrees) +
+        -2235 * math.sin(lp * degrees) +
         382 * math.sin(a3) +
-        175 * math.sin(a1 - f * _degrees) +
-        175 * math.sin(a1 + f * _degrees) +
-        127 * math.sin((lp - mp) * _degrees) -
-        115 * math.sin((lp + mp) * _degrees);
+        175 * math.sin(a1 - f * degrees) +
+        175 * math.sin(a1 + f * degrees) +
+        127 * math.sin((lp - mp) * degrees) -
+        115 * math.sin((lp + mp) * degrees);
 
     return MoonEphemeris(
-      longitude: turn((lp + sumL / 1e6) * _degrees),
-      latitude: sumB / 1e6 * _degrees,
+      longitude: turn((lp + sumL / 1e6) * degrees),
+      latitude: sumB / 1e6 * degrees,
       distanceKm: 385000.56 + sumR / 1000,
-      sunLongitude: _sunLongitude(t),
-      argumentOfLatitude: turn(f * _degrees),
+      sunLongitude: SunEphemeris.atCenturies(t).longitude,
+      argumentOfLatitude: turn(f * degrees),
       centuries: t,
     );
   }
@@ -140,23 +142,26 @@ class MoonEphemeris {
   /// of the last digit the page shows.
   double get illuminated => (1 - math.cos(phaseAngle)) / 2;
 
-  /// Equatorial coordinates of date, radians — the frame rise and set need.
-  ({double rightAscension, double declination}) get equatorial {
-    // Mean obliquity (Meeus 21.2, linear term). Nutation adds under 0.003°,
-    // inside the truncation error either way.
-    final obliquity = (23.439291 - 0.0130042 * centuries) * _degrees;
-    final sinB = math.sin(latitude);
-    final cosB = math.cos(latitude);
-    final sinL = math.sin(longitude);
-    final sinE = math.sin(obliquity);
-    final cosE = math.cos(obliquity);
-    return (
-      rightAscension: turn(
-        math.atan2(sinL * cosE - (sinB / cosB) * sinE, math.cos(longitude)),
-      ),
-      declination: math.asin(sinB * cosE + cosB * sinE * sinL),
-    );
-  }
+  /// Equatorial coordinates of date — the frame rise, set and pointing need.
+  Equatorial get equatorial => Equatorial.fromEcliptic(
+    longitude: longitude,
+    latitude: latitude,
+    obliquity: meanObliquity(centuries),
+    distanceKm: distanceKm,
+  );
+
+  /// The altitude at which this Moon counts as rising or setting, radians.
+  ///
+  /// Not zero, and not a constant. Refraction lifts the limb 34′, while the
+  /// parallax — nearly a degree, and varying 14% with distance — converts the
+  /// geocentric position this series gives into the one an observer on the
+  /// surface actually sees (Meeus ch. 14).
+  double get horizonAltitude => horizonAltitudeFor(distanceKm);
+
+  /// The same, from a distance alone — the form the rise/set solver uses, so
+  /// it need not re-evaluate the whole series to ask about the horizon.
+  static double horizonAltitudeFor(double distanceKm) =>
+      0.7275 * math.asin(_earthRadiusKm / distanceKm) - horizonRefraction;
 
   /// Equatorial horizontal parallax, radians — how far the Moon's apparent
   /// place shifts between the Earth's centre and a point on its surface.
@@ -167,23 +172,6 @@ class MoonEphemeris {
   /// Apparent angular diameter, radians — 29.4′ at apogee, 33.5′ at perigee.
   double get angularDiameter => 2 * math.asin(_moonRadiusKm / distanceKm);
 
-  /// Julian centuries of Terrestrial Time from J2000.0 at [utc].
-  ///
-  /// The series is defined on TT, which runs ~75 s ahead of UTC this decade.
-  /// Left out, that offset alone costs 60″ of longitude — four times the whole
-  /// truncation error — so it is worth the one polynomial (Espenak & Meeus's
-  /// ΔT fit for 2005–2050). Rise/set still takes its *hour angle* from UT;
-  /// only the position is TT.
-  static double centuriesFromJ2000(DateTime utc) {
-    final years = utc.year + (utc.month - 0.5) / 12 - 2000;
-    final deltaT = 62.92 + 0.32217 * years + 0.005589 * years * years;
-    return (utc.millisecondsSinceEpoch / Duration.millisecondsPerDay +
-            deltaT / Duration.secondsPerDay +
-            2440587.5 -
-            2451545.0) /
-        36525.0;
-  }
-
   /// `e` raised to |[solarAnomaly]| — the correction applies once per power of
   /// M in the argument.
   static double _eccentricityPower(double e, double solarAnomaly) =>
@@ -192,24 +180,6 @@ class MoonEphemeris {
         1 => e,
         _ => e * e,
       };
-
-  /// The Sun's apparent ecliptic longitude, radians (Meeus ch. 24, low
-  /// precision — 0.01°, far finer than a phase readout resolves).
-  static double _sunLongitude(double t) {
-    final l0 = 280.46646 + 36000.76983 * t;
-    final m = (357.52911 + 35999.05029 * t) * _degrees;
-    final centre =
-        (1.914602 - 0.004817 * t) * math.sin(m) +
-        0.019993 * math.sin(2 * m) +
-        0.000289 * math.sin(3 * m);
-    return turn((l0 + centre) * _degrees);
-  }
-}
-
-/// Wraps an angle into `[0, 2π)`.
-double turn(double radians) {
-  const full = 2 * math.pi;
-  return ((radians % full) + full) % full;
 }
 
 /// Periodic terms for longitude and distance — Meeus table 45.A, first 35 rows.

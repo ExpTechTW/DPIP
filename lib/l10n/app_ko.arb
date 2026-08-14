@@ -928,6 +928,9 @@
   "reportFilterLocationHint": "예: 화롄, 해역",
   "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
+  "meshtasticDistance": "거리",
+  "meshtasticSnrTrend": "신호 추이 (SNR)",
+  "meshtasticBatteryTrend": "배터리 추이",
   "typhoonOverlayMenuTooltip": "Typhoon overlay options",
   "mapLayerSatelliteBtdOzone": "히마와리 대류권계면",
   "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
@@ -1092,5 +1095,265 @@
   "moonNoEvent": "해당 없음",
   "@moonNoEvent": {
     "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "태양",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSubtitle": "일출·박명·절기",
+  "@sunSubtitle": {
+    "description": "Sun page one-line summary on the data hub"
+  },
+  "sunSectionDaylight": "일조",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "박명",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "빛",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "해시계",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "절기",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "일출",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "일몰",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "남중",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "낮 길이",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "시민",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "항해",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "천문",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "아침 골든아워",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "저녁 골든아워",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "블루아워",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "균시차",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "분",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "다음 절기",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "행성",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSubtitle": "오늘 밤 위치와 밝기",
+  "@planetsSubtitle": {
+    "description": "Planets page one-line summary on the data hub"
+  },
+  "planetsSectionTonight": "현재",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "지평선 위",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "지평선 아래",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "태양에 근접",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "등급",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "이각",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "시간대",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "초저녁",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "새벽",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "거리",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "au",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "고도",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "수성",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "금성",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "화성",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "목성",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "토성",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "천왕성",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "해왕성",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "춘분",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "청명",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "곡우",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "입하",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "소만",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "망종",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "하지",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "소서",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "대서",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "입추",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "처서",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "백로",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "추분",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "한로",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "상강",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "입동",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "소설",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "대설",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "동지",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "소한",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "대한",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "입춘",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "우수",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "경칩",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
   }
 }

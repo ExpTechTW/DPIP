@@ -2594,6 +2594,9 @@
   "reportFilterLocationHint": "e.g. Hualien, offshore",
   "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
+  "meshtasticDistance": "Distance",
+  "meshtasticSnrTrend": "Signal trend (SNR)",
+  "meshtasticBatteryTrend": "Battery trend",
   "typhoonOverlayMenuTooltip": "Typhoon overlay options",
   "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
   "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
@@ -2889,5 +2892,265 @@
   "moonNoEvent": "None today",
   "@moonNoEvent": {
     "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "Sun",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSubtitle": "Sunrise, twilight and the solar terms",
+  "@sunSubtitle": {
+    "description": "Sun page one-line summary on the data hub"
+  },
+  "sunSectionDaylight": "Daylight",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "Twilight",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "Light",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "Sundial",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "Solar terms",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "Sunrise",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "Sunset",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "Solar noon",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "Day length",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "Civil",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "Nautical",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "Astronomical",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "Morning golden hour",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "Evening golden hour",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "Blue hour",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "Equation of time",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "min",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "Next term",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "Planets",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSubtitle": "Where they are tonight, and how bright",
+  "@planetsSubtitle": {
+    "description": "Planets page one-line summary on the data hub"
+  },
+  "planetsSectionTonight": "Right now",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "Up",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "Below",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "In glare",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "Magnitude",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "Elongation",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "Sky",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "Evening",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "Morning",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "Distance",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "au",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "Altitude",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "Mercury",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "Venus",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "Mars",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "Jupiter",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "Saturn",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "Uranus",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "Neptune",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "Vernal Equinox",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "Pure Brightness",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "Grain Rain",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "Start of Summer",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "Grain Full",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "Grain in Ear",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "Summer Solstice",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "Minor Heat",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "Major Heat",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "Start of Autumn",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "End of Heat",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "White Dew",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "Autumnal Equinox",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "Cold Dew",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "Frost Descent",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "Start of Winter",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "Minor Snow",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "Major Snow",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "Winter Solstice",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "Minor Cold",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "Major Cold",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "Start of Spring",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "Rain Water",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "Awakening of Insects",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
   }
 }

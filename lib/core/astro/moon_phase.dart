@@ -10,6 +10,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:dpip/core/astro/astro_time.dart';
 import 'package:dpip/core/astro/moon_ephemeris.dart';
 
 /// The synodic month — mean Earth days between identical phases.

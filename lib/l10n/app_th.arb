@@ -928,6 +928,9 @@
   "reportFilterLocationHint": "เช่น ฮวาเหลียน",
   "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
+  "meshtasticDistance": "ระยะทาง",
+  "meshtasticSnrTrend": "แนวโน้มสัญญาณ (SNR)",
+  "meshtasticBatteryTrend": "แนวโน้มแบตเตอรี่",
   "typhoonOverlayMenuTooltip": "Typhoon overlay options",
   "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
   "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
@@ -1092,5 +1095,265 @@
   "moonNoEvent": "ไม่มีในวันนี้",
   "@moonNoEvent": {
     "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "ดวงอาทิตย์",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSubtitle": "พระอาทิตย์ขึ้น สนธยา และปักษ์",
+  "@sunSubtitle": {
+    "description": "Sun page one-line summary on the data hub"
+  },
+  "sunSectionDaylight": "แสงกลางวัน",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "สนธยา",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "แสง",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "นาฬิกาแดด",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "ปักษ์",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "พระอาทิตย์ขึ้น",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "พระอาทิตย์ตก",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "เที่ยงสุริยะ",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "ความยาววัน",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "พลเรือน",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "เดินเรือ",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "ดาราศาสตร์",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "โกลเดนอาวร์เช้า",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "โกลเดนอาวร์เย็น",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "บลูอาวร์",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "สมการเวลา",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "นาที",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "ปักษ์ถัดไป",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "ดาวเคราะห์",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSubtitle": "คืนนี้อยู่ไหน สว่างแค่ไหน",
+  "@planetsSubtitle": {
+    "description": "Planets page one-line summary on the data hub"
+  },
+  "planetsSectionTonight": "ขณะนี้",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "เหนือขอบฟ้า",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "ใต้ขอบฟ้า",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "ใกล้ดวงอาทิตย์",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "โชติมาตร",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "มุมห่าง",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "ช่วงเวลา",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "หัวค่ำ",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "ก่อนรุ่ง",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "ระยะทาง",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "au",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "มุมเงย",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "พุธ",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "ศุกร์",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "อังคาร",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "พฤหัสบดี",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "เสาร์",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "ยูเรนัส",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "เนปจูน",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "วสันตวิษุวัต",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "เช็งเม้ง",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "ฝนธัญพืช",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "เริ่มฤดูร้อน",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "ธัญพืชเต็ม",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "ธัญพืชออกรวง",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "ครีษมายัน",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "ร้อนน้อย",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "ร้อนมาก",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "เริ่มฤดูใบไม้ร่วง",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "สิ้นสุดความร้อน",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "น้ำค้างขาว",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "ศารทวิษุวัต",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "น้ำค้างเย็น",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "น้ำค้างแข็ง",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "เริ่มฤดูหนาว",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "หิมะน้อย",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "หิมะมาก",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "เหมายัน",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "หนาวน้อย",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "หนาวมาก",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "เริ่มฤดูใบไม้ผลิ",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "ฝนน้ำ",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "แมลงตื่น",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
   }
 }

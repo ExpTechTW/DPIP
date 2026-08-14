@@ -1872,6 +1872,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticBattery => 'Battery';
 
   @override
+  String get meshtasticDistance => 'Khoảng cách';
+
+  @override
+  String get meshtasticSnrTrend => 'Xu hướng tín hiệu (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => 'Xu hướng pin';
+
+  @override
   String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
 
   @override
@@ -2153,4 +2162,199 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moonNoEvent => 'Không có hôm nay';
+
+  @override
+  String get sunTitle => 'Mặt Trời';
+
+  @override
+  String get sunSubtitle => 'Bình minh, hoàng hôn và tiết khí';
+
+  @override
+  String get sunSectionDaylight => 'Ánh sáng ban ngày';
+
+  @override
+  String get sunSectionTwilight => 'Hoàng hôn';
+
+  @override
+  String get sunSectionLight => 'Ánh sáng';
+
+  @override
+  String get sunSectionSundial => 'Đồng hồ mặt trời';
+
+  @override
+  String get sunSectionTerms => 'Tiết khí';
+
+  @override
+  String get sunRise => 'Mặt Trời mọc';
+
+  @override
+  String get sunSet => 'Mặt Trời lặn';
+
+  @override
+  String get sunNoon => 'Chính ngọ';
+
+  @override
+  String get sunDayLength => 'Độ dài ngày';
+
+  @override
+  String get sunTwilightCivil => 'Dân dụng';
+
+  @override
+  String get sunTwilightNautical => 'Hàng hải';
+
+  @override
+  String get sunTwilightAstronomical => 'Thiên văn';
+
+  @override
+  String get sunGoldenHourMorning => 'Giờ vàng buổi sáng';
+
+  @override
+  String get sunGoldenHourEvening => 'Giờ vàng buổi chiều';
+
+  @override
+  String get sunBlueHour => 'Giờ xanh';
+
+  @override
+  String get sunEquationOfTime => 'Phương trình thời gian';
+
+  @override
+  String get sunMinutes => 'phút';
+
+  @override
+  String get solarTermNext => 'Tiết khí tiếp theo';
+
+  @override
+  String get planetsTitle => 'Hành tinh';
+
+  @override
+  String get planetsSubtitle => 'Đêm nay ở đâu, sáng bao nhiêu';
+
+  @override
+  String get planetsSectionTonight => 'Hiện tại';
+
+  @override
+  String get planetUp => 'Trên chân trời';
+
+  @override
+  String get planetDown => 'Dưới chân trời';
+
+  @override
+  String get planetInGlare => 'Quá gần Mặt Trời';
+
+  @override
+  String get planetMagnitude => 'Cấp sao';
+
+  @override
+  String get planetElongation => 'Ly giác';
+
+  @override
+  String get planetSky => 'Thời điểm';
+
+  @override
+  String get planetEvening => 'Sao Hôm';
+
+  @override
+  String get planetMorning => 'Sao Mai';
+
+  @override
+  String get planetDistance => 'Khoảng cách';
+
+  @override
+  String get planetAu => 'au';
+
+  @override
+  String get planetAltitude => 'Độ cao';
+
+  @override
+  String get planetMercury => 'Sao Thủy';
+
+  @override
+  String get planetVenus => 'Sao Kim';
+
+  @override
+  String get planetMars => 'Sao Hỏa';
+
+  @override
+  String get planetJupiter => 'Sao Mộc';
+
+  @override
+  String get planetSaturn => 'Sao Thổ';
+
+  @override
+  String get planetUranus => 'Sao Thiên Vương';
+
+  @override
+  String get planetNeptune => 'Sao Hải Vương';
+
+  @override
+  String get solarTermVernalEquinox => 'Xuân phân';
+
+  @override
+  String get solarTermPureBrightness => 'Thanh minh';
+
+  @override
+  String get solarTermGrainRain => 'Cốc vũ';
+
+  @override
+  String get solarTermStartOfSummer => 'Lập hạ';
+
+  @override
+  String get solarTermGrainFull => 'Tiểu mãn';
+
+  @override
+  String get solarTermGrainInEar => 'Mang chủng';
+
+  @override
+  String get solarTermSummerSolstice => 'Hạ chí';
+
+  @override
+  String get solarTermMinorHeat => 'Tiểu thử';
+
+  @override
+  String get solarTermMajorHeat => 'Đại thử';
+
+  @override
+  String get solarTermStartOfAutumn => 'Lập thu';
+
+  @override
+  String get solarTermEndOfHeat => 'Xử thử';
+
+  @override
+  String get solarTermWhiteDew => 'Bạch lộ';
+
+  @override
+  String get solarTermAutumnalEquinox => 'Thu phân';
+
+  @override
+  String get solarTermColdDew => 'Hàn lộ';
+
+  @override
+  String get solarTermFrostDescent => 'Sương giáng';
+
+  @override
+  String get solarTermStartOfWinter => 'Lập đông';
+
+  @override
+  String get solarTermMinorSnow => 'Tiểu tuyết';
+
+  @override
+  String get solarTermMajorSnow => 'Đại tuyết';
+
+  @override
+  String get solarTermWinterSolstice => 'Đông chí';
+
+  @override
+  String get solarTermMinorCold => 'Tiểu hàn';
+
+  @override
+  String get solarTermMajorCold => 'Đại hàn';
+
+  @override
+  String get solarTermStartOfSpring => 'Lập xuân';
+
+  @override
+  String get solarTermRainWater => 'Vũ thủy';
+
+  @override
+  String get solarTermAwakeningOfInsects => 'Kinh trập';
 }

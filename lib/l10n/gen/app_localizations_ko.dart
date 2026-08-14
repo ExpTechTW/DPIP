@@ -1848,6 +1848,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticBattery => 'Battery';
 
   @override
+  String get meshtasticDistance => '거리';
+
+  @override
+  String get meshtasticSnrTrend => '신호 추이 (SNR)';
+
+  @override
+  String get meshtasticBatteryTrend => '배터리 추이';
+
+  @override
   String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
 
   @override
@@ -2128,4 +2137,199 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moonNoEvent => '해당 없음';
+
+  @override
+  String get sunTitle => '태양';
+
+  @override
+  String get sunSubtitle => '일출·박명·절기';
+
+  @override
+  String get sunSectionDaylight => '일조';
+
+  @override
+  String get sunSectionTwilight => '박명';
+
+  @override
+  String get sunSectionLight => '빛';
+
+  @override
+  String get sunSectionSundial => '해시계';
+
+  @override
+  String get sunSectionTerms => '절기';
+
+  @override
+  String get sunRise => '일출';
+
+  @override
+  String get sunSet => '일몰';
+
+  @override
+  String get sunNoon => '남중';
+
+  @override
+  String get sunDayLength => '낮 길이';
+
+  @override
+  String get sunTwilightCivil => '시민';
+
+  @override
+  String get sunTwilightNautical => '항해';
+
+  @override
+  String get sunTwilightAstronomical => '천문';
+
+  @override
+  String get sunGoldenHourMorning => '아침 골든아워';
+
+  @override
+  String get sunGoldenHourEvening => '저녁 골든아워';
+
+  @override
+  String get sunBlueHour => '블루아워';
+
+  @override
+  String get sunEquationOfTime => '균시차';
+
+  @override
+  String get sunMinutes => '분';
+
+  @override
+  String get solarTermNext => '다음 절기';
+
+  @override
+  String get planetsTitle => '행성';
+
+  @override
+  String get planetsSubtitle => '오늘 밤 위치와 밝기';
+
+  @override
+  String get planetsSectionTonight => '현재';
+
+  @override
+  String get planetUp => '지평선 위';
+
+  @override
+  String get planetDown => '지평선 아래';
+
+  @override
+  String get planetInGlare => '태양에 근접';
+
+  @override
+  String get planetMagnitude => '등급';
+
+  @override
+  String get planetElongation => '이각';
+
+  @override
+  String get planetSky => '시간대';
+
+  @override
+  String get planetEvening => '초저녁';
+
+  @override
+  String get planetMorning => '새벽';
+
+  @override
+  String get planetDistance => '거리';
+
+  @override
+  String get planetAu => 'au';
+
+  @override
+  String get planetAltitude => '고도';
+
+  @override
+  String get planetMercury => '수성';
+
+  @override
+  String get planetVenus => '금성';
+
+  @override
+  String get planetMars => '화성';
+
+  @override
+  String get planetJupiter => '목성';
+
+  @override
+  String get planetSaturn => '토성';
+
+  @override
+  String get planetUranus => '천왕성';
+
+  @override
+  String get planetNeptune => '해왕성';
+
+  @override
+  String get solarTermVernalEquinox => '춘분';
+
+  @override
+  String get solarTermPureBrightness => '청명';
+
+  @override
+  String get solarTermGrainRain => '곡우';
+
+  @override
+  String get solarTermStartOfSummer => '입하';
+
+  @override
+  String get solarTermGrainFull => '소만';
+
+  @override
+  String get solarTermGrainInEar => '망종';
+
+  @override
+  String get solarTermSummerSolstice => '하지';
+
+  @override
+  String get solarTermMinorHeat => '소서';
+
+  @override
+  String get solarTermMajorHeat => '대서';
+
+  @override
+  String get solarTermStartOfAutumn => '입추';
+
+  @override
+  String get solarTermEndOfHeat => '처서';
+
+  @override
+  String get solarTermWhiteDew => '백로';
+
+  @override
+  String get solarTermAutumnalEquinox => '추분';
+
+  @override
+  String get solarTermColdDew => '한로';
+
+  @override
+  String get solarTermFrostDescent => '상강';
+
+  @override
+  String get solarTermStartOfWinter => '입동';
+
+  @override
+  String get solarTermMinorSnow => '소설';
+
+  @override
+  String get solarTermMajorSnow => '대설';
+
+  @override
+  String get solarTermWinterSolstice => '동지';
+
+  @override
+  String get solarTermMinorCold => '소한';
+
+  @override
+  String get solarTermMajorCold => '대한';
+
+  @override
+  String get solarTermStartOfSpring => '입춘';
+
+  @override
+  String get solarTermRainWater => '우수';
+
+  @override
+  String get solarTermAwakeningOfInsects => '경칩';
 }
