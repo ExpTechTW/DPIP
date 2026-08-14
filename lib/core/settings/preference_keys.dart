@@ -109,6 +109,23 @@ abstract final class PreferenceKeys {
     'location.deviceLocationUpdatedAtMs',
   );
 
+  /// The radio `MeshLink` keeps reconnecting to (BLE id), and its name for
+  /// display. Their presence *is* the intent to stay connected — removed by
+  /// `MeshLink.detach()`, which is the only thing that stops reconnection.
+  static const PrefKey<String> meshDeviceId = PrefKey<String>._(
+    'meshtastic.deviceId',
+  );
+  static const PrefKey<String> meshDeviceName = PrefKey<String>._(
+    'meshtastic.deviceName',
+  );
+
+  /// The mesh message log — the most recent messages as JSON strings, newest
+  /// first. See `MeshChatController`. The radio's own replay queue is small,
+  /// shared with telemetry, and lost on reboot, so the log is kept here.
+  static const PrefKey<List<String>> meshMessages = PrefKey<List<String>>._(
+    'meshtastic.messages',
+  );
+
   /// Selected LB / Core API region. See `RegionSelection`.
   ///
   /// Colon-form kept as-is (pre-existing storage address).

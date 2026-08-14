@@ -17,6 +17,9 @@ import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
+import 'package:dpip/core/meshtastic/data/meshtastic_client_impl.dart';
+import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -41,6 +44,7 @@ import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
+import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
@@ -179,6 +183,12 @@ Future<void> bootstrap() async {
     regions: regionStore,
   );
 
+  // The mesh link is app-wide, not page-owned: a radio stays attached (and
+  // keeps reconnecting) for the whole app session, because it is a reception
+  // path for disaster information. `start()` picks a saved radio back up.
+  final meshtastic = MeshtasticClientImpl();
+  final meshLink = MeshLink(meshtastic, prefs);
+
   final deps = SharedDeps(
     prefs: prefs,
     apiClient: apiClient,
@@ -199,10 +209,17 @@ Future<void> bootstrap() async {
     theme: theme,
     defaultMapLayer: defaultMapLayer,
     mapLayerOrder: mapLayerOrder,
+    meshtastic: meshtastic,
+    meshLink: meshLink,
+    meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,
   );
+
+  // Reconnects to the saved radio, if there is one. Deliberately not awaited:
+  // BLE takes seconds and the first frame must not wait for it.
+  meshLink.start();
 
   // Each feature turns [deps] into its providers (and registers its realtime
   // channels). Adding a feature = one line here + its `*Providers` function.
@@ -219,6 +236,7 @@ Future<void> bootstrap() async {
         ...eventsProviders(deps),
         ...changelogProviders(deps),
         ...notificationProviders(deps),
+        ...meshtasticProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
       ],

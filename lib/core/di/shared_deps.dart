@@ -3,6 +3,9 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -50,6 +53,9 @@ class SharedDeps {
     required this.theme,
     required this.defaultMapLayer,
     required this.mapLayerOrder,
+    required this.meshtastic,
+    required this.meshLink,
+    required this.meshGateway,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
@@ -117,6 +123,16 @@ class SharedDeps {
 
   /// User-customised map layer-picker order (also provided).
   final MapLayerOrderController mapLayerOrder;
+
+  /// LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging.
+  final MeshtasticService meshtastic;
+
+  /// Keeps the chosen radio attached across pages, drops and app restarts, and
+  /// provisions it for DPIP.
+  final MeshLink meshLink;
+
+  /// DPIP disaster payloads in and out of the mesh — the seam feeds use.
+  final DpipMeshGateway meshGateway;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

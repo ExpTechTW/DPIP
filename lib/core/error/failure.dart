@@ -36,3 +36,29 @@ final class NoDataFailure extends Failure {
 final class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message);
 }
+
+/// A LoRa radio has no free channel slot left for DPIP's own channel.
+///
+/// Its own type because the recovery is specific and human: DPIP never
+/// overwrites a channel the user configured, so someone has to free a slot.
+final class MeshChannelNoSlotFailure extends Failure {
+  const MeshChannelNoSlotFailure(super.message);
+}
+
+/// A channel with DPIP's name already exists on the radio with a different key.
+///
+/// Left for the user to resolve on purpose: writing a channel replaces the
+/// whole slot, so "fixing" it would swap their key for the published default
+/// one — and a licensed radio, which strips PSKs by itself, would turn that fix
+/// into an endless rewrite-and-reboot loop.
+final class MeshChannelConflictFailure extends Failure {
+  const MeshChannelConflictFailure(super.message);
+}
+
+/// The OS refused a permission the operation needs (Bluetooth, location…).
+///
+/// Distinct from other failures so a UI can guide the user to system settings
+/// when the permission was permanently denied (which a plain retry can't fix).
+final class PermissionDeniedFailure extends Failure {
+  const PermissionDeniedFailure(super.message);
+}

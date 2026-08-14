@@ -3,6 +3,9 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -43,6 +46,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
+  Provider<MeshtasticService>.value(value: deps.meshtastic),
+  ChangeNotifierProvider<MeshLink>.value(value: deps.meshLink),
+  Provider<DpipMeshGateway>.value(value: deps.meshGateway),
   Provider<ApiClient>.value(value: deps.apiClient),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),

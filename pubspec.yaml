@@ -29,6 +29,9 @@ dependencies:
   in_app_purchase: ^3.3.0
   intl: ^0.20.2
   json_annotation: ^4.12.0
+  # Direct dep: MeshtasticClientImpl bridges the vendored package's
+  # `package:logging` records into the app Log.
+  logging: ^1.3.0
   # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix
   # + setRenderPaused (pause native render loop for hidden tabs).
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
@@ -52,6 +55,19 @@ dependencies:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
       ref: 0674b9be9f4dc2ee7146d528ed9225bb0ce86baf
+  # LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging. Requires
+  # Bluetooth + location permissions (Android manifest / iOS Info.plist below).
+  # Vendored (third_party/) with two upstream fixes: requestMtu is skipped off
+  # Android (CoreBluetooth negotiates MTU; flutter_blue_plus throws there) and
+  # text/JSON payloads decode as UTF-8 (fromCharCodes garbles CJK).
+  meshtastic_flutter:
+    path: third_party/meshtastic_flutter
+  # Direct dep: MeshtasticClientImpl's device map holds flutter_blue_plus's
+  # BluetoothDevice (meshtastic_flutter doesn't re-export it).
+  flutter_blue_plus: ^1.36.8
+  # Direct dep: the impl requests Bluetooth/location permissions itself so a
+  # denial surfaces a typed failure with a settings path.
+  permission_handler: ^12.0.3
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1
