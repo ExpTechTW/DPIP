@@ -57,6 +57,17 @@ class FakeMeshService implements MeshtasticService {
   @override
   Stream<MeshDataPacket> get dataStream => data.stream;
 
+  final traffics = StreamController<MeshTraffic>.broadcast();
+
+  @override
+  MeshTraffic traffic = const MeshTraffic();
+
+  @override
+  Stream<MeshTraffic> get trafficStream => traffics.stream;
+
+  @override
+  MeshRadioInfo? radioInfo;
+
   @override
   Future<Result<void>> initialize() async => const Ok(null);
 
