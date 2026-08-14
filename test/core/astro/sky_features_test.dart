@@ -14,6 +14,8 @@ import 'package:dpip/core/astro/meteor_showers.dart';
 import 'package:dpip/core/astro/moon_phase.dart';
 import 'package:dpip/core/astro/moon_rise_set.dart';
 import 'package:dpip/core/astro/night_window.dart';
+import 'package:dpip/core/astro/sun_ephemeris.dart';
+import 'package:dpip/core/astro/sun_events.dart';
 import 'package:dpip/core/astro/tidal_forcing.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -93,21 +95,18 @@ void main() {
       // The Quadrantids run 28 December to 12 January — a window that a naive
       // month comparison drops entirely.
       expect(
-        MeteorShowerConditions.activeOn(
-          DateTime.utc(2026, 1, 3),
-        ).map((s) => s.id),
+        MeteorShowerConditions.activeOn(DateTime.utc(2026, 1, 3))
+            .map((s) => s.id),
         contains('quadrantids'),
       );
       expect(
-        MeteorShowerConditions.activeOn(
-          DateTime.utc(2025, 12, 30),
-        ).map((s) => s.id),
+        MeteorShowerConditions.activeOn(DateTime.utc(2025, 12, 30))
+            .map((s) => s.id),
         contains('quadrantids'),
       );
       expect(
-        MeteorShowerConditions.activeOn(
-          DateTime.utc(2026, 3, 1),
-        ).map((s) => s.id),
+        MeteorShowerConditions.activeOn(DateTime.utc(2026, 3, 1))
+            .map((s) => s.id),
         isEmpty,
       );
     });
@@ -212,21 +211,47 @@ void main() {
 
   group('tidal forcing', () {
     test('the Sun raises 46% of the Moon\'s tide', () {
-      // The one number here that can be checked against a textbook with no
-      // ocean in the way. Compared at the sub-solar and sub-lunar points by
-      // taking the amplitude ratio over a long run.
-      var lunarPeak = 0.0;
-      var solarPeak = 0.0;
-      for (var hours = 0; hours < 24 * 40; hours++) {
-        final forcing = TidalForcing.at(
-          DateTime.utc(2026).add(Duration(hours: hours)),
-          latitude: _taipei.latitude,
-          longitude: _taipei.longitude,
-        );
-        lunarPeak = math.max(lunarPeak, forcing.lunarMetres);
-        solarPeak = math.max(solarPeak, forcing.solarMetres);
+      // The one number here checkable against a textbook with no ocean in the
+      // way. Compared with the geometry and the distance law divided out —
+      // taking raw peaks instead would compare the Moon near perigee against
+      // the Sun near aphelion, since the Sun only passes overhead at Taipei in
+      // June when the Earth is furthest away.
+      final at = DateTime.utc(2026, 5, 3, 7);
+      final forcing = TidalForcing.at(
+        at,
+        latitude: _taipei.latitude,
+        longitude: _taipei.longitude,
+      );
+
+      double potential(double altitude) {
+        final cosZenith = math.sin(altitude);
+        return (3 * cosZenith * cosZenith - 1) / 2;
       }
-      expect(solarPeak / lunarPeak, closeTo(0.46, 0.06));
+
+      final moonAltitude = MoonRiseSet.lookFrom(
+        at,
+        latitude: _taipei.latitude,
+        longitude: _taipei.longitude,
+      ).altitude;
+      final sunAltitude = SunEvents.lookFrom(
+        at,
+        latitude: _taipei.latitude,
+        longitude: _taipei.longitude,
+      ).altitude;
+      final sunDistance = SunEphemeris.at(at).distanceKm;
+
+      final lunarCoefficient =
+          forcing.lunarMetres /
+          potential(moonAltitude) /
+          forcing.distanceFactor;
+      final solarCoefficient =
+          forcing.solarMetres /
+          potential(sunAltitude) /
+          math.pow(astronomicalUnitKm / sunDistance, 3);
+
+      expect(lunarCoefficient, closeTo(0.358, 0.001));
+      expect(solarCoefficient, closeTo(0.164, 0.001));
+      expect(solarCoefficient / lunarCoefficient, closeTo(0.46, 0.01));
     });
 
     test('spring tides fall at new and full moon', () {
