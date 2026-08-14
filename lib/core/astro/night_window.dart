@@ -61,10 +61,8 @@ class NightConditions {
       : darkWindows.reduce((a, b) => a.length >= b.length ? a : b);
 
   /// Total dark time.
-  Duration get totalDark => darkWindows.fold(
-    Duration.zero,
-    (sum, window) => sum + window.length,
-  );
+  Duration get totalDark =>
+      darkWindows.fold(Duration.zero, (sum, window) => sum + window.length);
 
   /// Conditions for the night starting at [from] — pass the UTC instant the
   /// local day begins, as the other astronomy pages do.

@@ -26,6 +26,7 @@ class BundledTleSource implements TleSource {
   const BundledTleSource();
 
   @override
-  Future<List<TleSet>> load() async =>
-      TleSet.parseAll(await rootBundle.loadString('assets/astro/satellites.tle'));
+  Future<List<TleSet>> load() async => TleSet.parseAll(
+    await rootBundle.loadString('assets/astro/satellites.tle'),
+  );
 }

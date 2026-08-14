@@ -107,8 +107,7 @@ class TleSet {
     final dayOfYear = epochField - twoDigitYear * 1000;
     final epoch = DateTime.utc(year).add(
       Duration(
-        microseconds:
-            ((dayOfYear - 1) * Duration.microsecondsPerDay).round(),
+        microseconds: ((dayOfYear - 1) * Duration.microsecondsPerDay).round(),
       ),
     );
 
@@ -179,7 +178,10 @@ class Sgp4 {
     final delta1 = tempA / (a1 * a1);
     final a0 =
         a1 *
-        (1 - delta1 / 3 - delta1 * delta1 - 134 / 81 * delta1 * delta1 * delta1);
+        (1 -
+            delta1 / 3 -
+            delta1 * delta1 -
+            134 / 81 * delta1 * delta1 * delta1);
     final delta0 = tempA / (a0 * a0);
     _meanMotion = elements.meanMotion / (1 + delta0);
     _semiMajorAxis = a0 / (1 - delta0);
@@ -205,8 +207,7 @@ class Sgp4 {
     final c2 =
         coef1 *
         _meanMotion *
-        (_semiMajorAxis *
-                (1 + 1.5 * etaSquared + eeta * (4 + etaSquared)) +
+        (_semiMajorAxis * (1 + 1.5 * etaSquared + eeta * (4 + etaSquared)) +
             1.5 *
                 _k2 *
                 xi /
@@ -259,41 +260,46 @@ class Sgp4 {
         (1 +
             3 * _k2 * (-1 + 3 * theta2) / (2 * a2 * betaSquared * beta0) +
             3 *
-                    _k2 *
-                    _k2 *
-                    (13 - 78 * theta2 + 137 * theta2 * theta2) /
-                    (16 * a4 * beta4 * betaSquared * beta0));
+                _k2 *
+                _k2 *
+                (13 - 78 * theta2 + 137 * theta2 * theta2) /
+                (16 * a4 * beta4 * betaSquared * beta0));
     _perigeeDot =
         _meanMotion *
         (-3 * _k2 * (1 - 5 * theta2) / (2 * a2 * beta4) +
             3 *
-                    _k2 *
-                    _k2 *
-                    (7 - 114 * theta2 + 395 * theta2 * theta2) /
-                    (16 * a4 * beta4 * beta4) +
+                _k2 *
+                _k2 *
+                (7 - 114 * theta2 + 395 * theta2 * theta2) /
+                (16 * a4 * beta4 * beta4) +
             5 *
-                    _k4 *
-                    (3 - 36 * theta2 + 49 * theta2 * theta2) /
-                    (4 * a4 * beta4 * beta4));
+                _k4 *
+                (3 - 36 * theta2 + 49 * theta2 * theta2) /
+                (4 * a4 * beta4 * beta4));
     _nodeDot =
         _meanMotion *
         (-3 * _k2 * cosInclination / (a2 * beta4) +
             3 *
-                    _k2 *
-                    _k2 *
-                    (4 * cosInclination - 19 * theta2 * cosInclination) /
-                    (2 * a4 * beta4 * beta4) +
+                _k2 *
+                _k2 *
+                (4 * cosInclination - 19 * theta2 * cosInclination) /
+                (2 * a4 * beta4 * beta4) +
             5 *
-                    _k4 *
-                    cosInclination *
-                    (3 - 7 * theta2) /
-                    (2 * a4 * beta4 * beta4));
+                _k4 *
+                cosInclination *
+                (3 - 7 * theta2) /
+                (2 * a4 * beta4 * beta4));
 
     _d2 = 4 * _semiMajorAxis * xi * _c1 * _c1;
     final temp = _d2 * xi * _c1 / 3;
     _d3 = (17 * _semiMajorAxis + s) * temp;
     _d4 =
-        0.5 * temp * _semiMajorAxis * xi * (221 * _semiMajorAxis + 31 * s) * _c1;
+        0.5 *
+        temp *
+        _semiMajorAxis *
+        xi *
+        (221 * _semiMajorAxis + 31 * s) *
+        _c1;
 
     _xi = xi;
     _eta = eta;
@@ -336,10 +342,8 @@ class Sgp4 {
     final perigeeDf = elements.argumentOfPerigee + _perigeeDot * t;
     final nodeDf = elements.rightAscensionOfNode + _nodeDot * t;
 
-    final deltaPerigee = elements.bstar *
-        _c3 *
-        math.cos(elements.argumentOfPerigee) *
-        t;
+    final deltaPerigee =
+        elements.bstar * _c3 * math.cos(elements.argumentOfPerigee) * t;
     final deltaMean = e0 > 1e-4
         ? -2 /
               3 *
@@ -455,15 +459,13 @@ class Sgp4 {
         r * (1 - 1.5 * _k2 * betaL / (pl * pl) * (3 * theta2 - 1)) +
         0.5 * _k2 / pl * (1 - theta2) * cos2u;
     final uk = uAngle - 0.25 * _k2 / (pl * pl) * (7 * theta2 - 1) * sin2u;
-    final nodek =
-        node + 1.5 * _k2 * _theta / (pl * pl) * sin2u;
+    final nodek = node + 1.5 * _k2 * _theta / (pl * pl) * sin2u;
     final inclinationk =
         elements.inclination +
         1.5 * _k2 * _theta * math.sin(elements.inclination) / (pl * pl) * cos2u;
     final rdotk = rdot - _k2 * n / pl * (1 - theta2) * sin2u;
     final rfdotk =
-        rfdot +
-        _k2 * n / pl * ((1 - theta2) * cos2u + 1.5 * (1 - 3 * theta2));
+        rfdot + _k2 * n / pl * ((1 - theta2) * cos2u + 1.5 * (1 - 3 * theta2));
 
     // Orientation vectors.
     final sinuk = math.sin(uk);
@@ -533,7 +535,8 @@ class Sgp4 {
     final cosTheta = math.cos(localSidereal);
     final south = sinPhi * cosTheta * rx + sinPhi * sinTheta * ry - cosPhi * rz;
     final east = -sinTheta * rx + cosTheta * ry;
-    final zenith = cosPhi * cosTheta * rx + cosPhi * sinTheta * ry + sinPhi * rz;
+    final zenith =
+        cosPhi * cosTheta * rx + cosPhi * sinTheta * ry + sinPhi * rz;
 
     final range = math.sqrt(south * south + east * east + zenith * zenith);
     return Horizontal(
@@ -588,11 +591,7 @@ abstract final class SatellitePasses {
     var bestAt = from;
     var bestAzimuth = 0.0;
 
-    for (
-      var at = from;
-      at.isBefore(from.add(window));
-      at = at.add(step)
-    ) {
+    for (var at = from; at.isBefore(from.add(window)); at = at.add(step)) {
       final look = satellite.lookFrom(
         at,
         latitude: latitude,

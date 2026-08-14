@@ -187,9 +187,7 @@ class Observer {
     // The observer's distance from the Earth's centre, split into its
     // equatorial and polar components (Meeus 11.1); sea level is assumed.
     const flattening = 1 / 298.257223563;
-    final reduced = math.atan(
-      (1 - flattening) * math.tan(_phi),
-    );
+    final reduced = math.atan((1 - flattening) * math.tan(_phi));
     final rhoSin = (1 - flattening) * math.sin(reduced);
     final rhoCos = math.cos(reduced);
 

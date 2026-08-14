@@ -96,10 +96,7 @@ abstract final class Eclipses {
   ///
   /// Lunar eclipses are global: whoever has the Moon above the horizon sees
   /// the same event at the same instant, so nothing here depends on a place.
-  static Eclipse? nextLunar(
-    DateTime utc, {
-    int withinDays = 400,
-  }) {
+  static Eclipse? nextLunar(DateTime utc, {int withinDays = 400}) {
     var full = MoonPhase.nextFullMoon(utc);
     final limit = utc.add(Duration(days: withinDays));
     while (full.isBefore(limit)) {
@@ -119,7 +116,8 @@ abstract final class Eclipses {
 
     final moonSemidiameter = moon.angularDiameter / 2;
     final sunSemidiameter = sun.angularDiameter / 2;
-    final solarParallax = _solarParallax / (sun.distanceKm / astronomicalUnitKm);
+    final solarParallax =
+        _solarParallax / (sun.distanceKm / astronomicalUnitKm);
     // Meeus ch. 54: the shadow's angular radii at the Moon's distance.
     final penumbra =
         _atmosphere * (moon.parallax + solarParallax + sunSemidiameter);
@@ -140,12 +138,7 @@ abstract final class Eclipses {
         : EclipseKind.none;
 
     if (kind == EclipseKind.none) {
-      return Eclipse(
-        kind: kind,
-        peak: peak,
-        magnitude: 0,
-        isSolar: false,
-      );
+      return Eclipse(kind: kind, peak: peak, magnitude: 0, isSolar: false);
     }
 
     // Contacts: where the relevant magnitude passes through zero.

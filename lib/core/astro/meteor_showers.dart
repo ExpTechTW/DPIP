@@ -289,9 +289,7 @@ abstract final class MeteorShowerConditions {
     // The night either side of local midnight at the peak.
     for (var minutes = -8 * 60; minutes <= 8 * 60; minutes += 15) {
       final at = peak.add(Duration(minutes: minutes));
-      final altitude = observer
-          .lookAt(shower.radiantAt(at), at)
-          .altitude;
+      final altitude = observer.lookAt(shower.radiantAt(at), at).altitude;
       if (altitude > bestAltitude) {
         bestAltitude = altitude;
         bestTime = at;

@@ -209,9 +209,7 @@ abstract final class LunisolarCalendar {
     for (var i = 0; i < span; i++) {
       final isLeap = i == leapIndex;
       if (!isLeap && i > 0) number = number % 12 + 1;
-      months.add(
-        _Month(start: starts[i], number: number, isLeap: isLeap),
-      );
+      months.add(_Month(start: starts[i], number: number, isLeap: isLeap));
     }
     // Keep the following month 11 so the caller can measure the last month's
     // length without recomputing the next 歲.

@@ -177,11 +177,7 @@ class TidalForcing {
           Duration(milliseconds: hi.difference(lo).inMilliseconds ~/ 2),
         );
         found.add(
-          TidalExtreme(
-            at: peak,
-            metres: height(peak),
-            isHigh: risingBefore,
-          ),
+          TidalExtreme(at: peak, metres: height(peak), isHigh: risingBefore),
         );
       }
       previous = current;

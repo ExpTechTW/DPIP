@@ -108,8 +108,7 @@ class DeepSkyObject {
                 3600 *
                 degrees,
       ),
-      declination:
-          dec + nArcsec * math.cos(ra) * years / 3600 * degrees,
+      declination: dec + nArcsec * math.cos(ra) * years / 3600 * degrees,
     );
   }
 }
@@ -133,7 +132,15 @@ _messier = [
   (10, 'NGC 6254', '', DeepSkyType.gc, 6.6, 254.2751, -4.1),
   (11, 'NGC 6705', 'Wild Duck Cluster', DeepSkyType.oc, 5.8, 282.775, -6.2667),
   (12, 'NGC 6218', '', DeepSkyType.gc, 6.6, 251.8001, -1.95),
-  (13, 'NGC 6205', 'Great Hercules Cluster', DeepSkyType.gc, 5.9, 250.425, 36.4667),
+  (
+    13,
+    'NGC 6205',
+    'Great Hercules Cluster',
+    DeepSkyType.gc,
+    5.9,
+    250.425,
+    36.4667,
+  ),
   (14, 'NGC 6402', '', DeepSkyType.gc, 7.6, 264.4001, -3.25),
   (15, 'NGC 7078', '', DeepSkyType.gc, 6.4, 322.5, 12.1667),
   (16, 'NGC 6611', 'Eagle Nebula', DeepSkyType.sfr, 6, 274.7, -13.7833),
@@ -196,7 +203,15 @@ _messier = [
   (73, 'NGC 6994', '4 Star asterism', DeepSkyType.pos, 10, 314.7251, -12.6333),
   (74, 'NGC 628', '', DeepSkyType.s, 9.2, 24.1751, 15.7833),
   (75, 'NGC 6864', '', DeepSkyType.gc, 8.6, 301.525, -21.9167),
-  (76, 'NGC 650/1', 'Little Dumbbell Nebula', DeepSkyType.pn, 11.5, 25.6001, 51.5667),
+  (
+    76,
+    'NGC 650/1',
+    'Little Dumbbell Nebula',
+    DeepSkyType.pn,
+    11.5,
+    25.6001,
+    51.5667,
+  ),
   (77, 'NGC 1068', 'Cetus A', DeepSkyType.s, 8.8, 40.6751, -0.0167),
   (78, 'NGC 2068', '', DeepSkyType.rn, 8, 86.675, 0.05),
   (79, 'NGC 1904', '', DeepSkyType.gc, 8, 81.125, -24.55),

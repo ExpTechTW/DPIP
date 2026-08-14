@@ -20,9 +20,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 const _zone = Duration(hours: 8);
 
-LunisolarDate _on(int year, int month, int day) => LunisolarCalendar.of(
-  DateTime.utc(year, month, day, 12).subtract(_zone),
-);
+LunisolarDate _on(int year, int month, int day) =>
+    LunisolarCalendar.of(DateTime.utc(year, month, day, 12).subtract(_zone));
 
 void main() {
   group('LunisolarCalendar', () {
@@ -125,9 +124,12 @@ void main() {
         // shows up as a repeated number flagged 閏.
         for (var day = 0; day < 400; day++) {
           final date = LunisolarCalendar.of(
-            DateTime.utc(entry.key, 1, 20, 12)
-                .add(Duration(days: day))
-                .subtract(_zone),
+            DateTime.utc(
+              entry.key,
+              1,
+              20,
+              12,
+            ).add(Duration(days: day)).subtract(_zone),
           );
           if (date.year != entry.key) continue;
           if (date.isLeapMonth) {

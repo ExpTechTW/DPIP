@@ -80,7 +80,8 @@ class StarCatalog {
         CatalogStar(
           rightAscension:
               starData.getUint16(offset, Endian.little) / 65535 * 360,
-          declination: starData.getInt16(offset + 2, Endian.little) / 32767 * 90,
+          declination:
+              starData.getInt16(offset + 2, Endian.little) / 32767 * 90,
           magnitude: starData.getUint8(offset + 4) / 25 - 2.0,
         ),
       );
