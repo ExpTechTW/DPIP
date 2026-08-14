@@ -17,6 +17,7 @@ void main() {
     double? lat,
     double? lon,
     int? battery,
+    double snr = 0,
     DateTime? heard,
     bool viaMqtt = false,
   }) => MeshNode(
@@ -27,6 +28,7 @@ void main() {
     lastHeard: heard,
     latitude: lat,
     longitude: lon,
+    snr: snr,
     viaMqtt: viaMqtt,
   );
 
@@ -198,5 +200,82 @@ void main() {
     expect(store.nodes, isEmpty);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getStringList('meshtastic.nodes'), isEmpty);
+  });
+
+  group('telemetry history', () {
+    test('records one sample per distinct reading', () async {
+      final (store, service) = await makeStore();
+      service.nodes.add(node(1, snr: -5.0, battery: 80));
+      await Future<void>.delayed(Duration.zero);
+      clock = clock.add(const Duration(minutes: 1));
+      service.nodes.add(node(1, snr: -3.5, battery: 79));
+      await Future<void>.delayed(Duration.zero);
+
+      final history = store.historyOf(1);
+      expect(history, hasLength(2));
+      expect(history.first.snr, -5.0);
+      expect(history.last.snr, -3.5);
+      expect(history.last.battery, 79);
+      expect(
+        history.last.time.difference(history.first.time),
+        const Duration(minutes: 1),
+      );
+    });
+
+    test('a repeated reading only moves the last sample in time', () async {
+      final (store, service) = await makeStore();
+      service.nodes.add(node(1, snr: -5.0, battery: 80));
+      await Future<void>.delayed(Duration.zero);
+      clock = clock.add(const Duration(minutes: 5));
+      // A node burst re-emits the same telemetry; that must not pile up.
+      service.nodes
+        ..add(node(1, snr: -5.0, battery: 80))
+        ..add(node(1, snr: -5.0, battery: 80));
+      await Future<void>.delayed(Duration.zero);
+
+      final history = store.historyOf(1);
+      expect(history, hasLength(1));
+      expect(history.single.time, clock);
+    });
+
+    test('capped at the ring size', () async {
+      final (store, service) = await makeStore();
+      for (var i = 0; i < MeshNodeStore.historyLimit + 10; i++) {
+        service.nodes.add(node(1, snr: -10.0 + i));
+        await Future<void>.delayed(Duration.zero);
+        clock = clock.add(const Duration(seconds: 1));
+      }
+
+      final history = store.historyOf(1);
+      expect(history, hasLength(MeshNodeStore.historyLimit));
+      // The newest survives, the oldest is gone.
+      expect(history.last.snr, -10.0 + MeshNodeStore.historyLimit + 9);
+      expect(history.first.snr, -10.0 + 10);
+    });
+  });
+
+  group('distance to my radio', () {
+    test('measured from the radio node, not the phone', () async {
+      final (store, service) = await makeStore();
+      // My radio sits in Hualien city; the node is 1° north on the same
+      // meridian (~111 km) and 1° east on it (~100 km).
+      service.nodes
+        ..add(node(0x1234, name: 'mine', lat: 24.0, lon: 121.6))
+        ..add(node(1, lat: 25.0, lon: 122.6));
+      await Future<void>.delayed(Duration.zero);
+
+      final km = store.distanceToMyRadioKm(store.byNum(1)!);
+      expect(km, isNotNull);
+      expect(km!, greaterThan(140));
+      expect(km, lessThan(160));
+    });
+
+    test('null without a radio position', () async {
+      final (store, service) = await makeStore();
+      service.nodes.add(node(1, lat: 25.0, lon: 122.6));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(store.distanceToMyRadioKm(store.byNum(1)!), isNull);
+    });
   });
 }

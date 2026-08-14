@@ -147,6 +147,7 @@ class _Body extends StatelessWidget {
             else
               _NodeDetail(
                 node: node,
+                store: store,
                 online: store.isOnline(node),
                 onClose: onClose,
               ),
@@ -160,11 +161,13 @@ class _Body extends StatelessWidget {
 class _NodeDetail extends StatelessWidget {
   const _NodeDetail({
     required this.node,
+    required this.store,
     required this.online,
     required this.onClose,
   });
 
   final MeshNode node;
+  final MeshNodeStore store;
   final bool online;
   final VoidCallback onClose;
 
@@ -294,12 +297,83 @@ class _NodeDetail extends StatelessWidget {
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
+                if (store.distanceToMyRadioKm(node) != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  Icon(
+                    Icons.near_me_outlined,
+                    size: 14,
+                    color: colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    '${l10n.meshtasticDistance} '
+                    // l10n-ignore: metric distance readout
+                    '${_formatKm(store.distanceToMyRadioKm(node)!)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
               ],
             ),
           ],
+
+          // 5. Trends — the last hour of this node's own telemetry, so SNR
+          //    and battery read as a story rather than a single number.
+          ..._trends(context),
         ],
       ),
     );
+  }
+
+  List<Widget> _trends(BuildContext context) {
+    final samples = store.historyOf(node.num);
+    if (samples.length < 2) return const [];
+
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final snr = [
+      for (final s in samples)
+        if (s.snr != 0) s.snr,
+    ];
+    final battery = [
+      for (final s in samples)
+        if (s.battery != null && s.battery! <= 100) s.battery!.toDouble(),
+    ];
+    if (snr.length < 2 && battery.length < 2) return const [];
+
+    return [
+      const SizedBox(height: AppSpacing.lg),
+      if (snr.length >= 2) ...[
+        _TrendBlock(
+          icon: Icons.network_check_outlined,
+          label: l10n.meshtasticSnrTrend,
+          // l10n-ignore: decibel unit
+          unit: ' dB',
+          values: snr,
+          tone: online ? colors.primary : colors.outline,
+        ),
+        const SizedBox(height: AppSpacing.md),
+      ],
+      if (battery.length >= 2)
+        _TrendBlock(
+          icon: Icons.battery_std_outlined,
+          label: l10n.meshtasticBatteryTrend,
+          // l10n-ignore: percent unit
+          unit: '%',
+          values: battery,
+          tone: colors.tertiary,
+        ),
+    ];
+  }
+
+  // l10n-ignore: compact distance readout
+  String _formatKm(double km) {
+    if (km < 1) return '${(km * 1000).round()} m';
+    if (km < 100) return '${km.toStringAsFixed(1)} km';
+    return '${km.round()} km';
   }
 
   // l10n-ignore: compact age readout
@@ -385,4 +459,126 @@ class _Metric extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A labelled sparkline: the trend's name and current value on top, the line
+/// itself below. Deliberately not a fl_chart — a 2-line plot needs no axes,
+/// no tooltips, and no dependency draw, just a painter.
+class _TrendBlock extends StatelessWidget {
+  const _TrendBlock({
+    required this.icon,
+    required this.label,
+    required this.unit,
+    required this.values,
+    required this.tone,
+  });
+
+  final IconData icon;
+  final String label;
+  final String unit;
+  final List<double> values;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 14, color: colors.onSurfaceVariant),
+            const SizedBox(width: AppSpacing.xs),
+            Text(label, style: theme.textTheme.labelMedium),
+            const Spacer(),
+            Text(
+              // l10n-ignore: current-value readout
+              '${values.last.toStringAsFixed(values.last.abs() < 100 ? 1 : 0)}'
+              '$unit',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: tone,
+                fontWeight: FontWeight.w600,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SizedBox(
+          height: 44,
+          width: double.infinity,
+          child: CustomPaint(
+            painter: _SparklinePainter(values: values, tone: tone),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Draws a thin line through [values] with a soft fill beneath it, scaled so
+/// the extremes sit on the block's top and bottom edges — a flat line should
+/// still fill the block, or the eye reads it as "nothing happened".
+class _SparklinePainter extends CustomPainter {
+  const _SparklinePainter({required this.values, required this.tone});
+
+  final List<double> values;
+  final Color tone;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var lo = values.first, hi = values.first;
+    for (final v in values) {
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (hi - lo < 1e-9) {
+      // A perfectly flat series needs a band to breathe in, or the line is
+      // invisible against the fill.
+      lo -= 1;
+      hi += 1;
+    }
+    final span = hi - lo;
+
+    Offset point(int i) {
+      final x = size.width * i / (values.length - 1);
+      final y = size.height - size.height * (values[i] - lo) / span;
+      return Offset(x, y);
+    }
+
+    final path = Path()..moveTo(point(0).dx, point(0).dy);
+    for (var i = 1; i < values.length; i++) {
+      path.lineTo(point(i).dx, point(i).dy);
+    }
+
+    final fill = Path.from(path)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(
+      fill,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [tone.withValues(alpha: 0.22), tone.withValues(alpha: 0.02)],
+        ).createShader(Offset.zero & size),
+    );
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..color = tone;
+    canvas.drawPath(path, stroke);
+
+    final last = point(values.length - 1);
+    canvas.drawCircle(last, 3, Paint()..color = tone);
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.tone != tone;
 }

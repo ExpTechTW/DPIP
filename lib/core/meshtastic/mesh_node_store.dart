@@ -13,13 +13,25 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/preference_keys.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:flutter/foundation.dart';
+
+/// One point in a node's telemetry history — what the sheet's trend charts
+/// plot. Kept in memory only (see [MeshNodeStore.historyLimit]).
+class MeshNodeSample {
+  const MeshNodeSample({required this.time, required this.snr, this.battery});
+
+  final DateTime time;
+  final double snr;
+  final int? battery;
+}
 
 class MeshNodeStore extends ChangeNotifier {
   MeshNodeStore(this._service, this._prefs, {DateTime Function()? now})
@@ -145,8 +157,92 @@ class MeshNodeStore extends ChangeNotifier {
             snr: node.snr != 0 ? node.snr : existing.snr,
             viaMqtt: node.viaMqtt,
           );
+    _recordSample(node);
     notifyListeners();
     _scheduleWrite();
+  }
+
+  /// Keeps a node's recent telemetry so the sheet can draw trends.
+  ///
+  /// Memory-only on purpose: a ring of numbers is worth showing, not worth
+  /// persisting — the radio re-sends the whole node DB on every connect
+  /// anyway, and the sample cadence is the node's own broadcast rate
+  /// (seconds to minutes), so a full ring is a long recent past.
+  static const int historyLimit = 60;
+
+  final Map<int, List<MeshNodeSample>> _history = {};
+
+  /// This node's recent (time, SNR, battery) samples, oldest first.
+  List<MeshNodeSample> historyOf(int num) =>
+      List.unmodifiable(_history[num] ?? const []);
+
+  void _recordSample(MeshNode node) {
+    final samples = _history.putIfAbsent(node.num, () => []);
+    final last = samples.isNotEmpty ? samples.last : null;
+    final time = _now();
+    // A burst arrives twenty nodes at a time and the radio re-emits the same
+    // telemetry repeatedly; a sample that changes nothing just moves the last
+    // one's time instead of piling up identical points.
+    if (last != null &&
+        last.snr == node.snr &&
+        last.battery == node.batteryLevel) {
+      samples[samples.length - 1] = MeshNodeSample(
+        time: time,
+        snr: last.snr,
+        battery: last.battery,
+      );
+      return;
+    }
+    samples.add(
+      MeshNodeSample(time: time, snr: node.snr, battery: node.batteryLevel),
+    );
+    if (samples.length > historyLimit) {
+      samples.removeRange(0, samples.length - historyLimit);
+    }
+  }
+
+  /// Straight-line distance from this node to the radio's own node, km.
+  ///
+  /// The map's "how far is it" — computed here so the sheet stays a view.
+  /// Null when either side has no position yet.
+  double? distanceToMyRadioKm(MeshNode node) {
+    final mine = _service.myNodeNum == null
+        ? null
+        : _nodes[_service.myNodeNum!];
+    final a = mine;
+    if (a == null ||
+        a.latitude == null ||
+        a.longitude == null ||
+        node.latitude == null ||
+        node.longitude == null) {
+      return null;
+    }
+    return _haversineKm(
+      a.latitude!,
+      a.longitude!,
+      node.latitude!,
+      node.longitude!,
+    );
+  }
+
+  /// Great-circle distance between two points (km) — short-range accuracy is
+  /// all a mesh needs, and the formula stays cheap on every sample.
+  static double _haversineKm(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
+    const earthRadiusKm = 6371.0;
+    final dLat = degToRad(lat2 - lat1);
+    final dLon = degToRad(lon2 - lon1);
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(degToRad(lat1)) *
+            math.cos(degToRad(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    return earthRadiusKm * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
   }
 
   void _scheduleWrite() {
