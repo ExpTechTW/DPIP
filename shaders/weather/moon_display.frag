@@ -53,8 +53,13 @@ out vec4 fragColor;
 const float PI = 3.14159265359;
 
 /// Equirectangular texel for a point on the unit sphere, in surface space.
+///
+/// The maps are centred on 0° longitude — the middle of the near side — so the
+/// centre of the disc must land on u = 0.5. `+z` points at the viewer, hence
+/// `atan(x, z)`: negating z instead would centre the disc on ±180° and quietly
+/// render the *far* side, which is the same brightness and the wrong Moon.
 vec2 sphereUv(vec3 p) {
-  float lon = atan(p.x, -p.z);
+  float lon = atan(p.x, p.z);
   float lat = asin(clamp(p.y, -1.0, 1.0));
   return vec2(lon / (2.0 * PI) + 0.5, 0.5 - lat / PI);
 }
@@ -82,13 +87,16 @@ void main() {
 
   // Libration — the Moon rocks a few degrees each month, showing a little
   // around each edge. Rotating the lookup (not the disc) is what keeps the
-  // same face toward us while the visible edges change.
+  // same face toward us while the visible edges change. iLibration is the
+  // selenographic point facing Earth, so these rotations are exactly what puts
+  // that point at the centre of the disc.
   float cl = cos(iLibration.x), sl = sin(iLibration.x);
   float cb = cos(iLibration.y), sb = sin(iLibration.y);
+  float ex = -sl * view.x + cl * view.z;
   vec3 surf = vec3(
     cl * view.x + sl * view.z,
-    cb * view.y - sb * (-sl * view.x + cl * view.z),
-    sb * view.y + cb * (-sl * view.x + cl * view.z)
+    cb * view.y + sb * ex,
+    cb * ex - sb * view.y
   );
 
   vec3 albedo = texture(iColor, sphereUv(surf)).rgb;

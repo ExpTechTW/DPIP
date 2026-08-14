@@ -28,8 +28,9 @@ Future<ui.Image> _asset(String key) async {
 Future<ui.Image> _renderPhase(
   ui.Image color,
   ui.Image height,
-  double phase,
-) async {
+  double phase, {
+  double librationLongitude = 0,
+}) async {
   final program = await ui.FragmentProgram.fromAsset(
     'shaders/weather/moon_display.frag',
   );
@@ -37,7 +38,7 @@ Future<ui.Image> _renderPhase(
   shader.setFloat(0, _size.toDouble());
   shader.setFloat(1, _size.toDouble());
   shader.setFloat(2, phase);
-  shader.setFloat(3, 0); // libration held at zero so the tests are stable
+  shader.setFloat(3, librationLongitude);
   shader.setFloat(4, 0);
   shader.setImageSampler(0, color);
   shader.setImageSampler(1, height);
@@ -67,6 +68,28 @@ Future<double> _luminance(
   final to = (right * _size).round();
   for (var y = 0; y < _size; y++) {
     for (var x = from; x < to; x++) {
+      final i = (y * _size + x) * 4;
+      if (pixels[i + 3] == 0) continue;
+      total += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+      count++;
+    }
+  }
+  return count == 0 ? 0 : total / count;
+}
+
+/// Mean luminance of a horizontal band, as a fraction of the image height,
+/// over the middle half of its width (so the limb's own falloff stays out).
+Future<double> _band(
+  ui.Image image, {
+  required double top,
+  required double bottom,
+}) async {
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final pixels = bytes!.buffer.asUint8List();
+  var total = 0.0;
+  var count = 0;
+  for (var y = (top * _size).round(); y < (bottom * _size).round(); y++) {
+    for (var x = (_size * 0.25).round(); x < (_size * 0.75).round(); x++) {
       final i = (y * _size + x) * 4;
       if (pixels[i + 3] == 0) continue;
       total += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
@@ -127,6 +150,42 @@ void main() {
       expect(pixels[(y * _size + x) * 4 + 3], 0, reason: 'corner ($x,$y)');
     }
     image.dispose();
+  });
+
+  test('the disc shows the near side, not the far side', () async {
+    // Orthographic projection folds both hemispheres onto the same circle, so
+    // the far side renders as a perfectly plausible moon — same shape, same
+    // brightness, wrong world. What separates them is *where the maria are*:
+    // the near side's northern half is flooded with dark basalt (Imbrium,
+    // Serenitatis, Tranquillitatis) while its south is bright highland. On the
+    // far side that contrast reverses. Rotating the lookup half a turn is
+    // exactly the bug this catches, so the far side is rendered here as the
+    // control rather than assumed.
+    final near = await _renderPhase(color, height, 3.14159265);
+    final far = await _renderPhase(
+      color,
+      height,
+      3.14159265,
+      librationLongitude: 3.14159265,
+    );
+
+    final nearNorth = await _band(near, top: 0.18, bottom: 0.42);
+    final nearSouth = await _band(near, top: 0.58, bottom: 0.82);
+    final farNorth = await _band(far, top: 0.18, bottom: 0.42);
+    final farSouth = await _band(far, top: 0.58, bottom: 0.82);
+
+    expect(
+      nearNorth,
+      lessThan(nearSouth * 0.92),
+      reason: 'near-side maria should darken the northern half',
+    );
+    expect(
+      farNorth,
+      greaterThan(farSouth),
+      reason: 'the far side has the opposite contrast — the control',
+    );
+    near.dispose();
+    far.dispose();
   });
 
   test('a full moon stays bright to the limb', () async {
