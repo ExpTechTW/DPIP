@@ -20,6 +20,7 @@ lib/
 │   ├── error/             # Result + Failure hierarchy
 │   ├── geo/               # location services, township directory/boundaries
 │   ├── logging/           # the Log facade
+│   ├── meshtastic/        # LoRa mesh: BLE transport, link keeper, DPIP data plane
 │   ├── models/            # shared value types (LatLng, …)
 │   ├── network/           # ApiClient + ApiTier + ApiPaths, region failover,
 │   │                      # SSE, ETag cache, meteor delta decode
@@ -31,8 +32,9 @@ lib/
 │   └── weather/           # weather-condition / icon mapping
 ├── features/              # one folder per feature, each self-contained
 │   │                      # changelog · disaster_map · earthquake · events ·
-│   │                      # home · location · log · map · more · notification ·
-│   │                      # onboarding · settings · sponsor · typhoon · weather
+│   │                      # home · location · log · map · meshtastic · more ·
+│   │                      # notification · onboarding · settings · sponsor ·
+│   │                      # typhoon · weather
 │   └── <feature>/
 │       ├── data/          # datasources, repository impls, JSON→model mapping
 │       ├── domain/        # @freezed entities, repository interfaces (pure Dart)

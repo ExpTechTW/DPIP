@@ -135,6 +135,27 @@ baseline, feature-first architecture).
   device; permission is requested after the first frame for now (move to
   onboarding). The push token registers through the location feature
   (`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves.
+- **LoRa mesh (`core/meshtastic/`):** the off-grid path. Three layers, each with
+  one job. `MeshtasticService` (domain) is the **transport** — connect/scan,
+  packet streams, `sendData`, and the radio's channel/region config; its BLE
+  impl lives in `data/` over the vendored `third_party/meshtastic_flutter`
+  (locally forked — see its CHANGELOG). `MeshLink` (created in `bootstrap`, not
+  by a page) owns the **session**: the chosen radio is persisted and *is* the
+  intent to stay connected, so it survives page changes, drops and app
+  restarts; only `detach()` stops it. It also provisions the radio after every
+  connect. `DpipMeshGateway` is the **data plane**: DPIP disaster payloads ride
+  `PRIVATE_APP` (256) inside a 5-byte versioned envelope (`dpip_mesh.dart`) on
+  the fixed `DPIP` channel (PSK `AQ==`, region `TW`) — never on
+  `TEXT_MESSAGE_APP`, which belongs to the user's chat. A feed broadcasts by
+  handing over a `DpipMeshPacket` and receives by listening to `inbound`; it
+  never sees Bluetooth. Wire codes and the envelope layout are pinned by tests
+  — changing one is a protocol break, so bump the version instead. Mesh
+  delivery is **best-effort** (lossy, duty-cycle limited, unacknowledged): a
+  safety-critical feed may add it as a path, never rely on it as the only one.
+  Radio writes go through local admin messages (`from == 0` exempts them from
+  the remote-admin session key); a channel write is read back before it counts,
+  and a region change is confirmed by the user because the firmware reboots the
+  radio and takes every other channel with it.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
