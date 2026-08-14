@@ -1,5 +1,6 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:flutter/material.dart';
@@ -210,9 +211,11 @@ class _MapTimelineState extends State<MapTimeline> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    // Asked of the clock rather than of the list, so a forecast's "現在" lands
-    // on the present rather than on its furthest step.
-    final nowIndex = nowFrameIndex(widget.frames);
+    // Asked of the calibrated clock rather than of the list, so a forecast's
+    // "現在" lands on the present rather than on its furthest step — and the
+    // clock resyncs on foreground, so returning from the background moves the
+    // marker to the real now instead of the device clock's guess.
+    final nowIndex = nowFrameIndex(widget.frames, now: AppTime.utc);
     final era = _eraOf(_liveIndex, nowIndex);
     final labelStep = (48 / widget.itemExtent).ceil();
 

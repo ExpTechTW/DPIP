@@ -4,6 +4,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -19,6 +20,8 @@ import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart'
+    show VisibleTab, VisibleTabScope;
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
@@ -64,9 +67,13 @@ class MapScaffold extends StatefulWidget {
   State<MapScaffold> createState() => _MapScaffoldState();
 }
 
-class _MapScaffoldState extends State<MapScaffold> {
+class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
+
+  /// The shell's visible-tab notifier — same contract as [BaseMap]: null
+  /// (full-screen routes, previews) means always visible.
+  VisibleTab? _visibleTab;
 
   /// Whether the initial framing has run. Only on first load — a reload (theme
   /// change) keeps whatever the user has panned/zoomed to.
@@ -156,6 +163,12 @@ class _MapScaffoldState extends State<MapScaffold> {
   bool _reframeOnMeasure = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final handoff = context.read<MapCameraHandoff>();
@@ -168,10 +181,22 @@ class _MapScaffoldState extends State<MapScaffold> {
       _stationHandoff?.removeListener(_onStationHandoff);
       _stationHandoff = station..addListener(_onStationHandoff);
     }
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_onTabChanged);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_onTabChanged);
   }
+
+  /// Whether this surface is on screen — null tab (full-screen) counts as
+  /// visible, matching [BaseMap]'s own gate.
+  bool get _isVisible =>
+      _visibleTab == null || _visibleTab!.value == widget.tabIndex;
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_onTabChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _bearing.dispose();
     _cameraEpoch.dispose();
     _showTownLabels.dispose();
@@ -180,6 +205,28 @@ class _MapScaffoldState extends State<MapScaffold> {
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
     super.dispose();
+  }
+
+  /// The timeline's "now" and its frames went stale while this surface was
+  /// off-screen — the app backgrounded, or the user sat on another tab.
+  ///
+  /// Re-fetch and re-centre on the present, but only when this map can be
+  /// seen: the IndexedStack keeps hidden tabs mounted, and a hidden map has
+  /// no timeline to update. Non-timeline layers are skipped entirely — their
+  /// data sources (RTS, the mesh node store) refresh themselves, and a bare
+  /// re-render would only flash the map.
+  void _onTabChanged() {
+    if (!_isVisible) return;
+    if (_active.usesTimeline) unawaited(_loadActive());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_isVisible) return;
+    // Coming back from the background is the same event as re-entering the
+    // tab: what is on screen has been sitting there unattended. A radar frame
+    // every 10 minutes means a half-hour away is three frames missed.
+    if (_active.usesTimeline) unawaited(_loadActive());
   }
 
   /// A framing request arrived (map re-opened from Home / the nav bar) — apply it
@@ -503,7 +550,12 @@ class _MapScaffoldState extends State<MapScaffold> {
       ok: (frames) {
         setState(() {
           _frames = frames;
-          _selectedIndex = nowFrameIndex(frames);
+          // The calibrated clock, not device time: the frames are server
+          // timestamps, and a device clock that drifted (or a timezone the
+          // device changed) would pick the wrong "now" frame. The NTP resync
+          // on foreground is what makes this actually correct after a
+          // background stretch.
+          _selectedIndex = nowFrameIndex(frames, now: AppTime.utc);
         });
         if (frames.isNotEmpty) {
           // Register the set, then reveal the present (a layer adds tiles
