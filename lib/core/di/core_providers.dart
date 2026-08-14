@@ -5,7 +5,10 @@ import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -48,6 +51,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   Provider<NotificationService>.value(value: deps.notificationService),
   Provider<MeshtasticService>.value(value: deps.meshtastic),
   ChangeNotifierProvider<MeshLink>.value(value: deps.meshLink),
+  ChangeNotifierProvider<MeshAlerts>.value(value: deps.meshAlerts),
+  ChangeNotifierProvider<MeshNodeStore>.value(value: deps.meshNodes),
+  Provider<MeshStore?>.value(value: deps.meshStore),
   Provider<DpipMeshGateway>.value(value: deps.meshGateway),
   Provider<ApiClient>.value(value: deps.apiClient),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.

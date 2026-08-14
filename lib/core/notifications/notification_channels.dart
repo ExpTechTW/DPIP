@@ -38,6 +38,10 @@ abstract final class NotificationChannels {
       channelGroupName: '海嘯',
     ),
     NotificationChannelGroup(
+      channelGroupKey: 'group_mesh',
+      channelGroupName: 'LoRa 網狀網路',
+    ),
+    NotificationChannelGroup(
       channelGroupKey: 'group_other',
       channelGroupName: '其他',
     ),
@@ -355,6 +359,32 @@ abstract final class NotificationChannels {
       ledColor: Colors.red,
       enableVibration: true,
       vibrationPattern: lowVibrationPattern,
+    ),
+    // Locally raised, never pushed: the mesh is an off-grid path, so these two
+    // are posted by the app itself from the BLE link (see `MeshAlerts`) — there
+    // is no server involved and no internet needed for them to arrive.
+    NotificationChannel(
+      channelGroupKey: 'group_mesh',
+      channelKey: 'mesh_message',
+      channelName: 'Meshtastic 訊息',
+      channelDescription: '從 LoRa 網狀網路收到的訊息',
+      importance: NotificationImportance.High,
+      defaultColor: const Color(0xFF4CAF50),
+      ledColor: const Color(0xFF4CAF50),
+      playSound: true,
+      vibrationPattern: lowVibrationPattern,
+    ),
+    NotificationChannel(
+      channelGroupKey: 'group_mesh',
+      channelKey: 'mesh_node',
+      channelName: 'Meshtastic 新節點',
+      channelDescription: '第一次聽到某個節點時通知',
+      importance: NotificationImportance.Low,
+      defaultColor: const Color(0xFF4CAF50),
+      channelShowBadge: false,
+      playSound: false,
+      enableVibration: false,
+      enableLights: false,
     ),
     // Standalone (no group): a low-importance, silent channel for any background
     // service notice. Kept for parity with the legacy catalogue; the rewrite's

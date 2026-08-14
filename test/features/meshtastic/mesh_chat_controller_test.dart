@@ -1,15 +1,21 @@
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(sqfliteFfiInit);
+
+  late Database db;
 
   MeshMessage message(String text, {int from = 1, int seconds = 0}) =>
       MeshMessage(
@@ -19,52 +25,79 @@ void main() {
         timestamp: DateTime.utc(2026, 1, 1).add(Duration(seconds: seconds)),
       );
 
-  Future<(MeshChatController, FakeMeshService)> makeController([
-    Map<String, Object> initial = const {},
+  /// A controller over a fresh in-memory database, or over [reuse] to model a
+  /// restart against the same storage.
+  Future<(MeshChatController, FakeMeshService, MeshStore)> makeController([
+    MeshStore? reuse,
   ]) async {
-    SharedPreferences.setMockInitialValues(initial);
+    SharedPreferences.setMockInitialValues({});
     final service = FakeMeshService();
     final prefs = Prefs(await SharedPreferences.getInstance());
-    return (
-      MeshChatController(service, MeshLink(service, prefs), prefs),
+    MeshStore store;
+    if (reuse != null) {
+      store = reuse;
+    } else {
+      db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+      await MeshStore.createSchema(db);
+      store = MeshStore(db);
+    }
+    final controller = MeshChatController(
       service,
+      MeshLink(service, prefs),
+      MeshNodeStore(service, prefs)..start(),
+      store,
     );
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    return (controller, service, store);
   }
 
-  /// Lets the controller's fire-and-forget persist settle.
-  Future<void> settle() => Future<void>.delayed(Duration.zero);
+  tearDown(() async => db.close());
 
-  test('keeps the newest messages first, capped at maxMessages', () async {
-    final (controller, service) = await makeController();
-    for (var i = 0; i < MeshChatController.maxMessages + 10; i++) {
+  /// Lets the fire-and-forget SQLite writes land — they cross an isolate, so
+  /// a bare microtask drain isn't enough.
+  Future<void> settle() =>
+      Future<void>.delayed(const Duration(milliseconds: 150));
+
+  test('keeps the newest messages first', () async {
+    final (controller, service, _) = await makeController();
+    for (var i = 0; i < 10; i++) {
       service.messages.add(message('m$i', seconds: i));
     }
     await settle();
 
-    expect(controller.messages.length, MeshChatController.maxMessages);
-    expect(controller.messages.first.text, 'm59');
-    expect(controller.messages.last.text, 'm10');
+    expect(controller.messages, hasLength(10));
+    expect(controller.messages.first.text, 'm9');
+    expect(controller.messages.last.text, 'm0');
   });
 
-  test('persists the log and restores it into a new controller', () async {
-    final (controller, service) = await makeController();
+  test('holds only a window of the log in memory', () async {
+    final (controller, service, store) = await makeController();
+    for (var i = 0; i < MeshChatController.windowSize + 20; i++) {
+      service.messages.add(message('m$i', seconds: i));
+    }
+    await settle();
+
+    expect(controller.messages, hasLength(MeshChatController.windowSize));
+    // The store keeps everything — the window is a view, not a retention cap.
+    expect(
+      await store.messages(limit: 10000),
+      hasLength(MeshChatController.windowSize + 20),
+    );
+  });
+
+  test('persists the log and reloads it after a restart', () async {
+    final (controller, service, store) = await makeController();
     service.messages.add(message('hello'));
     await settle();
     controller.dispose();
 
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getStringList('meshtastic.messages');
-    expect(stored, hasLength(1));
-
-    final (restored, _) = await makeController({
-      'meshtastic.messages': stored!,
-    });
+    final (restored, _, _) = await makeController(store);
     expect(restored.messages.single.text, 'hello');
     expect(restored.messages.single.outgoing, isFalse);
   });
 
   test('drops a message the log already holds', () async {
-    final (controller, service) = await makeController();
+    final (controller, service, _) = await makeController();
     service.messages
       ..add(message('same'))
       ..add(message('same'));
@@ -74,20 +107,44 @@ void main() {
   });
 
   test('records a sent message as outgoing, and not a failed one', () async {
-    final (controller, service) = await makeController();
+    final (controller, service, _) = await makeController();
 
     expect(await controller.send('  hi  '), isNull);
+    await settle();
     expect(service.sentText, ['hi']);
     expect(controller.messages.single.text, 'hi');
     expect(controller.messages.single.outgoing, isTrue);
 
     service.sendFailure = const UnexpectedFailure('radio busy');
     expect(await controller.send('nope'), 'radio busy');
+    await settle();
     expect(controller.messages, hasLength(1));
   });
 
+  test('sends on the channel it is given and records it there', () async {
+    final (controller, service, _) = await makeController();
+
+    expect(await controller.send('hi', channel: 3), isNull);
+    await settle();
+
+    expect(service.sentChannels, [3]);
+    expect(controller.messages.single.channel, 3);
+  });
+
+  test('counts stored messages per channel', () async {
+    final (controller, service, _) = await makeController();
+    service.messages
+      ..add(message('a', seconds: 1))
+      ..add(message('b', seconds: 2));
+    await settle();
+    await controller.send('mine', channel: 3);
+    await settle();
+
+    expect(controller.messageCountsByChannel, {0: 2, 3: 1});
+  });
+
   test('clearMessages empties the log and its storage', () async {
-    final (controller, service) = await makeController();
+    final (controller, service, store) = await makeController();
     service.messages.add(message('bye'));
     await settle();
 
@@ -95,20 +152,6 @@ void main() {
     await settle();
 
     expect(controller.messages, isEmpty);
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getStringList('meshtastic.messages'), isEmpty);
-  });
-
-  test('ignores a corrupt stored entry instead of losing the log', () async {
-    final (controller, service) = await makeController();
-    service.messages.add(message('good'));
-    await settle();
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getStringList('meshtastic.messages')!;
-
-    final (restored, _) = await makeController({
-      'meshtastic.messages': ['not json', ...stored],
-    });
-    expect(restored.messages.single.text, 'good');
+    expect(await store.messages(), isEmpty);
   });
 }

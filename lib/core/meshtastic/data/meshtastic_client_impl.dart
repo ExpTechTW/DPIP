@@ -22,6 +22,7 @@ import 'dart:convert';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/meshtastic/data/mesh_traffic_counter.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -53,15 +54,7 @@ class MeshtasticClientImpl implements MeshtasticService {
 
   final StreamController<MeshTraffic> _trafficController =
       StreamController<MeshTraffic>.broadcast();
-  int _rxPackets = 0;
-  int _txPackets = 0;
-  int _rxBytes = 0;
-  int _txBytes = 0;
-  int _rxUndecoded = 0;
-  final Map<int, int> _rxByPort = {};
-  final Map<int, int> _txByPort = {};
-  DateTime? _lastRx;
-  DateTime? _lastTx;
+  final MeshTrafficCounter _counter = MeshTrafficCounter();
 
   mesh.MeshtasticClient get _c {
     _installLogBridge();
@@ -80,24 +73,15 @@ class MeshtasticClientImpl implements MeshtasticService {
 
   void _countRx(mesh.MeshPacketWrapper packet) {
     final decoded = packet.decoded;
-    _rxPackets++;
-    _lastRx = AppTime.utc.toLocal();
-    if (decoded == null) {
-      _rxUndecoded++;
-      _rxBytes += packet.encrypted?.length ?? 0;
-    } else {
-      _rxBytes += decoded.payload.length;
-      final port = decoded.portnum.value;
-      _rxByPort[port] = (_rxByPort[port] ?? 0) + 1;
-    }
+    _counter.recordRx(
+      portnum: decoded?.portnum.value,
+      bytes: decoded?.payload.length ?? packet.encrypted?.length ?? 0,
+    );
     _publishTraffic();
   }
 
   void _countTx(int portnum, int bytes) {
-    _txPackets++;
-    _txBytes += bytes;
-    _txByPort[portnum] = (_txByPort[portnum] ?? 0) + 1;
-    _lastTx = AppTime.utc.toLocal();
+    _counter.recordTx(portnum: portnum, bytes: bytes);
     _publishTraffic();
   }
 
@@ -464,6 +448,7 @@ class MeshtasticClientImpl implements MeshtasticService {
       latitude: node.latitude,
       longitude: node.longitude,
       snr: node.snr,
+      viaMqtt: node.viaMqtt,
     );
   });
 
@@ -543,17 +528,7 @@ class MeshtasticClientImpl implements MeshtasticService {
   }
 
   @override
-  MeshTraffic get traffic => MeshTraffic(
-    rxPackets: _rxPackets,
-    txPackets: _txPackets,
-    rxBytes: _rxBytes,
-    txBytes: _txBytes,
-    rxUndecoded: _rxUndecoded,
-    rxByPort: Map.unmodifiable(_rxByPort),
-    txByPort: Map.unmodifiable(_txByPort),
-    lastRx: _lastRx,
-    lastTx: _lastTx,
-  );
+  MeshTraffic get traffic => _counter.snapshot;
 
   @override
   Stream<MeshTraffic> get trafficStream => _trafficController.stream;
@@ -563,7 +538,10 @@ class MeshtasticClientImpl implements MeshtasticService {
     final nodeNum = _c.myNodeNum;
     if (nodeNum == null) return null;
     final node = _c.localNode;
-    final metrics = node?.deviceMetrics;
+    // Live telemetry first: the node-DB copy is a snapshot from connect time
+    // and is regularly stale or absent for the radio's own entry, which is
+    // exactly the reading a user checks.
+    final metrics = _c.metricsFor(nodeNum) ?? node?.deviceMetrics;
     final metadata = _c.metadata;
     final lora = _c.loraConfig;
     return MeshRadioInfo(
@@ -588,6 +566,7 @@ class MeshtasticClientImpl implements MeshtasticService {
       uptime: metrics?.hasUptimeSeconds() ?? false
           ? Duration(seconds: metrics!.uptimeSeconds)
           : null,
+      metricsAt: _c.metricsAgeFor(nodeNum),
       isLicensed: node?.isLicensed ?? false,
       hasWifi: metadata?.hasWifi ?? false,
       hasBluetooth: metadata?.hasBluetooth ?? false,

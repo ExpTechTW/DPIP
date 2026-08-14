@@ -47,6 +47,7 @@ String routeForNotificationChannel(String? channelKey) {
   return switch (NotificationChannels.groupOf(channelKey)) {
     'group_eew' => AppRoutes.eew,
     'group_eq' => AppRoutes.earthquake,
+    'group_mesh' => AppRoutes.meshtastic,
     'group_info' || 'group_tsunami' || 'group_other' => AppRoutes.home,
     _ => _unmapped(channelKey),
   };

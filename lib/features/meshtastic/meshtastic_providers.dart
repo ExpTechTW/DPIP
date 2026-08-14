@@ -19,7 +19,11 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> meshtasticProviders(SharedDeps deps) => [
   ChangeNotifierProvider<MeshChatController>(
     lazy: false,
-    create: (_) =>
-        MeshChatController(deps.meshtastic, deps.meshLink, deps.prefs),
+    create: (_) => MeshChatController(
+      deps.meshtastic,
+      deps.meshLink,
+      deps.meshNodes,
+      deps.meshStore,
+    ),
   ),
 ];

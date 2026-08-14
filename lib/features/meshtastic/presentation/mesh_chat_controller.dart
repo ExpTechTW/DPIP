@@ -2,26 +2,29 @@
 /// log.
 ///
 /// Lives in the provider tree rather than in the page's `State` for two
-/// reasons: the radio keeps delivering while the page is closed, and the last
-/// [MeshChatController.maxMessages] messages are persisted, so the log survives
-/// navigation *and* an app restart. That persistence is not a nicety — the
-/// radio's own replay queue is small, shared with telemetry/position traffic,
-/// and emptied once read, so it can never be the app's message history.
+/// reasons: the radio keeps delivering while the page is closed, and the log is
+/// persisted (in SQLite — see [MeshStore]), so it survives navigation *and* an
+/// app restart. That persistence is not a nicety — the radio's own replay queue
+/// is small, shared with telemetry/position traffic, and emptied once read, so
+/// it can never be the app's message history.
+///
+/// The in-memory list is a **window** onto that store, not the log itself: the
+/// newest [MeshChatController.windowSize] messages, which is what a chat screen
+/// can show. Retention lives in the store.
 ///
 /// The controller owns no BLE: it only listens to [MeshtasticService] and
 /// turns its streams into a snapshot the page renders.
 library;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:flutter/foundation.dart';
 
 /// One line in the message log — a packet heard from the mesh, or a message
@@ -36,25 +39,13 @@ class MeshChatMessage {
     this.outgoing = false,
   });
 
-  /// Restores a message written by [toJson]; returns null for anything
-  /// unreadable, so one corrupt entry can't take the whole log down.
-  static MeshChatMessage? fromJson(String encoded) {
-    try {
-      final json = jsonDecode(encoded);
-      if (json is! Map<String, dynamic>) return null;
-      return MeshChatMessage(
-        from: (json['f'] as num?)?.toInt() ?? 0,
-        channel: (json['c'] as num?)?.toInt() ?? 0,
-        text: json['t'] as String? ?? '',
-        timestamp: DateTime.fromMillisecondsSinceEpoch(
-          (json['ts'] as num?)?.toInt() ?? 0,
-        ),
-        outgoing: json['o'] as bool? ?? false,
-      );
-    } catch (_) {
-      return null;
-    }
-  }
+  /// Adapts a stored row.
+  MeshChatMessage.stored(MeshStoredMessage row)
+    : from = row.from,
+      channel = row.channel,
+      text = row.text,
+      timestamp = row.timestamp,
+      outgoing = row.outgoing;
 
   /// Sender node number (0 for [outgoing] — the local radio's own number is
   /// not part of the transport's surface, and the bubble never shows it).
@@ -70,43 +61,45 @@ class MeshChatMessage {
   /// back, so a sent message is recorded locally).
   final bool outgoing;
 
-  String toJson() => jsonEncode({
-    'f': from,
-    'c': channel,
-    't': text,
-    'ts': timestamp.millisecondsSinceEpoch,
-    'o': outgoing,
-  });
-
-  /// Identity used to drop a message the log already holds — a reconnect can
-  /// replay a packet that was stored during the previous session.
-  String get _identity =>
-      '$from/$channel/${timestamp.millisecondsSinceEpoch}/$text';
+  MeshStoredMessage toStored() => MeshStoredMessage(
+    from: from,
+    channel: channel,
+    text: text,
+    timestamp: timestamp,
+    outgoing: outgoing,
+  );
 }
 
 class MeshChatController extends ChangeNotifier {
-  MeshChatController(this._service, this._link, this._prefs) {
-    _restore();
-    _nodeSub = _service.nodeStream.listen(_onNode);
+  MeshChatController(this._service, this._link, this._nodes, this._store) {
+    unawaited(_restore());
+    // Nodes come from the shared store, which persists them — this page is one
+    // of two surfaces showing the same table (the map layer is the other).
+    _nodes.addListener(notifyListeners);
     _messageSub = _service.messageStream.listen(_onMessage);
   }
 
-  /// How many messages the log keeps, in memory and on disk.
-  static const int maxMessages = 50;
+  /// How many messages the in-memory window holds. Not a retention limit —
+  /// the store keeps far more (see [MeshStore.messageRetention]); this is just
+  /// how much of it a chat screen keeps materialised.
+  static const int windowSize = 300;
 
   final MeshtasticService _service;
 
   /// Connection lifecycle lives in [MeshLink] (app-wide, survives this page);
   /// this controller only owns the conversation.
   final MeshLink _link;
-  final Prefs _prefs;
+  final MeshNodeStore _nodes;
 
-  StreamSubscription<MeshNode>? _nodeSub;
+  /// Null when the database couldn't be opened — the log then lives only for
+  /// this session rather than the page failing to work at all.
+  final MeshStore? _store;
+
   StreamSubscription<MeshMessage>? _messageSub;
   StreamSubscription<MeshDevice>? _scanSub;
 
-  final Map<int, MeshNode> _nodes = {};
   final List<MeshChatMessage> _messages = [];
+  final Map<int, int> _counts = {};
   final List<MeshDevice> _devices = [];
   bool _scanning = false;
   String? _connectingId;
@@ -117,22 +110,27 @@ class MeshChatController extends ChangeNotifier {
   /// need both objects.
   bool get isConnected => _link.isConnected;
 
+  /// How many stored messages each channel holds — what the channel tabs
+  /// badge, so a quiet channel with history is distinguishable from an empty
+  /// one.
+  /// The last 24 hours of utilization samples, oldest first — what the chart
+  /// plots. Read on demand rather than held: it is only looked at when the
+  /// radio panel is open.
+  Future<List<MeshMetricSample>> metricsHistory() async =>
+      await _store?.metrics() ?? const [];
+
+  /// Counted in SQL at load and kept up to date locally, so a channel whose
+  /// history falls outside the in-memory window still reports its real total.
+  Map<int, int> get messageCountsByChannel => Map.unmodifiable(_counts);
+
   /// The message log, **newest first** (the page renders it reversed).
   List<MeshChatMessage> get messages => List.unmodifiable(_messages);
 
   /// Every node heard so far, online first, then most-recently-heard.
-  List<MeshNode> get nodes {
-    final all = _nodes.values.toList()
-      ..sort((a, b) {
-        if (a.isOnline != b.isOnline) return a.isOnline ? -1 : 1;
-        final aHeard = a.lastHeard, bHeard = b.lastHeard;
-        if (aHeard != null && bHeard != null) return bHeard.compareTo(aHeard);
-        if (aHeard != null) return -1;
-        if (bHeard != null) return 1;
-        return a.displayName.compareTo(b.displayName);
-      });
-    return List.unmodifiable(all);
-  }
+  List<MeshNode> get nodes => _nodes.nodes;
+
+  /// Whether [node] has been heard recently enough to count as online.
+  bool isOnline(MeshNode node) => _nodes.isOnline(node);
 
   /// Radios found by the current/last scan.
   List<MeshDevice> get devices => List.unmodifiable(_devices);
@@ -147,7 +145,7 @@ class MeshChatController extends ChangeNotifier {
 
   /// The sender's node name once the mesh has told us about it, else its id.
   String senderLabel(int num) {
-    final name = _nodes[num]?.displayName;
+    final name = _nodes.byNum(num)?.displayName;
     return (name != null && name.isNotEmpty)
         ? name
         : '0x${num.toRadixString(16)}';
@@ -222,17 +220,17 @@ class MeshChatController extends ChangeNotifier {
     return null;
   }
 
-  /// Broadcasts [text] on the primary channel and records it locally — the
-  /// radio does not echo our own packets back. Returns null on success.
-  Future<String?> send(String text) async {
+  /// Broadcasts [text] on [channel] and records it locally — the radio does
+  /// not echo our own packets back. Returns null on success.
+  Future<String?> send(String text, {int channel = 0}) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return null;
-    final result = await _service.sendText(trimmed);
+    final result = await _service.sendText(trimmed, channel: channel);
     if (result case Err(:final failure)) return failure.message;
     _add(
       MeshChatMessage(
         from: 0,
-        channel: 0,
+        channel: channel,
         text: trimmed,
         timestamp: AppTime.utc.toLocal(),
         outgoing: true,
@@ -245,13 +243,9 @@ class MeshChatController extends ChangeNotifier {
   void clearMessages() {
     if (_messages.isEmpty) return;
     _messages.clear();
+    _counts.clear();
     notifyListeners();
-    unawaited(_persist());
-  }
-
-  void _onNode(MeshNode node) {
-    _nodes[node.num] = node;
-    notifyListeners();
+    unawaited(_store?.clearMessages());
   }
 
   void _onMessage(MeshMessage message) {
@@ -266,38 +260,55 @@ class MeshChatController extends ChangeNotifier {
   }
 
   void _add(MeshChatMessage message) {
-    if (_messages.any((m) => m._identity == message._identity)) return;
+    final store = _store;
+    if (store == null) {
+      // No database: fall back to an in-memory log, deduplicated here instead
+      // of by the store's unique index.
+      if (_messages.any((m) => _sameMessage(m, message))) return;
+      _remember(message);
+      return;
+    }
+    unawaited(
+      store.addMessage(message.toStored()).then((isNew) {
+        // A reconnect replays packets the log may already hold; the store's
+        // unique index is what decides, so the UI follows its answer.
+        if (isNew) _remember(message);
+      }),
+    );
+  }
+
+  void _remember(MeshChatMessage message) {
     _messages.insert(0, message);
-    if (_messages.length > maxMessages) {
-      _messages.removeRange(maxMessages, _messages.length);
+    if (_messages.length > windowSize) {
+      _messages.removeRange(windowSize, _messages.length);
     }
+    _counts[message.channel] = (_counts[message.channel] ?? 0) + 1;
     notifyListeners();
-    unawaited(_persist());
   }
 
-  void _restore() {
-    final stored = _prefs.getStringList(PreferenceKeys.meshMessages);
-    if (stored == null) return;
-    for (final entry in stored.take(maxMessages)) {
-      final message = MeshChatMessage.fromJson(entry);
-      if (message != null) _messages.add(message);
-    }
-    Log.debug('mesh chat: restored ${_messages.length} message(s)');
-  }
+  bool _sameMessage(MeshChatMessage a, MeshChatMessage b) =>
+      a.from == b.from &&
+      a.channel == b.channel &&
+      a.timestamp == b.timestamp &&
+      a.text == b.text;
 
-  Future<void> _persist() async {
-    try {
-      await _prefs.setStringList(PreferenceKeys.meshMessages, [
-        for (final message in _messages) message.toJson(),
-      ]);
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'mesh chat persist');
-    }
+  Future<void> _restore() async {
+    final store = _store;
+    if (store == null) return;
+    final rows = await store.messages(limit: windowSize);
+    _messages
+      ..clear()
+      ..addAll([for (final row in rows) MeshChatMessage.stored(row)]);
+    _counts
+      ..clear()
+      ..addAll(await store.messageCountsByChannel());
+    Log.debug('mesh chat: loaded ${_messages.length} message(s)');
+    notifyListeners();
   }
 
   @override
   void dispose() {
-    unawaited(_nodeSub?.cancel());
+    _nodes.removeListener(notifyListeners);
     unawaited(_messageSub?.cancel());
     unawaited(_scanSub?.cancel());
     super.dispose();

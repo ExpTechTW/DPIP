@@ -130,6 +130,7 @@ class MeshLink extends ChangeNotifier {
   MeshProvisionState _provision = MeshProvisionState.idle;
   String? _provisionError;
   int? _dpipChannel;
+  int? _lastDpipChannel;
 
   /// The transport's current connection state.
   MeshConnectionStatus get status => _status;
@@ -160,8 +161,16 @@ class MeshLink extends ChangeNotifier {
   String? get lastError => _lastError;
 
   /// The DPIP channel's index on the attached radio, once provisioned — what
-  /// the gateway sends and filters on.
+  /// the gateway sends and filters on. Cleared on a drop, because an index
+  /// from the previous radio must never be transmitted on.
   int? get dpipChannel => _dpipChannel;
+
+  /// Where DPIP was last seen, kept across a drop.
+  ///
+  /// Display only — never send on this. It exists so a disconnected UI can
+  /// still default to the DPIP conversation instead of falling back to
+  /// whatever channel happens to sort first.
+  int? get lastKnownDpipChannel => _dpipChannel ?? _lastDpipChannel;
 
   MeshProvisionState get provision => _provision;
 
@@ -489,6 +498,7 @@ class MeshLink extends ChangeNotifier {
     switch (result) {
       case Ok(:final value):
         _dpipChannel = value;
+        _lastDpipChannel = value;
         _provision = MeshProvisionState.ready;
       case Err(:final failure):
         _dpipChannel = null;

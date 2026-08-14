@@ -1,0 +1,120 @@
+/// Regression test for channels bleeding into each other while disconnected.
+///
+/// The page used to skip filtering when the radio hadn't reported its channel
+/// table — so with no link, every channel's messages appeared in one list.
+/// Channels are separate conversations; interleaving them is wrong however
+/// little else is known about the radio.
+library;
+
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
+import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
+import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../../core/meshtastic/fake_mesh_service.dart';
+
+void main() {
+  setUpAll(sqfliteFfiInit);
+
+  MeshStoredMessage stored(String text, int channel, int seconds) =>
+      MeshStoredMessage(
+        from: 1,
+        channel: channel,
+        text: text,
+        timestamp: DateTime.utc(2026, 1, 1).add(Duration(seconds: seconds)),
+        outgoing: false,
+      );
+
+  Future<void> pumpPage(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    late MeshChatController controller;
+    late MeshLink link;
+    late MeshAlerts alerts;
+    late FakeMeshService service;
+    // Real I/O: SQLite runs off the test's fake-async zone, so anything that
+    // touches it must happen inside `runAsync` or its futures never complete
+    // and the test simply hangs.
+    await tester.runAsync(() async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = Prefs(await SharedPreferences.getInstance());
+      final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+      addTearDown(db.close);
+      await MeshStore.createSchema(db);
+      final store = MeshStore(db);
+      await store.addMessage(stored('on the primary', 0, 2));
+      await store.addMessage(stored('on the secondary', 3, 1));
+
+      // Disconnected on purpose: no channel table, the case that broke.
+      service = FakeMeshService();
+      link = MeshLink(service, prefs);
+      alerts = MeshAlerts(service, prefs, post: (_) async {});
+      controller = MeshChatController(
+        service,
+        link,
+        MeshNodeStore(service, prefs)..start(),
+        store,
+      );
+      // Let the controller's initial load land before the first frame.
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<MeshtasticService>.value(value: service),
+          ChangeNotifierProvider<MeshLink>.value(value: link),
+          ChangeNotifierProvider<MeshAlerts>.value(value: alerts),
+          ChangeNotifierProvider<MeshChatController>.value(value: controller),
+        ],
+        child: const MaterialApp(
+          locale: Locale('zh', 'TW'),
+          localizationsDelegates: [
+            ...AppLocalizations.localizationsDelegates,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: MeshtasticPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+  }
+
+  testWidgets('shows one channel at a time while disconnected', (tester) async {
+    await pumpPage(tester);
+
+    expect(find.text('on the primary'), findsOneWidget);
+    expect(find.text('on the secondary'), findsNothing);
+  });
+
+  testWidgets('still offers the channels the log knows about', (tester) async {
+    await pumpPage(tester);
+
+    // The radio has told us nothing, but the stored log has: two channels.
+    await tester.tap(find.text('CH0'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('CH3').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('on the secondary'), findsOneWidget);
+    expect(find.text('on the primary'), findsNothing);
+  });
+}

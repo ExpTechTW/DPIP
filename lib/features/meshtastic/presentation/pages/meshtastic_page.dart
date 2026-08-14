@@ -8,14 +8,19 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/platform/screen_wake.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
+import 'package:dpip/features/meshtastic/presentation/widgets/mesh_utilization_chart.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -23,55 +28,154 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-class MeshtasticPage extends StatelessWidget {
+class MeshtasticPage extends StatefulWidget {
   const MeshtasticPage({super.key});
+
+  @override
+  State<MeshtasticPage> createState() => _MeshtasticPageState();
+}
+
+class _MeshtasticPageState extends State<MeshtasticPage> {
+  /// Which channel is being read and written, once the user has picked one.
+  ///
+  /// Deliberately **not** persisted and not remembered across visits: DPIP is
+  /// the channel this app exists for, so every entry starts there and a
+  /// detour to another channel lasts only as long as the visit.
+  int? _channel;
+
+  /// Held rather than looked up in [dispose]: by then the element is
+  /// deactivated and reaching for an ancestor throws.
+  MeshAlerts? _alerts;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _alerts = context.read<MeshAlerts>();
+  }
+
+  @override
+  void dispose() {
+    // Nothing on screen any more, so every channel is worth announcing again.
+    _alerts?.setVisibleChannel(null);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final controller = context.watch<MeshChatController>();
     final link = context.watch<MeshLink>();
+    final service = context.read<MeshtasticService>();
     final status = link.status;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(l10n.meshtasticTitle),
-            Text(
-              _statusLabel(l10n, status),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+    // Channels come from two places, because either can be missing: the radio
+    // knows the table but only while connected, and the stored log knows which
+    // channels actually carry history. Their union is what the user can pick
+    // from — so a disconnected app still offers every conversation it holds
+    // instead of collapsing them into one list.
+    final dpipIndex = link.lastKnownDpipChannel;
+    final channels = _channelOptions(
+      fromRadio: service.channels,
+      fromLog: controller.messageCountsByChannel.keys,
+    );
+    // Falls back through: the user's pick → the DPIP channel → the first
+    // option. Re-derived on every build, so a channel that disappears (a
+    // different radio, a rewritten table) can't leave the page pointing at a
+    // slot that no longer exists.
+    final int selected;
+    if (channels.any((c) => c.index == _channel)) {
+      selected = _channel!;
+    } else if (channels.any((c) => c.index == dpipIndex)) {
+      selected = dpipIndex!;
+    } else {
+      selected = channels.isEmpty ? 0 : channels.first.index;
+    }
+
+    // A message arriving in the conversation the user is reading is not news;
+    // anything else still is.
+    context.read<MeshAlerts>().setVisibleChannel(selected);
+
+    // The screen stays awake for as long as this page is up: a conversation you
+    // are watching for a reply is exactly the case where the display timing out
+    // costs you the thing you were waiting for. Released on dispose.
+    return ScreenWakeScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.meshtasticTitle),
+              Text(
+                _statusLabel(l10n, status),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              tooltip: l10n.meshtasticNodes,
+              onPressed: () => _showNodes(context),
+              icon: Badge(
+                isLabelVisible: controller.nodes.isNotEmpty,
+                label: Text('${controller.nodes.length}'),
+                child: const Icon(Icons.hub_outlined),
+              ),
+            ),
+            _OverflowMenu(
+              controller: controller,
+              link: link,
+              alerts: context.watch<MeshAlerts>(),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            tooltip: l10n.meshtasticNodes,
-            onPressed: () => _showNodes(context),
-            icon: Badge(
-              isLabelVisible: controller.nodes.isNotEmpty,
-              label: Text('${controller.nodes.length}'),
-              child: const Icon(Icons.hub_outlined),
-            ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              _ConnectionBanner(link: link),
+              _RadioStrip(link: link),
+              if (channels.length > 1)
+                _ChannelPicker(
+                  channels: channels,
+                  selected: selected,
+                  dpipIndex: dpipIndex,
+                  counts: controller.messageCountsByChannel,
+                  radio: service.radioInfo,
+                  onSelected: (index) => setState(() => _channel = index),
+                ),
+              Expanded(
+                child: _MessageLog(controller: controller, channel: selected),
+              ),
+              _Composer(controller: controller, channel: selected),
+            ],
           ),
-          _OverflowMenu(controller: controller, link: link),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _ConnectionBanner(link: link),
-            _RadioStrip(link: link),
-            Expanded(child: _MessageLog(controller: controller)),
-            _Composer(controller: controller),
-          ],
         ),
       ),
     );
+  }
+
+  /// Every channel worth offering, index-ordered: the radio's enabled slots,
+  /// plus any channel the stored log holds messages for.
+  ///
+  /// A log-only channel is synthesised with no name — all that is known about
+  /// it is its index, which is exactly what its label falls back to.
+  List<MeshChannel> _channelOptions({
+    required List<MeshChannel> fromRadio,
+    required Iterable<int> fromLog,
+  }) {
+    final byIndex = <int, MeshChannel>{
+      for (final channel in fromRadio)
+        if (channel.enabled) channel.index: channel,
+    };
+    for (final index in fromLog) {
+      byIndex.putIfAbsent(
+        index,
+        () => MeshChannel(index: index, name: '', psk: const [], enabled: true),
+      );
+    }
+    return byIndex.values.toList()..sort((a, b) => a.index.compareTo(b.index));
   }
 
   String _statusLabel(AppLocalizations l10n, MeshConnectionStatus status) {
@@ -122,10 +226,15 @@ void _toast(BuildContext context, String message) {
 
 /// App-bar overflow: connect/disconnect and log housekeeping.
 class _OverflowMenu extends StatelessWidget {
-  const _OverflowMenu({required this.controller, required this.link});
+  const _OverflowMenu({
+    required this.controller,
+    required this.link,
+    required this.alerts,
+  });
 
   final MeshChatController controller;
   final MeshLink link;
+  final MeshAlerts alerts;
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +267,19 @@ class _OverflowMenu extends StatelessWidget {
             leading: const Icon(Icons.bluetooth_disabled_outlined),
             title: Text(l10n.meshtasticDisconnect),
           ),
+        ),
+        CheckedPopupMenuItem(
+          checked: alerts.messagesEnabled,
+          value: () => unawaited(
+            alerts.setMessagesEnabled(enabled: !alerts.messagesEnabled),
+          ),
+          child: Text(l10n.meshtasticNotifyMessages),
+        ),
+        CheckedPopupMenuItem(
+          checked: alerts.nodesEnabled,
+          value: () =>
+              unawaited(alerts.setNodesEnabled(enabled: !alerts.nodesEnabled)),
+          child: Text(l10n.meshtasticNotifyNodes),
         ),
         PopupMenuItem(
           enabled: controller.messages.isNotEmpty,
@@ -286,13 +408,34 @@ class _RadioStripState extends State<_RadioStrip> {
   @override
   void initState() {
     super.initState();
-    // The "last packet Ns ago" readout has to age on its own; without a tick
-    // it would freeze at whatever it said when the last packet arrived, which
-    // is exactly the reassurance-without-evidence this strip exists to avoid.
-    _ticker = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => setState(() {}),
-    );
+    _syncTicker();
+  }
+
+  @override
+  void didUpdateWidget(_RadioStrip oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncTicker();
+  }
+
+  /// Runs the 1 Hz tick **only while there is a link**.
+  ///
+  /// The "last packet Ns ago" readout has to age on its own — without a tick it
+  /// would freeze at whatever it said when the last packet arrived, which is
+  /// exactly the reassurance-without-evidence this strip exists to avoid. But
+  /// the strip renders nothing when disconnected, so ticking then would rebuild
+  /// a hidden widget once a second forever (and never let a widget test settle).
+  void _syncTicker() {
+    final needed = widget.link.isConnected;
+    if (needed == (_ticker != null)) return;
+    if (needed) {
+      _ticker = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) => setState(() {}),
+      );
+    } else {
+      _ticker?.cancel();
+      _ticker = null;
+    }
   }
 
   @override
@@ -605,16 +748,153 @@ class _DpipRow extends StatelessWidget {
   }
 }
 
+/// Which channel is being read and written, as a dropdown.
+///
+/// A dropdown rather than a row of tabs because the channels are a list the
+/// user picks *one* of, and most radios carry several: tabs would either wrap
+/// or scroll sideways, hiding the very choice they exist to present. It also
+/// keeps a permanent, readable answer to "which channel am I in" on screen.
+class _ChannelPicker extends StatelessWidget {
+  const _ChannelPicker({
+    required this.channels,
+    required this.selected,
+    required this.dpipIndex,
+    required this.counts,
+    required this.radio,
+    required this.onSelected,
+  });
+
+  final List<MeshChannel> channels;
+  final int selected;
+
+  /// Which slot DPIP occupies, matched by index rather than by name: a
+  /// channel restored from the log has no name, and a radio is free to carry
+  /// DPIP under any index.
+  final int? dpipIndex;
+  final Map<int, int> counts;
+  final MeshRadioInfo? radio;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    // DPIP first: it is the channel this app is responsible for, the others
+    // are the user's own and are simply passed through.
+    final ordered = [...channels]
+      ..sort((a, b) {
+        final aDpip = a.index == dpipIndex;
+        final bDpip = b.index == dpipIndex;
+        if (aDpip != bDpip) return aDpip ? -1 : 1;
+        return a.index.compareTo(b.index);
+      });
+    final current = ordered.firstWhere(
+      (c) => c.index == selected,
+      orElse: () => ordered.first,
+    );
+
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        child: PopupMenuButton<int>(
+          initialValue: selected,
+          onSelected: onSelected,
+          borderRadius: AppRadius.medium,
+          itemBuilder: (_) => [
+            for (final channel in ordered)
+              CheckedPopupMenuItem(
+                value: channel.index,
+                checked: channel.index == selected,
+                child: Row(
+                  children: [
+                    if (channel.index == dpipIndex) ...[
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 16,
+                        color: colors.primary,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                    ],
+                    Text(_channelLabel(channel, radio)),
+                    const SizedBox(width: AppSpacing.sm),
+                    if ((counts[channel.index] ?? 0) > 0)
+                      Text(
+                        // l10n-ignore: message count
+                        '${counts[channel.index]}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  current.index == dpipIndex
+                      ? Icons.shield_outlined
+                      : Icons.tag,
+                  size: 18,
+                  color: colors.primary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  _channelLabel(current, radio),
+                  style: theme.textTheme.titleSmall,
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  size: 20,
+                  color: colors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What to call a channel: its name, or for an unnamed primary the modem
+/// preset the firmware names it after, or the slot number.
+// l10n-ignore: channel index fallback
+String _channelLabel(MeshChannel channel, MeshRadioInfo? radio) {
+  if (channel.name.isNotEmpty) return channel.name;
+  final preset = radio?.modemPreset;
+  if (channel.index == 0 && preset != null && preset.isNotEmpty) return preset;
+  return 'CH${channel.index}';
+}
+
 /// The message log — newest at the bottom, grouped by day.
 class _MessageLog extends StatelessWidget {
-  const _MessageLog({required this.controller});
+  const _MessageLog({required this.controller, required this.channel});
 
   final MeshChatController controller;
+
+  /// Which channel to show. Always filtered, connected or not — channels are
+  /// separate conversations, and interleaving them is wrong however little
+  /// else is known about the radio.
+  final int channel;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final messages = controller.messages;
+    final messages = [
+      for (final message in controller.messages)
+        if (message.channel == channel) message,
+    ];
     if (messages.isEmpty) {
       return EmptyView(
         icon: controller.isConnected
@@ -756,28 +1036,11 @@ class _Bubble extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (message.channel != 0) ...[
-                          // l10n-ignore: channel index, not prose
-                          Text(
-                            'CH${message.channel}',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: muted,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                        ],
-                        Text(
-                          MaterialLocalizations.of(context).formatTimeOfDay(
-                            TimeOfDay.fromDateTime(message.timestamp),
-                          ),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: muted,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      MaterialLocalizations.of(context).formatTimeOfDay(
+                        TimeOfDay.fromDateTime(message.timestamp),
+                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(color: muted),
                     ),
                   ],
                 ),
@@ -793,9 +1056,12 @@ class _Bubble extends StatelessWidget {
 /// The pinned composer. Disabled until the radio is connected *and* configured
 /// — sending earlier is rejected by the transport anyway.
 class _Composer extends StatefulWidget {
-  const _Composer({required this.controller});
+  const _Composer({required this.controller, required this.channel});
 
   final MeshChatController controller;
+
+  /// The channel a message goes out on — whatever tab is open.
+  final int channel;
 
   @override
   State<_Composer> createState() => _ComposerState();
@@ -817,7 +1083,7 @@ class _ComposerState extends State<_Composer> {
     final text = _text.text.trim();
     if (text.isEmpty || _sending) return;
     setState(() => _sending = true);
-    final failure = await widget.controller.send(text);
+    final failure = await widget.controller.send(text, channel: widget.channel);
     if (!mounted) return;
     setState(() => _sending = false);
     if (failure != null) {
@@ -848,28 +1114,41 @@ class _ComposerState extends State<_Composer> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: TextField(
-                controller: _text,
-                focusNode: _focus,
-                enabled: enabled,
-                minLines: 1,
-                maxLines: 4,
-                textInputAction: TextInputAction.send,
-                textCapitalization: TextCapitalization.sentences,
-                onSubmitted: (_) => unawaited(_send()),
-                decoration: InputDecoration(
-                  hintText: l10n.meshtasticSendHint,
-                  filled: true,
-                  isDense: true,
-                  border: const OutlineInputBorder(
-                    borderRadius: AppRadius.large,
-                    borderSide: BorderSide.none,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _text,
+                    focusNode: _focus,
+                    enabled: enabled,
+                    minLines: 1,
+                    maxLines: 4,
+                    textInputAction: TextInputAction.send,
+                    textCapitalization: TextCapitalization.sentences,
+                    // Byte-based, not character-based: the frame budget is in
+                    // UTF-8 bytes, and `maxLength` counts characters — it
+                    // would promise a CJK writer three times the room there is.
+                    inputFormatters: composerInputFormatters,
+                    onSubmitted: (_) => unawaited(_send()),
+                    decoration: InputDecoration(
+                      hintText: l10n.meshtasticSendHint,
+                      filled: true,
+                      isDense: true,
+                      border: const OutlineInputBorder(
+                        borderRadius: AppRadius.large,
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
+                      ),
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.md,
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _text,
+                    builder: (context, value, _) => _QuotaBar(text: value.text),
                   ),
-                ),
+                ],
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -892,6 +1171,111 @@ class _ComposerState extends State<_Composer> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// What the composer feeds its `TextField`. Public so the cap can be tested
+/// against a real field rather than by reaching into a private class.
+const List<TextInputFormatter> composerInputFormatters = [
+  _ByteLimitFormatter(MeshPorts.maxTextBytes),
+];
+
+/// Caps the field at [maxBytes] **UTF-8 bytes**.
+///
+/// A mesh frame's budget is bytes, and the alphabet decides the exchange rate:
+/// one Latin letter costs 1, one Chinese character costs 3. Flutter's
+/// `maxLength` counts characters, so it would let a Chinese message grow to
+/// roughly three times what can actually be transmitted, and the send would
+/// then fail at the radio with a message the user can't act on.
+///
+/// Over-long input is truncated rather than rejected, so pasting a long text
+/// keeps as much as fits instead of dropping all of it — cut on grapheme
+/// clusters so an emoji or a combining mark is never split in half.
+class _ByteLimitFormatter extends TextInputFormatter {
+  const _ByteLimitFormatter(this.maxBytes);
+
+  final int maxBytes;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (_utf8Length(newValue.text) <= maxBytes) return newValue;
+    final buffer = StringBuffer();
+    var used = 0;
+    for (final cluster in newValue.text.characters) {
+      final cost = _utf8Length(cluster);
+      if (used + cost > maxBytes) break;
+      buffer.write(cluster);
+      used += cost;
+    }
+    final text = buffer.toString();
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+}
+
+int _utf8Length(String text) => utf8.encode(text).length;
+
+/// How much of one mesh frame the draft already occupies.
+///
+/// Shown as a bar rather than a number alone because the limit is in bytes:
+/// "148/221" means little on its own, but a bar that is two-thirds full is
+/// immediately readable.
+class _QuotaBar extends StatelessWidget {
+  const _QuotaBar({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    if (text.isEmpty) return const SizedBox(height: AppSpacing.sm);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final used = _utf8Length(text);
+    final ratio = (used / MeshPorts.maxTextBytes).clamp(0.0, 1.0);
+    final full = used >= MeshPorts.maxTextBytes;
+    final color = full
+        ? colors.error
+        : ratio > 0.8
+        ? colors.tertiary
+        : colors.primary;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        0,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: ratio,
+                minHeight: 3,
+                backgroundColor: colors.surfaceContainerHighest,
+                color: color,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          // l10n-ignore: byte budget readout
+          Text(
+            '$used/${MeshPorts.maxTextBytes}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: full ? colors.error : colors.onSurfaceVariant,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1046,6 +1430,12 @@ class _RadioSheet extends StatelessWidget {
             title: l10n.meshtasticRadioSettings,
             rows: _lora(l10n, radio, link),
           ),
+          SectionHeader(l10n.meshtasticUtilization),
+          FutureBuilder<List<MeshMetricSample>>(
+            future: context.read<MeshChatController>().metricsHistory(),
+            builder: (context, snapshot) =>
+                MeshUtilizationChart(samples: snapshot.data ?? const []),
+          ),
           StreamBuilder<MeshTraffic>(
             initialData: service.traffic,
             stream: service.trafficStream,
@@ -1102,6 +1492,9 @@ class _RadioSheet extends StatelessWidget {
       (l10n.meshtasticVoltage, '${radio.voltage!.toStringAsFixed(2)} V'),
     if (radio.uptime != null)
       (l10n.meshtasticUptime, _durationLabel(radio.uptime!)),
+    // The age matters: the radio broadcasts telemetry every few minutes, so a
+    // charge figure with no timestamp reads as live when it isn't.
+    (l10n.meshtasticReadingAge, _sinceLabel(radio.metricsAt)),
   ];
 
   List<(String, String)> _lora(
@@ -1236,7 +1629,8 @@ class _NodeSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final nodes = context.watch<MeshChatController>().nodes;
+    final controller = context.watch<MeshChatController>();
+    final nodes = controller.nodes;
 
     return _SheetFrame(
       title: l10n.meshtasticNodes,
@@ -1255,9 +1649,15 @@ class _NodeSheet extends StatelessWidget {
           for (final node in nodes)
             ListTile(
               leading: Icon(
-                node.isOnline ? Icons.circle : Icons.circle_outlined,
+                // Derived from `lastHeard`, not the flag the node was stored
+                // with: a node saved as online yesterday is not online now.
+                controller.isOnline(node)
+                    ? Icons.circle
+                    : Icons.circle_outlined,
                 size: 12,
-                color: node.isOnline ? colors.primary : colors.outline,
+                color: controller.isOnline(node)
+                    ? colors.primary
+                    : colors.outline,
               ),
               title: Text(node.displayName),
               subtitle: Text(_nodeDetail(node)),

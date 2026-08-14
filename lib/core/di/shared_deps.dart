@@ -5,7 +5,10 @@ import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -55,6 +58,9 @@ class SharedDeps {
     required this.mapLayerOrder,
     required this.meshtastic,
     required this.meshLink,
+    required this.meshAlerts,
+    required this.meshNodes,
+    this.meshStore,
     required this.meshGateway,
     this.etagCache,
     this.networkUsage,
@@ -130,6 +136,17 @@ class SharedDeps {
   /// Keeps the chosen radio attached across pages, drops and app restarts, and
   /// provisions it for DPIP.
   final MeshLink meshLink;
+
+  /// Local notifications for mesh traffic (no push involved).
+  final MeshAlerts meshAlerts;
+
+  /// The last known mesh node table — persisted, so the map and the node list
+  /// have something to show with no radio attached.
+  final MeshNodeStore meshNodes;
+
+  /// The mesh conversation log and utilization history (SQLite). Null when
+  /// the database couldn't be opened — the log is then session-only.
+  final MeshStore? meshStore;
 
   /// DPIP disaster payloads in and out of the mesh — the seam feeds use.
   final DpipMeshGateway meshGateway;

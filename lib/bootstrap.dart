@@ -18,8 +18,13 @@ import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
+import 'package:dpip/core/meshtastic/data/mesh_log_migration.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/data/meshtastic_client_impl.dart';
+import 'package:dpip/core/meshtastic/mesh_metrics_recorder.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -188,6 +193,16 @@ Future<void> bootstrap() async {
   // path for disaster information. `start()` picks a saved radio back up.
   final meshtastic = MeshtasticClientImpl();
   final meshLink = MeshLink(meshtastic, prefs);
+  final meshAlerts = MeshAlerts(meshtastic, prefs);
+  final meshNodes = MeshNodeStore(meshtastic, prefs);
+  // Mesh data gets its own database, deliberately **not** the HTTP cache one:
+  // that lives in the platform cache directory, which the OS may purge, and a
+  // conversation is the one thing here that cannot be fetched again.
+  final meshStore = await _openMeshStore();
+  if (meshStore != null) {
+    await migrateLegacyMeshLog(prefs, meshStore);
+    unawaited(meshStore.prune());
+  }
 
   final deps = SharedDeps(
     prefs: prefs,
@@ -211,6 +226,9 @@ Future<void> bootstrap() async {
     mapLayerOrder: mapLayerOrder,
     meshtastic: meshtastic,
     meshLink: meshLink,
+    meshAlerts: meshAlerts,
+    meshNodes: meshNodes,
+    meshStore: meshStore,
     meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
@@ -220,6 +238,13 @@ Future<void> bootstrap() async {
   // Reconnects to the saved radio, if there is one. Deliberately not awaited:
   // BLE takes seconds and the first frame must not wait for it.
   meshLink.start();
+  // Local notifications for anything the mesh delivers while the user is
+  // elsewhere — raised by the app itself, so they work with no internet.
+  meshAlerts.start();
+  meshNodes.start();
+  if (meshStore != null) {
+    MeshMetricsRecorder(meshtastic, meshStore).start();
+  }
 
   // Each feature turns [deps] into its providers (and registers its realtime
   // channels). Adding a feature = one line here + its `*Providers` function.
@@ -268,6 +293,30 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
     return (etag: EtagCacheStore(db, usage: usage), usage: usage);
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
+    return null;
+  }
+}
+
+/// Opens the mesh database under the application-support directory.
+///
+/// Support, not cache: the mesh log and its utilization history are user data
+/// that no server can re-supply, and the cache directory is purgeable by the
+/// OS. Best-effort like the cache — a failure means the conversation lives
+/// only for this session rather than the app failing to launch.
+Future<MeshStore?> _openMeshStore() async {
+  try {
+    final base = await getApplicationSupportDirectory();
+    final db = await openDatabase(
+      '${base.path}/meshtastic.db',
+      version: 1,
+      onCreate: (db, _) => MeshStore.createSchema(db),
+    );
+    // Also on open, so a database created by an older build picks up tables
+    // added later (every statement is `IF NOT EXISTS`).
+    await MeshStore.createSchema(db);
+    return MeshStore(db);
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'mesh database unavailable');
     return null;
   }
 }

@@ -43,6 +43,7 @@ class FakeMeshService implements MeshtasticService {
 
   final List<({int portnum, int channel, List<int> payload})> sentData = [];
   final List<String> sentText = [];
+  final List<int> sentChannels = [];
   Failure? sendFailure;
 
   @override
@@ -109,6 +110,7 @@ class FakeMeshService implements MeshtasticService {
     final failure = sendFailure;
     if (failure != null) return Err(failure);
     sentText.add(text);
+    sentChannels.add(channel);
     return const Ok(null);
   }
 

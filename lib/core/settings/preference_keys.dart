@@ -119,6 +119,29 @@ abstract final class PreferenceKeys {
     'meshtastic.deviceName',
   );
 
+  /// Local (never pushed) mesh notifications. Messages default on; new-node
+  /// alerts default **off** — a busy mesh introduces neighbours all day. See
+  /// `MeshAlerts`.
+  static const PrefKey<bool> meshNotifyMessages = PrefKey<bool>._(
+    'meshtastic.notifyMessages',
+  );
+  static const PrefKey<bool> meshNotifyNodes = PrefKey<bool>._(
+    'meshtastic.notifyNodes',
+  );
+
+  /// Whether the mesh map layer hides MQTT-only nodes. Defaults to **true** —
+  /// see `MeshNodeStore.excludeMqtt`.
+  static const PrefKey<bool> meshExcludeMqtt = PrefKey<bool>._(
+    'map.meshExcludeMqtt',
+  );
+
+  /// The last known mesh node table (JSON strings, most-recently-heard first).
+  /// Survives reconnects and restarts so the map and the node list have
+  /// something to show with no radio attached. See `MeshNodeStore`.
+  static const PrefKey<List<String>> meshNodes = PrefKey<List<String>>._(
+    'meshtastic.nodes',
+  );
+
   /// The mesh message log — the most recent messages as JSON strings, newest
   /// first. See `MeshChatController`. The radio's own replay queue is small,
   /// shared with telemetry, and lost on reboot, so the log is kept here.

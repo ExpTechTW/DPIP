@@ -58,6 +58,11 @@ class NodeInfoWrapper {
   /// Whether this node is licensed amateur radio
   bool get isLicensed => user?.isLicensed ?? false;
 
+  /// Whether the radio only ever heard this node through an MQTT bridge —
+  /// i.e. over the internet, not over the air. Such a node can be anywhere on
+  /// the planet, so it says nothing about radio reachability.
+  bool get viaMqtt => nodeInfo.viaMqtt;
+
   /// Role of this node
   Config_DeviceConfig_Role? get role => user?.role;
 

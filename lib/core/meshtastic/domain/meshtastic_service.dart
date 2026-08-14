@@ -149,9 +149,23 @@ abstract final class MeshPorts {
   /// `TEXT_MESSAGE_APP`.
   static const int text = 1;
 
-  /// Largest payload one mesh frame carries. A DPIP packet that doesn't fit
-  /// must be split by its own schema — the transport never fragments.
+  /// Largest payload one mesh frame carries (`DATA_PAYLOAD_LEN`). A DPIP
+  /// packet that doesn't fit must be split by its own schema — the transport
+  /// never fragments.
   static const int maxPayloadBytes = 233;
+
+  /// Share of [maxPayloadBytes] held back from anything a user composes.
+  ///
+  /// The transport only measures the payload, but what actually goes on air
+  /// carries the `Data` and `MeshPacket` framing around it, and a radio may
+  /// refuse a frame that lands right on the edge. Spending the last few bytes
+  /// buys nothing and risks a message that silently doesn't send.
+  static const double payloadHeadroom = 0.05;
+
+  /// What a composed message may occupy, in **UTF-8 bytes** — not characters.
+  /// One Chinese character costs three of these, so a character count would
+  /// promise roughly three times the room that exists.
+  static const int maxTextBytes = 221; // (233 * 0.95).floor()
 }
 
 /// Packets in and out since the app started, counted at the transport — one
@@ -209,6 +223,7 @@ class MeshRadioInfo {
     this.channelUtilization,
     this.airUtilTx,
     this.uptime,
+    this.metricsAt,
     this.isLicensed = false,
     this.hasWifi = false,
     this.hasBluetooth = false,
@@ -244,6 +259,11 @@ class MeshRadioInfo {
   final double? airUtilTx;
 
   final Duration? uptime;
+
+  /// When the battery/airtime figures above were last reported. A charge
+  /// reading without its age is worse than none — the radio only broadcasts
+  /// telemetry every few minutes, so a stale number looks live.
+  final DateTime? metricsAt;
 
   final bool isLicensed;
   final bool hasWifi;
@@ -361,6 +381,7 @@ class MeshNode {
     this.latitude,
     this.longitude,
     this.snr = 0,
+    this.viaMqtt = false,
   });
 
   /// Node id (radio number, hex elsewhere in the mesh UI).
@@ -373,6 +394,11 @@ class MeshNode {
   final double? latitude;
   final double? longitude;
   final double snr;
+
+  /// Heard only through an MQTT bridge — over the internet rather than over
+  /// the air. Such a node may be on the other side of the world, so it is not
+  /// evidence of radio reach.
+  final bool viaMqtt;
 }
 
 /// A received text packet from the mesh.

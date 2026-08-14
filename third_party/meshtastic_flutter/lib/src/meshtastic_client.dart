@@ -11,6 +11,7 @@ import '../generated/config.pb.dart';
 import '../generated/module_config.pb.dart';
 import '../generated/channel.pb.dart';
 import '../generated/portnums.pb.dart';
+import '../generated/telemetry.pb.dart';
 import 'models/connection_state.dart';
 import 'models/mesh_packet_wrapper.dart';
 import 'models/node_info.dart';
@@ -58,6 +59,15 @@ class MeshtasticClient {
 
   // Configuration and state
   final Map<int, NodeInfoWrapper> _nodes = {};
+
+  /// Live device metrics per node, and when each arrived.
+  ///
+  /// Separate from the node DB because the DB entry is a *snapshot taken at
+  /// config-download time* — for the local radio it is often stale or missing
+  /// entirely. The truth is broadcast continuously on TELEMETRY_APP, including
+  /// by the attached radio about itself.
+  final Map<int, DeviceMetrics> _metrics = {};
+  final Map<int, DateTime> _metricsAt = {};
   MyNodeInfo? _myNodeInfo;
   Config? _config;
   Config_LoRaConfig? _lora;
@@ -101,6 +111,14 @@ class MeshtasticClient {
 
   /// The channel table as last read from the radio, index-ordered.
   List<Channel> get channels => List.unmodifiable(_channels);
+
+  /// The freshest device metrics for [nodeNum] (battery, voltage, air time),
+  /// or null if that node has never reported any.
+  DeviceMetrics? metricsFor(int nodeNum) => _metrics[nodeNum];
+
+  /// When [metricsFor] last changed for [nodeNum] — a battery reading is only
+  /// meaningful next to its age.
+  DateTime? metricsAgeFor(int nodeNum) => _metricsAt[nodeNum];
 
   /// Records a channel we just wrote, so the cached table doesn't keep
   /// reporting the pre-write state for the rest of the session (which would
@@ -367,6 +385,8 @@ class MeshtasticClient {
     _drainRequested = false;
     _pendingEmptyRetries = 0;
     _nodes.clear();
+    _metrics.clear();
+    _metricsAt.clear();
     _myNodeInfo = null;
     _config = null;
     _lora = null;
@@ -537,6 +557,36 @@ class MeshtasticClient {
   /// Packet ids only need to be unique among in-flight packets.
   int _nextPacketId() => DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
 
+  /// Takes the device metrics out of a telemetry packet.
+  ///
+  /// This is where a live battery reading actually comes from — for the
+  /// attached radio as much as for anyone else on the mesh, because it
+  /// broadcasts its own telemetry like any other node. The node DB copy is
+  /// updated too, so a re-emitted node carries the new numbers.
+  void _absorbTelemetry(MeshPacketWrapper packet) {
+    final payload = packet.decoded?.payload;
+    if (payload == null || payload.isEmpty) return;
+    try {
+      final telemetry = Telemetry.fromBuffer(payload);
+      if (!telemetry.hasDeviceMetrics()) return;
+      final from = packet.from;
+      _metrics[from] = telemetry.deviceMetrics;
+      _metricsAt[from] = DateTime.now();
+      final node = _nodes[from];
+      if (node != null) {
+        node.original.deviceMetrics = telemetry.deviceMetrics;
+        _nodeController.add(node);
+      }
+      _logger.info(
+        'Device metrics from ${from.toRadixString(16)}: '
+        'battery=${telemetry.deviceMetrics.batteryLevel}% '
+        'voltage=${telemetry.deviceMetrics.voltage}V',
+      );
+    } catch (e) {
+      _logger.warning('Unreadable telemetry: $e');
+    }
+  }
+
   void _emitAdminReply(MeshPacketWrapper packet) {
     final payload = packet.decoded?.payload;
     if (payload == null || payload.isEmpty) return;
@@ -619,6 +669,11 @@ class MeshtasticClient {
       if (fromRadio.hasNodeInfo()) {
         final nodeInfo = NodeInfoWrapper(fromRadio.nodeInfo);
         _nodes[nodeInfo.num] = nodeInfo;
+        final stored = nodeInfo.deviceMetrics;
+        // Only as a starting point — a later telemetry packet overwrites it.
+        if (stored != null && !_metrics.containsKey(nodeInfo.num)) {
+          _metrics[nodeInfo.num] = stored;
+        }
         _nodeController.add(nodeInfo);
         _logger.info(
           'Received NodeInfo: num=${nodeInfo.num.toRadixString(16)}, '
@@ -676,6 +731,9 @@ class MeshtasticClient {
         _logger.info('Received MeshPacket: ${packetWrapper.toString()}');
         if (packetWrapper.portnum == PortNum.ADMIN_APP) {
           _emitAdminReply(packetWrapper);
+        }
+        if (packetWrapper.portnum == PortNum.TELEMETRY_APP) {
+          _absorbTelemetry(packetWrapper);
         }
       }
 
