@@ -3152,5 +3152,385 @@
   "solarTermAwakeningOfInsects": "Awakening of Insects",
   "@solarTermAwakeningOfInsects": {
     "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "Tonight",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSubtitle": "What is observable, and when",
+  "@tonightSubtitle": {
+    "description": "Tonight page summary on the data hub"
+  },
+  "tonightSectionDark": "Observing window",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "Astronomical night",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "Never fully dark",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "Dark window",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "Moon up all night",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "Total dark",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "Moonlight",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "Meteor showers",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "Radiant never rises",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "/h",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "Satellite passes",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "Targets up now",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "Quadrantids",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "Lyrids",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "Eta Aquariids",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "Delta Aquariids",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "Perseids",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "Orionids",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "Southern Taurids",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "Leonids",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "Geminids",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "Ursids",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "Open cluster",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "Globular cluster",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "Spiral galaxy",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "Elliptical galaxy",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "Irregular galaxy",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "Planetary nebula",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "Supernova remnant",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "Emission nebula",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "Reflection nebula",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "Asterism",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "Almanac",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSubtitle": "The lunisolar date and the eclipses ahead",
+  "@almanacSubtitle": {
+    "description": "Almanac page summary on the data hub"
+  },
+  "almanacSectionToday": "Today",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "Gregorian",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "Lunisolar",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "Year",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "Month length",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "30 days",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "29 days",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "Leap ",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "Lunar eclipses",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "Solar eclipses",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "None in range",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "Total",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "Partial",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "Annular",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "Penumbral",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "Rat",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "Ox",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "Tiger",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "Rabbit",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "Dragon",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "Snake",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "Horse",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "Goat",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "Monkey",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "Rooster",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "Dog",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "Pig",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "Tide",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideSubtitle": "Spring, neap and the pull of the Moon",
+  "@tideSubtitle": {
+    "description": "Tide page summary on the data hub"
+  },
+  "tideDisclaimer": "Astronomical forcing only — not a harbour tide table. For water levels use the CWA's published tables.",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "Right now",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "Cycle",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "Spring",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "Neap",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "Middling",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "Lunar pull",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "Equilibrium tide",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "m",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "Next perigean spring",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "Turning points",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "High",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "Low",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "Sky chart",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartSubtitle": "The naked-eye sky above you",
+  "@skyChartSubtitle": {
+    "description": "Sky chart page summary on the data hub"
+  },
+  "skyChartNorth": "N",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "E",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "S",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "W",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "elements {days} d old",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}month {month}, day {day}",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "No shower running",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "No visible pass in 48 h",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "Orbit data unavailable",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "Nothing high enough",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "Star catalogue unavailable",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
   }
 }

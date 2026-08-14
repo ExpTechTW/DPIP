@@ -2314,6 +2314,283 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => '驚蟄';
+
+  @override
+  String get tonightTitle => '今夜';
+
+  @override
+  String get tonightSubtitle => '現在看得到什麼、什麼時候';
+
+  @override
+  String get tonightSectionDark => '觀測窗口';
+
+  @override
+  String get tonightAstronomicalNight => '天文夜';
+
+  @override
+  String get tonightNeverDark => '整夜不全暗';
+
+  @override
+  String get tonightDarkWindow => '暗窗';
+
+  @override
+  String get tonightMoonAllNight => '月亮整夜在天上';
+
+  @override
+  String get tonightDarkTotal => '總暗時';
+
+  @override
+  String get tonightMoonlight => '月光';
+
+  @override
+  String get tonightSectionShowers => '流星雨';
+
+  @override
+  String get tonightRadiantDown => '輻射點不升起';
+
+  @override
+  String get tonightPerHour => '顆/時';
+
+  @override
+  String get tonightSectionSatellites => '衛星過境';
+
+  @override
+  String get tonightSectionTargets => '此刻可觀測目標';
+
+  @override
+  String get showerQuadrantids => '象限儀座';
+
+  @override
+  String get showerLyrids => '天琴座';
+
+  @override
+  String get showerEtaAquariids => '寶瓶座η';
+
+  @override
+  String get showerDeltaAquariids => '寶瓶座δ';
+
+  @override
+  String get showerPerseids => '英仙座';
+
+  @override
+  String get showerOrionids => '獵戶座';
+
+  @override
+  String get showerSouthernTaurids => '金牛座南';
+
+  @override
+  String get showerLeonids => '獅子座';
+
+  @override
+  String get showerGeminids => '雙子座';
+
+  @override
+  String get showerUrsids => '小熊座';
+
+  @override
+  String get deepSkyOpenCluster => '疏散星團';
+
+  @override
+  String get deepSkyGlobularCluster => '球狀星團';
+
+  @override
+  String get deepSkySpiralGalaxy => '螺旋星系';
+
+  @override
+  String get deepSkyEllipticalGalaxy => '橢圓星系';
+
+  @override
+  String get deepSkyIrregularGalaxy => '不規則星系';
+
+  @override
+  String get deepSkyPlanetaryNebula => '行星狀星雲';
+
+  @override
+  String get deepSkySupernovaRemnant => '超新星遺跡';
+
+  @override
+  String get deepSkyEmissionNebula => '發射星雲';
+
+  @override
+  String get deepSkyReflectionNebula => '反射星雲';
+
+  @override
+  String get deepSkyAsterism => '星群';
+
+  @override
+  String get almanacTitle => '曆法';
+
+  @override
+  String get almanacSubtitle => '農曆日期與未來的日月食';
+
+  @override
+  String get almanacSectionToday => '今日';
+
+  @override
+  String get almanacGregorian => '西曆';
+
+  @override
+  String get almanacLunar => '農曆';
+
+  @override
+  String get almanacYear => '歲次';
+
+  @override
+  String get almanacMonthLength => '月大小';
+
+  @override
+  String get almanacLongMonth => '三十日';
+
+  @override
+  String get almanacShortMonth => '二十九日';
+
+  @override
+  String get almanacLeapPrefix => '閏';
+
+  @override
+  String get almanacSectionLunarEclipses => '月食';
+
+  @override
+  String get almanacSectionSolarEclipses => '日食';
+
+  @override
+  String get almanacNoSolarEclipse => '範圍內無';
+
+  @override
+  String get eclipseTotal => '全食';
+
+  @override
+  String get eclipsePartial => '偏食';
+
+  @override
+  String get eclipseAnnular => '環食';
+
+  @override
+  String get eclipsePenumbral => '半影食';
+
+  @override
+  String get zodiacRat => '鼠';
+
+  @override
+  String get zodiacOx => '牛';
+
+  @override
+  String get zodiacTiger => '虎';
+
+  @override
+  String get zodiacRabbit => '兔';
+
+  @override
+  String get zodiacDragon => '龍';
+
+  @override
+  String get zodiacSnake => '蛇';
+
+  @override
+  String get zodiacHorse => '馬';
+
+  @override
+  String get zodiacGoat => '羊';
+
+  @override
+  String get zodiacMonkey => '猴';
+
+  @override
+  String get zodiacRooster => '雞';
+
+  @override
+  String get zodiacDog => '狗';
+
+  @override
+  String get zodiacPig => '豬';
+
+  @override
+  String get tideTitle => '潮汐';
+
+  @override
+  String get tideSubtitle => '大潮、小潮與月球引力';
+
+  @override
+  String get tideDisclaimer => '僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布之潮汐預報。';
+
+  @override
+  String get tideSectionNow => '此刻';
+
+  @override
+  String get tidePhase => '週期';
+
+  @override
+  String get tideSpring => '大潮';
+
+  @override
+  String get tideNeap => '小潮';
+
+  @override
+  String get tideMiddling => '中潮';
+
+  @override
+  String get tideLunarDistanceFactor => '月球引力';
+
+  @override
+  String get tideEquilibrium => '平衡潮高';
+
+  @override
+  String get tideMetres => '公尺';
+
+  @override
+  String get tidePerigeanSpring => '下次近地點大潮';
+
+  @override
+  String get tideSectionTurningPoints => '轉折點';
+
+  @override
+  String get tideHigh => '高';
+
+  @override
+  String get tideLow => '低';
+
+  @override
+  String get skyChartTitle => '星圖';
+
+  @override
+  String get skyChartSubtitle => '頭頂上肉眼可見的天空';
+
+  @override
+  String get skyChartNorth => '北';
+
+  @override
+  String get skyChartEast => '東';
+
+  @override
+  String get skyChartSouth => '南';
+
+  @override
+  String get skyChartWest => '西';
+
+  @override
+  String tonightElementAge(int days) {
+    return '軌道資料 $days 天前';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leap$month 月 $day 日';
+  }
+
+  @override
+  String get tonightNoShowers => '目前無流星雨';
+
+  @override
+  String get tonightNoPasses => '48 小時內無可見過境';
+
+  @override
+  String get tonightSatellitesUnavailable => '無法讀取軌道資料';
+
+  @override
+  String get tonightNoTargets => '無足夠高度的目標';
+
+  @override
+  String get skyChartUnavailable => '無法讀取星表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4625,6 +4902,283 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get solarTermAwakeningOfInsects => '惊蛰';
+
+  @override
+  String get tonightTitle => '今夜';
+
+  @override
+  String get tonightSubtitle => '现在看得到什麼、什麼时候';
+
+  @override
+  String get tonightSectionDark => '观测窗口';
+
+  @override
+  String get tonightAstronomicalNight => '天文夜';
+
+  @override
+  String get tonightNeverDark => '整夜不全暗';
+
+  @override
+  String get tonightDarkWindow => '暗窗';
+
+  @override
+  String get tonightMoonAllNight => '月亮整夜在天上';
+
+  @override
+  String get tonightDarkTotal => '總暗时';
+
+  @override
+  String get tonightMoonlight => '月光';
+
+  @override
+  String get tonightSectionShowers => '流星雨';
+
+  @override
+  String get tonightRadiantDown => '輻射点不升起';
+
+  @override
+  String get tonightPerHour => '颗/时';
+
+  @override
+  String get tonightSectionSatellites => '卫星过境';
+
+  @override
+  String get tonightSectionTargets => '此刻可观测目標';
+
+  @override
+  String get showerQuadrantids => '象限儀座';
+
+  @override
+  String get showerLyrids => '天琴座';
+
+  @override
+  String get showerEtaAquariids => '寶瓶座η';
+
+  @override
+  String get showerDeltaAquariids => '寶瓶座δ';
+
+  @override
+  String get showerPerseids => '英仙座';
+
+  @override
+  String get showerOrionids => '獵戶座';
+
+  @override
+  String get showerSouthernTaurids => '金牛座南';
+
+  @override
+  String get showerLeonids => '獅子座';
+
+  @override
+  String get showerGeminids => '雙子座';
+
+  @override
+  String get showerUrsids => '小熊座';
+
+  @override
+  String get deepSkyOpenCluster => '疏散星团';
+
+  @override
+  String get deepSkyGlobularCluster => '球狀星团';
+
+  @override
+  String get deepSkySpiralGalaxy => '螺旋星系';
+
+  @override
+  String get deepSkyEllipticalGalaxy => '椭圆星系';
+
+  @override
+  String get deepSkyIrregularGalaxy => '不規则星系';
+
+  @override
+  String get deepSkyPlanetaryNebula => '行星狀星云';
+
+  @override
+  String get deepSkySupernovaRemnant => '超新星遗迹';
+
+  @override
+  String get deepSkyEmissionNebula => '发射星云';
+
+  @override
+  String get deepSkyReflectionNebula => '反射星云';
+
+  @override
+  String get deepSkyAsterism => '星群';
+
+  @override
+  String get almanacTitle => '历法';
+
+  @override
+  String get almanacSubtitle => '农历日期与未来的日月食';
+
+  @override
+  String get almanacSectionToday => '今日';
+
+  @override
+  String get almanacGregorian => '西历';
+
+  @override
+  String get almanacLunar => '农历';
+
+  @override
+  String get almanacYear => '岁次';
+
+  @override
+  String get almanacMonthLength => '月大小';
+
+  @override
+  String get almanacLongMonth => '三十日';
+
+  @override
+  String get almanacShortMonth => '二十九日';
+
+  @override
+  String get almanacLeapPrefix => '闰';
+
+  @override
+  String get almanacSectionLunarEclipses => '月食';
+
+  @override
+  String get almanacSectionSolarEclipses => '日食';
+
+  @override
+  String get almanacNoSolarEclipse => '范围內無';
+
+  @override
+  String get eclipseTotal => '全食';
+
+  @override
+  String get eclipsePartial => '偏食';
+
+  @override
+  String get eclipseAnnular => '环食';
+
+  @override
+  String get eclipsePenumbral => '半影食';
+
+  @override
+  String get zodiacRat => '鼠';
+
+  @override
+  String get zodiacOx => '牛';
+
+  @override
+  String get zodiacTiger => '虎';
+
+  @override
+  String get zodiacRabbit => '兔';
+
+  @override
+  String get zodiacDragon => '龙';
+
+  @override
+  String get zodiacSnake => '蛇';
+
+  @override
+  String get zodiacHorse => '马';
+
+  @override
+  String get zodiacGoat => '羊';
+
+  @override
+  String get zodiacMonkey => '猴';
+
+  @override
+  String get zodiacRooster => '鸡';
+
+  @override
+  String get zodiacDog => '狗';
+
+  @override
+  String get zodiacPig => '猪';
+
+  @override
+  String get tideTitle => '潮汐';
+
+  @override
+  String get tideSubtitle => '大潮、小潮与月球引力';
+
+  @override
+  String get tideDisclaimer => '仅为天文引潮力，非港口潮汐表。水位請参考气象署公布之潮汐预报。';
+
+  @override
+  String get tideSectionNow => '此刻';
+
+  @override
+  String get tidePhase => '周期';
+
+  @override
+  String get tideSpring => '大潮';
+
+  @override
+  String get tideNeap => '小潮';
+
+  @override
+  String get tideMiddling => '中潮';
+
+  @override
+  String get tideLunarDistanceFactor => '月球引力';
+
+  @override
+  String get tideEquilibrium => '平衡潮高';
+
+  @override
+  String get tideMetres => '公尺';
+
+  @override
+  String get tidePerigeanSpring => '下次近地点大潮';
+
+  @override
+  String get tideSectionTurningPoints => '转折点';
+
+  @override
+  String get tideHigh => '高';
+
+  @override
+  String get tideLow => '低';
+
+  @override
+  String get skyChartTitle => '星图';
+
+  @override
+  String get skyChartSubtitle => '头頂上肉眼可见的天空';
+
+  @override
+  String get skyChartNorth => '北';
+
+  @override
+  String get skyChartEast => '东';
+
+  @override
+  String get skyChartSouth => '南';
+
+  @override
+  String get skyChartWest => '西';
+
+  @override
+  String tonightElementAge(int days) {
+    return '轨道数据 $days 天前';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leap$month 月 $day 日';
+  }
+
+  @override
+  String get tonightNoShowers => '目前无流星雨';
+
+  @override
+  String get tonightNoPasses => '48 小时内无可见过境';
+
+  @override
+  String get tonightSatellitesUnavailable => '无法读取轨道数据';
+
+  @override
+  String get tonightNoTargets => '无足够高度的目标';
+
+  @override
+  String get skyChartUnavailable => '无法读取星表';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -6936,6 +7490,283 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get solarTermAwakeningOfInsects => '驚蟄';
+
+  @override
+  String get tonightTitle => '今夜';
+
+  @override
+  String get tonightSubtitle => '現在看得到什麼、什麼時候';
+
+  @override
+  String get tonightSectionDark => '觀測窗口';
+
+  @override
+  String get tonightAstronomicalNight => '天文夜';
+
+  @override
+  String get tonightNeverDark => '整夜不全暗';
+
+  @override
+  String get tonightDarkWindow => '暗窗';
+
+  @override
+  String get tonightMoonAllNight => '月亮整夜在天上';
+
+  @override
+  String get tonightDarkTotal => '總暗時';
+
+  @override
+  String get tonightMoonlight => '月光';
+
+  @override
+  String get tonightSectionShowers => '流星雨';
+
+  @override
+  String get tonightRadiantDown => '輻射點不升起';
+
+  @override
+  String get tonightPerHour => '顆/時';
+
+  @override
+  String get tonightSectionSatellites => '衛星過境';
+
+  @override
+  String get tonightSectionTargets => '此刻可觀測目標';
+
+  @override
+  String get showerQuadrantids => '象限儀座';
+
+  @override
+  String get showerLyrids => '天琴座';
+
+  @override
+  String get showerEtaAquariids => '寶瓶座η';
+
+  @override
+  String get showerDeltaAquariids => '寶瓶座δ';
+
+  @override
+  String get showerPerseids => '英仙座';
+
+  @override
+  String get showerOrionids => '獵戶座';
+
+  @override
+  String get showerSouthernTaurids => '金牛座南';
+
+  @override
+  String get showerLeonids => '獅子座';
+
+  @override
+  String get showerGeminids => '雙子座';
+
+  @override
+  String get showerUrsids => '小熊座';
+
+  @override
+  String get deepSkyOpenCluster => '疏散星團';
+
+  @override
+  String get deepSkyGlobularCluster => '球狀星團';
+
+  @override
+  String get deepSkySpiralGalaxy => '螺旋星系';
+
+  @override
+  String get deepSkyEllipticalGalaxy => '橢圓星系';
+
+  @override
+  String get deepSkyIrregularGalaxy => '不規則星系';
+
+  @override
+  String get deepSkyPlanetaryNebula => '行星狀星雲';
+
+  @override
+  String get deepSkySupernovaRemnant => '超新星遺跡';
+
+  @override
+  String get deepSkyEmissionNebula => '發射星雲';
+
+  @override
+  String get deepSkyReflectionNebula => '反射星雲';
+
+  @override
+  String get deepSkyAsterism => '星群';
+
+  @override
+  String get almanacTitle => '曆法';
+
+  @override
+  String get almanacSubtitle => '農曆日期與未來的日月食';
+
+  @override
+  String get almanacSectionToday => '今日';
+
+  @override
+  String get almanacGregorian => '西曆';
+
+  @override
+  String get almanacLunar => '農曆';
+
+  @override
+  String get almanacYear => '歲次';
+
+  @override
+  String get almanacMonthLength => '月大小';
+
+  @override
+  String get almanacLongMonth => '三十日';
+
+  @override
+  String get almanacShortMonth => '二十九日';
+
+  @override
+  String get almanacLeapPrefix => '閏';
+
+  @override
+  String get almanacSectionLunarEclipses => '月食';
+
+  @override
+  String get almanacSectionSolarEclipses => '日食';
+
+  @override
+  String get almanacNoSolarEclipse => '範圍內無';
+
+  @override
+  String get eclipseTotal => '全食';
+
+  @override
+  String get eclipsePartial => '偏食';
+
+  @override
+  String get eclipseAnnular => '環食';
+
+  @override
+  String get eclipsePenumbral => '半影食';
+
+  @override
+  String get zodiacRat => '鼠';
+
+  @override
+  String get zodiacOx => '牛';
+
+  @override
+  String get zodiacTiger => '虎';
+
+  @override
+  String get zodiacRabbit => '兔';
+
+  @override
+  String get zodiacDragon => '龍';
+
+  @override
+  String get zodiacSnake => '蛇';
+
+  @override
+  String get zodiacHorse => '馬';
+
+  @override
+  String get zodiacGoat => '羊';
+
+  @override
+  String get zodiacMonkey => '猴';
+
+  @override
+  String get zodiacRooster => '雞';
+
+  @override
+  String get zodiacDog => '狗';
+
+  @override
+  String get zodiacPig => '豬';
+
+  @override
+  String get tideTitle => '潮汐';
+
+  @override
+  String get tideSubtitle => '大潮、小潮與月球引力';
+
+  @override
+  String get tideDisclaimer => '僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布之潮汐預報。';
+
+  @override
+  String get tideSectionNow => '此刻';
+
+  @override
+  String get tidePhase => '週期';
+
+  @override
+  String get tideSpring => '大潮';
+
+  @override
+  String get tideNeap => '小潮';
+
+  @override
+  String get tideMiddling => '中潮';
+
+  @override
+  String get tideLunarDistanceFactor => '月球引力';
+
+  @override
+  String get tideEquilibrium => '平衡潮高';
+
+  @override
+  String get tideMetres => '公尺';
+
+  @override
+  String get tidePerigeanSpring => '下次近地點大潮';
+
+  @override
+  String get tideSectionTurningPoints => '轉折點';
+
+  @override
+  String get tideHigh => '高';
+
+  @override
+  String get tideLow => '低';
+
+  @override
+  String get skyChartTitle => '星圖';
+
+  @override
+  String get skyChartSubtitle => '頭頂上肉眼可見的天空';
+
+  @override
+  String get skyChartNorth => '北';
+
+  @override
+  String get skyChartEast => '東';
+
+  @override
+  String get skyChartSouth => '南';
+
+  @override
+  String get skyChartWest => '西';
+
+  @override
+  String tonightElementAge(int days) {
+    return '軌道資料 $days 天前';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leap$month 月 $day 日';
+  }
+
+  @override
+  String get tonightNoShowers => '目前無流星雨';
+
+  @override
+  String get tonightNoPasses => '48 小時內無可見過境';
+
+  @override
+  String get tonightSatellitesUnavailable => '無法讀取軌道資料';
+
+  @override
+  String get tonightNoTargets => '無足夠高度的目標';
+
+  @override
+  String get skyChartUnavailable => '無法讀取星表';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -9247,4 +10078,281 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get solarTermAwakeningOfInsects => '驚蟄';
+
+  @override
+  String get tonightTitle => '今夜';
+
+  @override
+  String get tonightSubtitle => '現在看得到什麼、什麼時候';
+
+  @override
+  String get tonightSectionDark => '觀測窗口';
+
+  @override
+  String get tonightAstronomicalNight => '天文夜';
+
+  @override
+  String get tonightNeverDark => '整夜不全暗';
+
+  @override
+  String get tonightDarkWindow => '暗窗';
+
+  @override
+  String get tonightMoonAllNight => '月亮整夜在天上';
+
+  @override
+  String get tonightDarkTotal => '總暗時';
+
+  @override
+  String get tonightMoonlight => '月光';
+
+  @override
+  String get tonightSectionShowers => '流星雨';
+
+  @override
+  String get tonightRadiantDown => '輻射點不升起';
+
+  @override
+  String get tonightPerHour => '顆/時';
+
+  @override
+  String get tonightSectionSatellites => '衛星過境';
+
+  @override
+  String get tonightSectionTargets => '此刻可觀測目標';
+
+  @override
+  String get showerQuadrantids => '象限儀座';
+
+  @override
+  String get showerLyrids => '天琴座';
+
+  @override
+  String get showerEtaAquariids => '寶瓶座η';
+
+  @override
+  String get showerDeltaAquariids => '寶瓶座δ';
+
+  @override
+  String get showerPerseids => '英仙座';
+
+  @override
+  String get showerOrionids => '獵戶座';
+
+  @override
+  String get showerSouthernTaurids => '金牛座南';
+
+  @override
+  String get showerLeonids => '獅子座';
+
+  @override
+  String get showerGeminids => '雙子座';
+
+  @override
+  String get showerUrsids => '小熊座';
+
+  @override
+  String get deepSkyOpenCluster => '疏散星團';
+
+  @override
+  String get deepSkyGlobularCluster => '球狀星團';
+
+  @override
+  String get deepSkySpiralGalaxy => '螺旋星系';
+
+  @override
+  String get deepSkyEllipticalGalaxy => '橢圓星系';
+
+  @override
+  String get deepSkyIrregularGalaxy => '不規則星系';
+
+  @override
+  String get deepSkyPlanetaryNebula => '行星狀星雲';
+
+  @override
+  String get deepSkySupernovaRemnant => '超新星遺跡';
+
+  @override
+  String get deepSkyEmissionNebula => '發射星雲';
+
+  @override
+  String get deepSkyReflectionNebula => '反射星雲';
+
+  @override
+  String get deepSkyAsterism => '星群';
+
+  @override
+  String get almanacTitle => '曆法';
+
+  @override
+  String get almanacSubtitle => '農曆日期與未來的日月食';
+
+  @override
+  String get almanacSectionToday => '今日';
+
+  @override
+  String get almanacGregorian => '西曆';
+
+  @override
+  String get almanacLunar => '農曆';
+
+  @override
+  String get almanacYear => '歲次';
+
+  @override
+  String get almanacMonthLength => '月大小';
+
+  @override
+  String get almanacLongMonth => '三十日';
+
+  @override
+  String get almanacShortMonth => '二十九日';
+
+  @override
+  String get almanacLeapPrefix => '閏';
+
+  @override
+  String get almanacSectionLunarEclipses => '月食';
+
+  @override
+  String get almanacSectionSolarEclipses => '日食';
+
+  @override
+  String get almanacNoSolarEclipse => '範圍內無';
+
+  @override
+  String get eclipseTotal => '全食';
+
+  @override
+  String get eclipsePartial => '偏食';
+
+  @override
+  String get eclipseAnnular => '環食';
+
+  @override
+  String get eclipsePenumbral => '半影食';
+
+  @override
+  String get zodiacRat => '鼠';
+
+  @override
+  String get zodiacOx => '牛';
+
+  @override
+  String get zodiacTiger => '虎';
+
+  @override
+  String get zodiacRabbit => '兔';
+
+  @override
+  String get zodiacDragon => '龍';
+
+  @override
+  String get zodiacSnake => '蛇';
+
+  @override
+  String get zodiacHorse => '馬';
+
+  @override
+  String get zodiacGoat => '羊';
+
+  @override
+  String get zodiacMonkey => '猴';
+
+  @override
+  String get zodiacRooster => '雞';
+
+  @override
+  String get zodiacDog => '狗';
+
+  @override
+  String get zodiacPig => '豬';
+
+  @override
+  String get tideTitle => '潮汐';
+
+  @override
+  String get tideSubtitle => '大潮、小潮與月球引力';
+
+  @override
+  String get tideDisclaimer => '僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布之潮汐預報。';
+
+  @override
+  String get tideSectionNow => '此刻';
+
+  @override
+  String get tidePhase => '週期';
+
+  @override
+  String get tideSpring => '大潮';
+
+  @override
+  String get tideNeap => '小潮';
+
+  @override
+  String get tideMiddling => '中潮';
+
+  @override
+  String get tideLunarDistanceFactor => '月球引力';
+
+  @override
+  String get tideEquilibrium => '平衡潮高';
+
+  @override
+  String get tideMetres => '公尺';
+
+  @override
+  String get tidePerigeanSpring => '下次近地點大潮';
+
+  @override
+  String get tideSectionTurningPoints => '轉折點';
+
+  @override
+  String get tideHigh => '高';
+
+  @override
+  String get tideLow => '低';
+
+  @override
+  String get skyChartTitle => '星圖';
+
+  @override
+  String get skyChartSubtitle => '頭頂上肉眼可見的天空';
+
+  @override
+  String get skyChartNorth => '北';
+
+  @override
+  String get skyChartEast => '東';
+
+  @override
+  String get skyChartSouth => '南';
+
+  @override
+  String get skyChartWest => '西';
+
+  @override
+  String tonightElementAge(int days) {
+    return '軌道資料 $days 天前';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leap$month 月 $day 日';
+  }
+
+  @override
+  String get tonightNoShowers => '目前無流星雨';
+
+  @override
+  String get tonightNoPasses => '48 小時內無可見過境';
+
+  @override
+  String get tonightSatellitesUnavailable => '無法讀取軌道資料';
+
+  @override
+  String get tonightNoTargets => '無足夠高度的目標';
+
+  @override
+  String get skyChartUnavailable => '無法讀取星表';
 }

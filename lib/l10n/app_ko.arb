@@ -1355,5 +1355,385 @@
   "solarTermAwakeningOfInsects": "경칩",
   "@solarTermAwakeningOfInsects": {
     "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "오늘 밤",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSubtitle": "무엇을 언제 볼 수 있는가",
+  "@tonightSubtitle": {
+    "description": "Tonight page summary on the data hub"
+  },
+  "tonightSectionDark": "관측 가능 시간",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "천문박명 종료",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "완전히 어두워지지 않음",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "암흑 시간대",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "달이 밤새 떠 있음",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "총 암흑 시간",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "달빛",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "유성우",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "복사점이 뜨지 않음",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "개/시",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "위성 통과",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "지금 볼 수 있는 천체",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "사분의자리",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "거문고자리",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "물병자리 에타",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "물병자리 델타",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "페르세우스자리",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "오리온자리",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "황소자리 남",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "사자자리",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "쌍둥이자리",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "작은곰자리",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "산개성단",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "구상성단",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "나선은하",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "타원은하",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "불규칙은하",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "행성상성운",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "초신성 잔해",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "발광성운",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "반사성운",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "성군",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "역법",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSubtitle": "음력과 앞으로의 일식·월식",
+  "@almanacSubtitle": {
+    "description": "Almanac page summary on the data hub"
+  },
+  "almanacSectionToday": "오늘",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "양력",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "음력",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "세차",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "월 대소",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "30일",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "29일",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "윤",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "월식",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "일식",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "범위 내 없음",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "개기",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "부분",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "금환",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "반영",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "쥐",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "소",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "호랑이",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "토끼",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "용",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "뱀",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "말",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "양",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "원숭이",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "닭",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "개",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "돼지",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "조석",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideSubtitle": "사리·조금과 달의 인력",
+  "@tideSubtitle": {
+    "description": "Tide page summary on the data hub"
+  },
+  "tideDisclaimer": "천문 기조력만이며 항만 조석표가 아닙니다. 수위는 기상청 발표를 참고하세요.",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "현재",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "주기",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "사리",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "조금",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "중조",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "달의 인력",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "평형 조위",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "m",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "다음 근지점 사리",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "전환점",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "고",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "저",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "성도",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartSubtitle": "머리 위 맨눈으로 보이는 하늘",
+  "@skyChartSubtitle": {
+    "description": "Sky chart page summary on the data hub"
+  },
+  "skyChartNorth": "북",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "동",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "남",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "서",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "궤도 요소 {days}일 전",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}{month}월 {day}일",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "진행 중인 유성우 없음",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "48시간 내 가시 통과 없음",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "궤도 데이터를 읽을 수 없음",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "충분히 높은 천체 없음",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "성표를 읽을 수 없음",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
   }
 }

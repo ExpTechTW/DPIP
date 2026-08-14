@@ -4496,6 +4496,552 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Awakening of Insects'**
   String get solarTermAwakeningOfInsects;
+
+  /// Tonight page title
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight'**
+  String get tonightTitle;
+
+  /// Tonight page summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'What is observable, and when'**
+  String get tonightSubtitle;
+
+  /// Section header: the observing window
+  ///
+  /// In en, this message translates to:
+  /// **'Observing window'**
+  String get tonightSectionDark;
+
+  /// Dusk to dawn with the Sun 18 degrees down
+  ///
+  /// In en, this message translates to:
+  /// **'Astronomical night'**
+  String get tonightAstronomicalNight;
+
+  /// Shown when the Sun never gets 18 degrees below the horizon
+  ///
+  /// In en, this message translates to:
+  /// **'Never fully dark'**
+  String get tonightNeverDark;
+
+  /// The longest stretch with no Sun and no Moon
+  ///
+  /// In en, this message translates to:
+  /// **'Dark window'**
+  String get tonightDarkWindow;
+
+  /// Shown when the Moon is up for the whole night
+  ///
+  /// In en, this message translates to:
+  /// **'Moon up all night'**
+  String get tonightMoonAllNight;
+
+  /// Total dark time, hours:minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Total dark'**
+  String get tonightDarkTotal;
+
+  /// The Moon's illuminated fraction tonight
+  ///
+  /// In en, this message translates to:
+  /// **'Moonlight'**
+  String get tonightMoonlight;
+
+  /// Section header: meteor showers running now
+  ///
+  /// In en, this message translates to:
+  /// **'Meteor showers'**
+  String get tonightSectionShowers;
+
+  /// The shower's radiant never rises here
+  ///
+  /// In en, this message translates to:
+  /// **'Radiant never rises'**
+  String get tonightRadiantDown;
+
+  /// Unit: meteors per hour
+  ///
+  /// In en, this message translates to:
+  /// **'/h'**
+  String get tonightPerHour;
+
+  /// Section header: visible satellite passes
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite passes'**
+  String get tonightSectionSatellites;
+
+  /// Section header: deep-sky objects high enough to observe
+  ///
+  /// In en, this message translates to:
+  /// **'Targets up now'**
+  String get tonightSectionTargets;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Quadrantids'**
+  String get showerQuadrantids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrids'**
+  String get showerLyrids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Eta Aquariids'**
+  String get showerEtaAquariids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Delta Aquariids'**
+  String get showerDeltaAquariids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Perseids'**
+  String get showerPerseids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Orionids'**
+  String get showerOrionids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Southern Taurids'**
+  String get showerSouthernTaurids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Leonids'**
+  String get showerLeonids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Geminids'**
+  String get showerGeminids;
+
+  /// Meteor shower name
+  ///
+  /// In en, this message translates to:
+  /// **'Ursids'**
+  String get showerUrsids;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Open cluster'**
+  String get deepSkyOpenCluster;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Globular cluster'**
+  String get deepSkyGlobularCluster;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Spiral galaxy'**
+  String get deepSkySpiralGalaxy;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Elliptical galaxy'**
+  String get deepSkyEllipticalGalaxy;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Irregular galaxy'**
+  String get deepSkyIrregularGalaxy;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Planetary nebula'**
+  String get deepSkyPlanetaryNebula;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Supernova remnant'**
+  String get deepSkySupernovaRemnant;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Emission nebula'**
+  String get deepSkyEmissionNebula;
+
+  /// Deep-sky object type
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection nebula'**
+  String get deepSkyReflectionNebula;
+
+  /// Deep-sky object type: a star pattern, not a single object
+  ///
+  /// In en, this message translates to:
+  /// **'Asterism'**
+  String get deepSkyAsterism;
+
+  /// Almanac page title
+  ///
+  /// In en, this message translates to:
+  /// **'Almanac'**
+  String get almanacTitle;
+
+  /// Almanac page summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'The lunisolar date and the eclipses ahead'**
+  String get almanacSubtitle;
+
+  /// Section header: today's date in both calendars
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get almanacSectionToday;
+
+  /// The Gregorian date
+  ///
+  /// In en, this message translates to:
+  /// **'Gregorian'**
+  String get almanacGregorian;
+
+  /// The lunisolar date
+  ///
+  /// In en, this message translates to:
+  /// **'Lunisolar'**
+  String get almanacLunar;
+
+  /// The sexagenary year and its zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get almanacYear;
+
+  /// Whether this lunar month has 29 or 30 days
+  ///
+  /// In en, this message translates to:
+  /// **'Month length'**
+  String get almanacMonthLength;
+
+  /// A 30-day lunar month
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get almanacLongMonth;
+
+  /// A 29-day lunar month
+  ///
+  /// In en, this message translates to:
+  /// **'29 days'**
+  String get almanacShortMonth;
+
+  /// Prefix marking an intercalary lunar month
+  ///
+  /// In en, this message translates to:
+  /// **'Leap '**
+  String get almanacLeapPrefix;
+
+  /// Section header: upcoming lunar eclipses
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar eclipses'**
+  String get almanacSectionLunarEclipses;
+
+  /// Section header: solar eclipses visible from here
+  ///
+  /// In en, this message translates to:
+  /// **'Solar eclipses'**
+  String get almanacSectionSolarEclipses;
+
+  /// No solar eclipse is visible from here in the search window
+  ///
+  /// In en, this message translates to:
+  /// **'None in range'**
+  String get almanacNoSolarEclipse;
+
+  /// Eclipse type
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get eclipseTotal;
+
+  /// Eclipse type
+  ///
+  /// In en, this message translates to:
+  /// **'Partial'**
+  String get eclipsePartial;
+
+  /// Eclipse type: a ring of Sun remains
+  ///
+  /// In en, this message translates to:
+  /// **'Annular'**
+  String get eclipseAnnular;
+
+  /// Eclipse type: the Moon only enters the outer shadow
+  ///
+  /// In en, this message translates to:
+  /// **'Penumbral'**
+  String get eclipsePenumbral;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Rat'**
+  String get zodiacRat;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Ox'**
+  String get zodiacOx;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Tiger'**
+  String get zodiacTiger;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Rabbit'**
+  String get zodiacRabbit;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Dragon'**
+  String get zodiacDragon;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Snake'**
+  String get zodiacSnake;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Horse'**
+  String get zodiacHorse;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Goat'**
+  String get zodiacGoat;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Monkey'**
+  String get zodiacMonkey;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Rooster'**
+  String get zodiacRooster;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Dog'**
+  String get zodiacDog;
+
+  /// Chinese zodiac animal
+  ///
+  /// In en, this message translates to:
+  /// **'Pig'**
+  String get zodiacPig;
+
+  /// Tide page title
+  ///
+  /// In en, this message translates to:
+  /// **'Tide'**
+  String get tideTitle;
+
+  /// Tide page summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'Spring, neap and the pull of the Moon'**
+  String get tideSubtitle;
+
+  /// Says plainly that this is the astronomical forcing, not a harbour tide table
+  ///
+  /// In en, this message translates to:
+  /// **'Astronomical forcing only — not a harbour tide table. For water levels use the CWA\'s published tables.'**
+  String get tideDisclaimer;
+
+  /// Section header: the tide-raising force right now
+  ///
+  /// In en, this message translates to:
+  /// **'Right now'**
+  String get tideSectionNow;
+
+  /// Where in the spring-neap cycle the tide sits
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle'**
+  String get tidePhase;
+
+  /// Spring tide: Sun and Moon aligned
+  ///
+  /// In en, this message translates to:
+  /// **'Spring'**
+  String get tideSpring;
+
+  /// Neap tide: Sun and Moon at right angles
+  ///
+  /// In en, this message translates to:
+  /// **'Neap'**
+  String get tideNeap;
+
+  /// Between spring and neap
+  ///
+  /// In en, this message translates to:
+  /// **'Middling'**
+  String get tideMiddling;
+
+  /// How much stronger the Moon's pull is than at mean distance
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar pull'**
+  String get tideLunarDistanceFactor;
+
+  /// The equilibrium tide height
+  ///
+  /// In en, this message translates to:
+  /// **'Equilibrium tide'**
+  String get tideEquilibrium;
+
+  /// Unit: metres
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get tideMetres;
+
+  /// The next spring tide at lunar perigee - the highest water
+  ///
+  /// In en, this message translates to:
+  /// **'Next perigean spring'**
+  String get tidePerigeanSpring;
+
+  /// Section header: when the forcing peaks and troughs
+  ///
+  /// In en, this message translates to:
+  /// **'Turning points'**
+  String get tideSectionTurningPoints;
+
+  /// A high point of the tidal forcing
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get tideHigh;
+
+  /// A low point of the tidal forcing
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get tideLow;
+
+  /// Sky chart page title
+  ///
+  /// In en, this message translates to:
+  /// **'Sky chart'**
+  String get skyChartTitle;
+
+  /// Sky chart page summary on the data hub
+  ///
+  /// In en, this message translates to:
+  /// **'The naked-eye sky above you'**
+  String get skyChartSubtitle;
+
+  /// Compass point on the sky chart
+  ///
+  /// In en, this message translates to:
+  /// **'N'**
+  String get skyChartNorth;
+
+  /// Compass point on the sky chart
+  ///
+  /// In en, this message translates to:
+  /// **'E'**
+  String get skyChartEast;
+
+  /// Compass point on the sky chart
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get skyChartSouth;
+
+  /// Compass point on the sky chart
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get skyChartWest;
+
+  /// How old the bundled satellite element set is, in days
+  ///
+  /// In en, this message translates to:
+  /// **'elements {days} d old'**
+  String tonightElementAge(int days);
+
+  /// A lunisolar date: an optional leap marker, the month and the day
+  ///
+  /// In en, this message translates to:
+  /// **'{leap}month {month}, day {day}'**
+  String almanacLunarDate(String leap, int month, int day);
+
+  /// Shown when no meteor shower is running today
+  ///
+  /// In en, this message translates to:
+  /// **'No shower running'**
+  String get tonightNoShowers;
+
+  /// Shown when no satellite pass is visible in the next two days
+  ///
+  /// In en, this message translates to:
+  /// **'No visible pass in 48 h'**
+  String get tonightNoPasses;
+
+  /// Shown when the bundled element set could not be read
+  ///
+  /// In en, this message translates to:
+  /// **'Orbit data unavailable'**
+  String get tonightSatellitesUnavailable;
+
+  /// Shown when nothing in the catalogue is high enough tonight
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing high enough'**
+  String get tonightNoTargets;
+
+  /// Shown when the bundled star catalogue could not be read
+  ///
+  /// In en, this message translates to:
+  /// **'Star catalogue unavailable'**
+  String get skyChartUnavailable;
 }
 
 class _AppLocalizationsDelegate

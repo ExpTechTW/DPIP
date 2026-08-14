@@ -2357,4 +2357,283 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => 'Kinh trập';
+
+  @override
+  String get tonightTitle => 'Đêm nay';
+
+  @override
+  String get tonightSubtitle => 'Có thể quan sát gì, và khi nào';
+
+  @override
+  String get tonightSectionDark => 'Cửa sổ quan sát';
+
+  @override
+  String get tonightAstronomicalNight => 'Đêm thiên văn';
+
+  @override
+  String get tonightNeverDark => 'Không bao giờ tối hẳn';
+
+  @override
+  String get tonightDarkWindow => 'Cửa sổ tối';
+
+  @override
+  String get tonightMoonAllNight => 'Trăng lên suốt đêm';
+
+  @override
+  String get tonightDarkTotal => 'Tổng thời gian tối';
+
+  @override
+  String get tonightMoonlight => 'Ánh trăng';
+
+  @override
+  String get tonightSectionShowers => 'Mưa sao băng';
+
+  @override
+  String get tonightRadiantDown => 'Tâm điểm không mọc';
+
+  @override
+  String get tonightPerHour => 'sao/giờ';
+
+  @override
+  String get tonightSectionSatellites => 'Vệ tinh bay qua';
+
+  @override
+  String get tonightSectionTargets => 'Mục tiêu đang lên';
+
+  @override
+  String get showerQuadrantids => 'Quadrantids';
+
+  @override
+  String get showerLyrids => 'Lyrids';
+
+  @override
+  String get showerEtaAquariids => 'Eta Aquariids';
+
+  @override
+  String get showerDeltaAquariids => 'Delta Aquariids';
+
+  @override
+  String get showerPerseids => 'Perseids';
+
+  @override
+  String get showerOrionids => 'Orionids';
+
+  @override
+  String get showerSouthernTaurids => 'Nam Taurids';
+
+  @override
+  String get showerLeonids => 'Leonids';
+
+  @override
+  String get showerGeminids => 'Geminids';
+
+  @override
+  String get showerUrsids => 'Ursids';
+
+  @override
+  String get deepSkyOpenCluster => 'Cụm sao mở';
+
+  @override
+  String get deepSkyGlobularCluster => 'Cụm sao cầu';
+
+  @override
+  String get deepSkySpiralGalaxy => 'Thiên hà xoắn ốc';
+
+  @override
+  String get deepSkyEllipticalGalaxy => 'Thiên hà elip';
+
+  @override
+  String get deepSkyIrregularGalaxy => 'Thiên hà vô định hình';
+
+  @override
+  String get deepSkyPlanetaryNebula => 'Tinh vân hành tinh';
+
+  @override
+  String get deepSkySupernovaRemnant => 'Tàn dư siêu tân tinh';
+
+  @override
+  String get deepSkyEmissionNebula => 'Tinh vân phát xạ';
+
+  @override
+  String get deepSkyReflectionNebula => 'Tinh vân phản xạ';
+
+  @override
+  String get deepSkyAsterism => 'Chòm sao nhỏ';
+
+  @override
+  String get almanacTitle => 'Lịch pháp';
+
+  @override
+  String get almanacSubtitle =>
+      'Ngày âm lịch và nhật thực, nguyệt thực sắp tới';
+
+  @override
+  String get almanacSectionToday => 'Hôm nay';
+
+  @override
+  String get almanacGregorian => 'Dương lịch';
+
+  @override
+  String get almanacLunar => 'Âm lịch';
+
+  @override
+  String get almanacYear => 'Can chi';
+
+  @override
+  String get almanacMonthLength => 'Độ dài tháng';
+
+  @override
+  String get almanacLongMonth => '30 ngày';
+
+  @override
+  String get almanacShortMonth => '29 ngày';
+
+  @override
+  String get almanacLeapPrefix => 'Nhuận ';
+
+  @override
+  String get almanacSectionLunarEclipses => 'Nguyệt thực';
+
+  @override
+  String get almanacSectionSolarEclipses => 'Nhật thực';
+
+  @override
+  String get almanacNoSolarEclipse => 'Không có trong phạm vi';
+
+  @override
+  String get eclipseTotal => 'Toàn phần';
+
+  @override
+  String get eclipsePartial => 'Một phần';
+
+  @override
+  String get eclipseAnnular => 'Hình khuyên';
+
+  @override
+  String get eclipsePenumbral => 'Nửa tối';
+
+  @override
+  String get zodiacRat => 'Tý';
+
+  @override
+  String get zodiacOx => 'Sửu';
+
+  @override
+  String get zodiacTiger => 'Dần';
+
+  @override
+  String get zodiacRabbit => 'Mão';
+
+  @override
+  String get zodiacDragon => 'Thìn';
+
+  @override
+  String get zodiacSnake => 'Tỵ';
+
+  @override
+  String get zodiacHorse => 'Ngọ';
+
+  @override
+  String get zodiacGoat => 'Mùi';
+
+  @override
+  String get zodiacMonkey => 'Thân';
+
+  @override
+  String get zodiacRooster => 'Dậu';
+
+  @override
+  String get zodiacDog => 'Tuất';
+
+  @override
+  String get zodiacPig => 'Hợi';
+
+  @override
+  String get tideTitle => 'Thủy triều';
+
+  @override
+  String get tideSubtitle => 'Triều cường, triều kém và lực hút của Mặt Trăng';
+
+  @override
+  String get tideDisclaimer =>
+      'Chỉ là lực triều thiên văn, không phải bảng thủy triều cảng. Mực nước xin xem bảng do CWA công bố.';
+
+  @override
+  String get tideSectionNow => 'Hiện tại';
+
+  @override
+  String get tidePhase => 'Chu kỳ';
+
+  @override
+  String get tideSpring => 'Triều cường';
+
+  @override
+  String get tideNeap => 'Triều kém';
+
+  @override
+  String get tideMiddling => 'Trung bình';
+
+  @override
+  String get tideLunarDistanceFactor => 'Lực hút Mặt Trăng';
+
+  @override
+  String get tideEquilibrium => 'Triều cân bằng';
+
+  @override
+  String get tideMetres => 'm';
+
+  @override
+  String get tidePerigeanSpring => 'Triều cường cận điểm tới';
+
+  @override
+  String get tideSectionTurningPoints => 'Điểm ngoặt';
+
+  @override
+  String get tideHigh => 'Cao';
+
+  @override
+  String get tideLow => 'Thấp';
+
+  @override
+  String get skyChartTitle => 'Bản đồ sao';
+
+  @override
+  String get skyChartSubtitle => 'Bầu trời nhìn bằng mắt thường';
+
+  @override
+  String get skyChartNorth => 'B';
+
+  @override
+  String get skyChartEast => 'Đ';
+
+  @override
+  String get skyChartSouth => 'N';
+
+  @override
+  String get skyChartWest => 'T';
+
+  @override
+  String tonightElementAge(int days) {
+    return 'dữ liệu quỹ đạo $days ngày trước';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '${leap}tháng $month ngày $day';
+  }
+
+  @override
+  String get tonightNoShowers => 'Không có mưa sao băng';
+
+  @override
+  String get tonightNoPasses => 'Không có lượt bay qua nhìn thấy trong 48 giờ';
+
+  @override
+  String get tonightSatellitesUnavailable => 'Không đọc được dữ liệu quỹ đạo';
+
+  @override
+  String get tonightNoTargets => 'Không có mục tiêu đủ cao';
+
+  @override
+  String get skyChartUnavailable => 'Không đọc được danh mục sao';
 }

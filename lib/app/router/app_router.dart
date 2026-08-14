@@ -14,7 +14,11 @@ import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/data/presentation/pages/moon_page.dart';
+import 'package:dpip/features/data/presentation/pages/almanac_page.dart';
 import 'package:dpip/features/data/presentation/pages/planets_page.dart';
+import 'package:dpip/features/data/presentation/pages/sky_chart_page.dart';
+import 'package:dpip/features/data/presentation/pages/tide_page.dart';
+import 'package:dpip/features/data/presentation/pages/tonight_page.dart';
 import 'package:dpip/features/data/presentation/pages/sun_page.dart';
 import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
@@ -126,6 +130,26 @@ final GoRouter appRouter = GoRouter(
                   path: AppRoutes.planetsPath,
                   name: AppRoutes.planets,
                   builder: (_, _) => const PlanetsPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.tonightPath,
+                  name: AppRoutes.tonight,
+                  builder: (_, _) => const TonightPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.almanacPath,
+                  name: AppRoutes.almanac,
+                  builder: (_, _) => const AlmanacPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.skyChartPath,
+                  name: AppRoutes.skyChart,
+                  builder: (_, _) => const SkyChartPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.tidePath,
+                  name: AppRoutes.tide,
+                  builder: (_, _) => const TidePage(),
                 ),
               ],
             ),

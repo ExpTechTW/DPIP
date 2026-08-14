@@ -1355,5 +1355,385 @@
   "solarTermAwakeningOfInsects": "驚蟄",
   "@solarTermAwakeningOfInsects": {
     "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "今夜",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSubtitle": "現在看得到什麼、什麼時候",
+  "@tonightSubtitle": {
+    "description": "Tonight page summary on the data hub"
+  },
+  "tonightSectionDark": "觀測窗口",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "天文夜",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "整夜不全暗",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "暗窗",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "月亮整夜在天上",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "總暗時",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "月光",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "流星雨",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "輻射點不升起",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "顆/時",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "衛星過境",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "此刻可觀測目標",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "象限儀座",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "天琴座",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "寶瓶座η",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "寶瓶座δ",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "英仙座",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "獵戶座",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "金牛座南",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "獅子座",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "雙子座",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "小熊座",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "疏散星團",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "球狀星團",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "螺旋星系",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "橢圓星系",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "不規則星系",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "行星狀星雲",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "超新星遺跡",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "發射星雲",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "反射星雲",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "星群",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "曆法",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSubtitle": "農曆日期與未來的日月食",
+  "@almanacSubtitle": {
+    "description": "Almanac page summary on the data hub"
+  },
+  "almanacSectionToday": "今日",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "西曆",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "農曆",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "歲次",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "月大小",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "三十日",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "二十九日",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "閏",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "月食",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "日食",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "範圍內無",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "全食",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "偏食",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "環食",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "半影食",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "鼠",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "牛",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "虎",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "兔",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "龍",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "蛇",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "馬",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "羊",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "猴",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "雞",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "狗",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "豬",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "潮汐",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideSubtitle": "大潮、小潮與月球引力",
+  "@tideSubtitle": {
+    "description": "Tide page summary on the data hub"
+  },
+  "tideDisclaimer": "僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布之潮汐預報。",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "此刻",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "週期",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "大潮",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "小潮",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "中潮",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "月球引力",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "平衡潮高",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "公尺",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "下次近地點大潮",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "轉折點",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "高",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "低",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "星圖",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartSubtitle": "頭頂上肉眼可見的天空",
+  "@skyChartSubtitle": {
+    "description": "Sky chart page summary on the data hub"
+  },
+  "skyChartNorth": "北",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "東",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "南",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "西",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "軌道資料 {days} 天前",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}{month} 月 {day} 日",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "目前無流星雨",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "48 小時內無可見過境",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "無法讀取軌道資料",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "無足夠高度的目標",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "無法讀取星表",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
   }
 }

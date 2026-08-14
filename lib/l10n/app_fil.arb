@@ -1355,5 +1355,385 @@
   "solarTermAwakeningOfInsects": "Awakening of Insects",
   "@solarTermAwakeningOfInsects": {
     "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "Ngayong gabi",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSubtitle": "Ano ang makikita, at kailan",
+  "@tonightSubtitle": {
+    "description": "Tonight page summary on the data hub"
+  },
+  "tonightSectionDark": "Oras ng obserbasyon",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "Astronomical na gabi",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "Hindi tuluyang dumidilim",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "Madilim na yugto",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "Buwan nasa langit buong gabi",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "Kabuuang dilim",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "Liwanag ng buwan",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "Mga meteor shower",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "Hindi sumisikat ang radiant",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "/oras",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "Pagdaan ng satelayt",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "Nakikita ngayon",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "Quadrantids",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "Lyrids",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "Eta Aquariids",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "Delta Aquariids",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "Perseids",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "Orionids",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "Southern Taurids",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "Leonids",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "Geminids",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "Ursids",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "Open cluster",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "Globular cluster",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "Spiral galaxy",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "Elliptical galaxy",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "Irregular galaxy",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "Planetary nebula",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "Supernova remnant",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "Emission nebula",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "Reflection nebula",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "Asterism",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "Almanake",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSubtitle": "Petsang lunisolar at mga eklipse",
+  "@almanacSubtitle": {
+    "description": "Almanac page summary on the data hub"
+  },
+  "almanacSectionToday": "Ngayon",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "Gregorian",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "Lunisolar",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "Taon",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "Haba ng buwan",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "30 araw",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "29 araw",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "Leap ",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "Eklipse ng buwan",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "Eklipse ng araw",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "Wala sa saklaw",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "Total",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "Parsyal",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "Annular",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "Penumbral",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "Daga",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "Baka",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "Tigre",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "Kuneho",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "Dragon",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "Ahas",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "Kabayo",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "Kambing",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "Unggoy",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "Manok",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "Aso",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "Baboy",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "Taog",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideSubtitle": "Spring, neap at hila ng buwan",
+  "@tideSubtitle": {
+    "description": "Tide page summary on the data hub"
+  },
+  "tideDisclaimer": "Astronomikal na puwersa lamang — hindi talaan ng taog sa daungan. Para sa lebel ng tubig, gamitin ang talaan ng CWA.",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "Ngayon",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "Siklo",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "Spring",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "Neap",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "Katamtaman",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "Hila ng buwan",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "Equilibrium tide",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "m",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "Susunod na perigean spring",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "Mga turning point",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "Taas",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "Baba",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "Mapa ng langit",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartSubtitle": "Ang langit sa itaas mo",
+  "@skyChartSubtitle": {
+    "description": "Sky chart page summary on the data hub"
+  },
+  "skyChartNorth": "H",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "S",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "T",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "K",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "{days} araw nang luma ang elements",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}buwan {month}, araw {day}",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "Walang shower ngayon",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "Walang nakikitang pass sa 48 oras",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "Hindi mabasa ang orbit data",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "Walang sapat na taas",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "Hindi mabasa ang star catalogue",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
   }
 }

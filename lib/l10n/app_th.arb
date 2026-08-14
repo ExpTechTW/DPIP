@@ -1355,5 +1355,385 @@
   "solarTermAwakeningOfInsects": "แมลงตื่น",
   "@solarTermAwakeningOfInsects": {
     "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "คืนนี้",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSubtitle": "มีอะไรให้ดู และเมื่อไร",
+  "@tonightSubtitle": {
+    "description": "Tonight page summary on the data hub"
+  },
+  "tonightSectionDark": "ช่วงสังเกตการณ์",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "กลางคืนทางดาราศาสตร์",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "ไม่มืดสนิท",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "ช่วงมืด",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "ดวงจันทร์อยู่ทั้งคืน",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "เวลามืดรวม",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "แสงจันทร์",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "ฝนดาวตก",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "จุดกระจายไม่ขึ้น",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "ดวง/ชม.",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "การผ่านของดาวเทียม",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "เป้าหมายที่เห็นได้ตอนนี้",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "ควอดรานติดส์",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "ไลริดส์",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "อีตาอควาริดส์",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "เดลตาอควาริดส์",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "เพอร์เซอิดส์",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "โอไรออนิดส์",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "เทาริดส์ใต้",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "ลีโอนิดส์",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "เจมินิดส์",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "เออร์ซิดส์",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "กระจุกดาวเปิด",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "กระจุกดาวทรงกลม",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "ดาราจักรกังหัน",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "ดาราจักรรี",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "ดาราจักรไร้รูปแบบ",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "เนบิวลาดาวเคราะห์",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "ซากซูเปอร์โนวา",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "เนบิวลาเปล่งแสง",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "เนบิวลาสะท้อนแสง",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "กลุ่มดาวย่อย",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "ปฏิทิน",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSubtitle": "ปฏิทินจันทรคติและอุปราคาข้างหน้า",
+  "@almanacSubtitle": {
+    "description": "Almanac page summary on the data hub"
+  },
+  "almanacSectionToday": "วันนี้",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "สุริยคติ",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "จันทรคติ",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "ปีนักษัตร",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "ความยาวเดือน",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "30 วัน",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "29 วัน",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "อธิกมาส ",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "จันทรุปราคา",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "สุริยุปราคา",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "ไม่มีในช่วงนี้",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "เต็มดวง",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "บางส่วน",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "วงแหวน",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "เงามัว",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "ชวด",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "ฉลู",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "ขาล",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "เถาะ",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "มะโรง",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "มะเส็ง",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "มะเมีย",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "มะแม",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "วอก",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "ระกา",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "จอ",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "กุน",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "น้ำขึ้นน้ำลง",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideSubtitle": "น้ำเกิด น้ำตาย และแรงดึงดูดของดวงจันทร์",
+  "@tideSubtitle": {
+    "description": "Tide page summary on the data hub"
+  },
+  "tideDisclaimer": "แรงดาราศาสตร์เท่านั้น ไม่ใช่ตารางน้ำท่า ระดับน้ำโปรดดูตารางที่กรมอุตุนิยมวิทยาเผยแพร่",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "ขณะนี้",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "วัฏจักร",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "น้ำเกิด",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "น้ำตาย",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "ปานกลาง",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "แรงดึงดวงจันทร์",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "ระดับสมดุล",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "ม.",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "น้ำเกิดใกล้โลกครั้งถัดไป",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "จุดเปลี่ยน",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "สูง",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "ต่ำ",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "แผนที่ดาว",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartSubtitle": "ท้องฟ้าที่ตาเปล่ามองเห็น",
+  "@skyChartSubtitle": {
+    "description": "Sky chart page summary on the data hub"
+  },
+  "skyChartNorth": "N",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "E",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "S",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "W",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "ข้อมูลวงโคจร {days} วันก่อน",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}เดือน {month} วันที่ {day}",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "ไม่มีฝนดาวตก",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "ไม่มีการผ่านที่มองเห็นใน 48 ชม.",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "อ่านข้อมูลวงโคจรไม่ได้",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "ไม่มีเป้าหมายที่สูงพอ",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "อ่านแคตตาล็อกดาวไม่ได้",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
   }
 }

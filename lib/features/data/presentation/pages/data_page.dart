@@ -138,6 +138,30 @@ class DataPage extends StatelessWidget {
                       l10n.planetsTitle,
                       colors.secondary,
                     ),
+                    (
+                      AppRoutes.tonight,
+                      Icons.dark_mode_outlined,
+                      l10n.tonightTitle,
+                      colors.primary,
+                    ),
+                    (
+                      AppRoutes.skyChart,
+                      Icons.auto_awesome_outlined,
+                      l10n.skyChartTitle,
+                      colors.tertiary,
+                    ),
+                    (
+                      AppRoutes.almanac,
+                      Icons.calendar_month_outlined,
+                      l10n.almanacTitle,
+                      colors.secondary,
+                    ),
+                    (
+                      AppRoutes.tide,
+                      Icons.waves_outlined,
+                      l10n.tideTitle,
+                      colors.primary,
+                    ),
                   ])
                 _RankingGridTile(
                   icon: icon,

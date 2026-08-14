@@ -60,6 +60,22 @@ abstract final class AppRoutes {
   static const String planets = 'planets';
   static const String planetsPath = 'planets';
 
+  /// Tonight's observing window and what is up — nested under [dataPath].
+  static const String tonight = 'tonight';
+  static const String tonightPath = 'tonight';
+
+  /// 農曆 and upcoming eclipses — nested under [dataPath].
+  static const String almanac = 'almanac';
+  static const String almanacPath = 'almanac';
+
+  /// The naked-eye sky chart — nested under [dataPath].
+  static const String skyChart = 'skyChart';
+  static const String skyChartPath = 'sky-chart';
+
+  /// Astronomical tidal forcing — nested under [dataPath].
+  static const String tide = 'tide';
+  static const String tidePath = 'tide';
+
   static const String more = 'more';
   static const String morePath = '/more';
 

@@ -2357,4 +2357,282 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => 'Awakening of Insects';
+
+  @override
+  String get tonightTitle => 'Tonight';
+
+  @override
+  String get tonightSubtitle => 'What is observable, and when';
+
+  @override
+  String get tonightSectionDark => 'Observing window';
+
+  @override
+  String get tonightAstronomicalNight => 'Astronomical night';
+
+  @override
+  String get tonightNeverDark => 'Never fully dark';
+
+  @override
+  String get tonightDarkWindow => 'Dark window';
+
+  @override
+  String get tonightMoonAllNight => 'Moon up all night';
+
+  @override
+  String get tonightDarkTotal => 'Total dark';
+
+  @override
+  String get tonightMoonlight => 'Moonlight';
+
+  @override
+  String get tonightSectionShowers => 'Meteor showers';
+
+  @override
+  String get tonightRadiantDown => 'Radiant never rises';
+
+  @override
+  String get tonightPerHour => '/h';
+
+  @override
+  String get tonightSectionSatellites => 'Satellite passes';
+
+  @override
+  String get tonightSectionTargets => 'Targets up now';
+
+  @override
+  String get showerQuadrantids => 'Quadrantids';
+
+  @override
+  String get showerLyrids => 'Lyrids';
+
+  @override
+  String get showerEtaAquariids => 'Eta Aquariids';
+
+  @override
+  String get showerDeltaAquariids => 'Delta Aquariids';
+
+  @override
+  String get showerPerseids => 'Perseids';
+
+  @override
+  String get showerOrionids => 'Orionids';
+
+  @override
+  String get showerSouthernTaurids => 'Southern Taurids';
+
+  @override
+  String get showerLeonids => 'Leonids';
+
+  @override
+  String get showerGeminids => 'Geminids';
+
+  @override
+  String get showerUrsids => 'Ursids';
+
+  @override
+  String get deepSkyOpenCluster => 'Open cluster';
+
+  @override
+  String get deepSkyGlobularCluster => 'Globular cluster';
+
+  @override
+  String get deepSkySpiralGalaxy => 'Spiral galaxy';
+
+  @override
+  String get deepSkyEllipticalGalaxy => 'Elliptical galaxy';
+
+  @override
+  String get deepSkyIrregularGalaxy => 'Irregular galaxy';
+
+  @override
+  String get deepSkyPlanetaryNebula => 'Planetary nebula';
+
+  @override
+  String get deepSkySupernovaRemnant => 'Supernova remnant';
+
+  @override
+  String get deepSkyEmissionNebula => 'Emission nebula';
+
+  @override
+  String get deepSkyReflectionNebula => 'Reflection nebula';
+
+  @override
+  String get deepSkyAsterism => 'Asterism';
+
+  @override
+  String get almanacTitle => 'Almanac';
+
+  @override
+  String get almanacSubtitle => 'The lunisolar date and the eclipses ahead';
+
+  @override
+  String get almanacSectionToday => 'Today';
+
+  @override
+  String get almanacGregorian => 'Gregorian';
+
+  @override
+  String get almanacLunar => 'Lunisolar';
+
+  @override
+  String get almanacYear => 'Year';
+
+  @override
+  String get almanacMonthLength => 'Month length';
+
+  @override
+  String get almanacLongMonth => '30 days';
+
+  @override
+  String get almanacShortMonth => '29 days';
+
+  @override
+  String get almanacLeapPrefix => 'Leap ';
+
+  @override
+  String get almanacSectionLunarEclipses => 'Lunar eclipses';
+
+  @override
+  String get almanacSectionSolarEclipses => 'Solar eclipses';
+
+  @override
+  String get almanacNoSolarEclipse => 'None in range';
+
+  @override
+  String get eclipseTotal => 'Total';
+
+  @override
+  String get eclipsePartial => 'Partial';
+
+  @override
+  String get eclipseAnnular => 'Annular';
+
+  @override
+  String get eclipsePenumbral => 'Penumbral';
+
+  @override
+  String get zodiacRat => 'Rat';
+
+  @override
+  String get zodiacOx => 'Ox';
+
+  @override
+  String get zodiacTiger => 'Tiger';
+
+  @override
+  String get zodiacRabbit => 'Rabbit';
+
+  @override
+  String get zodiacDragon => 'Dragon';
+
+  @override
+  String get zodiacSnake => 'Snake';
+
+  @override
+  String get zodiacHorse => 'Horse';
+
+  @override
+  String get zodiacGoat => 'Goat';
+
+  @override
+  String get zodiacMonkey => 'Monkey';
+
+  @override
+  String get zodiacRooster => 'Rooster';
+
+  @override
+  String get zodiacDog => 'Dog';
+
+  @override
+  String get zodiacPig => 'Pig';
+
+  @override
+  String get tideTitle => 'Tide';
+
+  @override
+  String get tideSubtitle => 'Spring, neap and the pull of the Moon';
+
+  @override
+  String get tideDisclaimer =>
+      'Astronomical forcing only — not a harbour tide table. For water levels use the CWA\'s published tables.';
+
+  @override
+  String get tideSectionNow => 'Right now';
+
+  @override
+  String get tidePhase => 'Cycle';
+
+  @override
+  String get tideSpring => 'Spring';
+
+  @override
+  String get tideNeap => 'Neap';
+
+  @override
+  String get tideMiddling => 'Middling';
+
+  @override
+  String get tideLunarDistanceFactor => 'Lunar pull';
+
+  @override
+  String get tideEquilibrium => 'Equilibrium tide';
+
+  @override
+  String get tideMetres => 'm';
+
+  @override
+  String get tidePerigeanSpring => 'Next perigean spring';
+
+  @override
+  String get tideSectionTurningPoints => 'Turning points';
+
+  @override
+  String get tideHigh => 'High';
+
+  @override
+  String get tideLow => 'Low';
+
+  @override
+  String get skyChartTitle => 'Sky chart';
+
+  @override
+  String get skyChartSubtitle => 'The naked-eye sky above you';
+
+  @override
+  String get skyChartNorth => 'N';
+
+  @override
+  String get skyChartEast => 'E';
+
+  @override
+  String get skyChartSouth => 'S';
+
+  @override
+  String get skyChartWest => 'W';
+
+  @override
+  String tonightElementAge(int days) {
+    return 'elements $days d old';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '${leap}month $month, day $day';
+  }
+
+  @override
+  String get tonightNoShowers => 'No shower running';
+
+  @override
+  String get tonightNoPasses => 'No visible pass in 48 h';
+
+  @override
+  String get tonightSatellitesUnavailable => 'Orbit data unavailable';
+
+  @override
+  String get tonightNoTargets => 'Nothing high enough';
+
+  @override
+  String get skyChartUnavailable => 'Star catalogue unavailable';
 }

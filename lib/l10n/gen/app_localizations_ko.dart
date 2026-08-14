@@ -2332,4 +2332,281 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => '경칩';
+
+  @override
+  String get tonightTitle => '오늘 밤';
+
+  @override
+  String get tonightSubtitle => '무엇을 언제 볼 수 있는가';
+
+  @override
+  String get tonightSectionDark => '관측 가능 시간';
+
+  @override
+  String get tonightAstronomicalNight => '천문박명 종료';
+
+  @override
+  String get tonightNeverDark => '완전히 어두워지지 않음';
+
+  @override
+  String get tonightDarkWindow => '암흑 시간대';
+
+  @override
+  String get tonightMoonAllNight => '달이 밤새 떠 있음';
+
+  @override
+  String get tonightDarkTotal => '총 암흑 시간';
+
+  @override
+  String get tonightMoonlight => '달빛';
+
+  @override
+  String get tonightSectionShowers => '유성우';
+
+  @override
+  String get tonightRadiantDown => '복사점이 뜨지 않음';
+
+  @override
+  String get tonightPerHour => '개/시';
+
+  @override
+  String get tonightSectionSatellites => '위성 통과';
+
+  @override
+  String get tonightSectionTargets => '지금 볼 수 있는 천체';
+
+  @override
+  String get showerQuadrantids => '사분의자리';
+
+  @override
+  String get showerLyrids => '거문고자리';
+
+  @override
+  String get showerEtaAquariids => '물병자리 에타';
+
+  @override
+  String get showerDeltaAquariids => '물병자리 델타';
+
+  @override
+  String get showerPerseids => '페르세우스자리';
+
+  @override
+  String get showerOrionids => '오리온자리';
+
+  @override
+  String get showerSouthernTaurids => '황소자리 남';
+
+  @override
+  String get showerLeonids => '사자자리';
+
+  @override
+  String get showerGeminids => '쌍둥이자리';
+
+  @override
+  String get showerUrsids => '작은곰자리';
+
+  @override
+  String get deepSkyOpenCluster => '산개성단';
+
+  @override
+  String get deepSkyGlobularCluster => '구상성단';
+
+  @override
+  String get deepSkySpiralGalaxy => '나선은하';
+
+  @override
+  String get deepSkyEllipticalGalaxy => '타원은하';
+
+  @override
+  String get deepSkyIrregularGalaxy => '불규칙은하';
+
+  @override
+  String get deepSkyPlanetaryNebula => '행성상성운';
+
+  @override
+  String get deepSkySupernovaRemnant => '초신성 잔해';
+
+  @override
+  String get deepSkyEmissionNebula => '발광성운';
+
+  @override
+  String get deepSkyReflectionNebula => '반사성운';
+
+  @override
+  String get deepSkyAsterism => '성군';
+
+  @override
+  String get almanacTitle => '역법';
+
+  @override
+  String get almanacSubtitle => '음력과 앞으로의 일식·월식';
+
+  @override
+  String get almanacSectionToday => '오늘';
+
+  @override
+  String get almanacGregorian => '양력';
+
+  @override
+  String get almanacLunar => '음력';
+
+  @override
+  String get almanacYear => '세차';
+
+  @override
+  String get almanacMonthLength => '월 대소';
+
+  @override
+  String get almanacLongMonth => '30일';
+
+  @override
+  String get almanacShortMonth => '29일';
+
+  @override
+  String get almanacLeapPrefix => '윤';
+
+  @override
+  String get almanacSectionLunarEclipses => '월식';
+
+  @override
+  String get almanacSectionSolarEclipses => '일식';
+
+  @override
+  String get almanacNoSolarEclipse => '범위 내 없음';
+
+  @override
+  String get eclipseTotal => '개기';
+
+  @override
+  String get eclipsePartial => '부분';
+
+  @override
+  String get eclipseAnnular => '금환';
+
+  @override
+  String get eclipsePenumbral => '반영';
+
+  @override
+  String get zodiacRat => '쥐';
+
+  @override
+  String get zodiacOx => '소';
+
+  @override
+  String get zodiacTiger => '호랑이';
+
+  @override
+  String get zodiacRabbit => '토끼';
+
+  @override
+  String get zodiacDragon => '용';
+
+  @override
+  String get zodiacSnake => '뱀';
+
+  @override
+  String get zodiacHorse => '말';
+
+  @override
+  String get zodiacGoat => '양';
+
+  @override
+  String get zodiacMonkey => '원숭이';
+
+  @override
+  String get zodiacRooster => '닭';
+
+  @override
+  String get zodiacDog => '개';
+
+  @override
+  String get zodiacPig => '돼지';
+
+  @override
+  String get tideTitle => '조석';
+
+  @override
+  String get tideSubtitle => '사리·조금과 달의 인력';
+
+  @override
+  String get tideDisclaimer => '천문 기조력만이며 항만 조석표가 아닙니다. 수위는 기상청 발표를 참고하세요.';
+
+  @override
+  String get tideSectionNow => '현재';
+
+  @override
+  String get tidePhase => '주기';
+
+  @override
+  String get tideSpring => '사리';
+
+  @override
+  String get tideNeap => '조금';
+
+  @override
+  String get tideMiddling => '중조';
+
+  @override
+  String get tideLunarDistanceFactor => '달의 인력';
+
+  @override
+  String get tideEquilibrium => '평형 조위';
+
+  @override
+  String get tideMetres => 'm';
+
+  @override
+  String get tidePerigeanSpring => '다음 근지점 사리';
+
+  @override
+  String get tideSectionTurningPoints => '전환점';
+
+  @override
+  String get tideHigh => '고';
+
+  @override
+  String get tideLow => '저';
+
+  @override
+  String get skyChartTitle => '성도';
+
+  @override
+  String get skyChartSubtitle => '머리 위 맨눈으로 보이는 하늘';
+
+  @override
+  String get skyChartNorth => '북';
+
+  @override
+  String get skyChartEast => '동';
+
+  @override
+  String get skyChartSouth => '남';
+
+  @override
+  String get skyChartWest => '서';
+
+  @override
+  String tonightElementAge(int days) {
+    return '궤도 요소 $days일 전';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leap$month월 $day일';
+  }
+
+  @override
+  String get tonightNoShowers => '진행 중인 유성우 없음';
+
+  @override
+  String get tonightNoPasses => '48시간 내 가시 통과 없음';
+
+  @override
+  String get tonightSatellitesUnavailable => '궤도 데이터를 읽을 수 없음';
+
+  @override
+  String get tonightNoTargets => '충분히 높은 천체 없음';
+
+  @override
+  String get skyChartUnavailable => '성표를 읽을 수 없음';
 }

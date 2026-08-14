@@ -2360,4 +2360,282 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => 'Awakening of Insects';
+
+  @override
+  String get tonightTitle => 'Malam ini';
+
+  @override
+  String get tonightSubtitle => 'Apa yang terlihat, dan kapan';
+
+  @override
+  String get tonightSectionDark => 'Jendela pengamatan';
+
+  @override
+  String get tonightAstronomicalNight => 'Malam astronomis';
+
+  @override
+  String get tonightNeverDark => 'Tak pernah gelap total';
+
+  @override
+  String get tonightDarkWindow => 'Jendela gelap';
+
+  @override
+  String get tonightMoonAllNight => 'Bulan terbit sepanjang malam';
+
+  @override
+  String get tonightDarkTotal => 'Total gelap';
+
+  @override
+  String get tonightMoonlight => 'Cahaya bulan';
+
+  @override
+  String get tonightSectionShowers => 'Hujan meteor';
+
+  @override
+  String get tonightRadiantDown => 'Radian tidak terbit';
+
+  @override
+  String get tonightPerHour => '/jam';
+
+  @override
+  String get tonightSectionSatellites => 'Lintasan satelit';
+
+  @override
+  String get tonightSectionTargets => 'Sasaran yang terlihat';
+
+  @override
+  String get showerQuadrantids => 'Quadrantids';
+
+  @override
+  String get showerLyrids => 'Lyrids';
+
+  @override
+  String get showerEtaAquariids => 'Eta Aquariids';
+
+  @override
+  String get showerDeltaAquariids => 'Delta Aquariids';
+
+  @override
+  String get showerPerseids => 'Perseids';
+
+  @override
+  String get showerOrionids => 'Orionids';
+
+  @override
+  String get showerSouthernTaurids => 'Taurids Selatan';
+
+  @override
+  String get showerLeonids => 'Leonids';
+
+  @override
+  String get showerGeminids => 'Geminids';
+
+  @override
+  String get showerUrsids => 'Ursids';
+
+  @override
+  String get deepSkyOpenCluster => 'Gugus terbuka';
+
+  @override
+  String get deepSkyGlobularCluster => 'Gugus bola';
+
+  @override
+  String get deepSkySpiralGalaxy => 'Galaksi spiral';
+
+  @override
+  String get deepSkyEllipticalGalaxy => 'Galaksi elips';
+
+  @override
+  String get deepSkyIrregularGalaxy => 'Galaksi tak beraturan';
+
+  @override
+  String get deepSkyPlanetaryNebula => 'Nebula planeter';
+
+  @override
+  String get deepSkySupernovaRemnant => 'Sisa supernova';
+
+  @override
+  String get deepSkyEmissionNebula => 'Nebula emisi';
+
+  @override
+  String get deepSkyReflectionNebula => 'Nebula refleksi';
+
+  @override
+  String get deepSkyAsterism => 'Asterisme';
+
+  @override
+  String get almanacTitle => 'Almanak';
+
+  @override
+  String get almanacSubtitle => 'Tanggal lunisolar dan gerhana mendatang';
+
+  @override
+  String get almanacSectionToday => 'Hari ini';
+
+  @override
+  String get almanacGregorian => 'Masehi';
+
+  @override
+  String get almanacLunar => 'Lunisolar';
+
+  @override
+  String get almanacYear => 'Tahun';
+
+  @override
+  String get almanacMonthLength => 'Panjang bulan';
+
+  @override
+  String get almanacLongMonth => '30 hari';
+
+  @override
+  String get almanacShortMonth => '29 hari';
+
+  @override
+  String get almanacLeapPrefix => 'Kabisat ';
+
+  @override
+  String get almanacSectionLunarEclipses => 'Gerhana bulan';
+
+  @override
+  String get almanacSectionSolarEclipses => 'Gerhana matahari';
+
+  @override
+  String get almanacNoSolarEclipse => 'Tidak ada';
+
+  @override
+  String get eclipseTotal => 'Total';
+
+  @override
+  String get eclipsePartial => 'Sebagian';
+
+  @override
+  String get eclipseAnnular => 'Cincin';
+
+  @override
+  String get eclipsePenumbral => 'Penumbra';
+
+  @override
+  String get zodiacRat => 'Tikus';
+
+  @override
+  String get zodiacOx => 'Kerbau';
+
+  @override
+  String get zodiacTiger => 'Macan';
+
+  @override
+  String get zodiacRabbit => 'Kelinci';
+
+  @override
+  String get zodiacDragon => 'Naga';
+
+  @override
+  String get zodiacSnake => 'Ular';
+
+  @override
+  String get zodiacHorse => 'Kuda';
+
+  @override
+  String get zodiacGoat => 'Kambing';
+
+  @override
+  String get zodiacMonkey => 'Monyet';
+
+  @override
+  String get zodiacRooster => 'Ayam';
+
+  @override
+  String get zodiacDog => 'Anjing';
+
+  @override
+  String get zodiacPig => 'Babi';
+
+  @override
+  String get tideTitle => 'Pasang surut';
+
+  @override
+  String get tideSubtitle => 'Purnama, perbani, dan tarikan Bulan';
+
+  @override
+  String get tideDisclaimer =>
+      'Hanya gaya astronomis — bukan tabel pasang surut pelabuhan. Untuk tinggi muka air gunakan tabel CWA.';
+
+  @override
+  String get tideSectionNow => 'Saat ini';
+
+  @override
+  String get tidePhase => 'Siklus';
+
+  @override
+  String get tideSpring => 'Purnama';
+
+  @override
+  String get tideNeap => 'Perbani';
+
+  @override
+  String get tideMiddling => 'Sedang';
+
+  @override
+  String get tideLunarDistanceFactor => 'Tarikan Bulan';
+
+  @override
+  String get tideEquilibrium => 'Pasang setimbang';
+
+  @override
+  String get tideMetres => 'm';
+
+  @override
+  String get tidePerigeanSpring => 'Purnama perigee berikutnya';
+
+  @override
+  String get tideSectionTurningPoints => 'Titik balik';
+
+  @override
+  String get tideHigh => 'Tinggi';
+
+  @override
+  String get tideLow => 'Rendah';
+
+  @override
+  String get skyChartTitle => 'Peta langit';
+
+  @override
+  String get skyChartSubtitle => 'Langit yang terlihat mata telanjang';
+
+  @override
+  String get skyChartNorth => 'U';
+
+  @override
+  String get skyChartEast => 'T';
+
+  @override
+  String get skyChartSouth => 'S';
+
+  @override
+  String get skyChartWest => 'B';
+
+  @override
+  String tonightElementAge(int days) {
+    return 'elemen orbit $days hari lalu';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '${leap}bulan $month, hari $day';
+  }
+
+  @override
+  String get tonightNoShowers => 'Tidak ada hujan meteor';
+
+  @override
+  String get tonightNoPasses => 'Tidak ada lintasan terlihat dalam 48 jam';
+
+  @override
+  String get tonightSatellitesUnavailable => 'Data orbit tidak terbaca';
+
+  @override
+  String get tonightNoTargets => 'Tidak ada sasaran cukup tinggi';
+
+  @override
+  String get skyChartUnavailable => 'Katalog bintang tidak terbaca';
 }

@@ -2354,4 +2354,282 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get solarTermAwakeningOfInsects => 'แมลงตื่น';
+
+  @override
+  String get tonightTitle => 'คืนนี้';
+
+  @override
+  String get tonightSubtitle => 'มีอะไรให้ดู และเมื่อไร';
+
+  @override
+  String get tonightSectionDark => 'ช่วงสังเกตการณ์';
+
+  @override
+  String get tonightAstronomicalNight => 'กลางคืนทางดาราศาสตร์';
+
+  @override
+  String get tonightNeverDark => 'ไม่มืดสนิท';
+
+  @override
+  String get tonightDarkWindow => 'ช่วงมืด';
+
+  @override
+  String get tonightMoonAllNight => 'ดวงจันทร์อยู่ทั้งคืน';
+
+  @override
+  String get tonightDarkTotal => 'เวลามืดรวม';
+
+  @override
+  String get tonightMoonlight => 'แสงจันทร์';
+
+  @override
+  String get tonightSectionShowers => 'ฝนดาวตก';
+
+  @override
+  String get tonightRadiantDown => 'จุดกระจายไม่ขึ้น';
+
+  @override
+  String get tonightPerHour => 'ดวง/ชม.';
+
+  @override
+  String get tonightSectionSatellites => 'การผ่านของดาวเทียม';
+
+  @override
+  String get tonightSectionTargets => 'เป้าหมายที่เห็นได้ตอนนี้';
+
+  @override
+  String get showerQuadrantids => 'ควอดรานติดส์';
+
+  @override
+  String get showerLyrids => 'ไลริดส์';
+
+  @override
+  String get showerEtaAquariids => 'อีตาอควาริดส์';
+
+  @override
+  String get showerDeltaAquariids => 'เดลตาอควาริดส์';
+
+  @override
+  String get showerPerseids => 'เพอร์เซอิดส์';
+
+  @override
+  String get showerOrionids => 'โอไรออนิดส์';
+
+  @override
+  String get showerSouthernTaurids => 'เทาริดส์ใต้';
+
+  @override
+  String get showerLeonids => 'ลีโอนิดส์';
+
+  @override
+  String get showerGeminids => 'เจมินิดส์';
+
+  @override
+  String get showerUrsids => 'เออร์ซิดส์';
+
+  @override
+  String get deepSkyOpenCluster => 'กระจุกดาวเปิด';
+
+  @override
+  String get deepSkyGlobularCluster => 'กระจุกดาวทรงกลม';
+
+  @override
+  String get deepSkySpiralGalaxy => 'ดาราจักรกังหัน';
+
+  @override
+  String get deepSkyEllipticalGalaxy => 'ดาราจักรรี';
+
+  @override
+  String get deepSkyIrregularGalaxy => 'ดาราจักรไร้รูปแบบ';
+
+  @override
+  String get deepSkyPlanetaryNebula => 'เนบิวลาดาวเคราะห์';
+
+  @override
+  String get deepSkySupernovaRemnant => 'ซากซูเปอร์โนวา';
+
+  @override
+  String get deepSkyEmissionNebula => 'เนบิวลาเปล่งแสง';
+
+  @override
+  String get deepSkyReflectionNebula => 'เนบิวลาสะท้อนแสง';
+
+  @override
+  String get deepSkyAsterism => 'กลุ่มดาวย่อย';
+
+  @override
+  String get almanacTitle => 'ปฏิทิน';
+
+  @override
+  String get almanacSubtitle => 'ปฏิทินจันทรคติและอุปราคาข้างหน้า';
+
+  @override
+  String get almanacSectionToday => 'วันนี้';
+
+  @override
+  String get almanacGregorian => 'สุริยคติ';
+
+  @override
+  String get almanacLunar => 'จันทรคติ';
+
+  @override
+  String get almanacYear => 'ปีนักษัตร';
+
+  @override
+  String get almanacMonthLength => 'ความยาวเดือน';
+
+  @override
+  String get almanacLongMonth => '30 วัน';
+
+  @override
+  String get almanacShortMonth => '29 วัน';
+
+  @override
+  String get almanacLeapPrefix => 'อธิกมาส ';
+
+  @override
+  String get almanacSectionLunarEclipses => 'จันทรุปราคา';
+
+  @override
+  String get almanacSectionSolarEclipses => 'สุริยุปราคา';
+
+  @override
+  String get almanacNoSolarEclipse => 'ไม่มีในช่วงนี้';
+
+  @override
+  String get eclipseTotal => 'เต็มดวง';
+
+  @override
+  String get eclipsePartial => 'บางส่วน';
+
+  @override
+  String get eclipseAnnular => 'วงแหวน';
+
+  @override
+  String get eclipsePenumbral => 'เงามัว';
+
+  @override
+  String get zodiacRat => 'ชวด';
+
+  @override
+  String get zodiacOx => 'ฉลู';
+
+  @override
+  String get zodiacTiger => 'ขาล';
+
+  @override
+  String get zodiacRabbit => 'เถาะ';
+
+  @override
+  String get zodiacDragon => 'มะโรง';
+
+  @override
+  String get zodiacSnake => 'มะเส็ง';
+
+  @override
+  String get zodiacHorse => 'มะเมีย';
+
+  @override
+  String get zodiacGoat => 'มะแม';
+
+  @override
+  String get zodiacMonkey => 'วอก';
+
+  @override
+  String get zodiacRooster => 'ระกา';
+
+  @override
+  String get zodiacDog => 'จอ';
+
+  @override
+  String get zodiacPig => 'กุน';
+
+  @override
+  String get tideTitle => 'น้ำขึ้นน้ำลง';
+
+  @override
+  String get tideSubtitle => 'น้ำเกิด น้ำตาย และแรงดึงดูดของดวงจันทร์';
+
+  @override
+  String get tideDisclaimer =>
+      'แรงดาราศาสตร์เท่านั้น ไม่ใช่ตารางน้ำท่า ระดับน้ำโปรดดูตารางที่กรมอุตุนิยมวิทยาเผยแพร่';
+
+  @override
+  String get tideSectionNow => 'ขณะนี้';
+
+  @override
+  String get tidePhase => 'วัฏจักร';
+
+  @override
+  String get tideSpring => 'น้ำเกิด';
+
+  @override
+  String get tideNeap => 'น้ำตาย';
+
+  @override
+  String get tideMiddling => 'ปานกลาง';
+
+  @override
+  String get tideLunarDistanceFactor => 'แรงดึงดวงจันทร์';
+
+  @override
+  String get tideEquilibrium => 'ระดับสมดุล';
+
+  @override
+  String get tideMetres => 'ม.';
+
+  @override
+  String get tidePerigeanSpring => 'น้ำเกิดใกล้โลกครั้งถัดไป';
+
+  @override
+  String get tideSectionTurningPoints => 'จุดเปลี่ยน';
+
+  @override
+  String get tideHigh => 'สูง';
+
+  @override
+  String get tideLow => 'ต่ำ';
+
+  @override
+  String get skyChartTitle => 'แผนที่ดาว';
+
+  @override
+  String get skyChartSubtitle => 'ท้องฟ้าที่ตาเปล่ามองเห็น';
+
+  @override
+  String get skyChartNorth => 'N';
+
+  @override
+  String get skyChartEast => 'E';
+
+  @override
+  String get skyChartSouth => 'S';
+
+  @override
+  String get skyChartWest => 'W';
+
+  @override
+  String tonightElementAge(int days) {
+    return 'ข้อมูลวงโคจร $days วันก่อน';
+  }
+
+  @override
+  String almanacLunarDate(String leap, int month, int day) {
+    return '$leapเดือน $month วันที่ $day';
+  }
+
+  @override
+  String get tonightNoShowers => 'ไม่มีฝนดาวตก';
+
+  @override
+  String get tonightNoPasses => 'ไม่มีการผ่านที่มองเห็นใน 48 ชม.';
+
+  @override
+  String get tonightSatellitesUnavailable => 'อ่านข้อมูลวงโคจรไม่ได้';
+
+  @override
+  String get tonightNoTargets => 'ไม่มีเป้าหมายที่สูงพอ';
+
+  @override
+  String get skyChartUnavailable => 'อ่านแคตตาล็อกดาวไม่ได้';
 }
