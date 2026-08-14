@@ -19,9 +19,11 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/astro/astro_time.dart';
 import 'package:dpip/core/astro/deep_sky.dart';
 import 'package:dpip/core/astro/meteor_showers.dart';
+import 'package:dpip/core/astro/tle_source.dart';
 import 'package:dpip/core/astro/tonight_report.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/features/data/presentation/observer_place.dart';
 import 'package:dpip/features/data/presentation/widgets/astro_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -29,6 +31,7 @@ import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 const Duration _taiwanOffset = Duration(hours: 8);
 

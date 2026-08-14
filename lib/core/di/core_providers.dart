@@ -3,6 +3,7 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
@@ -43,6 +44,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<MapLayerOrderController>.value(
     value: deps.mapLayerOrder,
   ),
+  Provider<Prefs>.value(value: deps.prefs),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),
