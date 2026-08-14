@@ -13,6 +13,7 @@ import 'package:dpip/features/location/presentation/pages/region_select_page.dar
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -125,6 +126,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.meshtasticPath,
+      name: AppRoutes.meshtastic,
+      builder: (_, _) => const MeshtasticPage(),
     ),
     GoRoute(
       path: AppRoutes.changelogPath,

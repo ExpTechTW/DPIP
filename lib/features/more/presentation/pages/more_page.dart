@@ -103,6 +103,11 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreDeveloper,
                 onTap: () => context.pushNamed(AppRoutes.developer),
               ),
+              _MoreTile(
+                icon: Icons.router_outlined,
+                title: l10n.meshtasticTitle,
+                onTap: () => context.pushNamed(AppRoutes.meshtastic),
+              ),
             ],
           ),
           SectionHeader(l10n.moreSectionLinks),

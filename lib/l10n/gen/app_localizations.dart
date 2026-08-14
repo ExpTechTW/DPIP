@@ -3428,6 +3428,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The finer mesh'**
   String get windForecastTownOutlineHint;
+
+  /// Meshtastic test page title
+  ///
+  /// In en, this message translates to:
+  /// **'Mesh Network Test'**
+  String get meshtasticTitle;
+
+  /// Start scanning for Meshtastic radios
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get meshtasticScan;
+
+  /// Scan in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning…'**
+  String get meshtasticScanning;
+
+  /// Disconnect from the radio
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get meshtasticDisconnect;
+
+  /// Empty scan result
+  ///
+  /// In en, this message translates to:
+  /// **'No Meshtastic devices found'**
+  String get meshtasticNoDevices;
+
+  /// Bluetooth init in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing Bluetooth…'**
+  String get meshtasticInitializing;
+
+  /// Idle state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Ready — press scan to find radios'**
+  String get meshtasticReady;
+
+  /// Bluetooth unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is not supported on this device'**
+  String get meshtasticNotSupported;
+
+  /// Mesh nodes section header
+  ///
+  /// In en, this message translates to:
+  /// **'Nodes'**
+  String get meshtasticNodes;
+
+  /// Mesh messages section header
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get meshtasticMessages;
+
+  /// Send message button
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get meshtasticSend;
+
+  /// Message input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Message to broadcast'**
+  String get meshtasticSendHint;
+
+  /// Connection state label
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get meshtasticStateDisconnected;
+
+  /// Connection state label
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting…'**
+  String get meshtasticStateConnecting;
+
+  /// Connection state label
+  ///
+  /// In en, this message translates to:
+  /// **'Configuring…'**
+  String get meshtasticStateConfiguring;
+
+  /// Connection state label
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get meshtasticStateConnected;
+
+  /// Connection state label
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get meshtasticStateError;
+
+  /// Generic operation failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed'**
+  String get meshtasticFailed;
+
+  /// Empty message log while connected
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get meshtasticNoMessages;
+
+  /// Empty node list
+  ///
+  /// In en, this message translates to:
+  /// **'No nodes heard yet'**
+  String get meshtasticNoNodes;
+
+  /// Empty message log while not connected
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected to a radio'**
+  String get meshtasticNotConnected;
+
+  /// Device picker sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Select a radio'**
+  String get meshtasticSelectDevice;
+
+  /// Menu action clearing the message log
+  ///
+  /// In en, this message translates to:
+  /// **'Clear messages'**
+  String get meshtasticClearMessages;
+
+  /// Placeholder for a text packet with no body
+  ///
+  /// In en, this message translates to:
+  /// **'(empty message)'**
+  String get meshtasticEmptyMessage;
+
+  /// Toast shown after copying a message
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied'**
+  String get meshtasticCopied;
+
+  /// Dismisses a dialog without acting
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// The link dropped and is being re-established
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get meshtasticReconnecting;
+
+  /// Creating/verifying the DPIP channel
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up the DPIP channel…'**
+  String get meshtasticChannelWorking;
+
+  /// The DPIP channel exists on the radio
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP channel ready'**
+  String get meshtasticChannelReady;
+
+  /// Every secondary channel slot is taken
+  ///
+  /// In en, this message translates to:
+  /// **'No free channel slot — free one on the radio'**
+  String get meshtasticChannelNoSlot;
+
+  /// The radio rejected the channel write
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t set up the DPIP channel'**
+  String get meshtasticChannelFailed;
+
+  /// Radio is on another LoRa region than DPIP needs
+  ///
+  /// In en, this message translates to:
+  /// **'Radio region is {region} — DPIP needs TW'**
+  String meshtasticRegionMismatch(String region);
+
+  /// Button applying the DPIP LoRa region
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to TW'**
+  String get meshtasticRegionSwitch;
+
+  /// Confirmation before rebooting the radio
+  ///
+  /// In en, this message translates to:
+  /// **'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.'**
+  String get meshtasticRegionConfirm;
+
+  /// Another app holds the BLE link
+  ///
+  /// In en, this message translates to:
+  /// **'Another app is using this radio'**
+  String get meshtasticBusyTitle;
+
+  /// Why two clients on one radio is a problem
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.'**
+  String get meshtasticBusyBody;
+
+  /// Connect despite the other app
+  ///
+  /// In en, this message translates to:
+  /// **'Connect anyway'**
+  String get meshtasticConnectAnyway;
 }
 
 class _AppLocalizationsDelegate

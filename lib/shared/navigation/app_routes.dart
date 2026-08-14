@@ -77,6 +77,10 @@ abstract final class AppRoutes {
   static const String log = 'log';
   static const String logPath = '/log';
 
+  /// LoRa mesh (Meshtastic) BLE test page — scan/connect/chat against a radio.
+  static const String meshtastic = 'meshtastic';
+  static const String meshtasticPath = '/meshtastic';
+
   /// App release notes (GitHub releases).
   static const String changelog = 'changelog';
   static const String changelogPath = '/changelog';

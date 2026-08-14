@@ -1776,4 +1776,121 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => 'より細かいメッシュ';
+
+  @override
+  String get meshtasticTitle => 'Mesh Network Test';
+
+  @override
+  String get meshtasticScan => 'Scan';
+
+  @override
+  String get meshtasticScanning => 'Scanning…';
+
+  @override
+  String get meshtasticDisconnect => 'Disconnect';
+
+  @override
+  String get meshtasticNoDevices => 'No Meshtastic devices found';
+
+  @override
+  String get meshtasticInitializing => 'Initializing Bluetooth…';
+
+  @override
+  String get meshtasticReady => 'Ready — press scan to find radios';
+
+  @override
+  String get meshtasticNotSupported =>
+      'Bluetooth is not supported on this device';
+
+  @override
+  String get meshtasticNodes => 'Nodes';
+
+  @override
+  String get meshtasticMessages => 'Messages';
+
+  @override
+  String get meshtasticSend => 'Send';
+
+  @override
+  String get meshtasticSendHint => 'Message to broadcast';
+
+  @override
+  String get meshtasticStateDisconnected => 'Disconnected';
+
+  @override
+  String get meshtasticStateConnecting => 'Connecting…';
+
+  @override
+  String get meshtasticStateConfiguring => 'Configuring…';
+
+  @override
+  String get meshtasticStateConnected => 'Connected';
+
+  @override
+  String get meshtasticStateError => 'Error';
+
+  @override
+  String get meshtasticFailed => 'Operation failed';
+
+  @override
+  String get meshtasticNoMessages => 'No messages yet';
+
+  @override
+  String get meshtasticNoNodes => 'No nodes heard yet';
+
+  @override
+  String get meshtasticNotConnected => 'Not connected to a radio';
+
+  @override
+  String get meshtasticSelectDevice => 'Select a radio';
+
+  @override
+  String get meshtasticClearMessages => 'Clear messages';
+
+  @override
+  String get meshtasticEmptyMessage => '(empty message)';
+
+  @override
+  String get meshtasticCopied => 'Message copied';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get meshtasticReconnecting => 'Reconnecting…';
+
+  @override
+  String get meshtasticChannelWorking => 'Setting up the DPIP channel…';
+
+  @override
+  String get meshtasticChannelReady => 'DPIP channel ready';
+
+  @override
+  String get meshtasticChannelNoSlot =>
+      'No free channel slot — free one on the radio';
+
+  @override
+  String get meshtasticChannelFailed => 'Couldn\'t set up the DPIP channel';
+
+  @override
+  String meshtasticRegionMismatch(String region) {
+    return 'Radio region is $region — DPIP needs TW';
+  }
+
+  @override
+  String get meshtasticRegionSwitch => 'Switch to TW';
+
+  @override
+  String get meshtasticRegionConfirm =>
+      'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.';
+
+  @override
+  String get meshtasticBusyTitle => 'Another app is using this radio';
+
+  @override
+  String get meshtasticBusyBody =>
+      'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.';
+
+  @override
+  String get meshtasticConnectAnyway => 'Connect anyway';
 }

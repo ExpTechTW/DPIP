@@ -1770,6 +1770,121 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String get meshtasticTitle => '網狀網路測試';
+
+  @override
+  String get meshtasticScan => '掃描';
+
+  @override
+  String get meshtasticScanning => '掃描中…';
+
+  @override
+  String get meshtasticDisconnect => '斷線';
+
+  @override
+  String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
+
+  @override
+  String get meshtasticInitializing => '藍牙初始化中…';
+
+  @override
+  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
+
+  @override
+  String get meshtasticNotSupported => '此裝置不支援藍牙';
+
+  @override
+  String get meshtasticNodes => '節點';
+
+  @override
+  String get meshtasticMessages => '訊息';
+
+  @override
+  String get meshtasticSend => '傳送';
+
+  @override
+  String get meshtasticSendHint => '要廣播的訊息';
+
+  @override
+  String get meshtasticStateDisconnected => '未連線';
+
+  @override
+  String get meshtasticStateConnecting => '連線中…';
+
+  @override
+  String get meshtasticStateConfiguring => '設定中…';
+
+  @override
+  String get meshtasticStateConnected => '已連線';
+
+  @override
+  String get meshtasticStateError => '錯誤';
+
+  @override
+  String get meshtasticFailed => '操作失敗';
+
+  @override
+  String get meshtasticNoMessages => '尚無訊息';
+
+  @override
+  String get meshtasticNoNodes => '尚未聽到任何節點';
+
+  @override
+  String get meshtasticNotConnected => '尚未連線至裝置';
+
+  @override
+  String get meshtasticSelectDevice => '選擇裝置';
+
+  @override
+  String get meshtasticClearMessages => '清除訊息';
+
+  @override
+  String get meshtasticEmptyMessage => '（空白訊息）';
+
+  @override
+  String get meshtasticCopied => '已複製訊息';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get meshtasticReconnecting => '重新連線中…';
+
+  @override
+  String get meshtasticChannelWorking => '正在設定 DPIP 頻道…';
+
+  @override
+  String get meshtasticChannelReady => 'DPIP 頻道已就緒';
+
+  @override
+  String get meshtasticChannelNoSlot => '沒有可用的頻道空位 — 請先在裝置上空出一個';
+
+  @override
+  String get meshtasticChannelFailed => '無法設定 DPIP 頻道';
+
+  @override
+  String meshtasticRegionMismatch(String region) {
+    return '裝置地區為 $region — DPIP 需要 TW';
+  }
+
+  @override
+  String get meshtasticRegionSwitch => '切換為 TW';
+
+  @override
+  String get meshtasticRegionConfirm =>
+      '要將這台裝置切換為 TW 地區嗎？裝置會重新啟動並短暫斷線，上面的其他頻道也會一起改變。';
+
+  @override
+  String get meshtasticBusyTitle => '另一個 App 正在使用這台裝置';
+
+  @override
+  String get meshtasticBusyBody =>
+      '請先在另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。';
+
+  @override
+  String get meshtasticConnectAnyway => '仍要連線';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3537,6 +3652,121 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更细的网格';
+
+  @override
+  String get meshtasticTitle => '網狀網路測試';
+
+  @override
+  String get meshtasticScan => '掃描';
+
+  @override
+  String get meshtasticScanning => '掃描中…';
+
+  @override
+  String get meshtasticDisconnect => '斷線';
+
+  @override
+  String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
+
+  @override
+  String get meshtasticInitializing => '藍牙初始化中…';
+
+  @override
+  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
+
+  @override
+  String get meshtasticNotSupported => '此裝置不支援藍牙';
+
+  @override
+  String get meshtasticNodes => '節點';
+
+  @override
+  String get meshtasticMessages => '訊息';
+
+  @override
+  String get meshtasticSend => '傳送';
+
+  @override
+  String get meshtasticSendHint => '要廣播的訊息';
+
+  @override
+  String get meshtasticStateDisconnected => '未連線';
+
+  @override
+  String get meshtasticStateConnecting => '連線中…';
+
+  @override
+  String get meshtasticStateConfiguring => '設定中…';
+
+  @override
+  String get meshtasticStateConnected => '已連線';
+
+  @override
+  String get meshtasticStateError => '錯誤';
+
+  @override
+  String get meshtasticFailed => '操作失敗';
+
+  @override
+  String get meshtasticNoMessages => '尚无讯息';
+
+  @override
+  String get meshtasticNoNodes => '尚未听到任何节点';
+
+  @override
+  String get meshtasticNotConnected => '尚未连线至装置';
+
+  @override
+  String get meshtasticSelectDevice => '选择装置';
+
+  @override
+  String get meshtasticClearMessages => '清除讯息';
+
+  @override
+  String get meshtasticEmptyMessage => '（空白讯息）';
+
+  @override
+  String get meshtasticCopied => '已复制讯息';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get meshtasticReconnecting => '重新连线中…';
+
+  @override
+  String get meshtasticChannelWorking => '正在设定 DPIP 频道…';
+
+  @override
+  String get meshtasticChannelReady => 'DPIP 频道已就绪';
+
+  @override
+  String get meshtasticChannelNoSlot => '没有可用的频道空位 — 请先在设备上空出一个';
+
+  @override
+  String get meshtasticChannelFailed => '无法设定 DPIP 频道';
+
+  @override
+  String meshtasticRegionMismatch(String region) {
+    return '设备地区为 $region — DPIP 需要 TW';
+  }
+
+  @override
+  String get meshtasticRegionSwitch => '切换为 TW';
+
+  @override
+  String get meshtasticRegionConfirm =>
+      '要将这台设备切换为 TW 地区吗？设备会重新启动并短暂断线，上面的其他频道也会一起改变。';
+
+  @override
+  String get meshtasticBusyTitle => '另一个 App 正在使用这台设备';
+
+  @override
+  String get meshtasticBusyBody =>
+      '请先在另一个 Meshtastic App 中断线。两个 App 同时连同一台设备会互相抢走讯息，导致部分讯息遗失。';
+
+  @override
+  String get meshtasticConnectAnyway => '仍要连线';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -5304,6 +5534,121 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String get meshtasticTitle => '網狀網路測試';
+
+  @override
+  String get meshtasticScan => '掃描';
+
+  @override
+  String get meshtasticScanning => '掃描中…';
+
+  @override
+  String get meshtasticDisconnect => '斷線';
+
+  @override
+  String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
+
+  @override
+  String get meshtasticInitializing => '藍牙初始化中…';
+
+  @override
+  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
+
+  @override
+  String get meshtasticNotSupported => '此裝置不支援藍牙';
+
+  @override
+  String get meshtasticNodes => '節點';
+
+  @override
+  String get meshtasticMessages => '訊息';
+
+  @override
+  String get meshtasticSend => '傳送';
+
+  @override
+  String get meshtasticSendHint => '要廣播的訊息';
+
+  @override
+  String get meshtasticStateDisconnected => '未連線';
+
+  @override
+  String get meshtasticStateConnecting => '連線中…';
+
+  @override
+  String get meshtasticStateConfiguring => '設定中…';
+
+  @override
+  String get meshtasticStateConnected => '已連線';
+
+  @override
+  String get meshtasticStateError => '錯誤';
+
+  @override
+  String get meshtasticFailed => '操作失敗';
+
+  @override
+  String get meshtasticNoMessages => '尚無訊息';
+
+  @override
+  String get meshtasticNoNodes => '尚未聽到任何節點';
+
+  @override
+  String get meshtasticNotConnected => '尚未連線至裝置';
+
+  @override
+  String get meshtasticSelectDevice => '選擇裝置';
+
+  @override
+  String get meshtasticClearMessages => '清除訊息';
+
+  @override
+  String get meshtasticEmptyMessage => '（空白訊息）';
+
+  @override
+  String get meshtasticCopied => '已複製訊息';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get meshtasticReconnecting => '重新連線中…';
+
+  @override
+  String get meshtasticChannelWorking => '正在設定 DPIP 頻道…';
+
+  @override
+  String get meshtasticChannelReady => 'DPIP 頻道已就緒';
+
+  @override
+  String get meshtasticChannelNoSlot => '沒有可用的頻道空位 — 請先在裝置上空出一個';
+
+  @override
+  String get meshtasticChannelFailed => '無法設定 DPIP 頻道';
+
+  @override
+  String meshtasticRegionMismatch(String region) {
+    return '裝置地區為 $region — DPIP 需要 TW';
+  }
+
+  @override
+  String get meshtasticRegionSwitch => '切換為 TW';
+
+  @override
+  String get meshtasticRegionConfirm =>
+      '要將這台裝置切換為 TW 地區嗎？裝置會重新啟動並短暫斷線，上面的其他頻道也會一起改變。';
+
+  @override
+  String get meshtasticBusyTitle => '另一個 App 正在使用這台裝置';
+
+  @override
+  String get meshtasticBusyBody =>
+      '請先在另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。';
+
+  @override
+  String get meshtasticConnectAnyway => '仍要連線';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7071,4 +7416,119 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get windForecastTownOutlineHint => '更細的網格';
+
+  @override
+  String get meshtasticTitle => '網狀網路測試';
+
+  @override
+  String get meshtasticScan => '掃描';
+
+  @override
+  String get meshtasticScanning => '掃描中…';
+
+  @override
+  String get meshtasticDisconnect => '斷線';
+
+  @override
+  String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
+
+  @override
+  String get meshtasticInitializing => '藍牙初始化中…';
+
+  @override
+  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
+
+  @override
+  String get meshtasticNotSupported => '此裝置不支援藍牙';
+
+  @override
+  String get meshtasticNodes => '節點';
+
+  @override
+  String get meshtasticMessages => '訊息';
+
+  @override
+  String get meshtasticSend => '傳送';
+
+  @override
+  String get meshtasticSendHint => '要廣播的訊息';
+
+  @override
+  String get meshtasticStateDisconnected => '未連線';
+
+  @override
+  String get meshtasticStateConnecting => '連線中…';
+
+  @override
+  String get meshtasticStateConfiguring => '設定中…';
+
+  @override
+  String get meshtasticStateConnected => '已連線';
+
+  @override
+  String get meshtasticStateError => '錯誤';
+
+  @override
+  String get meshtasticFailed => '操作失敗';
+
+  @override
+  String get meshtasticNoMessages => '尚無訊息';
+
+  @override
+  String get meshtasticNoNodes => '尚未聽到任何節點';
+
+  @override
+  String get meshtasticNotConnected => '尚未連線至裝置';
+
+  @override
+  String get meshtasticSelectDevice => '選擇裝置';
+
+  @override
+  String get meshtasticClearMessages => '清除訊息';
+
+  @override
+  String get meshtasticEmptyMessage => '（空白訊息）';
+
+  @override
+  String get meshtasticCopied => '已複製訊息';
+
+  @override
+  String get commonCancel => '取消';
+
+  @override
+  String get meshtasticReconnecting => '重新連線中…';
+
+  @override
+  String get meshtasticChannelWorking => '正在設定 DPIP 頻道…';
+
+  @override
+  String get meshtasticChannelReady => 'DPIP 頻道已就緒';
+
+  @override
+  String get meshtasticChannelNoSlot => '沒有可用的頻道空位 — 請先在裝置上空出一個';
+
+  @override
+  String get meshtasticChannelFailed => '無法設定 DPIP 頻道';
+
+  @override
+  String meshtasticRegionMismatch(String region) {
+    return '裝置地區為 $region — DPIP 需要 TW';
+  }
+
+  @override
+  String get meshtasticRegionSwitch => '切換為 TW';
+
+  @override
+  String get meshtasticRegionConfirm =>
+      '要將這台裝置切換為 TW 地區嗎？裝置會重新啟動並短暫斷線，上面的其他頻道也會一起改變。';
+
+  @override
+  String get meshtasticBusyTitle => '另一個 App 正在使用這台裝置';
+
+  @override
+  String get meshtasticBusyBody =>
+      '請先在另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。';
+
+  @override
+  String get meshtasticConnectAnyway => '仍要連線';
 }
