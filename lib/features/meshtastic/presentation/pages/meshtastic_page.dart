@@ -9,6 +9,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -103,6 +105,13 @@ Future<void> _showNodes(BuildContext context) => showModalBottomSheet<void>(
   showDragHandle: true,
   isScrollControlled: true,
   builder: (_) => const _NodeSheet(),
+);
+
+Future<void> _showRadio(BuildContext context) => showModalBottomSheet<void>(
+  context: context,
+  showDragHandle: true,
+  isScrollControlled: true,
+  builder: (_) => const _RadioSheet(),
 );
 
 void _toast(BuildContext context, String message) {
@@ -363,9 +372,7 @@ class _VitalsRow extends StatelessWidget {
         const Spacer(),
         if (battery != null) ...[
           Icon(
-            radio!.isPluggedIn
-                ? Icons.power_outlined
-                : _batteryIcon(battery),
+            radio!.isPluggedIn ? Icons.power_outlined : _batteryIcon(battery),
             size: 16,
             color: !radio!.isPluggedIn && battery <= 20
                 ? colors.error
@@ -535,11 +542,7 @@ class _DpipRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: warn ? colors.error : colors.primary,
-            ),
+            Icon(icon, size: 16, color: warn ? colors.error : colors.primary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
@@ -1008,6 +1011,221 @@ Future<void> _pick(
     return;
   }
   navigator.pop();
+}
+
+/// Everything the attached radio knows about itself, in one place: identity,
+/// firmware, power, radio settings, channel table and session traffic.
+///
+/// Diagnostics, so the values are shown raw — a wrong-looking number here is
+/// the point.
+class _RadioSheet extends StatelessWidget {
+  const _RadioSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final service = context.read<MeshtasticService>();
+    final link = context.watch<MeshLink>();
+    final radio = service.radioInfo;
+
+    return _SheetFrame(
+      title: l10n.meshtasticRadio,
+      children: [
+        if (radio == null)
+          EmptyView(
+            icon: Icons.settings_input_antenna_outlined,
+            message: l10n.meshtasticNotConnected,
+          )
+        else ...[
+          _InfoSection(
+            title: l10n.meshtasticDevice,
+            rows: _device(l10n, radio),
+          ),
+          _InfoSection(title: l10n.meshtasticPower, rows: _power(l10n, radio)),
+          _InfoSection(
+            title: l10n.meshtasticRadioSettings,
+            rows: _lora(l10n, radio, link),
+          ),
+          StreamBuilder<MeshTraffic>(
+            initialData: service.traffic,
+            stream: service.trafficStream,
+            builder: (context, snapshot) => _InfoSection(
+              title: l10n.meshtasticTraffic,
+              rows: _traffic(l10n, snapshot.data ?? const MeshTraffic()),
+            ),
+          ),
+          _InfoSection(
+            title: l10n.meshtasticChannels,
+            rows: [
+              for (final channel in service.channels)
+                if (channel.enabled)
+                  (
+                    // l10n-ignore: channel index label
+                    'CH${channel.index}',
+                    channel.name.isEmpty
+                        // l10n-ignore: firmware's own name for an unnamed channel
+                        ? '(default)'
+                        : channel.name,
+                  ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  List<(String, String)> _device(
+    AppLocalizations l10n,
+    MeshRadioInfo radio,
+  ) => [
+    (l10n.meshtasticName, radio.longName ?? '—'),
+    // l10n-ignore: node id in the hex form the mesh uses
+    (l10n.meshtasticNodeId, '!${radio.nodeNum.toRadixString(16)}'),
+    if (radio.shortName != null) (l10n.meshtasticShortName, radio.shortName!),
+    (l10n.meshtasticHardware, radio.hardware ?? '—'),
+    (l10n.meshtasticFirmware, radio.firmware ?? '—'),
+    (l10n.meshtasticRole, radio.role ?? '—'),
+  ];
+
+  List<(String, String)> _power(AppLocalizations l10n, MeshRadioInfo radio) => [
+    (
+      l10n.meshtasticBattery,
+      radio.isPluggedIn
+          ? l10n.meshtasticExternalPower
+          : radio.batteryPercent == null
+          ? '—'
+          // l10n-ignore: percentage readout
+          : '${radio.batteryPercent}%',
+    ),
+    if (radio.voltage != null)
+      // l10n-ignore: volts
+      (l10n.meshtasticVoltage, '${radio.voltage!.toStringAsFixed(2)} V'),
+    if (radio.uptime != null)
+      (l10n.meshtasticUptime, _durationLabel(radio.uptime!)),
+  ];
+
+  List<(String, String)> _lora(
+    AppLocalizations l10n,
+    MeshRadioInfo radio,
+    MeshLink link,
+  ) => [
+    (l10n.meshtasticRegionLabel, radio.region ?? '—'),
+    (l10n.meshtasticPreset, radio.modemPreset ?? '—'),
+    if (radio.hopLimit != null) (l10n.meshtasticHopLimit, '${radio.hopLimit}'),
+    if (radio.txPower != null)
+      // l10n-ignore: dBm
+      (l10n.meshtasticTxPower, '${radio.txPower} dBm'),
+    if (radio.channelUtilization != null)
+      (
+        l10n.meshtasticChannelUse,
+        // l10n-ignore: percentage readout
+        '${radio.channelUtilization!.toStringAsFixed(1)}%',
+      ),
+    if (radio.airUtilTx != null)
+      // l10n-ignore: percentage readout
+      (l10n.meshtasticAirtime, '${radio.airUtilTx!.toStringAsFixed(1)}%'),
+    (
+      l10n.meshtasticDpipChannel,
+      link.dpipChannel == null
+          ? '—'
+          // l10n-ignore: channel index label
+          : '${DpipMeshChannel.name} CH${link.dpipChannel}',
+    ),
+  ];
+
+  List<(String, String)> _traffic(AppLocalizations l10n, MeshTraffic traffic) =>
+      [
+        (
+          l10n.meshtasticReceived,
+          // l10n-ignore: packet/byte counters
+          '${traffic.rxPackets} · ${_bytesLabel(traffic.rxBytes)}',
+        ),
+        (
+          l10n.meshtasticSent,
+          // l10n-ignore: packet/byte counters
+          '${traffic.txPackets} · ${_bytesLabel(traffic.txBytes)}',
+        ),
+        if (traffic.rxUndecoded > 0)
+          (l10n.meshtasticUndecoded, '${traffic.rxUndecoded}'),
+        (l10n.meshtasticLastReceived, _sinceLabel(traffic.lastRx)),
+        (l10n.meshtasticLastSent, _sinceLabel(traffic.lastTx)),
+        for (final entry in traffic.rxByPort.entries)
+          (_portLabel(entry.key), '${entry.value}'),
+      ];
+}
+
+/// A titled block of label/value rows.
+class _InfoSection extends StatelessWidget {
+  const _InfoSection({required this.title, required this.rows});
+
+  final String title;
+  final List<(String, String)> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    if (rows.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title),
+        for (final (label, value) in rows)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xs,
+              AppSpacing.lg,
+              AppSpacing.xs,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  value,
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Meshtastic app ports, named where the name helps and numbered otherwise.
+// l10n-ignore: protocol port names
+String _portLabel(int portnum) => switch (portnum) {
+  1 => 'Text',
+  3 => 'Position',
+  4 => 'Node info',
+  5 => 'Routing',
+  6 => 'Admin',
+  8 => 'Waypoint',
+  10 => 'Detection',
+  67 => 'Telemetry',
+  70 => 'Traceroute',
+  71 => 'Neighbour info',
+  MeshPorts.private => 'DPIP',
+  _ => 'Port $portnum',
+};
+
+// l10n-ignore: byte counter
+String _bytesLabel(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} kB';
+  return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 }
 
 /// Everything the radio has heard, online first.

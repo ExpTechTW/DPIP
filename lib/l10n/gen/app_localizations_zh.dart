@@ -1885,6 +1885,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get meshtasticConnectAnyway => '仍要連線';
+
+  @override
+  String get meshtasticRadio => '電台';
+
+  @override
+  String get meshtasticDevice => '裝置';
+
+  @override
+  String get meshtasticPower => '電力';
+
+  @override
+  String get meshtasticRadioSettings => 'LoRa';
+
+  @override
+  String get meshtasticTraffic => '流量';
+
+  @override
+  String get meshtasticChannels => '頻道';
+
+  @override
+  String get meshtasticName => '名稱';
+
+  @override
+  String get meshtasticShortName => '簡稱';
+
+  @override
+  String get meshtasticNodeId => '節點 ID';
+
+  @override
+  String get meshtasticHardware => '硬體';
+
+  @override
+  String get meshtasticFirmware => '韌體';
+
+  @override
+  String get meshtasticRole => '角色';
+
+  @override
+  String get meshtasticBattery => '電量';
+
+  @override
+  String get meshtasticExternalPower => '外部供電';
+
+  @override
+  String get meshtasticVoltage => '電壓';
+
+  @override
+  String get meshtasticUptime => '運行時間';
+
+  @override
+  String get meshtasticRegionLabel => '地區';
+
+  @override
+  String get meshtasticPreset => '調變預設';
+
+  @override
+  String get meshtasticHopLimit => '跳數上限';
+
+  @override
+  String get meshtasticTxPower => '發射功率';
+
+  @override
+  String get meshtasticChannelUse => '頻道使用率';
+
+  @override
+  String get meshtasticAirtime => '發射佔空比';
+
+  @override
+  String get meshtasticDpipChannel => 'DPIP 頻道';
+
+  @override
+  String get meshtasticReceived => '已接收';
+
+  @override
+  String get meshtasticSent => '已送出';
+
+  @override
+  String get meshtasticUndecoded => '無法解密';
+
+  @override
+  String get meshtasticLastReceived => '最近接收';
+
+  @override
+  String get meshtasticLastSent => '最近送出';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3767,6 +3851,90 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get meshtasticConnectAnyway => '仍要连线';
+
+  @override
+  String get meshtasticRadio => '电台';
+
+  @override
+  String get meshtasticDevice => '设备';
+
+  @override
+  String get meshtasticPower => '电力';
+
+  @override
+  String get meshtasticRadioSettings => 'LoRa';
+
+  @override
+  String get meshtasticTraffic => '流量';
+
+  @override
+  String get meshtasticChannels => '频道';
+
+  @override
+  String get meshtasticName => '名称';
+
+  @override
+  String get meshtasticShortName => '简称';
+
+  @override
+  String get meshtasticNodeId => '节点 ID';
+
+  @override
+  String get meshtasticHardware => '硬件';
+
+  @override
+  String get meshtasticFirmware => '固件';
+
+  @override
+  String get meshtasticRole => '角色';
+
+  @override
+  String get meshtasticBattery => '电量';
+
+  @override
+  String get meshtasticExternalPower => '外部供电';
+
+  @override
+  String get meshtasticVoltage => '电压';
+
+  @override
+  String get meshtasticUptime => '运行时间';
+
+  @override
+  String get meshtasticRegionLabel => '地区';
+
+  @override
+  String get meshtasticPreset => '调变预设';
+
+  @override
+  String get meshtasticHopLimit => '跳数上限';
+
+  @override
+  String get meshtasticTxPower => '发射功率';
+
+  @override
+  String get meshtasticChannelUse => '频道使用率';
+
+  @override
+  String get meshtasticAirtime => '发射占空比';
+
+  @override
+  String get meshtasticDpipChannel => 'DPIP 频道';
+
+  @override
+  String get meshtasticReceived => '已接收';
+
+  @override
+  String get meshtasticSent => '已送出';
+
+  @override
+  String get meshtasticUndecoded => '无法解密';
+
+  @override
+  String get meshtasticLastReceived => '最近接收';
+
+  @override
+  String get meshtasticLastSent => '最近送出';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -5649,6 +5817,90 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get meshtasticConnectAnyway => '仍要連線';
+
+  @override
+  String get meshtasticRadio => '電台';
+
+  @override
+  String get meshtasticDevice => '裝置';
+
+  @override
+  String get meshtasticPower => '電力';
+
+  @override
+  String get meshtasticRadioSettings => 'LoRa';
+
+  @override
+  String get meshtasticTraffic => '流量';
+
+  @override
+  String get meshtasticChannels => '頻道';
+
+  @override
+  String get meshtasticName => '名稱';
+
+  @override
+  String get meshtasticShortName => '簡稱';
+
+  @override
+  String get meshtasticNodeId => '節點 ID';
+
+  @override
+  String get meshtasticHardware => '硬體';
+
+  @override
+  String get meshtasticFirmware => '韌體';
+
+  @override
+  String get meshtasticRole => '角色';
+
+  @override
+  String get meshtasticBattery => '電量';
+
+  @override
+  String get meshtasticExternalPower => '外部供電';
+
+  @override
+  String get meshtasticVoltage => '電壓';
+
+  @override
+  String get meshtasticUptime => '運行時間';
+
+  @override
+  String get meshtasticRegionLabel => '地區';
+
+  @override
+  String get meshtasticPreset => '調變預設';
+
+  @override
+  String get meshtasticHopLimit => '跳數上限';
+
+  @override
+  String get meshtasticTxPower => '發射功率';
+
+  @override
+  String get meshtasticChannelUse => '頻道使用率';
+
+  @override
+  String get meshtasticAirtime => '發射佔空比';
+
+  @override
+  String get meshtasticDpipChannel => 'DPIP 頻道';
+
+  @override
+  String get meshtasticReceived => '已接收';
+
+  @override
+  String get meshtasticSent => '已送出';
+
+  @override
+  String get meshtasticUndecoded => '無法解密';
+
+  @override
+  String get meshtasticLastReceived => '最近接收';
+
+  @override
+  String get meshtasticLastSent => '最近送出';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7531,4 +7783,88 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get meshtasticConnectAnyway => '仍要連線';
+
+  @override
+  String get meshtasticRadio => '電台';
+
+  @override
+  String get meshtasticDevice => '裝置';
+
+  @override
+  String get meshtasticPower => '電力';
+
+  @override
+  String get meshtasticRadioSettings => 'LoRa';
+
+  @override
+  String get meshtasticTraffic => '流量';
+
+  @override
+  String get meshtasticChannels => '頻道';
+
+  @override
+  String get meshtasticName => '名稱';
+
+  @override
+  String get meshtasticShortName => '簡稱';
+
+  @override
+  String get meshtasticNodeId => '節點 ID';
+
+  @override
+  String get meshtasticHardware => '硬體';
+
+  @override
+  String get meshtasticFirmware => '韌體';
+
+  @override
+  String get meshtasticRole => '角色';
+
+  @override
+  String get meshtasticBattery => '電量';
+
+  @override
+  String get meshtasticExternalPower => '外部供電';
+
+  @override
+  String get meshtasticVoltage => '電壓';
+
+  @override
+  String get meshtasticUptime => '運行時間';
+
+  @override
+  String get meshtasticRegionLabel => '地區';
+
+  @override
+  String get meshtasticPreset => '調變預設';
+
+  @override
+  String get meshtasticHopLimit => '跳數上限';
+
+  @override
+  String get meshtasticTxPower => '發射功率';
+
+  @override
+  String get meshtasticChannelUse => '頻道使用率';
+
+  @override
+  String get meshtasticAirtime => '發射佔空比';
+
+  @override
+  String get meshtasticDpipChannel => 'DPIP 頻道';
+
+  @override
+  String get meshtasticReceived => '已接收';
+
+  @override
+  String get meshtasticSent => '已送出';
+
+  @override
+  String get meshtasticUndecoded => '無法解密';
+
+  @override
+  String get meshtasticLastReceived => '最近接收';
+
+  @override
+  String get meshtasticLastSent => '最近送出';
 }

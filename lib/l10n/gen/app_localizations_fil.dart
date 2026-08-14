@@ -1938,4 +1938,88 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get meshtasticConnectAnyway => 'Connect anyway';
+
+  @override
+  String get meshtasticRadio => 'Radio';
+
+  @override
+  String get meshtasticDevice => 'Device';
+
+  @override
+  String get meshtasticPower => 'Power';
+
+  @override
+  String get meshtasticRadioSettings => 'LoRa';
+
+  @override
+  String get meshtasticTraffic => 'Traffic';
+
+  @override
+  String get meshtasticChannels => 'Channels';
+
+  @override
+  String get meshtasticName => 'Name';
+
+  @override
+  String get meshtasticShortName => 'Short name';
+
+  @override
+  String get meshtasticNodeId => 'Node ID';
+
+  @override
+  String get meshtasticHardware => 'Hardware';
+
+  @override
+  String get meshtasticFirmware => 'Firmware';
+
+  @override
+  String get meshtasticRole => 'Role';
+
+  @override
+  String get meshtasticBattery => 'Battery';
+
+  @override
+  String get meshtasticExternalPower => 'External power';
+
+  @override
+  String get meshtasticVoltage => 'Voltage';
+
+  @override
+  String get meshtasticUptime => 'Uptime';
+
+  @override
+  String get meshtasticRegionLabel => 'Region';
+
+  @override
+  String get meshtasticPreset => 'Modem preset';
+
+  @override
+  String get meshtasticHopLimit => 'Hop limit';
+
+  @override
+  String get meshtasticTxPower => 'TX power';
+
+  @override
+  String get meshtasticChannelUse => 'Channel use';
+
+  @override
+  String get meshtasticAirtime => 'Air time (TX)';
+
+  @override
+  String get meshtasticDpipChannel => 'DPIP channel';
+
+  @override
+  String get meshtasticReceived => 'Received';
+
+  @override
+  String get meshtasticSent => 'Sent';
+
+  @override
+  String get meshtasticUndecoded => 'Not decrypted';
+
+  @override
+  String get meshtasticLastReceived => 'Last received';
+
+  @override
+  String get meshtasticLastSent => 'Last sent';
 }

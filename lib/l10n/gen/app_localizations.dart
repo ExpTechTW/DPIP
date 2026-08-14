@@ -3650,6 +3650,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connect anyway'**
   String get meshtasticConnectAnyway;
+
+  /// Radio diagnostics sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Radio'**
+  String get meshtasticRadio;
+
+  /// Section: device identity
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get meshtasticDevice;
+
+  /// Section: battery and uptime
+  ///
+  /// In en, this message translates to:
+  /// **'Power'**
+  String get meshtasticPower;
+
+  /// Section: LoRa settings
+  ///
+  /// In en, this message translates to:
+  /// **'LoRa'**
+  String get meshtasticRadioSettings;
+
+  /// Section: packet counters
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic'**
+  String get meshtasticTraffic;
+
+  /// Section: the radio's channel table
+  ///
+  /// In en, this message translates to:
+  /// **'Channels'**
+  String get meshtasticChannels;
+
+  /// The radio's long name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get meshtasticName;
+
+  /// The radio's short name
+  ///
+  /// In en, this message translates to:
+  /// **'Short name'**
+  String get meshtasticShortName;
+
+  /// The radio's node number
+  ///
+  /// In en, this message translates to:
+  /// **'Node ID'**
+  String get meshtasticNodeId;
+
+  /// Board model
+  ///
+  /// In en, this message translates to:
+  /// **'Hardware'**
+  String get meshtasticHardware;
+
+  /// Firmware version
+  ///
+  /// In en, this message translates to:
+  /// **'Firmware'**
+  String get meshtasticFirmware;
+
+  /// Device role (client, router...)
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get meshtasticRole;
+
+  /// Battery charge
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get meshtasticBattery;
+
+  /// Battery value when mains powered
+  ///
+  /// In en, this message translates to:
+  /// **'External power'**
+  String get meshtasticExternalPower;
+
+  /// Battery voltage
+  ///
+  /// In en, this message translates to:
+  /// **'Voltage'**
+  String get meshtasticVoltage;
+
+  /// Time since the radio booted
+  ///
+  /// In en, this message translates to:
+  /// **'Uptime'**
+  String get meshtasticUptime;
+
+  /// LoRa region
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get meshtasticRegionLabel;
+
+  /// LoRa modem preset
+  ///
+  /// In en, this message translates to:
+  /// **'Modem preset'**
+  String get meshtasticPreset;
+
+  /// How many hops a packet may take
+  ///
+  /// In en, this message translates to:
+  /// **'Hop limit'**
+  String get meshtasticHopLimit;
+
+  /// Transmit power
+  ///
+  /// In en, this message translates to:
+  /// **'TX power'**
+  String get meshtasticTxPower;
+
+  /// Share of airtime seen busy
+  ///
+  /// In en, this message translates to:
+  /// **'Channel use'**
+  String get meshtasticChannelUse;
+
+  /// Share of airtime this radio transmitted
+  ///
+  /// In en, this message translates to:
+  /// **'Air time (TX)'**
+  String get meshtasticAirtime;
+
+  /// Which channel DPIP payloads use
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP channel'**
+  String get meshtasticDpipChannel;
+
+  /// Packets received this session
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get meshtasticReceived;
+
+  /// Packets sent this session
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get meshtasticSent;
+
+  /// Packets the radio could not decrypt
+  ///
+  /// In en, this message translates to:
+  /// **'Not decrypted'**
+  String get meshtasticUndecoded;
+
+  /// Age of the last received packet
+  ///
+  /// In en, this message translates to:
+  /// **'Last received'**
+  String get meshtasticLastReceived;
+
+  /// Age of the last sent packet
+  ///
+  /// In en, this message translates to:
+  /// **'Last sent'**
+  String get meshtasticLastSent;
 }
 
 class _AppLocalizationsDelegate
