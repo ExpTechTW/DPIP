@@ -104,6 +104,7 @@ flutter:
     - shaders/weather/sun_flare.frag
     - shaders/weather/galaxy.frag
     - shaders/weather/night.frag
+    - shaders/weather/night_field.frag
     - shaders/weather/rain_on_glass.frag
     - shaders/weather/lightning.frag
     - shaders/weather/rainbow.frag

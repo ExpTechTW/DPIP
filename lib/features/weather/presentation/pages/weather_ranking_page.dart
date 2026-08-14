@@ -314,19 +314,23 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
   }
 }
 
+final DateFormat _snapshotFormat = DateFormat('yyyy/MM/dd HH:mm');
+
 String _formatSnapshotTime(int unixSeconds) {
   final taipei = AppTime.taipei(
     DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000, isUtc: true),
   );
-  return DateFormat('yyyy/MM/dd HH:mm').format(taipei);
+  return _snapshotFormat.format(taipei);
 }
+
+final DateFormat _clockFormat = DateFormat('HH:mm');
 
 /// Taipei wall-clock `HH:mm` for an occurrence timestamp.
 String _formatClock(int unixSeconds) {
   final taipei = AppTime.taipei(
     DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000, isUtc: true),
   );
-  return DateFormat('HH:mm').format(taipei);
+  return _clockFormat.format(taipei);
 }
 
 /// Ranking list → map tab: focus camera + open station sheet.

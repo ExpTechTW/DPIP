@@ -66,6 +66,13 @@ class _HomePageState extends State<HomePage> {
   /// content and is never dimmed with it.
   static const double _mapDimPeak = 0.35;
 
+  /// The filter instance last handed to the [ImageFiltered] — [ImageFilter]
+  /// has no value equality, so a fresh `blur(...)` per drag tick would
+  /// recomposite the full-screen blur every frame even though the sigma
+  /// quantises to the same step (same pattern as [_CachedBlur] in HomeSheet).
+  ImageFilter? _mapBlur;
+  double _mapBlurSigma = -1;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -200,6 +207,13 @@ class _HomePageState extends State<HomePage> {
                       // full-screen blur recomposites on level crossings only.
                       final sigma = _mapBlurPeak * ((t * 6).round() / 6);
                       final dim = t * _mapDimPeak;
+                      if (sigma != _mapBlurSigma) {
+                        _mapBlurSigma = sigma;
+                        _mapBlur = ImageFilter.blur(
+                          sigmaX: sigma,
+                          sigmaY: sigma,
+                        );
+                      }
                       // The tree's shape never changes — no SizedBox/ImageFiltered
                       // swap at t=0, which would re-parent the subtree right over
                       // the map platform view at the exact edge the sheet starts
@@ -207,10 +221,7 @@ class _HomePageState extends State<HomePage> {
                       // `enabled` makes the filter a no-op at rest without
                       // touching the tree.
                       return ImageFiltered(
-                        imageFilter: ImageFilter.blur(
-                          sigmaX: sigma,
-                          sigmaY: sigma,
-                        ),
+                        imageFilter: _mapBlur!,
                         enabled: t > 0,
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),

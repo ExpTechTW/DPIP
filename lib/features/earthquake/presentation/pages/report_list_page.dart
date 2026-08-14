@@ -304,8 +304,13 @@ class _DaySection extends StatelessWidget {
     if (day == today.subtract(const Duration(days: 1))) {
       return l10n.reportListYesterday;
     }
-    return DateFormat.yMMMEd(locale).format(day);
+    // Parsing a locale's pattern is not free — memoised per locale.
+    return _dayFormats
+        .putIfAbsent(locale, () => DateFormat.yMMMEd(locale))
+        .format(day);
   }
+
+  static final Map<String, DateFormat> _dayFormats = {};
 }
 
 class _ReportTile extends StatelessWidget {
@@ -316,13 +321,15 @@ class _ReportTile extends StatelessWidget {
   /// Numbered CWA reports — magnitude in gold to mark the official serial set.
   static const Color _numberedMagGold = Color(0xFFE8C547);
 
+  static final DateFormat _stampFormat = DateFormat('HH:mm:ss');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
     final taipei = AppTime.taipei(report.originTimeUtc);
-    final stamp = DateFormat('HH:mm:ss').format(taipei);
+    final stamp = _stampFormat.format(taipei);
     final intensity = Intensity.displayForReport(
       report.intensity,
       report.originTimeUtc,

@@ -148,8 +148,8 @@ class HomeSheet extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 // Frosted map-through backdrop, dominant while collapsed.
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                _CachedBlur(
+                  sigma: blur,
                   child: ColoredBox(
                     color: colors.surface.withValues(alpha: surfaceAlpha),
                   ),
@@ -201,6 +201,38 @@ class HomeSheet extends StatelessWidget {
   /// computed alongside it in [build], kept in sync via the same constants.
   static double _flush(double e) =>
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
+}
+
+/// A [BackdropFilter] that reuses its [ImageFilter] instance while [sigma]
+/// stays on the same quantised step.
+///
+/// [ImageFilter] has no value equality, so a fresh `blur(...)` per drag tick
+/// marks the whole-screen blur layer dirty and recomposites it every frame
+/// even though the sigma only changes on a few level crossings (the sheet
+/// quantises it to 6 steps). Reusing the instance keeps the layer cached
+/// between steps — the same pattern [_ScrollBlurredWeather] uses.
+class _CachedBlur extends StatefulWidget {
+  const _CachedBlur({required this.sigma, required this.child});
+
+  final double sigma;
+  final Widget child;
+
+  @override
+  State<_CachedBlur> createState() => _CachedBlurState();
+}
+
+class _CachedBlurState extends State<_CachedBlur> {
+  ImageFilter? _filter;
+  double _sigma = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.sigma != _sigma) {
+      _sigma = widget.sigma;
+      _filter = ImageFilter.blur(sigmaX: _sigma, sigmaY: _sigma);
+    }
+    return BackdropFilter(filter: _filter!, child: widget.child);
+  }
 }
 
 /// Blurs and dims [child] in step with [scrollController], so the sky reads as

@@ -110,6 +110,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   static const List<String> _layerAssets = [
     WeatherSkyPainter.nightAsset,
+    WeatherSkyPainter.nightFieldAsset,
     WeatherSkyPainter.cloudsAsset,
     WeatherSkyPainter.lightningAsset,
     WeatherSkyPainter.sunFlareAsset,
