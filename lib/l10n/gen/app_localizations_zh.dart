@@ -1787,19 +1787,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
 
   @override
-  String get meshtasticInitializing => '藍牙初始化中…';
-
-  @override
-  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
-
-  @override
-  String get meshtasticNotSupported => '此裝置不支援藍牙';
-
-  @override
   String get meshtasticNodes => '節點';
-
-  @override
-  String get meshtasticMessages => '訊息';
 
   @override
   String get meshtasticSend => '傳送';
@@ -1821,9 +1809,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get meshtasticStateError => '錯誤';
-
-  @override
-  String get meshtasticFailed => '操作失敗';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -2038,9 +2023,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get meshtasticLastHeard => '最後聽到';
-
-  @override
-  String get meshtasticPosition => '位置';
 
   @override
   String get meshtasticTapNode => '點選節點查看詳細資訊';
@@ -3851,19 +3833,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
 
   @override
-  String get meshtasticInitializing => '藍牙初始化中…';
-
-  @override
-  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
-
-  @override
-  String get meshtasticNotSupported => '此裝置不支援藍牙';
-
-  @override
   String get meshtasticNodes => '節點';
-
-  @override
-  String get meshtasticMessages => '訊息';
 
   @override
   String get meshtasticSend => '傳送';
@@ -3885,9 +3855,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get meshtasticStateError => '錯誤';
-
-  @override
-  String get meshtasticFailed => '操作失敗';
 
   @override
   String get meshtasticNoMessages => '尚无讯息';
@@ -4102,9 +4069,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastHeard => '最后听到';
-
-  @override
-  String get meshtasticPosition => '位置';
 
   @override
   String get meshtasticTapNode => '点选节点查看详细信息';
@@ -5915,19 +5879,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
 
   @override
-  String get meshtasticInitializing => '藍牙初始化中…';
-
-  @override
-  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
-
-  @override
-  String get meshtasticNotSupported => '此裝置不支援藍牙';
-
-  @override
   String get meshtasticNodes => '節點';
-
-  @override
-  String get meshtasticMessages => '訊息';
 
   @override
   String get meshtasticSend => '傳送';
@@ -5949,9 +5901,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get meshtasticStateError => '錯誤';
-
-  @override
-  String get meshtasticFailed => '操作失敗';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -6166,9 +6115,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastHeard => '最後聽到';
-
-  @override
-  String get meshtasticPosition => '位置';
 
   @override
   String get meshtasticTapNode => '點選節點查看詳細資訊';
@@ -7979,19 +7925,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get meshtasticNoDevices => '找不到 Meshtastic 裝置';
 
   @override
-  String get meshtasticInitializing => '藍牙初始化中…';
-
-  @override
-  String get meshtasticReady => '就緒 — 按「掃描」搜尋無線電';
-
-  @override
-  String get meshtasticNotSupported => '此裝置不支援藍牙';
-
-  @override
   String get meshtasticNodes => '節點';
-
-  @override
-  String get meshtasticMessages => '訊息';
 
   @override
   String get meshtasticSend => '傳送';
@@ -8013,9 +7947,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get meshtasticStateError => '錯誤';
-
-  @override
-  String get meshtasticFailed => '操作失敗';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -8230,9 +8161,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastHeard => '最後聽到';
-
-  @override
-  String get meshtasticPosition => '位置';
 
   @override
   String get meshtasticTapNode => '點選節點查看詳細資訊';

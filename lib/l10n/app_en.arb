@@ -2450,25 +2450,9 @@
   "@meshtasticNoDevices": {
     "description": "Empty scan result"
   },
-  "meshtasticInitializing": "Initializing Bluetooth…",
-  "@meshtasticInitializing": {
-    "description": "Bluetooth init in progress"
-  },
-  "meshtasticReady": "Ready — press scan to find radios",
-  "@meshtasticReady": {
-    "description": "Idle state hint"
-  },
-  "meshtasticNotSupported": "Bluetooth is not supported on this device",
-  "@meshtasticNotSupported": {
-    "description": "Bluetooth unavailable"
-  },
   "meshtasticNodes": "Nodes",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
-  },
-  "meshtasticMessages": "Messages",
-  "@meshtasticMessages": {
-    "description": "Mesh messages section header"
   },
   "meshtasticSend": "Send",
   "@meshtasticSend": {
@@ -2497,10 +2481,6 @@
   "meshtasticStateError": "Error",
   "@meshtasticStateError": {
     "description": "Connection state label"
-  },
-  "meshtasticFailed": "Operation failed",
-  "@meshtasticFailed": {
-    "description": "Generic operation failure toast"
   },
   "meshtasticNoMessages": "No messages yet",
   "@meshtasticNoMessages": {
@@ -2784,23 +2764,44 @@
     "description": "Phase: waning crescent"
   },
   "meshtasticLastHeard": "Last heard",
-  "@meshtasticLastHeard": {"description": "When a node last transmitted"},
-  "meshtasticPosition": "Position",
-  "@meshtasticPosition": {"description": "A node's reported coordinates"},
+  "@meshtasticLastHeard": {
+    "description": "When a node last transmitted"
+  },
   "meshtasticTapNode": "Tap a node for details",
-  "@meshtasticTapNode": {"description": "Resting state of the map node sheet"},
+  "@meshtasticTapNode": {
+    "description": "Resting state of the map node sheet"
+  },
   "meshtasticLayerOptions": "Node options",
-  "@meshtasticLayerOptions": {"description": "Tooltip for the mesh layer's options chip"},
+  "@meshtasticLayerOptions": {
+    "description": "Tooltip for the mesh layer's options chip"
+  },
   "meshtasticExcludeMqtt": "Hide MQTT nodes",
-  "@meshtasticExcludeMqtt": {"description": "Toggle hiding internet-bridged nodes"},
+  "@meshtasticExcludeMqtt": {
+    "description": "Toggle hiding internet-bridged nodes"
+  },
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
-  "@meshtasticExcludeMqttSubtitle": {"description": "What an MQTT node is"},
+  "@meshtasticExcludeMqttSubtitle": {
+    "description": "What an MQTT node is"
+  },
   "meshtasticExcludeMqttHidden": "{count} hidden",
-  "@meshtasticExcludeMqttHidden": {"description": "How many nodes the filter is hiding", "placeholders": {"count": {"type": "int"}}},
+  "@meshtasticExcludeMqttHidden": {
+    "description": "How many nodes the filter is hiding",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "meshtasticOnline": "Heard recently",
-  "@meshtasticOnline": {"description": "Legend: node heard within the online window"},
+  "@meshtasticOnline": {
+    "description": "Legend: node heard within the online window"
+  },
   "meshtasticSilent": "Silent",
-  "@meshtasticSilent": {"description": "Legend: node known but not heard recently"},
+  "@meshtasticSilent": {
+    "description": "Legend: node known but not heard recently"
+  },
   "meshtasticViaMqtt": "Via MQTT (internet)",
-  "@meshtasticViaMqtt": {"description": "Legend: node reported over an MQTT bridge"}
+  "@meshtasticViaMqtt": {
+    "description": "Legend: node reported over an MQTT bridge"
+  }
 }

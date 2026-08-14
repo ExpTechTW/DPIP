@@ -1824,20 +1824,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticNoDevices => 'No Meshtastic devices found';
 
   @override
-  String get meshtasticInitializing => 'Initializing Bluetooth…';
-
-  @override
-  String get meshtasticReady => 'Ready — press scan to find radios';
-
-  @override
-  String get meshtasticNotSupported =>
-      'Bluetooth is not supported on this device';
-
-  @override
   String get meshtasticNodes => 'Nodes';
-
-  @override
-  String get meshtasticMessages => 'Messages';
 
   @override
   String get meshtasticSend => 'Send';
@@ -1859,9 +1846,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get meshtasticStateError => 'Error';
-
-  @override
-  String get meshtasticFailed => 'Operation failed';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2078,9 +2062,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get meshtasticLastHeard => 'Last heard';
-
-  @override
-  String get meshtasticPosition => 'Position';
 
   @override
   String get meshtasticTapNode => 'Tap a node for details';

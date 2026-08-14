@@ -3459,35 +3459,11 @@ abstract class AppLocalizations {
   /// **'No Meshtastic devices found'**
   String get meshtasticNoDevices;
 
-  /// Bluetooth init in progress
-  ///
-  /// In en, this message translates to:
-  /// **'Initializing Bluetooth…'**
-  String get meshtasticInitializing;
-
-  /// Idle state hint
-  ///
-  /// In en, this message translates to:
-  /// **'Ready — press scan to find radios'**
-  String get meshtasticReady;
-
-  /// Bluetooth unavailable
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth is not supported on this device'**
-  String get meshtasticNotSupported;
-
   /// Mesh nodes section header
   ///
   /// In en, this message translates to:
   /// **'Nodes'**
   String get meshtasticNodes;
-
-  /// Mesh messages section header
-  ///
-  /// In en, this message translates to:
-  /// **'Messages'**
-  String get meshtasticMessages;
 
   /// Send message button
   ///
@@ -3530,12 +3506,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get meshtasticStateError;
-
-  /// Generic operation failure toast
-  ///
-  /// In en, this message translates to:
-  /// **'Operation failed'**
-  String get meshtasticFailed;
 
   /// Empty message log while connected
   ///
@@ -3956,12 +3926,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last heard'**
   String get meshtasticLastHeard;
-
-  /// A node's reported coordinates
-  ///
-  /// In en, this message translates to:
-  /// **'Position'**
-  String get meshtasticPosition;
 
   /// Resting state of the map node sheet
   ///

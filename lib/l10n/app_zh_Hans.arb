@@ -681,25 +681,9 @@
   "@meshtasticNoDevices": {
     "description": "Empty scan result"
   },
-  "meshtasticInitializing": "藍牙初始化中…",
-  "@meshtasticInitializing": {
-    "description": "Bluetooth init in progress"
-  },
-  "meshtasticReady": "就緒 — 按「掃描」搜尋無線電",
-  "@meshtasticReady": {
-    "description": "Idle state hint"
-  },
-  "meshtasticNotSupported": "此裝置不支援藍牙",
-  "@meshtasticNotSupported": {
-    "description": "Bluetooth unavailable"
-  },
   "meshtasticNodes": "節點",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
-  },
-  "meshtasticMessages": "訊息",
-  "@meshtasticMessages": {
-    "description": "Mesh messages section header"
   },
   "meshtasticSend": "傳送",
   "@meshtasticSend": {
@@ -728,10 +712,6 @@
   "meshtasticStateError": "錯誤",
   "@meshtasticStateError": {
     "description": "Connection state label"
-  },
-  "meshtasticFailed": "操作失敗",
-  "@meshtasticFailed": {
-    "description": "Generic operation failure toast"
   },
   "meshtasticNoMessages": "尚无讯息",
   "@meshtasticNoMessages": {
@@ -1015,23 +995,44 @@
     "description": "Phase: waning crescent"
   },
   "meshtasticLastHeard": "最后听到",
-  "@meshtasticLastHeard": {"description": "When a node last transmitted"},
-  "meshtasticPosition": "位置",
-  "@meshtasticPosition": {"description": "A node's reported coordinates"},
+  "@meshtasticLastHeard": {
+    "description": "When a node last transmitted"
+  },
   "meshtasticTapNode": "点选节点查看详细信息",
-  "@meshtasticTapNode": {"description": "Resting state of the map node sheet"},
+  "@meshtasticTapNode": {
+    "description": "Resting state of the map node sheet"
+  },
   "meshtasticLayerOptions": "节点选项",
-  "@meshtasticLayerOptions": {"description": "Tooltip for the mesh layer's options chip"},
+  "@meshtasticLayerOptions": {
+    "description": "Tooltip for the mesh layer's options chip"
+  },
   "meshtasticExcludeMqtt": "隐藏 MQTT 节点",
-  "@meshtasticExcludeMqtt": {"description": "Toggle hiding internet-bridged nodes"},
+  "@meshtasticExcludeMqtt": {
+    "description": "Toggle hiding internet-bridged nodes"
+  },
   "meshtasticExcludeMqttSubtitle": "经互联网桥接、并非无线电听到的节点",
-  "@meshtasticExcludeMqttSubtitle": {"description": "What an MQTT node is"},
+  "@meshtasticExcludeMqttSubtitle": {
+    "description": "What an MQTT node is"
+  },
   "meshtasticExcludeMqttHidden": "已隐藏 {count} 个",
-  "@meshtasticExcludeMqttHidden": {"description": "How many nodes the filter is hiding", "placeholders": {"count": {"type": "int"}}},
+  "@meshtasticExcludeMqttHidden": {
+    "description": "How many nodes the filter is hiding",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "meshtasticOnline": "近期听到",
-  "@meshtasticOnline": {"description": "Legend: node heard within the online window"},
+  "@meshtasticOnline": {
+    "description": "Legend: node heard within the online window"
+  },
   "meshtasticSilent": "已静默",
-  "@meshtasticSilent": {"description": "Legend: node known but not heard recently"},
+  "@meshtasticSilent": {
+    "description": "Legend: node known but not heard recently"
+  },
   "meshtasticViaMqtt": "经 MQTT（互联网）",
-  "@meshtasticViaMqtt": {"description": "Legend: node reported over an MQTT bridge"}
+  "@meshtasticViaMqtt": {
+    "description": "Legend: node reported over an MQTT bridge"
+  }
 }
