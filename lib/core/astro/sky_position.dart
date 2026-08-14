@@ -16,6 +16,9 @@ import 'dart:math' as math;
 
 import 'package:dpip/core/astro/astro_time.dart';
 
+/// Earth's equatorial radius, km — the scale of every parallax.
+const double _earthRadiusKm = 6378.14;
+
 /// Refraction at the horizon: a body's *apparent* place is about 34′ above its
 /// true one, so it is seen to rise while still geometrically below.
 const double horizonRefraction = 34 * arcminutes;
@@ -162,6 +165,50 @@ class Observer {
           cosPhi * sinDec - sinPhi * cosDec * math.cos(h),
         ),
       ),
+    );
+  }
+
+  /// [position] as seen from this point on the surface rather than from the
+  /// Earth's centre (Meeus ch. 40).
+  ///
+  /// Only the Moon needs this — its parallax is nearly a degree, twice its own
+  /// diameter — but it is what makes a *local* solar eclipse computable
+  /// without Besselian elements: whether the Moon covers the Sun depends
+  /// entirely on where you are standing.
+  ///
+  /// The Earth's flattening is included; it moves the answer by a few
+  /// arcseconds, which matters when the question is whether two discs
+  /// 32′ across overlap.
+  Equatorial topocentric(Equatorial position, DateTime utc) {
+    final distance = position.distanceKm;
+    if (distance == null) return position;
+    final parallax = math.asin(_earthRadiusKm / distance);
+
+    // The observer's distance from the Earth's centre, split into its
+    // equatorial and polar components (Meeus 11.1); sea level is assumed.
+    const flattening = 1 / 298.257223563;
+    final reduced = math.atan(
+      (1 - flattening) * math.tan(_phi),
+    );
+    final rhoSin = (1 - flattening) * math.sin(reduced);
+    final rhoCos = math.cos(reduced);
+
+    final h = hourAngle(position, utc);
+    final sinParallax = math.sin(parallax);
+    final denominator =
+        math.cos(position.declination) - rhoCos * sinParallax * math.cos(h);
+    final deltaRa = math.atan2(
+      -rhoCos * sinParallax * math.sin(h),
+      denominator,
+    );
+    return Equatorial(
+      rightAscension: turn(position.rightAscension + deltaRa),
+      declination: math.atan2(
+        (math.sin(position.declination) - rhoSin * sinParallax) *
+            math.cos(deltaRa),
+        denominator,
+      ),
+      distanceKm: distance,
     );
   }
 

@@ -165,16 +165,26 @@ abstract final class LunisolarCalendar {
 
   /// The months of the 歲 containing [day], numbered and leap-marked.
   static List<_Month> _suiContaining(DateTime day) {
-    // Month 11 of this 歲 begins on the new-moon day at or before the winter
-    // solstice that opens it. If the day is before that month started, the
-    // relevant 歲 is the previous one.
+    // A 歲 opens with month 11, which begins on the new-moon day at or before
+    // its winter solstice — and that is up to a month *before* the solstice
+    // itself. So the solstice at or before the day does not always identify
+    // the right 歲: in the weeks between a month 11 starting and its solstice
+    // arriving, the day already belongs to the next one. Both directions are
+    // resolved here rather than left to the caller to notice.
     var solstice = _solsticeAtOrBefore(day.add(const Duration(days: 1)));
     var start = _newMoonDayAtOrBefore(solstice);
-    if (day.isBefore(start)) {
+    while (day.isBefore(start)) {
       solstice = _solsticeAtOrBefore(
         solstice.subtract(const Duration(days: 1)),
       );
       start = _newMoonDayAtOrBefore(solstice);
+    }
+    while (true) {
+      final following = SolarTerms.next(solstice, SolarTerm.winterSolstice);
+      final followingStart = _newMoonDayAtOrBefore(following);
+      if (day.isBefore(followingStart)) break;
+      solstice = following;
+      start = followingStart;
     }
     final nextSolstice = SolarTerms.next(solstice, SolarTerm.winterSolstice);
     final end = _newMoonDayAtOrBefore(nextSolstice);
