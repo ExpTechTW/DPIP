@@ -108,8 +108,13 @@ class SunEvents {
   /// This is the first half of "when can I actually observe"; the other half
   /// is whether the Moon is up, which the caller combines from
   /// `MoonRiseSet`.
+  /// Null also when the window opened at midnight rather than midday: the
+  /// dawn found would then be *this* morning's, before the dusk, and a pair in
+  /// that order is not a night. Solve from noon to get a usable one.
   (DateTime, DateTime)? get astronomicalNight =>
-      astronomicalDusk != null && astronomicalDawn != null
+      astronomicalDusk != null &&
+          astronomicalDawn != null &&
+          astronomicalDawn!.isAfter(astronomicalDusk!)
       ? (astronomicalDusk!, astronomicalDawn!)
       : null;
 

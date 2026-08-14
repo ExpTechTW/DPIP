@@ -158,4 +158,16 @@ abstract final class PreferenceKeys {
   static const PrefKey<String> regionCore = PrefKey<String>._(
     'network:region:core',
   );
+
+  /// The most recent satellite element set, and when it was fetched.
+  ///
+  /// Cached as the raw TLE text: it is a few hundred bytes, it is the format
+  /// every source speaks, and keeping it verbatim means the parser is the only
+  /// thing that has to understand it.
+  static const PrefKey<String> satelliteElements = PrefKey<String>._(
+    'astro:satellite:tle',
+  );
+  static const PrefKey<int> satelliteElementsFetchedAt = PrefKey<int>._(
+    'astro:satellite:fetchedAt',
+  );
 }

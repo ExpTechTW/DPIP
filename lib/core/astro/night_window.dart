@@ -64,16 +64,21 @@ class NightConditions {
   Duration get totalDark =>
       darkWindows.fold(Duration.zero, (sum, window) => sum + window.length);
 
-  /// Conditions for the night starting at [from] — pass the UTC instant the
-  /// local day begins, as the other astronomy pages do.
+  /// Conditions for the night of [from] — pass the UTC instant the local day
+  /// begins, as the other astronomy pages do.
+  ///
+  /// The Sun is solved from local **noon**, not from midnight. Solved from
+  /// midnight, the first dusk found is this evening's and the first dawn is
+  /// this *morning's* — a pair in the wrong order, describing a night that
+  /// already ended. Noon-to-noon is the window a night actually sits in.
   factory NightConditions.of(
     DateTime from, {
     required double latitude,
     required double longitude,
-    Duration window = const Duration(hours: 36),
+    Duration window = const Duration(hours: 24),
   }) {
     final sun = SunEvents.of(
-      from,
+      from.add(const Duration(hours: 12)),
       latitude: latitude,
       longitude: longitude,
       window: window,
