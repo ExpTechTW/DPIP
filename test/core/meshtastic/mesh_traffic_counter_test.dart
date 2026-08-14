@@ -20,7 +20,7 @@ void main() {
       ..recordRx(portnum: MeshPorts.text, bytes: 10)
       ..recordRx(portnum: MeshPorts.text, bytes: 5)
       ..recordRx(portnum: MeshPorts.private, bytes: 20)
-      ..recordTx(portnum: MeshPorts.private, bytes: 7);
+      ..recordTx(bytes: 7);
 
     final traffic = c.snapshot;
     expect(traffic.rxPackets, 3);
@@ -28,7 +28,6 @@ void main() {
     expect(traffic.rxByPort, {MeshPorts.text: 2, MeshPorts.private: 1});
     expect(traffic.txPackets, 1);
     expect(traffic.txBytes, 7);
-    expect(traffic.txByPort, {MeshPorts.private: 1});
     expect(traffic.isEmpty, isFalse);
   });
 
@@ -48,7 +47,7 @@ void main() {
     expect(c.snapshot.lastTx, isNull);
 
     clock = DateTime.utc(2026, 1, 1, 0, 5);
-    c.recordTx(portnum: 1, bytes: 1);
+    c.recordTx(bytes: 1);
     expect(c.snapshot.lastRx, DateTime.utc(2026, 1, 1));
     expect(c.snapshot.lastTx, DateTime.utc(2026, 1, 1, 0, 5));
   });

@@ -80,8 +80,8 @@ class MeshtasticClientImpl implements MeshtasticService {
     _publishTraffic();
   }
 
-  void _countTx(int portnum, int bytes) {
-    _counter.recordTx(portnum: portnum, bytes: bytes);
+  void _countTx(int bytes) {
+    _counter.recordTx(bytes: bytes);
     _publishTraffic();
   }
 
@@ -392,7 +392,7 @@ class MeshtasticClientImpl implements MeshtasticService {
       final bytes = utf8.encode(text);
       Log.info('meshtastic send: channel=$channel bytes=${bytes.length}');
       await _c.sendTextMessage(text, channel: channel);
-      _countTx(MeshPorts.text, bytes.length);
+      _countTx(bytes.length);
       Log.info('meshtastic send: done');
       return const Ok(null);
     } catch (error, stackTrace) {
@@ -519,7 +519,7 @@ class MeshtasticClientImpl implements MeshtasticService {
         channel: channel,
         wantAck: wantAck,
       );
-      _countTx(portnum, payload.length);
+      _countTx(payload.length);
       return const Ok(null);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'meshtastic sendData');

@@ -178,7 +178,6 @@ class MeshTraffic {
     this.txBytes = 0,
     this.rxUndecoded = 0,
     this.rxByPort = const {},
-    this.txByPort = const {},
     this.lastRx,
     this.lastTx,
   });
@@ -195,9 +194,12 @@ class MeshTraffic {
   /// for). They still prove the link is alive, which is why they're counted.
   final int rxUndecoded;
 
-  /// Packet count per app port, for the diagnostics panel.
+  /// Received packet count per app port, for the diagnostics panel.
+  ///
+  /// Inbound only, deliberately: what arrives comes from every app on the
+  /// mesh, so the breakdown says something. What leaves is only ever ours —
+  /// chat and DPIP — and the totals already cover it.
   final Map<int, int> rxByPort;
-  final Map<int, int> txByPort;
 
   final DateTime? lastRx;
   final DateTime? lastTx;

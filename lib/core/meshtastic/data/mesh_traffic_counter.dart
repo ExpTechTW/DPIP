@@ -19,7 +19,6 @@ class MeshTrafficCounter {
   int _txBytes = 0;
   int _rxUndecoded = 0;
   final Map<int, int> _rxByPort = {};
-  final Map<int, int> _txByPort = {};
   DateTime? _lastRx;
   DateTime? _lastTx;
 
@@ -37,10 +36,9 @@ class MeshTrafficCounter {
     _rxByPort[portnum] = (_rxByPort[portnum] ?? 0) + 1;
   }
 
-  void recordTx({required int portnum, required int bytes}) {
+  void recordTx({required int bytes}) {
     _txPackets++;
     _txBytes += bytes;
-    _txByPort[portnum] = (_txByPort[portnum] ?? 0) + 1;
     _lastTx = _now();
   }
 
@@ -54,7 +52,6 @@ class MeshTrafficCounter {
     txBytes: _txBytes,
     rxUndecoded: _rxUndecoded,
     rxByPort: Map.unmodifiable(_rxByPort),
-    txByPort: Map.unmodifiable(_txByPort),
     lastRx: _lastRx,
     lastTx: _lastTx,
   );
