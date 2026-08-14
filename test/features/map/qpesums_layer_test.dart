@@ -1,7 +1,6 @@
 import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,47 +33,6 @@ void main() {
     await layer.show(controller, frames[2]);
 
     expect(controller.opacityOf('qpesums-lyr-${frames[2].id}'), '0.85');
-  });
-
-  test('later frames anchor below the admin lines, 國界 included', () async {
-    final layer = QpesumsMapLayer(_FakeQpesumsRepository(_ids(9)));
-    final frames = (await layer.frames()).valueOrNull!;
-    final controller = RecordingMapController();
-
-    await layer.prepare(controller, frames);
-    await layer.show(controller, frames[4]);
-    expect(
-      controller.belowOf('qpesums-lyr-${frames[4].id}'),
-      isNull,
-      reason: 'the first frame has no anchor yet — borders add above it',
-    );
-
-    await layer.show(controller, frames[0], scrubbing: true);
-    expect(
-      controller.belowOf('qpesums-lyr-${frames[0].id}'),
-      AdminBoundary.town.lineLayerId,
-      reason:
-          'a mid-drag reveal must mount below the topmost admin line so the '
-          'county/town borders and scan range stay on top',
-    );
-
-    // 國界 ships on, so its frame is already on the map — the anchor must
-    // not follow it (the global frame sits lowest, so a raster hung under its
-    // casing would cover the county and town lines above it).
-    expect(
-      controller.calls,
-      contains('addLineLayer:admin-global-outline'),
-      reason: '國界 ships on by default',
-    );
-
-    await layer.show(controller, frames[8], scrubbing: true);
-    expect(
-      controller.belowOf('qpesums-lyr-${frames[8].id}'),
-      AdminBoundary.town.lineLayerId,
-      reason:
-          'the topmost admin line stays the township line — the anchor must '
-          'not move onto the global frame just because it is on',
-    );
   });
 
   test(

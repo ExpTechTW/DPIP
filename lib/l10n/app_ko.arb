@@ -1,395 +1,676 @@
 {
-  "@@locale": "ko",
-  "languageName": "한국어",
-  "navHome": "홈",
-  "navEvents": "이벤트",
-  "navMap": "지도",
-  "navData": "자료",
-  "navEarthquake": "지진",
-  "dataSectionSeismic": "지진",
-  "dataEarthquakeSubtitle": "지진 보고서",
-  "dataSectionWeather": "기상",
-  "dataWeatherRankingSubtitle": "실시간 관측 순위",
-  "weatherRankingTitle": "관측 순위",
-  "weatherRankingMeta": "자료 시각: {time}\n관측점 {count}",
-  "weatherRankingEmpty": "정렬할 관측이 없습니다",
-  "weatherRankingBy": "정렬",
-  "weatherRankingHighest": "최고",
-  "weatherRankingLowest": "최저",
-  "weatherRankingMergeTo": "병합",
-  "weatherRankingMergeTown": "향진",
-  "weatherRankingMergeCounty": "현시",
-  "weatherRankingWind": "풍속",
-  "weatherRankingGust": "돌풍",
-  "weatherRankingTempExtremes": "기온 극값",
-  "weatherRankingExtremeHigh": "오늘 최고",
-  "weatherRankingExtremeLow": "오늘 최저",
-  "weatherRankingExtremeRange": "일교차",
-  "weatherRankingRecordedAt": "기록 시각 {time}",
-  "weatherRankingAnalysisCurrent": "현재 {value}°C",
-  "weatherRankingAnalysisHigh": "최고 {value}",
-  "weatherRankingAnalysisLow": "최저 {value}",
-  "weatherRankingAnalysisRange": "일교차 {value}°C",
-  "reportListEmpty": "지진 보고서가 없습니다",
-  "reportListEmptyFiltered": "조건에 맞는 지진 보고서가 없습니다",
-  "reportListMeta": "M{magnitude} · {depth} km",
-  "reportListMagnitude": "M{magnitude}",
-  "reportListDepthUnit": "km",
-  "reportListLocalFelt": "소규모 유감",
-  "reportListToday": "오늘",
-  "reportListYesterday": "어제",
-  "reportListDayCount": "{count}",
-  "reportListEnd": "마지막입니다",
-  "reportFilterTitle": "필터",
-  "reportFilterSort": "정렬",
-  "reportFilterSortTime": "시간",
-  "reportFilterSortIntensity": "진도",
-  "reportFilterSortMagnitude": "규모",
-  "reportFilterSortDepth": "깊이",
-  "reportFilterOrderDesc": "내림차순",
-  "reportFilterOrderAsc": "오름차순",
-  "reportFilterIntensity": "진도",
-  "reportFilterIntensityInfoTitle": "진도 신제·구제",
-  "reportFilterIntensityInfoIntro": "기상서는 2020년 1월 1일(타이베이 시간)부터 신제 진도를 사용합니다.",
-  "reportFilterIntensityInfoLegacyTitle": "구제(2020년 이전)",
-  "reportFilterIntensityInfoLegacyBody": "진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.",
-  "reportFilterIntensityInfoModernTitle": "신제(2020년 이후)",
-  "reportFilterIntensityInfoModernBody": "진도는 0–4, 5약, 5강, 6약, 6강, 7입니다. 필터는 신제를 따르며, 이전 지진은 목록에서 구제 표기로 표시됩니다.",
-  "reportFilterMagnitude": "규모",
-  "reportFilterDepth": "깊이",
-  "reportFilterDepthKm": "{depth} km",
-  "reportFilterDate": "날짜",
-  "reportFilterDatePick": "날짜 선택",
-  "reportFilterDateStartNote": "시작일: 당일 00:00（타이베이）",
-  "reportFilterDateEndNote": "종료일: 당일 24:00（타이베이）",
-  "reportFilterRange": "{start} – {end}",
-  "reportFilterLocation": "위치",
-  "reportFilterLocationHint": "예: 화롄, 해역",
-  "reportFilterAny": "전체",
-  "reportFilterApply": "적용",
-  "reportFilterReset": "초기화",
-  "reportListSearch": "조회",
-  "reportDetailTitle": "지진 보고서",
-  "reportDetailNumbered": "번호 {number} 유의미 유감지진",
-  "reportDetailLocalFelt": "국지적 유감지진",
-  "reportDetailInfo": "상세 정보",
-  "reportDetailOriginTime": "발생 시각",
-  "reportDetailEpicenter": "진앙 좌표",
-  "reportDetailMagnitude": "지진 규모",
-  "reportDetailDepth": "진원 깊이",
-  "reportDetailAreaIntensity": "지역별 진도",
-  "reportDetailLocalIntensity": "내 위치의 진도",
-  "reportDetailLocalIntensityUnavailable": "진도 정보 없음",
-  "reportDetailSortByIntensity": "진도순 정렬",
-  "reportDetailSortByCounty": "지역순 정렬",
-  "reportDetailImage": "지진 보고서 이미지",
-  "reportDetailImageUnavailable": "보고서 이미지가 아직 없습니다",
-  "reportDetailOpenReport": "보고서 페이지",
-  "reportDetailReplay": "다시 보기",
-  "navMore": "더보기",
-  "appLogs": "앱 로그",
-  "changelogTitle": "변경 로그",
-  "changelogEmpty": "아직 릴리스 노트가 없습니다",
-  "changelogTypePrerelease": "베타",
-  "changelogTypeStable": "정식",
-  "changelogCurrentVersion": "현재",
-  "changelogVersionDetails": "릴리스 상세",
-  "changelogBodyEmpty": "이 릴리스에 대한 설명이 없습니다.",
-  "mapPlaceholderDisabled": "지도 (일시 사용 중지)",
-  "moreSectionRegion": "지역",
-  "moreSectionNotify": "알림",
-  "moreSectionDisplay": "표시",
-  "regionManageTitle": "저장한 지역",
-  "regionAddButton": "지역 추가",
-  "regionEmpty": "저장된 지역이 없습니다",
-  "regionSelectTitle": "지역 선택",
-  "regionSelectCount": "{count}/{max} 선택됨",
-  "regionSelectFull": "최대 {max}개 지역까지 저장할 수 있습니다",
-  "regionEdit": "수정",
-  "moreSectionAdvanced": "고급",
-  "moreDeveloper": "디버그 정보",
-  "experimentalFeatures": "실험적 기능",
-  "moreSectionLinks": "링크",
-  "moreCwaEew": "중앙기상청(CWA) 지진 조기경보",
-  "moreTremReport": "TREM 탐지 보고",
-  "moreServerStatus": "서버 상태",
-  "moreAnnouncements": "공지사항",
-  "moreDiscord": "Discord 커뮤니티",
-  "moreNotifyLog": "DPIP 알림 발송 기록",
-  "moreLinkOpenFailed": "링크를 열 수 없습니다",
-  "weatherDynamicState": "날씨 애니메이션",
-  "weatherDynamicStateSubtitle": "홈 배경 날씨를 재정의합니다",
-  "weatherModeAuto": "자동",
-  "weatherModeClear": "맑음",
-  "weatherModeRain": "비",
-  "weatherModeFog": "안개",
-  "weatherModeThunderstorm": "뇌우",
-  "commonLoading": "불러오는 중…",
-  "commonRetry": "다시 시도",
-  "commonError": "문제가 발생했습니다",
-  "commonFetchFailed": "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
-  "commonEmpty": "표시할 내용이 없습니다",
-  "feedConnecting": "연결 중…",
-  "feedStale": "데이터가 오래되었을 수 있습니다",
-  "feedOffline": "연결이 끊어졌습니다",
-  "eewTitle": "지진 조기경보",
-  "eewNone": "현재 지진 조기경보가 없습니다",
-  "eewSummary": "규모 {magnitude} · 깊이 {depth} km",
-  "regionNationwide": "전국",
-  "regionCurrent": "현재 위치",
-  "regionCurrentUnavailable": "현재 위치를 가져올 수 없습니다",
-  "weatherPrecipitation": "강수량",
-  "weatherHumidity": "습도",
-  "weatherDataTime": "{station} · 데이터 시간 {time}",
-  "homeViewOnMap": "지도에서 보기",
-  "homeForecastTitle": "24시간 예보",
-  "homeForecastHighLow": "최고 {high}° · 최저 {low}°",
-  "homeForecastPop": "{pop}%",
-  "homeForecastFeelsLike": "체감 {temp}°",
-  "homeForecastHumidity": "습도 {value}%",
-  "homeForecastWind": "{direction} · 풍력 {level}",
-  "homeForecastUnavailable": "지역을 선택하면 예보를 볼 수 있습니다",
-  "homeForecastEmpty": "예보 데이터가 없습니다",
-  "homeActiveEventsTitle": "발효 중 이벤트",
-  "homeActiveEventsEmpty": "발효 중인 이벤트가 없습니다",
-  "homeRainTrendTitle": "향후 1시간 강수",
-  "homeRainTrendMinute": "{minute}분",
-  "homeRainTrendUpdated": "업데이트 {time}",
-  "homeRainTrendNoData": "데이터 없음",
-  "homeRainTrendScattered": "약한 비가 올 수 있어요",
-  "homeRainTrendLightSustained": "앞으로 1시간 동안 약한 비가 이어질 거예요",
-  "homeRainTrendLightStopping": "{minutes}분 후에 비가 그칠 것으로 예상돼요",
-  "homeRainTrendHeavySustained": "앞으로 1시간 동안 강한 비가 이어질 거예요",
-  "homeRainTrendHeavyStopping": "{minutes}분 후에 강한 비가 그칠 것으로 예상돼요",
-  "mapLayers": "레이어",
-  "mapLayerOrderTitle": "레이어 순서",
-  "mapLayerOrderReset": "기본 순서로 재설정",
-  "mapLayerRadar": "레이더 합성 에코",
-  "mapLayerSatellite": "히마와리 적외(B13)",
-  "mapLayerSatelliteB01": "히마와리 가시 청색(B01)",
-  "mapLayerSatelliteB02": "히마와리 가시 녹색(B02)",
-  "mapLayerSatelliteB03": "히마와리 가시 적색(B03)",
-  "mapLayerSatelliteB04": "히마와리 근적외(B04)",
-  "mapLayerSatelliteB05": "히마와리 근적외(B05)",
-  "mapLayerSatelliteB06": "히마와리 근적외(B06)",
-  "mapLayerSatelliteB07": "히마와리 단파 적외(B07)",
-  "mapLayerSatelliteB08": "히마와리 상층 수증기(B08)",
-  "mapLayerSatelliteB09": "히마와리 중층 수증기(B09)",
-  "mapLayerSatelliteB10": "히마와리 하층 수증기(B10)",
-  "mapLayerSatelliteB11": "히마와리 이산화황/구름상(B11)",
-  "mapLayerSatelliteB12": "히마와리 오존(B12)",
-  "mapLayerSatelliteB13": "히마와리 적외(B13)",
-  "mapLayerSatelliteB14": "히마와리 장파 적외(B14)",
-  "mapLayerSatelliteB15": "히마와리 장파 적외(B15)",
-  "mapLayerSatelliteB16": "히마와리 이산화탄소(B16)",
-  "mapLayerSatelliteTruecolor": "히마와리 트루컬러",
-  "mapLayerSatelliteNaturalcolor": "히마와리 내추럴컬러",
-  "mapLayerSatelliteAsh": "히마와리 화산재",
-  "mapLayerSatelliteDust": "히마와리 황사",
-  "mapLayerSatelliteAirmass": "히마와리 에어매스",
-  "mapLayerSatelliteNightmicrophysics": "히마와리 야간 미세물리",
-  "mapLayerSatelliteWatervapor": "히마와리 수증기",
-  "mapLayerSatelliteBtdSplit": "히마와리 스플릿 윈도우",
-  "mapLayerSatelliteBtdFog": "히마와리 야간 안개",
-  "mapLayerSatelliteBtdWvirw": "히마와리 오버슈팅 탑",
-  "mapLayerSatelliteBtdSo2": "히마와리 이산화황/구름상",
-  "mapLayerSatelliteBtdCo2": "히마와리 권운/운고",
-  "mapLayerSatelliteBtdOzone": "히마와리 대류권계면",
-  "mapLayerSatelliteCloudtop": "히마와리 운정 온도",
-  "mapLayerSatelliteCloudmask": "히마와리 구름 마스크",
-  "mapLayerSatelliteSst": "히마와리 해수면 온도",
-  "mapLayerSatelliteNdvi": "히마와리 NDVI",
-  "mapLayerSatelliteNdwi": "히마와리 NDWI",
-  "mapLayerSatelliteMndwi": "히마와리 MNDWI",
-  "mapLayerSatelliteGlobalOutline": "국경선",
-  "mapLayerSatelliteRgbComposite": "RGB 합성(JMA 레시피)",
-  "mapLayerSatelliteCloudClear": "맑음",
-  "mapLayerSatelliteCloudProbablyClear": "아마 맑음",
-  "mapLayerSatelliteCloudProbablyCloudy": "아마 구름",
-  "mapLayerSatelliteCloudCloudy": "구름",
-  "mapLayerSatelliteTransparentWarm": "맑음(고온부) = 투명,배경 지도 표시",
-  "mapLayerSatelliteTransparentReflectance": "낮은 반사율/야간 = 투명,배경 지도 표시",
-  "mapLayerSatelliteTransparentZero": "차이 0 = 투명(신호 없음)",
-  "mapLayerSatelliteTransparentNight": "야간 = 투명,배경 지도 표시",
-  "mapLayerSatelliteTransparentNoData": "데이터 없음(육지) = 투명",
-  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 투명(식생 없음)",
-  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 투명(수역 없음)",
-  "mapLayerSatelliteTransparentClear": "맑음 = 투명,배경 지도 표시",
-  "mapLayerStyleSection": "색상 스타일",
-  "mapLayerStyleTooltip": "색상 스타일",
-  "mapLayerStyleGray": "그레이스케일（JMA）",
-  "mapLayerStyleGrayTooltip": "기상청 적외 영상 관례：온도가 낮을수록 흰색",
-  "mapLayerStyleJma": "운정 강조（JMA）",
-  "mapLayerStyleJmaTooltip": "그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조",
-  "mapLayerStyleBd": "Dvorak BD",
-  "mapLayerStyleBdTooltip": "Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일",
-  "mapLayerQpesums": "1시간 강수 예보",
-  "mapLayerLightning": "번개",
-  "lightningLegendCg": "대지로 · {minutes}분 이내",
-  "lightningLegendCc": "구름 사이 · {minutes}분 이내",
-  "mapTimelineNow": "현재",
-  "mapTimelinePast": "과거",
-  "mapTimelineFuture": "미래",
-  "mapTimelineObserved": "관측",
-  "mapTimelineForecast": "예보",
-  "mapTimelineDataTime": "데이터 시간 {time}",
-  "notifySettingsMenu": "알림 설정",
-  "notifyTitle": "알림",
-  "notifyUnavailable": "푸시 알림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.",
-  "notifySetFailed": "설정을 저장하지 못했습니다. 다시 시도해 주세요.",
-  "notifySectionEew": "지진 조기경보",
-  "notifySectionEarthquake": "지진",
-  "notifySectionWeather": "날씨",
-  "notifySectionTsunami": "지진해일",
-  "notifySectionOther": "기타",
-  "notifyEew": "긴급 지진 경보",
-  "notifyMonitor": "강진 감시기",
-  "notifyReport": "지진 보고",
-  "notifyIntensity": "진도 속보",
-  "notifyThunderstorm": "뇌우 알림",
-  "notifyAdvisory": "기상 특보",
-  "notifyEvacuation": "재난 정보",
-  "notifyTsunami": "지진해일 정보",
-  "notifyAnnouncement": "공지사항",
-  "notifyOptOff": "끄기",
-  "notifyOptAll": "전체 수신",
-  "notifyOptLocalIntensity4": "현재 위치 진도 4 이상",
-  "notifyOptLocalIntensity1": "현재 위치 진도 1 이상",
-  "notifyOptWeatherLocal": "현재 위치만",
-  "notifyOptTsunamiWarning": "지진해일 경보만",
-  "notifyOptTsunamiAll": "지진해일 주의보 및 경보",
-  "onboardingNext": "다음",
-  "onboardingBack": "이전",
-  "onboardingScrollHint": "계속하려면 아래로 스크롤하세요",
-  "onboardingIntroTitle": "DPIP에 오신 것을 환영합니다",
-  "onboardingIntroBody": "DPIP는 여러분과 함께하는 방재 파트너입니다. 지진 조기경보, 지진 보고, 날씨, 각종 재해 정보를 통합하여 중요한 순간에 실시간으로 알려드립니다.\n\n• 지진: 지진 조기경보, 진도 속보, 상세 지진 보고\n• 날씨: 뇌우 실시간 메시지, 기상 특보\n• 지진해일 및 재난 정보\n\n다음으로, 서비스 약관을 확인하고 DPIP가 실시간으로 여러분을 보호할 수 있도록 몇 가지 권한을 허용해 주시기 바랍니다.",
-  "onboardingTermsTitle": "서비스 약관",
-  "onboardingTermsBody": "DPIP를 사용하기 전에 다음 유의 사항을 반드시 읽어 주세요:\n\n• 모든 정보는 중앙기상청(CWA)에서 발표한 내용을 기준으로 합니다.\n\n• 네트워크, 서버, 애플리케이션, 상위 데이터 출처의 상태에 따라 정보를 받지 못할 수 있습니다. 이러한 상황을 방지하기 위해 최선을 다하고 있으나, 절대 발생하지 않는다고 보장할 수는 없습니다.\n\n• 강한 흔들림이 알림보다 먼저 귀하의 위치에 도달할 수 있습니다.\n\n• 지진 조기경보는 빠르게 계산된 결과로 상당한 오차가 있을 수 있으므로, 이를 이해하고 신중하게 사용하시기 바랍니다.\n\n• 당국이 승인하지 않은 모든 행위는 법적 위험을 수반할 수 있으니, 관련 규정을 반드시 준수해 주세요.\n\n또한 지역 맞춤형 경보를 제공하기 위해, 본 서비스는 귀하에게 어떤 경보를 보낼지 결정하기 위한 목적으로만 포그라운드 및 백그라운드에서 귀하의 대략적인 위치와 푸시 식별자를 수집하여 업로드합니다.\n\n하단의 “동의하고 계속”을 누르면 위 사항을 읽고 이해했으며 이에 동의함을 확인하는 것입니다.",
-  "onboardingTermsAgree": "서비스 약관을 읽었으며 이에 동의합니다",
-  "onboardingAgreeContinue": "동의하고 계속",
-  "onboardingPermsTitle": "권한 허용",
-  "onboardingPermsBody": "재해가 발생하는 즉시 알려드릴 수 있도록 다음 권한을 허용해 주세요. 시스템 설정에서 언제든지 변경할 수 있습니다.",
-  "onboardingPermNotify": "알림",
-  "onboardingPermNotifyDesc": "지진, 날씨, 재해가 발생하는 즉시 경보를 전달합니다.",
-  "onboardingPermCritical": "중요 알림",
-  "onboardingPermCriticalDesc": "생명을 위협하는 지진 경보가 무음 모드나 방해 금지 모드에서도 소리를 낼 수 있도록 합니다.",
-  "onboardingPermLocation": "위치",
-  "onboardingPermLocationDesc": "현재 위치에 맞춰 경보를 전달합니다.",
-  "onboardingPermBackground": "백그라운드 위치",
-  "onboardingPermBackgroundDesc": "“항상 허용”을 선택하면 앱이 종료된 상태에서도 위치 맞춤 경보를 받을 수 있습니다.",
-  "onboardingPermBattery": "배터리 최적화 제외",
-  "onboardingPermBatteryDesc": "DPIP가 백그라운드에서 계속 실행되어 경보가 지연되거나 누락되지 않도록 허용합니다.",
-  "onboardingGrant": "허용",
-  "onboardingGranted": "허용됨",
-  "onboardingStart": "시작하기",
-  "language": "언어",
-  "languageSettings": "언어",
-  "languageSystem": "시스템 기본값",
-  "locationBannerServiceOff": "위치 서비스가 꺼져 있어 지역 맞춤 경보를 받을 수 없습니다.",
-  "locationBannerPermission": "위치 권한이 꺼져 있어 지역 맞춤 경보를 받을 수 없습니다.",
-  "locationBannerFix": "설정 열기",
-  "notifyBannerDisabled": "알림이 꺼져 있어 재난 경보를 받을 수 없습니다.",
-  "onboardingSkipTitle": "권한이 허용되지 않았습니다",
+  "typhoonValueLat": "{lat}°N",
   "onboardingSkipBody": "위치 및 알림 권한이 없으면 DPIP가 주변의 지진과 재난을 실시간으로 알려드릴 수 없습니다. 나중에 설정에서 권한을 허용할 수 있습니다.",
-  "onboardingSkipStay": "돌아가기",
-  "onboardingSkipLeave": "그래도 건너뛰기",
-  "moreYoutube": "YouTube",
-  "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "소스 코드",
-  "moreSectionApp": "앱 다운로드",
-  "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store",
-  "displaySettings": "화면",
-  "defaultMapLayerSettings": "지도 기본 레이어",
-  "defaultMapLayerSubtitle": "지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.",
-  "mapNavRadar": "레이더",
-  "mapNavQpesums": "예보",
-  "mapNavSatellite": "위성",
-  "mapNavLightning": "번개",
-  "mapNavTyphoon": "태풍",
-  "mapNavEarthquake": "지진",
-  "mapNavTemperature": "온도",
-  "mapNavHumidity": "습도",
-  "mapNavPressure": "기압",
-  "mapNavWind": "풍향",
-  "mapNavRain": "강우",
-  "mapNavDisaster": "방재",
-  "displayTheme": "테마",
-  "themeSystem": "시스템",
-  "themeLight": "라이트",
-  "themeDark": "다크",
-  "moreSectionAbout": "정보",
-  "termsOfService": "서비스 약관",
-  "faq": "자주 묻는 질문",
-  "openSourceLicenses": "오픈소스 라이선스",
-  "sponsorTitle": "DPIP 후원하기",
-  "sponsorIntro": "DPIP는 실시간 재난 예방 정보를 제공하는 데 전념하며, 광고나 다른 수익 모델이 없습니다. 여러분의 후원은 서버 운영과 지속적인 개발에 도움이 됩니다.",
-  "sponsorSubscriptions": "구독",
-  "sponsorRecommended": "추천",
-  "sponsorOneTime": "일회성 후원",
-  "sponsorPerMonth": "{price} / 월",
-  "sponsorRestore": "구매 복원",
-  "sponsorTerms": "이용약관",
-  "sponsorPrivacy": "개인정보 처리방침",
-  "sponsorRestoring": "구매를 복원하는 중…",
-  "sponsorRestoreUnavailable": "스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요.",
-  "commonClose": "닫기",
-  "mapLayerTemperature": "기온",
-  "trendRange24h": "24시간",
-  "trendRange7d": "7일",
-  "trendNoData": "추세 데이터 없음",
-  "trendCumulativeTotal": "누적 {total} mm",
-  "chartHourLabel": "{hour}시",
-  "mapLayerHumidity": "습도",
-  "mapLayerPressure": "기압",
-  "mapLayerWind": "바람",
-  "mapLayerWindForecastEcmwf": "ECMWF",
-  "mapLayerWindForecastGfs": "GFS",
-  "mapLayerRain": "강수량",
-  "rainIntervalMenu": "누적 구간",
-  "rainIntervalNow": "오늘",
-  "rainInterval10m": "10분",
-  "rainInterval1h": "1시간",
-  "rainInterval3h": "3시간",
-  "rainInterval6h": "6시간",
-  "rainInterval12h": "12시간",
+  "@mapAppCoordinatesCopied": {},
+  "@meshtasticLayerOptions": {
+    "description": "Tooltip for the mesh layer's options chip"
+  },
   "rainInterval24h": "24시간",
-  "rainInterval2d": "2일",
-  "rainInterval3d": "3일",
-  "mapLayerTyphoon": "태풍",
-  "typhoonNoActive": "활성 태풍 없음",
-  "typhoonWind": "풍속",
-  "typhoonGust": "순간최대풍속",
-  "typhoonPressure": "기압",
-  "typhoonMotion": "이동",
-  "mapLayerMonitor": "실시간 지진 모니터",
-  "mapLayerAed": "AED",
-  "mapLayerDisasterMap": "방재 지도",
-  "disasterMapOverlayMenuTooltip": "방재 지도 레이어",
-  "disasterMapOverlaySectionLayers": "레이어",
-  "disasterMapOverlayAedTooltip": "AED 위치 표시",
-  "aedAddress": "주소",
-  "aedRegion": "지역",
-  "aedCategory": "분류",
-  "aedType": "유형",
-  "aedPlaceDesc": "설치 위치",
-  "aedDescription": "비고",
-  "aedHoursWeekday": "평일 운영시간",
+  "homeRainTrendHeavyStopping": "{minutes}분 후에 강한 비가 그칠 것으로 예상돼요",
+  "mapTimelineObserved": "관측",
+  "regionSelectTitle": "지역 선택",
+  "skyTimeNoon": "정오",
+  "radarCountyOutlineSubtitle": "레이더 에코 아래에서도 경계가 보이도록 합니다.",
+  "@meshtasticRegionLabel": {
+    "description": "LoRa region"
+  },
+  "dpmFilterSectionRestroomType": "화장실 유형",
+  "mapLayerSatelliteB03": "히마와리 가시 적색(B03)",
+  "reportFilterIntensity": "진도",
+  "mapLayerLightning": "번개",
+  "restroomTypeMale": "남자 화장실",
+  "meshtasticLastReceived": "Last received",
+  "reportDetailSortByCounty": "지역순 정렬",
+  "@moonSubtitle": {
+    "description": "Moon entry card subtitle in the data catalogue"
+  },
+  "@moonDays": {
+    "description": "Day unit for the moon age"
+  },
+  "homeRainTrendScattered": "약한 비가 올 수 있어요",
+  "meshtasticUptime": "Uptime",
+  "weatherRankingTempExtremes": "기온 극값",
+  "themeLight": "라이트",
+  "mapTerrainReliefHint": "기본 지도에 지형 음영 표시",
+  "meshtasticEmptyMessage": "(empty message)",
+  "moreSectionRegion": "지역",
+  "dpmDisasterEarthquake": "지진",
+  "mapLayerSatellite": "히마와리 적외(B13)",
+  "@meshtasticTapNode": {
+    "description": "Resting state of the map node sheet"
+  },
   "aedHoursSaturday": "토요일 운영시간",
-  "aedHoursSunday": "일요일 운영시간",
-  "aedOpenRemark": "운영시간 비고",
-  "aedEmergencyPhone": "비상 연락처",
-  "mapLayerRestroom": "공중화장실",
-  "mapLayerShelter": "대피소",
-  "disasterMapOverlayRestroomTooltip": "공중화장실 표시",
-  "disasterMapOverlayShelterTooltip": "대피소 표시",
-  "dpmOpenInMaps": "지도에서 열기",
-  "@dpmOpenInMaps": {},
-  "mapAppGoogleMaps": "Google Maps",
-  "@mapAppGoogleMaps": {},
-  "mapAppAppleMaps": "Apple Maps",
-  "@mapAppAppleMaps": {},
+  "dpmDisasterSlope": "사면 재해",
+  "moonPhaseNew": "New moon",
+  "notifySectionEew": "지진 조기경보",
+  "mapResetNorth": "북쪽으로 되돌리기",
+  "rainInterval2d": "2일",
+  "mapTownLabelsHint": "확대하면 읍면동 이름 표시",
+  "commonCancel": "Cancel",
+  "notifyOptTsunamiWarning": "지진해일 경보만",
+  "mapLayerSatelliteBtdFog": "히마와리 야간 안개",
+  "@meshtasticSelectDevice": {
+    "description": "Device picker sheet title"
+  },
+  "moreSectionAdvanced": "고급",
+  "@meshtasticLastHeard": {
+    "description": "When a node last transmitted"
+  },
+  "weatherRankingExtremeRange": "일교차",
+  "notifySettingsMenu": "알림 설정",
+  "typhoonHistoryTitle": "자료 시각",
   "mapAppDefault": "{app} (기본)",
+  "trendRange24h": "24시간",
+  "mapLayerStyleJmaTooltip": "그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조",
+  "weatherRankingRecordedAt": "기록 시각 {time}",
+  "mapLayerRain": "강수량",
+  "mapLayerQpesums": "1시간 강수 예보",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "@dataSectionAstronomy": {
+    "description": "Astronomy section header in the data catalogue"
+  },
+  "mapOverlaySectionMap": "지도",
+  "mapTerrainRelief": "지형 입체감",
+  "eewMaxIntensity": "최대 진도",
+  "mapLegendCollapse": "범례 숨기기",
+  "changelogTitle": "변경 로그",
+  "reportFilterOrderDesc": "내림차순",
+  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
+  "reportFilterIntensityInfoTitle": "진도 신제·구제",
+  "mapLayerTyphoon": "태풍",
+  "radarOverlayMenuTooltip": "레이더 레이어 옵션",
+  "mapMyLocation": "내 위치",
+  "@meshtasticChannelUse": {
+    "description": "Share of airtime seen busy"
+  },
+  "meshtasticNodes": "Nodes",
+  "meshtasticSend": "Send",
+  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
+  "aedType": "유형",
+  "termsOfService": "서비스 약관",
+  "typhoonLegendCircle25": "폭풍권 (10급)",
+  "sponsorTitle": "DPIP 후원하기",
+  "mapNavSatellite": "위성",
+  "homeRainTrendUpdated": "업데이트 {time}",
+  "onboardingNext": "다음",
+  "weatherRankingMergeTown": "향진",
+  "mapLayerMonitor": "실시간 지진 모니터",
+  "moreYoutube": "YouTube",
+  "sponsorSubscriptions": "구독",
+  "typhoonValueLon": "{lon}°E",
+  "skyTime": "하늘 시각",
+  "weatherModeCloudy": "구름 많음",
+  "skyTimeDusk": "땅거미",
+  "@meshtasticExcludeMqttSubtitle": {
+    "description": "What an MQTT node is"
+  },
+  "meshtasticFirmware": "Firmware",
+  "@mapLayerMeshtastic": {
+    "description": "Map layer name: mesh nodes"
+  },
+  "reportFilterDateEndNote": "종료일: 당일 24:00（타이베이）",
+  "meshtasticSilent": "Silent",
+  "reportFilterSortMagnitude": "규모",
+  "mapLayerCategoryEarthquake": "지진",
+  "mapLayerSatelliteB12": "히마와리 오존(B12)",
+  "typhoonLegendPast": "실황 경로",
+  "restroomCategoryOther": "기타",
+  "@meshtasticRegionConfirm": {
+    "description": "Confirmation before rebooting the radio"
+  },
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "homeForecastHighLow": "최고 {high}° · 최저 {low}°",
+  "@meshtasticChannelFailed": {
+    "description": "The radio rejected the channel write"
+  },
+  "locationBannerFix": "설정 열기",
+  "mapLegendExpand": "범례",
+  "eewNone": "현재 지진 조기경보가 없습니다",
+  "typhoonTyNo": "TY {no}",
+  "notifyOptTsunamiAll": "지진해일 주의보 및 경보",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "meshtasticLayerOptions": "Node options",
+  "onboardingAgreeContinue": "동의하고 계속",
+  "meshtasticNodeId": "Node ID",
+  "commonRetry": "다시 시도",
+  "reportDetailNumbered": "번호 {number} 유의미 유감지진",
+  "typhoonOverlayStormBandSubtitle": "With average circle",
+  "disasterMapOverlayRestroomTooltip": "공중화장실 표시",
+  "weatherRankingTitle": "관측 순위",
+  "homeRainTrendHeavySustained": "앞으로 1시간 동안 강한 비가 이어질 거예요",
+  "notifySectionTsunami": "지진해일",
+  "restroomCategoryPark": "공원",
+  "moreLinkOpenFailed": "링크를 열 수 없습니다",
+  "themeDark": "다크",
+  "sponsorRestore": "구매 복원",
+  "@meshtasticSilent": {
+    "description": "Legend: node known but not heard recently"
+  },
+  "meshtasticChannelWorking": "Setting up the DPIP channel…",
+  "meshtasticRegionSwitch": "Switch to TW",
+  "@meshtasticLastReceived": {
+    "description": "Age of the last received packet"
+  },
+  "meshtasticTraffic": "Traffic",
+  "@meshtasticDpipChannel": {
+    "description": "Which channel DPIP payloads use"
+  },
+  "mapLayerStyleBdTooltip": "Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일",
+  "disasterMapOverlayAedTooltip": "AED 위치 표시",
+  "@moonTitle": {
+    "description": "Moon page title"
+  },
+  "mapLayerHumidity": "습도",
+  "mapLayerSatelliteTransparentNight": "야간 = 투명,배경 지도 표시",
+  "meshtasticScanning": "Scanning…",
+  "@meshtasticDevice": {
+    "description": "Section: device identity"
+  },
+  "regionSelectFull": "최대 {max}개 지역까지 저장할 수 있습니다",
+  "meshtasticTitle": "Meshtastic",
+  "navMore": "더보기",
+  "meshtasticDpipChannel": "DPIP channel",
+  "disasterMapOverlaySectionLayers": "레이어",
+  "@moonPhaseWaningCrescent": {
+    "description": "Phase: waning crescent"
+  },
+  "mapLayerSatelliteB05": "히마와리 근적외(B05)",
+  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
+  "@meshtasticNotConnected": {
+    "description": "Empty message log while not connected"
+  },
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "typhoonLabelNe": "NE",
+  "meshtasticCopied": "Message copied",
+  "reportListEmpty": "지진 보고서가 없습니다",
+  "reportListEnd": "마지막입니다",
+  "mapLayerSatelliteTruecolor": "히마와리 트루컬러",
+  "typhoonOverlaySectionExtra": "Overlays",
+  "eewSWave": "S파",
+  "meshtasticBusyTitle": "Another app is using this radio",
+  "restroomCategoryCultural": "문화·여가 시설",
+  "typhoonLabelWind": "Max. sustained wind near centre",
+  "radarGlobalOutlineHint": "각국 국경선",
+  "notifyEvacuation": "재난 정보",
+  "typhoonLegendCircle15": "강풍권 (7급)",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "@meshtasticRadioSettings": {
+    "description": "Section: LoRa settings"
+  },
+  "dataSectionAstronomy": "Astronomy",
+  "homeRainTrendLightSustained": "앞으로 1시간 동안 약한 비가 이어질 거예요",
+  "commonError": "문제가 발생했습니다",
+  "moonPhaseWaningCrescent": "Waning crescent",
+  "meshtasticPower": "Power",
+  "@meshtasticChannelWorking": {
+    "description": "Creating/verifying the DPIP channel"
+  },
+  "mapTimelineNow": "현재",
+  "reportFilterRange": "{start} – {end}",
+  "reportDetailOpenReport": "보고서 페이지",
+  "trendRange7d": "7일",
+  "typhoonWarningAreas": "대상 지역: {areas}",
+  "rainIntervalSection": "집계 시간",
+  "notifyTitle": "알림",
+  "meshtasticTxPower": "TX power",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "restroomCategoryLabel": "구분",
+  "sponsorRestoring": "구매를 복원하는 중…",
+  "sponsorIntro": "DPIP는 실시간 재난 예방 정보를 제공하는 데 전념하며, 광고나 다른 수익 모델이 없습니다. 여러분의 후원은 서버 운영과 지속적인 개발에 도움이 됩니다.",
+  "shelterAddressLabel": "주소",
+  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
+  "@meshtasticHardware": {
+    "description": "Board model"
+  },
+  "restroomCategoryCommercial": "상업·영업 시설",
+  "@meshtasticAirtime": {
+    "description": "Share of airtime this radio transmitted"
+  },
+  "aedRegion": "지역",
+  "homeRainTrendLightStopping": "{minutes}분 후에 비가 그칠 것으로 예상돼요",
+  "reportDetailInfo": "상세 정보",
+  "mapNavWind": "풍향",
+  "@meshtasticReceived": {
+    "description": "Packets received this session"
+  },
+  "windForecastOverlayMenuTooltip": "바람 예보 레이어 옵션",
+  "dataWeatherRankingSubtitle": "실시간 관측 순위",
+  "rainInterval6h": "6시간",
+  "homeRainTrendMinute": "{minute}분",
+  "restroomTypeUnspecified": "미설정",
+  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
+  "mapLayerSatelliteGlobalOutline": "국경선",
+  "mapNavTemperature": "온도",
+  "typhoonLegendForecastPoint": "예보 지점",
+  "@meshtasticBattery": {
+    "description": "Battery charge"
+  },
+  "reportListYesterday": "어제",
+  "moreSectionLinks": "링크",
+  "feedOffline": "연결이 끊어졌습니다",
+  "mapLayerStyleBd": "Dvorak BD",
+  "moreSectionDisplay": "표시",
+  "rainInterval3d": "3일",
+  "defaultMapLayerSubtitle": "지도 탭을 열 때 표시할 레이어입니다. 하단 탐색 아이콘과 라벨도 함께 바뀝니다.",
+  "aedDescription": "비고",
+  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
+  "onboardingPermLocationDesc": "현재 위치에 맞춰 경보를 전달합니다.",
+  "mapLayerSatelliteB16": "히마와리 이산화탄소(B16)",
+  "@meshtasticClearMessages": {
+    "description": "Menu action clearing the message log"
+  },
+  "homeActiveEventsEmpty": "발효 중인 이벤트가 없습니다",
+  "typhoonLabelPosition": "Centre location",
+  "weatherRankingBy": "정렬",
+  "typhoonIntensityMild": "Mild typhoon",
+  "windForecastGlobalOutlineHint": "각국 국경선",
+  "rainInterval1h": "1시간",
+  "eewLocalIntensity": "현재 위치 예상",
+  "mapLayerRadar": "레이더 합성 에코",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "restroomCategoryReligious": "종교·의례 시설",
+  "meshtasticRole": "Role",
+  "mapLayerSatelliteCloudCloudy": "구름",
+  "skyTimeSunrise": "일출",
+  "@mapLayerMeshtasticSubtitle": {
+    "description": "Map layer switcher subtitle"
+  },
+  "meshtasticNoMessages": "No messages yet",
+  "onboardingPermNotifyDesc": "지진, 날씨, 재해가 발생하는 즉시 경보를 전달합니다.",
+  "radarTownOutline": "읍·면·동 경계",
+  "mapLayerStyleSection": "색상 스타일",
+  "@moonPhaseNew": {
+    "description": "Phase: new moon"
+  },
+  "disasterMapOverlayMenuTooltip": "방재 지도 레이어",
+  "moreGooglePlay": "Google Play",
+  "meshtasticOnline": "Heard recently",
+  "@meshtasticSendHint": {
+    "description": "Message input hint"
+  },
+  "typhoonLabelSw": "SW",
+  "typhoonForecastLead": "Forecast +{hours} h",
+  "dpmDisasterTsunami": "쓰나미",
+  "@mapAppOpenFailed": {},
+  "changelogTypeStable": "정식",
+  "mapLayerSatelliteTransparentClear": "맑음 = 투명,배경 지도 표시",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "@meshtasticBusyTitle": {
+    "description": "Another app holds the BLE link"
+  },
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "mapOverlaySectionReference": "참조 레이어",
+  "mapLayerSatelliteB02": "히마와리 가시 녹색(B02)",
+  "reportListLocalFelt": "소규모 유감",
+  "weatherRankingEmpty": "정렬할 관측이 없습니다",
+  "notifySectionOther": "기타",
+  "weatherRankingMeta": "자료 시각: {time}\n관측점 {count}",
+  "onboardingTermsAgree": "서비스 약관을 읽었으며 이에 동의합니다",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 투명(식생 없음)",
+  "notifyOptLocalIntensity4": "현재 위치 진도 4 이상",
+  "eewArrived": "도달",
+  "meshtasticNoDevices": "No Meshtastic devices found",
+  "mapLayerCategoryLife": "생활",
+  "reportFilterSortIntensity": "진도",
+  "typhoonMotion": "이동",
+  "meshtasticStateDisconnected": "Disconnected",
+  "typhoonIntensityIntense": "Intense typhoon",
+  "@meshtasticSend": {
+    "description": "Send message button"
+  },
+  "mapLayerOrderTitle": "레이어 순서",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "@meshtasticShortName": {
+    "description": "The radio's short name"
+  },
+  "dpmYes": "예",
+  "meshtasticNoHistory": "Not enough history yet",
+  "reportDetailLocalIntensityUnavailable": "진도 정보 없음",
+  "mapLayerWindForecastGfs": "GFS",
+  "reportListDepthUnit": "km",
+  "reportFilterDepth": "깊이",
+  "@meshtasticNoHistory": {
+    "description": "Chart placeholder before two samples exist"
+  },
+  "onboardingScrollHint": "계속하려면 아래로 스크롤하세요",
+  "@meshtasticRadio": {
+    "description": "Radio diagnostics sheet title"
+  },
+  "mapNavQpesums": "예보",
+  "@meshtasticStateError": {
+    "description": "Connection state label"
+  },
+  "@meshtasticVoltage": {
+    "description": "Battery voltage"
+  },
+  "navMap": "지도",
+  "notifyAdvisory": "기상 특보",
+  "@meshtasticNoMessages": {
+    "description": "Empty message log while connected"
+  },
+  "reportFilterReset": "초기화",
+  "mapLayerSatelliteMndwi": "히마와리 MNDWI",
+  "typhoonOverlaySectionStorm": "Storm wind",
+  "moonPhaseFull": "Full moon",
+  "@meshtasticEmptyMessage": {
+    "description": "Placeholder for a text packet with no body"
+  },
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "moonPhaseWaningGibbous": "Waning gibbous",
+  "weatherDynamicStateSubtitle": "홈 배경 날씨를 재정의합니다",
+  "reportFilterIntensityInfoModernTitle": "신제(2020년 이후)",
+  "@mapAppGoogleMaps": {},
+  "typhoonDataTime": "Data time\n{time}",
+  "restroomTypeAccessible": "장애인 화장실",
+  "moreSectionAbout": "정보",
+  "meshtasticSelectDevice": "Select a radio",
+  "onboardingIntroBody": "DPIP는 여러분과 함께하는 방재 파트너입니다. 지진 조기경보, 지진 보고, 날씨, 각종 재해 정보를 통합하여 중요한 순간에 실시간으로 알려드립니다.\n\n• 지진: 지진 조기경보, 진도 속보, 상세 지진 보고\n• 날씨: 뇌우 실시간 메시지, 기상 특보\n• 지진해일 및 재난 정보\n\n다음으로, 서비스 약관을 확인하고 DPIP가 실시간으로 여러분을 보호할 수 있도록 몇 가지 권한을 허용해 주시기 바랍니다.",
+  "shelterCapacityLabel": "수용 인원",
+  "reportDetailImage": "지진 보고서 이미지",
+  "meshtasticStateConfiguring": "Configuring…",
+  "@moonPhaseLastQuarter": {
+    "description": "Phase: last quarter"
+  },
+  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
+  "onboardingPermNotify": "알림",
+  "meshtasticClearMessages": "Clear messages",
+  "meshtasticNotifyMessages": "Notify on new messages",
+  "defaultMapLayerSettings": "지도 기본 레이어",
+  "moreSectionNotify": "알림",
+  "@moonPhaseFull": {
+    "description": "Phase: full moon"
+  },
+  "notifyUnavailable": "푸시 알림이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.",
+  "mapLayerOrderReset": "기본 순서로 재설정",
+  "dpmAddress": "주소",
+  "weatherRankingMergeCounty": "현시",
+  "moreSectionApp": "앱 다운로드",
+  "reportFilterIntensityInfoLegacyBody": "진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.",
+  "mapLayerSatelliteSst": "히마와리 해수면 온도",
+  "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "mapTimelineFuture": "미래",
+  "typhoonLegendCircleAvg": "Average circle",
+  "reportFilterDepthKm": "{depth} km",
+  "typhoonLabelSe": "SE",
+  "radarTownOutlineHint": "더 세밀한 구획",
+  "eewCountdown": "{seconds}초",
+  "@meshtasticDisconnect": {
+    "description": "Disconnect from the radio"
+  },
+  "typhoonLabelGust": "Peak gust",
+  "mapAppGoogleMaps": "Google Maps",
+  "sponsorTerms": "이용약관",
+  "restroomTypeGenderNeutral": "성중립 화장실",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "notifyThunderstorm": "뇌우 알림",
+  "skyTimeGolden": "골든아워",
+  "moonAge": "Age",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  },
+  "meshtasticRadioSettings": "LoRa",
+  "weatherRankingAnalysisCurrent": "현재 {value}°C",
+  "@meshtasticNotifyMessages": {
+    "description": "Toggle: local notification for an incoming mesh message"
+  },
+  "moreGithub": "ExpTech GitHub",
+  "homeForecastUnavailable": "지역을 선택하면 예보를 볼 수 있습니다",
+  "mapLayers": "레이어",
+  "meshtasticHardware": "Hardware",
+  "languageSettings": "언어",
+  "dpmDisasterNuclear": "핵 사고",
+  "@moonNextFullMoon": {
+    "description": "Next full moon date label"
+  },
+  "language": "언어",
+  "homeForecastFeelsLike": "체감 {temp}°",
+  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
+  "@meshtasticHopLimit": {
+    "description": "How many hops a packet may take"
+  },
+  "skyTimeDawn": "여명",
+  "skyTimeAfternoon": "오후",
+  "meshtasticLastHeard": "Last heard",
+  "typhoonWarningTitle": "태풍 경보",
+  "moreSourceCode": "소스 코드",
+  "mapLayerCategoryWeather": "기상 관측",
+  "mapLayerSatelliteB09": "히마와리 중층 수증기(B09)",
+  "windForecastTownOutlineHint": "더 촘촘한 망",
+  "mapLayerSatelliteCloudmask": "히마와리 구름 마스크",
+  "mapAppCopyCoordinates": "좌표 복사",
+  "reportFilterIntensityInfoIntro": "기상서는 2020년 1월 1일(타이베이 시간)부터 신제 진도를 사용합니다.",
+  "mapNavEarthquake": "지진",
+  "typhoonGust": "순간최대풍속",
+  "restroomGradeAverage": "보통",
+  "@meshtasticNodes": {
+    "description": "Mesh nodes section header"
+  },
+  "mapLayerSatelliteBtdCo2": "히마와리 권운/운고",
+  "onboardingPermBackgroundDesc": "“항상 허용”을 선택하면 앱이 종료된 상태에서도 위치 맞춤 경보를 받을 수 있습니다.",
+  "mapTimelineForecast": "예보",
+  "restroomTypeLabel": "유형",
+  "navEarthquake": "지진",
+  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
+  "moonPhaseWaxingGibbous": "Waxing gibbous",
+  "reportDetailTitle": "지진 보고서",
+  "moreTremReport": "TREM 탐지 보고",
+  "weatherDataTime": "{station} · 데이터 시간 {time}",
+  "meshtasticNoNodes": "No nodes heard yet",
+  "meshtasticViaMqtt": "Via MQTT (internet)",
+  "radarCountyOutline": "시·군 경계",
+  "onboardingGranted": "허용됨",
+  "@mapAppCopyCoordinates": {},
+  "commonClose": "닫기",
+  "restroomGradeLabel": "등급",
+  "rainIntervalNow": "오늘",
+  "changelogCurrentVersion": "현재",
+  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "typhoonLabelPressure": "Central pressure",
+  "aedOpenRemark": "운영시간 비고",
+  "onboardingPermsBody": "재해가 발생하는 즉시 알려드릴 수 있도록 다음 권한을 허용해 주세요. 시스템 설정에서 언제든지 변경할 수 있습니다.",
+  "typhoonOverlaySectionWeather": "Weather underlay",
+  "@meshtasticStateConnected": {
+    "description": "Connection state label"
+  },
+  "notifyOptWeatherLocal": "현재 위치만",
+  "mapNavRain": "강우",
+  "moonDays": "days",
+  "mapLegendUnit": "단위: {unit}",
+  "weatherModeClear": "맑음",
+  "meshtasticRadio": "Radio",
+  "commonEmpty": "표시할 내용이 없습니다",
+  "mapLayerSatelliteB01": "히마와리 가시 청색(B01)",
+  "meshtasticExternalPower": "External power",
+  "moonPhaseLastQuarter": "Last quarter",
+  "@meshtasticName": {
+    "description": "The radio's long name"
+  },
+  "reportFilterOrderAsc": "오름차순",
+  "reportFilterApply": "적용",
+  "reportDetailImageUnavailable": "보고서 이미지가 아직 없습니다",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "weatherRankingHighest": "최고",
+  "reportDetailReplay": "다시 보기",
+  "mapLayerRestroom": "공중화장실",
+  "restroomCategoryWelfare": "사회복지 기관·집회 시설",
+  "restroomGradeExcellent": "최우수",
+  "meshtasticLastSent": "Last sent",
+  "meshtasticName": "Name",
+  "meshtasticScan": "Scan",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "mapLayerCategoryForecast": "수치 예보",
+  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
+  "themeSystem": "시스템",
+  "mapLayerSatelliteNdvi": "히마와리 NDVI",
+  "typhoonLegendForecast": "예보 경로",
+  "typhoonValueHpa": "{n} hPa",
+  "weatherPrecipitation": "강수량",
+  "moonNextFullMoon": "Next full moon",
+  "dpmSheetEmpty": "지도에서 마커를 눌러 상세 보기",
+  "onboardingSkipLeave": "그래도 건너뛰기",
+  "onboardingBack": "이전",
+  "aedPlaceDesc": "설치 위치",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "onboardingSkipTitle": "권한이 허용되지 않았습니다",
+  "restroomTypeFamily": "가족 화장실",
+  "typhoonValueKm": "{n} km",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "typhoonPressure": "기압",
+  "@meshtasticCopied": {
+    "description": "Toast shown after copying a message"
+  },
+  "onboardingPermBattery": "배터리 최적화 제외",
+  "typhoonLabelNw": "NW",
+  "dpmDisasterFlood": "홍수",
+  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "restroomCategoryLeisure": "휴양·오락 시설",
+  "mapLayerTemperature": "기온",
+  "aedCategory": "분류",
+  "@moonTimelineCaption": {
+    "description": "Moon phase timeline caption"
+  },
+  "meshtasticChannels": "Channels",
+  "monitorWaiting": "데이터 대기 중…",
+  "typhoonOverlayForecastCallouts": "Forecast tooltips",
+  "@meshtasticTitle": {
+    "description": "Meshtastic test page title"
+  },
+  "reportDetailEpicenter": "진앙 좌표",
+  "meshtasticVoltage": "Voltage",
+  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
+  "@meshtasticSent": {
+    "description": "Packets sent this session"
+  },
+  "mapLayerWind": "바람",
+  "reportDetailMagnitude": "지진 규모",
+  "@meshtasticRole": {
+    "description": "Device role (client, router...)"
+  },
+  "reportDetailAreaIntensity": "지역별 진도",
+  "rainInterval12h": "12시간",
+  "reportListMagnitude": "M{magnitude}",
+  "dpmDisasterLandslide": "산사태",
+  "notifyMonitor": "강진 감시기",
+  "onboardingStart": "시작하기",
+  "@meshtasticExternalPower": {
+    "description": "Battery value when mains powered"
+  },
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "sponsorPerMonth": "{price} / 월",
+  "mapLayerPressure": "기압",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "mapLayerSatelliteB04": "히마와리 근적외(B04)",
+  "mapLayerSatelliteTransparentZero": "차이 0 = 투명(신호 없음)",
+  "shelterIndoorLabel": "실내 수용",
+  "notifyOptOff": "끄기",
+  "reportFilterSortTime": "시간",
+  "mapLayerSatelliteCloudProbablyClear": "아마 맑음",
+  "weatherModeThunderstorm": "뇌우",
+  "homeViewOnMap": "지도에서 보기",
+  "reportFilterIntensityInfoLegacyTitle": "구제(2020년 이전)",
+  "typhoonLabelSpeed": "Past movement speed",
+  "@meshtasticReconnecting": {
+    "description": "The link dropped and is being re-established"
+  },
+  "mapAppOpenFailed": "{app}을(를) 열 수 없습니다",
+  "mapLayerSatelliteRgbComposite": "RGB 합성(JMA 레시피)",
+  "@meshtasticStateDisconnected": {
+    "description": "Connection state label"
+  },
+  "meshtasticReceived": "Received",
+  "weatherRankingExtremeLow": "오늘 최저",
+  "@meshtasticRegionSwitch": {
+    "description": "Button applying the DPIP LoRa region"
+  },
+  "mapLayerSatelliteB10": "히마와리 하층 수증기(B10)",
+  "mapLayerSatelliteCloudProbablyCloudy": "아마 구름",
+  "shelterCategoryLabel": "적용 재해",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 투명(수역 없음)",
+  "meshtasticStateConnecting": "Connecting…",
+  "moonTitle": "Moon",
+  "weatherRankingGust": "돌풍",
+  "moreAppStore": "App Store",
+  "@meshtasticUndecoded": {
+    "description": "Packets the radio could not decrypt"
+  },
+  "dpmFilterSectionShelter": "대피소 재해 유형",
+  "@commonCancel": {
+    "description": "Dismisses a dialog without acting"
+  },
+  "moreServerStatus": "서버 상태",
+  "notifySectionWeather": "날씨",
+  "meshtasticPreset": "Modem preset",
+  "dataSectionSeismic": "지진",
+  "changelogBodyEmpty": "이 릴리스에 대한 설명이 없습니다.",
+  "radarGlobalOutline": "국경",
+  "notifyEew": "긴급 지진 경보",
+  "regionNationwide": "전국",
+  "moreNotifyLog": "DPIP 알림 발송 기록",
+  "regionCurrent": "현재 위치",
+  "dpmFilterSectionRestroom": "시설 유형",
+  "meshtasticNotConnected": "Not connected to a radio",
+  "weatherModeSnow": "눈",
+  "mapLayerMeshtastic": "Meshtastic nodes",
+  "moreDeveloper": "디버그 정보",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "mapLayerSatelliteB14": "히마와리 장파 적외(B14)",
+  "meshtasticChannelUse": "Channel use",
+  "mapNavLightning": "번개",
+  "homeForecastEmpty": "예보 데이터가 없습니다",
+  "sponsorOneTime": "일회성 후원",
+  "mapLayerSatelliteBtdSplit": "히마와리 스플릿 윈도우",
+  "onboardingPermBackground": "백그라운드 위치",
+  "aedEmergencyPhone": "비상 연락처",
+  "dpmOpenInMaps": "지도에서 열기",
+  "meshtasticNotifyNodes": "Notify on new nodes",
+  "onboardingPermCriticalDesc": "생명을 위협하는 지진 경보가 무음 모드나 방해 금지 모드에서도 소리를 낼 수 있도록 합니다.",
   "@mapAppDefault": {
     "placeholders": {
       "app": {
@@ -397,375 +678,72 @@
       }
     }
   },
-  "mapAppCopyCoordinates": "좌표 복사",
-  "@mapAppCopyCoordinates": {},
-  "mapAppCoordinatesCopied": "좌표가 복사되었습니다",
-  "@mapAppCoordinatesCopied": {},
-  "mapAppOpenFailed": "{app}을(를) 열 수 없습니다",
-  "@mapAppOpenFailed": {},
-  "mapAppCallFailed": "이 기기에서는 전화를 걸 수 없습니다",
-  "mapOverlaySectionReference": "참조 레이어",
-  "mapLayerCategoryEarthquake": "지진",
-  "mapLayerCategoryTyphoon": "태풍",
-  "mapLayerCategoryWeather": "기상 관측",
-  "mapLayerCategorySatellite": "위성",
-  "mapLayerCategoryRadar": "레이더",
-  "mapLayerCategoryLife": "생활",
-  "mapLayerCategoryForecast": "수치 예보",
-  "mapOverlaySectionMap": "지도",
-  "rainIntervalSection": "집계 시간",
-  "mapTownLabels": "읍면동 이름",
-  "mapTownLabelsHint": "확대하면 읍면동 이름 표시",
-  "mapTerrainRelief": "지형 입체감",
-  "mapTerrainReliefHint": "기본 지도에 지형 음영 표시",
-  "dpmSheetEmpty": "지도에서 마커를 눌러 상세 보기",
-  "dpmAddress": "주소",
-  "restroomTypeLabel": "유형",
-  "restroomCategoryLabel": "구분",
-  "restroomGradeLabel": "등급",
-  "restroomTypeFemale": "여자 화장실",
-  "restroomTypeMale": "남자 화장실",
-  "restroomTypeMixed": "남녀 공용 화장실",
-  "restroomTypeAccessible": "장애인 화장실",
-  "restroomTypeGenderNeutral": "성중립 화장실",
-  "restroomTypeFamily": "가족 화장실",
-  "restroomTypeUnspecified": "미설정",
-  "restroomCategoryTransport": "교통",
-  "restroomCategoryPark": "공원",
-  "restroomCategoryCommercial": "상업·영업 시설",
-  "restroomCategoryReligious": "종교·의례 시설",
-  "restroomCategoryCultural": "문화·여가 시설",
-  "restroomCategoryGovernment": "민원 업무 시설",
-  "restroomCategoryWelfare": "사회복지 기관·집회 시설",
-  "restroomCategoryTourist": "관광 지역·경치 구역",
-  "restroomCategoryLeisure": "휴양·오락 시설",
-  "restroomCategoryOther": "기타",
-  "restroomGradeExcellent": "최우수",
-  "restroomGradeGood": "우수",
-  "restroomGradeAverage": "보통",
-  "restroomGradePoor": "불합격",
-  "shelterAddressLabel": "주소",
-  "shelterCapacityLabel": "수용 인원",
-  "shelterCapacityValue": "{n} 명",
-  "shelterCategoryLabel": "적용 재해",
-  "shelterIndoorLabel": "실내 수용",
-  "shelterOutdoorLabel": "실외 수용",
-  "shelterVulnerableOkLabel": "취약계층 수용 가능",
-  "dpmYes": "예",
-  "dpmNo": "아니요",
-  "stationSheetEmpty": "관측소를 눌러 관측값 보기",
-  "monitorDelay": "지연 {value} s",
-  "monitorWaiting": "데이터 대기 중…",
-  "mapLegendUnit": "단위: {unit}",
-  "typhoonLegendPast": "실황 경로",
-  "typhoonLegendForecast": "예보 경로",
-  "typhoonLegendForecastPoint": "예보 지점",
-  "typhoonLegendCurrent": "현재 중심",
-  "typhoonLegendCone": "예보 원추",
-  "mapLegendExpand": "범례",
-  "mapLegendCollapse": "범례 숨기기",
-  "mapMyLocation": "내 위치",
-  "mapResetNorth": "북쪽으로 되돌리기",
-  "typhoonLegendCircle15": "강풍권 (7급)",
-  "typhoonLegendCircle25": "폭풍권 (10급)",
-  "typhoonLegendProbability": "내습 확률",
+  "mapLayerSatelliteTransparentWarm": "맑음(고온부) = 투명,배경 지도 표시",
+  "meshtasticSent": "Sent",
+  "homeForecastTitle": "24시간 예보",
   "typhoonLegendWarningAreas": "경보 지역",
-  "typhoonWarningTitle": "태풍 경보",
-  "typhoonWarningAreas": "대상 지역: {areas}",
-  "typhoonTrackDetail": "경로 상세",
-  "typhoonHistoryTitle": "자료 시각",
-  "typhoonHistoryLive": "실시간",
-  "typhoonSatelliteTitle": "위성",
-  "typhoonDataTime": "Data time\n{time}",
-  "typhoonForecastLead": "Forecast +{hours} h",
-  "typhoonIntensityIntense": "Intense typhoon",
-  "typhoonIntensityMild": "Mild typhoon",
-  "typhoonIntensityModerate": "Moderate typhoon",
-  "typhoonIntensityTd": "Tropical depression",
-  "typhoonPickerNamed": "{name} TY {no}",
-  "typhoonPickerTd": "Tropical depression TD {no}",
-  "typhoonTyNo": "TY {no}",
-  "typhoonTdNo": "TD {no}",
-  "typhoonLabelDirection": "Past movement direction",
-  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
-  "typhoonLabelGust": "Peak gust",
-  "typhoonLabelNe": "NE",
-  "typhoonLabelNw": "NW",
-  "typhoonLabelPosition": "Centre location",
-  "typhoonLabelPressure": "Central pressure",
-  "typhoonLabelProbCircle": "70% probability circle",
-  "typhoonLabelSe": "SE",
-  "typhoonLabelSpeed": "Past movement speed",
-  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
-  "typhoonLabelSw": "SW",
-  "typhoonLabelWind": "Max. sustained wind near centre",
-  "typhoonLegendCircleAvg": "Average circle",
-  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
-  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
-  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
-  "typhoonOverlaySectionExtra": "Overlays",
-  "typhoonOverlaySectionStorm": "Storm wind",
-  "typhoonOverlaySectionWeather": "Weather underlay",
-  "typhoonOverlayStormBandSubtitle": "With average circle",
-  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
-  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
-  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
-  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
-  "typhoonOverlayWeatherNone": "None",
-  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
-  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
-  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
-  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
-  "typhoonTimeChip": "{day}日{hour}時",
-  "typhoonValueHpa": "{n} hPa",
-  "typhoonValueKm": "{n} km",
-  "typhoonValueLat": "{lat}°N",
-  "typhoonValueLon": "{lon}°E",
-  "typhoonValueMs": "{n} m/s",
-  "typhoonOverlayForecastCallouts": "Forecast tooltips",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
-  "dpmFilterSectionRestroom": "시설 유형",
-  "dpmFilterSectionRestroomType": "화장실 유형",
-  "dpmFilterSectionShelter": "대피소 재해 유형",
-  "dpmDisasterFlood": "홍수",
-  "dpmDisasterEarthquake": "지진",
-  "dpmDisasterLandslide": "산사태",
-  "dpmDisasterTsunami": "쓰나미",
-  "dpmDisasterSlope": "사면 재해",
-  "dpmDisasterNuclear": "핵 사고",
-  "skyTime": "하늘 시각",
-  "@skyTime": {
-    "description": "Label for the experimental sky time-of-day override."
-  },
-  "skyTimeAuto": "자동",
-  "@skyTimeAuto": {
-    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
-  },
-  "skyTimeDawn": "여명",
-  "@skyTimeDawn": {
-    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
-  },
-  "skyTimeSunrise": "일출",
-  "@skyTimeSunrise": {
-    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
-  },
-  "skyTimeMorning": "오전",
-  "@skyTimeMorning": {
-    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
-  },
-  "skyTimeNoon": "정오",
-  "@skyTimeNoon": {
-    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
-  },
-  "skyTimeAfternoon": "오후",
-  "@skyTimeAfternoon": {
-    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
-  },
-  "skyTimeGolden": "골든아워",
+  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "notifyOptLocalIntensity1": "현재 위치 진도 1 이상",
   "@skyTimeGolden": {
     "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
   },
-  "skyTimeSunset": "일몰",
-  "@skyTimeSunset": {
-    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
-  },
-  "skyTimeDusk": "땅거미",
-  "@skyTimeDusk": {
-    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
-  },
-  "skyTimeNight": "밤",
-  "@skyTimeNight": {
-    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
-  },
-  "weatherModeCloudy": "구름 많음",
-  "@weatherModeCloudy": {
-    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
-  },
-  "weatherModeOvercast": "흐림",
-  "@weatherModeOvercast": {
-    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
-  },
-  "weatherModeSnow": "눈",
-  "@weatherModeSnow": {
-    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
-  },
-  "weatherModeSand": "황사",
-  "@weatherModeSand": {
-    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
-  },
-  "radarScanRange": "스캔 범위 표시",
-  "@radarScanRange": {
-    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
-  },
-  "radarScanRangeSubtitle": "레이더 4기가 실제로 관측하는 범위를 표시합니다.",
-  "@radarScanRangeSubtitle": {
-    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
-  },
-  "radarScanRangeHint": "범위 밖 공백은 미관측",
-  "@radarScanRangeHint": {
-    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
-  },
-  "radarOverlayMenuTooltip": "레이더 레이어 옵션",
-  "@radarOverlayMenuTooltip": {
-    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
-  },
-  "radarCountyOutline": "시·군 경계",
-  "@radarCountyOutline": {
-    "description": "County-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarGlobalOutline": "국경",
-  "@radarGlobalOutline": {
-    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
-  },
-  "radarGlobalOutlineHint": "각국 국경선",
-  "@radarGlobalOutlineHint": {
-    "description": "Hint under the national-border toggle in the radar overlay menu."
-  },
-  "radarCountyOutlineHint": "에코 위에 표시",
-  "@radarCountyOutlineHint": {
-    "description": "Hint under the county-border toggle in the radar overlay menu."
-  },
-  "radarCountyOutlineSubtitle": "레이더 에코 아래에서도 경계가 보이도록 합니다.",
-  "@radarCountyOutlineSubtitle": {
-    "description": "County-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarTownOutline": "읍·면·동 경계",
-  "@radarTownOutline": {
-    "description": "Township-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarTownOutlineHint": "더 세밀한 구획",
-  "@radarTownOutlineHint": {
-    "description": "Hint under the township-border toggle in the radar overlay menu."
-  },
-  "radarTownOutlineSubtitle": "레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.",
-  "@radarTownOutlineSubtitle": {
-    "description": "Township-border overlay toggle in the map's radar overlay menu."
-  },
-  "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",
-  "@qpesumsOverlayMenuTooltip": {
-    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
-  },
-  "windForecastOverlayMenuTooltip": "바람 예보 레이어 옵션",
-  "@windForecastOverlayMenuTooltip": {
-    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
-  },
-  "windForecastCountyOutlineHint": "바람장 위에 표시",
-  "@windForecastCountyOutlineHint": {
-    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
-  },
-  "windForecastGlobalOutlineHint": "각국 국경선",
-  "@windForecastGlobalOutlineHint": {
-    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
-  },
-  "windForecastTownOutlineHint": "더 촘촘한 망",
-  "@windForecastTownOutlineHint": {
-    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  },
-  "meshtasticTitle": "Meshtastic",
-  "@meshtasticTitle": {
-    "description": "Meshtastic test page title"
-  },
-  "meshtasticScan": "Scan",
-  "@meshtasticScan": {
-    "description": "Start scanning for Meshtastic radios"
-  },
-  "meshtasticScanning": "Scanning…",
-  "@meshtasticScanning": {
-    "description": "Scan in progress"
-  },
-  "meshtasticDisconnect": "Disconnect",
-  "@meshtasticDisconnect": {
-    "description": "Disconnect from the radio"
-  },
-  "meshtasticNoDevices": "No Meshtastic devices found",
-  "@meshtasticNoDevices": {
-    "description": "Empty scan result"
-  },
-  "meshtasticNodes": "Nodes",
-  "@meshtasticNodes": {
-    "description": "Mesh nodes section header"
-  },
-  "meshtasticSend": "Send",
-  "@meshtasticSend": {
-    "description": "Send message button"
-  },
-  "meshtasticSendHint": "Message to broadcast",
-  "@meshtasticSendHint": {
-    "description": "Message input hint"
-  },
-  "meshtasticStateDisconnected": "Disconnected",
-  "@meshtasticStateDisconnected": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConnecting": "Connecting…",
-  "@meshtasticStateConnecting": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConfiguring": "Configuring…",
-  "@meshtasticStateConfiguring": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConnected": "Connected",
-  "@meshtasticStateConnected": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateError": "Error",
-  "@meshtasticStateError": {
-    "description": "Connection state label"
-  },
-  "meshtasticNoMessages": "No messages yet",
-  "@meshtasticNoMessages": {
-    "description": "Empty message log while connected"
-  },
-  "meshtasticNoNodes": "No nodes heard yet",
-  "@meshtasticNoNodes": {
-    "description": "Empty node list"
-  },
-  "meshtasticNotConnected": "Not connected to a radio",
-  "@meshtasticNotConnected": {
-    "description": "Empty message log while not connected"
-  },
-  "meshtasticSelectDevice": "Select a radio",
-  "@meshtasticSelectDevice": {
-    "description": "Device picker sheet title"
-  },
-  "meshtasticClearMessages": "Clear messages",
-  "@meshtasticClearMessages": {
-    "description": "Menu action clearing the message log"
-  },
-  "meshtasticEmptyMessage": "(empty message)",
-  "@meshtasticEmptyMessage": {
-    "description": "Placeholder for a text packet with no body"
-  },
-  "meshtasticCopied": "Message copied",
-  "@meshtasticCopied": {
-    "description": "Toast shown after copying a message"
-  },
-  "commonCancel": "Cancel",
-  "@commonCancel": {
-    "description": "Dismisses a dialog without acting"
-  },
-  "meshtasticReconnecting": "Reconnecting…",
-  "@meshtasticReconnecting": {
-    "description": "The link dropped and is being re-established"
-  },
-  "meshtasticChannelWorking": "Setting up the DPIP channel…",
-  "@meshtasticChannelWorking": {
-    "description": "Creating/verifying the DPIP channel"
-  },
-  "meshtasticChannelReady": "DPIP channel ready",
   "@meshtasticChannelReady": {
     "description": "The DPIP channel exists on the radio"
   },
-  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
-  "@meshtasticChannelNoSlot": {
-    "description": "Every secondary channel slot is taken"
+  "mapTimelinePast": "과거",
+  "restroomTypeFemale": "여자 화장실",
+  "reportListToday": "오늘",
+  "meshtasticTapNode": "Tap a node for details",
+  "commonLoading": "불러오는 중…",
+  "@meshtasticStateConnecting": {
+    "description": "Connection state label"
   },
-  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
-  "@meshtasticChannelFailed": {
-    "description": "The radio rejected the channel write"
+  "typhoonIntensityModerate": "Moderate typhoon",
+  "typhoonWind": "풍속",
+  "mapLayerSatelliteAsh": "히마와리 화산재",
+  "rainInterval3h": "3시간",
+  "reportListSearch": "조회",
+  "meshtasticChannelReady": "DPIP channel ready",
+  "@meshtasticNotifyNodes": {
+    "description": "Toggle: local notification when a new node is heard"
   },
-  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "mapLayerCategorySatellite": "위성",
+  "reportFilterLocation": "위치",
+  "mapLayerSatelliteNightmicrophysics": "히마와리 야간 미세물리",
+  "typhoonIntensityTd": "Tropical depression",
+  "reportFilterDate": "날짜",
+  "sponsorRestoreUnavailable": "스토어에 연결할 수 없습니다. 나중에 다시 시도해 주세요.",
+  "homeForecastPop": "{pop}%",
+  "regionEmpty": "저장된 지역이 없습니다",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "@moonAge": {
+    "description": "Moon age label"
+  },
+  "onboardingPermBatteryDesc": "DPIP가 백그라운드에서 계속 실행되어 경보가 지연되거나 누락되지 않도록 허용합니다.",
+  "mapNavDisaster": "방재",
+  "radarScanRangeSubtitle": "레이더 4기가 실제로 관측하는 범위를 표시합니다.",
+  "aedHoursSunday": "일요일 운영시간",
+  "reportDetailOriginTime": "발생 시각",
+  "trendNoData": "추세 데이터 없음",
+  "onboardingPermLocation": "위치",
+  "moreDiscord": "Discord 커뮤니티",
+  "mapNavPressure": "기압",
+  "mapLayerSatelliteB13": "히마와리 적외(B13)",
+  "typhoonTdNo": "TD {no}",
+  "changelogEmpty": "아직 릴리스 노트가 없습니다",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "@meshtasticViaMqtt": {
+    "description": "Legend: node reported over an MQTT bridge"
+  },
+  "reportFilterDateStartNote": "시작일: 당일 00:00（타이베이）",
+  "eewTitle": "지진 조기경보",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "@@locale": "ko",
+  "regionSelectCount": "{count}/{max} 선택됨",
   "@meshtasticRegionMismatch": {
     "description": "Radio is on another LoRa region than DPIP needs",
     "placeholders": {
@@ -774,247 +752,267 @@
       }
     }
   },
-  "meshtasticRegionSwitch": "Switch to TW",
-  "@meshtasticRegionSwitch": {
-    "description": "Button applying the DPIP LoRa region"
+  "mapLayerSatelliteBtdSo2": "히마와리 이산화황/구름상",
+  "meshtasticStateError": "Error",
+  "weatherModeOvercast": "흐림",
+  "@meshtasticScan": {
+    "description": "Start scanning for Meshtastic radios"
   },
-  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
-  "@meshtasticRegionConfirm": {
-    "description": "Confirmation before rebooting the radio"
-  },
-  "meshtasticBusyTitle": "Another app is using this radio",
-  "@meshtasticBusyTitle": {
-    "description": "Another app holds the BLE link"
-  },
-  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
-  "@meshtasticBusyBody": {
-    "description": "Why two clients on one radio is a problem"
-  },
-  "meshtasticConnectAnyway": "Connect anyway",
-  "@meshtasticConnectAnyway": {
-    "description": "Connect despite the other app"
-  },
-  "meshtasticRadio": "Radio",
-  "@meshtasticRadio": {
-    "description": "Radio diagnostics sheet title"
-  },
-  "meshtasticDevice": "Device",
-  "@meshtasticDevice": {
-    "description": "Section: device identity"
-  },
-  "meshtasticPower": "Power",
-  "@meshtasticPower": {
-    "description": "Section: battery and uptime"
-  },
-  "meshtasticRadioSettings": "LoRa",
-  "@meshtasticRadioSettings": {
-    "description": "Section: LoRa settings"
-  },
-  "meshtasticTraffic": "Traffic",
-  "@meshtasticTraffic": {
-    "description": "Section: packet counters"
-  },
-  "meshtasticChannels": "Channels",
-  "@meshtasticChannels": {
-    "description": "Section: the radio's channel table"
-  },
-  "meshtasticName": "Name",
-  "@meshtasticName": {
-    "description": "The radio's long name"
-  },
-  "meshtasticShortName": "Short name",
-  "@meshtasticShortName": {
-    "description": "The radio's short name"
-  },
-  "meshtasticNodeId": "Node ID",
-  "@meshtasticNodeId": {
-    "description": "The radio's node number"
-  },
-  "meshtasticHardware": "Hardware",
-  "@meshtasticHardware": {
-    "description": "Board model"
-  },
-  "meshtasticFirmware": "Firmware",
-  "@meshtasticFirmware": {
-    "description": "Firmware version"
-  },
-  "meshtasticRole": "Role",
-  "@meshtasticRole": {
-    "description": "Device role (client, router...)"
-  },
-  "meshtasticBattery": "Battery",
-  "@meshtasticBattery": {
-    "description": "Battery charge"
-  },
-  "meshtasticExternalPower": "External power",
-  "@meshtasticExternalPower": {
-    "description": "Battery value when mains powered"
-  },
-  "meshtasticVoltage": "Voltage",
-  "@meshtasticVoltage": {
-    "description": "Battery voltage"
-  },
-  "meshtasticUptime": "Uptime",
-  "@meshtasticUptime": {
-    "description": "Time since the radio booted"
-  },
-  "meshtasticRegionLabel": "Region",
-  "@meshtasticRegionLabel": {
-    "description": "LoRa region"
-  },
-  "meshtasticPreset": "Modem preset",
-  "@meshtasticPreset": {
-    "description": "LoRa modem preset"
-  },
-  "meshtasticHopLimit": "Hop limit",
-  "@meshtasticHopLimit": {
-    "description": "How many hops a packet may take"
-  },
-  "meshtasticTxPower": "TX power",
-  "@meshtasticTxPower": {
-    "description": "Transmit power"
-  },
-  "meshtasticChannelUse": "Channel use",
-  "@meshtasticChannelUse": {
-    "description": "Share of airtime seen busy"
-  },
-  "meshtasticAirtime": "Air time (TX)",
-  "@meshtasticAirtime": {
-    "description": "Share of airtime this radio transmitted"
-  },
-  "meshtasticDpipChannel": "DPIP channel",
-  "@meshtasticDpipChannel": {
-    "description": "Which channel DPIP payloads use"
-  },
-  "meshtasticReceived": "Received",
-  "@meshtasticReceived": {
-    "description": "Packets received this session"
-  },
-  "meshtasticSent": "Sent",
-  "@meshtasticSent": {
-    "description": "Packets sent this session"
-  },
-  "meshtasticUndecoded": "Not decrypted",
-  "@meshtasticUndecoded": {
-    "description": "Packets the radio could not decrypt"
-  },
-  "meshtasticLastReceived": "Last received",
-  "@meshtasticLastReceived": {
-    "description": "Age of the last received packet"
-  },
-  "meshtasticLastSent": "Last sent",
-  "@meshtasticLastSent": {
-    "description": "Age of the last sent packet"
-  },
-  "meshtasticReadingAge": "Reading taken",
-  "@meshtasticReadingAge": {
-    "description": "How old the battery/airtime numbers are"
-  },
-  "meshtasticNotifyMessages": "Notify on new messages",
-  "@meshtasticNotifyMessages": {
-    "description": "Toggle: local notification for an incoming mesh message"
-  },
-  "meshtasticNotifyNodes": "Notify on new nodes",
-  "@meshtasticNotifyNodes": {
-    "description": "Toggle: local notification when a new node is heard"
-  },
-  "mapLayerMeshtastic": "Meshtastic nodes",
-  "@mapLayerMeshtastic": {
-    "description": "Map layer name: mesh nodes"
-  },
-  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
-  "@mapLayerMeshtasticSubtitle": {
-    "description": "Map layer switcher subtitle"
-  },
-  "meshtasticNoHistory": "Not enough history yet",
-  "@meshtasticNoHistory": {
-    "description": "Chart placeholder before two samples exist"
-  },
-  "meshtasticUtilization": "Airtime (24h)",
-  "@meshtasticUtilization": {
-    "description": "Section title for the 24h airtime chart"
-  },
-  "moonTitle": "Moon",
-  "@moonTitle": {
-    "description": "Moon page title"
-  },
-  "moonSubtitle": "Lunar phase and illumination — computed locally",
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
-  "dataSectionAstronomy": "Astronomy",
-  "@dataSectionAstronomy": {
-    "description": "Astronomy section header in the data catalogue"
-  },
-  "moonAge": "Age",
-  "@moonAge": {
-    "description": "Moon age label"
-  },
-  "moonDays": "days",
-  "@moonDays": {
-    "description": "Day unit for the moon age"
-  },
-  "moonNextFullMoon": "Next full moon",
-  "@moonNextFullMoon": {
-    "description": "Next full moon date label"
-  },
-  "moonTimelineCaption": "Phase",
-  "@moonTimelineCaption": {
-    "description": "Moon phase timeline caption"
-  },
-  "moonPhaseNew": "New moon",
-  "@moonPhaseNew": {
-    "description": "Phase: new moon"
-  },
-  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "reportDetailDepth": "진원 깊이",
+  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
+  "reportFilterDatePick": "날짜 선택",
+  "onboardingSkipStay": "돌아가기",
   "@moonPhaseWaxingCrescent": {
     "description": "Phase: waxing crescent"
   },
+  "@meshtasticOnline": {
+    "description": "Legend: node heard within the online window"
+  },
+  "commonFetchFailed": "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  "@meshtasticTxPower": {
+    "description": "Transmit power"
+  },
+  "shelterOutdoorLabel": "실외 수용",
+  "meshtasticStateConnected": "Connected",
+  "mapNavRadar": "레이더",
+  "mapLayerSatelliteCloudClear": "맑음",
+  "eewSummary": "규모 {magnitude} · 깊이 {depth} km",
+  "locationBannerPermission": "위치 권한이 꺼져 있어 지역 맞춤 경보를 받을 수 없습니다.",
+  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
+  "radarCountyOutlineHint": "에코 위에 표시",
+  "windForecastCountyOutlineHint": "바람장 위에 표시",
+  "homeRainTrendTitle": "향후 1시간 강수",
   "moonPhaseFirstQuarter": "First quarter",
-  "@moonPhaseFirstQuarter": {
-    "description": "Phase: first quarter"
+  "mapLayerCategoryTyphoon": "태풍",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
   },
-  "moonPhaseWaxingGibbous": "Waxing gibbous",
-  "@moonPhaseWaxingGibbous": {
-    "description": "Phase: waxing gibbous"
+  "@meshtasticNodeId": {
+    "description": "The radio's node number"
   },
-  "moonPhaseFull": "Full moon",
-  "@moonPhaseFull": {
-    "description": "Phase: full moon"
-  },
-  "moonPhaseWaningGibbous": "Waning gibbous",
+  "meshtasticUtilization": "Airtime (24h)",
+  "restroomTypeMixed": "남녀 공용 화장실",
+  "restroomGradeGood": "우수",
+  "notifyTsunami": "지진해일 정보",
+  "navData": "자료",
+  "mapLayerSatelliteBtdWvirw": "히마와리 오버슈팅 탑",
+  "meshtasticReadingAge": "Reading taken",
   "@moonPhaseWaningGibbous": {
     "description": "Phase: waning gibbous"
   },
-  "moonPhaseLastQuarter": "Last quarter",
-  "@moonPhaseLastQuarter": {
-    "description": "Phase: last quarter"
+  "mapAppCallFailed": "이 기기에서는 전화를 걸 수 없습니다",
+  "@meshtasticPower": {
+    "description": "Section: battery and uptime"
   },
-  "moonPhaseWaningCrescent": "Waning crescent",
-  "@moonPhaseWaningCrescent": {
-    "description": "Phase: waning crescent"
-  },
-  "meshtasticLastHeard": "Last heard",
-  "@meshtasticLastHeard": {
-    "description": "When a node last transmitted"
-  },
-  "meshtasticTapNode": "Tap a node for details",
-  "@meshtasticTapNode": {
-    "description": "Resting state of the map node sheet"
-  },
-  "meshtasticLayerOptions": "Node options",
-  "@meshtasticLayerOptions": {
-    "description": "Tooltip for the mesh layer's options chip"
-  },
-  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "reportFilterAny": "전체",
+  "weatherRankingMergeTo": "병합",
+  "notifyIntensity": "진도 속보",
+  "typhoonTimeChip": "{day}日{hour}時",
+  "rainIntervalMenu": "누적 구간",
+  "reportDetailLocalFelt": "국지적 유감지진",
+  "meshtasticDevice": "Device",
+  "onboardingGrant": "허용",
+  "weatherModeRain": "비",
+  "shelterVulnerableOkLabel": "취약계층 수용 가능",
+  "stationSheetEmpty": "관측소를 눌러 관측값 보기",
+  "typhoonLegendProbability": "내습 확률",
   "@meshtasticExcludeMqtt": {
     "description": "Toggle hiding internet-bridged nodes"
   },
-  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
-  "@meshtasticExcludeMqttSubtitle": {
-    "description": "What an MQTT node is"
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
   },
-  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "reportFilterMagnitude": "규모",
+  "skyTimeMorning": "오전",
+  "@meshtasticNoDevices": {
+    "description": "Empty scan result"
+  },
+  "experimentalFeatures": "실험적 기능",
+  "onboardingTermsBody": "DPIP를 사용하기 전에 다음 유의 사항을 반드시 읽어 주세요:\n\n• 모든 정보는 중앙기상청(CWA)에서 발표한 내용을 기준으로 합니다.\n\n• 네트워크, 서버, 애플리케이션, 상위 데이터 출처의 상태에 따라 정보를 받지 못할 수 있습니다. 이러한 상황을 방지하기 위해 최선을 다하고 있으나, 절대 발생하지 않는다고 보장할 수는 없습니다.\n\n• 강한 흔들림이 알림보다 먼저 귀하의 위치에 도달할 수 있습니다.\n\n• 지진 조기경보는 빠르게 계산된 결과로 상당한 오차가 있을 수 있으므로, 이를 이해하고 신중하게 사용하시기 바랍니다.\n\n• 당국이 승인하지 않은 모든 행위는 법적 위험을 수반할 수 있으니, 관련 규정을 반드시 준수해 주세요.\n\n또한 지역 맞춤형 경보를 제공하기 위해, 본 서비스는 귀하에게 어떤 경보를 보낼지 결정하기 위한 목적으로만 포그라운드 및 백그라운드에서 귀하의 대략적인 위치와 푸시 식별자를 수집하여 업로드합니다.\n\n하단의 “동의하고 계속”을 누르면 위 사항을 읽고 이해했으며 이에 동의함을 확인하는 것입니다.",
+  "reportFilterTitle": "필터",
+  "onboardingPermCritical": "중요 알림",
+  "trendCumulativeTotal": "누적 {total} mm",
+  "languageName": "한국어",
+  "reportListEmptyFiltered": "조건에 맞는 지진 보고서가 없습니다",
+  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "mapNavTyphoon": "태풍",
+  "weatherModeSand": "황사",
+  "@moonPhaseFirstQuarter": {
+    "description": "Phase: first quarter"
+  },
+  "typhoonSatelliteTitle": "위성",
+  "@dpmOpenInMaps": {},
+  "notifyReport": "지진 보고",
+  "mapAppCoordinatesCopied": "좌표가 복사되었습니다",
+  "skyTimeNight": "밤",
+  "sponsorRecommended": "추천",
+  "mapLayerSatelliteB15": "히마와리 장파 적외(B15)",
+  "weatherRankingWind": "풍속",
+  "feedStale": "데이터가 오래되었을 수 있습니다",
+  "homeForecastWind": "{direction} · 풍력 {level}",
+  "navHome": "홈",
+  "meshtasticRegionLabel": "Region",
+  "mapLayerSatelliteCloudtop": "히마와리 운정 온도",
+  "moonTimelineCaption": "Phase",
+  "reportListMeta": "M{magnitude} · {depth} km",
+  "@meshtasticChannelNoSlot": {
+    "description": "Every secondary channel slot is taken"
+  },
+  "@meshtasticBusyBody": {
+    "description": "Why two clients on one radio is a problem"
+  },
+  "openSourceLicenses": "오픈소스 라이선스",
+  "weatherRankingLowest": "최저",
+  "@meshtasticConnectAnyway": {
+    "description": "Connect despite the other app"
+  },
+  "reportFilterSortDepth": "깊이",
+  "mapTimelineDataTime": "데이터 시간 {time}",
+  "radarScanRange": "스캔 범위 표시",
+  "meshtasticHopLimit": "Hop limit",
+  "@meshtasticUptime": {
+    "description": "Time since the radio booted"
+  },
+  "weatherRankingAnalysisRange": "일교차 {value}°C",
+  "weatherRankingExtremeHigh": "오늘 최고",
+  "@meshtasticUtilization": {
+    "description": "Section title for the 24h airtime chart"
+  },
+  "changelogVersionDetails": "릴리스 상세",
+  "sponsorPrivacy": "개인정보 처리방침",
+  "reportDetailLocalIntensity": "내 위치의 진도",
+  "mapLayerSatelliteNaturalcolor": "히마와리 내추럴컬러",
+  "meshtasticAirtime": "Air time (TX)",
+  "shelterCapacityValue": "{n} 명",
+  "lightningLegendCc": "구름 사이 · {minutes}분 이내",
+  "meshtasticSendHint": "Message to broadcast",
+  "monitorDelay": "지연 {value} s",
+  "@meshtasticFirmware": {
+    "description": "Firmware version"
+  },
+  "dpmNo": "아니요",
+  "mapLayerSatelliteB08": "히마와리 상층 수증기(B08)",
+  "meshtasticReconnecting": "Reconnecting…",
+  "@mapAppAppleMaps": {},
+  "@meshtasticReadingAge": {
+    "description": "How old the battery/airtime numbers are"
+  },
+  "radarTownOutlineSubtitle": "레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.",
+  "@moonPhaseWaxingGibbous": {
+    "description": "Phase: waxing gibbous"
+  },
+  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
+  "radarScanRangeHint": "범위 밖 공백은 미관측",
+  "typhoonPickerTd": "Tropical depression TD {no}",
+  "mapLayerSatelliteWatervapor": "히마와리 수증기",
+  "regionAddButton": "지역 추가",
+  "displaySettings": "화면",
+  "restroomGradePoor": "불합격",
+  "restroomCategoryTourist": "관광 지역·경치 구역",
+  "locationBannerServiceOff": "위치 서비스가 꺼져 있어 지역 맞춤 경보를 받을 수 없습니다.",
+  "mapLayerStyleTooltip": "색상 스타일",
+  "lightningLegendCg": "대지로 · {minutes}분 이내",
+  "skyTimeAuto": "자동",
+  "appLogs": "앱 로그",
+  "feedConnecting": "연결 중…",
+  "notifyBannerDisabled": "알림이 꺼져 있어 재난 경보를 받을 수 없습니다.",
+  "@meshtasticNoNodes": {
+    "description": "Empty node list"
+  },
+  "weatherHumidity": "습도",
+  "typhoonValueMs": "{n} m/s",
+  "homeForecastHumidity": "습도 {value}%",
+  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
+  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
+  "restroomCategoryTransport": "교통",
+  "reportFilterLocationHint": "예: 화롄, 해역",
+  "moonSubtitle": "Lunar phase and illumination — computed locally",
+  "meshtasticBattery": "Battery",
+  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
+  "mapLayerSatelliteBtdOzone": "히마와리 대류권계면",
+  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "notifySectionEarthquake": "지진",
+  "mapLayerDisasterMap": "방재 지도",
+  "weatherModeFog": "안개",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "mapLayerStyleGrayTooltip": "기상청 적외 영상 관례：온도가 낮을수록 흰색",
+  "moreAnnouncements": "공지사항",
+  "mapLayerSatelliteTransparentNoData": "데이터 없음(육지) = 투명",
+  "@meshtasticScanning": {
+    "description": "Scan in progress"
+  },
+  "restroomCategoryGovernment": "민원 업무 시설",
+  "typhoonLegendCurrent": "현재 중심",
+  "aedAddress": "주소",
+  "mapLayerAed": "AED",
+  "changelogTypePrerelease": "베타",
+  "reportFilterIntensityInfoModernBody": "진도는 0–4, 5약, 5강, 6약, 6강, 7입니다. 필터는 신제를 따르며, 이전 지진은 목록에서 구제 표기로 표시됩니다.",
+  "typhoonOverlayWeatherNone": "None",
+  "mapLayerStyleGray": "그레이스케일（JMA）",
+  "weatherModeAuto": "자동",
+  "typhoonLabelProbCircle": "70% probability circle",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "notifyOptAll": "전체 수신",
+  "displayTheme": "테마",
+  "mapLayerSatelliteB07": "히마와리 단파 적외(B07)",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "typhoonLabelDirection": "Past movement direction",
+  "@meshtasticLastSent": {
+    "description": "Age of the last sent packet"
+  },
+  "regionManageTitle": "저장한 지역",
+  "typhoonLegendCone": "예보 원추",
+  "moreCwaEew": "중앙기상청(CWA) 지진 조기경보",
+  "onboardingPermsTitle": "권한 허용",
+  "mapLayerStyleJma": "운정 강조（JMA）",
+  "rainInterval10m": "10분",
+  "weatherRankingAnalysisLow": "최저 {value}",
+  "meshtasticConnectAnyway": "Connect anyway",
+  "reportListDayCount": "{count}",
+  "mapLayerSatelliteB06": "히마와리 근적외(B06)",
+  "mapLayerSatelliteTransparentReflectance": "낮은 반사율/야간 = 투명,배경 지도 표시",
+  "chartHourLabel": "{hour}시",
+  "mapLayerShelter": "대피소",
+  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
+  "mapLayerSatelliteNdwi": "히마와리 NDWI",
+  "disasterMapOverlayShelterTooltip": "대피소 표시",
+  "mapNavHumidity": "습도",
+  "@meshtasticTraffic": {
+    "description": "Section: packet counters"
+  },
+  "reportDetailSortByIntensity": "진도순 정렬",
+  "homeRainTrendNoData": "데이터 없음",
+  "mapLayerCategoryRadar": "레이더",
+  "meshtasticShortName": "Short name",
+  "@meshtasticStateConfiguring": {
+    "description": "Connection state label"
+  },
+  "mapLayerSatelliteAirmass": "히마와리 에어매스",
+  "@meshtasticPreset": {
+    "description": "LoRa modem preset"
+  },
+  "typhoonTrackDetail": "경로 상세",
+  "dataSectionWeather": "기상",
+  "aedHoursWeekday": "평일 운영시간",
+  "homeActiveEventsTitle": "발효 중 이벤트",
+  "weatherRankingAnalysisHigh": "최고 {value}",
+  "faq": "자주 묻는 질문",
+  "typhoonHistoryLive": "실시간",
+  "eewSerial": "제 {serial} 보",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "reportFilterSort": "정렬",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
+  "dataEarthquakeSubtitle": "지진 보고서",
+  "typhoonNoActive": "활성 태풍 없음",
   "@meshtasticExcludeMqttHidden": {
     "description": "How many nodes the filter is hiding",
     "placeholders": {
@@ -1023,16 +1021,76 @@
       }
     }
   },
-  "meshtasticOnline": "Heard recently",
-  "@meshtasticOnline": {
-    "description": "Legend: node heard within the online window"
+  "mapLayerSatelliteB11": "히마와리 이산화황/구름상(B11)",
+  "navEvents": "이벤트",
+  "onboardingTermsTitle": "서비스 약관",
+  "@meshtasticChannels": {
+    "description": "Section: the radio's channel table"
   },
-  "meshtasticSilent": "Silent",
-  "@meshtasticSilent": {
-    "description": "Legend: node known but not heard recently"
+  "mapTownLabels": "읍면동 이름",
+  "notifySetFailed": "설정을 저장하지 못했습니다. 다시 시도해 주세요.",
+  "meshtasticDisconnect": "Disconnect",
+  "meshtasticUndecoded": "Not decrypted",
+  "notifyAnnouncement": "공지사항",
+  "onboardingIntroTitle": "DPIP에 오신 것을 환영합니다",
+  "regionCurrentUnavailable": "현재 위치를 가져올 수 없습니다",
+  "languageSystem": "시스템 기본값",
+  "skyTimeSunset": "일몰",
+  "mapLayerSatelliteDust": "히마와리 황사",
+  "mapAppAppleMaps": "Apple Maps",
+  "regionEdit": "수정",
+  "weatherDynamicState": "날씨 애니메이션",
+  "mapPlaceholderDisabled": "지도 (일시 사용 중지)",
+  "moonNow": "지금",
+  "@moonNow": {
+    "description": "Returns the moon page to the present moment"
   },
-  "meshtasticViaMqtt": "Via MQTT (internet)",
-  "@meshtasticViaMqtt": {
-    "description": "Legend: node reported over an MQTT bridge"
+  "moonSectionAppearance": "겉모습",
+  "@moonSectionAppearance": {
+    "description": "Section header: how the Moon looks at the chosen moment"
+  },
+  "moonSectionRiseSet": "월출·월몰",
+  "@moonSectionRiseSet": {
+    "description": "Section header: moonrise and moonset for the user's township"
+  },
+  "moonSectionUpcoming": "다음 위상",
+  "@moonSectionUpcoming": {
+    "description": "Section header: the next full and new moons"
+  },
+  "moonSectionCalendar": "달력",
+  "@moonSectionCalendar": {
+    "description": "Section header: the month-at-a-glance phase calendar"
+  },
+  "moonDistance": "거리",
+  "@moonDistance": {
+    "description": "Earth-Moon centre-to-centre distance"
+  },
+  "moonKilometres": "km",
+  "@moonKilometres": {
+    "description": "Unit suffix for the lunar distance"
+  },
+  "moonApparentSize": "시직경",
+  "@moonApparentSize": {
+    "description": "The Moon's apparent angular diameter"
+  },
+  "moonRise": "월출",
+  "@moonRise": {
+    "description": "Time the Moon rises"
+  },
+  "moonSet": "월몰",
+  "@moonSet": {
+    "description": "Time the Moon sets"
+  },
+  "moonNextNewMoon": "다음 삭",
+  "@moonNextNewMoon": {
+    "description": "Date and time of the next new moon"
+  },
+  "moonAlwaysUp": "종일 지평선 위",
+  "@moonAlwaysUp": {
+    "description": "Shown when the Moon neither rises nor sets and stays above the horizon"
+  },
+  "moonNoEvent": "해당 없음",
+  "@moonNoEvent": {
+    "description": "Shown when a calendar day has no moonrise or no moonset"
   }
 }

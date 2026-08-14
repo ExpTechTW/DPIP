@@ -69,6 +69,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
           satelliteGlobalOutlineLayerId,
           LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
           sourceLayer: 'global',
+          belowLayerId: townLabelLayerId,
           enableInteraction: false,
         );
       } else {
@@ -169,6 +170,8 @@ class SatelliteMapLayer extends RasterTimelineLayer {
         satelliteCountyOutlineLayerId,
         LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
         sourceLayer: 'city',
+        // Under the township names — a border must never cross a place name.
+        belowLayerId: townLabelLayerId,
         enableInteraction: false,
       );
       await controller.addLineLayer(
@@ -179,6 +182,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
           lineWidth: 0.7,
         ),
         sourceLayer: 'town',
+        belowLayerId: townLabelLayerId,
         enableInteraction: false,
       );
       await _syncGlobalOutline();

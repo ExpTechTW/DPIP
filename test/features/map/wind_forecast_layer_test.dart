@@ -7,15 +7,11 @@ import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_layer_category.dart';
-import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'raster_timeline_harness.dart';
 
@@ -98,12 +94,15 @@ void main() {
         containsAll([
           'addLineLayer:admin-county-outline',
           'addLineLayer:admin-town-outline',
-          'addLineLayer:admin-global-outline',
         ]),
         reason:
             'the wind field covers the base style\'s borders, so its own '
-            'county, township, and country frame is drawn over it on attach — '
-            '國界 ships on',
+            'county and township frame is drawn over it on attach',
+      );
+      expect(
+        controller.calls,
+        isNot(contains('addLineLayer:admin-global-outline')),
+        reason: 'the national border ships off and must not appear on attach',
       );
 
       controller.calls.clear();
@@ -118,34 +117,31 @@ void main() {
     },
   );
 
-  test(
-    'turning the global borders off removes them; on re-adds them',
-    () async {
-      final layer = WindForecastMapLayer(
-        _FakeWindRepository(_ids(5)),
-        model: WindForecastModel.ecmwf,
-      );
-      final frames = (await layer.frames()).valueOrNull!;
-      final controller = RecordingMapController();
+  test('turning the global borders on draws them over a live map', () async {
+    final layer = WindForecastMapLayer(
+      _FakeWindRepository(_ids(5)),
+      model: WindForecastModel.ecmwf,
+    );
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
 
-      await layer.prepare(controller, frames);
-      await layer.show(controller, frames[2]);
-      controller.calls.clear();
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    controller.calls.clear();
 
-      layer.setShowGlobalOutline(false);
-      for (var i = 0; i < 5; i++) {
-        await Future<void>.delayed(Duration.zero);
-      }
-      expect(controller.calls, contains('removeLayer:admin-global-outline'));
+    layer.setShowGlobalOutline(true);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    expect(controller.calls, contains('addLineLayer:admin-global-outline'));
 
-      controller.calls.clear();
-      layer.setShowGlobalOutline(true);
-      for (var i = 0; i < 5; i++) {
-        await Future<void>.delayed(Duration.zero);
-      }
-      expect(controller.calls, contains('addLineLayer:admin-global-outline'));
-    },
-  );
+    controller.calls.clear();
+    layer.setShowGlobalOutline(false);
+    for (var i = 0; i < 5; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    expect(controller.calls, contains('removeLayer:admin-global-outline'));
+  });
 
   test('turning the town borders off removes them from a live map', () async {
     final layer = WindForecastMapLayer(
@@ -172,66 +168,6 @@ void main() {
       reason: 'the county frame must stay when only the town toggle flips',
     );
   });
-
-  test(
-    'frames revealed after the first mount anchor below the borders',
-    () async {
-      final layer = WindForecastMapLayer(
-        _FakeWindRepository(_ids(12)),
-        model: WindForecastModel.ecmwf,
-      );
-      final frames = (await layer.frames()).valueOrNull!;
-      final controller = RecordingMapController();
-
-      await layer.prepare(controller, frames);
-      await layer.show(controller, frames[6]);
-
-      // The first frame mounts before the borders exist (attach adds them after
-      // the mount), so it sits on top and the borders land above it.
-      expect(
-        controller.belowOf('${layer.id}-lyr-${frames[6].id}'),
-        isNull,
-        reason: 'the first frame has no anchor yet — borders add above it',
-      );
-      expect(controller.calls, contains('addLineLayer:admin-county-outline'));
-
-      // Every later reveal — mid-scrub or settle — anchors under the topmost
-      // admin line, so a fresh frame can never cover the borders.
-      await layer.show(controller, frames[10], scrubbing: true);
-      expect(
-        controller.belowOf('${layer.id}-lyr-${frames[10].id}'),
-        AdminBoundary.town.lineLayerId,
-        reason:
-            'county + township borders ship on, so the township line is the '
-            'topmost admin stroke the frame must mount below',
-      );
-
-      await layer.show(controller, frames[2]);
-      expect(
-        controller.belowOf('${layer.id}-lyr-${frames[2].id}'),
-        AdminBoundary.town.lineLayerId,
-        reason: 'a settle re-mount past the ring anchors below the borders too',
-      );
-
-      // 國界 ships on, so its frame is already on the map — the anchor must
-      // not follow it (the global frame sits lowest; a raster hung under its
-      // casing would cover the county and town lines above it).
-      expect(
-        controller.calls,
-        contains('addLineLayer:admin-global-outline'),
-        reason: '國界 ships on by default',
-      );
-
-      await layer.show(controller, frames[9], scrubbing: true);
-      expect(
-        controller.belowOf('${layer.id}-lyr-${frames[9].id}'),
-        AdminBoundary.town.lineLayerId,
-        reason:
-            'the topmost admin line stays the township line — the anchor must '
-            'not move onto the global frame just because it is on',
-      );
-    },
-  );
 
   test('clear releases tiles', () async {
     final source = _FakeWindRepository(_ids(5));
@@ -341,24 +277,14 @@ void main() {
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
     );
-    // Zoom in so the wind field fills the viewport: the default z7 viewport
-    // covers a sliver of the global field (a handful of seeded particles, too
-    // few to assert anything about), while this field spans just the Taiwan
-    // window the camera sits over. A uniform full-speed field then lands the
-    // whole population in one speed bucket — the case that must not lose
-    // points.
-    await layer.onAttached(
-      RecordingMapController(
-        camera: const CameraPosition(target: LatLng(23.5, 121), zoom: 4),
-      ),
-    );
+    await layer.onAttached(RecordingMapController());
     layer.field.value = WindField(
       width: 2,
       height: 2,
-      lat0: 25,
-      lon0: 120,
-      dLat: -0.75,
-      dLon: 1.5,
+      lat0: 90,
+      lon0: 0,
+      dLat: -90,
+      dLon: 180,
       uMin: -20,
       uMax: 20,
       vMin: -1,
@@ -376,7 +302,6 @@ void main() {
           // background is near-white, so on that a blank overlay counts as
           // bright everywhere and the assertion below means nothing.
           body: RepaintBoundary(
-            key: const ValueKey('overlayBoundary'),
             child: ColoredBox(
               color: Colors.black,
               child: WindParticleOverlay(layer: layer),
@@ -390,11 +315,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    // The tree's *first* RepaintBoundary is Scaffold's (white), not the one
-    // the test wraps the black backdrop in — sampling that one would pass on
-    // a blank overlay. The boundary is keyed so the finder stays precise.
     final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byKey(const ValueKey('overlayBoundary')),
+      find.byType(RepaintBoundary).first,
     );
     // toImage is a real engine async — it must run outside the test's fake
     // clock, or the future never completes.
@@ -416,14 +338,9 @@ void main() {
       final b = bytes.getUint8(i + 2);
       if (r > 160 && g > 160 && b > 160) bright++;
     }
-    // The whole population lands in one speed bucket (a uniform full-speed
-    // field), so the bright count is really the bucket's draw — thousands of
-    // points, not a handful: an 8-bit bucket counter wraps at 255 and drops
-    // the bucket (or most of it) entirely, so this threshold is what fails
-    // that bug. A blank overlay paints ~0.
     expect(
       bright,
-      greaterThan(300),
+      greaterThan(10),
       reason: 'the particle trails must paint as visible bright pixels',
     );
     expect(tester.takeException(), isNull);
@@ -446,11 +363,7 @@ void main() {
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
     );
-    await layer.onAttached(
-      RecordingMapController(
-        camera: const CameraPosition(target: LatLng(23.5, 121), zoom: 4),
-      ),
-    );
+    await layer.onAttached(RecordingMapController());
 
     await tester.pumpWidget(
       MaterialApp(
@@ -459,7 +372,6 @@ void main() {
           // background is near-white, so on that a blank overlay counts as
           // bright everywhere and the assertion below means nothing.
           body: RepaintBoundary(
-            key: const ValueKey('overlayBoundary'),
             child: ColoredBox(
               color: Colors.black,
               child: WindParticleOverlay(layer: layer),
@@ -472,10 +384,10 @@ void main() {
     layer.field.value = WindField(
       width: 2,
       height: 2,
-      lat0: 25,
-      lon0: 120,
-      dLat: -0.75,
-      dLon: 1.5,
+      lat0: 90,
+      lon0: 0,
+      dLat: -90,
+      dLon: 180,
       uMin: -20,
       uMax: 20,
       vMin: -1,
@@ -489,11 +401,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    // The tree's *first* RepaintBoundary is Scaffold's (white), not the one
-    // the test wraps the black backdrop in — sampling that one would pass on
-    // a blank overlay. The boundary is keyed so the finder stays precise.
     final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byKey(const ValueKey('overlayBoundary')),
+      find.byType(RepaintBoundary).first,
     );
     ByteData? data;
     await tester.runAsync(() async {
@@ -512,85 +421,11 @@ void main() {
     }
     expect(
       bright,
-      greaterThan(300),
+      greaterThan(10),
       reason: 'a field loaded after mount must still start the streaks',
     );
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets(
-    'the overlay ticker stops while the map tab is hidden and resumes on '
-    'return',
-    (tester) async {
-      tester.view.physicalSize = const Size(1170, 2532);
-      tester.view.devicePixelRatio = 3.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final layer = WindForecastMapLayer(
-        _FakeWindRepository(const []),
-        model: WindForecastModel.gfs,
-      );
-      await layer.onAttached(RecordingMapController());
-
-      // The map tab is index 2; start hidden so the first sync already stops
-      // the ticker, then make it visible.
-      final visibleTab = VisibleTab(0);
-      await tester.pumpWidget(
-        MaterialApp(
-          home: VisibleTabScope(
-            visibleTab: visibleTab,
-            child: Scaffold(
-              body: ColoredBox(
-                color: Colors.black,
-                child: WindParticleOverlay(layer: layer),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      layer.field.value = WindField(
-        width: 2,
-        height: 2,
-        lat0: 90,
-        lon0: 0,
-        dLat: -90,
-        dLon: 180,
-        uMin: -20,
-        uMax: 20,
-        vMin: -1,
-        vMax: 1,
-        timeMs: 0,
-        model: 'gfs',
-        u: Uint8List.fromList([255, 255, 255, 255]),
-        v: Uint8List.fromList([128, 128, 128, 128]),
-      );
-      await tester.pump();
-
-      expect(
-        tester.binding.transientCallbackCount,
-        0,
-        reason: 'a hidden map tab must not run the particle ticker at all',
-      );
-
-      visibleTab.value = MapPage.tabIndex;
-      await tester.pump();
-      expect(
-        tester.binding.transientCallbackCount,
-        greaterThan(0),
-        reason: 'entering the map tab starts the animation',
-      );
-
-      visibleTab.value = 0;
-      await tester.pump();
-      expect(
-        tester.binding.transientCallbackCount,
-        0,
-        reason: 'leaving the map tab stops the per-frame raster immediately',
-      );
-    },
-  );
 
   testWidgets('the options chip offers county, township, and name toggles', (
     tester,

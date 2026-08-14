@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -92,11 +93,20 @@ void main() {
           .firstWhere((l) => l['id'] == townLabelLayerId);
     }
 
-    test('reads the township TOWN property in Noto Sans TC', () {
+    test('reads the township name from the app GeoJSON point source', () {
       final layout = townLabel()['layout'] as Map<String, dynamic>;
-      expect(layout['text-field'], ['get', 'TOWN']);
+      expect(layout['text-field'], ['get', 'name']);
       expect(layout['text-font'], ['Noto Sans TC Regular']);
       expect(layout['text-allow-overlap'], false);
+    });
+
+    test('is sourced from the GeoJSON points, never the tile polygons', () {
+      // Reading names off the `town` polygon layer duplicates a township whose
+      // polygon crosses a tile boundary (a centroid per clipped piece) — the
+      // whole reason labels come from the app's own point directory instead.
+      expect(townLabel()['source'], townLabelSourceId);
+      expect(townLabel().containsKey('source-layer'), isFalse);
+      expect(townLabel()['source'], isNot('exptech'));
     });
 
     test('is gated: not placed before min zoom, faded in by the fade zoom', () {
@@ -112,6 +122,63 @@ void main() {
       final paint = townLabel()['paint'] as Map<String, dynamic>;
       expect(paint['text-color'], MapColors.light.label);
       expect(paint['text-halo-color'], MapColors.light.labelHalo);
+    });
+  });
+
+  group('townLabelGeoJson', () {
+    final directory = TownDirectory.fromJson({
+      '100': {
+        'city': '臺北',
+        'town': '中正',
+        'lat': 25.03,
+        'lng': 121.52,
+        'cityLevel': '市',
+        'townLevel': '區',
+      },
+      '900': {
+        'city': '屏東',
+        'town': '屏東',
+        'lat': 22.68,
+        'lng': 120.49,
+        'cityLevel': '縣',
+        'townLevel': '市',
+      },
+    });
+
+    test('one point feature per township, named from the directory', () {
+      final geojson =
+          jsonDecode(townLabelGeoJson(directory)) as Map<String, dynamic>;
+      final features = geojson['features'] as List<dynamic>;
+      expect(features, hasLength(2));
+      for (final feature in features.cast<Map<String, dynamic>>()) {
+        expect(feature['type'], 'Feature');
+        final geometry = feature['geometry'] as Map<String, dynamic>;
+        expect(geometry['type'], 'Point');
+        final props = feature['properties'] as Map<String, dynamic>;
+        expect(props['name'], isA<String>());
+      }
+      final names = [
+        for (final f in features)
+          ((f as Map<String, dynamic>)['properties']
+              as Map<String, dynamic>)['name'],
+      ];
+      expect(names, containsAll(['中正區', '屏東市']));
+    });
+
+    test('each township appears exactly once, whatever the tiles hold', () {
+      // Regression: the vector tiles hold the same township twice (a polygon
+      // clipped across a tile boundary, or a mislabelled neighbour) and the old
+      // polygon-centroid labels rendered the name once per copy. The directory
+      // is unique per code, so a name never duplicates.
+      final codes = [
+        for (final f
+            in (jsonDecode(townLabelGeoJson(directory))
+                    as Map<String, dynamic>)['features']
+                as List<dynamic>)
+          (((f as Map<String, dynamic>)['properties'])
+              as Map<String, dynamic>)['name'],
+      ];
+      expect(codes.toSet().length, codes.length);
     });
   });
 }

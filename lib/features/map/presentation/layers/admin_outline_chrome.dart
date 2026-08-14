@@ -29,11 +29,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 mixin AdminOutlineChrome on RasterTimelineLayer {
   /// Whether 國界 (world country borders) are redrawn above the raster.
   ///
-  /// On by default: the neighbours' outlines are the frame a reader navigates
-  /// by on a basin-wide view, and 鄉鎮/縣市 lines alone read as floating once
-  /// the island fills the screen. A reader who wants the clean raster can turn
-  /// it off.
-  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(true);
+  /// Off by default: on a Taiwan-focused surface the neighbours' outlines are
+  /// usually noise, and a reader who wants them can ask.
+  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(false);
 
   /// Whether 縣市 borders are redrawn above the raster.
   final ValueNotifier<bool> showCountyOutline = ValueNotifier(true);
@@ -63,34 +61,6 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
     if (showCountyOutline.value) AdminBoundary.county,
     if (showGlobalOutline.value) AdminBoundary.global,
   };
-
-  /// The id of the **topmost** admin line actually on the map, or null when
-  /// none is.
-  ///
-  /// [_syncBoundaries] adds sets in [AdminBoundary.values] order (global →
-  /// county → town) and each pair casing-first, so the last *shown* set's line
-  /// is the topmost admin stroke. A consuming raster mounts *below* it — which,
-  /// because every admin pair stacks above it in that same order, puts the
-  /// frame under **all** admin strokes (casings included) at once.
-  ///
-  /// Anchoring on the *bottommost* set instead would be wrong once 國界 is on:
-  /// the global frame sits lowest, so a raster hung under its casing would
-  /// still cover the county and town lines above it — exactly what the
-  /// timeline scrub used to do to the borders.
-  ///
-  /// Gated on [_boundariesShown] (not the toggles): after a style reload the
-  /// native layers are gone while the toggles still read on, so anchoring on a
-  /// toggle would point a mount at a layer that does not exist and the frame
-  /// would fail to render. With nothing actually drawn, null (top of the
-  /// style) is the honest answer — the reload path re-adds the borders right
-  /// after the first frame, above it.
-  String? get adminBaseLayerId {
-    if (_boundariesShown.isEmpty) return null;
-    for (final boundary in AdminBoundary.values.reversed) {
-      if (_boundariesShown.contains(boundary)) return boundary.lineLayerId;
-    }
-    return null;
-  }
 
   /// Turns the 國界 borders on/off, applying it to a live map immediately.
   void setShowGlobalOutline(bool value) {

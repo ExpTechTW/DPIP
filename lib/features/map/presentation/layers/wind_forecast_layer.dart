@@ -13,6 +13,7 @@ import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
@@ -120,19 +121,12 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   double get opacity => 1.0;
 
   /// The field covers the base style's borders, so this layer supplies its own
-  /// on top — same reasoning as radar.
-  ///
-  /// The frame raster mounts **below the topmost admin line**
-  /// ([adminBaseLayerId]) once those are on the map, rather than
-  /// unconditionally on top: the first frame is mounted before
-  /// [AdminOutlineChrome.onAttached] adds the borders (so it falls back to the
-  /// top and the borders land above it), but every later frame would otherwise
-  /// stack over the borders and hide them the moment the timeline is scrubbed.
-  /// The topmost line — not the bottommost — is the anchor, because with 國界
-  /// on the global frame sits lowest and a raster under its casing would still
-  /// cover the county and town lines above it.
+  /// on top — same reasoning as radar. The raster still anchors **under** the
+  /// township-name labels, so a place name is never buried under the field; the
+  /// admin borders redraw between the two (they mount after the raster, closer
+  /// to the labels — see [AdminOutline]).
   @override
-  String? get rasterBelowLayerId => adminBaseLayerId;
+  String? get rasterBelowLayerId => townLabelLayerId;
 
   /// The frame times are forecast valid times, not observations — the timeline
   /// caption must say so instead of the shared "observed" default.

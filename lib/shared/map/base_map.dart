@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:math' show Point;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
 
 /// Layer-chip band under the safe-area top: outer pad ([AppSpacing.lg]) + chip
 /// height (~36) + a tight gap. iOS MapLibre already anchors ornaments to the
@@ -239,18 +241,22 @@ class _BaseMapState extends State<BaseMap> {
   }
 
   /// Style string memoised per palette — all other inputs are const, and
-  /// every [build] used to re-interpolate the full style JSON.
-  static final Map<MapPalette, String> _styleCache = {};
+  /// Every [build] used to re-interpolate the full style JSON — the string
+  /// only varies by palette and by the town-label directory, so it is memoised
+  /// on that pair.
+  static final Map<(MapPalette, String), String> _styleCache = {};
 
-  static String _styleString(MapPalette palette) => _styleCache.putIfAbsent(
-    palette,
-    () => exptechVectorStyle(
-      palette,
-      basemapTileUrl: basemapOriginTileUrl,
-      glyphsUrl: glyphsOriginUrl,
-      terrainTileUrl: terrainOriginTileUrl,
-    ),
-  );
+  static String _styleString(MapPalette palette, String townLabelData) =>
+      _styleCache.putIfAbsent(
+        (palette, townLabelData),
+        () => exptechVectorStyle(
+          palette,
+          basemapTileUrl: basemapOriginTileUrl,
+          glyphsUrl: glyphsOriginUrl,
+          terrainTileUrl: terrainOriginTileUrl,
+          townLabelData: townLabelData,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -274,9 +280,15 @@ class _BaseMapState extends State<BaseMap> {
       ),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
-      // The interpolated string only varies by palette (dark/light), so it is
-      // memoised — every rebuild used to re-run the ~2 KB interpolation.
-      styleString: _styleString(palette),
+      // The interpolated string only varies by palette and the town directory,
+      // so it is memoised — every rebuild used to re-run the ~2 KB
+      // interpolation and the per-town GeoJSON stringification. Township-name
+      // labels come from the app's own directory (a unique GeoJSON point per
+      // township), never the tile polygons — see [townLabelGeoJson].
+      styleString: _styleString(
+        palette,
+        townLabelGeoJson(context.read<TownDirectory>()),
+      ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).
       key: ValueKey(_mountAttempt),

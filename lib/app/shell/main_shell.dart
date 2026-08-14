@@ -6,6 +6,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/permission_banners.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,11 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  /// Index of the data branch (see the destinations in [build]) — the only
+  /// branch with nested routes, so leaving it while a replay is on screen
+  /// needs the replay closed (see [_closeReplayOnBranchLeave]).
+  static const int _dataBranchIndex = 3;
+
   int? _lastIndex;
 
   /// Which branch is on screen. The branches live in an IndexedStack and stay
@@ -156,10 +162,51 @@ class _MainShellState extends State<MainShell> {
         layerId: layerId,
       );
     }
+    final from = widget.navigationShell.currentIndex;
+    // Leaving the data branch while its replay page is on top closes it first.
+    // The industry-recognised way to clear a StatefulShellBranch's child
+    // routes is to operate the branch's own navigator via its navigatorKey
+    // (`navigatorKey.currentState?.pop()` — the same path a system back press
+    // takes), not `context.pop()`, which cannot reach branch navigators and
+    // throws "There is nothing to pop". go_router's onPopPage then syncs its
+    // route-match bookkeeping and the report page beneath stays intact. The
+    // branch switch is deferred one frame so the pop's configuration update
+    // settles first; running both in the same frame drops the whole branch.
+    if (index != from && from == _dataBranchIndex && _isReplayOnTop()) {
+      widget
+          .navigationShell
+          .route
+          .branches[_dataBranchIndex]
+          .navigatorKey
+          .currentState
+          ?.pop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        widget.navigationShell.goBranch(index);
+      });
+      return;
+    }
     widget.navigationShell.goBranch(
       index,
       // Tapping the active tab returns it to its initial route.
-      initialLocation: index == widget.navigationShell.currentIndex,
+      initialLocation: index == from,
     );
+  }
+
+  /// Whether the data branch's stack top is the replay page — the tell that a
+  /// switch away must close it (see [_onDestinationSelected]). Inspects the
+  /// branch's navigator pages only; navigation itself happens through the
+  /// router.
+  bool _isReplayOnTop() {
+    final navigator = widget
+        .navigationShell
+        .route
+        .branches[_dataBranchIndex]
+        .navigatorKey
+        .currentState;
+    final pages = navigator?.widget.pages;
+    return pages != null &&
+        pages.isNotEmpty &&
+        pages.last.name == AppRoutes.earthquakeReplay;
   }
 }

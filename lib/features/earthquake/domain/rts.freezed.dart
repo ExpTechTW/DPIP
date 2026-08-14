@@ -306,7 +306,7 @@ as int,
 /// @nodoc
 mixin _$RtsStation {
 
- double get pga; double get pgv;@JsonKey(name: 'i') double get intensityRaw;@JsonKey(name: 'I') int get intensity;
+ double get pga; double get pgv;@JsonKey(name: 'i') double get intensityRaw;@JsonKey(name: 'I') double get intensity;@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool get alert;
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -319,16 +319,16 @@ $RtsStationCopyWith<RtsStation> get copyWith => _$RtsStationCopyWithImpl<RtsStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.alert, alert) || other.alert == alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity);
+int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity,alert);
 
 @override
 String toString() {
-  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity)';
+  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity, alert: $alert)';
 }
 
 
@@ -339,7 +339,7 @@ abstract mixin class $RtsStationCopyWith<$Res>  {
   factory $RtsStationCopyWith(RtsStation value, $Res Function(RtsStation) _then) = _$RtsStationCopyWithImpl;
 @useResult
 $Res call({
- double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') int intensity
+ double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') double intensity,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
 });
 
 
@@ -356,13 +356,14 @@ class _$RtsStationCopyWithImpl<$Res>
 
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,Object? alert = null,}) {
   return _then(RtsStation(
 pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
 as double,pgv: null == pgv ? _self.pgv : pgv // ignore: cast_nullable_to_non_nullable
 as double,intensityRaw: null == intensityRaw ? _self.intensityRaw : intensityRaw // ignore: cast_nullable_to_non_nullable
 as double,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
-as int,
+as double,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -447,10 +448,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  int intensity)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RtsStation() when $default != null:
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
+return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
   return orElse();
 
 }
@@ -468,10 +469,10 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  int intensity)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)  $default,) {final _that = this;
 switch (_that) {
 case _RtsStation():
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
+return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -488,10 +489,10 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  int intensity)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,) {final _that = this;
 switch (_that) {
 case _RtsStation() when $default != null:
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
+return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
   return null;
 
 }
@@ -503,13 +504,14 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity);case _:
 @JsonSerializable()
 
 class _RtsStation implements RtsStation {
-  const _RtsStation({this.pga = 0.0, this.pgv = 0.0, @JsonKey(name: 'i') this.intensityRaw = 0.0, @JsonKey(name: 'I') this.intensity = 0});
+  const _RtsStation({this.pga = 0.0, this.pgv = 0.0, @JsonKey(name: 'i') this.intensityRaw = 0.0, @JsonKey(name: 'I') this.intensity = 0.0, @JsonKey(fromJson: boolishInt, toJson: intFromBool) this.alert = false});
   factory _RtsStation.fromJson(Map<String, dynamic> json) => _$RtsStationFromJson(json);
 
 @override@JsonKey() final  double pga;
 @override@JsonKey() final  double pgv;
 @override@JsonKey(name: 'i') final  double intensityRaw;
-@override@JsonKey(name: 'I') final  int intensity;
+@override@JsonKey(name: 'I') final  double intensity;
+@override@JsonKey(fromJson: boolishInt, toJson: intFromBool) final  bool alert;
 
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
@@ -524,16 +526,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.alert, alert) || other.alert == alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity);
+int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity,alert);
 
 @override
 String toString() {
-  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity)';
+  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity, alert: $alert)';
 }
 
 
@@ -544,7 +546,7 @@ abstract mixin class _$RtsStationCopyWith<$Res> implements $RtsStationCopyWith<$
   factory _$RtsStationCopyWith(_RtsStation value, $Res Function(_RtsStation) _then) = __$RtsStationCopyWithImpl;
 @override @useResult
 $Res call({
- double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') int intensity
+ double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') double intensity,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
 });
 
 
@@ -561,13 +563,14 @@ class __$RtsStationCopyWithImpl<$Res>
 
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,Object? alert = null,}) {
   return _then(_RtsStation(
 pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
 as double,pgv: null == pgv ? _self.pgv : pgv // ignore: cast_nullable_to_non_nullable
 as double,intensityRaw: null == intensityRaw ? _self.intensityRaw : intensityRaw // ignore: cast_nullable_to_non_nullable
 as double,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
-as int,
+as double,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

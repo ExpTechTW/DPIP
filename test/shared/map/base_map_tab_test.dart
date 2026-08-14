@@ -1,3 +1,4 @@
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:maplibre_gl_platform_interface/maplibre_gl_platform_interface.dart';
+import 'package:provider/provider.dart';
 
 /// A fake platform that completes the map lifecycle (`buildView` →
 /// `onPlatformViewCreated` → controller) and records every
@@ -50,7 +52,16 @@ void main() {
   });
 
   Future<void> pump(WidgetTester tester, Widget child) async {
-    await tester.pumpWidget(MaterialApp(home: child));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Provider<TownDirectory>.value(
+          // The style string needs a (empty) directory for its town labels —
+          // a real one is the app bootstrap's job.
+          value: TownDirectory.fromJson(const {}),
+          child: child,
+        ),
+      ),
+    );
     // Let the platform view callback run and the controller report in.
     await tester.pump();
   }

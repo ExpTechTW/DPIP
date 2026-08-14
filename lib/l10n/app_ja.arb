@@ -1,395 +1,676 @@
 {
-  "@@locale": "ja",
-  "languageName": "日本語",
-  "navHome": "ホーム",
-  "navEvents": "イベント",
-  "navMap": "地図",
-  "navData": "データ",
-  "navEarthquake": "地震",
-  "dataSectionSeismic": "地震",
-  "dataEarthquakeSubtitle": "地震報告",
-  "dataSectionWeather": "気象",
-  "dataWeatherRankingSubtitle": "即時観測ランキング",
-  "weatherRankingTitle": "観測ランキング",
-  "weatherRankingMeta": "データ時刻：{time}\n観測点 {count}",
-  "weatherRankingEmpty": "並べ替え可能な観測がありません",
-  "weatherRankingBy": "並び",
-  "weatherRankingHighest": "最高",
-  "weatherRankingLowest": "最低",
-  "weatherRankingMergeTo": "統合",
-  "weatherRankingMergeTown": "町村",
-  "weatherRankingMergeCounty": "県市",
-  "weatherRankingWind": "風速",
-  "weatherRankingGust": "突風",
-  "weatherRankingTempExtremes": "気温極値",
-  "weatherRankingExtremeHigh": "今日の最高",
-  "weatherRankingExtremeLow": "今日の最低",
-  "weatherRankingExtremeRange": "日較差",
-  "weatherRankingRecordedAt": "記録時刻 {time}",
-  "weatherRankingAnalysisCurrent": "現在 {value}°C",
-  "weatherRankingAnalysisHigh": "最高 {value}",
-  "weatherRankingAnalysisLow": "最低 {value}",
-  "weatherRankingAnalysisRange": "較差 {value}°C",
-  "reportListEmpty": "地震報告はありません",
-  "reportListEmptyFiltered": "条件に一致する地震報告はありません",
-  "reportListMeta": "M{magnitude} · {depth} km",
-  "reportListMagnitude": "M{magnitude}",
-  "reportListDepthUnit": "km",
-  "reportListLocalFelt": "局地有感",
-  "reportListToday": "今日",
-  "reportListYesterday": "昨日",
-  "reportListDayCount": "{count}",
-  "reportListEnd": "これ以上ありません",
-  "reportFilterTitle": "絞り込み",
-  "reportFilterSort": "並び替え",
-  "reportFilterSortTime": "時間",
-  "reportFilterSortIntensity": "震度",
-  "reportFilterSortMagnitude": "規模",
-  "reportFilterSortDepth": "深さ",
-  "reportFilterOrderDesc": "降順",
-  "reportFilterOrderAsc": "昇順",
-  "reportFilterIntensity": "震度",
-  "reportFilterIntensityInfoTitle": "震度の新制と旧制",
-  "reportFilterIntensityInfoIntro": "気象署は 2020 年 1 月 1 日（台北時間）から新制震度を採用しています。",
-  "reportFilterIntensityInfoLegacyTitle": "旧制（2020 年より前）",
-  "reportFilterIntensityInfoLegacyBody": "震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。",
-  "reportFilterIntensityInfoModernTitle": "新制（2020 年以降）",
-  "reportFilterIntensityInfoModernBody": "震度は 0–4、5弱、5強、6弱、6強、7。フィルタは新制に準拠し、それ以前の地震はリストで旧制表記になります。",
-  "reportFilterMagnitude": "マグニチュード",
-  "reportFilterDepth": "深さ",
-  "reportFilterDepthKm": "{depth} km",
-  "reportFilterDate": "日付",
-  "reportFilterDatePick": "日付を選択",
-  "reportFilterDateStartNote": "開始日：当日 00:00（台北時間）",
-  "reportFilterDateEndNote": "終了日：当日 24:00（台北時間）",
-  "reportFilterRange": "{start} – {end}",
-  "reportFilterLocation": "場所",
-  "reportFilterLocationHint": "例：花蓮、海域",
-  "reportFilterAny": "指定なし",
-  "reportFilterApply": "適用",
-  "reportFilterReset": "リセット",
-  "reportListSearch": "検索",
-  "reportDetailTitle": "地震レポート",
-  "reportDetailNumbered": "No.{number} 顕著有感地震",
-  "reportDetailLocalFelt": "局地的な有感地震",
-  "reportDetailInfo": "詳細情報",
-  "reportDetailOriginTime": "発震時刻",
-  "reportDetailEpicenter": "震央座標",
-  "reportDetailMagnitude": "地震規模",
-  "reportDetailDepth": "震源の深さ",
-  "reportDetailAreaIntensity": "地域別震度",
-  "reportDetailLocalIntensity": "現在地の震度",
-  "reportDetailLocalIntensityUnavailable": "震度情報なし",
-  "reportDetailSortByIntensity": "震度順に並べ替え",
-  "reportDetailSortByCounty": "地域順に並べ替え",
-  "reportDetailImage": "地震レポート画像",
-  "reportDetailImageUnavailable": "レポート画像はまだありません",
-  "reportDetailOpenReport": "レポートページ",
-  "reportDetailReplay": "リプレイ",
-  "navMore": "その他",
-  "appLogs": "アプリログ",
-  "changelogTitle": "更新履歴",
-  "changelogEmpty": "リリースノートはまだありません",
-  "changelogTypePrerelease": "ベータ",
-  "changelogTypeStable": "正式",
-  "changelogCurrentVersion": "現行",
-  "changelogVersionDetails": "リリース詳細",
-  "changelogBodyEmpty": "このリリースの説明はありません。",
-  "mapPlaceholderDisabled": "地図(一時的に無効)",
-  "moreSectionRegion": "地域",
-  "moreSectionNotify": "通知",
-  "moreSectionDisplay": "表示",
-  "regionManageTitle": "登録地域",
-  "regionAddButton": "地域を追加",
-  "regionEmpty": "登録地域がありません",
-  "regionSelectTitle": "地域を選択",
-  "regionSelectCount": "{count}/{max} 件選択中",
-  "regionSelectFull": "地域は最大 {max} 件まで登録できます",
-  "regionEdit": "変更",
-  "moreSectionAdvanced": "詳細設定",
-  "moreDeveloper": "デバッグ情報",
-  "experimentalFeatures": "実験的機能",
-  "moreSectionLinks": "関連リンク",
-  "moreCwaEew": "中央気象署 緊急地震速報",
-  "moreTremReport": "TREM 検知レポート",
-  "moreServerStatus": "サーバー状態",
-  "moreAnnouncements": "お知らせ",
-  "moreDiscord": "Discord コミュニティ",
-  "moreNotifyLog": "DPIP 通知送信履歴",
-  "moreLinkOpenFailed": "リンクを開けませんでした",
-  "weatherDynamicState": "天気アニメーション",
-  "weatherDynamicStateSubtitle": "ホーム背景の天気を上書きします",
-  "weatherModeAuto": "自動",
-  "weatherModeClear": "晴れ",
-  "weatherModeRain": "雨",
-  "weatherModeFog": "霧",
-  "weatherModeThunderstorm": "雷雨",
-  "commonLoading": "読み込み中…",
-  "commonRetry": "再試行",
-  "commonError": "問題が発生しました",
-  "commonFetchFailed": "データを取得できませんでした。しばらくしてから再度お試しください。",
-  "commonEmpty": "表示する項目がありません",
-  "feedConnecting": "接続中…",
-  "feedStale": "データが最新でない可能性があります",
-  "feedOffline": "接続が切断されました",
-  "eewTitle": "緊急地震速報",
-  "eewNone": "現在、緊急地震速報はありません",
-  "eewSummary": "M{magnitude}・深さ {depth} km",
-  "regionNationwide": "全国",
-  "regionCurrent": "現在地",
-  "regionCurrentUnavailable": "現在地を取得できません",
-  "weatherPrecipitation": "降水量",
-  "weatherHumidity": "湿度",
-  "weatherDataTime": "{station} · データ時刻 {time}",
-  "homeViewOnMap": "地図で見る",
-  "homeForecastTitle": "24時間予報",
-  "homeForecastHighLow": "高 {high}° · 低 {low}°",
-  "homeForecastPop": "{pop}%",
-  "homeForecastFeelsLike": "体感 {temp}°",
-  "homeForecastHumidity": "湿度 {value}%",
-  "homeForecastWind": "{direction} · 風力{level}",
-  "homeForecastUnavailable": "地域を選ぶと予報を表示します",
-  "homeForecastEmpty": "予報データがありません",
-  "homeActiveEventsTitle": "発生中の事象",
-  "homeActiveEventsEmpty": "発生中の事象はありません",
-  "homeRainTrendTitle": "今後1時間の雨",
-  "homeRainTrendMinute": "{minute}分",
-  "homeRainTrendUpdated": "更新 {time}",
-  "homeRainTrendNoData": "データなし",
-  "homeRainTrendScattered": "にわか雨の可能性があります",
-  "homeRainTrendLightSustained": "今後1時間は小雨が続きます",
-  "homeRainTrendLightStopping": "{minutes}分後に小雨が止む見込みです",
-  "homeRainTrendHeavySustained": "今後1時間は大雨が続きます",
-  "homeRainTrendHeavyStopping": "{minutes}分後に大雨が止む見込みです",
-  "mapLayers": "レイヤー",
-  "mapLayerOrderTitle": "レイヤーの順番",
-  "mapLayerOrderReset": "既定の順序に戻す",
-  "mapLayerRadar": "レーダー合成エコー図",
-  "mapLayerSatellite": "ひまわり 赤外線(B13)",
-  "mapLayerSatelliteB01": "ひまわり 可視青(B01)",
-  "mapLayerSatelliteB02": "ひまわり 可視緑(B02)",
-  "mapLayerSatelliteB03": "ひまわり 可視赤(B03)",
-  "mapLayerSatelliteB04": "ひまわり 近赤外(B04)",
-  "mapLayerSatelliteB05": "ひまわり 近赤外(B05)",
-  "mapLayerSatelliteB06": "ひまわり 近赤外(B06)",
-  "mapLayerSatelliteB07": "ひまわり 短波長赤外(B07)",
-  "mapLayerSatelliteB08": "ひまわり 上層水蒸気(B08)",
-  "mapLayerSatelliteB09": "ひまわり 中層水蒸気(B09)",
-  "mapLayerSatelliteB10": "ひまわり 下層水蒸気(B10)",
-  "mapLayerSatelliteB11": "ひまわり 二酸化硫黄/雲相(B11)",
-  "mapLayerSatelliteB12": "ひまわり オゾン(B12)",
-  "mapLayerSatelliteB13": "ひまわり 赤外線(B13)",
-  "mapLayerSatelliteB14": "ひまわり 長波長赤外線(B14)",
-  "mapLayerSatelliteB15": "ひまわり 長波長赤外線(B15)",
-  "mapLayerSatelliteB16": "ひまわり 二酸化炭素(B16)",
-  "mapLayerSatelliteTruecolor": "ひまわり トゥルーカラー",
-  "mapLayerSatelliteNaturalcolor": "ひまわり ナチュラルカラー",
-  "mapLayerSatelliteAsh": "ひまわり 火山灰",
-  "mapLayerSatelliteDust": "ひまわり 黄砂",
-  "mapLayerSatelliteAirmass": "ひまわり エアマス",
-  "mapLayerSatelliteNightmicrophysics": "ひまわり 夜間微物理",
-  "mapLayerSatelliteWatervapor": "ひまわり 水蒸気",
-  "mapLayerSatelliteBtdSplit": "ひまわり スプリットウィンドウ",
-  "mapLayerSatelliteBtdFog": "ひまわり 夜間霧",
-  "mapLayerSatelliteBtdWvirw": "ひまわり オーバーシューティングトップ",
-  "mapLayerSatelliteBtdSo2": "ひまわり 二酸化硫黄/雲相",
-  "mapLayerSatelliteBtdCo2": "ひまわり 巻雲/雲頂高度",
-  "mapLayerSatelliteBtdOzone": "ひまわり 対流圏界面",
-  "mapLayerSatelliteCloudtop": "ひまわり 雲頂温度",
-  "mapLayerSatelliteCloudmask": "ひまわり 雲マスク",
-  "mapLayerSatelliteSst": "ひまわり 海面水温",
-  "mapLayerSatelliteNdvi": "ひまわり NDVI",
-  "mapLayerSatelliteNdwi": "ひまわり NDWI",
-  "mapLayerSatelliteMndwi": "ひまわり MNDWI",
-  "mapLayerSatelliteGlobalOutline": "国境線",
-  "mapLayerSatelliteRgbComposite": "RGB 合成(JMA レシピ)",
-  "mapLayerSatelliteCloudClear": "晴れ",
-  "mapLayerSatelliteCloudProbablyClear": "おそらく晴れ",
-  "mapLayerSatelliteCloudProbablyCloudy": "おそらく雲",
-  "mapLayerSatelliteCloudCloudy": "雲",
-  "mapLayerSatelliteTransparentWarm": "晴れ(暖域) = 透明、地図が透ける",
-  "mapLayerSatelliteTransparentReflectance": "低反射率・夜間 = 透明、地図が透ける",
-  "mapLayerSatelliteTransparentZero": "差ゼロ = 透明(信号なし)",
-  "mapLayerSatelliteTransparentNight": "夜間 = 透明、地図が透ける",
-  "mapLayerSatelliteTransparentNoData": "データなし(陸上) = 透明",
-  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(植生なし)",
-  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 透明(水域なし)",
-  "mapLayerSatelliteTransparentClear": "晴れ = 透明、地図が透ける",
-  "mapLayerStyleSection": "色調",
-  "mapLayerStyleTooltip": "色調",
-  "mapLayerStyleGray": "グレースケール（JMA）",
-  "mapLayerStyleGrayTooltip": "気象庁の赤外画像の慣例：温度が低いほど白",
-  "mapLayerStyleJma": "雲頂強調（JMA）",
-  "mapLayerStyleJmaTooltip": "グレースケールをベースに −40 °C 以下を着色し、雲頂高度を強調",
-  "mapLayerStyleBd": "Dvorak BD",
-  "mapLayerStyleBdTooltip": "Dvorak BD カーブ——熱帯低気圧の強度解析に使う階段グレースケール",
-  "mapLayerQpesums": "1時間降水量予報",
-  "mapLayerLightning": "雷",
-  "lightningLegendCg": "対地 · {minutes} 分以内",
-  "lightningLegendCc": "雲間 · {minutes} 分以内",
-  "mapTimelineNow": "現在",
-  "mapTimelinePast": "過去",
-  "mapTimelineFuture": "未来",
-  "mapTimelineObserved": "観測",
-  "mapTimelineForecast": "予報",
-  "mapTimelineDataTime": "データ時刻 {time}",
-  "notifySettingsMenu": "通知設定",
-  "notifyTitle": "通知",
-  "notifyUnavailable": "プッシュ通知はまだ準備できていません。しばらくしてから再度お試しください。",
-  "notifySetFailed": "設定を保存できませんでした。もう一度お試しください。",
-  "notifySectionEew": "緊急地震速報",
-  "notifySectionEarthquake": "地震",
-  "notifySectionWeather": "天気",
-  "notifySectionTsunami": "津波",
-  "notifySectionOther": "その他",
-  "notifyEew": "緊急地震速報",
-  "notifyMonitor": "強震モニタ",
-  "notifyReport": "地震報告",
-  "notifyIntensity": "震度速報",
-  "notifyThunderstorm": "雷雨情報",
-  "notifyAdvisory": "気象警報・注意報",
-  "notifyEvacuation": "防災情報",
-  "notifyTsunami": "津波情報",
-  "notifyAnnouncement": "お知らせ",
-  "notifyOptOff": "オフ",
-  "notifyOptAll": "すべて受信",
-  "notifyOptLocalIntensity4": "所在地の震度4以上",
-  "notifyOptLocalIntensity1": "所在地の震度1以上",
-  "notifyOptWeatherLocal": "現在地のみ",
-  "notifyOptTsunamiWarning": "津波警報のみ",
-  "notifyOptTsunamiAll": "津波情報・津波警報",
-  "onboardingNext": "次へ",
-  "onboardingBack": "戻る",
-  "onboardingScrollHint": "下にスクロールして続行してください",
-  "onboardingIntroTitle": "DPIP へようこそ",
-  "onboardingIntroBody": "DPIP はあなたと共にある防災パートナーです。緊急地震速報、地震報告、天気、各種災害情報を統合し、重要な瞬間にすぐお知らせします。\n\n• 地震:緊急地震速報、震度速報、地震報告\n• 天気:雷雨即時情報、気象警報・注意報\n• 津波・防災情報\n\n次に、サービス利用規約をご確認いただき、DPIP がリアルタイムであなたを守れるよう、いくつかの権限の許可をお願いします。",
-  "onboardingTermsTitle": "サービス利用規約",
-  "onboardingTermsBody": "DPIP をご利用になる前に、以下の注意事項を必ずお読みください:\n\n• すべての情報は、台湾中央気象署(CWA)が発表する内容を優先してください。\n\n• ネットワーク、サーバー、アプリ、上流のデータソースの状態によっては、情報を受信できない場合があります。可能な限り回避に努めますが、決して発生しないことを保証するものではありません。\n\n• 強い揺れが、通知より先にあなたの所在地へ到達する場合があります。\n\n• 緊急地震速報は高速に計算された結果であり、大きな誤差を含む可能性があります。この点を理解したうえで、慎重にご利用ください。\n\n• 公的機関に認められていない行為には法的リスクが伴う可能性があります。関連する規定を必ずお守りください。\n\nまた、地域に応じた警報を提供するため、本サービスは、どの警報をあなたに送信するかを判断する目的にのみ、あなたのおおよその位置情報とプッシュ識別子を、フォアグラウンドおよびバックグラウンドで収集・アップロードします。\n\n下部の「同意して続行」をタップすることで、上記を読み、理解し、同意したものとみなされます。",
-  "onboardingTermsAgree": "サービス利用規約を読み、同意します",
-  "onboardingAgreeContinue": "同意して続行",
-  "onboardingPermsTitle": "権限の許可",
-  "onboardingPermsBody": "災害が発生した瞬間に DPIP がお知らせできるよう、以下の権限を許可してください。これらはシステム設定でいつでも変更できます。",
-  "onboardingPermNotify": "通知",
-  "onboardingPermNotifyDesc": "地震、天気、災害の発生時に、警報をすぐお届けします。",
-  "onboardingPermCritical": "重大な通知",
-  "onboardingPermCriticalDesc": "生命に関わる緊急地震速報を、消音モードやおやすみモードでも鳴らせるようにします。",
-  "onboardingPermLocation": "位置情報",
-  "onboardingPermLocationDesc": "あなたの所在地に合わせて警報を配信します。",
-  "onboardingPermBackground": "バックグラウンドの位置情報",
-  "onboardingPermBackgroundDesc": "「常に許可」を選択すると、アプリを閉じていても所在地に合わせて警報を配信できます。",
-  "onboardingPermBattery": "バッテリー最適化の除外",
-  "onboardingPermBatteryDesc": "DPIP がバックグラウンドで動作し続けられるようにして、警報の遅延や取りこぼしを防ぎます。",
-  "onboardingGrant": "許可",
-  "onboardingGranted": "許可済み",
-  "onboardingStart": "はじめる",
-  "language": "言語",
-  "languageSettings": "言語設定",
-  "languageSystem": "システムの既定",
-  "locationBannerServiceOff": "位置情報サービスがオフです。所在地に合わせた警報を配信できません。",
-  "locationBannerPermission": "位置情報の許可がオフです。所在地に合わせた警報を配信できません。",
-  "locationBannerFix": "設定を開く",
-  "notifyBannerDisabled": "通知がオフです — 災害警報を受け取れません。",
-  "onboardingSkipTitle": "権限が許可されていません",
+  "typhoonValueLat": "北緯 {lat} 度",
   "onboardingSkipBody": "位置情報と通知を許可しないと、DPIP はお近くの地震や災害をリアルタイムでお知らせできません。設定から後で許可することもできます。",
-  "onboardingSkipStay": "戻って許可",
-  "onboardingSkipLeave": "このままスキップ",
-  "moreYoutube": "YouTube",
-  "moreGithub": "ExpTech GitHub",
-  "moreSourceCode": "ソースコード",
-  "moreSectionApp": "アプリを入手",
-  "moreGooglePlay": "Google Play",
-  "moreAppStore": "App Store",
-  "displaySettings": "表示",
-  "defaultMapLayerSettings": "地図の初期レイヤー",
-  "defaultMapLayerSubtitle": "地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。",
-  "mapNavRadar": "レーダー",
-  "mapNavQpesums": "予報",
-  "mapNavSatellite": "衛星",
-  "mapNavLightning": "稲妻",
-  "mapNavTyphoon": "台風",
-  "mapNavEarthquake": "地震",
-  "mapNavTemperature": "気温",
-  "mapNavHumidity": "湿度",
-  "mapNavPressure": "気圧",
-  "mapNavWind": "風向",
-  "mapNavRain": "雨量",
-  "mapNavDisaster": "防災",
-  "displayTheme": "テーマ",
-  "themeSystem": "システム",
-  "themeLight": "ライト",
-  "themeDark": "ダーク",
-  "moreSectionAbout": "情報",
-  "termsOfService": "利用規約",
-  "faq": "よくある質問",
-  "openSourceLicenses": "オープンソースライセンス",
-  "sponsorTitle": "DPIP を支援",
-  "sponsorIntro": "DPIP はリアルタイムの防災情報の提供に取り組んでおり、広告やその他の収益モデルはありません。皆さまのご支援はサーバーの運用と継続的な開発に役立ちます。",
-  "sponsorSubscriptions": "サブスクリプション",
-  "sponsorRecommended": "おすすめ",
-  "sponsorOneTime": "一回限りの支援",
-  "sponsorPerMonth": "{price} / 月",
-  "sponsorRestore": "購入を復元",
-  "sponsorTerms": "利用規約",
-  "sponsorPrivacy": "プライバシーポリシー",
-  "sponsorRestoring": "購入を復元しています…",
-  "sponsorRestoreUnavailable": "ストアに接続できません。しばらくしてからもう一度お試しください。",
-  "commonClose": "閉じる",
-  "mapLayerTemperature": "気温",
-  "trendRange24h": "24時間",
-  "trendRange7d": "7日間",
-  "trendNoData": "トレンドデータがありません",
-  "trendCumulativeTotal": "累計 {total} mm",
-  "chartHourLabel": "{hour}時",
-  "mapLayerHumidity": "湿度",
-  "mapLayerPressure": "気圧",
-  "mapLayerWind": "風向",
-  "mapLayerWindForecastEcmwf": "ECMWF",
-  "mapLayerWindForecastGfs": "GFS",
-  "mapLayerRain": "降水量",
-  "rainIntervalMenu": "累積期間",
-  "rainIntervalNow": "今日",
-  "rainInterval10m": "10分",
-  "rainInterval1h": "1時間",
-  "rainInterval3h": "3時間",
-  "rainInterval6h": "6時間",
-  "rainInterval12h": "12時間",
+  "@mapAppCoordinatesCopied": {},
+  "@meshtasticLayerOptions": {
+    "description": "Tooltip for the mesh layer's options chip"
+  },
   "rainInterval24h": "24時間",
-  "rainInterval2d": "2日",
-  "rainInterval3d": "3日",
-  "mapLayerTyphoon": "台風",
-  "typhoonNoActive": "発生中の台風なし",
-  "typhoonWind": "風速",
-  "typhoonGust": "最大瞬間風速",
-  "typhoonPressure": "気圧",
-  "typhoonMotion": "進行",
-  "mapLayerMonitor": "強震モニタ",
-  "mapLayerAed": "AED",
-  "mapLayerDisasterMap": "防災マップ",
-  "disasterMapOverlayMenuTooltip": "防災マップのレイヤー",
-  "disasterMapOverlaySectionLayers": "レイヤー",
-  "disasterMapOverlayAedTooltip": "AEDの位置を表示",
-  "aedAddress": "住所",
-  "aedRegion": "地域",
-  "aedCategory": "分類",
-  "aedType": "種類",
-  "aedPlaceDesc": "設置場所",
-  "aedDescription": "備考",
-  "aedHoursWeekday": "平日の開館時間",
+  "homeRainTrendHeavyStopping": "{minutes}分後に大雨が止む見込みです",
+  "mapTimelineObserved": "観測",
+  "regionSelectTitle": "地域を選択",
+  "skyTimeNoon": "正午",
+  "radarCountyOutlineSubtitle": "レーダーエコーの下でも県市境界が見えるようにします。",
+  "@meshtasticRegionLabel": {
+    "description": "LoRa region"
+  },
+  "dpmFilterSectionRestroomType": "トイレの種類",
+  "mapLayerSatelliteB03": "ひまわり 可視赤(B03)",
+  "reportFilterIntensity": "震度",
+  "mapLayerLightning": "雷",
+  "restroomTypeMale": "男性用トイレ",
+  "meshtasticLastReceived": "Last received",
+  "reportDetailSortByCounty": "地域順に並べ替え",
+  "@moonSubtitle": {
+    "description": "Moon entry card subtitle in the data catalogue"
+  },
+  "@moonDays": {
+    "description": "Day unit for the moon age"
+  },
+  "homeRainTrendScattered": "にわか雨の可能性があります",
+  "meshtasticUptime": "Uptime",
+  "weatherRankingTempExtremes": "気温極値",
+  "themeLight": "ライト",
+  "mapTerrainReliefHint": "ベースマップに地形の陰影を表示",
+  "meshtasticEmptyMessage": "(empty message)",
+  "moreSectionRegion": "地域",
+  "dpmDisasterEarthquake": "震災",
+  "mapLayerSatellite": "ひまわり 赤外線(B13)",
+  "@meshtasticTapNode": {
+    "description": "Resting state of the map node sheet"
+  },
   "aedHoursSaturday": "土曜の開館時間",
-  "aedHoursSunday": "日曜の開館時間",
-  "aedOpenRemark": "開館時間メモ",
-  "aedEmergencyPhone": "緊急連絡先",
-  "mapLayerRestroom": "トイレ",
-  "mapLayerShelter": "避難所",
-  "disasterMapOverlayRestroomTooltip": "トイレを表示",
-  "disasterMapOverlayShelterTooltip": "避難所を表示",
-  "dpmOpenInMaps": "地図アプリで開く",
-  "@dpmOpenInMaps": {},
-  "mapAppGoogleMaps": "Google Maps",
-  "@mapAppGoogleMaps": {},
-  "mapAppAppleMaps": "Apple Maps",
-  "@mapAppAppleMaps": {},
+  "dpmDisasterSlope": "斜面災害",
+  "moonPhaseNew": "New moon",
+  "notifySectionEew": "緊急地震速報",
+  "mapResetNorth": "北を上にする",
+  "rainInterval2d": "2日",
+  "mapTownLabelsHint": "拡大すると郷鎮名を表示",
+  "commonCancel": "Cancel",
+  "notifyOptTsunamiWarning": "津波警報のみ",
+  "mapLayerSatelliteBtdFog": "ひまわり 夜間霧",
+  "@meshtasticSelectDevice": {
+    "description": "Device picker sheet title"
+  },
+  "moreSectionAdvanced": "詳細設定",
+  "@meshtasticLastHeard": {
+    "description": "When a node last transmitted"
+  },
+  "weatherRankingExtremeRange": "日較差",
+  "notifySettingsMenu": "通知設定",
+  "typhoonHistoryTitle": "資料時刻",
   "mapAppDefault": "{app}（デフォルト）",
+  "trendRange24h": "24時間",
+  "mapLayerStyleJmaTooltip": "グレースケールをベースに −40 °C 以下を着色し、雲頂高度を強調",
+  "weatherRankingRecordedAt": "記録時刻 {time}",
+  "mapLayerRain": "降水量",
+  "mapLayerQpesums": "1時間降水量予報",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "@dataSectionAstronomy": {
+    "description": "Astronomy section header in the data catalogue"
+  },
+  "mapOverlaySectionMap": "地図",
+  "mapTerrainRelief": "地形の立体感",
+  "eewMaxIntensity": "最大震度",
+  "mapLegendCollapse": "凡例を閉じる",
+  "changelogTitle": "更新履歴",
+  "reportFilterOrderDesc": "降順",
+  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
+  "reportFilterIntensityInfoTitle": "震度の新制と旧制",
+  "mapLayerTyphoon": "台風",
+  "radarOverlayMenuTooltip": "レーダーレイヤー設定",
+  "mapMyLocation": "現在地",
+  "@meshtasticChannelUse": {
+    "description": "Share of airtime seen busy"
+  },
+  "meshtasticNodes": "Nodes",
+  "meshtasticSend": "Send",
+  "typhoonOverlayStormL7Tooltip": "強風域 + 平均円（紫）",
+  "aedType": "種類",
+  "termsOfService": "利用規約",
+  "typhoonLegendCircle25": "暴風域（50kt）",
+  "sponsorTitle": "DPIP を支援",
+  "mapNavSatellite": "衛星",
+  "homeRainTrendUpdated": "更新 {time}",
+  "onboardingNext": "次へ",
+  "weatherRankingMergeTown": "町村",
+  "mapLayerMonitor": "強震モニタ",
+  "moreYoutube": "YouTube",
+  "sponsorSubscriptions": "サブスクリプション",
+  "typhoonValueLon": "東経 {lon} 度",
+  "skyTime": "空の時刻",
+  "weatherModeCloudy": "曇り",
+  "skyTimeDusk": "薄暮",
+  "@meshtasticExcludeMqttSubtitle": {
+    "description": "What an MQTT node is"
+  },
+  "meshtasticFirmware": "Firmware",
+  "@mapLayerMeshtastic": {
+    "description": "Map layer name: mesh nodes"
+  },
+  "reportFilterDateEndNote": "終了日：当日 24:00（台北時間）",
+  "meshtasticSilent": "Silent",
+  "reportFilterSortMagnitude": "規模",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerSatelliteB12": "ひまわり オゾン(B12)",
+  "typhoonLegendPast": "実況経路",
+  "restroomCategoryOther": "その他",
+  "@meshtasticRegionConfirm": {
+    "description": "Confirmation before rebooting the radio"
+  },
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "homeForecastHighLow": "高 {high}° · 低 {low}°",
+  "@meshtasticChannelFailed": {
+    "description": "The radio rejected the channel write"
+  },
+  "locationBannerFix": "設定を開く",
+  "mapLegendExpand": "凡例",
+  "eewNone": "現在、緊急地震速報はありません",
+  "typhoonTyNo": "TY {no}",
+  "notifyOptTsunamiAll": "津波情報・津波警報",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "meshtasticLayerOptions": "Node options",
+  "onboardingAgreeContinue": "同意して続行",
+  "meshtasticNodeId": "Node ID",
+  "commonRetry": "再試行",
+  "reportDetailNumbered": "No.{number} 顕著有感地震",
+  "typhoonOverlayStormBandSubtitle": "平均円付き",
+  "disasterMapOverlayRestroomTooltip": "トイレを表示",
+  "weatherRankingTitle": "観測ランキング",
+  "homeRainTrendHeavySustained": "今後1時間は大雨が続きます",
+  "notifySectionTsunami": "津波",
+  "restroomCategoryPark": "公園",
+  "moreLinkOpenFailed": "リンクを開けませんでした",
+  "themeDark": "ダーク",
+  "sponsorRestore": "購入を復元",
+  "@meshtasticSilent": {
+    "description": "Legend: node known but not heard recently"
+  },
+  "meshtasticChannelWorking": "Setting up the DPIP channel…",
+  "meshtasticRegionSwitch": "Switch to TW",
+  "@meshtasticLastReceived": {
+    "description": "Age of the last received packet"
+  },
+  "meshtasticTraffic": "Traffic",
+  "@meshtasticDpipChannel": {
+    "description": "Which channel DPIP payloads use"
+  },
+  "mapLayerStyleBdTooltip": "Dvorak BD カーブ——熱帯低気圧の強度解析に使う階段グレースケール",
+  "disasterMapOverlayAedTooltip": "AEDの位置を表示",
+  "@moonTitle": {
+    "description": "Moon page title"
+  },
+  "mapLayerHumidity": "湿度",
+  "mapLayerSatelliteTransparentNight": "夜間 = 透明、地図が透ける",
+  "meshtasticScanning": "Scanning…",
+  "@meshtasticDevice": {
+    "description": "Section: device identity"
+  },
+  "regionSelectFull": "地域は最大 {max} 件まで登録できます",
+  "meshtasticTitle": "Meshtastic",
+  "navMore": "その他",
+  "meshtasticDpipChannel": "DPIP channel",
+  "disasterMapOverlaySectionLayers": "レイヤー",
+  "@moonPhaseWaningCrescent": {
+    "description": "Phase: waning crescent"
+  },
+  "mapLayerSatelliteB05": "ひまわり 近赤外(B05)",
+  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
+  "@meshtasticNotConnected": {
+    "description": "Empty message log while not connected"
+  },
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "typhoonLabelNe": "北東",
+  "meshtasticCopied": "Message copied",
+  "reportListEmpty": "地震報告はありません",
+  "reportListEnd": "これ以上ありません",
+  "mapLayerSatelliteTruecolor": "ひまわり トゥルーカラー",
+  "typhoonOverlaySectionExtra": "オーバーレイ",
+  "eewSWave": "S波",
+  "meshtasticBusyTitle": "Another app is using this radio",
+  "restroomCategoryCultural": "文化・娯楽施設",
+  "typhoonLabelWind": "中心付近の最大風速",
+  "radarGlobalOutlineHint": "各国の国境外枠",
+  "notifyEvacuation": "防災情報",
+  "typhoonLegendCircle15": "強風域（30kt）",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "@meshtasticRadioSettings": {
+    "description": "Section: LoRa settings"
+  },
+  "dataSectionAstronomy": "Astronomy",
+  "homeRainTrendLightSustained": "今後1時間は小雨が続きます",
+  "commonError": "問題が発生しました",
+  "moonPhaseWaningCrescent": "Waning crescent",
+  "meshtasticPower": "Power",
+  "@meshtasticChannelWorking": {
+    "description": "Creating/verifying the DPIP channel"
+  },
+  "mapTimelineNow": "現在",
+  "reportFilterRange": "{start} – {end}",
+  "reportDetailOpenReport": "レポートページ",
+  "trendRange7d": "7日間",
+  "typhoonWarningAreas": "対象地域：{areas}",
+  "rainIntervalSection": "集計時間",
+  "notifyTitle": "通知",
+  "meshtasticTxPower": "TX power",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "restroomCategoryLabel": "区分",
+  "sponsorRestoring": "購入を復元しています…",
+  "sponsorIntro": "DPIP はリアルタイムの防災情報の提供に取り組んでおり、広告やその他の収益モデルはありません。皆さまのご支援はサーバーの運用と継続的な開発に役立ちます。",
+  "shelterAddressLabel": "住所",
+  "typhoonLabelStormAvg": "暴風域の平均半径",
+  "@meshtasticHardware": {
+    "description": "Board model"
+  },
+  "restroomCategoryCommercial": "商業・営業施設",
+  "@meshtasticAirtime": {
+    "description": "Share of airtime this radio transmitted"
+  },
+  "aedRegion": "地域",
+  "homeRainTrendLightStopping": "{minutes}分後に小雨が止む見込みです",
+  "reportDetailInfo": "詳細情報",
+  "mapNavWind": "風向",
+  "@meshtasticReceived": {
+    "description": "Packets received this session"
+  },
+  "windForecastOverlayMenuTooltip": "風予報レイヤー設定",
+  "dataWeatherRankingSubtitle": "即時観測ランキング",
+  "rainInterval6h": "6時間",
+  "homeRainTrendMinute": "{minute}分",
+  "restroomTypeUnspecified": "未設定",
+  "typhoonOverlayProbabilityHint": "予報円を隠します",
+  "mapLayerSatelliteGlobalOutline": "国境線",
+  "mapNavTemperature": "気温",
+  "typhoonLegendForecastPoint": "予報点",
+  "@meshtasticBattery": {
+    "description": "Battery charge"
+  },
+  "reportListYesterday": "昨日",
+  "moreSectionLinks": "関連リンク",
+  "feedOffline": "接続が切断されました",
+  "mapLayerStyleBd": "Dvorak BD",
+  "moreSectionDisplay": "表示",
+  "rainInterval3d": "3日",
+  "defaultMapLayerSubtitle": "地図タブを開いたときに表示するレイヤーです。下部ナビのアイコンとラベルもこれに合わせます。",
+  "aedDescription": "備考",
+  "typhoonOverlayWeatherRadarTooltip": "通報時刻に最も近いレーダー",
+  "onboardingPermLocationDesc": "あなたの所在地に合わせて警報を配信します。",
+  "mapLayerSatelliteB16": "ひまわり 二酸化炭素(B16)",
+  "@meshtasticClearMessages": {
+    "description": "Menu action clearing the message log"
+  },
+  "homeActiveEventsEmpty": "発生中の事象はありません",
+  "typhoonLabelPosition": "中心位置",
+  "weatherRankingBy": "並び",
+  "typhoonIntensityMild": "弱い台風",
+  "windForecastGlobalOutlineHint": "各国の国境外枠",
+  "rainInterval1h": "1時間",
+  "eewLocalIntensity": "現在地の推定",
+  "mapLayerRadar": "レーダー合成エコー図",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "restroomCategoryReligious": "宗教・礼拝施設",
+  "meshtasticRole": "Role",
+  "mapLayerSatelliteCloudCloudy": "雲",
+  "skyTimeSunrise": "日の出",
+  "@mapLayerMeshtasticSubtitle": {
+    "description": "Map layer switcher subtitle"
+  },
+  "meshtasticNoMessages": "No messages yet",
+  "onboardingPermNotifyDesc": "地震、天気、災害の発生時に、警報をすぐお届けします。",
+  "radarTownOutline": "市町村境界",
+  "mapLayerStyleSection": "色調",
+  "@moonPhaseNew": {
+    "description": "Phase: new moon"
+  },
+  "disasterMapOverlayMenuTooltip": "防災マップのレイヤー",
+  "moreGooglePlay": "Google Play",
+  "meshtasticOnline": "Heard recently",
+  "@meshtasticSendHint": {
+    "description": "Message input hint"
+  },
+  "typhoonLabelSw": "南西",
+  "typhoonForecastLead": "予報 +{hours} 時間",
+  "dpmDisasterTsunami": "津波",
+  "@mapAppOpenFailed": {},
+  "changelogTypeStable": "正式",
+  "mapLayerSatelliteTransparentClear": "晴れ = 透明、地図が透ける",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "@meshtasticBusyTitle": {
+    "description": "Another app holds the BLE link"
+  },
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "mapOverlaySectionReference": "参照レイヤー",
+  "mapLayerSatelliteB02": "ひまわり 可視緑(B02)",
+  "reportListLocalFelt": "局地有感",
+  "weatherRankingEmpty": "並べ替え可能な観測がありません",
+  "notifySectionOther": "その他",
+  "weatherRankingMeta": "データ時刻：{time}\n観測点 {count}",
+  "onboardingTermsAgree": "サービス利用規約を読み、同意します",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(植生なし)",
+  "notifyOptLocalIntensity4": "所在地の震度4以上",
+  "eewArrived": "到達",
+  "meshtasticNoDevices": "No Meshtastic devices found",
+  "mapLayerCategoryLife": "生活",
+  "reportFilterSortIntensity": "震度",
+  "typhoonMotion": "進行",
+  "meshtasticStateDisconnected": "Disconnected",
+  "typhoonIntensityIntense": "強い台風",
+  "@meshtasticSend": {
+    "description": "Send message button"
+  },
+  "mapLayerOrderTitle": "レイヤーの順番",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "@meshtasticShortName": {
+    "description": "The radio's short name"
+  },
+  "dpmYes": "はい",
+  "meshtasticNoHistory": "Not enough history yet",
+  "reportDetailLocalIntensityUnavailable": "震度情報なし",
+  "mapLayerWindForecastGfs": "GFS",
+  "reportListDepthUnit": "km",
+  "reportFilterDepth": "深さ",
+  "@meshtasticNoHistory": {
+    "description": "Chart placeholder before two samples exist"
+  },
+  "onboardingScrollHint": "下にスクロールして続行してください",
+  "@meshtasticRadio": {
+    "description": "Radio diagnostics sheet title"
+  },
+  "mapNavQpesums": "予報",
+  "@meshtasticStateError": {
+    "description": "Connection state label"
+  },
+  "@meshtasticVoltage": {
+    "description": "Battery voltage"
+  },
+  "navMap": "地図",
+  "notifyAdvisory": "気象警報・注意報",
+  "@meshtasticNoMessages": {
+    "description": "Empty message log while connected"
+  },
+  "reportFilterReset": "リセット",
+  "mapLayerSatelliteMndwi": "ひまわり MNDWI",
+  "typhoonOverlaySectionStorm": "暴風域",
+  "moonPhaseFull": "Full moon",
+  "@meshtasticEmptyMessage": {
+    "description": "Placeholder for a text packet with no body"
+  },
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "moonPhaseWaningGibbous": "Waning gibbous",
+  "weatherDynamicStateSubtitle": "ホーム背景の天気を上書きします",
+  "reportFilterIntensityInfoModernTitle": "新制（2020 年以降）",
+  "@mapAppGoogleMaps": {},
+  "typhoonDataTime": "資料時刻\n{time}",
+  "restroomTypeAccessible": "バリアフリートイレ",
+  "moreSectionAbout": "情報",
+  "meshtasticSelectDevice": "Select a radio",
+  "onboardingIntroBody": "DPIP はあなたと共にある防災パートナーです。緊急地震速報、地震報告、天気、各種災害情報を統合し、重要な瞬間にすぐお知らせします。\n\n• 地震:緊急地震速報、震度速報、地震報告\n• 天気:雷雨即時情報、気象警報・注意報\n• 津波・防災情報\n\n次に、サービス利用規約をご確認いただき、DPIP がリアルタイムであなたを守れるよう、いくつかの権限の許可をお願いします。",
+  "shelterCapacityLabel": "収容人数",
+  "reportDetailImage": "地震レポート画像",
+  "meshtasticStateConfiguring": "Configuring…",
+  "@moonPhaseLastQuarter": {
+    "description": "Phase: last quarter"
+  },
+  "typhoonLabelGaleAvg": "強風域の平均半径",
+  "onboardingPermNotify": "通知",
+  "meshtasticClearMessages": "Clear messages",
+  "meshtasticNotifyMessages": "Notify on new messages",
+  "defaultMapLayerSettings": "地図の初期レイヤー",
+  "moreSectionNotify": "通知",
+  "@moonPhaseFull": {
+    "description": "Phase: full moon"
+  },
+  "notifyUnavailable": "プッシュ通知はまだ準備できていません。しばらくしてから再度お試しください。",
+  "mapLayerOrderReset": "既定の順序に戻す",
+  "dpmAddress": "住所",
+  "weatherRankingMergeCounty": "県市",
+  "moreSectionApp": "アプリを入手",
+  "reportFilterIntensityInfoLegacyBody": "震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。",
+  "mapLayerSatelliteSst": "ひまわり 海面水温",
+  "qpesumsOverlayMenuTooltip": "定量降水予報レイヤー設定",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "mapTimelineFuture": "未来",
+  "typhoonLegendCircleAvg": "平均円",
+  "reportFilterDepthKm": "{depth} km",
+  "typhoonLabelSe": "南東",
+  "radarTownOutlineHint": "より細かい区分",
+  "eewCountdown": "あと {seconds} 秒",
+  "@meshtasticDisconnect": {
+    "description": "Disconnect from the radio"
+  },
+  "typhoonLabelGust": "最大瞬間風速",
+  "mapAppGoogleMaps": "Google Maps",
+  "sponsorTerms": "利用規約",
+  "restroomTypeGenderNeutral": "ジェンダーニュートラルトイレ",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "notifyThunderstorm": "雷雨情報",
+  "skyTimeGolden": "ゴールデンアワー",
+  "moonAge": "Age",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  },
+  "meshtasticRadioSettings": "LoRa",
+  "weatherRankingAnalysisCurrent": "現在 {value}°C",
+  "@meshtasticNotifyMessages": {
+    "description": "Toggle: local notification for an incoming mesh message"
+  },
+  "moreGithub": "ExpTech GitHub",
+  "homeForecastUnavailable": "地域を選ぶと予報を表示します",
+  "mapLayers": "レイヤー",
+  "meshtasticHardware": "Hardware",
+  "languageSettings": "言語設定",
+  "dpmDisasterNuclear": "原子力事故",
+  "@moonNextFullMoon": {
+    "description": "Next full moon date label"
+  },
+  "language": "言語",
+  "homeForecastFeelsLike": "体感 {temp}°",
+  "typhoonOverlayWeatherHint": "通報時刻に合わせる",
+  "@meshtasticHopLimit": {
+    "description": "How many hops a packet may take"
+  },
+  "skyTimeDawn": "夜明け前",
+  "skyTimeAfternoon": "午後",
+  "meshtasticLastHeard": "Last heard",
+  "typhoonWarningTitle": "台風警報",
+  "moreSourceCode": "ソースコード",
+  "mapLayerCategoryWeather": "気象観測",
+  "mapLayerSatelliteB09": "ひまわり 中層水蒸気(B09)",
+  "windForecastTownOutlineHint": "より細かいメッシュ",
+  "mapLayerSatelliteCloudmask": "ひまわり 雲マスク",
+  "mapAppCopyCoordinates": "座標をコピー",
+  "reportFilterIntensityInfoIntro": "気象署は 2020 年 1 月 1 日（台北時間）から新制震度を採用しています。",
+  "mapNavEarthquake": "地震",
+  "typhoonGust": "最大瞬間風速",
+  "restroomGradeAverage": "普通",
+  "@meshtasticNodes": {
+    "description": "Mesh nodes section header"
+  },
+  "mapLayerSatelliteBtdCo2": "ひまわり 巻雲/雲頂高度",
+  "onboardingPermBackgroundDesc": "「常に許可」を選択すると、アプリを閉じていても所在地に合わせて警報を配信できます。",
+  "mapTimelineForecast": "予報",
+  "restroomTypeLabel": "種別",
+  "navEarthquake": "地震",
+  "typhoonOverlayStormL10Tooltip": "暴風域 + 平均円（黄）",
+  "moonPhaseWaxingGibbous": "Waxing gibbous",
+  "reportDetailTitle": "地震レポート",
+  "moreTremReport": "TREM 検知レポート",
+  "weatherDataTime": "{station} · データ時刻 {time}",
+  "meshtasticNoNodes": "No nodes heard yet",
+  "meshtasticViaMqtt": "Via MQTT (internet)",
+  "radarCountyOutline": "県市境界",
+  "onboardingGranted": "許可済み",
+  "@mapAppCopyCoordinates": {},
+  "commonClose": "閉じる",
+  "restroomGradeLabel": "等級",
+  "rainIntervalNow": "今日",
+  "changelogCurrentVersion": "現行",
+  "typhoonOverlayForecastCalloutsTooltip": "拡大時に予報点の詳細カードを表示",
+  "typhoonLabelPressure": "中心気圧",
+  "aedOpenRemark": "開館時間メモ",
+  "onboardingPermsBody": "災害が発生した瞬間に DPIP がお知らせできるよう、以下の権限を許可してください。これらはシステム設定でいつでも変更できます。",
+  "typhoonOverlaySectionWeather": "天気下敷き",
+  "@meshtasticStateConnected": {
+    "description": "Connection state label"
+  },
+  "notifyOptWeatherLocal": "現在地のみ",
+  "mapNavRain": "雨量",
+  "moonDays": "days",
+  "mapLegendUnit": "単位：{unit}",
+  "weatherModeClear": "晴れ",
+  "meshtasticRadio": "Radio",
+  "commonEmpty": "表示する項目がありません",
+  "mapLayerSatelliteB01": "ひまわり 可視青(B01)",
+  "meshtasticExternalPower": "External power",
+  "moonPhaseLastQuarter": "Last quarter",
+  "@meshtasticName": {
+    "description": "The radio's long name"
+  },
+  "reportFilterOrderAsc": "昇順",
+  "reportFilterApply": "適用",
+  "reportDetailImageUnavailable": "レポート画像はまだありません",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "weatherRankingHighest": "最高",
+  "reportDetailReplay": "リプレイ",
+  "mapLayerRestroom": "トイレ",
+  "restroomCategoryWelfare": "社会福祉施設・集会所",
+  "restroomGradeExcellent": "最上級",
+  "meshtasticLastSent": "Last sent",
+  "meshtasticName": "Name",
+  "meshtasticScan": "Scan",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "mapLayerCategoryForecast": "数値予報",
+  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
+  "themeSystem": "システム",
+  "mapLayerSatelliteNdvi": "ひまわり NDVI",
+  "typhoonLegendForecast": "予報経路",
+  "typhoonValueHpa": "{n} hPa",
+  "weatherPrecipitation": "降水量",
+  "moonNextFullMoon": "Next full moon",
+  "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
+  "onboardingSkipLeave": "このままスキップ",
+  "onboardingBack": "戻る",
+  "aedPlaceDesc": "設置場所",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "onboardingSkipTitle": "権限が許可されていません",
+  "restroomTypeFamily": "親子トイレ",
+  "typhoonValueKm": "{n} km",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "typhoonPressure": "気圧",
+  "@meshtasticCopied": {
+    "description": "Toast shown after copying a message"
+  },
+  "onboardingPermBattery": "バッテリー最適化の除外",
+  "typhoonLabelNw": "北西",
+  "dpmDisasterFlood": "洪水",
+  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "restroomCategoryLeisure": "レジャー・娯楽施設",
+  "mapLayerTemperature": "気温",
+  "aedCategory": "分類",
+  "@moonTimelineCaption": {
+    "description": "Moon phase timeline caption"
+  },
+  "meshtasticChannels": "Channels",
+  "monitorWaiting": "データ待機中…",
+  "typhoonOverlayForecastCallouts": "予報点の情報",
+  "@meshtasticTitle": {
+    "description": "Meshtastic test page title"
+  },
+  "reportDetailEpicenter": "震央座標",
+  "meshtasticVoltage": "Voltage",
+  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
+  "@meshtasticSent": {
+    "description": "Packets sent this session"
+  },
+  "mapLayerWind": "風向",
+  "reportDetailMagnitude": "地震規模",
+  "@meshtasticRole": {
+    "description": "Device role (client, router...)"
+  },
+  "reportDetailAreaIntensity": "地域別震度",
+  "rainInterval12h": "12時間",
+  "reportListMagnitude": "M{magnitude}",
+  "dpmDisasterLandslide": "土石流",
+  "notifyMonitor": "強震モニタ",
+  "onboardingStart": "はじめる",
+  "@meshtasticExternalPower": {
+    "description": "Battery value when mains powered"
+  },
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "sponsorPerMonth": "{price} / 月",
+  "mapLayerPressure": "気圧",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "mapLayerSatelliteB04": "ひまわり 近赤外(B04)",
+  "mapLayerSatelliteTransparentZero": "差ゼロ = 透明(信号なし)",
+  "shelterIndoorLabel": "屋内収容",
+  "notifyOptOff": "オフ",
+  "reportFilterSortTime": "時間",
+  "mapLayerSatelliteCloudProbablyClear": "おそらく晴れ",
+  "weatherModeThunderstorm": "雷雨",
+  "homeViewOnMap": "地図で見る",
+  "reportFilterIntensityInfoLegacyTitle": "旧制（2020 年より前）",
+  "typhoonLabelSpeed": "これまでの移動速度",
+  "@meshtasticReconnecting": {
+    "description": "The link dropped and is being re-established"
+  },
+  "mapAppOpenFailed": "{app} を開けませんでした",
+  "mapLayerSatelliteRgbComposite": "RGB 合成(JMA レシピ)",
+  "@meshtasticStateDisconnected": {
+    "description": "Connection state label"
+  },
+  "meshtasticReceived": "Received",
+  "weatherRankingExtremeLow": "今日の最低",
+  "@meshtasticRegionSwitch": {
+    "description": "Button applying the DPIP LoRa region"
+  },
+  "mapLayerSatelliteB10": "ひまわり 下層水蒸気(B10)",
+  "mapLayerSatelliteCloudProbablyCloudy": "おそらく雲",
+  "shelterCategoryLabel": "対象災害",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 透明(水域なし)",
+  "meshtasticStateConnecting": "Connecting…",
+  "moonTitle": "Moon",
+  "weatherRankingGust": "突風",
+  "moreAppStore": "App Store",
+  "@meshtasticUndecoded": {
+    "description": "Packets the radio could not decrypt"
+  },
+  "dpmFilterSectionShelter": "避難所の災害種別",
+  "@commonCancel": {
+    "description": "Dismisses a dialog without acting"
+  },
+  "moreServerStatus": "サーバー状態",
+  "notifySectionWeather": "天気",
+  "meshtasticPreset": "Modem preset",
+  "dataSectionSeismic": "地震",
+  "changelogBodyEmpty": "このリリースの説明はありません。",
+  "radarGlobalOutline": "国境線",
+  "notifyEew": "緊急地震速報",
+  "regionNationwide": "全国",
+  "moreNotifyLog": "DPIP 通知送信履歴",
+  "regionCurrent": "現在地",
+  "dpmFilterSectionRestroom": "施設の種類",
+  "meshtasticNotConnected": "Not connected to a radio",
+  "weatherModeSnow": "雪",
+  "mapLayerMeshtastic": "Meshtastic nodes",
+  "moreDeveloper": "デバッグ情報",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "mapLayerSatelliteB14": "ひまわり 長波長赤外線(B14)",
+  "meshtasticChannelUse": "Channel use",
+  "mapNavLightning": "稲妻",
+  "homeForecastEmpty": "予報データがありません",
+  "sponsorOneTime": "一回限りの支援",
+  "mapLayerSatelliteBtdSplit": "ひまわり スプリットウィンドウ",
+  "onboardingPermBackground": "バックグラウンドの位置情報",
+  "aedEmergencyPhone": "緊急連絡先",
+  "dpmOpenInMaps": "地図アプリで開く",
+  "meshtasticNotifyNodes": "Notify on new nodes",
+  "onboardingPermCriticalDesc": "生命に関わる緊急地震速報を、消音モードやおやすみモードでも鳴らせるようにします。",
   "@mapAppDefault": {
     "placeholders": {
       "app": {
@@ -397,375 +678,72 @@
       }
     }
   },
-  "mapAppCopyCoordinates": "座標をコピー",
-  "@mapAppCopyCoordinates": {},
-  "mapAppCoordinatesCopied": "座標をコピーしました",
-  "@mapAppCoordinatesCopied": {},
-  "mapAppOpenFailed": "{app} を開けませんでした",
-  "@mapAppOpenFailed": {},
-  "mapAppCallFailed": "この端末では通話できません",
-  "mapOverlaySectionReference": "参照レイヤー",
-  "mapLayerCategoryEarthquake": "地震",
-  "mapLayerCategoryTyphoon": "台風",
-  "mapLayerCategoryWeather": "気象観測",
-  "mapLayerCategorySatellite": "衛星",
-  "mapLayerCategoryRadar": "レーダー",
-  "mapLayerCategoryLife": "生活",
-  "mapLayerCategoryForecast": "数値予報",
-  "mapOverlaySectionMap": "地図",
-  "rainIntervalSection": "集計時間",
-  "mapTownLabels": "郷鎮名",
-  "mapTownLabelsHint": "拡大すると郷鎮名を表示",
-  "mapTerrainRelief": "地形の立体感",
-  "mapTerrainReliefHint": "ベースマップに地形の陰影を表示",
-  "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
-  "dpmAddress": "住所",
-  "restroomTypeLabel": "種別",
-  "restroomCategoryLabel": "区分",
-  "restroomGradeLabel": "等級",
-  "restroomTypeFemale": "女性用トイレ",
-  "restroomTypeMale": "男性用トイレ",
-  "restroomTypeMixed": "男女共用トイレ",
-  "restroomTypeAccessible": "バリアフリートイレ",
-  "restroomTypeGenderNeutral": "ジェンダーニュートラルトイレ",
-  "restroomTypeFamily": "親子トイレ",
-  "restroomTypeUnspecified": "未設定",
-  "restroomCategoryTransport": "交通",
-  "restroomCategoryPark": "公園",
-  "restroomCategoryCommercial": "商業・営業施設",
-  "restroomCategoryReligious": "宗教・礼拝施設",
-  "restroomCategoryCultural": "文化・娯楽施設",
-  "restroomCategoryGovernment": "行政サービス施設",
-  "restroomCategoryWelfare": "社会福祉施設・集会所",
-  "restroomCategoryTourist": "観光地・景勝地",
-  "restroomCategoryLeisure": "レジャー・娯楽施設",
-  "restroomCategoryOther": "その他",
-  "restroomGradeExcellent": "最上級",
-  "restroomGradeGood": "優良",
-  "restroomGradeAverage": "普通",
-  "restroomGradePoor": "不合格",
-  "shelterAddressLabel": "住所",
-  "shelterCapacityLabel": "収容人数",
-  "shelterCapacityValue": "{n} 人",
-  "shelterCategoryLabel": "対象災害",
-  "shelterIndoorLabel": "屋内収容",
-  "shelterOutdoorLabel": "屋外収容",
-  "shelterVulnerableOkLabel": "要配慮者向け収容",
-  "dpmYes": "はい",
-  "dpmNo": "いいえ",
-  "stationSheetEmpty": "観測点をタップして値を表示",
-  "monitorDelay": "遅延 {value} s",
-  "monitorWaiting": "データ待機中…",
-  "mapLegendUnit": "単位：{unit}",
-  "typhoonLegendPast": "実況経路",
-  "typhoonLegendForecast": "予報経路",
-  "typhoonLegendForecastPoint": "予報点",
-  "typhoonLegendCurrent": "現在中心",
-  "typhoonLegendCone": "予報円",
-  "mapLegendExpand": "凡例",
-  "mapLegendCollapse": "凡例を閉じる",
-  "mapMyLocation": "現在地",
-  "mapResetNorth": "北を上にする",
-  "typhoonLegendCircle15": "強風域（30kt）",
-  "typhoonLegendCircle25": "暴風域（50kt）",
-  "typhoonLegendProbability": "接近確率",
+  "mapLayerSatelliteTransparentWarm": "晴れ(暖域) = 透明、地図が透ける",
+  "meshtasticSent": "Sent",
+  "homeForecastTitle": "24時間予報",
   "typhoonLegendWarningAreas": "警報区域",
-  "typhoonWarningTitle": "台風警報",
-  "typhoonWarningAreas": "対象地域：{areas}",
-  "typhoonTrackDetail": "経路詳細",
-  "typhoonHistoryTitle": "資料時刻",
-  "typhoonHistoryLive": "最新",
-  "typhoonSatelliteTitle": "衛星",
-  "typhoonDataTime": "資料時刻\n{time}",
-  "typhoonForecastLead": "予報 +{hours} 時間",
-  "typhoonIntensityIntense": "強い台風",
-  "typhoonIntensityMild": "弱い台風",
-  "typhoonIntensityModerate": "並の台風",
-  "typhoonIntensityTd": "熱帯低気圧",
-  "typhoonPickerNamed": "{name} TY {no}",
-  "typhoonPickerTd": "熱帯低気圧 TD {no}",
-  "typhoonTyNo": "TY {no}",
-  "typhoonTdNo": "TD {no}",
-  "typhoonLabelDirection": "これまでの進行方向",
-  "typhoonLabelGaleAvg": "強風域の平均半径",
-  "typhoonLabelGust": "最大瞬間風速",
-  "typhoonLabelNe": "北東",
-  "typhoonLabelNw": "北西",
-  "typhoonLabelPosition": "中心位置",
-  "typhoonLabelPressure": "中心気圧",
-  "typhoonLabelProbCircle": "70%確率円",
-  "typhoonLabelSe": "南東",
-  "typhoonLabelSpeed": "これまでの移動速度",
-  "typhoonLabelStormAvg": "暴風域の平均半径",
-  "typhoonLabelSw": "南西",
-  "typhoonLabelWind": "中心付近の最大風速",
-  "typhoonLegendCircleAvg": "平均円",
-  "typhoonOverlayMenuTooltip": "台風オーバーレイ設定",
-  "typhoonOverlayProbabilityHint": "予報円を隠します",
-  "typhoonOverlayProbabilityTooltip": "接近確率を表示（予報円を隠す）",
-  "typhoonOverlaySectionExtra": "オーバーレイ",
-  "typhoonOverlaySectionStorm": "暴風域",
-  "typhoonOverlaySectionWeather": "天気下敷き",
-  "typhoonOverlayStormBandSubtitle": "平均円付き",
-  "typhoonOverlayStormL10Tooltip": "暴風域 + 平均円（黄）",
-  "typhoonOverlayStormL7Tooltip": "強風域 + 平均円（紫）",
-  "typhoonOverlayWarningTooltip": "台風警報対象の県を強調",
-  "typhoonOverlayWeatherHint": "通報時刻に合わせる",
-  "typhoonOverlayWeatherNone": "なし",
-  "typhoonOverlayWeatherNoneTooltip": "レーダー／赤外線なし",
-  "typhoonOverlayWeatherRadarTooltip": "通報時刻に最も近いレーダー",
-  "typhoonOverlayWeatherSatelliteTooltip": "通報時刻に最も近い赤外線",
-  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
-  "typhoonTimeChip": "{day}日{hour}時",
-  "typhoonValueHpa": "{n} hPa",
-  "typhoonValueKm": "{n} km",
-  "typhoonValueLat": "北緯 {lat} 度",
-  "typhoonValueLon": "東経 {lon} 度",
-  "typhoonValueMs": "毎秒 {n} m",
-  "typhoonOverlayForecastCallouts": "予報点の情報",
-  "typhoonOverlayForecastCalloutsTooltip": "拡大時に予報点の詳細カードを表示",
-  "dpmFilterSectionRestroom": "施設の種類",
-  "dpmFilterSectionRestroomType": "トイレの種類",
-  "dpmFilterSectionShelter": "避難所の災害種別",
-  "dpmDisasterFlood": "洪水",
-  "dpmDisasterEarthquake": "震災",
-  "dpmDisasterLandslide": "土石流",
-  "dpmDisasterTsunami": "津波",
-  "dpmDisasterSlope": "斜面災害",
-  "dpmDisasterNuclear": "原子力事故",
-  "skyTime": "空の時刻",
-  "@skyTime": {
-    "description": "Label for the experimental sky time-of-day override."
-  },
-  "skyTimeAuto": "自動",
-  "@skyTimeAuto": {
-    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
-  },
-  "skyTimeDawn": "夜明け前",
-  "@skyTimeDawn": {
-    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
-  },
-  "skyTimeSunrise": "日の出",
-  "@skyTimeSunrise": {
-    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
-  },
-  "skyTimeMorning": "午前",
-  "@skyTimeMorning": {
-    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
-  },
-  "skyTimeNoon": "正午",
-  "@skyTimeNoon": {
-    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
-  },
-  "skyTimeAfternoon": "午後",
-  "@skyTimeAfternoon": {
-    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
-  },
-  "skyTimeGolden": "ゴールデンアワー",
+  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "notifyOptLocalIntensity1": "所在地の震度1以上",
   "@skyTimeGolden": {
     "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
   },
-  "skyTimeSunset": "日の入り",
-  "@skyTimeSunset": {
-    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
-  },
-  "skyTimeDusk": "薄暮",
-  "@skyTimeDusk": {
-    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
-  },
-  "skyTimeNight": "夜",
-  "@skyTimeNight": {
-    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
-  },
-  "weatherModeCloudy": "曇り",
-  "@weatherModeCloudy": {
-    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
-  },
-  "weatherModeOvercast": "本曇り",
-  "@weatherModeOvercast": {
-    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
-  },
-  "weatherModeSnow": "雪",
-  "@weatherModeSnow": {
-    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
-  },
-  "weatherModeSand": "砂じん",
-  "@weatherModeSand": {
-    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
-  },
-  "radarScanRange": "走査範囲を表示",
-  "@radarScanRange": {
-    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
-  },
-  "radarScanRangeSubtitle": "4基のレーダーが実際に観測する範囲を示します。",
-  "@radarScanRangeSubtitle": {
-    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
-  },
-  "radarScanRangeHint": "枠外の空白は未観測",
-  "@radarScanRangeHint": {
-    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
-  },
-  "radarOverlayMenuTooltip": "レーダーレイヤー設定",
-  "@radarOverlayMenuTooltip": {
-    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
-  },
-  "radarCountyOutline": "県市境界",
-  "@radarCountyOutline": {
-    "description": "County-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarGlobalOutline": "国境線",
-  "@radarGlobalOutline": {
-    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
-  },
-  "radarGlobalOutlineHint": "各国の国境外枠",
-  "@radarGlobalOutlineHint": {
-    "description": "Hint under the national-border toggle in the radar overlay menu."
-  },
-  "radarCountyOutlineHint": "エコーの上に描画",
-  "@radarCountyOutlineHint": {
-    "description": "Hint under the county-border toggle in the radar overlay menu."
-  },
-  "radarCountyOutlineSubtitle": "レーダーエコーの下でも県市境界が見えるようにします。",
-  "@radarCountyOutlineSubtitle": {
-    "description": "County-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarTownOutline": "市町村境界",
-  "@radarTownOutline": {
-    "description": "Township-border overlay toggle in the map's radar overlay menu."
-  },
-  "radarTownOutlineHint": "より細かい区分",
-  "@radarTownOutlineHint": {
-    "description": "Hint under the township-border toggle in the radar overlay menu."
-  },
-  "radarTownOutlineSubtitle": "レーダーエコーの下でも市町村境界が見えるようにします。",
-  "@radarTownOutlineSubtitle": {
-    "description": "Township-border overlay toggle in the map's radar overlay menu."
-  },
-  "qpesumsOverlayMenuTooltip": "定量降水予報レイヤー設定",
-  "@qpesumsOverlayMenuTooltip": {
-    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
-  },
-  "windForecastOverlayMenuTooltip": "風予報レイヤー設定",
-  "@windForecastOverlayMenuTooltip": {
-    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
-  },
-  "windForecastCountyOutlineHint": "風場の上に描画",
-  "@windForecastCountyOutlineHint": {
-    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
-  },
-  "windForecastGlobalOutlineHint": "各国の国境外枠",
-  "@windForecastGlobalOutlineHint": {
-    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
-  },
-  "windForecastTownOutlineHint": "より細かいメッシュ",
-  "@windForecastTownOutlineHint": {
-    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
-  },
-  "meshtasticTitle": "Meshtastic",
-  "@meshtasticTitle": {
-    "description": "Meshtastic test page title"
-  },
-  "meshtasticScan": "Scan",
-  "@meshtasticScan": {
-    "description": "Start scanning for Meshtastic radios"
-  },
-  "meshtasticScanning": "Scanning…",
-  "@meshtasticScanning": {
-    "description": "Scan in progress"
-  },
-  "meshtasticDisconnect": "Disconnect",
-  "@meshtasticDisconnect": {
-    "description": "Disconnect from the radio"
-  },
-  "meshtasticNoDevices": "No Meshtastic devices found",
-  "@meshtasticNoDevices": {
-    "description": "Empty scan result"
-  },
-  "meshtasticNodes": "Nodes",
-  "@meshtasticNodes": {
-    "description": "Mesh nodes section header"
-  },
-  "meshtasticSend": "Send",
-  "@meshtasticSend": {
-    "description": "Send message button"
-  },
-  "meshtasticSendHint": "Message to broadcast",
-  "@meshtasticSendHint": {
-    "description": "Message input hint"
-  },
-  "meshtasticStateDisconnected": "Disconnected",
-  "@meshtasticStateDisconnected": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConnecting": "Connecting…",
-  "@meshtasticStateConnecting": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConfiguring": "Configuring…",
-  "@meshtasticStateConfiguring": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateConnected": "Connected",
-  "@meshtasticStateConnected": {
-    "description": "Connection state label"
-  },
-  "meshtasticStateError": "Error",
-  "@meshtasticStateError": {
-    "description": "Connection state label"
-  },
-  "meshtasticNoMessages": "No messages yet",
-  "@meshtasticNoMessages": {
-    "description": "Empty message log while connected"
-  },
-  "meshtasticNoNodes": "No nodes heard yet",
-  "@meshtasticNoNodes": {
-    "description": "Empty node list"
-  },
-  "meshtasticNotConnected": "Not connected to a radio",
-  "@meshtasticNotConnected": {
-    "description": "Empty message log while not connected"
-  },
-  "meshtasticSelectDevice": "Select a radio",
-  "@meshtasticSelectDevice": {
-    "description": "Device picker sheet title"
-  },
-  "meshtasticClearMessages": "Clear messages",
-  "@meshtasticClearMessages": {
-    "description": "Menu action clearing the message log"
-  },
-  "meshtasticEmptyMessage": "(empty message)",
-  "@meshtasticEmptyMessage": {
-    "description": "Placeholder for a text packet with no body"
-  },
-  "meshtasticCopied": "Message copied",
-  "@meshtasticCopied": {
-    "description": "Toast shown after copying a message"
-  },
-  "commonCancel": "Cancel",
-  "@commonCancel": {
-    "description": "Dismisses a dialog without acting"
-  },
-  "meshtasticReconnecting": "Reconnecting…",
-  "@meshtasticReconnecting": {
-    "description": "The link dropped and is being re-established"
-  },
-  "meshtasticChannelWorking": "Setting up the DPIP channel…",
-  "@meshtasticChannelWorking": {
-    "description": "Creating/verifying the DPIP channel"
-  },
-  "meshtasticChannelReady": "DPIP channel ready",
   "@meshtasticChannelReady": {
     "description": "The DPIP channel exists on the radio"
   },
-  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
-  "@meshtasticChannelNoSlot": {
-    "description": "Every secondary channel slot is taken"
+  "mapTimelinePast": "過去",
+  "restroomTypeFemale": "女性用トイレ",
+  "reportListToday": "今日",
+  "meshtasticTapNode": "Tap a node for details",
+  "commonLoading": "読み込み中…",
+  "@meshtasticStateConnecting": {
+    "description": "Connection state label"
   },
-  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
-  "@meshtasticChannelFailed": {
-    "description": "The radio rejected the channel write"
+  "typhoonIntensityModerate": "並の台風",
+  "typhoonWind": "風速",
+  "mapLayerSatelliteAsh": "ひまわり 火山灰",
+  "rainInterval3h": "3時間",
+  "reportListSearch": "検索",
+  "meshtasticChannelReady": "DPIP channel ready",
+  "@meshtasticNotifyNodes": {
+    "description": "Toggle: local notification when a new node is heard"
   },
-  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "mapLayerCategorySatellite": "衛星",
+  "reportFilterLocation": "場所",
+  "mapLayerSatelliteNightmicrophysics": "ひまわり 夜間微物理",
+  "typhoonIntensityTd": "熱帯低気圧",
+  "reportFilterDate": "日付",
+  "sponsorRestoreUnavailable": "ストアに接続できません。しばらくしてからもう一度お試しください。",
+  "homeForecastPop": "{pop}%",
+  "regionEmpty": "登録地域がありません",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "@moonAge": {
+    "description": "Moon age label"
+  },
+  "onboardingPermBatteryDesc": "DPIP がバックグラウンドで動作し続けられるようにして、警報の遅延や取りこぼしを防ぎます。",
+  "mapNavDisaster": "防災",
+  "radarScanRangeSubtitle": "4基のレーダーが実際に観測する範囲を示します。",
+  "aedHoursSunday": "日曜の開館時間",
+  "reportDetailOriginTime": "発震時刻",
+  "trendNoData": "トレンドデータがありません",
+  "onboardingPermLocation": "位置情報",
+  "moreDiscord": "Discord コミュニティ",
+  "mapNavPressure": "気圧",
+  "mapLayerSatelliteB13": "ひまわり 赤外線(B13)",
+  "typhoonTdNo": "TD {no}",
+  "changelogEmpty": "リリースノートはまだありません",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "@meshtasticViaMqtt": {
+    "description": "Legend: node reported over an MQTT bridge"
+  },
+  "reportFilterDateStartNote": "開始日：当日 00:00（台北時間）",
+  "eewTitle": "緊急地震速報",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "@@locale": "ja",
+  "regionSelectCount": "{count}/{max} 件選択中",
   "@meshtasticRegionMismatch": {
     "description": "Radio is on another LoRa region than DPIP needs",
     "placeholders": {
@@ -774,247 +752,267 @@
       }
     }
   },
-  "meshtasticRegionSwitch": "Switch to TW",
-  "@meshtasticRegionSwitch": {
-    "description": "Button applying the DPIP LoRa region"
+  "mapLayerSatelliteBtdSo2": "ひまわり 二酸化硫黄/雲相",
+  "meshtasticStateError": "Error",
+  "weatherModeOvercast": "本曇り",
+  "@meshtasticScan": {
+    "description": "Start scanning for Meshtastic radios"
   },
-  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
-  "@meshtasticRegionConfirm": {
-    "description": "Confirmation before rebooting the radio"
-  },
-  "meshtasticBusyTitle": "Another app is using this radio",
-  "@meshtasticBusyTitle": {
-    "description": "Another app holds the BLE link"
-  },
-  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
-  "@meshtasticBusyBody": {
-    "description": "Why two clients on one radio is a problem"
-  },
-  "meshtasticConnectAnyway": "Connect anyway",
-  "@meshtasticConnectAnyway": {
-    "description": "Connect despite the other app"
-  },
-  "meshtasticRadio": "Radio",
-  "@meshtasticRadio": {
-    "description": "Radio diagnostics sheet title"
-  },
-  "meshtasticDevice": "Device",
-  "@meshtasticDevice": {
-    "description": "Section: device identity"
-  },
-  "meshtasticPower": "Power",
-  "@meshtasticPower": {
-    "description": "Section: battery and uptime"
-  },
-  "meshtasticRadioSettings": "LoRa",
-  "@meshtasticRadioSettings": {
-    "description": "Section: LoRa settings"
-  },
-  "meshtasticTraffic": "Traffic",
-  "@meshtasticTraffic": {
-    "description": "Section: packet counters"
-  },
-  "meshtasticChannels": "Channels",
-  "@meshtasticChannels": {
-    "description": "Section: the radio's channel table"
-  },
-  "meshtasticName": "Name",
-  "@meshtasticName": {
-    "description": "The radio's long name"
-  },
-  "meshtasticShortName": "Short name",
-  "@meshtasticShortName": {
-    "description": "The radio's short name"
-  },
-  "meshtasticNodeId": "Node ID",
-  "@meshtasticNodeId": {
-    "description": "The radio's node number"
-  },
-  "meshtasticHardware": "Hardware",
-  "@meshtasticHardware": {
-    "description": "Board model"
-  },
-  "meshtasticFirmware": "Firmware",
-  "@meshtasticFirmware": {
-    "description": "Firmware version"
-  },
-  "meshtasticRole": "Role",
-  "@meshtasticRole": {
-    "description": "Device role (client, router...)"
-  },
-  "meshtasticBattery": "Battery",
-  "@meshtasticBattery": {
-    "description": "Battery charge"
-  },
-  "meshtasticExternalPower": "External power",
-  "@meshtasticExternalPower": {
-    "description": "Battery value when mains powered"
-  },
-  "meshtasticVoltage": "Voltage",
-  "@meshtasticVoltage": {
-    "description": "Battery voltage"
-  },
-  "meshtasticUptime": "Uptime",
-  "@meshtasticUptime": {
-    "description": "Time since the radio booted"
-  },
-  "meshtasticRegionLabel": "Region",
-  "@meshtasticRegionLabel": {
-    "description": "LoRa region"
-  },
-  "meshtasticPreset": "Modem preset",
-  "@meshtasticPreset": {
-    "description": "LoRa modem preset"
-  },
-  "meshtasticHopLimit": "Hop limit",
-  "@meshtasticHopLimit": {
-    "description": "How many hops a packet may take"
-  },
-  "meshtasticTxPower": "TX power",
-  "@meshtasticTxPower": {
-    "description": "Transmit power"
-  },
-  "meshtasticChannelUse": "Channel use",
-  "@meshtasticChannelUse": {
-    "description": "Share of airtime seen busy"
-  },
-  "meshtasticAirtime": "Air time (TX)",
-  "@meshtasticAirtime": {
-    "description": "Share of airtime this radio transmitted"
-  },
-  "meshtasticDpipChannel": "DPIP channel",
-  "@meshtasticDpipChannel": {
-    "description": "Which channel DPIP payloads use"
-  },
-  "meshtasticReceived": "Received",
-  "@meshtasticReceived": {
-    "description": "Packets received this session"
-  },
-  "meshtasticSent": "Sent",
-  "@meshtasticSent": {
-    "description": "Packets sent this session"
-  },
-  "meshtasticUndecoded": "Not decrypted",
-  "@meshtasticUndecoded": {
-    "description": "Packets the radio could not decrypt"
-  },
-  "meshtasticLastReceived": "Last received",
-  "@meshtasticLastReceived": {
-    "description": "Age of the last received packet"
-  },
-  "meshtasticLastSent": "Last sent",
-  "@meshtasticLastSent": {
-    "description": "Age of the last sent packet"
-  },
-  "meshtasticReadingAge": "Reading taken",
-  "@meshtasticReadingAge": {
-    "description": "How old the battery/airtime numbers are"
-  },
-  "meshtasticNotifyMessages": "Notify on new messages",
-  "@meshtasticNotifyMessages": {
-    "description": "Toggle: local notification for an incoming mesh message"
-  },
-  "meshtasticNotifyNodes": "Notify on new nodes",
-  "@meshtasticNotifyNodes": {
-    "description": "Toggle: local notification when a new node is heard"
-  },
-  "mapLayerMeshtastic": "Meshtastic nodes",
-  "@mapLayerMeshtastic": {
-    "description": "Map layer name: mesh nodes"
-  },
-  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
-  "@mapLayerMeshtasticSubtitle": {
-    "description": "Map layer switcher subtitle"
-  },
-  "meshtasticNoHistory": "Not enough history yet",
-  "@meshtasticNoHistory": {
-    "description": "Chart placeholder before two samples exist"
-  },
-  "meshtasticUtilization": "Airtime (24h)",
-  "@meshtasticUtilization": {
-    "description": "Section title for the 24h airtime chart"
-  },
-  "moonTitle": "Moon",
-  "@moonTitle": {
-    "description": "Moon page title"
-  },
-  "moonSubtitle": "Lunar phase and illumination — computed locally",
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
-  "dataSectionAstronomy": "Astronomy",
-  "@dataSectionAstronomy": {
-    "description": "Astronomy section header in the data catalogue"
-  },
-  "moonAge": "Age",
-  "@moonAge": {
-    "description": "Moon age label"
-  },
-  "moonDays": "days",
-  "@moonDays": {
-    "description": "Day unit for the moon age"
-  },
-  "moonNextFullMoon": "Next full moon",
-  "@moonNextFullMoon": {
-    "description": "Next full moon date label"
-  },
-  "moonTimelineCaption": "Phase",
-  "@moonTimelineCaption": {
-    "description": "Moon phase timeline caption"
-  },
-  "moonPhaseNew": "New moon",
-  "@moonPhaseNew": {
-    "description": "Phase: new moon"
-  },
-  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "reportDetailDepth": "震源の深さ",
+  "typhoonOverlayWarningTooltip": "台風警報対象の県を強調",
+  "reportFilterDatePick": "日付を選択",
+  "onboardingSkipStay": "戻って許可",
   "@moonPhaseWaxingCrescent": {
     "description": "Phase: waxing crescent"
   },
+  "@meshtasticOnline": {
+    "description": "Legend: node heard within the online window"
+  },
+  "commonFetchFailed": "データを取得できませんでした。しばらくしてから再度お試しください。",
+  "@meshtasticTxPower": {
+    "description": "Transmit power"
+  },
+  "shelterOutdoorLabel": "屋外収容",
+  "meshtasticStateConnected": "Connected",
+  "mapNavRadar": "レーダー",
+  "mapLayerSatelliteCloudClear": "晴れ",
+  "eewSummary": "M{magnitude}・深さ {depth} km",
+  "locationBannerPermission": "位置情報の許可がオフです。所在地に合わせた警報を配信できません。",
+  "typhoonOverlayWeatherNoneTooltip": "レーダー／赤外線なし",
+  "radarCountyOutlineHint": "エコーの上に描画",
+  "windForecastCountyOutlineHint": "風場の上に描画",
+  "homeRainTrendTitle": "今後1時間の雨",
   "moonPhaseFirstQuarter": "First quarter",
-  "@moonPhaseFirstQuarter": {
-    "description": "Phase: first quarter"
+  "mapLayerCategoryTyphoon": "台風",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
   },
-  "moonPhaseWaxingGibbous": "Waxing gibbous",
-  "@moonPhaseWaxingGibbous": {
-    "description": "Phase: waxing gibbous"
+  "@meshtasticNodeId": {
+    "description": "The radio's node number"
   },
-  "moonPhaseFull": "Full moon",
-  "@moonPhaseFull": {
-    "description": "Phase: full moon"
-  },
-  "moonPhaseWaningGibbous": "Waning gibbous",
+  "meshtasticUtilization": "Airtime (24h)",
+  "restroomTypeMixed": "男女共用トイレ",
+  "restroomGradeGood": "優良",
+  "notifyTsunami": "津波情報",
+  "navData": "データ",
+  "mapLayerSatelliteBtdWvirw": "ひまわり オーバーシューティングトップ",
+  "meshtasticReadingAge": "Reading taken",
   "@moonPhaseWaningGibbous": {
     "description": "Phase: waning gibbous"
   },
-  "moonPhaseLastQuarter": "Last quarter",
-  "@moonPhaseLastQuarter": {
-    "description": "Phase: last quarter"
+  "mapAppCallFailed": "この端末では通話できません",
+  "@meshtasticPower": {
+    "description": "Section: battery and uptime"
   },
-  "moonPhaseWaningCrescent": "Waning crescent",
-  "@moonPhaseWaningCrescent": {
-    "description": "Phase: waning crescent"
-  },
-  "meshtasticLastHeard": "Last heard",
-  "@meshtasticLastHeard": {
-    "description": "When a node last transmitted"
-  },
-  "meshtasticTapNode": "Tap a node for details",
-  "@meshtasticTapNode": {
-    "description": "Resting state of the map node sheet"
-  },
-  "meshtasticLayerOptions": "Node options",
-  "@meshtasticLayerOptions": {
-    "description": "Tooltip for the mesh layer's options chip"
-  },
-  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "reportFilterAny": "指定なし",
+  "weatherRankingMergeTo": "統合",
+  "notifyIntensity": "震度速報",
+  "typhoonTimeChip": "{day}日{hour}時",
+  "rainIntervalMenu": "累積期間",
+  "reportDetailLocalFelt": "局地的な有感地震",
+  "meshtasticDevice": "Device",
+  "onboardingGrant": "許可",
+  "weatherModeRain": "雨",
+  "shelterVulnerableOkLabel": "要配慮者向け収容",
+  "stationSheetEmpty": "観測点をタップして値を表示",
+  "typhoonLegendProbability": "接近確率",
   "@meshtasticExcludeMqtt": {
     "description": "Toggle hiding internet-bridged nodes"
   },
-  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
-  "@meshtasticExcludeMqttSubtitle": {
-    "description": "What an MQTT node is"
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
   },
-  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "reportFilterMagnitude": "マグニチュード",
+  "skyTimeMorning": "午前",
+  "@meshtasticNoDevices": {
+    "description": "Empty scan result"
+  },
+  "experimentalFeatures": "実験的機能",
+  "onboardingTermsBody": "DPIP をご利用になる前に、以下の注意事項を必ずお読みください:\n\n• すべての情報は、台湾中央気象署(CWA)が発表する内容を優先してください。\n\n• ネットワーク、サーバー、アプリ、上流のデータソースの状態によっては、情報を受信できない場合があります。可能な限り回避に努めますが、決して発生しないことを保証するものではありません。\n\n• 強い揺れが、通知より先にあなたの所在地へ到達する場合があります。\n\n• 緊急地震速報は高速に計算された結果であり、大きな誤差を含む可能性があります。この点を理解したうえで、慎重にご利用ください。\n\n• 公的機関に認められていない行為には法的リスクが伴う可能性があります。関連する規定を必ずお守りください。\n\nまた、地域に応じた警報を提供するため、本サービスは、どの警報をあなたに送信するかを判断する目的にのみ、あなたのおおよその位置情報とプッシュ識別子を、フォアグラウンドおよびバックグラウンドで収集・アップロードします。\n\n下部の「同意して続行」をタップすることで、上記を読み、理解し、同意したものとみなされます。",
+  "reportFilterTitle": "絞り込み",
+  "onboardingPermCritical": "重大な通知",
+  "trendCumulativeTotal": "累計 {total} mm",
+  "languageName": "日本語",
+  "reportListEmptyFiltered": "条件に一致する地震報告はありません",
+  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "mapNavTyphoon": "台風",
+  "weatherModeSand": "砂じん",
+  "@moonPhaseFirstQuarter": {
+    "description": "Phase: first quarter"
+  },
+  "typhoonSatelliteTitle": "衛星",
+  "@dpmOpenInMaps": {},
+  "notifyReport": "地震報告",
+  "mapAppCoordinatesCopied": "座標をコピーしました",
+  "skyTimeNight": "夜",
+  "sponsorRecommended": "おすすめ",
+  "mapLayerSatelliteB15": "ひまわり 長波長赤外線(B15)",
+  "weatherRankingWind": "風速",
+  "feedStale": "データが最新でない可能性があります",
+  "homeForecastWind": "{direction} · 風力{level}",
+  "navHome": "ホーム",
+  "meshtasticRegionLabel": "Region",
+  "mapLayerSatelliteCloudtop": "ひまわり 雲頂温度",
+  "moonTimelineCaption": "Phase",
+  "reportListMeta": "M{magnitude} · {depth} km",
+  "@meshtasticChannelNoSlot": {
+    "description": "Every secondary channel slot is taken"
+  },
+  "@meshtasticBusyBody": {
+    "description": "Why two clients on one radio is a problem"
+  },
+  "openSourceLicenses": "オープンソースライセンス",
+  "weatherRankingLowest": "最低",
+  "@meshtasticConnectAnyway": {
+    "description": "Connect despite the other app"
+  },
+  "reportFilterSortDepth": "深さ",
+  "mapTimelineDataTime": "データ時刻 {time}",
+  "radarScanRange": "走査範囲を表示",
+  "meshtasticHopLimit": "Hop limit",
+  "@meshtasticUptime": {
+    "description": "Time since the radio booted"
+  },
+  "weatherRankingAnalysisRange": "較差 {value}°C",
+  "weatherRankingExtremeHigh": "今日の最高",
+  "@meshtasticUtilization": {
+    "description": "Section title for the 24h airtime chart"
+  },
+  "changelogVersionDetails": "リリース詳細",
+  "sponsorPrivacy": "プライバシーポリシー",
+  "reportDetailLocalIntensity": "現在地の震度",
+  "mapLayerSatelliteNaturalcolor": "ひまわり ナチュラルカラー",
+  "meshtasticAirtime": "Air time (TX)",
+  "shelterCapacityValue": "{n} 人",
+  "lightningLegendCc": "雲間 · {minutes} 分以内",
+  "meshtasticSendHint": "Message to broadcast",
+  "monitorDelay": "遅延 {value} s",
+  "@meshtasticFirmware": {
+    "description": "Firmware version"
+  },
+  "dpmNo": "いいえ",
+  "mapLayerSatelliteB08": "ひまわり 上層水蒸気(B08)",
+  "meshtasticReconnecting": "Reconnecting…",
+  "@mapAppAppleMaps": {},
+  "@meshtasticReadingAge": {
+    "description": "How old the battery/airtime numbers are"
+  },
+  "radarTownOutlineSubtitle": "レーダーエコーの下でも市町村境界が見えるようにします。",
+  "@moonPhaseWaxingGibbous": {
+    "description": "Phase: waxing gibbous"
+  },
+  "typhoonOverlayWeatherSatelliteTooltip": "通報時刻に最も近い赤外線",
+  "radarScanRangeHint": "枠外の空白は未観測",
+  "typhoonPickerTd": "熱帯低気圧 TD {no}",
+  "mapLayerSatelliteWatervapor": "ひまわり 水蒸気",
+  "regionAddButton": "地域を追加",
+  "displaySettings": "表示",
+  "restroomGradePoor": "不合格",
+  "restroomCategoryTourist": "観光地・景勝地",
+  "locationBannerServiceOff": "位置情報サービスがオフです。所在地に合わせた警報を配信できません。",
+  "mapLayerStyleTooltip": "色調",
+  "lightningLegendCg": "対地 · {minutes} 分以内",
+  "skyTimeAuto": "自動",
+  "appLogs": "アプリログ",
+  "feedConnecting": "接続中…",
+  "notifyBannerDisabled": "通知がオフです — 災害警報を受け取れません。",
+  "@meshtasticNoNodes": {
+    "description": "Empty node list"
+  },
+  "weatherHumidity": "湿度",
+  "typhoonValueMs": "毎秒 {n} m",
+  "homeForecastHumidity": "湿度 {value}%",
+  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
+  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
+  "restroomCategoryTransport": "交通",
+  "reportFilterLocationHint": "例：花蓮、海域",
+  "moonSubtitle": "Lunar phase and illumination — computed locally",
+  "meshtasticBattery": "Battery",
+  "typhoonOverlayMenuTooltip": "台風オーバーレイ設定",
+  "mapLayerSatelliteBtdOzone": "ひまわり 対流圏界面",
+  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "notifySectionEarthquake": "地震",
+  "mapLayerDisasterMap": "防災マップ",
+  "weatherModeFog": "霧",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "mapLayerStyleGrayTooltip": "気象庁の赤外画像の慣例：温度が低いほど白",
+  "moreAnnouncements": "お知らせ",
+  "mapLayerSatelliteTransparentNoData": "データなし(陸上) = 透明",
+  "@meshtasticScanning": {
+    "description": "Scan in progress"
+  },
+  "restroomCategoryGovernment": "行政サービス施設",
+  "typhoonLegendCurrent": "現在中心",
+  "aedAddress": "住所",
+  "mapLayerAed": "AED",
+  "changelogTypePrerelease": "ベータ",
+  "reportFilterIntensityInfoModernBody": "震度は 0–4、5弱、5強、6弱、6強、7。フィルタは新制に準拠し、それ以前の地震はリストで旧制表記になります。",
+  "typhoonOverlayWeatherNone": "なし",
+  "mapLayerStyleGray": "グレースケール（JMA）",
+  "weatherModeAuto": "自動",
+  "typhoonLabelProbCircle": "70%確率円",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "notifyOptAll": "すべて受信",
+  "displayTheme": "テーマ",
+  "mapLayerSatelliteB07": "ひまわり 短波長赤外(B07)",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "typhoonLabelDirection": "これまでの進行方向",
+  "@meshtasticLastSent": {
+    "description": "Age of the last sent packet"
+  },
+  "regionManageTitle": "登録地域",
+  "typhoonLegendCone": "予報円",
+  "moreCwaEew": "中央気象署 緊急地震速報",
+  "onboardingPermsTitle": "権限の許可",
+  "mapLayerStyleJma": "雲頂強調（JMA）",
+  "rainInterval10m": "10分",
+  "weatherRankingAnalysisLow": "最低 {value}",
+  "meshtasticConnectAnyway": "Connect anyway",
+  "reportListDayCount": "{count}",
+  "mapLayerSatelliteB06": "ひまわり 近赤外(B06)",
+  "mapLayerSatelliteTransparentReflectance": "低反射率・夜間 = 透明、地図が透ける",
+  "chartHourLabel": "{hour}時",
+  "mapLayerShelter": "避難所",
+  "typhoonOverlayProbabilityTooltip": "接近確率を表示（予報円を隠す）",
+  "mapLayerSatelliteNdwi": "ひまわり NDWI",
+  "disasterMapOverlayShelterTooltip": "避難所を表示",
+  "mapNavHumidity": "湿度",
+  "@meshtasticTraffic": {
+    "description": "Section: packet counters"
+  },
+  "reportDetailSortByIntensity": "震度順に並べ替え",
+  "homeRainTrendNoData": "データなし",
+  "mapLayerCategoryRadar": "レーダー",
+  "meshtasticShortName": "Short name",
+  "@meshtasticStateConfiguring": {
+    "description": "Connection state label"
+  },
+  "mapLayerSatelliteAirmass": "ひまわり エアマス",
+  "@meshtasticPreset": {
+    "description": "LoRa modem preset"
+  },
+  "typhoonTrackDetail": "経路詳細",
+  "dataSectionWeather": "気象",
+  "aedHoursWeekday": "平日の開館時間",
+  "homeActiveEventsTitle": "発生中の事象",
+  "weatherRankingAnalysisHigh": "最高 {value}",
+  "faq": "よくある質問",
+  "typhoonHistoryLive": "最新",
+  "eewSerial": "第 {serial} 報",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "reportFilterSort": "並び替え",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
+  "dataEarthquakeSubtitle": "地震報告",
+  "typhoonNoActive": "発生中の台風なし",
   "@meshtasticExcludeMqttHidden": {
     "description": "How many nodes the filter is hiding",
     "placeholders": {
@@ -1023,16 +1021,76 @@
       }
     }
   },
-  "meshtasticOnline": "Heard recently",
-  "@meshtasticOnline": {
-    "description": "Legend: node heard within the online window"
+  "mapLayerSatelliteB11": "ひまわり 二酸化硫黄/雲相(B11)",
+  "navEvents": "イベント",
+  "onboardingTermsTitle": "サービス利用規約",
+  "@meshtasticChannels": {
+    "description": "Section: the radio's channel table"
   },
-  "meshtasticSilent": "Silent",
-  "@meshtasticSilent": {
-    "description": "Legend: node known but not heard recently"
+  "mapTownLabels": "郷鎮名",
+  "notifySetFailed": "設定を保存できませんでした。もう一度お試しください。",
+  "meshtasticDisconnect": "Disconnect",
+  "meshtasticUndecoded": "Not decrypted",
+  "notifyAnnouncement": "お知らせ",
+  "onboardingIntroTitle": "DPIP へようこそ",
+  "regionCurrentUnavailable": "現在地を取得できません",
+  "languageSystem": "システムの既定",
+  "skyTimeSunset": "日の入り",
+  "mapLayerSatelliteDust": "ひまわり 黄砂",
+  "mapAppAppleMaps": "Apple Maps",
+  "regionEdit": "変更",
+  "weatherDynamicState": "天気アニメーション",
+  "mapPlaceholderDisabled": "地図(一時的に無効)",
+  "moonNow": "現在",
+  "@moonNow": {
+    "description": "Returns the moon page to the present moment"
   },
-  "meshtasticViaMqtt": "Via MQTT (internet)",
-  "@meshtasticViaMqtt": {
-    "description": "Legend: node reported over an MQTT bridge"
+  "moonSectionAppearance": "見え方",
+  "@moonSectionAppearance": {
+    "description": "Section header: how the Moon looks at the chosen moment"
+  },
+  "moonSectionRiseSet": "月の出・月の入り",
+  "@moonSectionRiseSet": {
+    "description": "Section header: moonrise and moonset for the user's township"
+  },
+  "moonSectionUpcoming": "次の月相",
+  "@moonSectionUpcoming": {
+    "description": "Section header: the next full and new moons"
+  },
+  "moonSectionCalendar": "月齢カレンダー",
+  "@moonSectionCalendar": {
+    "description": "Section header: the month-at-a-glance phase calendar"
+  },
+  "moonDistance": "距離",
+  "@moonDistance": {
+    "description": "Earth-Moon centre-to-centre distance"
+  },
+  "moonKilometres": "km",
+  "@moonKilometres": {
+    "description": "Unit suffix for the lunar distance"
+  },
+  "moonApparentSize": "視直径",
+  "@moonApparentSize": {
+    "description": "The Moon's apparent angular diameter"
+  },
+  "moonRise": "月の出",
+  "@moonRise": {
+    "description": "Time the Moon rises"
+  },
+  "moonSet": "月の入り",
+  "@moonSet": {
+    "description": "Time the Moon sets"
+  },
+  "moonNextNewMoon": "次の新月",
+  "@moonNextNewMoon": {
+    "description": "Date and time of the next new moon"
+  },
+  "moonAlwaysUp": "終日地平線上",
+  "@moonAlwaysUp": {
+    "description": "Shown when the Moon neither rises nor sets and stays above the horizon"
+  },
+  "moonNoEvent": "この日はなし",
+  "@moonNoEvent": {
+    "description": "Shown when a calendar day has no moonrise or no moonset"
   }
 }

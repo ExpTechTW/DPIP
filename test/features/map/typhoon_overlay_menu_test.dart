@@ -286,9 +286,21 @@ void main() {
     },
   );
 
-  test('omitting the anchor keeps the borders on top', () async {
-    final controller = RecordingMapController();
-    await AdminOutline.add(controller, AdminBoundary.county);
-    expect(controller.belowOf(AdminBoundary.county.lineLayerId), isNull);
-  });
+  test(
+    'omitting the anchor anchors the borders under the township labels',
+    () async {
+      final controller = RecordingMapController();
+      await AdminOutline.add(controller, AdminBoundary.county);
+      // A border line must never cross a place name — the labels stay the
+      // top-most text on every surface.
+      expect(
+        controller.belowOf(AdminBoundary.county.lineLayerId),
+        townLabelLayerId,
+      );
+      expect(
+        controller.belowOf(AdminBoundary.county.casingLayerId),
+        townLabelLayerId,
+      );
+    },
+  );
 }

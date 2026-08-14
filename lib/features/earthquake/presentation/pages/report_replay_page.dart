@@ -15,12 +15,17 @@ import 'dart:async';
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
+import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
+import 'package:dpip/features/earthquake/domain/intensity.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -31,14 +36,22 @@ import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
-import 'package:dpip/shared/map/map_style.dart' show landLayerId;
+import 'package:dpip/shared/map/map_style.dart'
+    show
+        MapColors,
+        countyFillLayerId,
+        landLayerId,
+        townFillLayerId,
+        townLabelLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -70,6 +83,10 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// real transition — the wavefront still grows every tick in between).
   final ValueNotifier<int> _tick = ValueNotifier(0);
   Timer? _ticker;
+
+  /// Which active alert the single EEW card currently shows — tapping the card
+  /// advances it through the alert set (modulo the count in the builder).
+  int _eewIndex = 0;
 
   @override
   void initState() {
@@ -115,12 +132,35 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                child: FrostedSurface(
-                  borderRadius: AppRadius.large,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.pop(),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FrostedSurface(
+                      borderRadius: AppRadius.large,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => context.pop(),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    // The replay surface is the 強震監視器 frozen in time —
+                    // the same intensity legend the live monitor carries,
+                    // switching to the EEW felt-scale while an alert is up
+                    // (the legacy monitor did exactly this on active EEW).
+                    ListenableBuilder(
+                      listenable: _session.eew,
+                      builder: (context, _) {
+                        final hasEew = _session.eew.alerts.isNotEmpty;
+                        return MapLegendCard(
+                          child: IntensityLegend(
+                            mode: hasEew
+                                ? IntensityLegendMode.eew
+                                : IntensityLegendMode.rts,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -140,11 +180,26 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                     ListenableBuilder(
                       listenable: _session.eew,
                       builder: (context, _) {
-                        final alert = _session.eew.primaryAlert;
-                        if (alert == null) return const SizedBox.shrink();
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                          child: EewCard(eew: alert),
+                        final alerts = _session.eew.alerts;
+                        if (alerts.isEmpty) return const SizedBox.shrink();
+                        // One card at a time — tapping cycles through the
+                        // active alerts (parallel earthquakes, overlapping
+                        // reports) instead of stacking every one on screen.
+                        // The index is clamped by modulo, so a report leaving
+                        // the active set mid-replay can't point past the list.
+                        final index = _eewIndex % alerts.length;
+                        final eew = alerts[index];
+                        return _EewAlertCard(
+                          eew: eew,
+                          clock: () => _session.clock.now(),
+                          position: index + 1,
+                          count: alerts.length,
+                          onTap: alerts.length > 1
+                              ? () => setState(
+                                  () => _eewIndex =
+                                      (_eewIndex + 1) % alerts.length,
+                                )
+                              : null,
                         );
                       },
                     ),
@@ -203,6 +258,14 @@ class _ReplayMapState extends State<_ReplayMap> {
   static const String _rtsSourceId = 'replay-rts-src';
   static const String _rtsCircleId = 'replay-rts-circle';
   static const String _rtsLabelId = 'replay-rts-label';
+
+  /// Per-station discrete-intensity marker layer — the legacy monitor's
+  /// `intensity` layer. While a large event's detection boxes are up, the
+  /// station dots give way to these icons (`intensity-1`…`intensity-9`, same
+  /// PNGs the report map uses), one numeral per station over its estimated
+  /// shaking.
+  static const String _rtsIntensityId = 'replay-rts-intensity';
+
   static const String _boxSourceId = 'replay-box-src';
   static const String _boxLineLayerId = 'replay-box-line';
   static const String _eewSourceId = 'replay-eew-src';
@@ -242,15 +305,42 @@ class _ReplayMapState extends State<_ReplayMap> {
     8.0,
   ];
 
+  /// The intensity icon for scale index 1–9, dark or light artwork — the same
+  /// assets the report detail map registers.
+  static String _intensityIcon(int level, {required bool dark}) =>
+      dark ? 'intensity-$level-dark' : 'intensity-$level';
+
   MapLibreMapController? _controller;
   Map<String, SeismicStation> _stations = const {};
   bool _stationsFetching = false;
   bool _ready = false;
-  String? _framedEewId;
   SeismicTravelTimeTable? _travelTimeTable;
-  final Map<String, TravelTimeSource> _sources = {};
   RtsBoxGrid? _boxGrid;
-  bool _boxActive = false;
+
+  /// The township directory, for the whole-island estimated-shaking tint.
+  late final TownDirectory _directory = context.read<TownDirectory>();
+
+  /// The EEW id/serial combo the town/county fill is currently tinted for —
+  /// recomputing the 368-town estimate every tick is wasteful when nothing
+  /// changed, so the fill only updates when this key does.
+  String? _fillEewKey;
+
+  /// Brightness at the last style load — the intensity icons come in light and
+  /// dark artwork ([IntensityIcon.light] / [.dark]) and the layer is rebuilt
+  /// on style reload, so the choice is made once per load.
+  bool _dark = false;
+
+  /// Whether the station layer is currently showing intensity icons (big-quake
+  /// box mode) instead of dots — the legacy monitor's `_lastIntensityLayersVisible`.
+  bool? _lastIconMode;
+
+  /// Legacy-style blink: while a large event's detection boxes are on the map
+  /// they (and the EEW epicentre cross) toggle visibility on a 1 s cadence so
+  /// they stand out from the static replay surface — ported from the legacy
+  /// monitor's `_setupBlinkTimer`.
+  Timer? _blinkTimer;
+  bool _boxVisible = true;
+  bool _epicenterVisible = true;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
   /// north, kept in sync from [BaseMap.onCameraMove].
@@ -277,8 +367,44 @@ class _ReplayMapState extends State<_ReplayMap> {
   void dispose() {
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
+    _blinkTimer?.cancel();
     _bearing.dispose();
     super.dispose();
+  }
+
+  /// Toggles the detection boxes and the epicentre cross every second while
+  /// their data is present, and hides them the moment it is gone. Visibility
+  /// lives entirely here — [_updateBox]/[_updateEew] only push geometry.
+  void _setupBlink() {
+    _blinkTimer?.cancel();
+    _blinkTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
+      final controller = _controller;
+      if (controller == null || !_ready) return;
+      try {
+        final hasBox = widget.rts.box.isNotEmpty;
+        if (hasBox) {
+          _boxVisible = !_boxVisible;
+          await controller.setLayerVisibility(_boxLineLayerId, _boxVisible);
+        } else if (_boxVisible) {
+          _boxVisible = false;
+          await controller.setLayerVisibility(_boxLineLayerId, false);
+        }
+
+        final hasEew = widget.eew.alerts.isNotEmpty;
+        if (hasEew) {
+          _epicenterVisible = !_epicenterVisible;
+          await controller.setLayerVisibility(
+            _epicenterLayerId,
+            _epicenterVisible,
+          );
+        } else if (_epicenterVisible) {
+          _epicenterVisible = false;
+          await controller.setLayerVisibility(_epicenterLayerId, false);
+        }
+      } catch (_) {
+        // Layers gone mid style-reload — the next blink retries.
+      }
+    });
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -311,9 +437,11 @@ class _ReplayMapState extends State<_ReplayMap> {
   Future<void> _onStyleLoaded() async {
     final controller = _controller;
     if (controller == null) return;
+    _dark = Theme.of(context).brightness == Brightness.dark;
     try {
       final data = await IntensityIconRenderer.render('cross');
       await controller.addImage(_crossIcon, data);
+      await _loadIntensityIcons(controller);
 
       await controller.addSource(
         _rtsSourceId,
@@ -328,6 +456,9 @@ class _ReplayMapState extends State<_ReplayMap> {
           circleStrokeColor: '#9E9E9E',
           circleStrokeWidth: 1,
         ),
+        // Station dots under the township names — the wavefront must never
+        // hide where you are.
+        belowLayerId: townLabelLayerId,
       );
       await controller.addSymbolLayer(
         _rtsSourceId,
@@ -337,6 +468,27 @@ class _ReplayMapState extends State<_ReplayMap> {
           textSize: 10,
         ),
         minzoom: 10,
+        // Township names stay the top-most text; station labels give way on
+        // collision (the layer order decides who wins placement).
+        belowLayerId: townLabelLayerId,
+      );
+
+      // The discrete-intensity markers — hidden until a big event's detection
+      // boxes arrive ([_syncStationMode] flips them on and drops the dots),
+      // ported from the legacy monitor's `intensity` layer: an icon per station
+      // picked from its discrete intensity, overlap allowed so the whole island
+      // reads at once. Icons, not text — the same artwork the report map uses.
+      await controller.addSymbolLayer(
+        _rtsSourceId,
+        _rtsIntensityId,
+        const SymbolLayerProperties(
+          iconImage: <Object>['get', 'icon'],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          symbolZOrder: 'source',
+          visibility: 'none',
+        ),
+        belowLayerId: townLabelLayerId,
       );
 
       await controller.addSource(
@@ -364,6 +516,7 @@ class _ReplayMapState extends State<_ReplayMap> {
         _eewSourceId,
         _pWaveLayerId,
         const LineLayerProperties(lineColor: '#00E5FF', lineWidth: 2),
+        belowLayerId: townLabelLayerId,
         filter: const [
           '==',
           ['get', 'type'],
@@ -374,6 +527,7 @@ class _ReplayMapState extends State<_ReplayMap> {
         _eewSourceId,
         _sWaveLayerId,
         const LineLayerProperties(lineColor: '#FF3B30', lineWidth: 2),
+        belowLayerId: townLabelLayerId,
         filter: const [
           '==',
           ['get', 'type'],
@@ -389,6 +543,7 @@ class _ReplayMapState extends State<_ReplayMap> {
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
+        belowLayerId: townLabelLayerId,
         filter: const [
           '==',
           ['get', 'type'],
@@ -416,6 +571,8 @@ class _ReplayMapState extends State<_ReplayMap> {
           lineWidth: 2,
           visibility: 'none',
         ),
+        // Detection-box borders stay under the township names.
+        belowLayerId: townLabelLayerId,
       );
     } catch (e, st) {
       Log.handle(e, st, 'replay box layer render failed');
@@ -425,6 +582,7 @@ class _ReplayMapState extends State<_ReplayMap> {
     unawaited(_updateRts());
     unawaited(_updateBox());
     unawaited(_updateEew());
+    _setupBlink();
     _frameTaiwan();
   }
 
@@ -463,7 +621,8 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// box-grid resolution (`rts.box` non-empty) draws the coloured grid cells
   /// *alongside* the per-station dots (not a replacement) — the box only
   /// covers the areas the event actually triggered, so stations outside it
-  /// still carry live detail.
+  /// still carry live detail. Only geometry is pushed here; the visibility
+  /// blink is [_setupBlink]'s job.
   Future<void> _updateBox() async {
     final controller = _controller;
     final grid = _boxGrid;
@@ -473,13 +632,13 @@ class _ReplayMapState extends State<_ReplayMap> {
       if (hasBox) {
         await controller.setGeoJsonSource(_boxSourceId, _boxGeoJson(grid));
       }
-      if (hasBox != _boxActive) {
-        _boxActive = hasBox;
-        await controller.setLayerVisibility(_boxLineLayerId, hasBox);
-      }
     } catch (_) {
       // Source/layer not on the map yet (mid style-reload) — the next update retries.
     }
+    // Boxes and intensity icons are the same big-quake mode (legacy's
+    // `rtsVisible = hasRtsData && !hasBox`) — flip the station layer with the
+    // box state rather than on every EEW tick.
+    await _syncStationMode();
   }
 
   Future<void> _updateEew() async {
@@ -487,16 +646,85 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (controller == null || !_ready) return;
     // The source starts as (and a no-alert payload would be) the empty
     // collection — skip the pointless per-tick round trip entirely.
-    if (widget.eew.alerts.isEmpty) {
-      _maybeFrameEpicenter();
-      return;
-    }
+    if (widget.eew.alerts.isEmpty) return;
     try {
       await controller.setGeoJsonSource(_eewSourceId, _eewGeoJson());
     } catch (_) {
       // Source not on the map yet (mid style-reload) — the next update retries.
     }
-    _maybeFrameEpicenter();
+    await _updateAreaFill(controller);
+  }
+
+  /// Tints the whole island by estimated shaking while an EEW alert is up —
+  /// the legacy monitor's county/town fill behaviour, driven by the same
+  /// [`EewEstimator.areaPga`] math. The base style's own `town` fill layer is
+  /// recoloured with a `match` on each township's `CODE` (hidden counties
+  /// beneath), so the felt-intensity wash reads over the base map without a
+  /// second geometry source; when the alerts clear the fills are restored.
+  ///
+  /// Recomputed only when the alert set's id/serial combos change — the 368-
+  /// town estimate is cheap but the platform churn isn't.
+  Future<void> _updateAreaFill(MapLibreMapController controller) async {
+    final alerts = widget.eew.alerts;
+    final key = alerts.isEmpty
+        ? null
+        : alerts.map((e) => '${e.id}:${e.serial}').join(',');
+    if (key == _fillEewKey) return;
+    _fillEewKey = key;
+
+    final baseFill = MapColors.of(Theme.of(context).brightness).fill;
+    try {
+      if (alerts.isEmpty) {
+        await controller.setLayerProperties(
+          countyFillLayerId,
+          FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
+        );
+        await controller.setLayerProperties(
+          townFillLayerId,
+          FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
+        );
+        return;
+      }
+
+      final eew = alerts.first;
+      final estimate = EewEstimator.areaPga(
+        epicenter: eew.info.latlng,
+        depth: eew.info.depth,
+        mag: eew.info.magnitude,
+        regionCentroids: {
+          for (final town in _directory.all)
+            town.code: geo.LatLng(town.lat, town.lng),
+        },
+      );
+      final entries = <Object>[];
+      estimate.regions.forEach((code, region) {
+        final level = Intensity.toScale(region.i);
+        if (level > 0) {
+          entries.add(int.parse(code));
+          entries.add(IntensityColors.discrete(level).toHexRgb());
+        }
+      });
+      if (entries.isEmpty) return;
+
+      await controller.setLayerProperties(
+        countyFillLayerId,
+        const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
+      );
+      await controller.setLayerProperties(
+        townFillLayerId,
+        FillLayerProperties(
+          fillColor: <Object>[
+            'match',
+            ['get', 'CODE'],
+            ...entries,
+            baseFill,
+          ],
+          fillOpacity: 1,
+        ),
+      );
+    } catch (_) {
+      // Layers gone mid style-reload — the next update re-applies.
+    }
   }
 
   Map<String, dynamic> _rtsGeoJson() {
@@ -504,6 +732,10 @@ class _ReplayMapState extends State<_ReplayMap> {
     for (final entry in widget.rts.stations.entries) {
       final station = _stations[entry.key];
       if (station == null) continue;
+      final data = entry.value;
+      final level = Intensity.toScale(
+        data.alert ? data.intensity : data.intensityRaw,
+      );
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -511,13 +743,45 @@ class _ReplayMapState extends State<_ReplayMap> {
           'coordinates': [station.longitude, station.latitude],
         },
         'properties': {
-          'i': entry.value.intensityRaw,
-          'label':
-              '${entry.key}\n${entry.value.intensityRaw.toStringAsFixed(1)}',
+          'i': data.intensityRaw,
+          'icon': level > 0 ? _intensityIcon(level, dark: _dark) : '',
+          'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
         },
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
+  }
+
+  /// Registers the 18 intensity icons (1–9 light + dark) plus the epicentre
+  /// cross — drawn in code (see [IntensityIconRenderer]), loaded once per style
+  /// load, mirroring the report detail map.
+  Future<void> _loadIntensityIcons(MapLibreMapController controller) async {
+    final icons = await IntensityIconRenderer.renderAll();
+    for (final entry in icons.entries) {
+      await controller.addImage(entry.key, entry.value);
+    }
+  }
+
+  /// Switches the station layer between dots and intensity icons, exactly as
+  /// the legacy monitor's `_updateRtsFromCache` did: while a large event's
+  /// detection boxes are on the map, the per-station intensity icons replace
+  /// the coloured dots and their id/reading labels; the moment the boxes are
+  /// gone the dots come back.
+  Future<void> _syncStationMode() async {
+    final controller = _controller;
+    if (controller == null || !_ready) return;
+    final iconMode = widget.rts.box.isNotEmpty;
+    if (iconMode == _lastIconMode) return;
+    _lastIconMode = iconMode;
+    try {
+      await Future.wait([
+        controller.setLayerVisibility(_rtsCircleId, !iconMode),
+        controller.setLayerVisibility(_rtsLabelId, !iconMode),
+        controller.setLayerVisibility(_rtsIntensityId, iconMode),
+      ]);
+    } catch (_) {
+      // Layers gone mid style-reload — the next update retries.
+    }
   }
 
   /// One polygon per box id present in the live feed's `rts.box`, joined
@@ -557,10 +821,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       );
 
       if (table != null && !elapsed.isNegative) {
-        // One depth-interpolated source per alert (reused across ticks).
-        final radius = _sources
-            .putIfAbsent(eew.id, () => table.source(info.depth))
-            .waveRadius(elapsed);
+        final radius = table.waveRadius(info.depth, elapsed);
         if (radius.p > 0) {
           features.add(
             circleFeature(
@@ -600,22 +861,6 @@ class _ReplayMapState extends State<_ReplayMap> {
     _frameBounds(BaseMap.taiwanBounds);
   }
 
-  /// Reframes on a new EEW's epicentre once (tracked by [_framedEewId]) so the
-  /// camera doesn't fight the user's own pan/zoom on every subsequent tick.
-  void _maybeFrameEpicenter() {
-    final primary = widget.eew.primaryAlert;
-    if (primary == null || primary.id == _framedEewId) return;
-    _framedEewId = primary.id;
-    const span = 1.5;
-    final info = primary.info;
-    _frameBounds(
-      LatLngBounds(
-        southwest: LatLng(info.latitude - span, info.longitude - span),
-        northeast: LatLng(info.latitude + span, info.longitude + span),
-      ),
-    );
-  }
-
   void _frameBounds(LatLngBounds targetBounds) {
     final controller = _controller;
     if (controller == null || !mounted) return;
@@ -638,7 +883,10 @@ class _ReplayMapState extends State<_ReplayMap> {
       children: [
         Positioned.fill(
           child: BaseMap(
-            showUserLocation: false,
+            // GPS on: the map shows the user's position, and the EEW cards'
+            // local-intensity tiles resolve against the current location the
+            // same way the legacy monitor's did.
+            showUserLocation: true,
             compassEnabled: false,
             onMapCreated: _onMapCreated,
             onStyleLoaded: () => unawaited(_onStyleLoaded()),
@@ -658,6 +906,105 @@ class _ReplayMapState extends State<_ReplayMap> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The replay's EEW alert card — one alert at a time, tapping cycles through
+/// the active set (see the count chip). Wraps the same [EewCardContent] the
+/// earthquake monitor's [EewCard] uses (same feature, so no layering issue)
+/// in its own bordered, tappable frame, so the header/tiles can't drift
+/// between the two; the countdown ticks against the replay's own clock so a
+/// historical alert counts down from its timeline, not real now.
+class _EewAlertCard extends StatelessWidget {
+  const _EewAlertCard({
+    required this.eew,
+    required this.clock,
+    required this.position,
+    required this.count,
+    this.onTap,
+  });
+
+  final Eew eew;
+
+  /// The instant the S-wave countdown is measured against — the replay clock.
+  final DateTime Function() clock;
+
+  /// This alert's 1-based position within [count]; the chip only shows when
+  /// there is more than one alert to cycle through.
+  final int position;
+
+  /// The number of currently-active alerts.
+  final int count;
+
+  /// Advances to the next alert; null when it is the only one.
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 0.2),
+      color: colors.surfaceContainerHigh,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.medium,
+        side: BorderSide(color: colors.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: EewCardContent(
+            eew: eew,
+            clock: clock,
+            trailing: count > 1
+                ? _AlertCountChip(position: position, count: count)
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A small "n/total" pill signalling that tapping the card cycles the alert.
+class _AlertCountChip extends StatelessWidget {
+  const _AlertCountChip({required this.position, required this.count});
+
+  final int position;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.swap_horiz, size: 14, color: colors.onSurfaceVariant),
+          const SizedBox(width: 2),
+          Text(
+            '$position/$count',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

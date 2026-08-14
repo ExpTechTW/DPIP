@@ -1,6 +1,7 @@
-/// The 強震監視器 overlay UI: a bottom freshness strip showing the feed status,
-/// the snapshot time, and the live latency (s). The intensity legend lives on
-/// the scaffold via [MapLayer.buildLegend].
+/// The 強震監視器 overlay UI: the live EEW alert cards (every active report,
+/// listed like the replay page lists its alerts) above a bottom freshness strip
+/// showing the feed status, the snapshot time, and the live latency (s). The
+/// intensity legend lives on the scaffold via [MapLayer.buildLegend].
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -8,24 +9,36 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
+import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
-/// `buildSheet` slot): a freshness strip at the bottom. Small so the map stays
-/// visible and interactive above it.
+/// `buildSheet` slot): the active EEW alert cards above a freshness strip at
+/// the bottom. Small so the map stays visible and interactive above it.
 class RtsMonitorPanel extends StatelessWidget {
-  const RtsMonitorPanel({super.key, required this.feed});
+  const RtsMonitorPanel({super.key, required this.feed, required this.eew});
 
   final RealtimeNotifier<Rts> feed;
+  final RealtimeNotifier<List<Eew>> eew;
 
   /// Roughly how much of the map height the bottom status strip covers at rest.
   /// Declared (not measured) because the strip is a floating overlay, not a
   /// bounded child the scaffold can size; the map subtracts it when framing.
   static const double bottomStripFraction = 0.1;
+
+  /// …and the whole stack (status strip + up to [maxEewListHeight] of alert
+  /// cards) while an alert is active — deliberate framing subtracts this so an
+  /// epicentre is never framed behind its own alert.
+  static const double expandedBottomFraction = 0.45;
+
+  /// Cap on the alert-card list so a burst of reports never pushes the status
+  /// strip off screen (same ceiling the replay page uses).
+  static const double maxEewListHeight = 240;
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +49,49 @@ class RtsMonitorPanel extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: ListenableBuilder(
-            listenable: feed,
-            builder: (context, _) => _StatusBar(state: feed.state),
+            listenable: Listenable.merge([feed, eew]),
+            builder: (context, _) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _EewAlerts(eew: eew),
+                const SizedBox(height: AppSpacing.sm),
+                _StatusBar(state: feed.state),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Every active EEW alert as a card, capped in height so the status bar below
+/// is never pushed off screen. Renders nothing when calm or when the feed has
+/// aged past live — a stale alert must never be presented as a current one.
+class _EewAlerts extends StatelessWidget {
+  const _EewAlerts({required this.eew});
+
+  final RealtimeNotifier<List<Eew>> eew;
+
+  @override
+  Widget build(BuildContext context) {
+    final state = eew.state;
+    final alerts = state.data;
+    if (state.status != RealtimeStatus.live ||
+        alerts == null ||
+        alerts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxHeight: RtsMonitorPanel.maxEewListHeight,
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        itemCount: alerts.length,
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+        itemBuilder: (context, index) => MonitorEewCard(alert: alerts[index]),
       ),
     );
   }
