@@ -156,7 +156,6 @@
   "homeRainTrendMinute": "{minute}分",
   "homeRainTrendUpdated": "更新 {time}",
   "homeRainTrendNoData": "データなし",
-
   "homeRainTrendScattered": "にわか雨の可能性があります",
   "homeRainTrendLightSustained": "今後1時間は小雨が続きます",
   "homeRainTrendLightStopping": "{minutes}分後に小雨が止む見込みです",
@@ -385,32 +384,26 @@
   "disasterMapOverlayRestroomTooltip": "トイレを表示",
   "disasterMapOverlayShelterTooltip": "避難所を表示",
   "dpmOpenInMaps": "地図アプリで開く",
-  "@dpmOpenInMaps": {
-  },
+  "@dpmOpenInMaps": {},
   "mapAppGoogleMaps": "Google Maps",
-  "@mapAppGoogleMaps": {
-  },
+  "@mapAppGoogleMaps": {},
   "mapAppAppleMaps": "Apple Maps",
-  "@mapAppAppleMaps": {
-  },
+  "@mapAppAppleMaps": {},
   "mapAppDefault": "{app}（デフォルト）",
   "@mapAppDefault": {
     "placeholders": {
-      "app": {"type": "String"}
+      "app": {
+        "type": "String"
+      }
     }
   },
   "mapAppCopyCoordinates": "座標をコピー",
-  "@mapAppCopyCoordinates": {
-  },
+  "@mapAppCopyCoordinates": {},
   "mapAppCoordinatesCopied": "座標をコピーしました",
-  "@mapAppCoordinatesCopied": {
-  },
+  "@mapAppCoordinatesCopied": {},
   "mapAppOpenFailed": "{app} を開けませんでした",
-  "@mapAppOpenFailed": {
-  },
-
+  "@mapAppOpenFailed": {},
   "mapAppCallFailed": "この端末では通話できません",
-
   "mapOverlaySectionReference": "参照レイヤー",
   "mapLayerCategoryEarthquake": "地震",
   "mapLayerCategoryTyphoon": "台風",
@@ -418,15 +411,13 @@
   "mapLayerCategorySatellite": "衛星",
   "mapLayerCategoryRadar": "レーダー",
   "mapLayerCategoryLife": "生活",
-  "mapLayerCategoryForecast": "数値予報",  "mapOverlaySectionMap": "地図",
+  "mapLayerCategoryForecast": "数値予報",
+  "mapOverlaySectionMap": "地図",
   "rainIntervalSection": "集計時間",
-
   "mapTownLabels": "郷鎮名",
   "mapTownLabelsHint": "拡大すると郷鎮名を表示",
-
   "mapTerrainRelief": "地形の立体感",
   "mapTerrainReliefHint": "ベースマップに地形の陰影を表示",
-
   "dpmSheetEmpty": "地図上のマーカーをタップして詳細を表示",
   "dpmAddress": "住所",
   "restroomTypeLabel": "種別",
@@ -670,134 +661,377 @@
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
-  "meshtasticTitle": "Mesh Network Test",
-  "@meshtasticTitle": {"description": "Meshtastic test page title"},
+  "meshtasticTitle": "Meshtastic",
+  "@meshtasticTitle": {
+    "description": "Meshtastic test page title"
+  },
   "meshtasticScan": "Scan",
-  "@meshtasticScan": {"description": "Start scanning for Meshtastic radios"},
+  "@meshtasticScan": {
+    "description": "Start scanning for Meshtastic radios"
+  },
   "meshtasticScanning": "Scanning…",
-  "@meshtasticScanning": {"description": "Scan in progress"},
+  "@meshtasticScanning": {
+    "description": "Scan in progress"
+  },
   "meshtasticDisconnect": "Disconnect",
-  "@meshtasticDisconnect": {"description": "Disconnect from the radio"},
+  "@meshtasticDisconnect": {
+    "description": "Disconnect from the radio"
+  },
   "meshtasticNoDevices": "No Meshtastic devices found",
-  "@meshtasticNoDevices": {"description": "Empty scan result"},
+  "@meshtasticNoDevices": {
+    "description": "Empty scan result"
+  },
   "meshtasticInitializing": "Initializing Bluetooth…",
-  "@meshtasticInitializing": {"description": "Bluetooth init in progress"},
+  "@meshtasticInitializing": {
+    "description": "Bluetooth init in progress"
+  },
   "meshtasticReady": "Ready — press scan to find radios",
-  "@meshtasticReady": {"description": "Idle state hint"},
+  "@meshtasticReady": {
+    "description": "Idle state hint"
+  },
   "meshtasticNotSupported": "Bluetooth is not supported on this device",
-  "@meshtasticNotSupported": {"description": "Bluetooth unavailable"},
+  "@meshtasticNotSupported": {
+    "description": "Bluetooth unavailable"
+  },
   "meshtasticNodes": "Nodes",
-  "@meshtasticNodes": {"description": "Mesh nodes section header"},
+  "@meshtasticNodes": {
+    "description": "Mesh nodes section header"
+  },
   "meshtasticMessages": "Messages",
-  "@meshtasticMessages": {"description": "Mesh messages section header"},
+  "@meshtasticMessages": {
+    "description": "Mesh messages section header"
+  },
   "meshtasticSend": "Send",
-  "@meshtasticSend": {"description": "Send message button"},
+  "@meshtasticSend": {
+    "description": "Send message button"
+  },
   "meshtasticSendHint": "Message to broadcast",
-  "@meshtasticSendHint": {"description": "Message input hint"},
+  "@meshtasticSendHint": {
+    "description": "Message input hint"
+  },
   "meshtasticStateDisconnected": "Disconnected",
-  "@meshtasticStateDisconnected": {"description": "Connection state label"},
+  "@meshtasticStateDisconnected": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConnecting": "Connecting…",
-  "@meshtasticStateConnecting": {"description": "Connection state label"},
+  "@meshtasticStateConnecting": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConfiguring": "Configuring…",
-  "@meshtasticStateConfiguring": {"description": "Connection state label"},
+  "@meshtasticStateConfiguring": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConnected": "Connected",
-  "@meshtasticStateConnected": {"description": "Connection state label"},
+  "@meshtasticStateConnected": {
+    "description": "Connection state label"
+  },
   "meshtasticStateError": "Error",
-  "@meshtasticStateError": {"description": "Connection state label"},
+  "@meshtasticStateError": {
+    "description": "Connection state label"
+  },
   "meshtasticFailed": "Operation failed",
-  "@meshtasticFailed": {"description": "Generic operation failure toast"},
+  "@meshtasticFailed": {
+    "description": "Generic operation failure toast"
+  },
   "meshtasticNoMessages": "No messages yet",
-  "@meshtasticNoMessages": {"description": "Empty message log while connected"},
+  "@meshtasticNoMessages": {
+    "description": "Empty message log while connected"
+  },
   "meshtasticNoNodes": "No nodes heard yet",
-  "@meshtasticNoNodes": {"description": "Empty node list"},
+  "@meshtasticNoNodes": {
+    "description": "Empty node list"
+  },
   "meshtasticNotConnected": "Not connected to a radio",
-  "@meshtasticNotConnected": {"description": "Empty message log while not connected"},
+  "@meshtasticNotConnected": {
+    "description": "Empty message log while not connected"
+  },
   "meshtasticSelectDevice": "Select a radio",
-  "@meshtasticSelectDevice": {"description": "Device picker sheet title"},
+  "@meshtasticSelectDevice": {
+    "description": "Device picker sheet title"
+  },
   "meshtasticClearMessages": "Clear messages",
-  "@meshtasticClearMessages": {"description": "Menu action clearing the message log"},
+  "@meshtasticClearMessages": {
+    "description": "Menu action clearing the message log"
+  },
   "meshtasticEmptyMessage": "(empty message)",
-  "@meshtasticEmptyMessage": {"description": "Placeholder for a text packet with no body"},
+  "@meshtasticEmptyMessage": {
+    "description": "Placeholder for a text packet with no body"
+  },
   "meshtasticCopied": "Message copied",
-  "@meshtasticCopied": {"description": "Toast shown after copying a message"},
+  "@meshtasticCopied": {
+    "description": "Toast shown after copying a message"
+  },
   "commonCancel": "Cancel",
-  "@commonCancel": {"description": "Dismisses a dialog without acting"},
+  "@commonCancel": {
+    "description": "Dismisses a dialog without acting"
+  },
   "meshtasticReconnecting": "Reconnecting…",
-  "@meshtasticReconnecting": {"description": "The link dropped and is being re-established"},
+  "@meshtasticReconnecting": {
+    "description": "The link dropped and is being re-established"
+  },
   "meshtasticChannelWorking": "Setting up the DPIP channel…",
-  "@meshtasticChannelWorking": {"description": "Creating/verifying the DPIP channel"},
+  "@meshtasticChannelWorking": {
+    "description": "Creating/verifying the DPIP channel"
+  },
   "meshtasticChannelReady": "DPIP channel ready",
-  "@meshtasticChannelReady": {"description": "The DPIP channel exists on the radio"},
+  "@meshtasticChannelReady": {
+    "description": "The DPIP channel exists on the radio"
+  },
   "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
-  "@meshtasticChannelNoSlot": {"description": "Every secondary channel slot is taken"},
+  "@meshtasticChannelNoSlot": {
+    "description": "Every secondary channel slot is taken"
+  },
   "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
-  "@meshtasticChannelFailed": {"description": "The radio rejected the channel write"},
+  "@meshtasticChannelFailed": {
+    "description": "The radio rejected the channel write"
+  },
   "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
-  "@meshtasticRegionMismatch": {"description": "Radio is on another LoRa region than DPIP needs", "placeholders": {"region": {"type": "String"}}},
+  "@meshtasticRegionMismatch": {
+    "description": "Radio is on another LoRa region than DPIP needs",
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
   "meshtasticRegionSwitch": "Switch to TW",
-  "@meshtasticRegionSwitch": {"description": "Button applying the DPIP LoRa region"},
+  "@meshtasticRegionSwitch": {
+    "description": "Button applying the DPIP LoRa region"
+  },
   "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
-  "@meshtasticRegionConfirm": {"description": "Confirmation before rebooting the radio"},
+  "@meshtasticRegionConfirm": {
+    "description": "Confirmation before rebooting the radio"
+  },
   "meshtasticBusyTitle": "Another app is using this radio",
-  "@meshtasticBusyTitle": {"description": "Another app holds the BLE link"},
+  "@meshtasticBusyTitle": {
+    "description": "Another app holds the BLE link"
+  },
   "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
-  "@meshtasticBusyBody": {"description": "Why two clients on one radio is a problem"},
+  "@meshtasticBusyBody": {
+    "description": "Why two clients on one radio is a problem"
+  },
   "meshtasticConnectAnyway": "Connect anyway",
-  "@meshtasticConnectAnyway": {"description": "Connect despite the other app"},
+  "@meshtasticConnectAnyway": {
+    "description": "Connect despite the other app"
+  },
   "meshtasticRadio": "Radio",
-  "@meshtasticRadio": {"description": "Radio diagnostics sheet title"},
+  "@meshtasticRadio": {
+    "description": "Radio diagnostics sheet title"
+  },
   "meshtasticDevice": "Device",
-  "@meshtasticDevice": {"description": "Section: device identity"},
+  "@meshtasticDevice": {
+    "description": "Section: device identity"
+  },
   "meshtasticPower": "Power",
-  "@meshtasticPower": {"description": "Section: battery and uptime"},
+  "@meshtasticPower": {
+    "description": "Section: battery and uptime"
+  },
   "meshtasticRadioSettings": "LoRa",
-  "@meshtasticRadioSettings": {"description": "Section: LoRa settings"},
+  "@meshtasticRadioSettings": {
+    "description": "Section: LoRa settings"
+  },
   "meshtasticTraffic": "Traffic",
-  "@meshtasticTraffic": {"description": "Section: packet counters"},
+  "@meshtasticTraffic": {
+    "description": "Section: packet counters"
+  },
   "meshtasticChannels": "Channels",
-  "@meshtasticChannels": {"description": "Section: the radio's channel table"},
+  "@meshtasticChannels": {
+    "description": "Section: the radio's channel table"
+  },
   "meshtasticName": "Name",
-  "@meshtasticName": {"description": "The radio's long name"},
+  "@meshtasticName": {
+    "description": "The radio's long name"
+  },
   "meshtasticShortName": "Short name",
-  "@meshtasticShortName": {"description": "The radio's short name"},
+  "@meshtasticShortName": {
+    "description": "The radio's short name"
+  },
   "meshtasticNodeId": "Node ID",
-  "@meshtasticNodeId": {"description": "The radio's node number"},
+  "@meshtasticNodeId": {
+    "description": "The radio's node number"
+  },
   "meshtasticHardware": "Hardware",
-  "@meshtasticHardware": {"description": "Board model"},
+  "@meshtasticHardware": {
+    "description": "Board model"
+  },
   "meshtasticFirmware": "Firmware",
-  "@meshtasticFirmware": {"description": "Firmware version"},
+  "@meshtasticFirmware": {
+    "description": "Firmware version"
+  },
   "meshtasticRole": "Role",
-  "@meshtasticRole": {"description": "Device role (client, router...)"},
+  "@meshtasticRole": {
+    "description": "Device role (client, router...)"
+  },
   "meshtasticBattery": "Battery",
-  "@meshtasticBattery": {"description": "Battery charge"},
+  "@meshtasticBattery": {
+    "description": "Battery charge"
+  },
   "meshtasticExternalPower": "External power",
-  "@meshtasticExternalPower": {"description": "Battery value when mains powered"},
+  "@meshtasticExternalPower": {
+    "description": "Battery value when mains powered"
+  },
   "meshtasticVoltage": "Voltage",
-  "@meshtasticVoltage": {"description": "Battery voltage"},
+  "@meshtasticVoltage": {
+    "description": "Battery voltage"
+  },
   "meshtasticUptime": "Uptime",
-  "@meshtasticUptime": {"description": "Time since the radio booted"},
+  "@meshtasticUptime": {
+    "description": "Time since the radio booted"
+  },
   "meshtasticRegionLabel": "Region",
-  "@meshtasticRegionLabel": {"description": "LoRa region"},
+  "@meshtasticRegionLabel": {
+    "description": "LoRa region"
+  },
   "meshtasticPreset": "Modem preset",
-  "@meshtasticPreset": {"description": "LoRa modem preset"},
+  "@meshtasticPreset": {
+    "description": "LoRa modem preset"
+  },
   "meshtasticHopLimit": "Hop limit",
-  "@meshtasticHopLimit": {"description": "How many hops a packet may take"},
+  "@meshtasticHopLimit": {
+    "description": "How many hops a packet may take"
+  },
   "meshtasticTxPower": "TX power",
-  "@meshtasticTxPower": {"description": "Transmit power"},
+  "@meshtasticTxPower": {
+    "description": "Transmit power"
+  },
   "meshtasticChannelUse": "Channel use",
-  "@meshtasticChannelUse": {"description": "Share of airtime seen busy"},
+  "@meshtasticChannelUse": {
+    "description": "Share of airtime seen busy"
+  },
   "meshtasticAirtime": "Air time (TX)",
-  "@meshtasticAirtime": {"description": "Share of airtime this radio transmitted"},
+  "@meshtasticAirtime": {
+    "description": "Share of airtime this radio transmitted"
+  },
   "meshtasticDpipChannel": "DPIP channel",
-  "@meshtasticDpipChannel": {"description": "Which channel DPIP payloads use"},
+  "@meshtasticDpipChannel": {
+    "description": "Which channel DPIP payloads use"
+  },
   "meshtasticReceived": "Received",
-  "@meshtasticReceived": {"description": "Packets received this session"},
+  "@meshtasticReceived": {
+    "description": "Packets received this session"
+  },
   "meshtasticSent": "Sent",
-  "@meshtasticSent": {"description": "Packets sent this session"},
+  "@meshtasticSent": {
+    "description": "Packets sent this session"
+  },
   "meshtasticUndecoded": "Not decrypted",
-  "@meshtasticUndecoded": {"description": "Packets the radio could not decrypt"},
+  "@meshtasticUndecoded": {
+    "description": "Packets the radio could not decrypt"
+  },
   "meshtasticLastReceived": "Last received",
-  "@meshtasticLastReceived": {"description": "Age of the last received packet"},
+  "@meshtasticLastReceived": {
+    "description": "Age of the last received packet"
+  },
   "meshtasticLastSent": "Last sent",
-  "@meshtasticLastSent": {"description": "Age of the last sent packet"}
+  "@meshtasticLastSent": {
+    "description": "Age of the last sent packet"
+  },
+  "meshtasticReadingAge": "Reading taken",
+  "@meshtasticReadingAge": {
+    "description": "How old the battery/airtime numbers are"
+  },
+  "meshtasticNotifyMessages": "Notify on new messages",
+  "@meshtasticNotifyMessages": {
+    "description": "Toggle: local notification for an incoming mesh message"
+  },
+  "meshtasticNotifyNodes": "Notify on new nodes",
+  "@meshtasticNotifyNodes": {
+    "description": "Toggle: local notification when a new node is heard"
+  },
+  "mapLayerMeshtastic": "Meshtastic nodes",
+  "@mapLayerMeshtastic": {
+    "description": "Map layer name: mesh nodes"
+  },
+  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
+  "@mapLayerMeshtasticSubtitle": {
+    "description": "Map layer switcher subtitle"
+  },
+  "meshtasticNoHistory": "Not enough history yet",
+  "@meshtasticNoHistory": {
+    "description": "Chart placeholder before two samples exist"
+  },
+  "meshtasticUtilization": "Airtime (24h)",
+  "@meshtasticUtilization": {
+    "description": "Section title for the 24h airtime chart"
+  },
+  "moonTitle": "Moon",
+  "@moonTitle": {
+    "description": "Moon page title"
+  },
+  "moonSubtitle": "Lunar phase and illumination — computed locally",
+  "@moonSubtitle": {
+    "description": "Moon entry card subtitle in the data catalogue"
+  },
+  "dataSectionAstronomy": "Astronomy",
+  "@dataSectionAstronomy": {
+    "description": "Astronomy section header in the data catalogue"
+  },
+  "moonAge": "Age",
+  "@moonAge": {
+    "description": "Moon age label"
+  },
+  "moonDays": "days",
+  "@moonDays": {
+    "description": "Day unit for the moon age"
+  },
+  "moonNextFullMoon": "Next full moon",
+  "@moonNextFullMoon": {
+    "description": "Next full moon date label"
+  },
+  "moonTimelineCaption": "Phase",
+  "@moonTimelineCaption": {
+    "description": "Moon phase timeline caption"
+  },
+  "moonPhaseNew": "New moon",
+  "@moonPhaseNew": {
+    "description": "Phase: new moon"
+  },
+  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "@moonPhaseWaxingCrescent": {
+    "description": "Phase: waxing crescent"
+  },
+  "moonPhaseFirstQuarter": "First quarter",
+  "@moonPhaseFirstQuarter": {
+    "description": "Phase: first quarter"
+  },
+  "moonPhaseWaxingGibbous": "Waxing gibbous",
+  "@moonPhaseWaxingGibbous": {
+    "description": "Phase: waxing gibbous"
+  },
+  "moonPhaseFull": "Full moon",
+  "@moonPhaseFull": {
+    "description": "Phase: full moon"
+  },
+  "moonPhaseWaningGibbous": "Waning gibbous",
+  "@moonPhaseWaningGibbous": {
+    "description": "Phase: waning gibbous"
+  },
+  "moonPhaseLastQuarter": "Last quarter",
+  "@moonPhaseLastQuarter": {
+    "description": "Phase: last quarter"
+  },
+  "moonPhaseWaningCrescent": "Waning crescent",
+  "@moonPhaseWaningCrescent": {
+    "description": "Phase: waning crescent"
+  },
+  "meshtasticLastHeard": "Last heard",
+  "@meshtasticLastHeard": {"description": "When a node last transmitted"},
+  "meshtasticPosition": "Position",
+  "@meshtasticPosition": {"description": "A node's reported coordinates"},
+  "meshtasticTapNode": "Tap a node for details",
+  "@meshtasticTapNode": {"description": "Resting state of the map node sheet"},
+  "meshtasticLayerOptions": "Node options",
+  "@meshtasticLayerOptions": {"description": "Tooltip for the mesh layer's options chip"},
+  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "@meshtasticExcludeMqtt": {"description": "Toggle hiding internet-bridged nodes"},
+  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
+  "@meshtasticExcludeMqttSubtitle": {"description": "What an MQTT node is"},
+  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "@meshtasticExcludeMqttHidden": {"description": "How many nodes the filter is hiding", "placeholders": {"count": {"type": "int"}}},
+  "meshtasticOnline": "Heard recently",
+  "@meshtasticOnline": {"description": "Legend: node heard within the online window"},
+  "meshtasticSilent": "Silent",
+  "@meshtasticSilent": {"description": "Legend: node known but not heard recently"},
+  "meshtasticViaMqtt": "Via MQTT (internet)",
+  "@meshtasticViaMqtt": {"description": "Legend: node reported over an MQTT bridge"}
 }

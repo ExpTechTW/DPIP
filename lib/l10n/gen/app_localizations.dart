@@ -3432,7 +3432,7 @@ abstract class AppLocalizations {
   /// Meshtastic test page title
   ///
   /// In en, this message translates to:
-  /// **'Mesh Network Test'**
+  /// **'Meshtastic'**
   String get meshtasticTitle;
 
   /// Start scanning for Meshtastic radios
@@ -3818,6 +3818,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last sent'**
   String get meshtasticLastSent;
+
+  /// How old the battery/airtime numbers are
+  ///
+  /// In en, this message translates to:
+  /// **'Reading taken'**
+  String get meshtasticReadingAge;
+
+  /// Toggle: local notification for an incoming mesh message
+  ///
+  /// In en, this message translates to:
+  /// **'Notify on new messages'**
+  String get meshtasticNotifyMessages;
+
+  /// Toggle: local notification when a new node is heard
+  ///
+  /// In en, this message translates to:
+  /// **'Notify on new nodes'**
+  String get meshtasticNotifyNodes;
+
+  /// Map layer name: mesh nodes
+  ///
+  /// In en, this message translates to:
+  /// **'Meshtastic nodes'**
+  String get mapLayerMeshtastic;
+
+  /// Map layer switcher subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'LoRa mesh nodes heard by your radio'**
+  String get mapLayerMeshtasticSubtitle;
+
+  /// Chart placeholder before two samples exist
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough history yet'**
+  String get meshtasticNoHistory;
+
+  /// Section title for the 24h airtime chart
+  ///
+  /// In en, this message translates to:
+  /// **'Airtime (24h)'**
+  String get meshtasticUtilization;
+
+  /// Moon page title
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get moonTitle;
+
+  /// Moon entry card subtitle in the data catalogue
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar phase and illumination — computed locally'**
+  String get moonSubtitle;
+
+  /// Astronomy section header in the data catalogue
+  ///
+  /// In en, this message translates to:
+  /// **'Astronomy'**
+  String get dataSectionAstronomy;
+
+  /// Moon age label
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get moonAge;
+
+  /// Day unit for the moon age
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get moonDays;
+
+  /// Next full moon date label
+  ///
+  /// In en, this message translates to:
+  /// **'Next full moon'**
+  String get moonNextFullMoon;
+
+  /// Moon phase timeline caption
+  ///
+  /// In en, this message translates to:
+  /// **'Phase'**
+  String get moonTimelineCaption;
+
+  /// Phase: new moon
+  ///
+  /// In en, this message translates to:
+  /// **'New moon'**
+  String get moonPhaseNew;
+
+  /// Phase: waxing crescent
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing crescent'**
+  String get moonPhaseWaxingCrescent;
+
+  /// Phase: first quarter
+  ///
+  /// In en, this message translates to:
+  /// **'First quarter'**
+  String get moonPhaseFirstQuarter;
+
+  /// Phase: waxing gibbous
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing gibbous'**
+  String get moonPhaseWaxingGibbous;
+
+  /// Phase: full moon
+  ///
+  /// In en, this message translates to:
+  /// **'Full moon'**
+  String get moonPhaseFull;
+
+  /// Phase: waning gibbous
+  ///
+  /// In en, this message translates to:
+  /// **'Waning gibbous'**
+  String get moonPhaseWaningGibbous;
+
+  /// Phase: last quarter
+  ///
+  /// In en, this message translates to:
+  /// **'Last quarter'**
+  String get moonPhaseLastQuarter;
+
+  /// Phase: waning crescent
+  ///
+  /// In en, this message translates to:
+  /// **'Waning crescent'**
+  String get moonPhaseWaningCrescent;
+
+  /// When a node last transmitted
+  ///
+  /// In en, this message translates to:
+  /// **'Last heard'**
+  String get meshtasticLastHeard;
+
+  /// A node's reported coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'Position'**
+  String get meshtasticPosition;
+
+  /// Resting state of the map node sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a node for details'**
+  String get meshtasticTapNode;
+
+  /// Tooltip for the mesh layer's options chip
+  ///
+  /// In en, this message translates to:
+  /// **'Node options'**
+  String get meshtasticLayerOptions;
+
+  /// Toggle hiding internet-bridged nodes
+  ///
+  /// In en, this message translates to:
+  /// **'Hide MQTT nodes'**
+  String get meshtasticExcludeMqtt;
+
+  /// What an MQTT node is
+  ///
+  /// In en, this message translates to:
+  /// **'Nodes bridged over the internet, not heard by radio'**
+  String get meshtasticExcludeMqttSubtitle;
+
+  /// How many nodes the filter is hiding
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hidden'**
+  String meshtasticExcludeMqttHidden(int count);
+
+  /// Legend: node heard within the online window
+  ///
+  /// In en, this message translates to:
+  /// **'Heard recently'**
+  String get meshtasticOnline;
+
+  /// Legend: node known but not heard recently
+  ///
+  /// In en, this message translates to:
+  /// **'Silent'**
+  String get meshtasticSilent;
+
+  /// Legend: node reported over an MQTT bridge
+  ///
+  /// In en, this message translates to:
+  /// **'Via MQTT (internet)'**
+  String get meshtasticViaMqtt;
 }
 
 class _AppLocalizationsDelegate

@@ -1812,7 +1812,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get windForecastTownOutlineHint => 'The finer mesh';
 
   @override
-  String get meshtasticTitle => 'Mesh Network Test';
+  String get meshtasticTitle => 'Meshtastic';
 
   @override
   String get meshtasticScan => 'Scan';
@@ -2011,4 +2011,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get meshtasticLastSent => 'Last sent';
+
+  @override
+  String get meshtasticReadingAge => 'Reading taken';
+
+  @override
+  String get meshtasticNotifyMessages => 'Notify on new messages';
+
+  @override
+  String get meshtasticNotifyNodes => 'Notify on new nodes';
+
+  @override
+  String get mapLayerMeshtastic => 'Meshtastic nodes';
+
+  @override
+  String get mapLayerMeshtasticSubtitle =>
+      'LoRa mesh nodes heard by your radio';
+
+  @override
+  String get meshtasticNoHistory => 'Not enough history yet';
+
+  @override
+  String get meshtasticUtilization => 'Airtime (24h)';
+
+  @override
+  String get moonTitle => 'Moon';
+
+  @override
+  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
+
+  @override
+  String get dataSectionAstronomy => 'Astronomy';
+
+  @override
+  String get moonAge => 'Age';
+
+  @override
+  String get moonDays => 'days';
+
+  @override
+  String get moonNextFullMoon => 'Next full moon';
+
+  @override
+  String get moonTimelineCaption => 'Phase';
+
+  @override
+  String get moonPhaseNew => 'New moon';
+
+  @override
+  String get moonPhaseWaxingCrescent => 'Waxing crescent';
+
+  @override
+  String get moonPhaseFirstQuarter => 'First quarter';
+
+  @override
+  String get moonPhaseWaxingGibbous => 'Waxing gibbous';
+
+  @override
+  String get moonPhaseFull => 'Full moon';
+
+  @override
+  String get moonPhaseWaningGibbous => 'Waning gibbous';
+
+  @override
+  String get moonPhaseLastQuarter => 'Last quarter';
+
+  @override
+  String get moonPhaseWaningCrescent => 'Waning crescent';
+
+  @override
+  String get meshtasticLastHeard => 'Last heard';
+
+  @override
+  String get meshtasticPosition => 'Position';
+
+  @override
+  String get meshtasticTapNode => 'Tap a node for details';
+
+  @override
+  String get meshtasticLayerOptions => 'Node options';
+
+  @override
+  String get meshtasticExcludeMqtt => 'Hide MQTT nodes';
+
+  @override
+  String get meshtasticExcludeMqttSubtitle =>
+      'Nodes bridged over the internet, not heard by radio';
+
+  @override
+  String meshtasticExcludeMqttHidden(int count) {
+    return '$count hidden';
+  }
+
+  @override
+  String get meshtasticOnline => 'Heard recently';
+
+  @override
+  String get meshtasticSilent => 'Silent';
+
+  @override
+  String get meshtasticViaMqtt => 'Via MQTT (internet)';
 }

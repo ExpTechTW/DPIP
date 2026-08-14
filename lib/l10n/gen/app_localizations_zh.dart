@@ -1772,7 +1772,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get windForecastTownOutlineHint => '更細的網格';
 
   @override
-  String get meshtasticTitle => '網狀網路測試';
+  String get meshtasticTitle => 'Meshtastic';
 
   @override
   String get meshtasticScan => '掃描';
@@ -1969,6 +1969,104 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get meshtasticLastSent => '最近送出';
+
+  @override
+  String get meshtasticReadingAge => '數值時間';
+
+  @override
+  String get meshtasticNotifyMessages => '新訊息通知';
+
+  @override
+  String get meshtasticNotifyNodes => '新節點通知';
+
+  @override
+  String get mapLayerMeshtastic => 'Meshtastic 節點';
+
+  @override
+  String get mapLayerMeshtasticSubtitle => '電台聽到過的 LoRa 網狀網路節點';
+
+  @override
+  String get meshtasticNoHistory => '歷史紀錄還不夠';
+
+  @override
+  String get meshtasticUtilization => '空中工時（24 小時）';
+
+  @override
+  String get moonTitle => '月亮';
+
+  @override
+  String get moonSubtitle => '月相與亮度 — 完全本地計算';
+
+  @override
+  String get dataSectionAstronomy => '天文';
+
+  @override
+  String get moonAge => '月齡';
+
+  @override
+  String get moonDays => '天';
+
+  @override
+  String get moonNextFullMoon => '下次滿月';
+
+  @override
+  String get moonTimelineCaption => '月相';
+
+  @override
+  String get moonPhaseNew => '新月';
+
+  @override
+  String get moonPhaseWaxingCrescent => '眉月';
+
+  @override
+  String get moonPhaseFirstQuarter => '上弦月';
+
+  @override
+  String get moonPhaseWaxingGibbous => '盈凸月';
+
+  @override
+  String get moonPhaseFull => '滿月';
+
+  @override
+  String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get moonPhaseLastQuarter => '下弦月';
+
+  @override
+  String get moonPhaseWaningCrescent => '殘月';
+
+  @override
+  String get meshtasticLastHeard => '最後聽到';
+
+  @override
+  String get meshtasticPosition => '位置';
+
+  @override
+  String get meshtasticTapNode => '點選節點查看詳細資訊';
+
+  @override
+  String get meshtasticLayerOptions => '節點選項';
+
+  @override
+  String get meshtasticExcludeMqtt => '隱藏 MQTT 節點';
+
+  @override
+  String get meshtasticExcludeMqttSubtitle => '經網際網路橋接、並非無線電聽到的節點';
+
+  @override
+  String meshtasticExcludeMqttHidden(int count) {
+    return '已隱藏 $count 個';
+  }
+
+  @override
+  String get meshtasticOnline => '近期聽到';
+
+  @override
+  String get meshtasticSilent => '已靜默';
+
+  @override
+  String get meshtasticViaMqtt => '經 MQTT（網際網路）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3738,7 +3836,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get windForecastTownOutlineHint => '更细的网格';
 
   @override
-  String get meshtasticTitle => '網狀網路測試';
+  String get meshtasticTitle => 'Meshtastic';
 
   @override
   String get meshtasticScan => '掃描';
@@ -3935,6 +4033,104 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastSent => '最近送出';
+
+  @override
+  String get meshtasticReadingAge => '数值时间';
+
+  @override
+  String get meshtasticNotifyMessages => '新讯息通知';
+
+  @override
+  String get meshtasticNotifyNodes => '新节点通知';
+
+  @override
+  String get mapLayerMeshtastic => 'Meshtastic 节点';
+
+  @override
+  String get mapLayerMeshtasticSubtitle => '电台听到过的 LoRa 网状网路节点';
+
+  @override
+  String get meshtasticNoHistory => '历史纪录还不够';
+
+  @override
+  String get meshtasticUtilization => '空中工时（24 小时）';
+
+  @override
+  String get moonTitle => '月亮';
+
+  @override
+  String get moonSubtitle => '月相與亮度 — 完全本地計算';
+
+  @override
+  String get dataSectionAstronomy => '天文';
+
+  @override
+  String get moonAge => '月齡';
+
+  @override
+  String get moonDays => '天';
+
+  @override
+  String get moonNextFullMoon => '下次滿月';
+
+  @override
+  String get moonTimelineCaption => '月相';
+
+  @override
+  String get moonPhaseNew => '新月';
+
+  @override
+  String get moonPhaseWaxingCrescent => '眉月';
+
+  @override
+  String get moonPhaseFirstQuarter => '上弦月';
+
+  @override
+  String get moonPhaseWaxingGibbous => '盈凸月';
+
+  @override
+  String get moonPhaseFull => '滿月';
+
+  @override
+  String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get moonPhaseLastQuarter => '下弦月';
+
+  @override
+  String get moonPhaseWaningCrescent => '殘月';
+
+  @override
+  String get meshtasticLastHeard => '最后听到';
+
+  @override
+  String get meshtasticPosition => '位置';
+
+  @override
+  String get meshtasticTapNode => '点选节点查看详细信息';
+
+  @override
+  String get meshtasticLayerOptions => '节点选项';
+
+  @override
+  String get meshtasticExcludeMqtt => '隐藏 MQTT 节点';
+
+  @override
+  String get meshtasticExcludeMqttSubtitle => '经互联网桥接、并非无线电听到的节点';
+
+  @override
+  String meshtasticExcludeMqttHidden(int count) {
+    return '已隐藏 $count 个';
+  }
+
+  @override
+  String get meshtasticOnline => '近期听到';
+
+  @override
+  String get meshtasticSilent => '已静默';
+
+  @override
+  String get meshtasticViaMqtt => '经 MQTT（互联网）';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -5704,7 +5900,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get windForecastTownOutlineHint => '更細的網格';
 
   @override
-  String get meshtasticTitle => '網狀網路測試';
+  String get meshtasticTitle => 'Meshtastic';
 
   @override
   String get meshtasticScan => '掃描';
@@ -5901,6 +6097,104 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastSent => '最近送出';
+
+  @override
+  String get meshtasticReadingAge => '數值時間';
+
+  @override
+  String get meshtasticNotifyMessages => '新訊息通知';
+
+  @override
+  String get meshtasticNotifyNodes => '新節點通知';
+
+  @override
+  String get mapLayerMeshtastic => 'Meshtastic 節點';
+
+  @override
+  String get mapLayerMeshtasticSubtitle => '電台聽到過的 LoRa 網狀網路節點';
+
+  @override
+  String get meshtasticNoHistory => '歷史紀錄還不夠';
+
+  @override
+  String get meshtasticUtilization => '空中工時（24 小時）';
+
+  @override
+  String get moonTitle => '月亮';
+
+  @override
+  String get moonSubtitle => '月相與亮度 — 完全本地計算';
+
+  @override
+  String get dataSectionAstronomy => '天文';
+
+  @override
+  String get moonAge => '月齡';
+
+  @override
+  String get moonDays => '天';
+
+  @override
+  String get moonNextFullMoon => '下次滿月';
+
+  @override
+  String get moonTimelineCaption => '月相';
+
+  @override
+  String get moonPhaseNew => '新月';
+
+  @override
+  String get moonPhaseWaxingCrescent => '眉月';
+
+  @override
+  String get moonPhaseFirstQuarter => '上弦月';
+
+  @override
+  String get moonPhaseWaxingGibbous => '盈凸月';
+
+  @override
+  String get moonPhaseFull => '滿月';
+
+  @override
+  String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get moonPhaseLastQuarter => '下弦月';
+
+  @override
+  String get moonPhaseWaningCrescent => '殘月';
+
+  @override
+  String get meshtasticLastHeard => '最後聽到';
+
+  @override
+  String get meshtasticPosition => '位置';
+
+  @override
+  String get meshtasticTapNode => '點選節點查看詳細資訊';
+
+  @override
+  String get meshtasticLayerOptions => '節點選項';
+
+  @override
+  String get meshtasticExcludeMqtt => '隱藏 MQTT 節點';
+
+  @override
+  String get meshtasticExcludeMqttSubtitle => '經網際網路橋接、並非無線電聽到的節點';
+
+  @override
+  String meshtasticExcludeMqttHidden(int count) {
+    return '已隱藏 $count 個';
+  }
+
+  @override
+  String get meshtasticOnline => '近期聽到';
+
+  @override
+  String get meshtasticSilent => '已靜默';
+
+  @override
+  String get meshtasticViaMqtt => '經 MQTT（網際網路）';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7670,7 +7964,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get windForecastTownOutlineHint => '更細的網格';
 
   @override
-  String get meshtasticTitle => '網狀網路測試';
+  String get meshtasticTitle => 'Meshtastic';
 
   @override
   String get meshtasticScan => '掃描';
@@ -7867,4 +8161,102 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get meshtasticLastSent => '最近送出';
+
+  @override
+  String get meshtasticReadingAge => '數值時間';
+
+  @override
+  String get meshtasticNotifyMessages => '新訊息通知';
+
+  @override
+  String get meshtasticNotifyNodes => '新節點通知';
+
+  @override
+  String get mapLayerMeshtastic => 'Meshtastic 節點';
+
+  @override
+  String get mapLayerMeshtasticSubtitle => '電台聽到過的 LoRa 網狀網路節點';
+
+  @override
+  String get meshtasticNoHistory => '歷史紀錄還不夠';
+
+  @override
+  String get meshtasticUtilization => '空中工時（24 小時）';
+
+  @override
+  String get moonTitle => '月亮';
+
+  @override
+  String get moonSubtitle => '月相與亮度 — 完全本地計算';
+
+  @override
+  String get dataSectionAstronomy => '天文';
+
+  @override
+  String get moonAge => '月齡';
+
+  @override
+  String get moonDays => '天';
+
+  @override
+  String get moonNextFullMoon => '下次滿月';
+
+  @override
+  String get moonTimelineCaption => '月相';
+
+  @override
+  String get moonPhaseNew => '新月';
+
+  @override
+  String get moonPhaseWaxingCrescent => '眉月';
+
+  @override
+  String get moonPhaseFirstQuarter => '上弦月';
+
+  @override
+  String get moonPhaseWaxingGibbous => '盈凸月';
+
+  @override
+  String get moonPhaseFull => '滿月';
+
+  @override
+  String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get moonPhaseLastQuarter => '下弦月';
+
+  @override
+  String get moonPhaseWaningCrescent => '殘月';
+
+  @override
+  String get meshtasticLastHeard => '最後聽到';
+
+  @override
+  String get meshtasticPosition => '位置';
+
+  @override
+  String get meshtasticTapNode => '點選節點查看詳細資訊';
+
+  @override
+  String get meshtasticLayerOptions => '節點選項';
+
+  @override
+  String get meshtasticExcludeMqtt => '隱藏 MQTT 節點';
+
+  @override
+  String get meshtasticExcludeMqttSubtitle => '經網際網路橋接、並非無線電聽到的節點';
+
+  @override
+  String meshtasticExcludeMqttHidden(int count) {
+    return '已隱藏 $count 個';
+  }
+
+  @override
+  String get meshtasticOnline => '近期聽到';
+
+  @override
+  String get meshtasticSilent => '已靜默';
+
+  @override
+  String get meshtasticViaMqtt => '經 MQTT（網際網路）';
 }

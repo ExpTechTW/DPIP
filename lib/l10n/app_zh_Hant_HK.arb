@@ -156,7 +156,6 @@
   "homeRainTrendMinute": "{minute}分",
   "homeRainTrendUpdated": "更新 {time}",
   "homeRainTrendNoData": "無資料",
-
   "homeRainTrendScattered": "可能會有零星降雨",
   "homeRainTrendLightSustained": "未來 1 小時會有持續小雨",
   "homeRainTrendLightStopping": "預計 {minutes} 分鐘後停止下小雨",
@@ -385,32 +384,26 @@
   "disasterMapOverlayRestroomTooltip": "顯示公廁",
   "disasterMapOverlayShelterTooltip": "顯示避難收容場所",
   "dpmOpenInMaps": "開啟地圖",
-  "@dpmOpenInMaps": {
-  },
+  "@dpmOpenInMaps": {},
   "mapAppGoogleMaps": "Google Maps",
-  "@mapAppGoogleMaps": {
-  },
+  "@mapAppGoogleMaps": {},
   "mapAppAppleMaps": "Apple Maps",
-  "@mapAppAppleMaps": {
-  },
+  "@mapAppAppleMaps": {},
   "mapAppDefault": "{app}（預設）",
   "@mapAppDefault": {
     "placeholders": {
-      "app": {"type": "String"}
+      "app": {
+        "type": "String"
+      }
     }
   },
   "mapAppCopyCoordinates": "複製座標",
-  "@mapAppCopyCoordinates": {
-  },
+  "@mapAppCopyCoordinates": {},
   "mapAppCoordinatesCopied": "已複製座標",
-  "@mapAppCoordinatesCopied": {
-  },
+  "@mapAppCoordinatesCopied": {},
   "mapAppOpenFailed": "無法開啟 {app}",
-  "@mapAppOpenFailed": {
-  },
-
+  "@mapAppOpenFailed": {},
   "mapAppCallFailed": "此裝置無法撥打電話",
-
   "mapOverlaySectionReference": "參考圖層",
   "mapLayerCategoryEarthquake": "地震",
   "mapLayerCategoryTyphoon": "颱風",
@@ -418,15 +411,13 @@
   "mapLayerCategorySatellite": "衛星",
   "mapLayerCategoryRadar": "雷達",
   "mapLayerCategoryLife": "生活",
-  "mapLayerCategoryForecast": "數值預報",  "mapOverlaySectionMap": "地圖",
+  "mapLayerCategoryForecast": "數值預報",
+  "mapOverlaySectionMap": "地圖",
   "rainIntervalSection": "統計時間",
-
   "mapTownLabels": "鄉鎮名稱",
   "mapTownLabelsHint": "放大時顯示鄉鎮名稱",
-
   "mapTerrainRelief": "地形立體感",
   "mapTerrainReliefHint": "在底圖上顯示立體地形陰影",
-
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "dpmAddress": "地址",
   "restroomTypeLabel": "廁所類型",
@@ -670,134 +661,377 @@
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
-  "meshtasticTitle": "網狀網路測試",
-  "@meshtasticTitle": {"description": "Meshtastic test page title"},
+  "meshtasticTitle": "Meshtastic",
+  "@meshtasticTitle": {
+    "description": "Meshtastic test page title"
+  },
   "meshtasticScan": "掃描",
-  "@meshtasticScan": {"description": "Start scanning for Meshtastic radios"},
+  "@meshtasticScan": {
+    "description": "Start scanning for Meshtastic radios"
+  },
   "meshtasticScanning": "掃描中…",
-  "@meshtasticScanning": {"description": "Scan in progress"},
+  "@meshtasticScanning": {
+    "description": "Scan in progress"
+  },
   "meshtasticDisconnect": "斷線",
-  "@meshtasticDisconnect": {"description": "Disconnect from the radio"},
+  "@meshtasticDisconnect": {
+    "description": "Disconnect from the radio"
+  },
   "meshtasticNoDevices": "找不到 Meshtastic 裝置",
-  "@meshtasticNoDevices": {"description": "Empty scan result"},
+  "@meshtasticNoDevices": {
+    "description": "Empty scan result"
+  },
   "meshtasticInitializing": "藍牙初始化中…",
-  "@meshtasticInitializing": {"description": "Bluetooth init in progress"},
+  "@meshtasticInitializing": {
+    "description": "Bluetooth init in progress"
+  },
   "meshtasticReady": "就緒 — 按「掃描」搜尋無線電",
-  "@meshtasticReady": {"description": "Idle state hint"},
+  "@meshtasticReady": {
+    "description": "Idle state hint"
+  },
   "meshtasticNotSupported": "此裝置不支援藍牙",
-  "@meshtasticNotSupported": {"description": "Bluetooth unavailable"},
+  "@meshtasticNotSupported": {
+    "description": "Bluetooth unavailable"
+  },
   "meshtasticNodes": "節點",
-  "@meshtasticNodes": {"description": "Mesh nodes section header"},
+  "@meshtasticNodes": {
+    "description": "Mesh nodes section header"
+  },
   "meshtasticMessages": "訊息",
-  "@meshtasticMessages": {"description": "Mesh messages section header"},
+  "@meshtasticMessages": {
+    "description": "Mesh messages section header"
+  },
   "meshtasticSend": "傳送",
-  "@meshtasticSend": {"description": "Send message button"},
+  "@meshtasticSend": {
+    "description": "Send message button"
+  },
   "meshtasticSendHint": "要廣播的訊息",
-  "@meshtasticSendHint": {"description": "Message input hint"},
+  "@meshtasticSendHint": {
+    "description": "Message input hint"
+  },
   "meshtasticStateDisconnected": "未連線",
-  "@meshtasticStateDisconnected": {"description": "Connection state label"},
+  "@meshtasticStateDisconnected": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConnecting": "連線中…",
-  "@meshtasticStateConnecting": {"description": "Connection state label"},
+  "@meshtasticStateConnecting": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConfiguring": "設定中…",
-  "@meshtasticStateConfiguring": {"description": "Connection state label"},
+  "@meshtasticStateConfiguring": {
+    "description": "Connection state label"
+  },
   "meshtasticStateConnected": "已連線",
-  "@meshtasticStateConnected": {"description": "Connection state label"},
+  "@meshtasticStateConnected": {
+    "description": "Connection state label"
+  },
   "meshtasticStateError": "錯誤",
-  "@meshtasticStateError": {"description": "Connection state label"},
+  "@meshtasticStateError": {
+    "description": "Connection state label"
+  },
   "meshtasticFailed": "操作失敗",
-  "@meshtasticFailed": {"description": "Generic operation failure toast"},
+  "@meshtasticFailed": {
+    "description": "Generic operation failure toast"
+  },
   "meshtasticNoMessages": "尚無訊息",
-  "@meshtasticNoMessages": {"description": "Empty message log while connected"},
+  "@meshtasticNoMessages": {
+    "description": "Empty message log while connected"
+  },
   "meshtasticNoNodes": "尚未聽到任何節點",
-  "@meshtasticNoNodes": {"description": "Empty node list"},
+  "@meshtasticNoNodes": {
+    "description": "Empty node list"
+  },
   "meshtasticNotConnected": "尚未連線至裝置",
-  "@meshtasticNotConnected": {"description": "Empty message log while not connected"},
+  "@meshtasticNotConnected": {
+    "description": "Empty message log while not connected"
+  },
   "meshtasticSelectDevice": "選擇裝置",
-  "@meshtasticSelectDevice": {"description": "Device picker sheet title"},
+  "@meshtasticSelectDevice": {
+    "description": "Device picker sheet title"
+  },
   "meshtasticClearMessages": "清除訊息",
-  "@meshtasticClearMessages": {"description": "Menu action clearing the message log"},
+  "@meshtasticClearMessages": {
+    "description": "Menu action clearing the message log"
+  },
   "meshtasticEmptyMessage": "（空白訊息）",
-  "@meshtasticEmptyMessage": {"description": "Placeholder for a text packet with no body"},
+  "@meshtasticEmptyMessage": {
+    "description": "Placeholder for a text packet with no body"
+  },
   "meshtasticCopied": "已複製訊息",
-  "@meshtasticCopied": {"description": "Toast shown after copying a message"},
+  "@meshtasticCopied": {
+    "description": "Toast shown after copying a message"
+  },
   "commonCancel": "取消",
-  "@commonCancel": {"description": "Dismisses a dialog without acting"},
+  "@commonCancel": {
+    "description": "Dismisses a dialog without acting"
+  },
   "meshtasticReconnecting": "重新連線中…",
-  "@meshtasticReconnecting": {"description": "The link dropped and is being re-established"},
+  "@meshtasticReconnecting": {
+    "description": "The link dropped and is being re-established"
+  },
   "meshtasticChannelWorking": "正在設定 DPIP 頻道…",
-  "@meshtasticChannelWorking": {"description": "Creating/verifying the DPIP channel"},
+  "@meshtasticChannelWorking": {
+    "description": "Creating/verifying the DPIP channel"
+  },
   "meshtasticChannelReady": "DPIP 頻道已就緒",
-  "@meshtasticChannelReady": {"description": "The DPIP channel exists on the radio"},
+  "@meshtasticChannelReady": {
+    "description": "The DPIP channel exists on the radio"
+  },
   "meshtasticChannelNoSlot": "沒有可用的頻道空位 — 請先在裝置上空出一個",
-  "@meshtasticChannelNoSlot": {"description": "Every secondary channel slot is taken"},
+  "@meshtasticChannelNoSlot": {
+    "description": "Every secondary channel slot is taken"
+  },
   "meshtasticChannelFailed": "無法設定 DPIP 頻道",
-  "@meshtasticChannelFailed": {"description": "The radio rejected the channel write"},
+  "@meshtasticChannelFailed": {
+    "description": "The radio rejected the channel write"
+  },
   "meshtasticRegionMismatch": "裝置地區為 {region} — DPIP 需要 TW",
-  "@meshtasticRegionMismatch": {"description": "Radio is on another LoRa region than DPIP needs", "placeholders": {"region": {"type": "String"}}},
+  "@meshtasticRegionMismatch": {
+    "description": "Radio is on another LoRa region than DPIP needs",
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
   "meshtasticRegionSwitch": "切換為 TW",
-  "@meshtasticRegionSwitch": {"description": "Button applying the DPIP LoRa region"},
+  "@meshtasticRegionSwitch": {
+    "description": "Button applying the DPIP LoRa region"
+  },
   "meshtasticRegionConfirm": "要將這台裝置切換為 TW 地區嗎？裝置會重新啟動並短暫斷線，上面的其他頻道也會一起改變。",
-  "@meshtasticRegionConfirm": {"description": "Confirmation before rebooting the radio"},
+  "@meshtasticRegionConfirm": {
+    "description": "Confirmation before rebooting the radio"
+  },
   "meshtasticBusyTitle": "另一個 App 正在使用這台裝置",
-  "@meshtasticBusyTitle": {"description": "Another app holds the BLE link"},
+  "@meshtasticBusyTitle": {
+    "description": "Another app holds the BLE link"
+  },
   "meshtasticBusyBody": "請先在另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。",
-  "@meshtasticBusyBody": {"description": "Why two clients on one radio is a problem"},
+  "@meshtasticBusyBody": {
+    "description": "Why two clients on one radio is a problem"
+  },
   "meshtasticConnectAnyway": "仍要連線",
-  "@meshtasticConnectAnyway": {"description": "Connect despite the other app"},
+  "@meshtasticConnectAnyway": {
+    "description": "Connect despite the other app"
+  },
   "meshtasticRadio": "電台",
-  "@meshtasticRadio": {"description": "Radio diagnostics sheet title"},
+  "@meshtasticRadio": {
+    "description": "Radio diagnostics sheet title"
+  },
   "meshtasticDevice": "裝置",
-  "@meshtasticDevice": {"description": "Section: device identity"},
+  "@meshtasticDevice": {
+    "description": "Section: device identity"
+  },
   "meshtasticPower": "電力",
-  "@meshtasticPower": {"description": "Section: battery and uptime"},
+  "@meshtasticPower": {
+    "description": "Section: battery and uptime"
+  },
   "meshtasticRadioSettings": "LoRa",
-  "@meshtasticRadioSettings": {"description": "Section: LoRa settings"},
+  "@meshtasticRadioSettings": {
+    "description": "Section: LoRa settings"
+  },
   "meshtasticTraffic": "流量",
-  "@meshtasticTraffic": {"description": "Section: packet counters"},
+  "@meshtasticTraffic": {
+    "description": "Section: packet counters"
+  },
   "meshtasticChannels": "頻道",
-  "@meshtasticChannels": {"description": "Section: the radio's channel table"},
+  "@meshtasticChannels": {
+    "description": "Section: the radio's channel table"
+  },
   "meshtasticName": "名稱",
-  "@meshtasticName": {"description": "The radio's long name"},
+  "@meshtasticName": {
+    "description": "The radio's long name"
+  },
   "meshtasticShortName": "簡稱",
-  "@meshtasticShortName": {"description": "The radio's short name"},
+  "@meshtasticShortName": {
+    "description": "The radio's short name"
+  },
   "meshtasticNodeId": "節點 ID",
-  "@meshtasticNodeId": {"description": "The radio's node number"},
+  "@meshtasticNodeId": {
+    "description": "The radio's node number"
+  },
   "meshtasticHardware": "硬體",
-  "@meshtasticHardware": {"description": "Board model"},
+  "@meshtasticHardware": {
+    "description": "Board model"
+  },
   "meshtasticFirmware": "韌體",
-  "@meshtasticFirmware": {"description": "Firmware version"},
+  "@meshtasticFirmware": {
+    "description": "Firmware version"
+  },
   "meshtasticRole": "角色",
-  "@meshtasticRole": {"description": "Device role (client, router...)"},
+  "@meshtasticRole": {
+    "description": "Device role (client, router...)"
+  },
   "meshtasticBattery": "電量",
-  "@meshtasticBattery": {"description": "Battery charge"},
+  "@meshtasticBattery": {
+    "description": "Battery charge"
+  },
   "meshtasticExternalPower": "外部供電",
-  "@meshtasticExternalPower": {"description": "Battery value when mains powered"},
+  "@meshtasticExternalPower": {
+    "description": "Battery value when mains powered"
+  },
   "meshtasticVoltage": "電壓",
-  "@meshtasticVoltage": {"description": "Battery voltage"},
+  "@meshtasticVoltage": {
+    "description": "Battery voltage"
+  },
   "meshtasticUptime": "運行時間",
-  "@meshtasticUptime": {"description": "Time since the radio booted"},
+  "@meshtasticUptime": {
+    "description": "Time since the radio booted"
+  },
   "meshtasticRegionLabel": "地區",
-  "@meshtasticRegionLabel": {"description": "LoRa region"},
+  "@meshtasticRegionLabel": {
+    "description": "LoRa region"
+  },
   "meshtasticPreset": "調變預設",
-  "@meshtasticPreset": {"description": "LoRa modem preset"},
+  "@meshtasticPreset": {
+    "description": "LoRa modem preset"
+  },
   "meshtasticHopLimit": "跳數上限",
-  "@meshtasticHopLimit": {"description": "How many hops a packet may take"},
+  "@meshtasticHopLimit": {
+    "description": "How many hops a packet may take"
+  },
   "meshtasticTxPower": "發射功率",
-  "@meshtasticTxPower": {"description": "Transmit power"},
+  "@meshtasticTxPower": {
+    "description": "Transmit power"
+  },
   "meshtasticChannelUse": "頻道使用率",
-  "@meshtasticChannelUse": {"description": "Share of airtime seen busy"},
+  "@meshtasticChannelUse": {
+    "description": "Share of airtime seen busy"
+  },
   "meshtasticAirtime": "發射佔空比",
-  "@meshtasticAirtime": {"description": "Share of airtime this radio transmitted"},
+  "@meshtasticAirtime": {
+    "description": "Share of airtime this radio transmitted"
+  },
   "meshtasticDpipChannel": "DPIP 頻道",
-  "@meshtasticDpipChannel": {"description": "Which channel DPIP payloads use"},
+  "@meshtasticDpipChannel": {
+    "description": "Which channel DPIP payloads use"
+  },
   "meshtasticReceived": "已接收",
-  "@meshtasticReceived": {"description": "Packets received this session"},
+  "@meshtasticReceived": {
+    "description": "Packets received this session"
+  },
   "meshtasticSent": "已送出",
-  "@meshtasticSent": {"description": "Packets sent this session"},
+  "@meshtasticSent": {
+    "description": "Packets sent this session"
+  },
   "meshtasticUndecoded": "無法解密",
-  "@meshtasticUndecoded": {"description": "Packets the radio could not decrypt"},
+  "@meshtasticUndecoded": {
+    "description": "Packets the radio could not decrypt"
+  },
   "meshtasticLastReceived": "最近接收",
-  "@meshtasticLastReceived": {"description": "Age of the last received packet"},
+  "@meshtasticLastReceived": {
+    "description": "Age of the last received packet"
+  },
   "meshtasticLastSent": "最近送出",
-  "@meshtasticLastSent": {"description": "Age of the last sent packet"}
+  "@meshtasticLastSent": {
+    "description": "Age of the last sent packet"
+  },
+  "meshtasticReadingAge": "數值時間",
+  "@meshtasticReadingAge": {
+    "description": "How old the battery/airtime numbers are"
+  },
+  "meshtasticNotifyMessages": "新訊息通知",
+  "@meshtasticNotifyMessages": {
+    "description": "Toggle: local notification for an incoming mesh message"
+  },
+  "meshtasticNotifyNodes": "新節點通知",
+  "@meshtasticNotifyNodes": {
+    "description": "Toggle: local notification when a new node is heard"
+  },
+  "mapLayerMeshtastic": "Meshtastic 節點",
+  "@mapLayerMeshtastic": {
+    "description": "Map layer name: mesh nodes"
+  },
+  "mapLayerMeshtasticSubtitle": "電台聽到過的 LoRa 網狀網路節點",
+  "@mapLayerMeshtasticSubtitle": {
+    "description": "Map layer switcher subtitle"
+  },
+  "meshtasticNoHistory": "歷史紀錄還不夠",
+  "@meshtasticNoHistory": {
+    "description": "Chart placeholder before two samples exist"
+  },
+  "meshtasticUtilization": "空中工時（24 小時）",
+  "@meshtasticUtilization": {
+    "description": "Section title for the 24h airtime chart"
+  },
+  "moonTitle": "月亮",
+  "@moonTitle": {
+    "description": "Moon page title"
+  },
+  "moonSubtitle": "月相與亮度 — 完全本地計算",
+  "@moonSubtitle": {
+    "description": "Moon entry card subtitle in the data catalogue"
+  },
+  "dataSectionAstronomy": "天文",
+  "@dataSectionAstronomy": {
+    "description": "Astronomy section header in the data catalogue"
+  },
+  "moonAge": "月齡",
+  "@moonAge": {
+    "description": "Moon age label"
+  },
+  "moonDays": "天",
+  "@moonDays": {
+    "description": "Day unit for the moon age"
+  },
+  "moonNextFullMoon": "下次滿月",
+  "@moonNextFullMoon": {
+    "description": "Next full moon date label"
+  },
+  "moonTimelineCaption": "月相",
+  "@moonTimelineCaption": {
+    "description": "Moon phase timeline caption"
+  },
+  "moonPhaseNew": "新月",
+  "@moonPhaseNew": {
+    "description": "Phase: new moon"
+  },
+  "moonPhaseWaxingCrescent": "眉月",
+  "@moonPhaseWaxingCrescent": {
+    "description": "Phase: waxing crescent"
+  },
+  "moonPhaseFirstQuarter": "上弦月",
+  "@moonPhaseFirstQuarter": {
+    "description": "Phase: first quarter"
+  },
+  "moonPhaseWaxingGibbous": "盈凸月",
+  "@moonPhaseWaxingGibbous": {
+    "description": "Phase: waxing gibbous"
+  },
+  "moonPhaseFull": "滿月",
+  "@moonPhaseFull": {
+    "description": "Phase: full moon"
+  },
+  "moonPhaseWaningGibbous": "虧凸月",
+  "@moonPhaseWaningGibbous": {
+    "description": "Phase: waning gibbous"
+  },
+  "moonPhaseLastQuarter": "下弦月",
+  "@moonPhaseLastQuarter": {
+    "description": "Phase: last quarter"
+  },
+  "moonPhaseWaningCrescent": "殘月",
+  "@moonPhaseWaningCrescent": {
+    "description": "Phase: waning crescent"
+  },
+  "meshtasticLastHeard": "最後聽到",
+  "@meshtasticLastHeard": {"description": "When a node last transmitted"},
+  "meshtasticPosition": "位置",
+  "@meshtasticPosition": {"description": "A node's reported coordinates"},
+  "meshtasticTapNode": "點選節點查看詳細資訊",
+  "@meshtasticTapNode": {"description": "Resting state of the map node sheet"},
+  "meshtasticLayerOptions": "節點選項",
+  "@meshtasticLayerOptions": {"description": "Tooltip for the mesh layer's options chip"},
+  "meshtasticExcludeMqtt": "隱藏 MQTT 節點",
+  "@meshtasticExcludeMqtt": {"description": "Toggle hiding internet-bridged nodes"},
+  "meshtasticExcludeMqttSubtitle": "經網際網路橋接、並非無線電聽到的節點",
+  "@meshtasticExcludeMqttSubtitle": {"description": "What an MQTT node is"},
+  "meshtasticExcludeMqttHidden": "已隱藏 {count} 個",
+  "@meshtasticExcludeMqttHidden": {"description": "How many nodes the filter is hiding", "placeholders": {"count": {"type": "int"}}},
+  "meshtasticOnline": "近期聽到",
+  "@meshtasticOnline": {"description": "Legend: node heard within the online window"},
+  "meshtasticSilent": "已靜默",
+  "@meshtasticSilent": {"description": "Legend: node known but not heard recently"},
+  "meshtasticViaMqtt": "經 MQTT（網際網路）",
+  "@meshtasticViaMqtt": {"description": "Legend: node reported over an MQTT bridge"}
 }
