@@ -515,6 +515,7 @@ class MeshtasticClientImpl implements MeshtasticService {
     required List<int> payload,
     int channel = 0,
     bool wantAck = false,
+    bool wantResponse = false,
   }) async {
     final port = mesh.PortNum.valueOf(portnum);
     if (port == null) {
@@ -534,6 +535,7 @@ class MeshtasticClientImpl implements MeshtasticService {
         payload: payload,
         channel: channel,
         wantAck: wantAck,
+        wantResponse: wantResponse,
       );
       _countTx(payload.length);
       return const Ok(null);
@@ -542,6 +544,23 @@ class MeshtasticClientImpl implements MeshtasticService {
       return Err(_mapFailure(error));
     }
   }
+
+  @override
+  Future<Result<void>> traceRoute(int nodeNum) {
+    // One-element route: "show me the way to this node". The firmware fills
+    // the chain in as the probe floods and returns it via wantResponse.
+    final request = mesh.RouteDiscovery(route: [nodeNum]);
+    return sendData(
+      portnum: MeshPorts.traceroute,
+      payload: request.writeToBuffer(),
+      wantResponse: true,
+    );
+  }
+
+  @override
+  Stream<MeshRoute> get routeStream => dataStream
+      .where((packet) => packet.portnum == MeshPorts.traceroute)
+      .map((packet) => decodeMeshRoute(packet.payload));
 
   @override
   MeshTraffic get traffic => _counter.snapshot;
@@ -809,4 +828,32 @@ class MeshtasticClientImpl implements MeshtasticService {
     mesh.MeshtasticException(:final message) => UnexpectedFailure(message),
     _ => UnexpectedFailure('$error'),
   };
+}
+
+/// Decodes a [MeshRoute] from the payload of a `TRACEROUTE_APP` packet.
+///
+/// A standalone function so the wire decode is testable without a transport:
+/// the firmware stamps each hop with the SNR it received the probe at (dB,
+/// scaled by 4 on the wire), so a hop's reading is the `snr_towards` entry at
+/// its own index — the origin, which sent rather than received, has none, and
+/// a list that came up short leaves the missing hops blank rather than
+/// misaligned.
+MeshRoute decodeMeshRoute(List<int> payload) {
+  try {
+    final discovery = mesh.RouteDiscovery.fromBuffer(payload);
+    return MeshRoute(
+      towards: _zipHops(discovery.route, discovery.snrTowards),
+      back: _zipHops(discovery.routeBack, discovery.snrBack),
+    );
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'mesh route decode');
+    return const MeshRoute(towards: [], back: []);
+  }
+}
+
+List<MeshRouteHop> _zipHops(List<int> route, List<int> snrs) {
+  return [
+    for (var i = 0; i < route.length; i++)
+      MeshRouteHop(num: route[i], snr: i < snrs.length ? snrs[i] / 4.0 : null),
+  ];
 }

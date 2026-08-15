@@ -120,12 +120,34 @@ class FakeMeshService implements MeshtasticService {
     required List<int> payload,
     int channel = 0,
     bool wantAck = false,
+    bool wantResponse = false,
   }) async {
     final failure = sendFailure;
     if (failure != null) return Err(failure);
     sentData.add((portnum: portnum, channel: channel, payload: payload));
     return const Ok(null);
   }
+
+  final routes = StreamController<MeshRoute>.broadcast();
+
+  /// Whether [traceRoute] fails, and what it was asked for.
+  Result<void> traceResult = const Ok(null);
+  final List<int> tracedNodes = [];
+
+  /// When set, [traceRoute] waits on it instead of answering [traceResult] —
+  /// tests can hold a probe in flight.
+  Completer<Result<void>>? traceGate;
+
+  @override
+  Future<Result<void>> traceRoute(int nodeNum) async {
+    tracedNodes.add(nodeNum);
+    final gate = traceGate;
+    if (gate != null) return gate.future;
+    return traceResult;
+  }
+
+  @override
+  Stream<MeshRoute> get routeStream => routes.stream;
 
   @override
   Future<Result<int>> ensureChannel(MeshChannelSpec spec) async {

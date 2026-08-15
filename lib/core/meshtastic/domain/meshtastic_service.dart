@@ -73,13 +73,27 @@ abstract class MeshtasticService {
   ///
   /// [portnum] is a Meshtastic app port; DPIP traffic uses
   /// [MeshPorts.private]. Payloads are capped by the LoRa frame — see
-  /// [MeshPorts.maxPayloadBytes].
+  /// [MeshPorts.maxPayloadBytes]. [wantResponse] asks the destination to
+  /// unicast a reply, which is how [traceRoute] collects its answer.
   Future<Result<void>> sendData({
     required int portnum,
     required List<int> payload,
     int channel = 0,
     bool wantAck = false,
+    bool wantResponse = false,
   });
+
+  /// Asks the mesh for the path [nodeNum] is reached by, and yields it on
+  /// [routeStream] when the destination answers.
+  ///
+  /// One request + one reply on the air (each re-flooded by the hops it
+  /// passes), 30 s of firmware cooldown between attempts, and only nodes on
+  /// the same channel key can participate — the cheapest on-demand path
+  /// probe the mesh offers.
+  Future<Result<void>> traceRoute(int nodeNum);
+
+  /// Traceroute replies ([MeshPorts.traceroute] packets), decoded.
+  Stream<MeshRoute> get routeStream;
 
   /// Packet counters for the current session.
   ///
@@ -148,6 +162,10 @@ abstract final class MeshPorts {
 
   /// `TEXT_MESSAGE_APP`.
   static const int text = 1;
+
+  /// `TRACEROUTE_APP` — the on-demand path probe. The payload is a
+  /// `RouteDiscovery` protobuf; see [traceRoute].
+  static const int traceroute = 70;
 
   /// Largest payload one mesh frame carries (`DATA_PAYLOAD_LEN`). A DPIP
   /// packet that doesn't fit must be split by its own schema — the transport
@@ -290,6 +308,37 @@ class MeshDataPacket {
   final int portnum;
   final List<int> payload;
   final DateTime timestamp;
+}
+
+/// One hop of a traced route.
+class MeshRouteHop {
+  const MeshRouteHop({required this.num, this.snr});
+
+  /// Node id (hex elsewhere in the mesh UI). `0xFFFFFFFF` marks a hop the
+  /// route crossed but could not name — its firmware predates the route
+  /// fields, or it lacks the channel key.
+  final int num;
+
+  /// The signal this hop received the probe with, in dB. Null when the hop's
+  /// firmware predates per-hop SNR (or the lists were a different length).
+  final double? snr;
+}
+
+/// The path a traceroute found, in both directions.
+///
+/// LoRa links are asymmetric, which is why the route back is recorded
+/// separately — the way back can differ from the way there.
+class MeshRoute {
+  const MeshRoute({required this.towards, required this.back});
+
+  /// Origin → destination, with the origin itself as the first hop.
+  final List<MeshRouteHop> towards;
+
+  /// Destination → origin (only firmware ≥ 2.5 records it).
+  final List<MeshRouteHop> back;
+
+  /// The destination the probe reached, or null when the reply did not say.
+  int? get target => towards.isEmpty ? null : towards.last.num;
 }
 
 /// A channel slot on the radio.
