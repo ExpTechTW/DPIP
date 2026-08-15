@@ -262,8 +262,19 @@ class _RainOnCardState extends State<RainOnCard>
     // since the ticker was stopped (a closed gate cuts the water outright).
     // If rain should be running but the ticker is idle, re-check the gate
     // once this frame settles and restart if it is open.
+    //
+    // The opacity term is not optional. Without it this block undoes the
+    // [_syncRunning] call directly above it: fading out stops the ticker, which
+    // makes `!_ticker.isActive` true, which schedules a resume that restarts it
+    // — so the header card, whose opacity reaches exactly 0 once the hero
+    // scrolls past the fold, kept stepping two water solvers and bumping
+    // [_frame] every vsync while [_CardWaterPainter] returned without drawing a
+    // pixel. Nothing else stopped it: this card is mounted with `gated: false`,
+    // so the position gate is a constant `true`, and rain never drains below the
+    // intensity floor.
     if (widget.active &&
         widget.intensity > 0.001 &&
+        widget.opacity > 0.004 &&
         !_ticker.isActive &&
         !_resumeScheduled) {
       _resumeScheduled = true;
@@ -277,7 +288,13 @@ class _RainOnCardState extends State<RainOnCard>
   void _resumeIfGateOpen() {
     if (!mounted) return;
     _syncPositionGate();
-    if (_gateOpen && widget.active && widget.intensity > 0.001) {
+    // Same gate set as [_syncRunning], opacity included — a resume that used a
+    // weaker test than the stop it is undoing is how the ticker came back to
+    // life on an invisible card.
+    if (_gateOpen &&
+        widget.active &&
+        widget.intensity > 0.001 &&
+        widget.opacity > 0.004) {
       _last = Duration.zero;
       _ticker.start();
     }
