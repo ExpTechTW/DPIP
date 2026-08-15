@@ -114,21 +114,38 @@ void main() {
     });
   }
 
-  testWidgets('the two calls to action lead the page, in rank order', (
+  testWidgets('the three top entries lead the page, in rank order', (
     tester,
   ) async {
     await _pump(tester, _router([]));
     final support = tester.getTopLeft(find.text('Support DPIP')).dy;
     final discord = tester.getTopLeft(find.text('Discord community')).dy;
-    // Support first, Discord immediately under it…
+    final announcements = tester.getTopLeft(find.text('Announcements')).dy;
+    // Support first, Discord immediately under it, announcements next…
     expect(discord, greaterThan(support));
-    // …and both above every menu group.
+    expect(announcements, greaterThan(discord));
+    // …and all three above every menu group.
     expect(
       tester
           .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
           .dy,
-      greaterThan(discord),
+      greaterThan(announcements),
     );
+  });
+
+  testWidgets('the notification log sits with the notification settings', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    final notify = tester
+        .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
+        .dy;
+    final log = tester
+        .getTopLeft(find.widgetWithText(ListTile, 'DPIP notification log'))
+        .dy;
+    expect(log - notify, lessThan(240));
+    // Announcements left the links list — the only one left is the card.
+    expect(find.widgetWithText(ListTile, 'Announcements'), findsNothing);
   });
 
   testWidgets('Discord appears once, as the callout', (tester) async {

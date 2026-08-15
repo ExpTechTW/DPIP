@@ -43,6 +43,10 @@ class MorePage extends StatelessWidget {
           // competing banners.
           const _SupportCallout(),
           const _DiscordCallout(),
+          // The news entry, right behind the two calls to action: it used to
+          // sit four rows deep in the links list, but it is how ExpTech
+          // reaches everyone at once.
+          const _AnnouncementCard(),
           SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
@@ -59,6 +63,15 @@ class MorePage extends StatelessWidget {
                 icon: Icons.verified_user_outlined,
                 title: l10n.permissionsTitle,
                 onTap: () => context.pushNamed(AppRoutes.permissions),
+              ),
+              // What the system says actually went out — a status page, kept
+              // in the notification group because that is where you look when
+              // an alert did not arrive.
+              _MoreLinkTile(
+                icon: Icons.notifications_active_outlined,
+                title: l10n.moreNotifyLog,
+                host: 'status.exptech.com.tw',
+                url: 'https://status.exptech.com.tw/notify',
               ),
             ],
           ),
@@ -136,18 +149,6 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreServerStatus,
                 host: 'status.exptech.dev',
                 url: 'https://status.exptech.dev/status',
-              ),
-              _MoreLinkTile(
-                icon: Icons.campaign_outlined,
-                title: l10n.moreAnnouncements,
-                host: 'announcement.exptech.com.tw',
-                url: 'https://announcement.exptech.com.tw/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.notifications_active_outlined,
-                title: l10n.moreNotifyLog,
-                host: 'status.exptech.com.tw',
-                url: 'https://status.exptech.com.tw/notify',
               ),
               _MoreLinkTile(
                 icon: Icons.smart_display_outlined,
@@ -697,6 +698,89 @@ class _DiscordCallout extends StatelessWidget {
                   Icons.open_in_new,
                   size: 18,
                   color: colors.onSecondaryContainer.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The news entry, directly under the two calls to action.
+///
+/// Not a call to action — it asks nothing of the user — so it carries none of
+/// their weight: a flat neutral card, no gradient, no glow. It stays at the
+/// top anyway, because announcements are how ExpTech reaches everyone at
+/// once, and the row it replaced sat four deep in the links list.
+class _AnnouncementCard extends StatelessWidget {
+  const _AnnouncementCard();
+
+  static const String _url = 'https://announcement.exptech.com.tw/';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.surfaceContainerHigh,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openExternalLink(context, _url),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surfaceContainerHighest,
+                  ),
+                  child: Icon(
+                    Icons.campaign_outlined,
+                    color: colors.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.moreAnnouncements,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'announcement.exptech.com.tw',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  Icons.open_in_new,
+                  size: 18,
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.6),
                 ),
               ],
             ),
