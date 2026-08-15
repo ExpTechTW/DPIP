@@ -44,6 +44,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, BatteryOptimizationChannel.NAME)
             .setMethodCallHandler(BatteryOptimizationChannel(applicationContext))
 
+        MethodChannel(messenger, UnusedAppRestrictionsChannel.NAME)
+            .setMethodCallHandler(UnusedAppRestrictionsChannel(applicationContext))
+
         // Activity-scoped: the keep-awake window flag belongs to this window.
         MethodChannel(messenger, ScreenWakeChannel.NAME)
             .setMethodCallHandler(ScreenWakeChannel(this))

@@ -61,6 +61,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportDetailSortByCounty => 'เรียงตามพื้นที่';
 
   @override
+  String get onboardingPermUnusedApp => 'ให้แอปทำงานต่อเนื่อง';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android จะหยุดแอปที่คุณไม่ได้เปิดมาระยะหนึ่งและเพิกถอนสิทธิ์ ทำให้การแจ้งเตือนภัยพิบัติส่งไปยังพื้นที่ของคุณไม่ได้';
+
+  @override
   String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
 
   @override

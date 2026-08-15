@@ -61,6 +61,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportDetailSortByCounty => 'Urutkan menurut wilayah';
 
   @override
+  String get onboardingPermUnusedApp => 'Jaga aplikasi tetap aktif';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android menjeda aplikasi yang lama tidak Anda buka dan mencabut izinnya, sehingga peringatan bencana tidak sampai ke wilayah Anda.';
+
+  @override
   String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
 
   @override

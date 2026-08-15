@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "Payagan ang DPIP na patuloy na tumakbo sa background para hindi maantala o mapalampas ang mga alerto.",
+  "onboardingPermUnusedApp": "Panatilihing aktibo ang app",
+  "onboardingPermUnusedAppDesc": "Pinapahinto ng Android ang mga app na matagal mong hindi binuksan at binabawi ang mga pahintulot ng mga ito, kaya hindi na makakarating ang mga babala sa sakuna sa iyong lugar.",
   "mapNavDisaster": "Sakuna",
   "radarScanRangeSubtitle": "Ipinapakita ang aktwal na saklaw ng apat na radar.",
   "aedHoursSunday": "Oras sa Linggo",

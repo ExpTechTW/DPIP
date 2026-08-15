@@ -60,6 +60,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailSortByCounty => '지역순 정렬';
 
   @override
+  String get onboardingPermUnusedApp => '앱 활성 상태 유지';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android는 한동안 열지 않은 앱을 일시 중지하고 권한을 해제합니다. 그러면 재난 경보가 현재 위치로 전달되지 않습니다.';
+
+  @override
   String get homeRainTrendScattered => '약한 비가 올 수 있어요';
 
   @override

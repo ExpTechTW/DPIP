@@ -61,6 +61,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportDetailSortByCounty => 'Sắp xếp theo khu vực';
 
   @override
+  String get onboardingPermUnusedApp => 'Giữ ứng dụng hoạt động';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android tạm dừng các ứng dụng bạn lâu không mở và thu hồi quyền của chúng, khiến cảnh báo thảm họa không đến được khu vực của bạn.';
+
+  @override
   String get homeRainTrendScattered => 'Có thể có mưa rào nhẹ';
 
   @override

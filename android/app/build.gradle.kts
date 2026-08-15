@@ -93,6 +93,17 @@ dependencies {
     // geolocator / maplibre_gl; this promotes it to the app's compile
     // classpath. Keep ≥ maplibre_gl's pin (21.3.0).
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    // PackageManagerCompat.getUnusedAppRestrictionsStatus / IntentCompat's
+    // manage-unused-app-restrictions intent, for UnusedAppRestrictionsChannel.
+    // Already in the APK transitively through the Flutter embedding, but a
+    // transitive version is not a contract — pin it explicitly rather than
+    // compile against whatever the dependency graph happens to resolve.
+    implementation("androidx.core:core-ktx:1.13.1")
+    // getUnusedAppRestrictionsStatus returns a ListenableFuture, which lives in
+    // guava's listenablefuture artifact — androidx.core declares it but does not
+    // put it on a consumer's compile classpath, so calling addListener/get needs
+    // this explicitly.
+    implementation("androidx.concurrent:concurrent-futures:1.2.0")
     // Backports java.time/etc. for awesome_notifications (see compileOptions).
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

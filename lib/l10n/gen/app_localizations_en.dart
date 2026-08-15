@@ -61,6 +61,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportDetailSortByCounty => 'Sort by county';
 
   @override
+  String get onboardingPermUnusedApp => 'Keep app active';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android pauses apps you haven\'t opened in a while and revokes their permissions — which stops disaster alerts reaching your area.';
+
+  @override
   String get homeRainTrendScattered => 'Light showers possible';
 
   @override

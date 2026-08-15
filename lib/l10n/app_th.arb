@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "อนุญาตให้ DPIP ทำงานเบื้องหลังอย่างต่อเนื่อง เพื่อไม่ให้การเตือนภัยล่าช้าหรือพลาดไป",
+  "onboardingPermUnusedApp": "ให้แอปทำงานต่อเนื่อง",
+  "onboardingPermUnusedAppDesc": "Android จะหยุดแอปที่คุณไม่ได้เปิดมาระยะหนึ่งและเพิกถอนสิทธิ์ ทำให้การแจ้งเตือนภัยพิบัติส่งไปยังพื้นที่ของคุณไม่ได้",
   "mapNavDisaster": "ป้องกันภัย",
   "radarScanRangeSubtitle": "แสดงพื้นที่ที่เรดาร์ทั้งสี่ตรวจวัดได้จริง",
   "aedHoursSunday": "เวลาวันอาทิตย์",

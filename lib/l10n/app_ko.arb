@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "DPIP가 백그라운드에서 계속 실행되어 경보가 지연되거나 누락되지 않도록 허용합니다.",
+  "onboardingPermUnusedApp": "앱 활성 상태 유지",
+  "onboardingPermUnusedAppDesc": "Android는 한동안 열지 않은 앱을 일시 중지하고 권한을 해제합니다. 그러면 재난 경보가 현재 위치로 전달되지 않습니다.",
   "mapNavDisaster": "방재",
   "radarScanRangeSubtitle": "레이더 4기가 실제로 관측하는 범위를 표시합니다.",
   "aedHoursSunday": "일요일 운영시간",

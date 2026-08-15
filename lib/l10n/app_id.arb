@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "Izinkan DPIP terus berjalan di latar belakang agar peringatan tidak tertunda atau terlewat.",
+  "onboardingPermUnusedApp": "Jaga aplikasi tetap aktif",
+  "onboardingPermUnusedAppDesc": "Android menjeda aplikasi yang lama tidak Anda buka dan mencabut izinnya, sehingga peringatan bencana tidak sampai ke wilayah Anda.",
   "mapNavDisaster": "Bencana",
   "radarScanRangeSubtitle": "Menandai area yang benar-benar dipantau keempat radar.",
   "aedHoursSunday": "Jam Minggu",

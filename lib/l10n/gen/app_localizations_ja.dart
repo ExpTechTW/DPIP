@@ -60,6 +60,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailSortByCounty => '地域順に並べ替え';
 
   @override
+  String get onboardingPermUnusedApp => 'アプリを有効に保つ';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android はしばらく開いていないアプリを一時停止し、権限を取り消します。その結果、災害警報が現在地に届かなくなります。';
+
+  @override
   String get homeRainTrendScattered => 'にわか雨の可能性があります';
 
   @override

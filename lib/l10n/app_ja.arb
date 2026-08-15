@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "DPIP がバックグラウンドで動作し続けられるようにして、警報の遅延や取りこぼしを防ぎます。",
+  "onboardingPermUnusedApp": "アプリを有効に保つ",
+  "onboardingPermUnusedAppDesc": "Android はしばらく開いていないアプリを一時停止し、権限を取り消します。その結果、災害警報が現在地に届かなくなります。",
   "mapNavDisaster": "防災",
   "radarScanRangeSubtitle": "4基のレーダーが実際に観測する範囲を示します。",
   "aedHoursSunday": "日曜の開館時間",

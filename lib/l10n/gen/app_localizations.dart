@@ -207,6 +207,18 @@ abstract class AppLocalizations {
   /// **'Sort by county'**
   String get reportDetailSortByCounty;
 
+  /// Permission row: unused-app restrictions (Android)
+  ///
+  /// In en, this message translates to:
+  /// **'Keep app active'**
+  String get onboardingPermUnusedApp;
+
+  /// Permission row description: unused-app restrictions
+  ///
+  /// In en, this message translates to:
+  /// **'Android pauses apps you haven\'t opened in a while and revokes their permissions — which stops disaster alerts reaching your area.'**
+  String get onboardingPermUnusedAppDesc;
+
   /// Home rain trend subtitle: peak intensity below the light-rain threshold
   ///
   /// In en, this message translates to:

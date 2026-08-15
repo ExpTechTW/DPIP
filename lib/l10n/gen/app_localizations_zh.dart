@@ -60,6 +60,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportDetailSortByCounty => '依縣市排序';
 
   @override
+  String get onboardingPermUnusedApp => '保持 App 啟用';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android 會暫停你長期未開啟的 App 並撤銷其權限，這會讓災害警報無法送達你所在地。';
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -2698,6 +2705,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get reportDetailSortByCounty => '依县市排序';
+
+  @override
+  String get onboardingPermUnusedApp => '保持 App 启用';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android 会暂停你长期未开启的 App 并撤销其权限，这会让灾害警报无法送达你所在地。';
 
   @override
   String get homeRainTrendScattered => '可能会有零星降雨';
@@ -5340,6 +5354,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportDetailSortByCounty => '依縣市排序';
 
   @override
+  String get onboardingPermUnusedApp => '保持 App 啟用';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android 會暫停你長期未開啟嘅 App 並撤銷佢哋嘅權限，噉會令災害警報無法送到你所在地。';
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -7978,6 +7999,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get reportDetailSortByCounty => '依縣市排序';
+
+  @override
+  String get onboardingPermUnusedApp => '保持 App 啟用';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Android 會暫停你長期未開啟的 App 並撤銷其權限，這會讓災害警報無法送達你所在地。';
 
   @override
   String get homeRainTrendScattered => '可能會有零星降雨';

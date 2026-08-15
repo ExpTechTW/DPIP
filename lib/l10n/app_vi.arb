@@ -732,6 +732,8 @@
     "description": "Moon age label"
   },
   "onboardingPermBatteryDesc": "Cho phép DPIP tiếp tục chạy ở chế độ nền để cảnh báo không bị trì hoãn hay bỏ lỡ.",
+  "onboardingPermUnusedApp": "Giữ ứng dụng hoạt động",
+  "onboardingPermUnusedAppDesc": "Android tạm dừng các ứng dụng bạn lâu không mở và thu hồi quyền của chúng, khiến cảnh báo thảm họa không đến được khu vực của bạn.",
   "mapNavDisaster": "Phòng thảm",
   "radarScanRangeSubtitle": "Đánh dấu vùng bốn radar thực sự quan trắc.",
   "aedHoursSunday": "Giờ Chủ nhật",

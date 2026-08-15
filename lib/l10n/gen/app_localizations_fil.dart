@@ -61,6 +61,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportDetailSortByCounty => 'Ayusin ayon sa lalawigan';
 
   @override
+  String get onboardingPermUnusedApp => 'Panatilihing aktibo ang app';
+
+  @override
+  String get onboardingPermUnusedAppDesc =>
+      'Pinapahinto ng Android ang mga app na matagal mong hindi binuksan at binabawi ang mga pahintulot ng mga ito, kaya hindi na makakarating ang mga babala sa sakuna sa iyong lugar.';
+
+  @override
   String get homeRainTrendScattered => 'Posibleng mahinang ulan';
 
   @override

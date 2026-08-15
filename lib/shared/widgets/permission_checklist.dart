@@ -22,6 +22,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
+import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_settings_sheet.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +62,21 @@ class PermissionChecklist extends StatefulWidget {
 class _PermissionChecklistState extends State<PermissionChecklist>
     with WidgetsBindingObserver {
   final BatteryOptimization _battery = BatteryOptimization();
+  final UnusedAppRestrictionsService _unusedApp =
+      UnusedAppRestrictionsService();
 
   bool _notify = false;
   bool _critical = false;
   bool _location = false;
   bool _background = false;
   bool _batteryOk = false;
+
+  /// Whether Android will hibernate the app and revoke its permissions.
+  /// Starts at [UnusedAppRestrictions.unavailable] so the row stays hidden
+  /// until the platform has actually answered — showing a warning for one
+  /// frame on a device that turns out to be exempt is worse than showing it
+  /// a frame late.
+  UnusedAppRestrictions _unusedAppStatus = UnusedAppRestrictions.unavailable;
 
   @override
   void initState() {
@@ -99,11 +109,12 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final locationGranted = await location.granted();
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
+    final unusedApp = await _unusedApp.status();
     if (!mounted) return;
     Log.info(
       'permission state: notify=$notify critical=$critical '
       'location=$locationGranted background=$backgroundGranted '
-      'battery=$batteryOk',
+      'battery=$batteryOk unusedApp=${unusedApp.name}',
     );
     setState(() {
       _notify = notify;
@@ -111,6 +122,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       _location = locationGranted;
       _background = backgroundGranted;
       _batteryOk = batteryOk;
+      _unusedAppStatus = unusedApp;
     });
     widget.onChanged?.call(
       PermissionState(
@@ -210,6 +222,11 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     await _battery.request(); // re-checked on resume
   }
 
+  Future<void> _exemptUnusedApp() async {
+    // Not a permission — there is no prompt to await, only a settings page.
+    await _unusedApp.openSettings(); // re-checked on resume
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -259,6 +276,20 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             granted: _batteryOk,
             onGrant: _grantBattery,
           ),
+          // Hidden where the platform cannot answer — a device too old for the
+          // API, or without the Play services that back-port it, has nothing
+          // the user could change, and an un-actionable warning on a disaster
+          // app's permission page is worse than no row at all.
+          if (_unusedAppStatus != UnusedAppRestrictions.unavailable) ...[
+            const SizedBox(height: AppSpacing.sm),
+            PermissionRow(
+              icon: Icons.hotel_outlined,
+              title: l10n.onboardingPermUnusedApp,
+              description: l10n.onboardingPermUnusedAppDesc,
+              granted: _unusedAppStatus == UnusedAppRestrictions.exempt,
+              onGrant: _exemptUnusedApp,
+            ),
+          ],
         ],
       ],
     );

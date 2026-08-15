@@ -57,6 +57,14 @@
   "@onboardingPermBatteryDesc": {
     "description": "Permission row description: battery"
   },
+  "onboardingPermUnusedApp": "Keep app active",
+  "@onboardingPermUnusedApp": {
+    "description": "Permission row: unused-app restrictions (Android)"
+  },
+  "onboardingPermUnusedAppDesc": "Android pauses apps you haven't opened in a while and revokes their permissions — which stops disaster alerts reaching your area.",
+  "@onboardingPermUnusedAppDesc": {
+    "description": "Permission row description: unused-app restrictions"
+  },
   "@reportListMagnitude": {
     "description": "Emphasized magnitude on a report list row",
     "placeholders": {
@@ -193,7 +201,11 @@
   "updateAvailableBody": "Version {version} is out.",
   "@updateAvailableBody": {
     "description": "Body of the new-version dialog",
-    "placeholders": { "version": { "type": "String" } }
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "updateSkip": "Skip this one",
   "updateViewChangelog": "View changes",
@@ -2126,7 +2138,7 @@
   "reportDetailOriginTime": "Origin time",
   "trendNoData": "No trend data",
   "onboardingPermLocation": "Location",
-  "sponsorCalloutBody": "No ads \u2014 your support keeps the servers running.",
+  "sponsorCalloutBody": "No ads — your support keeps the servers running.",
   "@sponsorCalloutBody": {
     "description": "One-line subtitle on the More tab's support call to action"
   },
