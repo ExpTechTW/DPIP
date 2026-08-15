@@ -5402,6 +5402,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'High'**
   String get displayContrastHigh;
+
+  /// Sheet action: ask the mesh how this node is reached
+  ///
+  /// In en, this message translates to:
+  /// **'Trace route'**
+  String get meshtasticTraceRoute;
+
+  /// Sheet button while a traceroute probe is in flight
+  ///
+  /// In en, this message translates to:
+  /// **'Tracing…'**
+  String get meshtasticTracing;
+
+  /// Traceroute outcome when the destination never answers
+  ///
+  /// In en, this message translates to:
+  /// **'No reply — out of range or on another channel key'**
+  String get meshtasticTraceNoReply;
+
+  /// Traceroute outcome for a one-hop route
+  ///
+  /// In en, this message translates to:
+  /// **'Direct — no relays between'**
+  String get meshtasticTraceDirect;
+
+  /// Traceroute outcome hop count
+  ///
+  /// In en, this message translates to:
+  /// **'{n} hops'**
+  String meshtasticTraceHops(int n);
 }
 
 class _AppLocalizationsDelegate

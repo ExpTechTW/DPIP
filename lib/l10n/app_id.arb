@@ -1812,5 +1812,30 @@
   "displayWeightBold": "Tebal",
   "displayContrastStandard": "Standar",
   "displayContrastMedium": "Sedang",
-  "displayContrastHigh": "Tinggi"
+  "displayContrastHigh": "Tinggi",
+  "meshtasticTraceRoute": "Telusuri rute",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "Menelusuri…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "Tidak ada balasan — di luar jangkauan atau kunci berbeda",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "Langsung — tanpa relai",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} lompatan",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

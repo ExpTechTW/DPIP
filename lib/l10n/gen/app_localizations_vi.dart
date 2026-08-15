@@ -2832,4 +2832,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get displayContrastHigh => 'Cao';
+
+  @override
+  String get meshtasticTraceRoute => 'Truy vết đường đi';
+
+  @override
+  String get meshtasticTracing => 'Đang truy vết…';
+
+  @override
+  String get meshtasticTraceNoReply =>
+      'Không phản hồi — ngoài phạm vi hoặc khác khóa';
+
+  @override
+  String get meshtasticTraceDirect => 'Trực tiếp — không qua trung chuyển';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n chặng';
+  }
 }

@@ -1812,5 +1812,30 @@
   "displayWeightBold": "Makapal",
   "displayContrastStandard": "Karaniwan",
   "displayContrastMedium": "Katamtaman",
-  "displayContrastHigh": "Mataas"
+  "displayContrastHigh": "Mataas",
+  "meshtasticTraceRoute": "Sundan ang ruta",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "Sinusundan…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "Walang tugon — wala sa saklaw o ibang key",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "Direkta — walang relay",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} na relay",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

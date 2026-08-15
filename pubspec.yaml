@@ -79,6 +79,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Virtual time for timer-driven state machines (the traceroute timeout).
+  fake_async: ^1.3.0
   # Dart 3.13 (Flutter 3.47) makes `final` illegal on non-primary-constructor
   # parameters — freezed 3.2.x emits `required final T x` for collections, so
   # it can no longer compile. Only the 4.0 line (dev.3 today) supports 3.13;

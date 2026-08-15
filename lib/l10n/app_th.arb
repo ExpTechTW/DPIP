@@ -1812,5 +1812,30 @@
   "displayWeightBold": "หนา",
   "displayContrastStandard": "มาตรฐาน",
   "displayContrastMedium": "ปานกลาง",
-  "displayContrastHigh": "สูง"
+  "displayContrastHigh": "สูง",
+  "meshtasticTraceRoute": "ติดตามเส้นทาง",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "กำลังติดตาม…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "ไม่มีการตอบกลับ — อยู่นอกระยะหรือคีย์ต่างกัน",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "ตรงถึง — ไม่มีรีเลย์",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} ฮอป",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

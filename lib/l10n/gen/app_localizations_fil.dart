@@ -2842,4 +2842,22 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get displayContrastHigh => 'Mataas';
+
+  @override
+  String get meshtasticTraceRoute => 'Sundan ang ruta';
+
+  @override
+  String get meshtasticTracing => 'Sinusundan…';
+
+  @override
+  String get meshtasticTraceNoReply =>
+      'Walang tugon — wala sa saklaw o ibang key';
+
+  @override
+  String get meshtasticTraceDirect => 'Direkta — walang relay';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n na relay';
+  }
 }

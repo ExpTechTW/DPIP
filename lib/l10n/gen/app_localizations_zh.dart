@@ -2780,6 +2780,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get displayContrastHigh => '高';
+
+  @override
+  String get meshtasticTraceRoute => '追蹤路由';
+
+  @override
+  String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
+
+  @override
+  String get meshtasticTraceDirect => '直達 — 中間無中繼';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n 跳';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -5557,6 +5574,23 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get displayContrastHigh => '高';
+
+  @override
+  String get meshtasticTraceRoute => '追蹤路由';
+
+  @override
+  String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
+
+  @override
+  String get meshtasticTraceDirect => '直達 — 中間無中繼';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n 跳';
+  }
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -8334,6 +8368,23 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get displayContrastHigh => '高';
+
+  @override
+  String get meshtasticTraceRoute => '追蹤路由';
+
+  @override
+  String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
+
+  @override
+  String get meshtasticTraceDirect => '直達 — 中間無中繼';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n 跳';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11111,4 +11162,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get displayContrastHigh => '高';
+
+  @override
+  String get meshtasticTraceRoute => '追蹤路由';
+
+  @override
+  String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
+
+  @override
+  String get meshtasticTraceDirect => '直達 — 中間無中繼';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n 跳';
+  }
 }

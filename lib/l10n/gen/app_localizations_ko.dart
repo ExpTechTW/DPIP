@@ -2799,4 +2799,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get displayContrastHigh => '높음';
+
+  @override
+  String get meshtasticTraceRoute => '경로 추적';
+
+  @override
+  String get meshtasticTracing => '추적 중…';
+
+  @override
+  String get meshtasticTraceNoReply => '응답 없음 — 범위 밖 또는 다른 키';
+
+  @override
+  String get meshtasticTraceDirect => '직접 도달 — 중계 없음';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n 홉';
+  }
 }

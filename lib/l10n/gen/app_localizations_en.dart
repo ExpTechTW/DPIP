@@ -2831,4 +2831,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get displayContrastHigh => 'High';
+
+  @override
+  String get meshtasticTraceRoute => 'Trace route';
+
+  @override
+  String get meshtasticTracing => 'Tracing…';
+
+  @override
+  String get meshtasticTraceNoReply =>
+      'No reply — out of range or on another channel key';
+
+  @override
+  String get meshtasticTraceDirect => 'Direct — no relays between';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n hops';
+  }
 }

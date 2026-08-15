@@ -2835,4 +2835,22 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get displayContrastHigh => 'Tinggi';
+
+  @override
+  String get meshtasticTraceRoute => 'Telusuri rute';
+
+  @override
+  String get meshtasticTracing => 'Menelusuri…';
+
+  @override
+  String get meshtasticTraceNoReply =>
+      'Tidak ada balasan — di luar jangkauan atau kunci berbeda';
+
+  @override
+  String get meshtasticTraceDirect => 'Langsung — tanpa relai';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n lompatan';
+  }
 }

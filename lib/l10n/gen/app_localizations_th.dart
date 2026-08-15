@@ -2825,4 +2825,22 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get displayContrastHigh => 'สูง';
+
+  @override
+  String get meshtasticTraceRoute => 'ติดตามเส้นทาง';
+
+  @override
+  String get meshtasticTracing => 'กำลังติดตาม…';
+
+  @override
+  String get meshtasticTraceNoReply =>
+      'ไม่มีการตอบกลับ — อยู่นอกระยะหรือคีย์ต่างกัน';
+
+  @override
+  String get meshtasticTraceDirect => 'ตรงถึง — ไม่มีรีเลย์';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n ฮอป';
+  }
 }

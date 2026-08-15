@@ -1812,5 +1812,30 @@
   "displayWeightBold": "粗體",
   "displayContrastStandard": "標準",
   "displayContrastMedium": "中等",
-  "displayContrastHigh": "高"
+  "displayContrastHigh": "高",
+  "meshtasticTraceRoute": "追蹤路由",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "追蹤中…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "沒有回應 — 超出範圍或金鑰不同",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "直達 — 中間無中繼",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} 跳",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

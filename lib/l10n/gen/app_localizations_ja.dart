@@ -2790,4 +2790,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get displayContrastHigh => '高';
+
+  @override
+  String get meshtasticTraceRoute => 'ルート追跡';
+
+  @override
+  String get meshtasticTracing => '追跡中…';
+
+  @override
+  String get meshtasticTraceNoReply => '応答なし — 圏外または別のキー';
+
+  @override
+  String get meshtasticTraceDirect => '直接到達 — 中継なし';
+
+  @override
+  String meshtasticTraceHops(int n) {
+    return '$n ホップ';
+  }
 }

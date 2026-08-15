@@ -1812,5 +1812,30 @@
   "displayWeightBold": "Đậm",
   "displayContrastStandard": "Chuẩn",
   "displayContrastMedium": "Vừa",
-  "displayContrastHigh": "Cao"
+  "displayContrastHigh": "Cao",
+  "meshtasticTraceRoute": "Truy vết đường đi",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "Đang truy vết…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "Không phản hồi — ngoài phạm vi hoặc khác khóa",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "Trực tiếp — không qua trung chuyển",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} chặng",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

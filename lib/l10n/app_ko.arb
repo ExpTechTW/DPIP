@@ -1812,5 +1812,30 @@
   "displayWeightBold": "굵게",
   "displayContrastStandard": "표준",
   "displayContrastMedium": "중간",
-  "displayContrastHigh": "높음"
+  "displayContrastHigh": "높음",
+  "meshtasticTraceRoute": "경로 추적",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "추적 중…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceNoReply": "응답 없음 — 범위 밖 또는 다른 키",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "직접 도달 — 중계 없음",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} 홉",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }
