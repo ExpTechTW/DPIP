@@ -8,9 +8,11 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
@@ -217,6 +219,12 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
                   p.weather,
                   p.weatherCode,
                   colors,
+                  // Per hour, not per row: a clear 02:00 chip must show a moon
+                  // while the 14:00 chip beside it shows a sun.
+                  isNight: isNightHour(
+                    _hourNumber(p.time).toDouble(),
+                    utcDay: AppTime.utc,
+                  ),
                 );
                 final isSelected = index == selected;
                 return _HourChip(

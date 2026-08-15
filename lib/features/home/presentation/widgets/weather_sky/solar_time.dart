@@ -128,3 +128,47 @@ SolarPosition solarPosition(
 
   return (sunrise: solarNoon - hourAngle, sunset: solarNoon + hourAngle);
 }
+
+/// Whether the sun is below the horizon at [localHour] on the day of [utcDay].
+///
+/// This is what decides between the day and the night form of a weather glyph
+/// — a clear 02:00 must show a moon, not a sun. It uses the same
+/// refraction-corrected [sunTimes] as the backdrop, so the icon and the sky
+/// behind it flip at the same minute instead of a few minutes apart.
+///
+/// Takes a bare local hour because that is all an hourly forecast carries (its
+/// points are `"HH:00"` labels with no date). The day only sets the season, and
+/// sunrise moves by about a minute a day, so a chip that actually belongs to
+/// tomorrow is still resolved correctly.
+bool isNightHour(
+  double localHour, {
+  required DateTime utcDay,
+  double latitude = kTaiwanLatitude,
+  double longitude = kTaiwanLongitude,
+  double utcOffsetHours = 8,
+}) {
+  final times = sunTimes(
+    utcDay,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+  return localHour < times.sunrise || localHour >= times.sunset;
+}
+
+/// Whether the sun is below the horizon at the instant [utc].
+bool isNightAt(
+  DateTime utc, {
+  double latitude = kTaiwanLatitude,
+  double longitude = kTaiwanLongitude,
+  double utcOffsetHours = 8,
+}) {
+  final local = utc.add(Duration(minutes: (utcOffsetHours * 60).round()));
+  return isNightHour(
+    local.hour + local.minute / 60.0 + local.second / 3600.0,
+    utcDay: utc,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+}

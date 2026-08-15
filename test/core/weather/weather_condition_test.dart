@@ -51,11 +51,11 @@ void main() {
 
   group('weatherVisual', () {
     test('code phenomenon drives the icon regardless of the label', () {
-      // 200 有雷雨 — the code, not the 多雲 label, picks the storm.
-      expect(weatherVisual('多雲', 214, colors).$1, Icons.thunderstorm_outlined);
+      // 214 有雷雨 — the code, not the 多雲 label, picks the storm.
+      expect(weatherVisual('多雲', 214, colors).$1, thunderstorm);
       expect(weatherVisual('晴', 106, colors).$1, rainy);
-      expect(weatherVisual('陰', 208, colors).$1, Icons.snowing);
-      expect(weatherVisual('晴', 105, colors).$1, Icons.foggy);
+      expect(weatherVisual('陰', 208, colors).$1, snowingHeavy);
+      expect(weatherVisual('晴', 105, colors).$1, foggy);
     });
 
     test('phenomena refine the glyph beyond the eight modes', () {
@@ -63,18 +63,21 @@ void main() {
       // lightning without rain from a thunderstorm — each its own glyph while
       // the accent still follows the resolved backdrop mode.
       expect(weatherVisual('多雲', 111, colors).$1, rainyLight); // 有陣雨
-      expect(weatherVisual('晴', 103, colors).$1, Icons.bolt_outlined); // 有閃電
-      expect(weatherVisual('多雲', 107, colors).$1, Icons.sunny_snowing); // 有雨雪
-      expect(weatherVisual('多雲', 112, colors).$1, Icons.cloudy_snowing); // 陣雨雪
-      expect(weatherVisual('陰', 113, colors).$1, Icons.grain_outlined); // 有雹
-      // 大雷雨 is the heaviest rung — filled, so it reads heavier.
-      expect(weatherVisual('多雲', 117, colors).$1, Icons.thunderstorm);
+      expect(weatherVisual('晴', 103, colors).$1, bolt); // 有閃電
+      expect(weatherVisual('晴', 101, colors).$1, mist); // 有霾
+      // Mixed precipitation has its own glyphs now, rather than borrowing the
+      // sun-through-snow mark that used to stand in for 有雨雪.
+      expect(weatherVisual('多雲', 107, colors).$1, rainySnow); // 有雨雪
+      expect(weatherVisual('多雲', 112, colors).$1, weatherMix); // 陣雨雪
+      expect(weatherVisual('陰', 113, colors).$1, weatherHail); // 有雹
+      // 大雷雨 is the heaviest rain rung.
+      expect(weatherVisual('多雲', 117, colors).$1, rainyHeavy);
     });
 
     test('plain family codes map clear / cloudy / overcast', () {
-      expect(weatherVisual('晴', 100, colors).$1, Icons.wb_sunny_outlined);
-      expect(weatherVisual('多雲', 200, colors).$1, Icons.wb_cloudy_outlined);
-      expect(weatherVisual('陰', 300, colors).$1, Icons.cloud_outlined);
+      expect(weatherVisual('晴', 100, colors).$1, clearDay);
+      expect(weatherVisual('多雲', 200, colors).$1, partlyCloudyDay);
+      expect(weatherVisual('陰', 300, colors).$1, cloudy);
     });
 
     test('the accent colour follows the mode, not the glyph', () {
@@ -87,11 +90,12 @@ void main() {
     });
 
     test('a missing code falls back to substring matching', () {
-      expect(weatherVisual('午後雷陣雨', 0, colors).$1, Icons.thunderstorm_outlined);
+      expect(weatherVisual('午後雷陣雨', 0, colors).$1, thunderstorm);
       expect(weatherVisual('短暫雨', 0, colors).$1, rainy);
-      expect(weatherVisual('雪', 0, colors).$1, Icons.ac_unit_outlined);
-      expect(weatherVisual('晴時多雲', 0, colors).$1, Icons.wb_sunny_outlined);
-      expect(weatherVisual('多雲', 0, colors).$1, Icons.cloud_outlined);
+      expect(weatherVisual('雪', 0, colors).$1, snowing);
+      expect(weatherVisual('晴時多雲', 0, colors).$1, clearDay);
+      expect(weatherVisual('多雲', 0, colors).$1, partlyCloudyDay);
+      expect(weatherVisual('陰', 0, colors).$1, cloudy);
     });
   });
 }

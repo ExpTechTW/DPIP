@@ -28,6 +28,7 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart' show listEquals;
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -270,7 +271,7 @@ void main() {
 
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     expect(find.text(l10n.regionCurrentUnavailable), findsNothing);
-    expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
+    expect(find.byIcon(cloudy), findsOneWidget);
   });
 
   testWidgets('no GPS fix → the sheet carries no cards at all', (tester) async {
