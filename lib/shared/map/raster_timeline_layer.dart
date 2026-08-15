@@ -106,6 +106,31 @@ abstract class RasterTimelineLayer implements MapLayer {
   @protected
   String? get rasterBelowLayerId => outlineLayerId;
 
+  /// The seam between this layer's frames and the chrome drawn over them.
+  ///
+  /// Every frame mounts **below** this layer and every piece of chrome mounts
+  /// **above** it, which is the only thing that keeps the two apart while the
+  /// timeline is being scrubbed. `belowLayerId` inserts *immediately* below its
+  /// anchor, so when the frames and the borders shared one anchor
+  /// ([rasterBelowLayerId]) each newly-mounted frame landed on top of the
+  /// borders that were added at attach — the county and township lines sank
+  /// under the echo the moment the user dragged the timeline, and stayed there.
+  ///
+  /// It is an empty GeoJSON line layer: it draws nothing and costs nothing, it
+  /// exists only to hold a position in the style's layer order.
+  String get frameSeamLayerId => '$id-frame-seam';
+
+  String get _frameSeamSourceId => '$id-frame-seam-src';
+
+  /// Where chrome drawn *over* the frames anchors — above [frameSeamLayerId],
+  /// under the same style layer the frames are held beneath.
+  ///
+  /// Chrome must not pick its own anchor: one that resolves below the seam puts
+  /// the overlay under the raster it is supposed to annotate, which is how the
+  /// radar scan-range circle came to be drawn beneath the echo.
+  @protected
+  String? get chromeBelowLayerId => rasterBelowLayerId;
+
   /// What the frame times *are*, for the timeline caption above the date.
   ///
   /// Observed data (radar, satellite) keeps the shared "observed" label; a
@@ -187,6 +212,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
 
   @override
+  bool get overlayFollowsCamera => true;
+
+  @override
   void onMapGestureStart() {}
 
   @override
@@ -209,6 +237,9 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   String? _shownFrameId;
   bool _attached = false;
+
+  /// Whether [frameSeamLayerId] is currently on the map.
+  bool _seamMounted = false;
 
   /// The frame index the warm band is currently centred on — the gate that
   /// keeps a scrub from re-warming (or re-fetching the visible region) for
@@ -440,6 +471,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       );
       return;
     }
+    await _ensureSeam(controller);
     await controller.addSource(
       _sourceId(id),
       RasterSourceProperties(tiles: [source.tileUrl(id)], tileSize: 256),
@@ -448,9 +480,47 @@ abstract class RasterTimelineLayer implements MapLayer {
       _sourceId(id),
       _layerId(id),
       _mountPaint(value),
-      belowLayerId: rasterBelowLayerId,
+      // Under the seam, never under the shared anchor: chrome sits between the
+      // two, and anchoring here is what stops a scrub from burying it.
+      belowLayerId: _seamMounted ? frameSeamLayerId : rasterBelowLayerId,
     );
     _resident.add(id);
+  }
+
+  /// Puts the seam on the map once, before the first frame.
+  ///
+  /// Best-effort: if it cannot be added the frames fall back to the shared
+  /// anchor, which is the old behaviour — a scrub that re-buries the borders is
+  /// worse than the alternative, but a map with no echo at all is worse still.
+  Future<void> _ensureSeam(MapLibreMapController controller) async {
+    if (_seamMounted) return;
+    try {
+      await controller.addGeoJsonSource(_frameSeamSourceId, const {
+        'type': 'FeatureCollection',
+        'features': <Object>[],
+      });
+      await controller.addLineLayer(
+        _frameSeamSourceId,
+        frameSeamLayerId,
+        const LineLayerProperties(lineOpacity: 0),
+        belowLayerId: rasterBelowLayerId,
+        enableInteraction: false,
+      );
+      _seamMounted = true;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, '$id frame seam');
+    }
+  }
+
+  Future<void> _removeSeam(MapLibreMapController controller) async {
+    if (!_seamMounted) return;
+    _seamMounted = false;
+    try {
+      await controller.removeLayer(frameSeamLayerId);
+    } catch (_) {}
+    try {
+      await controller.removeSource(_frameSeamSourceId);
+    } catch (_) {}
   }
 
   /// Hides every ring member that fell outside [keep] and abandons their tile
@@ -584,6 +654,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       await _removeFrame(controller, id);
     }
     if (_attached) await onDetached(controller);
+    await _removeSeam(controller);
     _reset();
   }
 
@@ -611,6 +682,8 @@ abstract class RasterTimelineLayer implements MapLayer {
     _shownFrameId = null;
     _warmCentre = null;
     _attached = false;
+    // A style reload drops every runtime layer, the seam included.
+    _seamMounted = false;
   }
 }
 

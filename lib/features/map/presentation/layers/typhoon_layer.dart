@@ -115,6 +115,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
 
   bool _rangeShown = false;
   bool _globalShown = false;
+
   final Set<AdminBoundary> _boundariesShown = {};
 
   /// Blue-grey, matching the radar surface — distinct from every dBZ colour so
@@ -143,6 +144,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
   static const String _src = 'typhoon-src';
   static const String _wxSrc = 'typhoon-wx-src';
   static const String _wxLyr = 'typhoon-wx-lyr';
+
   static const String _warnLyr = 'typhoon-warning-areas';
   static const String _probLyr = 'typhoon-probability';
   static const String _coneLyr = 'typhoon-cone';

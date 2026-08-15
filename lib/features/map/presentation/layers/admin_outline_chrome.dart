@@ -125,7 +125,11 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
           await AdminOutline.remove(controller, boundary);
         } else {
           _boundariesShown.add(boundary);
-          await AdminOutline.add(controller, boundary);
+          await AdminOutline.add(
+            controller,
+            boundary,
+            belowLayerId: chromeBelowLayerId,
+          );
         }
       }
     } catch (error, stackTrace) {

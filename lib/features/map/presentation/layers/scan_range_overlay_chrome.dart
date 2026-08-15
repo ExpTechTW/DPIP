@@ -9,7 +9,6 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -100,7 +99,10 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
         await RadarScanRange.add(
           controller,
           outlineColor: scanRangeColor,
-          belowLayerId: outlineLayerId,
+          // The layer's chrome anchor, not the base style's county outline:
+          // that one sits *below* the raster, so the circle was being drawn
+          // under the echo it exists to bound.
+          belowLayerId: chromeBelowLayerId,
           sourceId: scanRangeSourceId,
           layerId: scanRangeLayerId,
         );

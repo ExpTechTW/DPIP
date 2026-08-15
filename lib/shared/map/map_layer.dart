@@ -164,6 +164,17 @@ abstract interface class MapLayer {
   /// Rebuilds on camera idle so projections stay in sync.
   Widget buildMapOverlay(BuildContext context);
 
+  /// Whether [buildMapOverlay]'s subtree must be **rebuilt from scratch** on
+  /// every camera settle so its screen-space projections are recomputed.
+  ///
+  /// True for a static overlay (typhoon callouts): it projects once per build,
+  /// so a settle has to throw the subtree away. False for an overlay that reads
+  /// the live camera itself every frame — re-keying one of those destroys its
+  /// [State] on every pan, zoom and tap, which for an animation means the
+  /// ticker, the simulation and the accumulated buffer are all rebuilt each
+  /// time (see `WindParticleOverlay`).
+  bool get overlayFollowsCamera => true;
+
   /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
   Future<void> onCameraIdle(MapLibreMapController controller);
 
@@ -261,6 +272,9 @@ mixin MapLayerDefaults implements MapLayer {
     required ValueChanged<bool> onShowTerrainChanged,
     required Future<void> Function() onReloadActive,
   }) => const SizedBox.shrink();
+
+  @override
+  bool get overlayFollowsCamera => true;
 
   @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();

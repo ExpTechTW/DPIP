@@ -850,7 +850,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             child: ValueListenableBuilder<int>(
               valueListenable: _cameraEpoch,
               builder: (context, epoch, _) => KeyedSubtree(
-                key: ValueKey<Object>('${_active.id}-$epoch'),
+                // The epoch is in the key only for overlays that project once
+                // per build: changing it discards the subtree's State, which is
+                // the point for a callout and ruinous for an animation that
+                // owns a ticker and a frame buffer.
+                key: ValueKey<Object>(
+                  _active.overlayFollowsCamera
+                      ? '${_active.id}-$epoch'
+                      : _active.id,
+                ),
                 child: _active.buildMapOverlay(context),
               ),
             ),

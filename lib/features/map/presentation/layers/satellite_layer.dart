@@ -125,6 +125,17 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   @override
   double get opacity => 1;
 
+  /// Over the base style's borders, not under them.
+  ///
+  /// This layer draws its own county and township outlines in bright yellow,
+  /// precisely because the default white does not survive on imagery. Anchoring
+  /// the frames under the base borders left *both* sets on the map — every
+  /// boundary drawn twice, at two weights and two colours — which the imagery
+  /// then had to compete with. The frames still sit under the township names,
+  /// so a place name is never buried.
+  @override
+  String? get rasterBelowLayerId => townLabelLayerId;
+
   /// Thermal bands offer the colour-style menu (and the township-label
   /// toggle); everything else — named products and the reflectance bands
   /// (B01–B06, whose only rendering is grayscale) — has no style to pick and
