@@ -14,6 +14,7 @@ import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -71,6 +72,8 @@ class DisplayPage extends StatelessWidget {
               (TextScaleStep.huge, l10n.displayScaleHuge),
             ],
             onChanged: settings.setTextScale,
+            preview: (step) =>
+                _MiniScreen(scheme: Theme.of(context).colorScheme, scale: step),
           ),
           _Choice<TextWeightStep>(
             title: l10n.displayTextWeight,
@@ -82,6 +85,10 @@ class DisplayPage extends StatelessWidget {
               (TextWeightStep.bold, l10n.displayWeightBold),
             ],
             onChanged: settings.setTextWeight,
+            preview: (step) => _MiniScreen(
+              scheme: Theme.of(context).colorScheme,
+              weight: step,
+            ),
           ),
           _Choice<ContrastStep>(
             title: l10n.displayContrast,
@@ -93,6 +100,14 @@ class DisplayPage extends StatelessWidget {
               (ContrastStep.high, l10n.displayContrastHigh),
             ],
             onChanged: settings.setContrast,
+            preview: (step) => _MiniScreen(
+              // Its own scheme, built at that contrast — the whole difference
+              // is in the palette, so a shared one would show nothing.
+              scheme: AppTheme.scheme(
+                Theme.of(context).brightness,
+                contrast: step,
+              ),
+            ),
           ),
           _Choice<ColorVision>(
             title: l10n.displayColorVision,
@@ -105,6 +120,10 @@ class DisplayPage extends StatelessWidget {
               (ColorVision.tritan, l10n.displayColorVisionTritan),
             ],
             onChanged: context.read<ColorVisionController>().set,
+            preview: (option) => _MiniScreen(
+              scheme: Theme.of(context).colorScheme,
+              vision: option,
+            ),
           ),
         ],
       ),
@@ -112,8 +131,14 @@ class DisplayPage extends StatelessWidget {
   }
 }
 
-/// One setting: a header, a line saying what it does, and its options as a
-/// segmented row.
+/// One setting: a header, a line saying what it does, and its options as a row
+/// of previews.
+///
+/// Previews rather than labels because none of these settings can be judged
+/// from its name — "medium contrast" and "deuteranopia" mean nothing until you
+/// see them, and the whole point of the page is choosing what you can read.
+/// Each card paints the same mock screen under its own option, so the row is a
+/// comparison rather than four assertions.
 class _Choice<T> extends StatelessWidget {
   const _Choice({
     required this.title,
@@ -121,6 +146,7 @@ class _Choice<T> extends StatelessWidget {
     required this.value,
     required this.options,
     required this.onChanged,
+    required this.preview,
   });
 
   final String title;
@@ -128,6 +154,9 @@ class _Choice<T> extends StatelessWidget {
   final T value;
   final List<(T, String)> options;
   final ValueChanged<T> onChanged;
+
+  /// The mock screen as this option would draw it.
+  final Widget Function(T option) preview;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +170,7 @@ class _Choice<T> extends StatelessWidget {
             AppSpacing.lg,
             0,
             AppSpacing.lg,
-            AppSpacing.sm,
+            AppSpacing.md,
           ),
           child: Text(
             description,
@@ -155,22 +184,23 @@ class _Choice<T> extends StatelessWidget {
             AppSpacing.lg,
             0,
             AppSpacing.lg,
-            AppSpacing.md,
+            AppSpacing.lg,
           ),
-          // Scrolls rather than wraps: at the largest text size four segments
-          // will not fit a phone's width, and a squeezed segment that clips its
-          // own label is worse than one the user swipes to.
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SegmentedButton<T>(
-              segments: [
-                for (final (option, label) in options)
-                  ButtonSegment<T>(value: option, label: Text(label)),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final (i, (option, label)) in options.indexed) ...[
+                if (i > 0) const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: _ThemeOptionCard(
+                    label: label,
+                    selected: option == value,
+                    onTap: () => onChanged(option),
+                    child: preview(option),
+                  ),
+                ),
               ],
-              selected: {value},
-              showSelectedIcon: false,
-              onSelectionChanged: (selection) => onChanged(selection.first),
-            ),
+            ],
           ),
         ),
       ],
@@ -197,12 +227,15 @@ class _ThemeOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          borderRadius: AppRadius.medium,
-          child: AnimatedContainer(
+    // The whole card is the target, label included: the name is what a reader
+    // looks at to decide, so it is what they reach for. Only the preview used to
+    // take the tap, which left the label looking inert.
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppRadius.medium,
+      child: Column(
+        children: [
+          AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
@@ -217,28 +250,29 @@ class _ThemeOptionCard extends StatelessWidget {
               child: AspectRatio(aspectRatio: 3 / 4, child: child),
             ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (selected) ...[
-              Icon(Icons.check_circle, size: 16, color: colors.primary),
-              const SizedBox(width: AppSpacing.xs),
-            ],
-            Flexible(
-              child: Text(
-                label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: selected ? colors.primary : colors.onSurface,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (selected) ...[
+                Icon(Icons.check_circle, size: 16, color: colors.primary),
+                const SizedBox(width: AppSpacing.xs),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: selected ? colors.primary : colors.onSurface,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                 ),
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -274,12 +308,34 @@ class _ThemePreview extends StatelessWidget {
   }
 }
 
-/// A minimal mock of the app UI — a top bar and a few content blocks — painted
-/// in [scheme]'s roles so each preview reads as that theme at a glance.
+/// A minimal mock of the app UI, painted under one specific set of display
+/// settings — so a row of these shows what each option actually does instead of
+/// naming it.
+///
+/// Every option renders the same screen with **its own** settings, not the ones
+/// currently in force, which is why the colours go through
+/// [ColorVisionFilter.transform] with an explicit [vision] rather than the
+/// `.vision` extension: the extension reads the global setting, and here each
+/// card needs a different one.
+///
+/// The intensity ramp is in the mock deliberately. It is the app's signature
+/// colour semantics and the sequence a red- or green-weak eye collapses worst,
+/// so it is where a colour-vision option is visible at all — a mock made only
+/// of theme greys would look identical in all four.
 class _MiniScreen extends StatelessWidget {
-  const _MiniScreen({required this.scheme});
+  const _MiniScreen({
+    required this.scheme,
+    this.vision = ColorVision.none,
+    this.scale = TextScaleStep.normal,
+    this.weight = TextWeightStep.normal,
+  });
 
   final ColorScheme scheme;
+  final ColorVision vision;
+  final TextScaleStep scale;
+  final TextWeightStep weight;
+
+  Color _c(Color color) => ColorVisionFilter.transform(color, vision);
 
   @override
   Widget build(BuildContext context) {
@@ -295,8 +351,23 @@ class _MiniScreen extends StatelessWidget {
       ),
     );
 
+    // The felt-intensity scale, 1 → 7: the app's own palette, and the sequence
+    // a colour-vision option changes most visibly.
+    final ramp = Row(
+      children: [
+        for (var level = 1; level <= 9; level++)
+          Expanded(
+            child: Container(
+              height: 10,
+              margin: const EdgeInsets.only(right: 1),
+              color: _c(IntensityColors.discrete(level)),
+            ),
+          ),
+      ],
+    );
+
     return Container(
-      color: scheme.surface,
+      color: _c(scheme.surface),
       padding: const EdgeInsets.all(AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,23 +375,42 @@ class _MiniScreen extends StatelessWidget {
           Container(
             height: 14,
             decoration: BoxDecoration(
-              color: scheme.primary,
+              color: _c(scheme.primary),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
+          ramp,
+          const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: scheme.primaryContainer,
+                color: _c(scheme.primaryContainer),
                 borderRadius: BorderRadius.circular(6),
+              ),
+              alignment: Alignment.center,
+              // Real text, at this option's size and weight — the only way a
+              // type setting reads as anything in a thumbnail.
+              child: Text(
+                '5\u207B',
+                textScaler: TextScaler.linear(scale.factor),
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1,
+                  color: _c(scheme.onPrimaryContainer),
+                  fontWeight:
+                      FontWeight.values[(3 + weight.steps).clamp(
+                        0,
+                        FontWeight.values.length - 1,
+                      )],
+                ),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          bar(scheme.surfaceContainerHighest),
+          bar(_c(scheme.surfaceContainerHighest)),
           const SizedBox(height: AppSpacing.xs),
-          bar(scheme.surfaceContainerHighest, widthFactor: 0.6),
+          bar(_c(scheme.surfaceContainerHighest), widthFactor: 0.6),
         ],
       ),
     );
