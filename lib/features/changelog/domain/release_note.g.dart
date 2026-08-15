@@ -11,6 +11,7 @@ _ReleaseNote _$ReleaseNoteFromJson(Map<String, dynamic> json) => _ReleaseNote(
   name: json['name'] as String? ?? '',
   body: json['body'] as String? ?? '',
   prerelease: json['prerelease'] as bool,
+  htmlUrl: json['html_url'] as String? ?? '',
   publishedAt: DateTime.parse(json['published_at'] as String),
 );
 
@@ -20,5 +21,6 @@ Map<String, dynamic> _$ReleaseNoteToJson(_ReleaseNote instance) =>
       'name': instance.name,
       'body': instance.body,
       'prerelease': instance.prerelease,
+      'html_url': instance.htmlUrl,
       'published_at': instance.publishedAt.toIso8601String(),
     };
