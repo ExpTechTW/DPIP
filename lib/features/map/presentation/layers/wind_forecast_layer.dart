@@ -46,6 +46,23 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   /// animation only once this is set.
   final ValueNotifier<WindField?> field = ValueNotifier(null);
 
+  /// Whether a finger is currently on the map.
+  ///
+  /// The particle field is torn down for the whole gesture and reseeded when it
+  /// ends. That is cheaper *and* more correct than animating through it: the
+  /// population size is a function of zoom, so a pinch re-sizes it on every
+  /// frame of the gesture — growing it seeds particles into a viewport that is
+  /// still moving, shrinking it truncates the list — and the field arrives at
+  /// the final zoom carrying whatever that churn produced. Starting again from
+  /// the camera the gesture settled on costs one reseed and is always right.
+  final ValueNotifier<bool> interacting = ValueNotifier(false);
+
+  @override
+  void onMapGestureStart() => interacting.value = true;
+
+  @override
+  void onMapGestureEnd() => interacting.value = false;
+
   String? _loadedFieldFrame;
 
   /// The live map controller — shared with the particle overlay, which reads
