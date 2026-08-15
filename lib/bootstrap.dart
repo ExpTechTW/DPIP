@@ -18,7 +18,6 @@ import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
-import 'package:dpip/core/meshtastic/data/mesh_log_migration.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/data/meshtastic_client_impl.dart';
 import 'package:dpip/core/meshtastic/mesh_metrics_recorder.dart';
@@ -40,7 +39,9 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/astro/tle_store.dart';
+import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
@@ -59,7 +60,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Initializes platform services and launches the app.
@@ -79,24 +79,25 @@ Future<void> bootstrap() async {
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
 
-  // Kick off every independent resource load in parallel — Firebase, prefs,
+  // Kick off every independent resource load in parallel — Firebase, settings,
   // the SQLite cache, the town directory and package info never touch each
   // other, so the serial chain would simply add their latencies. Each is
   // awaited individually below so failures keep their per-resource handling.
   unawaited(_initFirebase());
-  final prefsFuture = SharedPreferences.getInstance();
+  final durableFuture = _openDurable();
   final cacheFuture = _openCache();
   final townDirectoryFuture = TownDirectory.load();
   final appVersionFuture = PackageInfo.fromPlatform().then((p) => p.version);
 
-  final prefs = Prefs(await prefsFuture);
-  final regions = RegionSelection(prefs);
-  final experimental = ExperimentalSettings(prefs);
-  final onboarding = OnboardingStore(prefs);
-  final locale = LocaleController(prefs);
-  final theme = ThemeController(prefs);
-  final defaultMapLayer = DefaultMapLayerController(prefs);
-  final mapLayerOrder = MapLayerOrderController(prefs);
+  final durable = await durableFuture;
+  final settings = await SettingsStore.open(durable);
+  final regions = RegionSelection(settings);
+  final experimental = ExperimentalSettings(settings);
+  final onboarding = OnboardingStore(settings);
+  final locale = LocaleController(settings);
+  final theme = ThemeController(settings);
+  final defaultMapLayer = DefaultMapLayerController(settings);
+  final mapLayerOrder = MapLayerOrderController(settings);
   final cache = await cacheFuture;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final apiClient = ApiClient(dio, regions);
@@ -136,7 +137,7 @@ Future<void> bootstrap() async {
   // slow FCM registration must never gate launch. The token is only consumed
   // by device-location reports, which fire after GPS permission, so it lands
   // long before it is needed.
-  final notificationService = NotificationService(prefs);
+  final notificationService = NotificationService(settings);
   unawaited(_initNotifications(notificationService));
 
   // Location: the township directory (centroids) backs Home region labels and
@@ -145,7 +146,7 @@ Future<void> bootstrap() async {
   // `TownBoundaries.load`) so they never delay launch or the first frames.
   final townDirectory = await townDirectoryFuture;
   final townBoundaries = TownBoundaries.load();
-  final regionStore = RegionStore(prefs);
+  final regionStore = RegionStore(settings);
   final locationService = LocationService(
     townDirectory,
     boundaries: townBoundaries,
@@ -160,7 +161,7 @@ Future<void> bootstrap() async {
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
-    prefs: prefs,
+    settings: settings,
     onMoved: (fix) async {
       final token = notificationService.token;
       if (token == null) return false;
@@ -192,20 +193,20 @@ Future<void> bootstrap() async {
   // keeps reconnecting) for the whole app session, because it is a reception
   // path for disaster information. `start()` picks a saved radio back up.
   final meshtastic = MeshtasticClientImpl();
-  final meshLink = MeshLink(meshtastic, prefs);
-  final meshAlerts = MeshAlerts(meshtastic, prefs);
-  final meshNodes = MeshNodeStore(meshtastic, prefs);
-  // Mesh data gets its own database, deliberately **not** the HTTP cache one:
-  // that lives in the platform cache directory, which the OS may purge, and a
-  // conversation is the one thing here that cannot be fetched again.
-  final meshStore = await _openMeshStore();
+  final meshLink = MeshLink(meshtastic, settings);
+  final meshAlerts = MeshAlerts(meshtastic, settings);
+  // Mesh data lives in the durable database, deliberately **not** the HTTP
+  // cache one: that lives in the platform cache directory, which the OS may
+  // purge, and a conversation is the one thing here that cannot be fetched
+  // again.
+  final meshStore = durable == null ? null : MeshStore(durable);
+  final meshNodes = MeshNodeStore(meshtastic, settings, store: meshStore);
   if (meshStore != null) {
-    await migrateLegacyMeshLog(prefs, meshStore);
     unawaited(meshStore.prune());
   }
 
   final deps = SharedDeps(
-    prefs: prefs,
+    settings: settings,
     apiClient: apiClient,
     regions: regions,
     experimental: experimental,
@@ -229,6 +230,8 @@ Future<void> bootstrap() async {
     meshAlerts: meshAlerts,
     meshNodes: meshNodes,
     meshStore: meshStore,
+    database: AppDatabase(durable: durable, cache: cache?.db),
+    tleStore: TleStore(durable),
     meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
@@ -274,7 +277,8 @@ Future<void> bootstrap() async {
 /// database can't be opened the app runs without HTTP caching / accounting rather
 /// than failing to launch. The usage tables are created with `IF NOT EXISTS` on
 /// every open, so they're added to a pre-existing cache DB without a version bump.
-Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
+Future<({EtagCacheStore etag, NetworkUsageStore usage, Database db})?>
+_openCache() async {
   try {
     final base = await getApplicationCacheDirectory();
     final db = await openDatabase(
@@ -290,35 +294,44 @@ Future<({EtagCacheStore etag, NetworkUsageStore usage})?> _openCache() async {
     await NetworkUsageStore.createSchema(db);
     await EtagCacheStore.configureConnection(db);
     final usage = NetworkUsageStore(db);
-    return (etag: EtagCacheStore(db, usage: usage), usage: usage);
+    return (etag: EtagCacheStore(db, usage: usage), usage: usage, db: db);
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'ETag cache unavailable');
     return null;
   }
 }
 
-/// Opens the mesh database under the application-support directory.
+/// Opens the durable database — settings, orbital elements and mesh history.
 ///
-/// Support, not cache: the mesh log and its utilization history are user data
-/// that no server can re-supply, and the cache directory is purgeable by the
-/// OS. Best-effort like the cache — a failure means the conversation lives
-/// only for this session rather than the app failing to launch.
-Future<MeshStore?> _openMeshStore() async {
+/// Application-support, not cache: none of this can be fetched again, and the
+/// cache directory is one the OS may empty whenever it wants space. The HTTP
+/// cache is a separate file for exactly that reason, which is also what makes
+/// "clear cache" unable to reach any of this. See `core/storage/app_database.dart`.
+///
+/// Best-effort like the cache: a failure means settings live only for this
+/// session rather than the app refusing to launch. Every schema statement is
+/// `IF NOT EXISTS` and runs on every open, so a database created by an older
+/// build picks up tables added later without a version bump.
+Future<Database?> _openDurable() async {
   try {
     final base = await getApplicationSupportDirectory();
     final db = await openDatabase(
-      '${base.path}/meshtastic.db',
-      version: 1,
-      onCreate: (db, _) => MeshStore.createSchema(db),
+      '${base.path}/dpip.db',
+      version: appDatabaseVersion,
+      onCreate: (db, _) => _createDurableSchema(db),
     );
-    // Also on open, so a database created by an older build picks up tables
-    // added later (every statement is `IF NOT EXISTS`).
-    await MeshStore.createSchema(db);
-    return MeshStore(db);
+    await _createDurableSchema(db);
+    return db;
   } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'mesh database unavailable');
+    Log.handle(error, stackTrace, 'durable database unavailable');
     return null;
   }
+}
+
+Future<void> _createDurableSchema(Database db) async {
+  await SettingsStore.createSchema(db);
+  await TleStore.createSchema(db);
+  await MeshStore.createSchema(db);
 }
 
 /// Initializes Firebase in parallel with the rest of bootstrap. Hot-restart

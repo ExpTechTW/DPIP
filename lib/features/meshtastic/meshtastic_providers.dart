@@ -14,7 +14,7 @@ import 'package:provider/single_child_widget.dart';
 /// to a saved radio at startup and the message stream is a broadcast stream:
 /// anything arriving with no listener is gone. A log that only starts
 /// recording when the user happens to open the page would lose exactly the
-/// messages that arrived while they weren't looking. Creating it costs a prefs
+/// messages that arrived while they weren't looking. Creating it costs a settings
 /// read and two stream subscriptions — no BLE work of its own.
 List<SingleChildWidget> meshtasticProviders(SharedDeps deps) => [
   ChangeNotifierProvider<MeshChatController>(

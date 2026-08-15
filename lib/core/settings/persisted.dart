@@ -1,7 +1,7 @@
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
-/// A single enum setting backed by [Prefs] — reads with a fallback on
+/// A single enum setting backed by [SettingsStore] — reads with a fallback on
 /// construction and persists on change.
 ///
 /// A plain value holder, deliberately NOT a `ChangeNotifier`: [set] returns
@@ -10,17 +10,17 @@ import 'package:dpip/core/settings/prefs.dart';
 /// something other than its `name` (e.g. a region `.code`).
 class PersistedEnum<T extends Enum> {
   PersistedEnum(
-    this._prefs, {
-    required PrefKey<String> key,
+    this._settings, {
+    required SettingKey<String> key,
     required List<T> values,
     required T fallback,
     String Function(T value)? encode,
   }) : _key = key,
        _encode = encode ?? _name,
-       _value = _read(_prefs, key, values, fallback, encode ?? _name);
+       _value = _read(_settings, key, values, fallback, encode ?? _name);
 
-  final Prefs _prefs;
-  final PrefKey<String> _key;
+  final SettingsStore _settings;
+  final SettingKey<String> _key;
   final String Function(T value) _encode;
   T _value;
 
@@ -32,20 +32,20 @@ class PersistedEnum<T extends Enum> {
   bool set(T next) {
     if (next == _value) return false;
     _value = next;
-    _prefs.setString(_key, _encode(next));
+    _settings.setString(_key, _encode(next));
     return true;
   }
 
   static String _name(Enum value) => value.name;
 
   static T _read<T extends Enum>(
-    Prefs prefs,
-    PrefKey<String> key,
+    SettingsStore settings,
+    SettingKey<String> key,
     List<T> values,
     T fallback,
     String Function(T value) encode,
   ) {
-    final stored = prefs.getString(key);
+    final stored = settings.getString(key);
     for (final value in values) {
       if (encode(value) == stored) return value;
     }

@@ -71,7 +71,6 @@ dependencies:
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
   provider: ^6.1.5+1
-  shared_preferences: ^2.5.5
   sqflite: ^2.4.3
   talker_flutter: ^5.1.9
   url_launcher: ^6.3.2

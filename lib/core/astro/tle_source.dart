@@ -8,7 +8,7 @@
 /// Three tiers, each a real answer when the one above it is unavailable:
 ///
 ///   1. **Fetched** — the newest elements, at most once a day.
-///   2. **Cached** — the last successful fetch, kept in [Prefs].
+///   2. **Cached** — the last successful fetch, kept in [SettingsStore].
 ///   3. **Bundled** — the snapshot shipped with the app. Always present, so a
 ///      device that has never had a network still predicts passes.
 ///
@@ -26,8 +26,7 @@
 library;
 
 import 'package:dpip/core/astro/satellite.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/astro/tle_store.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// How long a fetched set is considered fresh.
@@ -67,14 +66,14 @@ class BundledTleSource implements TleSource {
 /// Cached elements, refreshed on a timer, never downgraded.
 class CachedTleSource implements TleSource {
   const CachedTleSource({
-    required this.prefs,
+    required this.store,
     required this.now,
     this.fetch,
     this.fallback = const BundledTleSource(),
     this.refreshInterval = tleRefreshInterval,
   });
 
-  final Prefs prefs;
+  final TleStore store;
   final DateTime Function() now;
 
   /// Null until the app has a route to a feed; the cache and the bundle still
@@ -91,28 +90,28 @@ class CachedTleSource implements TleSource {
   /// result for the page to show.
   @override
   Future<List<TleSet>> load() async {
-    if (_shouldRefresh) await _refresh();
-    final cached = prefs.getString(PreferenceKeys.satelliteElements);
-    if (cached != null) {
-      final parsed = _parse(cached);
+    var stored = await store.read();
+    if (_shouldRefresh(stored)) {
+      await _refresh(stored);
+      stored = await store.read();
+    }
+    if (stored != null) {
+      final parsed = _parse(stored.text);
       if (parsed.isNotEmpty) return parsed;
     }
     return fallback.load();
   }
 
-  bool get _shouldRefresh {
+  bool _shouldRefresh(StoredElements? stored) {
     if (fetch == null) return false;
-    final last = prefs.getInt(PreferenceKeys.satelliteElementsFetchedAt);
-    if (last == null) return true;
-    final since = now().difference(
-      DateTime.fromMillisecondsSinceEpoch(last, isUtc: true),
-    );
+    if (stored == null) return true;
+    final since = now().difference(stored.fetchedAt);
     // A clock that jumped backwards would otherwise freeze the refresh until
     // it caught up.
     return since.isNegative || since >= refreshInterval;
   }
 
-  Future<void> _refresh() async {
+  Future<void> _refresh(StoredElements? stored) async {
     final String text;
     try {
       text = await fetch!();
@@ -128,22 +127,15 @@ class CachedTleSource implements TleSource {
     // Only accept a genuinely newer set. The feed is regenerated constantly,
     // so identical or older elements arrive routinely, and replacing a good
     // cache with an older one would quietly make predictions worse.
-    final cached = _parse(
-      prefs.getString(PreferenceKeys.satelliteElements) ?? '',
-    );
+    final cached = _parse(stored?.text ?? '');
     if (cached.isNotEmpty && !_isNewer(incoming, cached)) {
-      await _stamp();
+      // Record the check without touching the elements.
+      await store.write(fetchedAt: now());
       return;
     }
 
-    await prefs.setString(PreferenceKeys.satelliteElements, text);
-    await _stamp();
+    await store.write(text: text, fetchedAt: now());
   }
-
-  Future<void> _stamp() => prefs.setInt(
-    PreferenceKeys.satelliteElementsFetchedAt,
-    now().toUtc().millisecondsSinceEpoch,
-  );
 
   /// Whether [incoming] carries a later epoch than [cached] for any object
   /// they share — the elements' own version number.

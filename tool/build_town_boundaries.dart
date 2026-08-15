@@ -24,9 +24,9 @@ const _src = 'assets/map/town_boundaries.json.gz';
 const _out = 'assets/map/town_boundaries.bin.gz';
 
 void main() {
-  final json =
-      jsonDecode(utf8.decode(gzip.decode(File(_src).readAsBytesSync())))
-          as Map<String, dynamic>;
+  final json = jsonDecode(
+    utf8.decode(gzip.decode(File(_src).readAsBytesSync())),
+  ) as Map<String, dynamic>;
 
   final out = BytesBuilder();
   void writeVarint(int value) {

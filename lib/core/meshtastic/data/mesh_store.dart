@@ -7,7 +7,7 @@
 /// exists precisely because it cannot be fetched again. So this opens its own
 /// file in the application-support directory.
 ///
-/// SQLite rather than the prefs list the log used to be: prefs is a
+/// SQLite rather than the settings list the log used to be: settings is a
 /// read-whole-file/write-whole-file key-value store, so every incoming message
 /// re-serialised the entire log, the whole thing lived in memory, and asking
 /// for "this channel, newest 50" meant filtering in Dart. Here that is an
@@ -58,11 +58,12 @@ class MeshStore {
     : _now = now ?? (() => AppTime.utc.toLocal());
 
   static const String _messages = 'mesh_messages';
+  static const String _nodes = 'mesh_nodes';
   static const String _metrics = 'mesh_metrics';
 
   /// How long the conversation log is kept. Generous because the whole point
   /// of the mesh is the times you cannot reach anything else; SQLite makes the
-  /// size a non-issue where the old prefs blob did not.
+  /// size a non-issue where the old settings blob did not.
   static const Duration messageRetention = Duration(days: 30);
 
   /// How long utilization samples are kept — what the chart plots.
@@ -72,6 +73,25 @@ class MeshStore {
   final DateTime Function() _now;
 
   static Future<void> createSchema(Database db) async {
+    // The node table the radio hands over on every connect, kept for the times
+    // there is no radio. A row per node, not a JSON blob in a settings key:
+    // 250 nodes re-serialised on every telemetry packet is exactly what the
+    // key-value store was bad at.
+    await db.execute(
+      'CREATE TABLE IF NOT EXISTS $_nodes ('
+      'num INTEGER PRIMARY KEY NOT NULL, '
+      'name TEXT NOT NULL, '
+      'battery INTEGER, '
+      'last_heard INTEGER, '
+      'latitude REAL, '
+      'longitude REAL, '
+      'snr REAL NOT NULL DEFAULT 0, '
+      'via_mqtt INTEGER NOT NULL DEFAULT 0)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS ${_nodes}_heard ON $_nodes(last_heard DESC)',
+    );
+
     await db.execute('''
       CREATE TABLE IF NOT EXISTS $_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -233,4 +253,34 @@ class MeshStore {
     timestamp: DateTime.fromMillisecondsSinceEpoch(row['ts']! as int),
     outgoing: (row['outgoing']! as int) == 1,
   );
+
+  /// Every stored node, most recently heard first.
+  Future<List<Map<String, Object?>>> readNodes({int limit = 250}) async {
+    try {
+      return await _db.query(_nodes, orderBy: 'last_heard DESC', limit: limit);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'reading mesh nodes');
+      return const [];
+    }
+  }
+
+  /// Replaces the stored node table.
+  ///
+  /// A whole-table swap rather than per-row upserts: the caller already holds
+  /// the authoritative set in memory, the write is debounced, and 250 rows in
+  /// one transaction is cheaper than reconciling deletions.
+  Future<void> writeNodes(List<Map<String, Object?>> rows) async {
+    try {
+      await _db.transaction((txn) async {
+        await txn.delete(_nodes);
+        final batch = txn.batch();
+        for (final row in rows) {
+          batch.insert(_nodes, row);
+        }
+        await batch.commit(noResult: true);
+      });
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'writing mesh nodes');
+    }
+  }
 }

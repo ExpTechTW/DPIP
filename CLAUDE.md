@@ -180,16 +180,26 @@ baseline, feature-first architecture).
   `shared/widgets/**`. A genuinely non-display or throwaway literal is exempted
   with `// l10n-ignore: <reason>` (that line/the one above) or
   `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
-- **Persistence keys (contract):** all `SharedPreferences` access goes through
-  the typed `Prefs` facade (`core/settings/prefs.dart`), keyed by a `PrefKey<T>`
-  from the `PreferenceKeys` registry (`core/settings/preference_keys.dart`) —
-  **never a raw string, never `SharedPreferences` directly.** `PrefKey`'s
-  constructor is private, so a key can only be minted in the registry; `Prefs`
-  has no `String`-taking overload, so an ad-hoc key can't reach storage — the
-  compiler rejects it, not review. Add a setting = add one `PrefKey<T>` constant
-  + use it; never change an existing key string without a migration. Only
-  `prefs.dart` (wraps it) and `bootstrap.dart` (mints the one instance) may
-  import `shared_preferences`, enforced by `tool/check_prefs.sh`.
+- **Persistence (contract):** everything persisted lives in **SQLite**, split
+  into two files by *durability*: `dpip.db` in application-support (settings,
+  `tle`, `mesh_*`) and `http_cache.db` in the platform cache directory
+  (`http_cache`, `net_usage`). The split is the point — the OS may empty the
+  cache directory whenever it wants space, so nothing that cannot be re-fetched
+  may live there, and `AppDatabase.clearCache()` holds no handle to the durable
+  file, which makes "clear cache deleted my settings" unavailable rather than
+  merely avoided. Tables are one-per-category and each is owned by exactly one
+  store (`core/storage/app_database.dart` documents the map).
+  Settings go through the typed `SettingsStore` facade
+  (`core/settings/settings_store.dart`), keyed by a `SettingKey<T>` from the
+  `SettingKeys` registry (`core/settings/setting_keys.dart`) — **never a raw
+  string**. `SettingKey`'s constructor is private, so a key can only be minted
+  in the registry; `SettingsStore` has no `String`-taking overload, so an
+  ad-hoc key can't reach storage — the compiler rejects it, not review. Reads
+  are synchronous (the table is loaded into memory once at bootstrap); writes
+  are async and log rather than throw. Add a setting = add one `SettingKey<T>`;
+  never change an existing key string without a migration. `shared_preferences`
+  is **not a dependency** — nothing may import it — and only a table's owning
+  store may import `sqflite`; both enforced by `tool/check_storage.sh`.
 - Every file starts with a doc comment; one public declaration = one clear
   responsibility.
 
@@ -198,7 +208,7 @@ baseline, feature-first architecture).
 `.github/workflows/ci.yml` runs on every push/PR and must stay green. It uses
 the mise-pinned toolchain and runs, in order: the layering gate
 (`tool/check_layering.sh`), the localization gate (`tool/check_l10n.sh`), the
-prefs gate (`tool/check_prefs.sh`), the lockfile gate (`tool/check_pubspec_lock.sh`),
+storage gate (`tool/check_storage.sh`), the lockfile gate (`tool/check_pubspec_lock.sh`),
 `dart format --set-exit-if-changed`, a codegen-drift check (`build_runner` +
 `git diff --exit-code` — committed `*.g.dart` / `*.freezed.dart` must match a
 fresh build), `flutter analyze`, and `flutter test`. The four bash gates need

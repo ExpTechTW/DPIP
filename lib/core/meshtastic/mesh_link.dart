@@ -28,8 +28,8 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/widgets.dart';
 
 /// How far provisioning the DPIP channel got on the attached radio.
@@ -73,7 +73,7 @@ enum MeshRegionState {
 }
 
 class MeshLink extends ChangeNotifier {
-  MeshLink(this._service, this._prefs);
+  MeshLink(this._service, this._settings);
 
   /// What [attach] returns when another app on this phone holds the radio —
   /// not a message, a signal for the UI to ask whether to connect anyway.
@@ -102,7 +102,7 @@ class MeshLink extends ChangeNotifier {
   static const Duration _attemptBudget = Duration(seconds: 50);
 
   final MeshtasticService _service;
-  final Prefs _prefs;
+  final SettingsStore _settings;
 
   StreamSubscription<MeshConnectionStatus>? _statusSub;
   AppLifecycleListener? _lifecycle;
@@ -111,7 +111,7 @@ class MeshLink extends ChangeNotifier {
   bool _disposed = false;
 
   /// Bumped by every [attach] / [detach]. An attempt (or a provisioning run)
-  /// whose generation is stale must not write state or prefs — it is working
+  /// whose generation is stale must not write state or settings — it is working
   /// on a radio the user has already moved on from.
   int _generation = 0;
   Future<String?>? _inFlight;
@@ -193,8 +193,8 @@ class MeshLink extends ChangeNotifier {
   void start() {
     _statusSub ??= _service.connectionStream.listen(_onStatus);
     _lifecycle ??= AppLifecycleListener(onResume: _onResume);
-    _deviceId = _prefs.getString(PreferenceKeys.meshDeviceId);
-    _deviceName = _prefs.getString(PreferenceKeys.meshDeviceName);
+    _deviceId = _settings.getString(SettingKeys.meshDeviceId);
+    _deviceName = _settings.getString(SettingKeys.meshDeviceName);
     if (_deviceId == null) return;
     Log.info('mesh link: resuming saved radio ${_deviceName ?? _deviceId}');
     unawaited(_attempt());
@@ -216,7 +216,7 @@ class MeshLink extends ChangeNotifier {
     // `_attempt` would drop the request and *report success*, so picking a
     // second radio while connected (or mid-reconnect) would silently keep the
     // old one — and a stale attempt could even write its own radio back into
-    // prefs afterwards.
+    // settings afterwards.
     // The choice is recorded **synchronously**, before any await, so two taps
     // resolve in a defined order (the later one wins) rather than racing each
     // other's writes.
@@ -239,8 +239,8 @@ class MeshLink extends ChangeNotifier {
     // Only the newest choice reaches storage — an overtaken attach must not
     // leave its radio behind as the one to reconnect to.
     if (generation != _generation) return null;
-    await _prefs.setString(PreferenceKeys.meshDeviceId, device.id);
-    await _prefs.setString(PreferenceKeys.meshDeviceName, device.name);
+    await _settings.setString(SettingKeys.meshDeviceId, device.id);
+    await _settings.setString(SettingKeys.meshDeviceName, device.name);
     if (generation != _generation) return null;
     return _attempt();
   }
@@ -257,8 +257,8 @@ class MeshLink extends ChangeNotifier {
     _provision = MeshProvisionState.idle;
     _provisionError = null;
     _lastError = null;
-    await _prefs.remove(PreferenceKeys.meshDeviceId);
-    await _prefs.remove(PreferenceKeys.meshDeviceName);
+    await _settings.remove(SettingKeys.meshDeviceId);
+    await _settings.remove(SettingKeys.meshDeviceName);
     await _service.disconnect();
     notifyListeners();
   }
@@ -396,8 +396,8 @@ class MeshLink extends ChangeNotifier {
   Future<void> _remember(MeshDevice device) async {
     _deviceId = device.id;
     _deviceName = device.name;
-    await _prefs.setString(PreferenceKeys.meshDeviceId, device.id);
-    await _prefs.setString(PreferenceKeys.meshDeviceName, device.name);
+    await _settings.setString(SettingKeys.meshDeviceId, device.id);
+    await _settings.setString(SettingKeys.meshDeviceName, device.name);
   }
 
   void _onStatus(MeshConnectionStatus status) {

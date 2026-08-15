@@ -5,7 +5,9 @@ import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
@@ -22,7 +24,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
@@ -37,7 +39,9 @@ import 'package:dpip/shared/map/map_tile_warmer.dart';
 /// one line in the aggregate list — never another named field on the app root.
 class SharedDeps {
   const SharedDeps({
-    required this.prefs,
+    required this.settings,
+    required this.database,
+    required this.tleStore,
     required this.apiClient,
     required this.regions,
     required this.experimental,
@@ -68,7 +72,7 @@ class SharedDeps {
   });
 
   /// Persistence for feature-local settings.
-  final Prefs prefs;
+  final SettingsStore settings;
 
   /// Region-aware HTTP surface for datasources.
   final ApiClient apiClient;
@@ -147,6 +151,13 @@ class SharedDeps {
   /// The mesh conversation log and utilization history (SQLite). Null when
   /// the database couldn't be opened — the log is then session-only.
   final MeshStore? meshStore;
+
+  /// Both SQLite files. Held so a settings screen can clear the cache without
+  /// any store handing out a handle to the durable one.
+  final AppDatabase database;
+
+  /// Orbital elements — its own table, its own store.
+  final TleStore tleStore;
 
   /// DPIP disaster payloads in and out of the mesh — the seam feeds use.
   final DpipMeshGateway meshGateway;

@@ -3,7 +3,9 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/astro/tle_store.dart';
+import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
@@ -44,7 +46,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<MapLayerOrderController>.value(
     value: deps.mapLayerOrder,
   ),
-  Provider<Prefs>.value(value: deps.prefs),
+  Provider<SettingsStore>.value(value: deps.settings),
+  Provider<AppDatabase>.value(value: deps.database),
+  Provider<TleStore>.value(value: deps.tleStore),
   Provider<TownDirectory>.value(value: deps.townDirectory),
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),

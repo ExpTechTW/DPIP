@@ -5,8 +5,8 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,12 +28,12 @@ const String _fallbackChannelKey = 'announcement-general-v2';
 /// [NotificationTaps]. A `notification`-payload message is displayed by the OS
 /// directly (its tap arrives via `onMessageOpenedApp`).
 class NotificationService {
-  NotificationService(this._prefs);
+  NotificationService(this._settings);
 
-  final Prefs _prefs;
+  final SettingsStore _settings;
 
   /// The last push token, or null before registration.
-  String? get token => _prefs.getString(PreferenceKeys.pushToken);
+  String? get token => _settings.getString(SettingKeys.pushToken);
 
   /// Whether the OS has granted notification permission.
   Future<bool> isAllowed() => AwesomeNotifications().isNotificationAllowed();
@@ -93,7 +93,7 @@ class NotificationService {
 
     // Android caches channel settings after first creation; force-update them
     // when the catalogue version changes.
-    final stored = _prefs.getInt(PreferenceKeys.channelVersion) ?? 0;
+    final stored = _settings.getInt(SettingKeys.channelVersion) ?? 0;
     if (stored < NotificationChannels.version) {
       for (final channel in NotificationChannels.channels) {
         try {
@@ -102,8 +102,8 @@ class NotificationService {
           Log.handle(error, stackTrace, 'setChannel ${channel.channelKey}');
         }
       }
-      await _prefs.setInt(
-        PreferenceKeys.channelVersion,
+      await _settings.setInt(
+        SettingKeys.channelVersion,
         NotificationChannels.version,
       );
     }
@@ -132,18 +132,18 @@ class NotificationService {
         // re-read the APNs token directly rather than persist [token] as-is.
         final apns = await messaging.getAPNSToken();
         if (apns != null) {
-          await _prefs.setString(PreferenceKeys.pushToken, apns);
+          await _settings.setString(SettingKeys.pushToken, apns);
         }
         return;
       }
-      await _prefs.setString(PreferenceKeys.pushToken, token);
+      await _settings.setString(SettingKeys.pushToken, token);
     });
     // Fire-and-forget: this can wait seconds for the iOS APNs token, and
     // `init()` is awaited at launch, so it must not block start-up.
     unawaited(_fetchToken());
   }
 
-  /// Fetches the push token and persists it as [PreferenceKeys.pushToken] —
+  /// Fetches the push token and persists it as [SettingKeys.pushToken] —
   /// the identifier every backend registration call (`/v2/location`,
   /// `/v2/notify`) keys on.
   ///
@@ -182,7 +182,7 @@ class NotificationService {
           ? apnsToken
           : fcmToken;
       if (pushToken != null) {
-        await _prefs.setString(PreferenceKeys.pushToken, pushToken);
+        await _settings.setString(SettingKeys.pushToken, pushToken);
       }
     } catch (error, stackTrace) {
       // The failure mode is platform-specific: on iOS an unready APNs token is

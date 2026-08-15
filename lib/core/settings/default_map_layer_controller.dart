@@ -3,8 +3,8 @@ library;
 
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/persisted.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 
 /// Holds the user's chosen [DefaultMapLayer], persisted across launches.
@@ -12,10 +12,10 @@ import 'package:flutter/foundation.dart';
 /// Drives [MapScaffold]'s initial overlay and the Map tab's bottom-nav icon /
 /// label. Fallback is [DefaultMapLayer.radar] (historical default).
 class DefaultMapLayerController extends ChangeNotifier {
-  DefaultMapLayerController(Prefs prefs)
+  DefaultMapLayerController(SettingsStore settings)
     : _layer = PersistedEnum(
-        prefs,
-        key: PreferenceKeys.defaultMapLayer,
+        settings,
+        key: SettingKeys.defaultMapLayer,
         values: DefaultMapLayer.values,
         fallback: DefaultMapLayer.radar,
       );

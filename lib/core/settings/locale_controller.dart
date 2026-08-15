@@ -1,8 +1,8 @@
 /// The app's selected UI language (or the system default).
 library;
 
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/widgets.dart';
 
 /// Holds the user's chosen [Locale] override, persisted across launches.
@@ -15,13 +15,13 @@ import 'package:flutter/widgets.dart';
 /// `ja`) so script- and region-specific variants — Traditional vs Simplified,
 /// Taiwan vs Hong Kong — round-trip losslessly, not just the bare language code.
 class LocaleController extends ChangeNotifier {
-  LocaleController(this._prefs);
+  LocaleController(this._settings);
 
-  final Prefs _prefs;
+  final SettingsStore _settings;
 
   /// The chosen locale, or null to follow the system.
   Locale? get locale {
-    final tag = _prefs.getString(PreferenceKeys.locale);
+    final tag = _settings.getString(SettingKeys.locale);
     if (tag == null || tag.isEmpty) return null;
     return _canonicalize(_parseTag(tag));
   }
@@ -29,10 +29,10 @@ class LocaleController extends ChangeNotifier {
   /// Sets the locale override; null clears it (back to the system language).
   Future<void> setLocale(Locale? locale) async {
     if (locale == null) {
-      await _prefs.remove(PreferenceKeys.locale);
+      await _settings.remove(SettingKeys.locale);
     } else {
       final canonical = _canonicalize(locale);
-      await _prefs.setString(PreferenceKeys.locale, canonical.toLanguageTag());
+      await _settings.setString(SettingKeys.locale, canonical.toLanguageTag());
     }
     notifyListeners();
   }

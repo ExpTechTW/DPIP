@@ -27,8 +27,8 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/widgets.dart';
 
 /// One notification this class decided to raise.
@@ -53,7 +53,7 @@ class MeshAlerts extends ChangeNotifier {
   /// twenty-second wait.
   MeshAlerts(
     this._service,
-    this._prefs, {
+    this._settings, {
     Future<void> Function(MeshAlert alert)? post,
     DateTime Function()? now,
   }) : _post = post ?? _postToOs,
@@ -74,7 +74,7 @@ class MeshAlerts extends ChangeNotifier {
   static const int _nodeBurstLimit = 3;
 
   final MeshtasticService _service;
-  final Prefs _prefs;
+  final SettingsStore _settings;
   final Future<void> Function(MeshAlert alert) _post;
   final DateTime Function() _now;
 
@@ -108,8 +108,8 @@ class MeshAlerts extends ChangeNotifier {
 
   void start() {
     _messagesEnabled =
-        _prefs.getBool(PreferenceKeys.meshNotifyMessages) ?? true;
-    _nodesEnabled = _prefs.getBool(PreferenceKeys.meshNotifyNodes) ?? false;
+        _settings.getBool(SettingKeys.meshNotifyMessages) ?? true;
+    _nodesEnabled = _settings.getBool(SettingKeys.meshNotifyNodes) ?? false;
     _messageSub ??= _service.messageStream.listen(_onMessage);
     _nodeSub ??= _service.nodeStream.listen(_onNode);
     _statusSub ??= _service.connectionStream.listen(_onStatus);
@@ -126,13 +126,13 @@ class MeshAlerts extends ChangeNotifier {
   Future<void> setMessagesEnabled({required bool enabled}) async {
     _messagesEnabled = enabled;
     notifyListeners();
-    await _prefs.setBool(PreferenceKeys.meshNotifyMessages, enabled);
+    await _settings.setBool(SettingKeys.meshNotifyMessages, enabled);
   }
 
   Future<void> setNodesEnabled({required bool enabled}) async {
     _nodesEnabled = enabled;
     notifyListeners();
-    await _prefs.setBool(PreferenceKeys.meshNotifyNodes, enabled);
+    await _settings.setBool(SettingKeys.meshNotifyNodes, enabled);
   }
 
   /// Called by the mesh page: [channel] while it is showing that conversation,

@@ -12,15 +12,15 @@
 library;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 
 /// One point in a node's telemetry history — what the sheet's trend charts
@@ -33,9 +33,18 @@ class MeshNodeSample {
   final int? battery;
 }
 
+// The store is handed in as a named parameter and copied to a private field;
+// an initializing formal cannot be used because named parameters may not be
+// private.
+// ignore_for_file: prefer_initializing_formals
 class MeshNodeStore extends ChangeNotifier {
-  MeshNodeStore(this._service, this._prefs, {DateTime Function()? now})
-    : _now = now ?? (() => AppTime.utc.toLocal());
+  MeshNodeStore(
+    this._service,
+    this._settings, {
+    MeshStore? store,
+    DateTime Function()? now,
+  }) : _store = store,
+       _now = now ?? (() => AppTime.utc.toLocal());
 
   /// How many nodes are kept. A busy region's mesh runs to a few hundred; the
   /// least-recently-heard are dropped first, because a node nobody has heard
@@ -51,7 +60,21 @@ class MeshNodeStore extends ChangeNotifier {
   static const Duration _writeDebounce = Duration(seconds: 2);
 
   final MeshtasticService _service;
-  final Prefs _prefs;
+  final SettingsStore _settings;
+
+  /// Where the node table is persisted. Null in tests and when the database
+  /// would not open — the store then keeps nodes for the session only.
+  final MeshStore? _store;
+
+  Future<void>? _restoring;
+
+  /// Completes when the stored table has been read back.
+  ///
+  /// Restoring is a query now, so it finishes a moment after [start]. Callers
+  /// that only draw can ignore this — the store notifies — but anything that
+  /// needs the remembered mesh to be *there* has something to await instead of
+  /// a delay chosen by guesswork.
+  Future<void> get whenRestored => _restoring ?? Future<void>.value();
   final DateTime Function() _now;
 
   StreamSubscription<MeshNode>? _sub;
@@ -72,7 +95,7 @@ class MeshNodeStore extends ChangeNotifier {
     if (_excludeMqtt == exclude) return;
     _excludeMqtt = exclude;
     notifyListeners();
-    await _prefs.setBool(PreferenceKeys.meshExcludeMqtt, exclude);
+    await _settings.setBool(SettingKeys.meshExcludeMqtt, exclude);
   }
 
   /// Every node known, online first, then most-recently-heard.
@@ -123,8 +146,8 @@ class MeshNodeStore extends ChangeNotifier {
   }
 
   void start() {
-    _excludeMqtt = _prefs.getBool(PreferenceKeys.meshExcludeMqtt) ?? true;
-    _restore();
+    _excludeMqtt = _settings.getBool(SettingKeys.meshExcludeMqtt) ?? true;
+    _restoring = _restore();
     _sub ??= _service.nodeStream.listen(_onNode);
   }
 
@@ -253,73 +276,72 @@ class MeshNodeStore extends ChangeNotifier {
     });
   }
 
-  void _restore() {
-    final stored = _prefs.getStringList(PreferenceKeys.meshNodes);
-    if (stored == null) return;
-    for (final entry in stored) {
-      final node = _decode(entry);
+  /// Reads the stored table back.
+  ///
+  /// Asynchronous now that the rows are in SQLite, so nodes appear a frame or
+  /// two after the page does. That is the right trade: this is a memory of the
+  /// mesh, not live state, and the radio replaces it wholesale on connect.
+  Future<void> _restore() async {
+    final store = _store;
+    if (store == null) return;
+    for (final row in await store.readNodes(limit: maxNodes)) {
+      final node = _fromRow(row);
       if (node != null) _nodes[node.num] = node;
     }
+    if (_nodes.isEmpty) return;
     Log.debug('mesh nodes: restored ${_nodes.length}');
+    notifyListeners();
   }
 
   Future<void> _persist() async {
-    try {
-      // Keep the most recently heard when trimming: an old node is the one the
-      // mesh has already forgotten.
-      final ordered = _nodes.values.toList()
-        ..sort((a, b) {
-          final aHeard = a.lastHeard, bHeard = b.lastHeard;
-          if (aHeard == null && bHeard == null) return 0;
-          if (aHeard == null) return 1;
-          if (bHeard == null) return -1;
-          return bHeard.compareTo(aHeard);
-        });
-      await _prefs.setStringList(PreferenceKeys.meshNodes, [
-        for (final node in ordered.take(maxNodes)) _encode(node),
-      ]);
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'mesh nodes persist');
-    }
+    final store = _store;
+    if (store == null) return;
+    // Keep the most recently heard when trimming: an old node is the one the
+    // mesh has already forgotten.
+    final ordered = _nodes.values.toList()
+      ..sort((a, b) {
+        final aHeard = a.lastHeard, bHeard = b.lastHeard;
+        if (aHeard == null && bHeard == null) return 0;
+        if (aHeard == null) return 1;
+        if (bHeard == null) return -1;
+        return bHeard.compareTo(aHeard);
+      });
+    await store.writeNodes([
+      for (final node in ordered.take(maxNodes)) _toRow(node),
+    ]);
   }
 
-  String _encode(MeshNode node) => jsonEncode({
-    'n': node.num,
-    'd': node.displayName,
-    if (node.batteryLevel != null) 'b': node.batteryLevel,
-    if (node.lastHeard != null) 'h': node.lastHeard!.millisecondsSinceEpoch,
-    if (node.latitude != null) 'la': node.latitude,
-    if (node.longitude != null) 'lo': node.longitude,
-    if (node.snr != 0) 's': node.snr,
-    if (node.viaMqtt) 'm': true,
-  });
+  Map<String, Object?> _toRow(MeshNode node) => {
+    'num': node.num,
+    'name': node.displayName,
+    'battery': node.batteryLevel,
+    'last_heard': node.lastHeard?.millisecondsSinceEpoch,
+    'latitude': node.latitude,
+    'longitude': node.longitude,
+    'snr': node.snr,
+    'via_mqtt': node.viaMqtt ? 1 : 0,
+  };
 
-  MeshNode? _decode(String encoded) {
-    try {
-      final json = jsonDecode(encoded);
-      if (json is! Map<String, dynamic>) return null;
-      final nodeNum = (json['n'] as num?)?.toInt();
-      if (nodeNum == null) return null;
-      final heard = (json['h'] as num?)?.toInt();
-      final lastHeard = heard == null
-          ? null
-          : DateTime.fromMillisecondsSinceEpoch(heard);
-      return MeshNode(
-        num: nodeNum,
-        displayName: json['d'] as String? ?? '',
-        // Recomputed from `lastHeard`, never restored — see [isOnline].
-        isOnline:
-            lastHeard != null && _now().difference(lastHeard) < onlineWindow,
-        batteryLevel: (json['b'] as num?)?.toInt(),
-        lastHeard: lastHeard,
-        latitude: (json['la'] as num?)?.toDouble(),
-        longitude: (json['lo'] as num?)?.toDouble(),
-        snr: (json['s'] as num?)?.toDouble() ?? 0,
-        viaMqtt: json['m'] as bool? ?? false,
-      );
-    } catch (_) {
-      return null;
-    }
+  MeshNode? _fromRow(Map<String, Object?> row) {
+    final nodeNum = (row['num'] as num?)?.toInt();
+    if (nodeNum == null) return null;
+    final heard = (row['last_heard'] as num?)?.toInt();
+    final lastHeard = heard == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(heard);
+    return MeshNode(
+      num: nodeNum,
+      displayName: row['name'] as String? ?? '',
+      // Recomputed from `lastHeard`, never restored — see [isOnline].
+      isOnline:
+          lastHeard != null && _now().difference(lastHeard) < onlineWindow,
+      batteryLevel: (row['battery'] as num?)?.toInt(),
+      lastHeard: lastHeard,
+      latitude: (row['latitude'] as num?)?.toDouble(),
+      longitude: (row['longitude'] as num?)?.toDouble(),
+      snr: (row['snr'] as num?)?.toDouble() ?? 0,
+      viaMqtt: (row['via_mqtt'] as num?) == 1,
+    );
   }
 
   @override

@@ -20,10 +20,10 @@ import 'package:dpip/core/astro/astro_time.dart';
 import 'package:dpip/core/astro/deep_sky.dart';
 import 'package:dpip/core/astro/meteor_showers.dart';
 import 'package:dpip/core/astro/tle_source.dart';
+import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/astro/tonight_report.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/prefs.dart';
 import 'package:dpip/features/data/presentation/observer_place.dart';
 import 'package:dpip/features/data/presentation/widgets/astro_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -71,7 +71,7 @@ class _TonightPageState extends State<TonightPage> {
       // Cache-backed, so wiring a feed later only has to fill in `fetch`.
       // With none wired it resolves to the bundled snapshot, which is what
       // ships today.
-      source: CachedTleSource(prefs: context.read<Prefs>(), now: () => now),
+      source: CachedTleSource(store: context.read<TleStore>(), now: () => now),
     );
   }
 

@@ -94,7 +94,7 @@ class MeshtasticClientImpl implements MeshtasticService {
   /// packet TX/RX) shows up in the app log.
   ///
   /// Records below INFO are dropped: the package logs every raw `FromRadio`
-  /// protobuf dump (and every `/prefs/*.proto` file header) at FINE — with the
+  /// protobuf dump (and every `/settings/*.proto` file header) at FINE — with the
   /// config download reading ~20 packets in 1.5 s that floods the log with
   /// near-identical blocks. INFO keeps one line per node/config step.
   ///
