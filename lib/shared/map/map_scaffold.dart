@@ -38,7 +38,7 @@ const String _basemapTileUrl = basemapOriginTileUrl;
 const RasterDemSourceProperties _terrainSourceProps = RasterDemSourceProperties(
   tiles: [terrainOriginTileUrl],
   bounds: [110.0, 10.0, 132.0, 35.0],
-  minzoom: terrainMinZoom,
+  minzoom: 0,
   maxzoom: 12,
   tileSize: 512,
   encoding: 'mapbox',
@@ -544,25 +544,23 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         maxZoom: 12,
         logLabel: 'basemap',
       );
-      // DEM tiles too, once the camera is past the zoom they start at. Native
-      // downloads a hillshade viewport as one burst of 512px meshes the first
-      // time; warming them from the store the same way as the basemap makes a
+      // DEM tiles too — the relief renders at every zoom, so warm them the
+      // same way as the basemap. Native downloads a hillshade viewport as one
+      // burst of 512px meshes the first time; warming from the store makes a
       // repeat visit an SQLite hit instead of a re-download.
-      if (zoom >= terrainMinZoom) {
-        await warmer.warmViewportAbsolute(
-          urlFor: (z, x, y) => terrainOriginTileUrl
-              .replaceAll('{z}', '$z')
-              .replaceAll('{x}', '$x')
-              .replaceAll('{y}', '$y'),
-          south: bounds.southwest.latitude,
-          west: bounds.southwest.longitude,
-          north: bounds.northeast.latitude,
-          east: bounds.northeast.longitude,
-          zoom: zoom,
-          maxZoom: 12,
-          logLabel: 'terrain',
-        );
-      }
+      await warmer.warmViewportAbsolute(
+        urlFor: (z, x, y) => terrainOriginTileUrl
+            .replaceAll('{z}', '$z')
+            .replaceAll('{x}', '$x')
+            .replaceAll('{y}', '$y'),
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+        maxZoom: 12,
+        logLabel: 'terrain',
+      );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'basemap viewport warm');
     }

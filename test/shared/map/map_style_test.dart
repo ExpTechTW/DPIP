@@ -50,11 +50,12 @@ void main() {
     expect(terrain['tileSize'], 512);
     expect(
       terrain['minzoom'],
-      terrainMinZoom,
+      0,
       reason:
-          'below z6 the relief is not worth 512px DEM tiles at whole-island '
-          'zoom — the home backdrop sits there and its download/decode bill '
-          'was the same as at full zoom',
+          'the relief must render at every zoom — a minzoom would blank the '
+          'hillshade out as the user zooms out, and the low-zoom DEM bill is '
+          'tiny (a whole-island view is one or two 512px tiles, vs ~49 at a '
+          'zoomed-in hillshade viewport)',
     );
     expect(terrain['maxzoom'], 12);
     expect(
