@@ -5,6 +5,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
@@ -127,11 +128,13 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
     return [
       if (showScanRange.value)
         SymbolLegendItem(
-          swatch: const LineSwatch(
-            color: Color(0xFF78909C),
+          // The same blue-grey the outline is drawn in, and corrected the same
+          // way: the ring is a vector line this app draws, not raster pixels.
+          swatch: LineSwatch(
+            color: const Color(0xFF78909C).vision,
             width: 1.5,
             opacity: 0.7,
-            dash: [3, 2],
+            dash: const [3, 2],
           ),
           label: l10n.radarScanRange,
         ),

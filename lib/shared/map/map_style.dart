@@ -7,6 +7,7 @@ library;
 import 'dart:convert';
 import 'dart:ui' show Brightness;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/shared/map/town_label_points.g.dart';
 import 'package:dpip/core/network/api_paths.dart';
@@ -14,6 +15,14 @@ import 'package:dpip/core/network/api_paths.dart';
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
 ///
 /// Do not invent map hexes at call sites; resolve via [MapColors.of].
+///
+/// A **value** type, deliberately: the palettes are no longer compile-time
+/// constants (their colours run through `.vision` at their definition, so they
+/// follow the colour-vision setting), which means every read builds a fresh
+/// instance. `BaseMap` memoises the interpolated style JSON on the palette, and
+/// with identity equality that cache would miss on every build and grow without
+/// bound. Equal colours are the same palette; a vision change makes a different
+/// one, and the style is rebuilt exactly once for it.
 final class MapPalette {
   const MapPalette({
     required this.background,
@@ -41,28 +50,52 @@ final class MapPalette {
 
   /// Township name halo — the outline that lifts [label] off the fill.
   final String labelHalo;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MapPalette &&
+          other.background == background &&
+          other.fill == fill &&
+          other.outline == outline &&
+          other.townOutline == townOutline &&
+          other.label == label &&
+          other.labelHalo == labelHalo;
+
+  @override
+  int get hashCode =>
+      Object.hash(background, fill, outline, townOutline, label, labelHalo);
 }
 
 /// Sole registry of base-map paint colours (light + dark).
+///
+/// Every hex below is the *standard-vision* value, routed through `.vision` at
+/// its definition so the whole cartography is recoloured with the rest of the
+/// app when a colour-vision correction is on. This is the only place the base
+/// map's colours are declared, so it is the only place the transform belongs —
+/// never in `colorFromHexRgb`/`toHexRgb`, which would double any colour that
+/// round-trips between the map and a legend. The transform is not a
+/// compile-time constant, so these are getters rather than `static const`;
+/// [MapPalette] carries value equality so the style cache still hits.
 abstract final class MapColors {
   /// Dark-mode cartography (default disaster-map look).
-  static const dark = MapPalette(
-    background: '#1f2025',
-    fill: '#3F4045',
-    outline: '#a9b4bc',
-    townOutline: '#6A6B72',
-    label: '#FFFFFF',
-    labelHalo: '#000000',
+  static MapPalette get dark => MapPalette(
+    background: '#1f2025'.vision,
+    fill: '#3F4045'.vision,
+    outline: '#a9b4bc'.vision,
+    townOutline: '#6A6B72'.vision,
+    label: '#FFFFFF'.vision,
+    labelHalo: '#000000'.vision,
   );
 
   /// Light-mode cartography — pale sea, mid-grey land.
-  static const light = MapPalette(
-    background: '#E0E0E0',
-    fill: '#ADADAD',
-    outline: '#6B6B6B',
-    townOutline: '#9A9A9A',
-    label: '#141414',
-    labelHalo: '#FFFFFF',
+  static MapPalette get light => MapPalette(
+    background: '#E0E0E0'.vision,
+    fill: '#ADADAD'.vision,
+    outline: '#6B6B6B'.vision,
+    townOutline: '#9A9A9A'.vision,
+    label: '#141414'.vision,
+    labelHalo: '#FFFFFF'.vision,
   );
 
   /// Palette for the given UI [brightness].
@@ -280,18 +313,25 @@ String exptechVectorStyle(
 }
 
 /// Purple used to highlight the selected township (fill + border).
-const String selectedColor = '#7C4DFF';
+///
+/// A getter, not a `const`: `.vision` runs at the definition, so the highlight
+/// is recoloured with the rest of the map.
+String get selectedColor => '#7C4DFF'.vision;
 
 /// Bright yellow country / county borders drawn **over** satellite imagery.
 ///
 /// The hue that stays legible on true-colour satellite (which is overall
 /// dark); tune it per channel if another imagery needs it. [AdminBoundary]
 /// overlays keep their own white core — only satellite is yellow.
-const String satelliteOutlineColor = '#FFD400';
+///
+/// Transformed, unlike the imagery underneath it: this is a vector line the app
+/// draws itself, not a description of the satellite pixels, so correcting it
+/// costs nothing and keeps it distinct from the other borders on the map.
+String get satelliteOutlineColor => '#FFD400'.vision;
 
 /// Satellite township borders — dark yellow ([satelliteOutlineColor]'s
 /// secondary), the fine mesh beneath the county/country frame.
-const String satelliteTownOutlineColor = '#B79A00';
+String get satelliteTownOutlineColor => '#B79A00'.vision;
 
 /// Runtime line layer: world land / country edges (`global` source-layer).
 const String satelliteGlobalOutlineLayerId = 'satellite-global-outline';

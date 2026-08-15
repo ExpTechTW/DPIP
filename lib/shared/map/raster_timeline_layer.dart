@@ -47,6 +47,15 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// target keep loading. Only then does it re-warm the band and mount the new
 /// neighbours transparent, so the next drag across them touches neither disk
 /// nor network.
+///
+/// ## Colour
+/// Nothing here declares any, and that is not an oversight: every pixel a frame
+/// draws arrives as a finished server-rendered tile, and MapLibre's raster layer
+/// exposes no colour matrix — so a colour-vision correction cannot reach these
+/// frames at all. A subclass's scale/legend colours are therefore exempt too
+/// (`ColorVisionFilter.rasterExempt`): a key that disagreed with the picture
+/// would be worse than one that is merely hard to read. The only paint values
+/// below are opacities, which the correction never touches.
 abstract class RasterTimelineLayer implements MapLayer {
   RasterTimelineLayer(this.source);
 

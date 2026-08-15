@@ -8,6 +8,7 @@ library;
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
@@ -35,11 +36,16 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
   };
 
   /// Age bucket → hex (legacy: red / yellow / green / blue).
-  static const Map<int, String> _ageHex = {
-    5: '#FF0000',
-    10: '#FFFF00',
-    30: '#00FF00',
-    60: '#0000FF',
+  ///
+  /// A getter rather than a `const` map: the strike marks are drawn by the
+  /// app (the PNGs are baked from these very colours), so the ramp follows
+  /// the colour-vision setting — and is re-read on every bake and every
+  /// legend build, which is what keeps the two agreeing after a change.
+  static Map<int, String> get _ageHex => {
+    5: '#FF0000'.vision,
+    10: '#FFFF00'.vision,
+    30: '#00FF00'.vision,
+    60: '#0000FF'.vision,
   };
 
   final Map<String, LightningSnapshot> _cache = {};
@@ -319,7 +325,7 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
     canvas.drawCircle(
       const Offset(size / 2, size / 2),
       size * 0.28 + halo,
-      Paint()..color = const Color(0xFF000000),
+      Paint()..color = const Color(0xFF000000).vision,
     );
     canvas.drawCircle(
       const Offset(size / 2, size / 2),
@@ -345,7 +351,7 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
       ),
       const Radius.circular(2),
     );
-    final black = Paint()..color = const Color(0xFF000000);
+    final black = Paint()..color = const Color(0xFF000000).vision;
     canvas.drawRRect(bar(thickness + halo * 2, size * 0.7 + halo * 2), black);
     canvas.drawRRect(bar(size * 0.7 + halo * 2, thickness + halo * 2), black);
     canvas.drawRRect(bar(thickness, size * 0.7), Paint()..color = fill);
@@ -395,7 +401,7 @@ class _LegendMark extends StatelessWidget {
           shape: BoxShape.circle,
           // Same black outline the map icons bake in — pale strikes (yellow /
           // blue on the frosted card) need it to read as a mark.
-          border: Border.all(color: Colors.black, width: 1.2),
+          border: Border.all(color: Colors.black.vision, width: 1.2),
         ),
       );
     }
@@ -417,7 +423,7 @@ class _CrossPainter extends CustomPainter {
     // Black bars first (thicker), the colour on top — the legend cross mirrors
     // the map marker's baked black outline.
     final paint = Paint()
-      ..color = const Color(0xFF000000)
+      ..color = const Color(0xFF000000).vision
       ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
     final c = Offset(size.width / 2, size.height / 2);

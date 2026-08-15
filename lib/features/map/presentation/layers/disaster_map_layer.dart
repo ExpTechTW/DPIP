@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
@@ -85,20 +86,35 @@ class DisasterMapLayer with MapLayerDefaults implements MapLayer {
   /// All switchable sub-layers, in draw order (later on top).
   List<DpmSubLayerBase> get subLayers => [aed, restroom, shelter];
 
-  static const _aedColor = '#e74c3c';
-  static const _restroomColor = '#2d9cdb';
-  static const _shelterColor = '#f2994a';
+  // The badge palette, colour-vision corrected at the definition. Getters
+  // rather than `static const`, because the transform is not a compile-time
+  // constant. Every marker on this layer is *baked by us* from these hexes
+  // ([_renderMarker]) — nothing here is server-rendered raster — so they
+  // correct like the rest of the app. The legend reads the very same strings
+  // (`sub.color` / this map) through `colorFromHexRgb`, which is why the badge
+  // and its key can't drift: they are one already-transformed value converted,
+  // not two transforms.
+  //
+  // Read once, when the sub-layers below are constructed: the marker PNGs are
+  // baked and cached from them, so a setting change lands with the layer that
+  // rebuilds them, not mid-session.
+  static String get _aedColor => '#e74c3c'.vision;
+  static String get _restroomColor => '#2d9cdb'.vision;
+  static String get _shelterColor => '#f2994a'.vision;
 
   /// Restroom marker colours per `type` code — six distinct hues so a dense
   /// single kind can't drown out the other sub-layers' markers (AED red /
   /// shelter orange); unknown codes (0 / 7) fall back to [_restroomColor].
-  static const Map<int, String> restroomTypeColors = {
-    1: '#ec4899',
-    2: '#3b82f6',
-    3: '#64748b',
-    4: '#22c55e',
-    5: '#a855f7',
-    6: '#06b6d4',
+  ///
+  /// Six hues that have to stay *told apart*, which is the whole point of the
+  /// correction — so each is transformed at its definition here.
+  static Map<int, String> get restroomTypeColors => {
+    1: '#ec4899'.vision,
+    2: '#3b82f6'.vision,
+    3: '#64748b'.vision,
+    4: '#22c55e'.vision,
+    5: '#a855f7'.vision,
+    6: '#06b6d4'.vision,
   };
 
   /// Finger-sized hit box around a tap, in logical pixels.

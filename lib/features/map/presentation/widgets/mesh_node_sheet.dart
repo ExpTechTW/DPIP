@@ -10,6 +10,7 @@
 /// there is a permanent affordance saying "there is something to drag here".
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
@@ -241,7 +242,7 @@ class _NodeDetail extends StatelessWidget {
                 _StatusChip(
                   icon: Icons.cloud_outlined,
                   label: l10n.meshtasticViaMqtt,
-                  tone: const Color(0xFF7E57C2),
+                  tone: const Color(0xFF7E57C2).vision,
                 ),
             ],
           ),

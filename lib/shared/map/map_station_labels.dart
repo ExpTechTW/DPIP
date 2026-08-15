@@ -32,6 +32,12 @@ const String stationLabelFont = 'Noto Sans TC Regular';
 /// A station's `"name\nreading"` label, pinned under its dot.
 ///
 /// [textField] is the MapLibre expression for the whole two-line string.
+///
+/// The text/halo defaults are white on black and stay `const`: they have to be
+/// compile-time constants to be default arguments, and the colour-vision
+/// correction is the identity on a neutral anyway — a grey has no lost channel
+/// to redistribute. A caller passing a *coloured* label supplies one that has
+/// already been transformed at its own definition.
 SymbolLayerProperties stationLabelProps({
   required List<Object> textField,
   double textSize = 11,

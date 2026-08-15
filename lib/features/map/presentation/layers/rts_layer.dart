@@ -5,6 +5,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
@@ -166,7 +167,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// A neutral hairline separating overlapping dots — legacy uses the theme's
   /// outlineVariant, but render() has no BuildContext, so a mid-grey that reads
   /// on both light and dark tiles stands in.
-  static const String _strokeColor = '#9E9E9E';
+  ///
+  /// A getter, not a `const`: the colour-vision transform runs at the
+  /// definition and isn't a compile-time constant. (It is the identity on a
+  /// pure grey — routing it anyway keeps the rule uniform for whoever tints
+  /// this later.)
+  static String get _strokeColor => '#9E9E9E'.vision;
   static const Map<String, dynamic> _emptyCollection = {
     'type': 'FeatureCollection',
     'features': <dynamic>[],
@@ -369,7 +375,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addFillLayer(
         _eewSourceId,
         _eewSWaveFillId,
-        const FillLayerProperties(fillColor: '#FF3B30', fillOpacity: 0.16),
+        // Vector geometry we draw ourselves, so it recolours with the app.
+        FillLayerProperties(fillColor: '#FF3B30'.vision, fillOpacity: 0.16),
         belowLayerId: landLayerId,
         filter: const [
           '==',
@@ -380,7 +387,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addLineLayer(
         _eewSourceId,
         _eewPWaveId,
-        const LineLayerProperties(lineColor: '#00E5FF', lineWidth: 2),
+        LineLayerProperties(lineColor: '#00E5FF'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',
@@ -391,7 +398,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addLineLayer(
         _eewSourceId,
         _eewSWaveId,
-        const LineLayerProperties(lineColor: '#FF3B30', lineWidth: 2),
+        LineLayerProperties(lineColor: '#FF3B30'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',

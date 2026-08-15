@@ -4,6 +4,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/forecast_overlay_menu.dart';
@@ -202,21 +203,27 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
             // The ramp is fixed in m/s, so the legend is drawn once and stays
             // true for every frame and both models — the same decision as
             // `satellite-tiles-go/web/wind.js` (SPEED_COLORS / SPEED_SCALE).
-            const ColorScaleLegend(
+            //
+            // Deliberately *not* corrected for colour vision: the field itself
+            // is a server-rendered raster whose pixels MapLibre cannot
+            // recolour, so a daltonised key would name colours that are not on
+            // the map. The stops stay the tiles' own colours — see
+            // [ColorVisionFilter.rasterExemptHex].
+            ColorScaleLegend(
               unit: 'm/s',
-              stops: [
-                (0, '#282C6E'),
-                (2, '#3056A8'),
-                (4, '#348CBA'),
-                (6, '#40B296'),
-                (8, '#68C45E'),
-                (11, '#B0D048'),
-                (14, '#E2BE4A'),
-                (17, '#E28C42'),
-                (21, '#D6543C'),
-                (25, '#BA3478'),
-                (28, '#9E3CB4'),
-                (32, '#EED6FF'),
+              stops: <ColorStop>[
+                (0, ColorVisionFilter.rasterExemptHex('#282C6E')),
+                (2, ColorVisionFilter.rasterExemptHex('#3056A8')),
+                (4, ColorVisionFilter.rasterExemptHex('#348CBA')),
+                (6, ColorVisionFilter.rasterExemptHex('#40B296')),
+                (8, ColorVisionFilter.rasterExemptHex('#68C45E')),
+                (11, ColorVisionFilter.rasterExemptHex('#B0D048')),
+                (14, ColorVisionFilter.rasterExemptHex('#E2BE4A')),
+                (17, ColorVisionFilter.rasterExemptHex('#E28C42')),
+                (21, ColorVisionFilter.rasterExemptHex('#D6543C')),
+                (25, ColorVisionFilter.rasterExemptHex('#BA3478')),
+                (28, ColorVisionFilter.rasterExemptHex('#9E3CB4')),
+                (32, ColorVisionFilter.rasterExemptHex('#EED6FF')),
               ],
             ),
             adminLegendSection(context),

@@ -3,6 +3,17 @@
 ///
 /// Placed top-left by [MapScaffold] via each layer's [MapLayer.buildLegend].
 /// Matches the RTS intensity legend's density so every layer reads the same.
+///
+/// **Colour-vision: these widgets transform nothing, deliberately.** A legend
+/// is handed the very colours its layer paints with, so the correction has
+/// already been applied — or deliberately withheld — where those colours are
+/// defined. Correcting again here would daltonise a daltonised colour and make
+/// the key disagree with the map. It would also be wrong in the one case that
+/// matters most: the radar and satellite legends describe server-rendered
+/// raster tiles, whose pixels MapLibre cannot recolour, so their stops are
+/// wrapped in `ColorVisionFilter.rasterExemptHex` at the definition — in
+/// `RadarLayer` and `SatelliteLegend` — and must arrive here untouched. `colorFromHexRgb` below stays a pure converter for the same
+/// reason (see `shared/color_hex.dart`).
 library;
 
 import 'dart:math' as math;
@@ -45,7 +56,9 @@ class MapLegendCard extends StatelessWidget {
 class ColorScaleLegend extends StatelessWidget {
   const ColorScaleLegend({super.key, required this.stops, this.unit});
 
-  /// Ascending value → hex colour pairs (same order as MapLibre ramps).
+  /// Ascending value → hex colour pairs (same order as MapLibre ramps), in
+  /// whatever colour the layer actually paints — corrected, or raster-exempt,
+  /// at their definition. Drawn here as given; see the library doc.
   final List<ColorStop> stops;
 
   /// Unit shown below the scale, e.g. `m/s` or `°C`.

@@ -10,6 +10,7 @@ library;
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
@@ -49,24 +50,31 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   /// and 44 px is the standard minimum touch target.
   static const double _tapRadiusPx = 44;
 
+  // The dot palette. Getters rather than `static const`, because the
+  // colour-vision transform at each definition is not a compile-time constant;
+  // they are read per paint, which is where the current setting matters. The
+  // legend below states the same three colours as `Color`s and routes them the
+  // same way, so the key and the map stay in step under every setting.
+
   /// Heard within [MeshNodeStore.onlineWindow] — a node that is part of the
   /// mesh right now.
-  static const String _onlineColor = '#4CAF50';
+  static String get _onlineColor => '#4CAF50'.vision;
 
   /// Known, but silent for a while. Kept on the map rather than hidden: a
   /// repeater that was there yesterday is still where you would go looking.
-  static const String _offlineColor = '#9E9E9E';
+  static String get _offlineColor => '#9E9E9E'.vision;
 
   /// Only ever heard through an MQTT bridge. A different hue, not a shade of
   /// the same one: it is a different *kind* of thing — an internet report of a
   /// node, not a radio contact — so it must not read as "a slightly less
-  /// online node".
-  static const String _mqttColor = '#7E57C2';
-  static const String _strokeColor = '#FFFFFF';
+  /// online node". The correction has to keep that separation, so it is
+  /// transformed like the rest rather than pinned.
+  static String get _mqttColor => '#7E57C2'.vision;
+  static String get _strokeColor => '#FFFFFF'.vision;
 
   /// Ring around the tapped node — the map has to answer "which one did I
   /// tap?" without the user having to compare the sheet to the dots.
-  static const String _selectedColor = '#1E88E5';
+  static String get _selectedColor => '#1E88E5'.vision;
 
   MapLibreMapController? _controller;
   bool _added = false;
@@ -403,6 +411,11 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   ///
   /// Without it the map shows green and grey dots and never says which is
   /// which — the one thing a reader cannot work out by looking.
+  ///
+  /// The swatches restate the map's hexes as `Color`s, so each one is routed
+  /// through `.vision` exactly like its counterpart above — same input, same
+  /// deterministic transform, so the key still names the dot it points at when
+  /// a correction is on. (Not `const` any more, for the same reason.)
   @override
   Widget buildLegend(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -415,18 +428,18 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
         builder: (context, _) => SymbolLegend(
           items: [
             SymbolLegendItem(
-              swatch: const LegendDot(color: Color(0xFF4CAF50)),
+              swatch: LegendDot(color: const Color(0xFF4CAF50).vision),
               label: l10n.meshtasticOnline,
             ),
             SymbolLegendItem(
-              swatch: const LegendDot(color: Color(0xFF9E9E9E)),
+              swatch: LegendDot(color: const Color(0xFF9E9E9E).vision),
               label: l10n.meshtasticSilent,
             ),
             // Only keyed when such nodes can actually be on the map: a legend
             // row for something the filter is hiding is noise.
             if (!_store.excludeMqtt)
               SymbolLegendItem(
-                swatch: const LegendDot(color: Color(0xFF7E57C2)),
+                swatch: LegendDot(color: const Color(0xFF7E57C2).vision),
                 label: l10n.meshtasticViaMqtt,
               ),
           ],

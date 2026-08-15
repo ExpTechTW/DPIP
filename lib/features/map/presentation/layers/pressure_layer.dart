@@ -1,6 +1,7 @@
 /// The station-pressure layer.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
@@ -35,11 +36,11 @@ class PressureMapLayer
   List<double?> trendOf(WeatherTrend trend) => trend.pressure;
 
   @override
-  List<(double, String)> get colorStops => const [
-    (980, '#4575B4'),
-    (1000, '#ABD9E9'),
-    (1013, '#FFFFBF'),
-    (1025, '#FDAE61'),
-    (1040, '#D73027'),
+  List<(double, String)> get colorStops => [
+    (980, '#4575B4'.vision),
+    (1000, '#ABD9E9'.vision),
+    (1013, '#FFFFBF'.vision),
+    (1025, '#FDAE61'.vision),
+    (1040, '#D73027'.vision),
   ];
 }

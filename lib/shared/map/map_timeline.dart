@@ -1,5 +1,6 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -357,12 +358,16 @@ TimelineEra _eraOf(int index, int nowIndex) =>
 /// The hues are fixed (not theme roles) because they are the semantics: 歷史
 /// blue, 現在 green, 未來 purple — a dark surface gets the lighter shade of the
 /// same hue, a light surface the deeper one.
-const Color _pastLight = Color(0xFF1565C0);
-const Color _pastDark = Color(0xFF64B5F6);
-const Color _nowLight = Color(0xFF2E7D32);
-const Color _nowDark = Color(0xFF81C784);
-const Color _futureLight = Color(0xFF7B1FA2);
-const Color _futureDark = Color(0xFFBA68C8);
+///
+/// Blue/green/purple is exactly the triple a deficient eye flattens, so each
+/// literal is routed through `.vision` at its definition. That transform is not
+/// a compile-time constant, hence getters rather than `const`.
+Color get _pastLight => const Color(0xFF1565C0).vision;
+Color get _pastDark => const Color(0xFF64B5F6).vision;
+Color get _nowLight => const Color(0xFF2E7D32).vision;
+Color get _nowDark => const Color(0xFF81C784).vision;
+Color get _futureLight => const Color(0xFF7B1FA2).vision;
+Color get _futureDark => const Color(0xFFBA68C8).vision;
 
 Color _eraColor(TimelineEra era, Brightness brightness) => switch (era) {
   TimelineEra.past => brightness == Brightness.dark ? _pastDark : _pastLight,

@@ -10,6 +10,14 @@ import 'package:flutter/material.dart';
 /// whose wire intensity is not backed by a numbered CWA report). The legacy
 /// app distinguished the two report kinds by fill: numbered = solid, 小區域 =
 /// hollow ring; the detail header only ever uses the solid form.
+///
+/// **Colour-vision:** this badge transforms nothing. [color] is handed in from
+/// `IntensityColors.discrete`, which already applied `.vision` at the scale's
+/// definition; correcting it a second time here would daltonise a daltonised
+/// colour and pull the badge away from the same intensity's dot on the map. The
+/// label's ink is *derived* from [color]'s measured brightness, so it follows
+/// the corrected fill on its own — and black/white are achromatic, which the
+/// transform leaves untouched in any case.
 class IntensityBadge extends StatelessWidget {
   const IntensityBadge({
     super.key,
@@ -22,7 +30,8 @@ class IntensityBadge extends StatelessWidget {
   /// Text drawn on the badge (see [Intensity.displayForReport]).
   final String label;
 
-  /// Palette colour for the badge fill (see `IntensityColors.discrete`).
+  /// Palette colour for the badge fill (see `IntensityColors.discrete`), which
+  /// must already be colour-vision corrected at its own definition.
   final Color color;
 
   /// Edge length of the square badge.

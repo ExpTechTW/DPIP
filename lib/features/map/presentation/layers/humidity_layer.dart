@@ -1,6 +1,7 @@
 /// The relative-humidity station layer.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
@@ -44,12 +45,12 @@ class HumidityMapLayer
   ];
 
   @override
-  List<(double, String)> get colorStops => const [
-    (0, '#B45309'),
-    (30, '#FDAE61'),
-    (50, '#FFFFBF'),
-    (70, '#ABD9E9'),
-    (90, '#74ADD1'),
-    (100, '#4575B4'),
+  List<(double, String)> get colorStops => [
+    (0, '#B45309'.vision),
+    (30, '#FDAE61'.vision),
+    (50, '#FFFFBF'.vision),
+    (70, '#ABD9E9'.vision),
+    (90, '#74ADD1'.vision),
+    (100, '#4575B4'.vision),
   ];
 }

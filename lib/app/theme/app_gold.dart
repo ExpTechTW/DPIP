@@ -18,8 +18,15 @@
 /// 8.6:1 on the fill in both themes, and the badge's mark clears 4.5:1 on the
 /// badge — so nothing here needs a scrim, and the card is legible before the
 /// gold is doing any work at all.
+/// The literals below are the *standard-vision* palette; each one is routed
+/// through `.vision` at its definition, so the gold is recoloured with the rest
+/// of the app when a colour-vision correction is on. Because the transform is
+/// not a compile-time constant, the two palettes are getters rather than
+/// `static const` — they are rebuilt per call, from `build`, where the current
+/// setting is what matters.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:flutter/material.dart';
 
 /// The gold pair for one brightness.
@@ -59,27 +66,27 @@ class AppGold {
   /// Champagne on white: the fill has to be pale enough for dark ink, so the
   /// *ink* carries the metal — a deep bronze reads as gold leaf where a bright
   /// yellow would read as a highlighter.
-  static const AppGold light = AppGold(
-    fillStart: Color(0xFFFDF2D0),
-    fillEnd: Color(0xFFF3D89A),
-    ink: Color(0xFF4A3208),
-    badge: Color(0xFF87610F),
-    onBadge: Color(0xFFFFF8E6),
-    edge: Color(0x33A9822B),
-    glow: Color(0x2E8A6A1F),
+  static AppGold get light => AppGold(
+    fillStart: const Color(0xFFFDF2D0).vision,
+    fillEnd: const Color(0xFFF3D89A).vision,
+    ink: const Color(0xFF4A3208).vision,
+    badge: const Color(0xFF87610F).vision,
+    onBadge: const Color(0xFFFFF8E6).vision,
+    edge: const Color(0x33A9822B).vision,
+    glow: const Color(0x2E8A6A1F).vision,
   );
 
   /// Deep amber on near-black: the fill carries the metal here, because a pale
   /// champagne on a dark page reads as plain cream. The ink lifts to a light
   /// gold so it stays legible on it.
-  static const AppGold dark = AppGold(
-    fillStart: Color(0xFF4A3811),
-    fillEnd: Color(0xFF2E230C),
-    ink: Color(0xFFF7DFA5),
-    badge: Color(0xFFE8C46A),
-    onBadge: Color(0xFF3A2A06),
-    edge: Color(0x40E8C46A),
-    glow: Color(0x33C9A34A),
+  static AppGold get dark => AppGold(
+    fillStart: const Color(0xFF4A3811).vision,
+    fillEnd: const Color(0xFF2E230C).vision,
+    ink: const Color(0xFFF7DFA5).vision,
+    badge: const Color(0xFFE8C46A).vision,
+    onBadge: const Color(0xFF3A2A06).vision,
+    edge: const Color(0x40E8C46A).vision,
+    glow: const Color(0x33C9A34A).vision,
   );
 
   /// The palette for the ambient theme.

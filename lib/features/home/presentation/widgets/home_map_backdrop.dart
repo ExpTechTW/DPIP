@@ -309,7 +309,8 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     await controller.addLineLayer(
       'exptech',
       _selectedLineLayer,
-      const LineLayerProperties(lineColor: selectedColor, lineWidth: 2.5),
+      // Not `const`: [selectedColor] follows the colour-vision setting.
+      LineLayerProperties(lineColor: selectedColor, lineWidth: 2.5),
       sourceLayer: 'town',
       filter: filter,
       enableInteraction: false,

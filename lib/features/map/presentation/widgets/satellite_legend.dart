@@ -11,6 +11,7 @@
 /// recipe — so they get a compositing note instead.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -36,8 +37,8 @@ class SatelliteLegend extends StatelessWidget {
   /// (a standalone legend with no live toggle).
   final ValueListenable<bool>? showGlobal;
 
-  static const Color _county = Color(0xFFFFD400);
-  static const Color _town = Color(0xFFB79A00);
+  static Color get _county => const Color(0xFFFFD400).vision;
+  static Color get _town => const Color(0xFFB79A00).vision;
 
   @override
   Widget build(BuildContext context) {
@@ -144,9 +145,13 @@ class SatelliteLegend extends StatelessWidget {
       SatelliteChannel.visibleRed ||
       SatelliteChannel.nir ||
       SatelliteChannel.nirPhase ||
-      SatelliteChannel.nirCloud => const ColorScaleLegend(
+      SatelliteChannel.nirCloud => ColorScaleLegend(
         unit: '%',
-        stops: [(0, '#000000'), (50, '#808080'), (100, '#FFFFFF')],
+        stops: [
+          (0, ColorVisionFilter.rasterExemptHex('#000000')),
+          (50, ColorVisionFilter.rasterExemptHex('#808080')),
+          (100, ColorVisionFilter.rasterExemptHex('#FFFFFF')),
+        ],
       ),
       // Thermal bands (B07–B16) take the selected [style].
       SatelliteChannel.swir ||
@@ -173,9 +178,13 @@ class SatelliteLegend extends StatelessWidget {
           ),
         ],
       ),
-      SatelliteChannel.watervapor => const ColorScaleLegend(
+      SatelliteChannel.watervapor => ColorScaleLegend(
         unit: 'K',
-        stops: [(190, '#FFFFFF'), (235, '#7F7F7F'), (280, '#000000')],
+        stops: [
+          (190, ColorVisionFilter.rasterExemptHex('#FFFFFF')),
+          (235, ColorVisionFilter.rasterExemptHex('#7F7F7F')),
+          (280, ColorVisionFilter.rasterExemptHex('#000000')),
+        ],
       ),
       // Brightness-temperature differences: negative blue, zero transparent
       // (the basemap shows through), positive red.
@@ -185,35 +194,51 @@ class SatelliteLegend extends StatelessWidget {
       SatelliteChannel.btdSo2 => _diverging(-6.0, 6.0),
       SatelliteChannel.btdCo2 => _diverging(-40.0, 2.0),
       SatelliteChannel.btdOzone => _diverging(-41.5, 4.3),
-      SatelliteChannel.cloudtop => const ColorScaleLegend(
+      SatelliteChannel.cloudtop => ColorScaleLegend(
         unit: 'K',
-        stops: [(190, '#FFFFFF'), (245, '#7F7F7F'), (300, '#000000')],
-      ),
-      SatelliteChannel.cloudmask => _cloudMask(l10n),
-      SatelliteChannel.sst => const ColorScaleLegend(
-        unit: '°C',
         stops: [
-          (-2, '#3C1478'),
-          (3, '#2846C8'),
-          (8, '#28A0DC'),
-          (13, '#3CC8A0'),
-          (18, '#AADC50'),
-          (23, '#F5C832'),
-          (28, '#F07828'),
-          (32, '#C81E28'),
+          (190, ColorVisionFilter.rasterExemptHex('#FFFFFF')),
+          (245, ColorVisionFilter.rasterExemptHex('#7F7F7F')),
+          (300, ColorVisionFilter.rasterExemptHex('#000000')),
         ],
       ),
-      SatelliteChannel.ndvi => const ColorScaleLegend(
+      SatelliteChannel.cloudmask => _cloudMask(l10n),
+      SatelliteChannel.sst => ColorScaleLegend(
+        unit: '°C',
+        stops: [
+          (-2, ColorVisionFilter.rasterExemptHex('#3C1478')),
+          (3, ColorVisionFilter.rasterExemptHex('#2846C8')),
+          (8, ColorVisionFilter.rasterExemptHex('#28A0DC')),
+          (13, ColorVisionFilter.rasterExemptHex('#3CC8A0')),
+          (18, ColorVisionFilter.rasterExemptHex('#AADC50')),
+          (23, ColorVisionFilter.rasterExemptHex('#F5C832')),
+          (28, ColorVisionFilter.rasterExemptHex('#F07828')),
+          (32, ColorVisionFilter.rasterExemptHex('#C81E28')),
+        ],
+      ),
+      SatelliteChannel.ndvi => ColorScaleLegend(
         unit: 'NDVI',
-        stops: [(0, '#C8AF6E'), (0.5, '#5F8A3A'), (1, '#196A23')],
+        stops: [
+          (0, ColorVisionFilter.rasterExemptHex('#C8AF6E')),
+          (0.5, ColorVisionFilter.rasterExemptHex('#5F8A3A')),
+          (1, ColorVisionFilter.rasterExemptHex('#196A23')),
+        ],
       ),
-      SatelliteChannel.ndwi => const ColorScaleLegend(
+      SatelliteChannel.ndwi => ColorScaleLegend(
         unit: 'NDWI',
-        stops: [(0, '#78BEE8'), (0.5, '#3C7FD0'), (1, '#0A3CB8')],
+        stops: [
+          (0, ColorVisionFilter.rasterExemptHex('#78BEE8')),
+          (0.5, ColorVisionFilter.rasterExemptHex('#3C7FD0')),
+          (1, ColorVisionFilter.rasterExemptHex('#0A3CB8')),
+        ],
       ),
-      SatelliteChannel.mndwi => const ColorScaleLegend(
+      SatelliteChannel.mndwi => ColorScaleLegend(
         unit: 'MNDWI',
-        stops: [(0, '#78BEE8'), (0.5, '#3C7FD0'), (1, '#0A3CB8')],
+        stops: [
+          (0, ColorVisionFilter.rasterExemptHex('#78BEE8')),
+          (0.5, ColorVisionFilter.rasterExemptHex('#3C7FD0')),
+          (1, ColorVisionFilter.rasterExemptHex('#0A3CB8')),
+        ],
       ),
     };
   }
@@ -222,20 +247,24 @@ class SatelliteLegend extends StatelessWidget {
   /// the Dvorak BD ladder.
   Widget _thermalKey(BuildContext context) {
     return switch (style.value) {
-      SatelliteStyle.gray => const ColorScaleLegend(
+      SatelliteStyle.gray => ColorScaleLegend(
         unit: 'K',
-        stops: [(190, '#FFFFFF'), (255, '#7F7F7F'), (320, '#000000')],
+        stops: [
+          (190, ColorVisionFilter.rasterExemptHex('#FFFFFF')),
+          (255, ColorVisionFilter.rasterExemptHex('#7F7F7F')),
+          (320, ColorVisionFilter.rasterExemptHex('#000000')),
+        ],
       ),
-      SatelliteStyle.jma => const ColorScaleLegend(
+      SatelliteStyle.jma => ColorScaleLegend(
         unit: '°C',
         stops: [
-          (-45, '#7891D2'),
-          (-52, '#2D55CD'),
-          (-60, '#28A5DC'),
-          (-68, '#46C86E'),
-          (-76, '#F5E646'),
-          (-84, '#F5962D'),
-          (-92, '#D72D2D'),
+          (-45, ColorVisionFilter.rasterExemptHex('#7891D2')),
+          (-52, ColorVisionFilter.rasterExemptHex('#2D55CD')),
+          (-60, ColorVisionFilter.rasterExemptHex('#28A5DC')),
+          (-68, ColorVisionFilter.rasterExemptHex('#46C86E')),
+          (-76, ColorVisionFilter.rasterExemptHex('#F5E646')),
+          (-84, ColorVisionFilter.rasterExemptHex('#F5962D')),
+          (-92, ColorVisionFilter.rasterExemptHex('#D72D2D')),
         ],
       ),
       SatelliteStyle.bd => const SymbolLegend(
@@ -269,7 +298,11 @@ class SatelliteLegend extends StatelessWidget {
   /// negative, near-zero the basemap, red positive.
   ColorScaleLegend _diverging(double lo, double hi) => ColorScaleLegend(
     unit: 'K',
-    stops: [(lo, '#1E5AEB'), (0, '#E8ECF2'), (hi, '#E61E14')],
+    stops: [
+      (lo, '#1E5AEB'),
+      (0, ColorVisionFilter.rasterExemptHex('#E8ECF2')),
+      (hi, '#E61E14'),
+    ],
   );
 
   /// The four cloud-mask categories — clear is transparent on the map.
@@ -304,15 +337,15 @@ class SatelliteLegend extends StatelessWidget {
       items: [
         if (showGlobal?.value ?? true)
           SymbolLegendItem(
-            swatch: const LineSwatch(color: _county, width: 1.0),
+            swatch: LineSwatch(color: _county, width: 1.0),
             label: l10n.mapLayerSatelliteGlobalOutline,
           ),
         SymbolLegendItem(
-          swatch: const LineSwatch(color: _county, width: 1.0),
+          swatch: LineSwatch(color: _county, width: 1.0),
           label: l10n.radarCountyOutline,
         ),
         SymbolLegendItem(
-          swatch: const LineSwatch(color: _town, width: 0.7),
+          swatch: LineSwatch(color: _town, width: 0.7),
           label: l10n.radarTownOutline,
         ),
       ],

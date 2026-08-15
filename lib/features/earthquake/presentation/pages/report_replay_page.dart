@@ -13,6 +13,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -540,7 +541,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addFillLayer(
         _eewSourceId,
         _sWaveFillLayerId,
-        const FillLayerProperties(fillColor: '#FF3B30', fillOpacity: 0.16),
+        FillLayerProperties(fillColor: '#FF3B30'.vision, fillOpacity: 0.16),
         belowLayerId: landLayerId,
         filter: const [
           '==',
@@ -551,7 +552,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addLineLayer(
         _eewSourceId,
         _pWaveLayerId,
-        const LineLayerProperties(lineColor: '#00E5FF', lineWidth: 2),
+        LineLayerProperties(lineColor: '#00E5FF'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',
@@ -562,7 +563,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addLineLayer(
         _eewSourceId,
         _sWaveLayerId,
-        const LineLayerProperties(lineColor: '#FF3B30', lineWidth: 2),
+        LineLayerProperties(lineColor: '#FF3B30'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',

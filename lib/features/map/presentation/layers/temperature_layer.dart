@@ -1,6 +1,7 @@
 /// The air-temperature station layer.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
@@ -35,13 +36,13 @@ class TemperatureMapLayer
   List<double?> trendOf(WeatherTrend trend) => trend.temperature;
 
   @override
-  List<(double, String)> get colorStops => const [
-    (-5, '#4575B4'),
-    (5, '#74ADD1'),
-    (15, '#ABD9E9'),
-    (22, '#FFFFBF'),
-    (28, '#FDAE61'),
-    (34, '#F46D43'),
-    (40, '#D73027'),
+  List<(double, String)> get colorStops => [
+    (-5, '#4575B4'.vision),
+    (5, '#74ADD1'.vision),
+    (15, '#ABD9E9'.vision),
+    (22, '#FFFFBF'.vision),
+    (28, '#FDAE61'.vision),
+    (34, '#F46D43'.vision),
+    (40, '#D73027'.vision),
   ];
 }
