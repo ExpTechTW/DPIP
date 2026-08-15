@@ -11,6 +11,7 @@ import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -70,6 +71,7 @@ class SharedDeps {
     required this.meshLink,
     required this.meshAlerts,
     required this.meshNodes,
+    required this.meshUnread,
     this.meshStore,
     required this.meshGateway,
     this.etagCache,
@@ -162,6 +164,9 @@ class SharedDeps {
   /// The last known mesh node table — persisted, so the map and the node list
   /// have something to show with no radio attached.
   final MeshNodeStore meshNodes;
+
+  /// Unread mesh conversations — read by the chat page and the More tab's dot.
+  final MeshUnread meshUnread;
 
   /// The mesh conversation log and utilization history (SQLite). Null when
   /// the database couldn't be opened — the log is then session-only.

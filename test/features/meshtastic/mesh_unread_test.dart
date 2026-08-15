@@ -14,7 +14,6 @@ library;
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
@@ -49,7 +48,6 @@ Future<(MeshChatController, FakeMeshService)> _controller(Database db) async {
   final controller = MeshChatController(
     service,
     MeshLink(service, settings),
-    MeshNodeStore(service, settings),
     MeshStore(db),
   );
   await _settle();

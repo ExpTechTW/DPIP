@@ -22,7 +22,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:flutter/foundation.dart';
@@ -71,7 +71,16 @@ class MeshChatMessage {
 }
 
 class MeshChatController extends ChangeNotifier {
-  MeshChatController(this._service, this._link, this._nodes, this._store) {
+  MeshChatController(
+    this._service,
+    this._link,
+    this._store, {
+    MeshUnread? unread,
+  }) : _unreadState = unread ?? MeshUnread(_store) {
+    // Low-frequency by construction (unread transitions only), so forwarding
+    // is safe — unlike the per-packet node stream this deliberately does not
+    // forward.
+    _unreadState.addListener(notifyListeners);
     unawaited(_restore());
     // Deliberately NOT forwarding the node store's notifications: it notifies
     // per packet, and forwarding rebuilt the whole chat page for every
@@ -96,7 +105,6 @@ class MeshChatController extends ChangeNotifier {
   /// Connection lifecycle lives in [MeshLink] (app-wide, survives this page);
   /// this controller only owns the conversation.
   final MeshLink _link;
-  final MeshNodeStore _nodes;
 
   /// Null when the database couldn't be opened — the log then lives only for
   /// this session rather than the page failing to work at all.
@@ -131,67 +139,19 @@ class MeshChatController extends ChangeNotifier {
   /// history falls outside the in-memory window still reports its real total.
   Map<int, int> get messageCountsByChannel => Map.unmodifiable(_counts);
 
+  /// The shared unread bookkeeping — also behind the More tab's red dot,
+  /// which is why it lives in `core/` rather than here.
+  final MeshUnread _unreadState;
+
   /// Received messages newer than each channel's read position — what the
-  /// picker's red dots show. Own sends never count as unread.
-  Map<int, int> get unreadByChannel => Map.unmodifiable(_unread);
+  /// picker's red pills show. Own sends never count as unread.
+  Map<int, int> get unreadByChannel => _unreadState.byChannel;
 
-  final Map<int, int> _unread = {};
-  final Map<int, int> _lastReads = {};
+  /// See [MeshUnread.unreadDividerTs].
+  int? unreadDividerTs(int channel) => _unreadState.unreadDividerTs(channel);
 
-  /// Which conversation is on screen, if any. A message landing here is read
-  /// the moment it arrives; anything else accrues a dot.
-  int? _visibleChannel;
-
-  /// Where the unread divider sits in the open conversation, or null when
-  /// there is nothing new there.
-  ///
-  /// Snapshotted the moment the conversation is opened — *before* the read
-  /// position advances — because opening is also what marks everything read:
-  /// derived live from `last_read` the line would vanish in the same frame it
-  /// appeared. It holds for the visit (the Discord behaviour: the line shows
-  /// where new began until you leave) and clears on switching away.
-  int? unreadDividerTs(int channel) =>
-      channel == _dividerChannel ? _dividerTs : null;
-
-  int? _dividerChannel;
-  int? _dividerTs;
-
-  /// Tells the log which conversation the user is looking at (null = none).
-  ///
-  /// Selecting a conversation reads it: its dot clears and its read position
-  /// advances to its newest message.
-  void markVisible(int? channel) {
-    if (channel == _visibleChannel) return;
-    _visibleChannel = channel;
-    if (channel == null) {
-      _dividerChannel = null;
-      _dividerTs = null;
-      return;
-    }
-    final hadUnread = (_unread.remove(channel) ?? 0) > 0;
-    // The divider marks where new begins: the read position as it stood when
-    // the conversation was opened. No unread, no line.
-    _dividerChannel = hadUnread ? channel : null;
-    _dividerTs = hadUnread ? (_lastReads[channel] ?? 0) : null;
-    _advanceRead(channel);
-    if (hadUnread) notifyListeners();
-  }
-
-  /// Persists the read position at the channel's newest message.
-  void _advanceRead(int channel) {
-    var newest = _lastReads[channel] ?? 0;
-    for (final message in _messages) {
-      if (message.channel != channel) continue;
-      final ts = message.timestamp.millisecondsSinceEpoch;
-      if (ts > newest) newest = ts;
-      break; // newest-first: the first hit is the newest
-    }
-    // Only on change: re-opening a read conversation must not rewrite the
-    // same position on every page build.
-    if (newest == 0 || newest == (_lastReads[channel] ?? 0)) return;
-    _lastReads[channel] = newest;
-    unawaited(_store?.writeLastRead(channel, newest));
-  }
+  /// See [MeshUnread.markVisible].
+  void markVisible(int? channel) => _unreadState.markVisible(channel);
 
   /// Channel index → the name last reported by a radio.
   ///
@@ -229,16 +189,6 @@ class MeshChatController extends ChangeNotifier {
 
   /// The message log, **newest first** (the page renders it reversed).
   List<MeshChatMessage> get messages => List.unmodifiable(_messages);
-
-  /// Every node heard so far, online first, then most-recently-heard.
-  List<MeshNode> get nodes => _nodes.nodes;
-
-  /// Node count without the sorted-list construction — for the page badge,
-  /// which rebuilds on every packet.
-  int get nodeCount => _nodes.count;
-
-  /// Whether [node] has been heard recently enough to count as online.
-  bool isOnline(MeshNode node) => _nodes.isOnline(node);
 
   /// Radios found by the current/last scan.
   List<MeshDevice> get devices => List.unmodifiable(_devices);
@@ -344,6 +294,7 @@ class MeshChatController extends ChangeNotifier {
     if (_messages.isEmpty) return;
     _messages.clear();
     _counts.clear();
+    _unreadState.reset();
     notifyListeners();
     unawaited(_store?.clearMessages());
   }
@@ -383,14 +334,11 @@ class MeshChatController extends ChangeNotifier {
       _messages.removeRange(windowSize, _messages.length);
     }
     _counts[message.channel] = (_counts[message.channel] ?? 0) + 1;
-    // Read state: a message in the open conversation is read on arrival (the
-    // read position advances with it); anywhere else it accrues a dot.
     if (!message.outgoing) {
-      if (message.channel == _visibleChannel) {
-        _advanceRead(message.channel);
-      } else {
-        _unread[message.channel] = (_unread[message.channel] ?? 0) + 1;
-      }
+      _unreadState.recordIncoming(
+        message.channel,
+        message.timestamp.millisecondsSinceEpoch,
+      );
     }
     notifyListeners();
   }
@@ -419,17 +367,7 @@ class MeshChatController extends ChangeNotifier {
     _messages
       ..clear()
       ..addAll([for (final row in rows) MeshChatMessage.stored(row)]);
-    _lastReads
-      ..clear()
-      ..addAll(await store.readLastReads());
-    _unread
-      ..clear()
-      ..addAll(await store.unreadCounts());
-    // The conversation already on screen is read by definition.
-    final visible = _visibleChannel;
-    if (visible != null && _unread.remove(visible) != null) {
-      _advanceRead(visible);
-    }
+    await _unreadState.restore();
     _counts
       ..clear()
       ..addAll(counts);
@@ -445,6 +383,7 @@ class MeshChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _unreadState.removeListener(notifyListeners);
     unawaited(_messageSub?.cancel());
     unawaited(_connectionSub?.cancel());
     unawaited(_scanSub?.cancel());

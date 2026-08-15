@@ -3,6 +3,7 @@ import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -99,6 +100,13 @@ class _MainShellState extends State<MainShell> with RouteAware {
     final needsPermissionAttention = context.select<PermissionHealth, bool>(
       (health) => health.needsAttention,
     );
+    // Unread mesh messages ride the same dot: both mean "the More tab holds
+    // something you have not dealt with", and two dots on one icon say
+    // nothing more than one.
+    final hasMeshUnread = context.select<MeshUnread, bool>(
+      (unread) => unread.hasUnread,
+    );
+    final moreAttention = needsPermissionAttention || hasMeshUnread;
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a
@@ -148,12 +156,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
         // Both icons, not just the unselected one: NavigationBar fades to
         // selectedIcon on tap, so badging only `icon` made the dot vanish the
         // moment the user opened the tab it was pointing at.
-        icon: _PermissionBadge(
-          needsAttention: needsPermissionAttention,
+        icon: _AttentionBadge(
+          show: moreAttention,
           child: const Icon(Icons.menu),
         ),
-        selectedIcon: _PermissionBadge(
-          needsAttention: needsPermissionAttention,
+        selectedIcon: _AttentionBadge(
+          show: moreAttention,
           child: const Icon(Icons.menu),
         ),
         label: l10n.navMore,
@@ -275,15 +283,15 @@ class _MainShellState extends State<MainShell> with RouteAware {
 /// here: the shell does not say what is wrong, only that something is, and the
 /// tab it sits on leads to the page that does. Announced for screen readers,
 /// where a dot is otherwise silent.
-class _PermissionBadge extends StatelessWidget {
-  const _PermissionBadge({required this.needsAttention, required this.child});
+class _AttentionBadge extends StatelessWidget {
+  const _AttentionBadge({required this.show, required this.child});
 
-  final bool needsAttention;
+  final bool show;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (!needsAttention) return child;
+    if (!show) return child;
     return Semantics(
       label: AppLocalizations.of(context).permissionsAttention,
       child: Badge(child: child),

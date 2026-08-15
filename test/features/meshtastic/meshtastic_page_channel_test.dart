@@ -74,7 +74,7 @@ void main() {
       link = MeshLink(service, settings);
       alerts = MeshAlerts(service, settings, post: (_) async {});
       nodes = MeshNodeStore(service, settings)..start();
-      controller = MeshChatController(service, link, nodes, store);
+      controller = MeshChatController(service, link, store);
       // Let the controller's initial load land before the first frame.
       await Future<void>.delayed(const Duration(milliseconds: 200));
     });

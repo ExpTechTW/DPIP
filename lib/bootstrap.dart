@@ -25,6 +25,7 @@ import 'package:dpip/core/meshtastic/mesh_metrics_recorder.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -254,6 +255,7 @@ Future<void> bootstrap() async {
   final meshStore = durable == null ? null : MeshStore(durable);
   final meshAlerts = MeshAlerts(meshtastic, settings, store: meshStore);
   final meshNodes = MeshNodeStore(meshtastic, settings, store: meshStore);
+  final meshUnread = MeshUnread(meshStore);
   // Retention for every table, on one schedule: now, then hourly. No store
   // prunes on its own timing any more — see [RetentionService] for why an app
   // that is left running needs a clock rather than a bootstrap.
@@ -291,6 +293,7 @@ Future<void> bootstrap() async {
     meshLink: meshLink,
     meshAlerts: meshAlerts,
     meshNodes: meshNodes,
+    meshUnread: meshUnread,
     meshStore: meshStore,
     database: AppDatabase(durable: durable, cache: cache?.db),
     tleStore: TleStore(durable),

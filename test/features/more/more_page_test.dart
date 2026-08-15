@@ -9,6 +9,7 @@ library;
 
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -52,7 +53,11 @@ GoRouter _router(List<String> visited) => GoRouter(
   ],
 );
 
-Future<void> _pump(WidgetTester tester, GoRouter router) async {
+Future<void> _pump(
+  WidgetTester tester,
+  GoRouter router, {
+  MeshUnread? unread,
+}) async {
   // Tall enough that every group lays out and hit-tests inside the viewport —
   // a row past the bottom edge takes taps that silently miss.
   tester.view.physicalSize = const Size(800, 4000);
@@ -69,6 +74,7 @@ Future<void> _pump(WidgetTester tester, GoRouter router) async {
         ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider(create: (_) => const TownDirectory({})),
+        ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
         // MorePage badges its permission row from this. Both services are pure
         // constructors and nothing calls start(), so it holds its optimistic
         // defaults and the row renders unbadged — which is what these tests are
@@ -179,5 +185,27 @@ void main() {
         .whereType<BoxDecoration>()
         .where((d) => d.gradient != null && d.boxShadow != null);
     expect(decorated, hasLength(1));
+  });
+
+  testWidgets('the Meshtastic row carries a dot only while unread exists', (
+    tester,
+  ) async {
+    final unread = MeshUnread(null);
+    await _pump(tester, _router([]), unread: unread);
+    // The row's icon is badged only when a conversation holds something the
+    // user has not seen — the same state the chat page's pills read.
+    Finder meshBadge() => find.descendant(
+      of: find.widgetWithText(ListTile, 'Meshtastic'),
+      matching: find.byType(Badge),
+    );
+    expect(meshBadge(), findsNothing);
+
+    unread.recordIncoming(2, DateTime.utc(2026, 1, 1).millisecondsSinceEpoch);
+    await tester.pump();
+    expect(meshBadge(), findsOneWidget);
+
+    unread.markVisible(2); // read it
+    await tester.pump();
+    expect(meshBadge(), findsNothing);
   });
 }

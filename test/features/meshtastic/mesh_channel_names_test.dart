@@ -13,7 +13,6 @@ library;
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -59,7 +58,6 @@ void main() {
     final controller = MeshChatController(
       service,
       MeshLink(service, settings),
-      MeshNodeStore(service, settings),
       MeshStore(db),
     );
     await settle();
@@ -89,7 +87,6 @@ void main() {
     final controller = MeshChatController(
       service,
       MeshLink(service, settings),
-      MeshNodeStore(service, settings),
       MeshStore(db),
     );
     await settle();
@@ -110,7 +107,6 @@ void main() {
     final controller = MeshChatController(
       service,
       MeshLink(service, settings),
-      MeshNodeStore(service, settings),
       MeshStore(db),
     );
     await settle();

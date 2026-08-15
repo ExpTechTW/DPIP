@@ -3,6 +3,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -112,6 +113,10 @@ class MorePage extends StatelessWidget {
               _MoreTile(
                 icon: Icons.router_outlined,
                 title: l10n.meshtasticTitle,
+                // A message arrived in a conversation the user has not read —
+                // the same state as the chat page's unread pills, selected
+                // down to one boolean so only this tile rebuilds.
+                alert: context.select<MeshUnread, bool>((u) => u.hasUnread),
                 onTap: () => context.pushNamed(AppRoutes.meshtastic),
               ),
             ],

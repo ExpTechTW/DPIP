@@ -14,6 +14,7 @@ import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -70,6 +71,8 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<MeshLink>.value(value: deps.meshLink),
   ChangeNotifierProvider<MeshAlerts>.value(value: deps.meshAlerts),
   ChangeNotifierProvider<MeshNodeStore>.value(value: deps.meshNodes),
+  // The More tab's red dot follows it; the chat controller writes it.
+  ChangeNotifierProvider<MeshUnread>.value(value: deps.meshUnread),
   Provider<MeshStore?>.value(value: deps.meshStore),
   Provider<DpipMeshGateway>.value(value: deps.meshGateway),
   Provider<ApiClient>.value(value: deps.apiClient),
