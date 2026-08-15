@@ -86,6 +86,18 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   bool _hasSnapshot = false;
   bool _disposed = false;
   bool _paused = false;
+
+  /// Bumped whenever the connection lifecycle is torn down, so a reconnect that
+  /// belongs to an older lifecycle cannot open a socket for the new one.
+  ///
+  /// A backoff is an un-cancellable pending future, and [pause] does not
+  /// outlive it: background and foreground can both happen inside one backoff
+  /// window, leaving the stale timer *and* the re-armed lazy open both live.
+  /// Both would then call [_openConnection], which assigns [_subscription]
+  /// unconditionally — so the first connection would be orphaned, still
+  /// subscribed, still receiving, with nothing left holding a reference to
+  /// cancel it. That is a leaked socket per background cycle.
+  int _generation = 0;
   int _attempt = 0;
   T? _latest;
   Duration? _lastEventMark;
@@ -124,6 +136,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   void pause() {
     if (_disposed || _paused) return;
     _paused = true;
+    _generation++; // orphan any backoff still counting down
     _subscription?.cancel();
     _subscription = null;
     _connected = false;
@@ -152,6 +165,11 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     if (_disposed || _paused) return;
     _connected = false;
     _hasSnapshot = false;
+    // Belt and braces: the generation guard should mean there is never a live
+    // subscription here, but the assignment below would orphan one silently
+    // rather than fail, and an orphaned SSE socket is exactly the kind of leak
+    // this class exists to avoid.
+    _subscription?.cancel();
     _subscription = _connect().listen(
       _onEvent,
       onError: (Object error, StackTrace stackTrace) {
@@ -203,9 +221,11 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
 
   void _scheduleReconnect() {
     final delay = _backoffDelay();
+    final generation = _generation;
     _attempt++;
     _delay(delay).then((_) {
-      if (!_disposed) _openConnection();
+      if (_disposed || generation != _generation) return;
+      _openConnection();
     });
   }
 

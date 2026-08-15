@@ -59,7 +59,8 @@ class _RecordingChannel implements RealtimeChannelBase {
   @override
   void start() => log.add('$id:start');
   @override
-  void pause() => log.add('$id:pause');
+  void pause({bool releaseTransport = false}) =>
+      log.add(releaseTransport ? '$id:pause+release' : '$id:pause');
   @override
   void resume() => log.add('$id:resume');
   @override
@@ -97,9 +98,23 @@ void main() {
     expect(log, ['a:start', 'b:start']);
   });
 
-  test('onBackground pauses every channel', () {
+  test('onBackground pauses every channel and releases its transport', () {
     service.onBackground();
+    expect(log, ['a:pause+release', 'b:pause+release']);
+  });
+
+  test('onInterrupted pauses polling but keeps connections open', () {
+    // `inactive` fires for a notification shade, the app switcher, an incoming
+    // call and every permission dialog. Dropping an SSE socket for those would
+    // reconnect constantly and flap a safety-critical feed through `offline`.
+    service.onInterrupted();
     expect(log, ['a:pause', 'b:pause']);
+  });
+
+  test('onInterrupted also halts the clock resync', () {
+    service.startAll();
+    service.onInterrupted();
+    expect(ticker.handle.cancelled, isTrue);
   });
 
   test('onForeground recomputes ALL channels before resuming ANY', () {

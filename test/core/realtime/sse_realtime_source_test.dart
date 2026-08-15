@@ -265,5 +265,34 @@ void main() {
       await h.source.fetch();
       expect(h.connects, hasLength(2));
     });
+
+    test('a backoff that outlives the pause cannot double-open', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      await h.current.close(); // drop → reconnect scheduled
+      await pumpEventQueue();
+      expect(h.delays, hasLength(1));
+
+      // The whole background stint fits inside the backoff window: the timer is
+      // still pending when the app comes back, so the reconnect it belongs to
+      // and the reconnect `resume` re-arms are both live.
+      h.source.pause();
+      h.source.resume();
+
+      h.delays.single.complete(); // the *stale* backoff fires, now unpaused
+      await pumpEventQueue();
+      await h.source.fetch(); // ...and the resumed lazy open fires too
+
+      expect(
+        h.connects,
+        hasLength(2),
+        reason: 'the stale backoff and the resume must not each open a socket',
+      );
+      expect(
+        h.connects.where((c) => c.hasListener),
+        hasLength(1),
+        reason: 'an overwritten subscription is a leaked connection',
+      );
+    });
   });
 }
