@@ -53,11 +53,13 @@
     "description": "Device picker sheet title"
   },
   "moreSectionAdvanced": "ขั้นสูง",
+  "moreSectionMesh": "เครือข่าย Mesh",
   "@meshtasticLastHeard": {
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "ช่วงวัน",
   "permissionsTitle": "ตรวจสอบสิทธิ์",
+  "permissionsAttention": "สิทธิ์ต้องได้รับการแก้ไข",
   "permissionsBody": "DPIP ต้องใช้สิทธิ์เหล่านี้เพื่อแจ้งเตือนคุณได้ทันเวลา หากไม่ได้รับการแจ้งเตือน มักเป็นเพราะยังไม่ได้เปิดสิทธิ์ข้อใดข้อหนึ่ง",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
   "typhoonHistoryTitle": "เวลาข้อมูล",

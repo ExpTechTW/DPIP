@@ -53,11 +53,13 @@
     "description": "Device picker sheet title"
   },
   "moreSectionAdvanced": "Lanjutan",
+  "moreSectionMesh": "Jaringan mesh",
   "@meshtasticLastHeard": {
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "Rentang harian",
   "permissionsTitle": "Pemeriksaan izin",
+  "permissionsAttention": "Izin perlu ditangani",
   "permissionsBody": "DPIP memerlukan izin ini untuk memberi peringatan tepat waktu. Peringatan yang tidak muncul biasanya karena salah satunya belum diberikan.",
   "notifySettingsMenu": "Pengaturan notifikasi",
   "typhoonHistoryTitle": "Waktu data",

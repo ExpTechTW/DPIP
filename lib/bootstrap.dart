@@ -26,6 +26,7 @@ import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -222,6 +223,13 @@ Future<void> bootstrap() async {
 
   // Watches the OS location toggle / permission and recovers reporting after a
   // mid-session change; drives the "fix it" banner.
+  // One shared read of "can an alert still reach this user", so the shell badge
+  // and the permission page agree and neither polls the OS on a rebuild.
+  final permissionHealth = PermissionHealth(
+    location: locationService,
+    notifications: notificationService,
+  );
+
   final locationMonitor = LocationMonitor(
     location: locationService,
     reporter: deviceLocationReporter,
@@ -265,6 +273,7 @@ Future<void> bootstrap() async {
     deviceLocationReporter: deviceLocationReporter,
     backgroundLocation: backgroundLocation,
     locationMonitor: locationMonitor,
+    permissionHealth: permissionHealth,
     onboarding: onboarding,
     locale: locale,
     theme: theme,

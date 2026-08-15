@@ -127,10 +127,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreSectionAdvanced => '進階';
 
   @override
+  String get moreSectionMesh => 'Mesh 網路';
+
+  @override
   String get weatherRankingExtremeRange => '日溫差';
 
   @override
   String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsAttention => '權限需要處理';
 
   @override
   String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';
@@ -2774,10 +2780,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreSectionAdvanced => '高级';
 
   @override
+  String get moreSectionMesh => 'Mesh 网络';
+
+  @override
   String get weatherRankingExtremeRange => '日温差';
 
   @override
   String get permissionsTitle => '权限检查';
+
+  @override
+  String get permissionsAttention => '权限需要处理';
 
   @override
   String get permissionsBody => 'DPIP 需要这些权限才能即时通知你。收不到警报时，通常就是其中一项尚未开启。';
@@ -5421,10 +5433,16 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreSectionAdvanced => '進階';
 
   @override
+  String get moreSectionMesh => 'Mesh 網絡';
+
+  @override
   String get weatherRankingExtremeRange => '日溫差';
 
   @override
   String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsAttention => '權限需要處理';
 
   @override
   String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';
@@ -8068,10 +8086,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get moreSectionAdvanced => '進階';
 
   @override
+  String get moreSectionMesh => 'Mesh 網路';
+
+  @override
   String get weatherRankingExtremeRange => '日溫差';
 
   @override
   String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsAttention => '權限需要處理';
 
   @override
   String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';

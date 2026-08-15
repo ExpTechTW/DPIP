@@ -3,6 +3,7 @@ import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
@@ -93,6 +94,11 @@ class _MainShellState extends State<MainShell> with RouteAware {
     final l10n = AppLocalizations.of(context);
     final index = widget.navigationShell.currentIndex;
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
+    // `select`, not `watch`: the whole shell (every mounted tab with it) must
+    // not rebuild because an unrelated permission field moved.
+    final needsPermissionAttention = context.select<PermissionHealth, bool>(
+      (health) => health.needsAttention,
+    );
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a
@@ -136,8 +142,20 @@ class _MainShellState extends State<MainShell> with RouteAware {
         label: l10n.navData,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.menu),
-        selectedIcon: const Icon(Icons.menu),
+        // The dot is the only place the shell says anything is wrong, and what
+        // is wrong is that an alert may not reach this user — so it rides the
+        // tab that leads to the fix.
+        // Both icons, not just the unselected one: NavigationBar fades to
+        // selectedIcon on tap, so badging only `icon` made the dot vanish the
+        // moment the user opened the tab it was pointing at.
+        icon: _PermissionBadge(
+          needsAttention: needsPermissionAttention,
+          child: const Icon(Icons.menu),
+        ),
+        selectedIcon: _PermissionBadge(
+          needsAttention: needsPermissionAttention,
+          child: const Icon(Icons.menu),
+        ),
         label: l10n.navMore,
       ),
     ];
@@ -248,5 +266,27 @@ class _MainShellState extends State<MainShell> with RouteAware {
     return pages != null &&
         pages.isNotEmpty &&
         pages.last.name == AppRoutes.earthquakeReplay;
+  }
+}
+
+/// A dot over [child] while a permission the app needs is missing.
+///
+/// [Badge] with no label is Material's small dot, which is the whole vocabulary
+/// here: the shell does not say what is wrong, only that something is, and the
+/// tab it sits on leads to the page that does. Announced for screen readers,
+/// where a dot is otherwise silent.
+class _PermissionBadge extends StatelessWidget {
+  const _PermissionBadge({required this.needsAttention, required this.child});
+
+  final bool needsAttention;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!needsAttention) return child;
+    return Semantics(
+      label: AppLocalizations.of(context).permissionsAttention,
+      child: Badge(child: child),
+    );
   }
 }

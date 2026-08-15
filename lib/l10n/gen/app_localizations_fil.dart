@@ -129,10 +129,16 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreSectionAdvanced => 'Advanced';
 
   @override
+  String get moreSectionMesh => 'Mesh network';
+
+  @override
   String get weatherRankingExtremeRange => 'Saklaw sa araw';
 
   @override
   String get permissionsTitle => 'Pagsusuri ng pahintulot';
+
+  @override
+  String get permissionsAttention => 'May pahintulot na kailangang ayusin';
 
   @override
   String get permissionsBody =>

@@ -128,10 +128,16 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionAdvanced => 'ขั้นสูง';
 
   @override
+  String get moreSectionMesh => 'เครือข่าย Mesh';
+
+  @override
   String get weatherRankingExtremeRange => 'ช่วงวัน';
 
   @override
   String get permissionsTitle => 'ตรวจสอบสิทธิ์';
+
+  @override
+  String get permissionsAttention => 'สิทธิ์ต้องได้รับการแก้ไข';
 
   @override
   String get permissionsBody =>

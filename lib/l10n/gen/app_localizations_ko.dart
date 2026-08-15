@@ -127,10 +127,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionAdvanced => '고급';
 
   @override
+  String get moreSectionMesh => '메시 네트워크';
+
+  @override
   String get weatherRankingExtremeRange => '일교차';
 
   @override
   String get permissionsTitle => '권한 확인';
+
+  @override
+  String get permissionsAttention => '권한을 확인해야 합니다';
 
   @override
   String get permissionsBody =>

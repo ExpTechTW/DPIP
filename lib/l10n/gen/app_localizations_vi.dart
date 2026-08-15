@@ -128,10 +128,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSectionAdvanced => 'Nâng cao';
 
   @override
+  String get moreSectionMesh => 'Mạng lưới Mesh';
+
+  @override
   String get weatherRankingExtremeRange => 'Biên độ ngày';
 
   @override
   String get permissionsTitle => 'Kiểm tra quyền';
+
+  @override
+  String get permissionsAttention => 'Cần xử lý quyền truy cập';
 
   @override
   String get permissionsBody =>

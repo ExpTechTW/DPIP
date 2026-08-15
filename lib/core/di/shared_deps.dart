@@ -16,6 +16,7 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
@@ -55,6 +56,7 @@ class SharedDeps {
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.permissionHealth,
     required this.onboarding,
     required this.locale,
     required this.theme,
@@ -117,6 +119,9 @@ class SharedDeps {
   /// App-wide location health monitor (also provided) — status + recovery when
   /// GPS / permission changes mid-session.
   final LocationMonitor locationMonitor;
+
+  /// One app-wide answer to whether alerts can still reach the user.
+  final PermissionHealth permissionHealth;
 
   /// First-launch onboarding completion (also provided) — gates the router and
   /// the app's permission requests.

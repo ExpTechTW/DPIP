@@ -128,10 +128,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreSectionAdvanced => 'Lanjutan';
 
   @override
+  String get moreSectionMesh => 'Jaringan mesh';
+
+  @override
   String get weatherRankingExtremeRange => 'Rentang harian';
 
   @override
   String get permissionsTitle => 'Pemeriksaan izin';
+
+  @override
+  String get permissionsAttention => 'Izin perlu ditangani';
 
   @override
   String get permissionsBody =>

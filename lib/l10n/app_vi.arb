@@ -53,11 +53,13 @@
     "description": "Device picker sheet title"
   },
   "moreSectionAdvanced": "Nâng cao",
+  "moreSectionMesh": "Mạng lưới Mesh",
   "@meshtasticLastHeard": {
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "Biên độ ngày",
   "permissionsTitle": "Kiểm tra quyền",
+  "permissionsAttention": "Cần xử lý quyền truy cập",
   "permissionsBody": "DPIP cần các quyền này để cảnh báo bạn kịp thời. Không nhận được cảnh báo thường là do thiếu một trong số đó.",
   "notifySettingsMenu": "Cài đặt thông báo",
   "typhoonHistoryTitle": "Thời điểm dữ liệu",

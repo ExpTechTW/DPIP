@@ -127,10 +127,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionAdvanced => '詳細設定';
 
   @override
+  String get moreSectionMesh => 'メッシュネットワーク';
+
+  @override
   String get weatherRankingExtremeRange => '日較差';
 
   @override
   String get permissionsTitle => '権限チェック';
+
+  @override
+  String get permissionsAttention => '権限の確認が必要です';
 
   @override
   String get permissionsBody =>

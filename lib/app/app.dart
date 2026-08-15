@@ -10,6 +10,7 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -50,6 +51,7 @@ class DpipApp extends StatelessWidget {
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
+        permissionHealth: deps.permissionHealth,
         onboarding: deps.onboarding,
         // Rebuild MaterialApp when the language override or theme mode changes
         // (a null locale / system mode follows the OS).
@@ -91,6 +93,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.permissionHealth,
     required this.onboarding,
     required this.child,
   });
@@ -102,6 +105,7 @@ class _AppServicesHost extends StatefulWidget {
   final DeviceLocationReporter deviceLocationReporter;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
+  final PermissionHealth permissionHealth;
   final OnboardingStore onboarding;
   final Widget child;
 
@@ -151,6 +155,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     if (_ready) return;
     _ready = true;
     widget.locationMonitor.start();
+    widget.permissionHealth.start();
     _startLocationIfGranted();
   }
 
@@ -215,6 +220,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     WidgetsBinding.instance.removeObserver(this);
     _observer.dispose();
     widget.locationMonitor.dispose();
+    widget.permissionHealth.dispose();
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();

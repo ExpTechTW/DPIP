@@ -132,6 +132,7 @@
     "description": "Device picker sheet title"
   },
   "moreSectionAdvanced": "Advanced",
+  "moreSectionMesh": "Mesh network",
   "@meshtasticLastHeard": {
     "description": "When a node last transmitted"
   },
@@ -149,8 +150,12 @@
     "description": "Section header on the More page for saved regions"
   },
   "permissionsTitle": "Permission check",
+  "permissionsAttention": "Permissions need attention",
   "@permissionsTitle": {
     "description": "Title of the standalone permission checklist page"
+  },
+  "@permissionsAttention": {
+    "description": "Screen-reader label for the permission warning dot"
   },
   "permissionsBody": "DPIP needs these permissions to alert you in time. A missing one is the usual reason an alert never arrived.",
   "@permissionsBody": {
@@ -611,6 +616,9 @@
   "typhoonOverlaySectionExtra": "Overlays",
   "@moreSectionAdvanced": {
     "description": "Section header on the More page grouping advanced/developer entries"
+  },
+  "@moreSectionMesh": {
+    "description": "More page section header: Meshtastic mesh network"
   },
   "eewSWave": "S-wave",
   "meshtasticBusyTitle": "Another app is using this radio",

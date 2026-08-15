@@ -339,6 +339,12 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get moreSectionAdvanced;
 
+  /// More page section header: Meshtastic mesh network
+  ///
+  /// In en, this message translates to:
+  /// **'Mesh network'**
+  String get moreSectionMesh;
+
   /// Chip to rank by daily high minus low
   ///
   /// In en, this message translates to:
@@ -350,6 +356,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Permission check'**
   String get permissionsTitle;
+
+  /// Screen-reader label for the permission warning dot
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions need attention'**
+  String get permissionsAttention;
 
   /// Intro line on the permission checklist page
   ///

@@ -7,7 +7,10 @@
 /// is a failure that only shows up on the day it matters.
 library;
 
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -66,6 +69,16 @@ Future<void> _pump(WidgetTester tester, GoRouter router) async {
         ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider(create: (_) => const TownDirectory({})),
+        // MorePage badges its permission row from this. Both services are pure
+        // constructors and nothing calls start(), so it holds its optimistic
+        // defaults and the row renders unbadged — which is what these tests are
+        // asserting about.
+        ChangeNotifierProvider(
+          create: (_) => PermissionHealth(
+            location: LocationService(const TownDirectory({})),
+            notifications: NotificationService(settings),
+          ),
+        ),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

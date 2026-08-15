@@ -129,10 +129,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSectionAdvanced => 'Advanced';
 
   @override
+  String get moreSectionMesh => 'Mesh network';
+
+  @override
   String get weatherRankingExtremeRange => 'Diurnal range';
 
   @override
   String get permissionsTitle => 'Permission check';
+
+  @override
+  String get permissionsAttention => 'Permissions need attention';
 
   @override
   String get permissionsBody =>

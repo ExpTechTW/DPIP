@@ -20,6 +20,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
@@ -116,6 +117,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       'location=$locationGranted background=$backgroundGranted '
       'battery=$batteryOk unusedApp=${unusedApp.name}',
     );
+    // The shell's badge reads PermissionHealth, not this widget's private copy,
+    // so without this the page would show a fresh grant while the dot stayed
+    // up — the two surfaces disagreeing about the same fact.
+    unawaited(context.read<PermissionHealth>().refresh());
     setState(() {
       _notify = notify;
       _critical = critical;

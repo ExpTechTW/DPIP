@@ -1,6 +1,7 @@
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -57,6 +58,8 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   // Exposed for the developer page's health readout; the arming itself is
   // driven from the app shell, not from a page.
   Provider<BackgroundLocationService>.value(value: deps.backgroundLocation),
+  // Watched by the More tab's badge and its 權限檢查 row.
+  ChangeNotifierProvider<PermissionHealth>.value(value: deps.permissionHealth),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
   Provider<MeshtasticService>.value(value: deps.meshtastic),

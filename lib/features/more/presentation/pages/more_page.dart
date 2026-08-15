@@ -8,6 +8,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,12 @@ class MorePage extends StatelessWidget {
               _MoreTile(
                 icon: Icons.verified_user_outlined,
                 title: l10n.permissionsTitle,
+                // The same dot the More tab carries, on the row it leads to —
+                // otherwise the tab says something is wrong and the page the
+                // user opens looks no different from every other row.
+                alert: context.select<PermissionHealth, bool>(
+                  (health) => health.needsAttention,
+                ),
                 onTap: () => context.pushNamed(AppRoutes.permissions),
               ),
               // What the system says actually went out — a status page, kept
@@ -122,6 +129,14 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreDeveloper,
                 onTap: () => context.pushNamed(AppRoutes.developer),
               ),
+            ],
+          ),
+          // Its own section rather than a row under 進階: the LoRa mesh is the
+          // app's off-grid reception path, not a developer curiosity, and the
+          // radio it pairs with is a physical thing the user owns and manages.
+          SectionHeader(l10n.moreSectionMesh),
+          _MoreGroup(
+            children: [
               _MoreTile(
                 icon: Icons.router_outlined,
                 title: l10n.meshtasticTitle,
@@ -264,18 +279,24 @@ class _MoreTile extends StatelessWidget {
     required this.icon,
     required this.title,
     this.subtitle,
+    this.alert = false,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String? subtitle;
+
+  /// Marks the row with the same dot the shell uses, for something the user
+  /// should act on. Off for every row that is merely a destination.
+  final bool alert;
+
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon),
+      leading: alert ? Badge(child: Icon(icon)) : Icon(icon),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: const Icon(Icons.chevron_right),
