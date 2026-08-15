@@ -10,6 +10,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
 import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
@@ -95,7 +96,10 @@ class _MapPageState extends State<MapPage> {
     WindMapLayer(context.read<MeteorWeatherRepository>()),
     RainMapLayer(context.read<MeteorRainRepository>()),
     DisasterMapLayer(context.read<DisasterMapRepository>()),
-    MeshNodeMapLayer(context.read<MeshNodeStore>()),
+    MeshNodeMapLayer(
+      context.read<MeshNodeStore>(),
+      service: context.read<MeshtasticService>(),
+    ),
   ];
 
   @override

@@ -1,6 +1,8 @@
 /// Shared fakes for the raster timeline layers (radar, satellite).
 library;
 
+import 'dart:math' show Point;
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show landLayerId, outlineLayerId, townLabelLayerId;
@@ -250,6 +252,11 @@ class RecordingMapController implements MapLibreMapController {
     southwest: const LatLng(22, 120),
     northeast: const LatLng(25, 122),
   );
+
+  @override
+  Future<List<Point<num>>> toScreenLocationBatch(
+    Iterable<LatLng> coords,
+  ) async => [for (final c in coords) Point(c.longitude, c.latitude)];
 
   /// Camera the [cameraPosition] getter reports — a wind-overlay test can
   /// zoom out to put more of the field in view (the default z7 viewport holds

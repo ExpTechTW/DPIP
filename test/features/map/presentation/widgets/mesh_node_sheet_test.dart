@@ -1,6 +1,7 @@
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/mesh_node_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,8 @@ void main() {
         store: store,
         selected: ValueNotifier(1),
         selectionRevision: ValueNotifier(0),
+        routeState: ValueNotifier(const MeshRouteState.none()),
+        onTraceRoute: (_) {},
         onClose: () {},
       ),
     ),

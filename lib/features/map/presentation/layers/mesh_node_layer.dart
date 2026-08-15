@@ -8,9 +8,11 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:dpip/core/a11y/color_vision.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
@@ -28,10 +30,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+/// Traceroute state shared by the sheet's button and the dashed overlay.
+///
+/// Exactly one of the three readings is set at a time: [tracing] while a
+/// probe is in flight, [result] when the destination answered, [failed]
+/// when the send failed or the reply never came.
+class MeshRouteState {
+  const MeshRouteState({this.target, this.result, this.failed = false});
+
+  const MeshRouteState.none() : this();
+
+  /// The node being probed right now, or null.
+  final int? target;
+
+  /// The path the last probe found, or null.
+  final MeshRoute? result;
+
+  /// The last probe failed or timed out.
+  final bool failed;
+
+  bool get tracing => target != null;
+  bool get hasRoute => result != null;
+}
+
 class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
-  MeshNodeMapLayer(this._store);
+  MeshNodeMapLayer(this._store, {required this._service});
 
   final MeshNodeStore _store;
+  final MeshtasticService _service;
 
   static const String _sourceId = 'mesh-node-src';
   static const String _circleId = 'mesh-node-circle';
@@ -87,6 +113,33 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   /// Bumped on every selecting tap, so tapping the same node again re-pops a
   /// sheet the user had collapsed — a same-value notifier would not notify.
   final ValueNotifier<int> _selectionRevision = ValueNotifier<int>(0);
+
+  /// Traceroute in flight or its latest result — the sheet's button reads it,
+  /// the overlay draws it.
+  final ValueNotifier<MeshRouteState> _routeState = ValueNotifier(
+    const MeshRouteState.none(),
+  );
+
+  /// Traceroute state for the sheet's button and the dashed overlay.
+  ValueListenable<MeshRouteState> get routeState => _routeState;
+
+  /// The route's hops projected to screen points, split where a hop has no
+  /// position (an unknown hop, or a node that never reported GPS). Updated on
+  /// camera idle so a pan/zoom lands on the new projection.
+  final ValueNotifier<List<List<Offset>>> _routeSegments = ValueNotifier(
+    const [],
+  );
+
+  /// The projected trace for the overlay, and a way tests can read it.
+  ValueListenable<List<List<Offset>>> get routeSegments => _routeSegments;
+
+  StreamSubscription<MeshRoute>? _routeSub;
+  Timer? _routeTimeout;
+
+  /// How long a probe may take before it counts as lost. The firmware's own
+  /// tracking window is 10 s and its cooldown 30 s, so a reply past ~15 s is
+  /// not coming.
+  static const Duration _traceTimeout = Duration(seconds: 20);
 
   @override
   String get id => 'meshtastic';
@@ -218,16 +271,124 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
       ? PlatformDispatcher.instance.views.first.devicePixelRatio
       : 1.0;
 
+  /// Sends a traceroute probe to [nodeNum] and watches for the reply.
+  ///
+  /// One probe at a time (the firmware itself is on a 30 s cooldown): a
+  /// second tap while one is in flight is ignored, and the send failing or
+  /// the reply not arriving both land in [MeshRouteState.failed].
+  Future<void> startTrace(int nodeNum) async {
+    if (_routeState.value.tracing) return;
+    _listenRoutes();
+    _routeState.value = MeshRouteState(target: nodeNum);
+    final result = await _service.traceRoute(nodeNum);
+    if (result is Err) {
+      _routeTimeout?.cancel();
+      _routeState.value = const MeshRouteState(failed: true);
+      return;
+    }
+    _routeTimeout?.cancel();
+    _routeTimeout = Timer(_traceTimeout, () {
+      _routeState.value = const MeshRouteState(failed: true);
+    });
+  }
+
+  /// Picks up the reply — subscribed lazily so an unvisited mesh page never
+  /// pays for the stream.
+  void _listenRoutes() {
+    _routeSub ??= _service.routeStream.listen((route) {
+      _routeTimeout?.cancel();
+      _routeState.value = MeshRouteState(result: route);
+      unawaited(_projectRoute());
+    });
+  }
+
+  /// Projects the traced hops to screen points, breaking the line where a
+  /// hop has no position. One batch call for all of them.
+  Future<void> _projectRoute() async {
+    final controller = _controller;
+    final route = _routeState.value.result;
+    if (controller == null || route == null) return;
+    try {
+      final coords = <LatLng>[];
+      final hopIndices = <int>[];
+      for (var i = 0; i < route.towards.length; i++) {
+        final node = _store.byNum(route.towards[i].num);
+        if (node == null || node.latitude == null || node.longitude == null) {
+          continue;
+        }
+        hopIndices.add(i);
+        coords.add(LatLng(node.latitude!, node.longitude!));
+      }
+      if (coords.isEmpty) {
+        _routeSegments.value = const [];
+        return;
+      }
+      final points = await controller.toScreenLocationBatch(coords);
+      final segments = <List<Offset>>[];
+      var current = <Offset>[];
+      var pointIndex = 0;
+      for (var i = 0; i < route.towards.length; i++) {
+        if (pointIndex < hopIndices.length && hopIndices[pointIndex] == i) {
+          current.add(
+            Offset(
+              points[pointIndex].x.toDouble(),
+              points[pointIndex].y.toDouble(),
+            ),
+          );
+          pointIndex++;
+        } else if (current.length >= 2) {
+          segments.add(current);
+          current = <Offset>[];
+        }
+      }
+      if (current.length >= 2) segments.add(current);
+      _routeSegments.value = segments;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh route projection');
+    }
+  }
+
   @override
   Widget buildSheet(BuildContext context) => MeshNodeSheet(
     store: _store,
     selected: _selected,
     selectionRevision: _selectionRevision,
+    routeState: _routeState,
+    onTraceRoute: (nodeNum) => unawaited(startTrace(nodeNum)),
     onClose: () {
       _selected.value = null;
       unawaited(_push());
     },
   );
+
+  @override
+  Widget buildMapOverlay(BuildContext context) {
+    // The traced path, drawn as marching ants over the dots. Read the route
+    // state and the projection separately so a camera settle (which
+    // re-projects) rebuilds only the painter's input, never the sheet.
+    return ValueListenableBuilder<MeshRouteState>(
+      valueListenable: _routeState,
+      builder: (context, state, _) {
+        if (state.result == null) return const SizedBox.shrink();
+        return ValueListenableBuilder<List<List<Offset>>>(
+          valueListenable: _routeSegments,
+          builder: (context, segments, _) => segments.isEmpty
+              ? const SizedBox.shrink()
+              : _RouteOverlay(
+                  segments: segments,
+                  color: const Color(0xFF1E88E5).vision,
+                ),
+        );
+      },
+    );
+  }
+
+  @override
+  Future<void> onCameraIdle(MapLibreMapController controller) async {
+    // Re-project after the camera settles — the overlay is keyed by the
+    // scaffold's camera epoch, so this runs just before its rebuild.
+    if (_routeState.value.result != null) await _projectRoute();
+  }
 
   /// The collapsed peek the scaffold frames around — the sheet is always
   /// present, just resting at its handle when nothing is selected.
@@ -386,6 +547,11 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     _pushTimer?.cancel();
     _pushQueued = false;
     _selected.value = null;
+    _routeTimeout?.cancel();
+    _routeSegments.value = const [];
+    _routeState.value = const MeshRouteState.none();
+    await _routeSub?.cancel();
+    _routeSub = null;
     await _removeFromMap(controller);
     _controller = null;
   }
@@ -549,4 +715,114 @@ class _MeshNodeMenu extends StatelessWidget {
       },
     );
   }
+}
+
+/// The traced path as an animated dashed line — marching ants.
+///
+/// Painted in the Flutter overlay rather than as a MapLibre line layer
+/// because the animation would otherwise have to rewrite `line-dasharray`
+/// through the platform channel every frame. Here one `CustomPaint` repaints
+/// per frame, and the platform channel is hit once per camera settle (the
+/// projection).
+///
+/// [segments] are already in the overlay's coordinate space; the painter
+/// never needs the map.
+class _RouteOverlay extends StatefulWidget {
+  const _RouteOverlay({required this.segments, required this.color});
+
+  final List<List<Offset>> segments;
+  final Color color;
+
+  @override
+  State<_RouteOverlay> createState() => _RouteOverlayState();
+}
+
+class _RouteOverlayState extends State<_RouteOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _phase = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _phase.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _phase,
+        builder: (context, _) => CustomPaint(
+          size: Size.infinite,
+          painter: _RoutePainter(
+            segments: widget.segments,
+            color: widget.color,
+            phase: _phase.value,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoutePainter extends CustomPainter {
+  const _RoutePainter({
+    required this.segments,
+    required this.color,
+    required this.phase,
+  });
+
+  final List<List<Offset>> segments;
+  final Color color;
+
+  /// 0..1 — where the dash pattern sits along the path; the controller
+  /// advances it so the dashes appear to march.
+  final double phase;
+
+  static const double _dash = 10;
+  static const double _gap = 8;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = color;
+    final cycle = _dash + _gap;
+    final offset = phase * cycle;
+    for (final segment in segments) {
+      if (segment.length < 2) continue;
+      final path = Path()..moveTo(segment.first.dx, segment.first.dy);
+      for (final point in segment.skip(1)) {
+        path.lineTo(point.dx, point.dy);
+      }
+      for (final metric in path.computeMetrics()) {
+        var distance = offset;
+        while (distance < metric.length) {
+          final end = math.min(distance + _dash, metric.length);
+          canvas.drawPath(metric.extractPath(distance, end), stroke);
+          distance += cycle;
+        }
+      }
+    }
+    // Endpoints as dots, so the path says where it starts and where it ends
+    // even when the dashed line between them is broken by a hop without a
+    // position.
+    final dot = Paint()..color = color;
+    for (final segment in segments) {
+      canvas.drawCircle(segment.first, 4.5, dot);
+      canvas.drawCircle(segment.last, 4.5, dot);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RoutePainter oldDelegate) =>
+      oldDelegate.segments != segments ||
+      oldDelegate.color != color ||
+      oldDelegate.phase != phase;
 }

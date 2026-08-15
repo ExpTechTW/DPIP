@@ -16,6 +16,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
@@ -28,6 +29,8 @@ class MeshNodeSheet extends StatefulWidget {
     required this.store,
     required this.selected,
     required this.selectionRevision,
+    required this.routeState,
+    required this.onTraceRoute,
     required this.onClose,
   });
 
@@ -39,6 +42,12 @@ class MeshNodeSheet extends StatefulWidget {
   /// Bumped on every selecting tap, so re-tapping the same node re-pops a
   /// sheet the user collapsed.
   final ValueListenable<int> selectionRevision;
+
+  /// Traceroute in flight or its latest result — what the trace button shows.
+  final ValueListenable<MeshRouteState> routeState;
+
+  /// Sends a traceroute probe to the tapped node.
+  final ValueChanged<int> onTraceRoute;
 
   final VoidCallback onClose;
 
@@ -99,6 +108,8 @@ class _MeshNodeSheetState extends State<MeshNodeSheet> {
               nodeNum: nodeNum,
               scrollController: scrollController,
               extent: _extent,
+              routeState: widget.routeState,
+              onTraceRoute: widget.onTraceRoute,
               onClose: widget.onClose,
             ),
           );
@@ -114,6 +125,8 @@ class _Body extends StatelessWidget {
     required this.nodeNum,
     required this.scrollController,
     required this.extent,
+    required this.routeState,
+    required this.onTraceRoute,
     required this.onClose,
   });
 
@@ -121,6 +134,8 @@ class _Body extends StatelessWidget {
   final int? nodeNum;
   final ScrollController scrollController;
   final ValueNotifier<double> extent;
+  final ValueListenable<MeshRouteState> routeState;
+  final ValueChanged<int> onTraceRoute;
   final VoidCallback onClose;
 
   @override
@@ -151,6 +166,8 @@ class _Body extends StatelessWidget {
                 node: node,
                 store: store,
                 online: store.isOnline(node),
+                routeState: routeState,
+                onTraceRoute: onTraceRoute,
                 onClose: onClose,
               ),
           ],
@@ -165,12 +182,16 @@ class _NodeDetail extends StatelessWidget {
     required this.node,
     required this.store,
     required this.online,
+    required this.routeState,
+    required this.onTraceRoute,
     required this.onClose,
   });
 
   final MeshNode node;
   final MeshNodeStore store;
   final bool online;
+  final ValueListenable<MeshRouteState> routeState;
+  final ValueChanged<int> onTraceRoute;
   final VoidCallback onClose;
 
   @override
@@ -245,6 +266,15 @@ class _NodeDetail extends StatelessWidget {
                   tone: const Color(0xFF7E57C2).vision,
                 ),
             ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // 2.5 Trace — the one action this sheet offers: ask the mesh how
+          //    this node is reached. The dashed answer draws on the map.
+          _TraceRow(
+            nodeNum: node.num,
+            routeState: routeState,
+            onTraceRoute: onTraceRoute,
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -407,6 +437,81 @@ class _NodeDetail extends StatelessWidget {
     if (age.inMinutes < 60) return '${age.inMinutes}m';
     if (age.inHours < 24) return '${age.inHours}h';
     return '${age.inDays}d';
+  }
+}
+
+/// The trace action and its outcome, read straight from the layer's state so
+/// only this row rebuilds when the probe progresses.
+class _TraceRow extends StatelessWidget {
+  const _TraceRow({
+    required this.nodeNum,
+    required this.routeState,
+    required this.onTraceRoute,
+  });
+
+  final int nodeNum;
+  final ValueListenable<MeshRouteState> routeState;
+  final ValueChanged<int> onTraceRoute;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return ValueListenableBuilder<MeshRouteState>(
+      valueListenable: routeState,
+      builder: (context, state, _) {
+        final tracing = state.tracing;
+        final result = state.result;
+        return Row(
+          children: [
+            FilledButton.tonalIcon(
+              onPressed: tracing ? null : () => onTraceRoute(nodeNum),
+              icon: tracing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.route_outlined, size: 18),
+              label: Text(
+                tracing ? l10n.meshtasticTracing : l10n.meshtasticTraceRoute,
+              ),
+            ),
+            // The outcome beside the button: the hop count of the last
+            // answer, or the failure. A result for a *different* node stays
+            // silent — it belongs to the dashed line still on the map.
+            if (!tracing && result != null && result.target == nodeNum) ...[
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  _summary(l10n, result),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+            ] else if (!tracing && state.failed) ...[
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  l10n.meshtasticTraceNoReply,
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: colors.error),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  // l10n-ignore: numeric hop summary
+  String _summary(AppLocalizations l10n, MeshRoute route) {
+    final hops = route.towards.length - 1;
+    if (hops <= 0) return l10n.meshtasticTraceDirect;
+    return l10n.meshtasticTraceHops(hops);
   }
 }
 
