@@ -30,6 +30,21 @@ WindField _field({int uValue = 128, int vValue = 128, double lon0 = 0}) =>
 WindField _eastField() => _field(uValue: 255, vValue: 128);
 
 const _camera = WindCamera(centerLat: 25, centerLng: 121, zoom: 5, bearing: 0);
+
+/// The latitude under a screen point — the inverse of [projectLatLng]'s
+/// rotation, written independently here so the test does not simply repeat the
+/// code it is checking.
+double _unprojectLat(WindCamera cam, Offset point, Size size) {
+  final world = 512 * math.pow(2.0, cam.zoom).toDouble();
+  final dx = point.dx - size.width / 2;
+  final dy = point.dy - size.height / 2;
+  final r = -cam.bearing * math.pi / 180;
+  // Inverse rotation: transpose of the forward one.
+  final wy = -dx * math.sin(r) + dy * math.cos(r);
+  final cy = mercatorY(cam.centerLat) * world;
+  return mercatorLat((cy + wy) / world);
+}
+
 const _size = Size(1000, 1000);
 
 void main() {
@@ -46,11 +61,78 @@ void main() {
       expect(p.dx, closeTo(500, 0.001));
     });
 
-    test('bearing 90 rotates north to the right of the viewport', () {
-      final cam = WindCamera(centerLat: 0, centerLng: 0, zoom: 2, bearing: 90);
+    test('a bearing of 90 puts east up and north to the left', () {
+      // What "bearing" means: the compass direction that is *up*. MapLibre
+      // builds its projection with `rotateZ(-bearing)` for exactly this, and
+      // this projection has to agree with it or the field is drawn at twice
+      // the bearing off — which at 90° is upside down.
+      //
+      // This test used to assert the opposite (north to the right) because it
+      // was written from the code rather than from the definition, so the sign
+      // error it was meant to catch read as correct for as long as nobody
+      // rotated the map.
+      const cam = WindCamera(centerLat: 0, centerLng: 0, zoom: 2, bearing: 90);
       final north = projectLatLng(cam, 1, 0, _size);
-      expect(north.dx, greaterThan(500));
+      expect(north.dx, lessThan(500), reason: 'north belongs on the left');
       expect(north.dy, closeTo(500, 0.001));
+
+      final east = projectLatLng(cam, 0, 1, _size);
+      expect(east.dy, lessThan(500), reason: 'east is up at bearing 90');
+      expect(east.dx, closeTo(500, 0.001));
+    });
+
+    test('a bearing of 180 turns the map upside down', () {
+      const cam = WindCamera(centerLat: 0, centerLng: 0, zoom: 2, bearing: 180);
+      final north = projectLatLng(cam, 1, 0, _size);
+      expect(north.dy, greaterThan(500), reason: 'north is down at 180');
+      expect(north.dx, closeTo(500, 0.001));
+    });
+
+    test('every bearing agrees with the bounds it is solved against', () {
+      // [viewportBounds] un-rotates the screen corners to decide where to
+      // respawn. If it turns the other way from [projectLatLng], particles are
+      // seeded outside the view and the field drains from where the user is
+      // looking — a rotation-only failure, invisible north-up.
+      for (final bearing in [0.0, 30.0, 45.0, 90.0, 135.0, 200.0, 315.0]) {
+        final cam = WindCamera(
+          centerLat: 23.5,
+          centerLng: 121,
+          zoom: 4,
+          bearing: bearing,
+        );
+        final vp = viewportBounds(cam, _size);
+        // The centre of the bounds must project near the centre of the screen.
+        final middle = projectLatLng(
+          cam,
+          (vp.northLat + vp.southLat) / 2,
+          (vp.westLng + vp.eastLng) / 2,
+          _size,
+        );
+        expect(
+          middle.dx,
+          closeTo(_size.width / 2, _size.width / 2),
+          reason: 'bearing $bearing puts the bounds off screen horizontally',
+        );
+        expect(
+          middle.dy,
+          closeTo(_size.height / 2, _size.height / 2),
+          reason: 'bearing $bearing puts the bounds off screen vertically',
+        );
+        // And every screen corner must fall inside the bounds it produced.
+        for (final corner in const [
+          Offset(0, 0),
+          Offset(1000, 0),
+          Offset(0, 1000),
+          Offset(1000, 1000),
+        ]) {
+          final lat = _unprojectLat(cam, corner, _size);
+          expect(
+            lat,
+            inInclusiveRange(vp.southLat - 1e-6, vp.northLat + 1e-6),
+            reason: 'bearing $bearing: a visible corner is outside the bounds',
+          );
+        }
+      }
     });
 
     test('a longitude expressed past 180 lands where its wrap does', () {

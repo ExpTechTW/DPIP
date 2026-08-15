@@ -162,8 +162,18 @@ double mercatorLat(double y) =>
     math.pi;
 
 /// Project a geographic point into the map view. The camera's target sits at
-/// the viewport centre and the view rotates clockwise with [WindCamera.bearing];
-/// tilt is always zero in this app (the map disables it), so no perspective.
+/// the viewport centre; tilt is always zero in this app (the map disables it),
+/// so no perspective.
+///
+/// The view rotates by **minus** [WindCamera.bearing], which is what MapLibre
+/// itself does (`mat4.rotateZ(m, m, -this.bearingInRadians)` when it builds the
+/// projection) and what the definition of bearing requires: a bearing of 90°
+/// means *east is up*, so a point due east must land above the centre and north
+/// must fall to the left.
+///
+/// The sign was positive here, which is invisible at bearing 0 — the only
+/// orientation anyone tests by eye — and puts the field at twice the bearing
+/// off as soon as the map is turned. At 90° it drew the wind field upside down.
 Offset projectLatLng(WindCamera cam, double lat, double lng, Size size) {
   final world = _worldSize(cam.zoom);
   final wx = (lng + 180) / 360 * world;
@@ -181,7 +191,7 @@ Offset projectLatLng(WindCamera cam, double lat, double lng, Size size) {
   // centred at 121°E should do with 175°W.
   final dx = _wrapWorld(wx - cx, world);
   final dy = wy - cy;
-  final r = cam.bearing * math.pi / 180;
+  final r = -cam.bearing * math.pi / 180;
   final cosR = math.cos(r);
   final sinR = math.sin(r);
   return Offset(
@@ -197,7 +207,10 @@ WindViewport viewportBounds(WindCamera cam, Size size) {
   final world = _worldSize(cam.zoom);
   final cx = (cam.centerLng + 180) / 360 * world;
   final cy = mercatorY(cam.centerLat) * world;
-  final r = cam.bearing * math.pi / 180;
+  // The exact inverse of [projectLatLng]'s rotation, so the bounds describe
+  // the region actually on screen. A mismatch here respawns particles outside
+  // the view, which drains the field from wherever the user is looking.
+  final r = -cam.bearing * math.pi / 180;
   final cosR = math.cos(r);
   final sinR = math.sin(r);
   var minX = double.infinity, maxX = -double.infinity;
@@ -312,7 +325,9 @@ class WindParticleSim {
     final world = _worldSize(cam.zoom);
     final cx = (cam.centerLng + 180) / 360 * world;
     final cy = mercatorY(cam.centerLat) * world;
-    final r = cam.bearing * math.pi / 180;
+    // Minus the bearing — see [projectLatLng]; this loop inlines that same
+    // projection, so it has to turn the same way.
+    final r = -cam.bearing * math.pi / 180;
     final cosR = math.cos(r);
     final sinR = math.sin(r);
     final halfWidth = size.width / 2;

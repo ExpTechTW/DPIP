@@ -20,6 +20,7 @@ import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -59,6 +60,9 @@ class _FlakyController extends RecordingMapController {
   bool throwOnCamera = false;
   bool cameraMissing = false;
 
+  /// Drives rotation — the gesture that used to break the streaks.
+  double bearing = 0;
+
   /// How many times the tick asked for the camera — the proof it is still
   /// running.
   int reads = 0;
@@ -68,13 +72,20 @@ class _FlakyController extends RecordingMapController {
     reads++;
     if (throwOnCamera) throw StateError('camera unavailable this frame');
     if (cameraMissing) return null;
-    return const CameraPosition(target: LatLng(23.5, 121), zoom: 5);
+    return CameraPosition(
+      target: const LatLng(23.5, 121),
+      zoom: 5,
+      bearing: bearing,
+    );
   }
 }
 
+final GlobalKey _boundaryKey = GlobalKey();
+
 Future<(WindForecastMapLayer, _FlakyController)> _mount(
-  WidgetTester tester,
-) async {
+  WidgetTester tester, {
+  bool boundary = false,
+}) async {
   final layer = WindForecastMapLayer(
     _Repo(['1700000000']),
     model: WindForecastModel.gfs,
@@ -84,17 +95,20 @@ Future<(WindForecastMapLayer, _FlakyController)> _mount(
   await layer.prepare(controller, frames);
   await layer.show(controller, frames.first);
 
-  await tester.pumpWidget(
-    MaterialApp(
-      home: Scaffold(
-        body: SizedBox(
-          width: 400,
-          height: 800,
-          child: WindParticleOverlay(layer: layer),
-        ),
-      ),
-    ),
+  Widget overlay = SizedBox(
+    width: 400,
+    height: 800,
+    child: WindParticleOverlay(layer: layer),
   );
+  if (boundary) {
+    // A dark ground so the white streaks read, inside a boundary the test can
+    // rasterise.
+    overlay = RepaintBoundary(
+      key: _boundaryKey,
+      child: ColoredBox(color: const Color(0xFF000000), child: overlay),
+    );
+  }
+  await tester.pumpWidget(MaterialApp(home: Scaffold(body: overlay)));
   await tester.pump(const Duration(milliseconds: 16));
   return (layer, controller);
 }
@@ -203,5 +217,122 @@ void main() {
       model: WindForecastModel.gfs,
     );
     expect(wind.overlayFollowsCamera, isFalse);
+  });
+
+  testWidgets('the streaks keep changing while the map rotates', (
+    tester,
+  ) async {
+    // The reported failure: rotate, and the particles freeze on an old picture
+    // while everything behind them keeps running — the simulation steps, the
+    // ticker fires, the painter is marked dirty. Only the painted output stops
+    // moving, so nothing short of reading the pixels can see it.
+    final (_, controller) = await _mount(tester, boundary: true);
+
+    Future<ByteData> shot() async {
+      final object =
+          _boundaryKey.currentContext!.findRenderObject()!
+              as RenderRepaintBoundary;
+      late ByteData data;
+      await tester.runAsync(() async {
+        final image = await object.toImage();
+        data = (await image.toByteData())!;
+        image.dispose();
+      });
+      return data;
+    }
+
+    // Spin the map, the way a two-finger twist does.
+    for (var i = 0; i < 20; i++) {
+      controller.bearing += 3;
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    final first = await shot();
+
+    for (var i = 0; i < 20; i++) {
+      controller.bearing += 3;
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    final second = await shot();
+
+    var differing = 0;
+    for (var i = 0; i < first.lengthInBytes; i += 4) {
+      if (first.getUint32(i) != second.getUint32(i)) differing++;
+    }
+    expect(
+      differing,
+      greaterThan(100),
+      reason: 'the streaks froze on a stale picture while the map rotated',
+    );
+  });
+
+  testWidgets('a gesture clears the field, and releasing reseeds it', (
+    tester,
+  ) async {
+    final (layer, controller) = await _mount(tester, boundary: true);
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    Future<int> litPixels() async {
+      final object =
+          _boundaryKey.currentContext!.findRenderObject()!
+              as RenderRepaintBoundary;
+      late ByteData data;
+      await tester.runAsync(() async {
+        final image = await object.toImage();
+        data = (await image.toByteData())!;
+        image.dispose();
+      });
+      var lit = 0;
+      for (var i = 0; i < data.lengthInBytes; i += 4) {
+        if (data.getUint8(i) > 40) lit++;
+      }
+      return lit;
+    }
+
+    expect(await litPixels(), greaterThan(0), reason: 'nothing drawn at rest');
+
+    // A finger goes down.
+    layer.onMapGestureStart();
+    await tester.pump();
+    expect(
+      await litPixels(),
+      0,
+      reason: 'the field must be gone for the whole gesture',
+    );
+
+    // …and nothing is computed while it is held. This is the point of the
+    // whole thing: a pan, pinch or rotate costs this page nothing.
+    final duringStart = controller.reads;
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(
+      controller.reads,
+      duringStart,
+      reason: 'the simulation kept running through the gesture',
+    );
+    expect(await litPixels(), 0);
+
+    // Release, and it comes back.
+    layer.onMapGestureEnd();
+    await tester.pump();
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(controller.reads, greaterThan(duringStart));
+    expect(await litPixels(), greaterThan(0), reason: 'it never came back');
+  });
+
+  test('the layer reports the gesture the scaffold hands it', () {
+    final layer = WindForecastMapLayer(
+      _Repo(const ['1']),
+      model: WindForecastModel.gfs,
+    );
+    expect(layer.interacting.value, isFalse);
+    layer.onMapGestureStart();
+    expect(layer.interacting.value, isTrue);
+    layer.onMapGestureEnd();
+    expect(layer.interacting.value, isFalse);
   });
 }

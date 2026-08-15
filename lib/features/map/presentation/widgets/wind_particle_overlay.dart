@@ -63,6 +63,9 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   /// overlay is always visible.
   VisibleTab? _visibleTab;
 
+  /// Whether a finger is on the map — the field is hidden for the duration.
+  bool _interacting = false;
+
   /// Frames actually stepped, and why the last one was not — the watchdog's
   /// only inputs.
   int _steps = 0;
@@ -76,6 +79,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   void initState() {
     super.initState();
     widget.layer.field.addListener(_onField);
+    widget.layer.interacting.addListener(_onInteracting);
     // Straight assignment: this runs inside the first build, where asking for
     // another one throws.
     _adoptField();
@@ -83,11 +87,11 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _watchdog = Timer.periodic(_watchdogPeriod, (_) => _checkAlive());
   }
 
-  /// Device class decides the trail buffer's internal resolution (see
-  /// [_TrailBuffer.scale]) — the dominant cost of this overlay is rasterising
-  /// that buffer, so the low tier cuts it by ~9× while the soft streaks stay
-  /// visually the same. Fire-and-forget: until the probe lands the high
-  /// setting stands in, and the buffer rebuilds itself at the new size.
+  /// Device class decides how long the streaks are, which is now what this
+  /// overlay's cost scales with: each frame of tail is one more
+  /// `drawRawPoints` over the visible population. A shorter tail on the low
+  /// tier is a slightly shorter streak, not a coarser one. Fire-and-forget:
+  /// until the probe lands the full length stands in.
   Future<void> _probeTier() async {
     RenderTier tier;
     try {
@@ -97,7 +101,9 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
       tier = RenderTier.high;
     }
     if (!mounted) return;
-    _trails.scale = tier == RenderTier.low ? 0.33 : 0.5;
+    _trails.tailFrames = tier == RenderTier.low
+        ? 6
+        : _TrailBuffer.historyFrames;
   }
 
   @override
@@ -127,10 +133,13 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _updateTicker();
   }
 
-  /// Runs the ticker only when there is a field to draw *and* the map tab is
-  /// on screen.
+  /// Whether the animation should be running at all: there is a field, the map
+  /// tab is on screen, and no gesture is in progress.
+  bool get _shouldAnimate => _sim != null && _visible && !_interacting;
+
+  /// Runs the ticker only while [_shouldAnimate].
   void _updateTicker() {
-    final shouldRun = _sim != null && _visible;
+    final shouldRun = _shouldAnimate;
     if (shouldRun && !_ticker.isActive) {
       _ticker.start();
     } else if (!shouldRun && _ticker.isActive) {
@@ -162,7 +171,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   /// and a fix.
   void _checkAlive() {
     if (!mounted) return;
-    final shouldRun = _sim != null && _visible;
+    final shouldRun = _shouldAnimate;
     if (!shouldRun || _steps != _seenSteps) {
       _seenSteps = _steps;
       _quietChecks = 0;
@@ -212,6 +221,31 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   void _onField() {
     if (!mounted) return;
     setState(_adoptField);
+  }
+
+  /// Clears the field for the duration of a gesture and reseeds it after.
+  ///
+  /// The whole overlay goes quiet in between — no stepping, no drawing, no
+  /// history — so a pan, pinch or rotate costs this page nothing at all. The
+  /// reseed then happens once, against the camera the gesture actually settled
+  /// on, rather than the field chasing a viewport that is still moving.
+  void _onInteracting() {
+    if (!mounted) return;
+    final interacting = widget.layer.interacting.value;
+    if (interacting == _interacting) return;
+    setState(() {
+      _interacting = interacting;
+      // A streak drawn before the gesture describes a view that is gone.
+      _trails.clear();
+      _lastCamera = null;
+      if (interacting) {
+        _updateTicker();
+      } else {
+        // Reseed from scratch: the population size follows zoom, and this is
+        // the first moment the zoom is final.
+        _adoptField();
+      }
+    });
   }
 
   void _adoptField() {
@@ -270,10 +304,9 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     }
     _lastCamera = camera;
 
-    // The painter needs these at paint time and the widget does not rebuild
-    // when the map zooms, so they travel on the buffer rather than as props.
+    // The painter needs the zoom at paint time and the widget does not rebuild
+    // when the map zooms, so it travels on the buffer rather than as a prop.
     _trails.zoom = camera.zoom;
-    _trails.devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
 
     sim.step(camera, size);
     _repaint.mark();
@@ -291,7 +324,9 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     return RepaintBoundary(
       child: CustomPaint(
         painter: _WindParticlePainter(
-          sim: _sim,
+          // Null for the whole gesture: the painter draws nothing, so the
+          // particles are simply gone until the map settles.
+          sim: _interacting ? null : _sim,
           trails: _trails,
           repaint: _repaint,
         ),
@@ -304,6 +339,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   void dispose() {
     _watchdog?.cancel();
     _visibleTab?.removeListener(_syncVisibility);
+    widget.layer.interacting.removeListener(_onInteracting);
     widget.layer.field.removeListener(_onField);
     _ticker.dispose();
     _repaint.dispose();
@@ -312,38 +348,35 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   }
 }
 
-/// The screen-space accumulation buffer the streaks live in.
+/// The streaks, as the last [historyFrames] frames of particle positions.
 ///
-/// This is the whole trail mechanism, and it is the web renderer's: nothing
-/// records where a particle has been. Each frame the previous picture is drawn
-/// back at [fadeOpacity] and the current dots are stamped on top, so a streak
-/// is the exponential decay of the dots that came before it. The cost is one
-/// composite per frame regardless of how long the streaks are — which is what
-/// makes six thousand particles affordable, where remembering fifty positions
-/// each would be three hundred thousand line segments a frame.
+/// This used to be an accumulation buffer: each frame the previous picture was
+/// drawn back at a fade opacity, the new dots stamped over it, and the result
+/// rasterised with `toImageSync` — one synchronous GPU round-trip on the UI
+/// thread, every frame. Elegant, and the source of the bug that would not die:
+/// when that readback returns a stale texture, the overlay shows a frozen
+/// picture *while everything behind it keeps working perfectly*. The
+/// simulation steps, the ticker fires, the painter is marked dirty — so no
+/// amount of watching for a stalled animation can detect it, and no pan, zoom
+/// or restart clears it. Rotating the map hammers that path hardest, because
+/// every frame of a rotation discards the buffer and demands a fresh readback.
 ///
-/// Held by the [State] rather than the painter, because a painter is rebuilt
-/// whenever the widget is and the buffer has to survive that.
-///
-/// The buffer renders at [scale] of the device resolution: every frame it is
-/// rasterised with `toImageSync` (a synchronous GPU round-trip on the UI
-/// thread), so at full resolution it was the dominant cost — and heat — of
-/// this page. Streaks are soft, semi-transparent white, so upscaling the
-/// buffer reads the same; [scale] 0.5 cuts that raster 4× and the low tier's
-/// 0.33 cuts it ~9×.
+/// So there is no readback any more, and no texture that can go stale. A
+/// streak is simply the last N frames of dots drawn together with an alpha
+/// ramp — the same picture the fade produced, built from data the CPU owns
+/// outright. The trade is a fixed number of extra `drawRawPoints` calls per
+/// frame instead of one composite, against a failure mode that cannot happen.
 class _TrailBuffer {
-  ui.Image? _image;
+  /// How many frames of history make a streak. The old exponential fade
+  /// (~0.95 a frame) stayed visible for roughly this long before it sank into
+  /// the background, so the streaks read about the same length.
+  static const int historyFrames = 14;
 
-  /// Speed buckets for [_stamp], reused across frames. Each bucket is an
-  /// interleaved `x,y` [Float32List] for [Canvas.drawRawPoints], so the stamp
-  /// path allocates nothing per frame — `drawPoints` would need a fresh
+  /// Speed buckets for the newest frame, reused across frames. Each bucket is
+  /// an interleaved `x,y` [Float32List] for [Canvas.drawRawPoints], so the
+  /// stamp path allocates nothing per frame — `drawPoints` would need a fresh
   /// [Offset] per visible particle (up to 6400 of them) for the collector to
   /// chase on the hottest path in the app.
-  ///
-  /// Typed-data lists are fixed-length, so capacity is preallocated (the worst
-  /// case: the whole population in one speed bucket) and [_counts] tracks how
-  /// much of it this frame is live; [drawRawPoints] gets a zero-copy sublist
-  /// view of just that.
   final List<Float32List> _buckets = List.generate(
     16,
     (_) => Float32List(_bucketCapacity),
@@ -355,70 +388,86 @@ class _TrailBuffer {
   /// 16 bits, not 8: the whole population (6400) can land in one speed bucket
   /// under strong wind, and an 8-bit counter wraps at 255 — the bucket then
   /// draws the wrong point count (or none at all, when the count wraps to 0),
-  /// which reads as particles vanishing and stale trails outliving a rotation.
+  /// which reads as particles vanishing.
   final Uint16List _counts = Uint16List(16);
 
-  /// Floats per bucket: the largest population (6400 at z3) as x,y pairs.
+  /// The tail: a ring of past frames, each a flat `x,y` list of the positions
+  /// that were visible then. Positions, not particles — a particle that
+  /// respawns must not drag its old streak across the screen to the new place.
+  final List<Float32List> _history = List.generate(
+    historyFrames,
+    (_) => Float32List(_bucketCapacity),
+    growable: false,
+  );
+  final Uint16List _historyCounts = Uint16List(historyFrames);
+  int _head = 0;
+  int _filled = 0;
+
+  /// Floats per frame: the largest population (6400 at z3) as x,y pairs.
   static const int _bucketCapacity = 6400 * 2;
 
-  /// Internal render resolution as a fraction of the device's — see the class
-  /// doc. Written by the state's device-tier probe; changing it recreates the
-  /// buffer on the next [advance] (the size check below).
-  double scale = 0.5;
-
-  /// Live camera zoom and device pixel ratio, written by the ticker. The
-  /// painter needs both at paint time and neither is known at build time —
-  /// the widget does not rebuild when the map zooms.
+  /// Live camera zoom, written by the ticker: the painter needs it at paint
+  /// time and it is not known at build time — the widget does not rebuild when
+  /// the map zooms.
   double zoom =
       3; // the wind layer's own floor, until the ticker says otherwise
-  double devicePixelRatio = 1;
 
+  /// How many frames of tail to actually draw, set from the device tier.
+  int tailFrames = historyFrames;
+
+  /// Drops the tail. Called on any camera change: a streak drawn for one view
+  /// is wrong for the next, and smearing it across the pan is worse than
+  /// starting over.
   void clear() {
-    _image?.dispose();
-    _image = null;
+    _head = 0;
+    _filled = 0;
+    _historyCounts.fillRange(0, historyFrames, 0);
   }
 
   void dispose() => clear();
 
-  /// Fades what is there, stamps [particles] over it, and returns the result.
-  ui.Image advance(Iterable<WindParticle> particles, Size size) {
-    final dpr = devicePixelRatio * scale;
-    final w = math.max(1, (size.width * dpr).round());
-    final h = math.max(1, (size.height * dpr).round());
-    final previous = _image;
-    if (previous != null && (previous.width != w || previous.height != h)) {
-      clear();
-    }
+  /// Draws the tail then the head, oldest first so newer dots sit on top.
+  void paint(Canvas canvas, Iterable<WindParticle> particles) {
+    final width = pointSizeFor(zoom);
+    final paint = Paint()
+      ..strokeWidth = width
+      ..strokeCap = StrokeCap.round;
 
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    final old = _image;
-    if (old != null) {
-      canvas.drawImage(
-        old,
-        Offset.zero,
-        Paint()
-          ..color = const Color(0xFFFFFFFF)
-              .withValues(alpha: fadeOpacityFor(zoom)),
+    // The tail, uniform white, fading with age. Oldest first.
+    final tail = math.min(_filled, tailFrames);
+    for (var age = tail; age >= 1; age--) {
+      final slot = (_head - age) % historyFrames;
+      final index = slot < 0 ? slot + historyFrames : slot;
+      final count = _historyCounts[index];
+      if (count == 0) continue;
+      // Linear ramp rather than the old geometric fade: over a bounded number
+      // of frames the two are indistinguishable, and this one reaches zero at
+      // the end of the tail instead of leaving a visible cut.
+      final t = 1.0 - (age - 1) / tail;
+      paint.color = Color.fromRGBO(255, 255, 255, 0.5 * t * t);
+      canvas.drawRawPoints(
+        ui.PointMode.points,
+        Float32List.sublistView(_history[index], 0, count * 2),
+        paint,
       );
     }
-    _stamp(canvas, particles, dpr);
 
-    final next = recorder.endRecording().toImageSync(w, h);
-    old?.dispose();
-    _image = next;
-    return next;
+    _stampHead(canvas, particles, paint);
+    _recordHead(particles);
   }
 
-  /// Stamps one dot per visible particle, in buffer pixels ([dpr] already
-  /// includes the buffer's own [scale]).
+  /// The newest frame, bucketed by speed so the head of each streak is
+  /// brighter where the wind is stronger.
   ///
   /// The web gives every point its own alpha from a fragment shader; a
-  /// [Canvas] carries one colour per call, so the field is bucketed by speed
-  /// and drawn a bucket at a time. Sixteen steps across an alpha range of 0.55
-  /// is a third of a level apart in 8-bit terms — below what the fade's own
-  /// rounding does to it anyway.
-  void _stamp(Canvas canvas, Iterable<WindParticle> particles, double dpr) {
+  /// [Canvas] carries one colour per call, so the field is bucketed and drawn a
+  /// bucket at a time. Sixteen steps across an alpha range of 0.55 is a third
+  /// of a level apart in 8-bit terms — below what rounding does to it anyway.
+  void _stampHead(
+    Canvas canvas,
+    Iterable<WindParticle> particles,
+    Paint paint,
+  ) {
     const buckets = 16;
     final points = _buckets;
     final counts = _counts;
@@ -427,14 +476,13 @@ class _TrailBuffer {
       if (!p.visible) continue;
       final t = (p.speed / kWindSpeedScale).clamp(0.0, 1.0);
       final bi = math.min(buckets - 1, (t * buckets).floor());
-      final i = counts[bi]++;
+      final i = counts[bi];
+      if (i * 2 + 1 >= _bucketCapacity) continue;
+      counts[bi] = i + 1;
       final b = points[bi];
-      b[i * 2] = p.sx * dpr;
-      b[i * 2 + 1] = p.sy * dpr;
+      b[i * 2] = p.sx;
+      b[i * 2 + 1] = p.sy;
     }
-    final paint = Paint()
-      ..strokeWidth = pointSizeFor(zoom) * dpr
-      ..strokeCap = StrokeCap.round;
     for (var i = 0; i < buckets; i++) {
       final count = counts[i];
       if (count == 0) continue;
@@ -448,9 +496,25 @@ class _TrailBuffer {
       );
     }
   }
+
+  /// Pushes this frame's positions into the ring for the next paint.
+  void _recordHead(Iterable<WindParticle> particles) {
+    final slot = _history[_head];
+    var n = 0;
+    for (final p in particles) {
+      if (!p.visible) continue;
+      if (n * 2 + 1 >= _bucketCapacity) break;
+      slot[n * 2] = p.sx;
+      slot[n * 2 + 1] = p.sy;
+      n++;
+    }
+    _historyCounts[_head] = n;
+    _head = (_head + 1) % historyFrames;
+    if (_filled < historyFrames) _filled++;
+  }
 }
 
-/// Composites the trail buffer onto the map.
+/// Draws the streaks over the map.
 class _WindParticlePainter extends CustomPainter {
   _WindParticlePainter({
     required this.sim,
@@ -465,15 +529,7 @@ class _WindParticlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final sim = this.sim;
     if (sim == null || size.isEmpty) return;
-    final image = trails.advance(sim.particles, size);
-    canvas.drawImageRect(
-      image,
-      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      Offset.zero & size,
-      // The buffer is scaled down relative to the screen, so bilinear (not
-      // `none`, which would show the upscale as hard squares on the dots).
-      Paint()..filterQuality = FilterQuality.low,
-    );
+    trails.paint(canvas, sim.particles);
   }
 
   @override
