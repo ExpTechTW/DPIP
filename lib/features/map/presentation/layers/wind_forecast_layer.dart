@@ -97,6 +97,13 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   Widget buildMapOverlay(BuildContext context) =>
       WindParticleOverlay(layer: this);
 
+  /// The particle overlay reads the live camera on every tick, so it never
+  /// needs a rebuild to reproject — and it must not get one: re-keying it on
+  /// each camera settle tore down the ticker, reseeded the whole particle
+  /// field and threw away the trail buffer on every pan, zoom and tap.
+  @override
+  bool get overlayFollowsCamera => false;
+
   @override
   String get id => 'wind-${model.key}';
 

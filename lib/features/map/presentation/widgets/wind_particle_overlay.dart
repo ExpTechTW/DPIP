@@ -3,6 +3,7 @@
 /// GPU pass on the CPU.
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -55,12 +56,21 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   WindCamera? _lastCamera;
   final _TrailBuffer _trails = _TrailBuffer();
 
-  /// Whether the map tab is the shell's visible one — see [_syncVisibility].
+  /// Whether the map is actually in front of the user — see [_syncVisibility].
   bool _visible = true;
 
   /// The shell's visible-tab notifier; `null` outside the shell means the
   /// overlay is always visible.
   VisibleTab? _visibleTab;
+
+  /// Frames actually stepped, and why the last one was not — the watchdog's
+  /// only inputs.
+  int _steps = 0;
+  int _seenSteps = 0;
+  int _quietChecks = 0;
+  String? _stalledOn;
+  bool _stallLogged = false;
+  Timer? _watchdog;
 
   @override
   void initState() {
@@ -70,6 +80,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     // another one throws.
     _adoptField();
     _probeTier();
+    _watchdog = Timer.periodic(_watchdogPeriod, (_) => _checkAlive());
   }
 
   /// Device class decides the trail buffer's internal resolution (see
@@ -103,14 +114,14 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _syncVisibility();
   }
 
-  /// Stops the animation when the map tab is hidden, starts it on return.
+  /// Stops the animation when the map goes out of view, starts it on return.
   ///
-  /// The shell's IndexedStack keeps this overlay mounted behind other tabs;
-  /// without this the per-frame raster would keep burning the GPU the user is
-  /// no longer looking at.
+  /// The shell's IndexedStack keeps this overlay mounted behind other tabs, and
+  /// a pushed full-screen route leaves the branch index untouched, so neither
+  /// tears it down. Without this the simulation would keep stepping — and the
+  /// trail buffer keep rasterising — for a surface nobody is looking at.
   void _syncVisibility() {
-    final visible =
-        (_visibleTab?.value ?? MapPage.tabIndex) == MapPage.tabIndex;
+    final visible = _visibleTab?.isOnScreen(MapPage.tabIndex) ?? true;
     if (visible == _visible) return;
     _visible = visible;
     _updateTicker();
@@ -125,6 +136,67 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     } else if (!shouldRun && _ticker.isActive) {
       _ticker.stop();
     }
+  }
+
+  /// How often the watchdog looks, and how many consecutive quiet looks count
+  /// as wedged.
+  ///
+  /// Two, not one: restarting drops the trail buffer, so a false positive is a
+  /// visible flicker. A healthy field produces sixty frames a second, so *zero*
+  /// across two full seconds is not a slow device — but a single quiet second
+  /// can be, on a frame the engine simply did not schedule.
+  static const Duration _watchdogPeriod = Duration(seconds: 1);
+  static const int _quietChecksBeforeRestart = 2;
+
+  /// Restarts the animation if it should be running and is not.
+  ///
+  /// This exists because a frozen wind field has proven able to survive every
+  /// recovery the page offers — panning, zooming, scrubbing, leaving the tab
+  /// and coming back — and a permanently dead overlay is a far worse outcome
+  /// than a one-second hitch. Rather than depend on having found every way it
+  /// can wedge, this watches the one thing that matters (are frames being
+  /// produced?) and rebuilds the animation when they stop.
+  ///
+  /// It also logs *why*, once per stall: the reason names which guard is
+  /// holding, which is the difference between a report of "the particles froze"
+  /// and a fix.
+  void _checkAlive() {
+    if (!mounted) return;
+    final shouldRun = _sim != null && _visible;
+    if (!shouldRun || _steps != _seenSteps) {
+      _seenSteps = _steps;
+      _quietChecks = 0;
+      _stallLogged = false;
+      return;
+    }
+    if (++_quietChecks < _quietChecksBeforeRestart) return;
+
+    if (!_stallLogged) {
+      _stallLogged = true;
+      Log.warning(
+        'wind particles stalled: ${_stalledOn ?? 'the ticker stopped firing'} '
+        '(ticker active=${_ticker.isActive} muted=${_ticker.muted}, '
+        'controller=${widget.layer.mapController != null}, '
+        'field=${widget.layer.field.value != null}, visible=$_visible)',
+      );
+    }
+
+    // A muted ticker is the framework's call (the route is off-stage), not a
+    // fault — restarting it would fight the framework and change nothing.
+    if (_ticker.muted) return;
+
+    // Rebuild the animation from scratch: a stopped or wedged ticker, a
+    // simulation whose field went missing, and a trail buffer that may hold a
+    // texture from before the stall.
+    _quietChecks = 0;
+    if (_ticker.isActive) _ticker.stop();
+    _trails.clear();
+    _lastCamera = null;
+    if (_sim == null) {
+      final field = widget.layer.field.value;
+      if (field != null) _sim = WindParticleSim(field);
+    }
+    _updateTicker();
   }
 
   /// The layer loaded a new field (frame scrub or first show) — swap the
@@ -150,13 +222,41 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _updateTicker();
   }
 
+  /// Steps the simulation for one frame.
+  ///
+  /// **Nothing may escape this method.** [Ticker] reschedules itself *after*
+  /// the callback returns, so a single throw here stops the animation for the
+  /// rest of the session — and `isActive` still reports `true` afterwards, so
+  /// [_updateTicker] sees a healthy ticker and never restarts it. That is a
+  /// frozen wind field that no amount of panning, zooming or re-selecting the
+  /// layer can revive, from one bad frame.
+  ///
+  /// A bad frame is not hypothetical: `context.size` throws outright while the
+  /// render object is dirty for layout, which is exactly the window a rebuild
+  /// of this subtree opens.
   void _onTick(Duration _) {
+    try {
+      _step();
+    } catch (error, stackTrace) {
+      // Logged, not swallowed silently — but the next frame still runs.
+      Log.handle(error, stackTrace, 'wind particle tick');
+    }
+  }
+
+  void _step() {
     final controller = widget.layer.mapController;
     final sim = _sim;
-    if (!mounted || controller == null || sim == null) return;
+    // Each bail-out names itself. A frozen field looks identical from the
+    // outside whichever of these stopped it, and they need different fixes —
+    // a detached controller is a layer-lifecycle bug, a null field is a load
+    // that never landed, a null size is a layout that never happened.
+    if (!mounted) return _stall('unmounted');
+    if (controller == null) return _stall('no map controller');
+    if (sim == null) return _stall('no wind field');
     final position = controller.cameraPosition;
+    if (position == null) return _stall('no camera');
     final size = context.size;
-    if (position == null || size == null || size.isEmpty) return;
+    if (size == null || size.isEmpty) return _stall('no size');
 
     final camera = WindCamera(
       centerLat: position.target.latitude,
@@ -177,22 +277,32 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
 
     sim.step(camera, size);
     _repaint.mark();
+    _steps++;
+    _stalledOn = null;
   }
+
+  void _stall(String reason) => _stalledOn = reason;
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _WindParticlePainter(
-        sim: _sim,
-        trails: _trails,
-        repaint: _repaint,
+    // Its own layer: this repaints every frame the ticker runs, and it sits in
+    // the map's overlay slot alongside chrome that changes only on interaction.
+    // Without the boundary each streak frame would dirty that whole layer.
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _WindParticlePainter(
+          sim: _sim,
+          trails: _trails,
+          repaint: _repaint,
+        ),
+        size: Size.infinite,
       ),
-      size: Size.infinite,
     );
   }
 
   @override
   void dispose() {
+    _watchdog?.cancel();
     _visibleTab?.removeListener(_syncVisibility);
     widget.layer.field.removeListener(_onField);
     _ticker.dispose();
