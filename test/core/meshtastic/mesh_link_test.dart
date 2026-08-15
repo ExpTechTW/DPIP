@@ -3,9 +3,9 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_mesh_service.dart';
 
@@ -14,13 +14,14 @@ void main() {
 
   const device = MeshDevice(id: 'AA:BB', name: 'YuYu_7d70');
 
+  late SettingsStore settings;
+
   Future<(MeshLink, FakeMeshService)> makeLink([
     Map<String, Object> initial = const {},
   ]) async {
-    SharedPreferences.setMockInitialValues(initial);
     final service = FakeMeshService();
-    final prefs = Prefs(await SharedPreferences.getInstance());
-    return (MeshLink(service, prefs), service);
+    settings = SettingsStore.inMemory(initial);
+    return (MeshLink(service, settings), service);
   }
 
   void emit(FakeMeshService service, MeshConnectionState state) =>
@@ -34,9 +35,8 @@ void main() {
       expect(await link.attach(device), isNull);
 
       expect(service.connectedIds, ['AA:BB']);
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('meshtastic.deviceId'), 'AA:BB');
-      expect(prefs.getString('meshtastic.deviceName'), 'YuYu_7d70');
+      expect(settings.getString(SettingKeys.meshDeviceId), 'AA:BB');
+      expect(settings.getString(SettingKeys.meshDeviceName), 'YuYu_7d70');
     });
 
     test(
@@ -139,8 +139,7 @@ void main() {
       await settle();
 
       expect(link.reconnecting, isFalse);
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('meshtastic.deviceId'), isNull);
+      expect(settings.getString(SettingKeys.meshDeviceId), isNull);
     });
   });
 

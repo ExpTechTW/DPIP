@@ -3,10 +3,9 @@ import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
@@ -30,9 +29,8 @@ void main() {
   Future<(MeshChatController, FakeMeshService, MeshStore)> makeController([
     MeshStore? reuse,
   ]) async {
-    SharedPreferences.setMockInitialValues({});
     final service = FakeMeshService();
-    final prefs = Prefs(await SharedPreferences.getInstance());
+    final settings = SettingsStore.inMemory({});
     MeshStore store;
     if (reuse != null) {
       store = reuse;
@@ -43,8 +41,8 @@ void main() {
     }
     final controller = MeshChatController(
       service,
-      MeshLink(service, prefs),
-      MeshNodeStore(service, prefs)..start(),
+      MeshLink(service, settings),
+      MeshNodeStore(service, settings)..start(),
       store,
     );
     await Future<void>.delayed(const Duration(milliseconds: 150));

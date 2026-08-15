@@ -1,11 +1,10 @@
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/map/presentation/widgets/mesh_node_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/meshtastic/fake_mesh_service.dart';
 
@@ -27,11 +26,10 @@ void main() {
 
   Future<(MeshNodeStore, FakeMeshService)> makeStore() async {
     clock = DateTime.utc(2026, 1, 1, 12);
-    SharedPreferences.setMockInitialValues({});
     final service = FakeMeshService();
     final store = MeshNodeStore(
       service,
-      Prefs(await SharedPreferences.getInstance()),
+      SettingsStore.inMemory({}),
       now: () => clock,
     )..start();
     return (store, service);

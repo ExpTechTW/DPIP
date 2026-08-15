@@ -5,11 +5,10 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Two townships far enough apart that moving between them is a real region
 /// change, resolved by nearest-centroid.
@@ -46,15 +45,14 @@ void main() {
   late LocationService location;
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = Prefs(await SharedPreferences.getInstance());
-    regions = RegionStore(prefs);
+    final settings = SettingsStore.inMemory({});
+    regions = RegionStore(settings);
     // Broadcast so a recovery-driven `reporter.restart()` can re-subscribe (a
     // single-subscription stream throws on the second listen).
     positions = StreamController<GpsFix>.broadcast();
     reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: prefs,
+      settings: settings,
       onMoved: (fix) async => true,
     );
     location = LocationService(

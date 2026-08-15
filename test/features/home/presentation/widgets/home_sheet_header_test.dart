@@ -9,7 +9,7 @@ import 'dart:async';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
@@ -24,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const _directory = TownDirectory(<String, Town>{
   '100': Town(
@@ -103,10 +102,11 @@ WeatherRealtime _realtime(String station, double temp) =>
     });
 
 Future<RegionStore> _store() async {
-  SharedPreferences.setMockInitialValues({
-    'home.savedRegionCodes': ['100', '200'],
-  });
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
+  return RegionStore(
+    SettingsStore.inMemory({
+      'home.savedRegionCodes': ['100', '200'],
+    }),
+  );
 }
 
 /// Pumps the header with a router (the view-on-map link navigates by name) and

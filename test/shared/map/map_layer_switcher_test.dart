@@ -1,12 +1,11 @@
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Minimal [MapLayer] for switcher tests — identity + label (+ optional
 /// subtitle) only.
@@ -53,10 +52,7 @@ void main() {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    SharedPreferences.setMockInitialValues(initial);
-    final controller = MapLayerOrderController(
-      Prefs(await SharedPreferences.getInstance()),
-    );
+    final controller = MapLayerOrderController(SettingsStore.inMemory(initial));
     await tester.pumpWidget(
       ChangeNotifierProvider<MapLayerOrderController>.value(
         value: controller,

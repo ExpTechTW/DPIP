@@ -1,8 +1,7 @@
 import 'package:dpip/core/settings/persisted.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum _Fruit {
   apple('a'),
@@ -14,19 +13,20 @@ enum _Fruit {
 
 // Any String-typed registry key exercises the generic mechanism; `.name`
 // (public) lets us seed the mock under its address. A test can't mint a
-// PrefKey (private ctor), and which key is used is irrelevant to what's under
+// SettingKey (private ctor), and which key is used is irrelevant to what's under
 // test — so reuse a real one rather than add a test-only minting seam.
-const _key = PreferenceKeys.weatherMode;
+const _key = SettingKeys.weatherMode;
 
-Future<Prefs> _prefs([Map<String, Object> initial = const {}]) async {
-  SharedPreferences.setMockInitialValues(initial);
-  return Prefs(await SharedPreferences.getInstance());
+Future<SettingsStore> _settings([
+  Map<String, Object> initial = const {},
+]) async {
+  return SettingsStore.inMemory(initial);
 }
 
 void main() {
   test('falls back when nothing is stored', () async {
     final p = PersistedEnum(
-      await _prefs(),
+      await _settings(),
       key: _key,
       values: _Fruit.values,
       fallback: _Fruit.banana,
@@ -36,7 +36,7 @@ void main() {
 
   test('reads a stored value via the encoder', () async {
     final p = PersistedEnum(
-      await _prefs({_key.name: 'a'}),
+      await _settings({_key.name: 'a'}),
       key: _key,
       values: _Fruit.values,
       fallback: _Fruit.banana,
@@ -46,9 +46,9 @@ void main() {
   });
 
   test('set reports change, persists, and is idempotent', () async {
-    final prefs = await _prefs();
+    final settings = await _settings();
     final p = PersistedEnum(
-      prefs,
+      settings,
       key: _key,
       values: _Fruit.values,
       fallback: _Fruit.apple,
@@ -57,19 +57,19 @@ void main() {
 
     expect(p.set(_Fruit.banana), isTrue);
     expect(p.value, _Fruit.banana);
-    expect(prefs.getString(_key), 'b');
+    expect(settings.getString(_key), 'b');
 
     expect(p.set(_Fruit.banana), isFalse);
   });
 
   test('defaults to the enum name when no encoder is given', () async {
-    final prefs = await _prefs();
+    final settings = await _settings();
     PersistedEnum(
-      prefs,
+      settings,
       key: _key,
       values: _Fruit.values,
       fallback: _Fruit.apple,
     ).set(_Fruit.banana);
-    expect(prefs.getString(_key), 'banana');
+    expect(settings.getString(_key), 'banana');
   });
 }

@@ -8,7 +8,7 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/events/domain/event.dart';
@@ -31,7 +31,6 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Stub weather: home content resolves no towns from an empty directory, so
 /// neither endpoint is invoked in the switch tests.
@@ -165,10 +164,11 @@ Widget _wrap(
 /// A store with two saved regions → four areas (全國, 所在地, +2), so the
 /// switch tests have room to move (select(2) / next twice).
 Future<RegionStore> _store() async {
-  SharedPreferences.setMockInitialValues({
-    'home.savedRegionCodes': ['100', '200'],
-  });
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
+  return RegionStore(
+    SettingsStore.inMemory({
+      'home.savedRegionCodes': ['100', '200'],
+    }),
+  );
 }
 
 void main() {

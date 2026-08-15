@@ -1,13 +1,16 @@
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'fake_mesh_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  sqfliteFfiInit();
 
   var clock = DateTime.utc(2026, 1, 1, 12);
 
@@ -32,17 +35,38 @@ void main() {
     viaMqtt: viaMqtt,
   );
 
-  Future<(MeshNodeStore, FakeMeshService)> makeStore([
+  /// Nodes now live in the `mesh_nodes` table, so a restart test needs the
+  /// *same* database on the second open — hence the explicit handle rather
+  /// than a fresh `:memory:` each time (sqflite would hand back a shared one
+  /// anyway, which is worse: silent cross-test state).
+  Future<Database> memoryDb() => databaseFactoryFfi.openDatabase(
+    inMemoryDatabasePath,
+    options: OpenDatabaseOptions(singleInstance: false),
+  );
+
+  late SettingsStore settings;
+
+  Future<(MeshNodeStore, FakeMeshService)> makeStore({
     Map<String, Object> initial = const {},
-  ]) async {
+    Database? db,
+  }) async {
     clock = DateTime.utc(2026, 1, 1, 12);
-    SharedPreferences.setMockInitialValues(initial);
     final service = FakeMeshService();
+    settings = SettingsStore.inMemory(initial);
+    MeshStore? mesh;
+    if (db != null) {
+      await MeshStore.createSchema(db);
+      mesh = MeshStore(db);
+    }
     final store = MeshNodeStore(
       service,
-      Prefs(await SharedPreferences.getInstance()),
+      settings,
+      store: mesh,
       now: () => clock,
     )..start();
+    // The restore is a query now, so wait for it rather than for a delay
+    // chosen by guesswork.
+    await store.whenRestored;
     return (store, service);
   }
 
@@ -84,18 +108,17 @@ void main() {
   });
 
   test('survives a restart, with freshness recomputed', () async {
-    final (store, service) = await makeStore();
+    final db = await memoryDb();
+    final (store, service) = await makeStore(db: db);
     service.nodes.add(
       node(7, name: 'repeater', lat: 23.5, lon: 120.5, heard: clock),
     );
     await flush();
 
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getStringList('meshtastic.nodes');
-    expect(stored, hasLength(1));
+    expect(await MeshStore(db).readNodes(), hasLength(1));
 
     // A day later the same entry must not still claim to be online.
-    final (restored, _) = await makeStore({'meshtastic.nodes': stored!});
+    final (restored, _) = await makeStore(db: db);
     clock = clock.add(const Duration(days: 1));
 
     final node7 = restored.byNum(7);
@@ -118,17 +141,16 @@ void main() {
   });
 
   test('drops the least recently heard past the cap', () async {
-    final (store, service) = await makeStore();
+    final db = await memoryDb();
+    final (store, service) = await makeStore(db: db);
     for (var i = 0; i < MeshNodeStore.maxNodes + 5; i++) {
       service.nodes.add(node(i, heard: clock.subtract(Duration(minutes: i))));
     }
     await flush();
 
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getStringList('meshtastic.nodes')!;
-    expect(stored, hasLength(MeshNodeStore.maxNodes));
+    expect(await MeshStore(db).readNodes(), hasLength(MeshNodeStore.maxNodes));
 
-    final (restored, _) = await makeStore({'meshtastic.nodes': stored});
+    final (restored, _) = await makeStore(db: db);
     // 0 was heard most recently, the tail is the oldest.
     expect(restored.byNum(0), isNotNull);
     expect(restored.byNum(MeshNodeStore.maxNodes + 4), isNull);
@@ -160,46 +182,59 @@ void main() {
         expect(store.positioned, hasLength(1));
         expect(store.hiddenMqttCount, 0);
 
-        final prefs = await SharedPreferences.getInstance();
-        expect(prefs.getBool('map.meshExcludeMqtt'), isFalse);
+        expect(settings.getBool(SettingKeys.meshExcludeMqtt), isFalse);
       },
     );
 
-    test('the flag survives a restart', () async {
-      final (store, service) = await makeStore();
+    test('the MQTT flag survives a restart', () async {
+      final db = await memoryDb();
+      final (store, service) = await makeStore(db: db);
       service.nodes.add(node(2, lat: 35.6, lon: 139.7, viaMqtt: true));
       await flush();
-      final prefs = await SharedPreferences.getInstance();
-      final stored = prefs.getStringList('meshtastic.nodes')!;
 
-      final (restored, _) = await makeStore({'meshtastic.nodes': stored});
+      final (restored, _) = await makeStore(db: db);
       expect(restored.byNum(2)?.viaMqtt, isTrue);
       expect(restored.positioned, isEmpty);
     });
   });
 
-  test('ignores a corrupt entry instead of losing the table', () async {
-    final (store, service) = await makeStore();
-    service.nodes.add(node(1, name: 'good'));
-    await flush();
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getStringList('meshtastic.nodes')!;
-
-    final (restored, _) = await makeStore({
-      'meshtastic.nodes': ['not json', ...stored],
-    });
-    expect(restored.nodes.single.displayName, 'good');
+  test('the schema makes a half-written node impossible', () async {
+    // The JSON-blob version could restore a node with no number, or lose the
+    // whole list to one malformed entry. Columns with NOT NULL make both
+    // states unrepresentable — the row is rejected at write time instead of
+    // being discovered at read time.
+    final db = await memoryDb();
+    await MeshStore.createSchema(db);
+    // A node with no name is rejected at write time.
+    await expectLater(
+      db.insert('mesh_nodes', {'num': 5, 'snr': 0.0}),
+      throwsA(isA<Object>()),
+    );
+    // A node always has a number: `num INTEGER PRIMARY KEY` is the rowid, so
+    // one is assigned even when the caller omits it. There is no such thing
+    // as the numberless entry the JSON blob could produce.
+    final id = await db.insert('mesh_nodes', {'name': 'auto', 'snr': 0.0});
+    expect(id, greaterThan(0));
+    await db.delete('mesh_nodes');
+    // And a well-formed row round-trips.
+    final (store, _) = await makeStore(db: db);
+    await MeshStore(db).writeNodes([
+      {'num': 5, 'name': 'ok', 'snr': 0.0, 'via_mqtt': 0},
+    ]);
+    final (restored, _) = await makeStore(db: db);
+    expect(restored.byNum(5)?.displayName, 'ok');
+    expect(store.nodes, isEmpty);
   });
 
   test('clear empties the table and its storage', () async {
-    final (store, service) = await makeStore();
+    final db = await memoryDb();
+    final (store, service) = await makeStore(db: db);
     service.nodes.add(node(1));
     await flush();
 
     await store.clear();
     expect(store.nodes, isEmpty);
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getStringList('meshtastic.nodes'), isEmpty);
+    expect(await MeshStore(db).readNodes(), isEmpty);
   });
 
   group('telemetry history', () {

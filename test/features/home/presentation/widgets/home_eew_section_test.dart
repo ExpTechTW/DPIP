@@ -9,7 +9,7 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -19,7 +19,6 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeClock implements Clock {
   _FakeClock(this.current);
@@ -134,8 +133,7 @@ Widget _wrap(RealtimeNotifier<List<Eew>> notifier, RegionStore store) =>
     );
 
 Future<RegionStore> _store() async {
-  SharedPreferences.setMockInitialValues({});
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
+  return RegionStore(SettingsStore.inMemory({}));
 }
 
 void main() {

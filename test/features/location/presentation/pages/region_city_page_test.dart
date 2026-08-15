@@ -1,6 +1,6 @@
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Town _town(String code, String town) => Town(
   code: code,
@@ -51,10 +50,11 @@ Widget _wrap(RegionStore store) {
 }
 
 Future<RegionStore> _store([List<String>? saved]) async {
-  SharedPreferences.setMockInitialValues(
-    saved == null ? {} : {'home.savedRegionCodes': saved},
+  return RegionStore(
+    SettingsStore.inMemory(
+      saved == null ? {} : {'home.savedRegionCodes': saved},
+    ),
   );
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
 }
 
 void main() {

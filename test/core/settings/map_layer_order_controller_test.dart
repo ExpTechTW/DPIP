@@ -1,13 +1,11 @@
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<MapLayerOrderController> controllerWith(
   Map<String, Object> initial,
 ) async {
-  SharedPreferences.setMockInitialValues(initial);
-  return MapLayerOrderController(Prefs(await SharedPreferences.getInstance()));
+  return MapLayerOrderController(SettingsStore.inMemory(initial));
 }
 
 void main() {

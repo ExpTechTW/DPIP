@@ -1,16 +1,18 @@
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dpip/core/settings/prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  late SettingsStore settings;
+
   Future<OnboardingStore> makeStore([bool complete = false]) async {
-    SharedPreferences.setMockInitialValues(
+    settings = SettingsStore.inMemory(
       complete ? {'onboarding.complete': true} : {},
     );
-    return OnboardingStore(Prefs(await SharedPreferences.getInstance()));
+    return OnboardingStore(settings);
   }
 
   test('defaults to incomplete', () async {
@@ -34,7 +36,6 @@ void main() {
     await store.complete();
     expect(notified, 1);
 
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getBool('onboarding.complete'), isTrue);
+    expect(settings.getBool(SettingKeys.onboardingComplete), isTrue);
   });
 }

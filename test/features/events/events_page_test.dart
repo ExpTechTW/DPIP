@@ -1,7 +1,7 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
@@ -11,7 +11,6 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Records which areas the page actually asked for, so a fallback to the
 /// nationwide feed is visible to the test rather than hidden behind an
@@ -49,10 +48,11 @@ Widget _wrap(RegionStore store, EventRepository events) {
 
 /// 全國, 所在地 and one saved township.
 Future<RegionStore> _store() async {
-  SharedPreferences.setMockInitialValues({
-    'home.savedRegionCodes': ['100'],
-  });
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
+  return RegionStore(
+    SettingsStore.inMemory({
+      'home.savedRegionCodes': ['100'],
+    }),
+  );
 }
 
 void main() {

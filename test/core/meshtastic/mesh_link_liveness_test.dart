@@ -1,9 +1,8 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_mesh_service.dart';
 
@@ -26,12 +25,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('retries when the radio drops during the connect itself', () async {
-    SharedPreferences.setMockInitialValues({});
     final service = _VanishingService();
-    final link = MeshLink(
-      service,
-      Prefs(await SharedPreferences.getInstance()),
-    );
+    final link = MeshLink(service, SettingsStore.inMemory({}));
     link.start();
 
     await link.attach(const MeshDevice(id: 'AA:BB', name: 'radio'));

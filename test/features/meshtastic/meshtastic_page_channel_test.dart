@@ -11,7 +11,7 @@ import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
@@ -50,8 +49,7 @@ void main() {
     // touches it must happen inside `runAsync` or its futures never complete
     // and the test simply hangs.
     await tester.runAsync(() async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = Prefs(await SharedPreferences.getInstance());
+      final settings = SettingsStore.inMemory({});
       final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
       addTearDown(db.close);
       await MeshStore.createSchema(db);
@@ -61,12 +59,12 @@ void main() {
 
       // Disconnected on purpose: no channel table, the case that broke.
       service = FakeMeshService();
-      link = MeshLink(service, prefs);
-      alerts = MeshAlerts(service, prefs, post: (_) async {});
+      link = MeshLink(service, settings);
+      alerts = MeshAlerts(service, settings, post: (_) async {});
       controller = MeshChatController(
         service,
         link,
-        MeshNodeStore(service, prefs)..start(),
+        MeshNodeStore(service, settings)..start(),
         store,
       );
       // Let the controller's initial load land before the first frame.

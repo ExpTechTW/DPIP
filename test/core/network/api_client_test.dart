@@ -5,8 +5,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dpip/core/settings/prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 /// A dio adapter that records the hosts it is asked to fetch and returns a
 /// scripted response per call, so failover behaviour is observable without a
@@ -45,8 +44,7 @@ void main() {
   late RegionSelection regions;
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
-    regions = RegionSelection(Prefs(await SharedPreferences.getInstance()));
+    regions = RegionSelection(SettingsStore.inMemory({}));
   });
 
   ApiClient clientWith(_FakeAdapter adapter) =>

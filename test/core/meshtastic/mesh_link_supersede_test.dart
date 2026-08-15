@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_mesh_service.dart';
 
@@ -31,12 +31,11 @@ void main() {
   const first = MeshDevice(id: 'AA:11', name: 'radio-a');
   const second = MeshDevice(id: 'BB:22', name: 'radio-b');
 
+  late SettingsStore settings;
+
   Future<(MeshLink, T)> makeLink<T extends FakeMeshService>(T service) async {
-    SharedPreferences.setMockInitialValues({});
-    final link = MeshLink(
-      service,
-      Prefs(await SharedPreferences.getInstance()),
-    );
+    settings = SettingsStore.inMemory();
+    final link = MeshLink(service, settings);
     link.start();
     return (link, service);
   }
@@ -55,8 +54,7 @@ void main() {
     // remembered — the single-flight guard used to swallow this silently.
     expect(service.connectedIds.last, 'BB:22');
     expect(link.savedRadioId, 'BB:22');
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('meshtastic.deviceId'), 'BB:22');
+    expect(settings.getString(SettingKeys.meshDeviceId), 'BB:22');
   });
 
   test('a superseded attempt cannot write its radio back', () async {
@@ -70,8 +68,7 @@ void main() {
     await secondAttach;
 
     expect(link.savedRadioId, 'BB:22');
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('meshtastic.deviceId'), 'BB:22');
+    expect(settings.getString(SettingKeys.meshDeviceId), 'BB:22');
   });
 
   test('detach during a connect leaves no phantom link', () async {

@@ -9,7 +9,7 @@ library;
 
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/data/presentation/pages/moon_page.dart';
 import 'package:dpip/features/data/presentation/widgets/moon_calendar.dart';
@@ -17,7 +17,6 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final _directory = TownDirectory.fromJson({
   '100': {
@@ -39,8 +38,7 @@ final _directory = TownDirectory.fromJson({
 });
 
 Future<RegionStore> _regions({String? currentCode}) async {
-  SharedPreferences.setMockInitialValues({});
-  final store = RegionStore(Prefs(await SharedPreferences.getInstance()));
+  final store = RegionStore(SettingsStore.inMemory({}));
   if (currentCode != null) store.setCurrentCode(currentCode);
   return store;
 }

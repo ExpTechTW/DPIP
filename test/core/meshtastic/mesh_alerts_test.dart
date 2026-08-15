@@ -1,8 +1,7 @@
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_mesh_service.dart';
 
@@ -17,11 +16,10 @@ void main() {
   ]) async {
     clock = DateTime.utc(2026, 1, 1, 12);
     posted = [];
-    SharedPreferences.setMockInitialValues(initial);
     final service = FakeMeshService();
     final alerts = MeshAlerts(
       service,
-      Prefs(await SharedPreferences.getInstance()),
+      SettingsStore.inMemory(initial),
       post: (alert) async => posted.add(alert),
       now: () => clock,
     )..start();

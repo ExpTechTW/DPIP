@@ -10,10 +10,9 @@ library;
 
 import 'package:dpip/core/astro/satellite.dart';
 import 'package:dpip/core/astro/tle_source.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/astro/tle_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// The ISS on day 226 of 2026.
 const _older = '''
@@ -44,22 +43,42 @@ class _Never implements TleSource {
   Future<List<TleSet>> load() async => const [];
 }
 
-Future<Prefs> _prefs([Map<String, Object> initial = const {}]) async {
-  SharedPreferences.setMockInitialValues(initial);
-  return Prefs(await SharedPreferences.getInstance());
+/// A real `tle` table in memory, so the test exercises the schema rather than
+/// a stand-in for it.
+/// A fresh in-memory database per call.
+///
+/// `singleInstance: false` matters: sqflite hands back the *same* handle for a
+/// repeated path, and `:memory:` is a path — so without it every test in the
+/// file shares one database and the second test starts with the first one's
+/// rows. That is exactly the kind of shared state that makes a suite pass in
+/// isolation and fail as a group.
+Future<Database> _openMemory() => databaseFactoryFfi.openDatabase(
+  inMemoryDatabasePath,
+  options: OpenDatabaseOptions(singleInstance: false),
+);
+
+Future<TleStore> _store({String? seed, DateTime? fetchedAt}) async {
+  final db = await _openMemory();
+  await TleStore.createSchema(db);
+  final store = TleStore(db);
+  if (seed != null) {
+    await store.write(text: seed, fetchedAt: fetchedAt ?? DateTime.utc(2026));
+  }
+  return store;
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  sqfliteFfiInit();
 
   var clock = DateTime.utc(2026, 8, 20);
 
   CachedTleSource source({
-    required Prefs prefs,
+    required TleStore store,
     TleFetcher? fetch,
     TleSource fallback = const _Bundled(),
   }) => CachedTleSource(
-    prefs: prefs,
+    store: store,
     now: () => clock,
     fetch: fetch,
     fallback: fallback,
@@ -69,11 +88,11 @@ void main() {
 
   test('with no fetcher it is the bundle, and never touches the network', () {
     // The shipping configuration until the app has a route to a feed.
-    return _prefs().then((prefs) async {
-      final loaded = await source(prefs: prefs).load();
+    return _store().then((store) async {
+      final loaded = await source(store: store).load();
       expect(loaded.single.catalogNumber, 25544);
       expect(
-        prefs.getInt(PreferenceKeys.satelliteElementsFetchedAt),
+        (await store.read())?.fetchedAt,
         isNull,
         reason: 'nothing was fetched, so nothing was stamped',
       );
@@ -81,10 +100,10 @@ void main() {
   });
 
   test('the first load fetches and caches', () async {
-    final prefs = await _prefs();
+    final store = await _store();
     var calls = 0;
     final loaded = await source(
-      prefs: prefs,
+      store: store,
       fetch: () async {
         calls++;
         return _newer;
@@ -92,25 +111,25 @@ void main() {
     ).load();
     expect(calls, 1);
     expect(loaded.single.epoch.day, 16); // day 228 of 2026 is 16 August
-    expect(prefs.getString(PreferenceKeys.satelliteElements), _newer);
-    expect(prefs.getInt(PreferenceKeys.satelliteElementsFetchedAt), isNotNull);
+    expect((await store.read())?.text, _newer);
+    expect((await store.read())?.fetchedAt, isNotNull);
   });
 
   test('a second load inside the interval does not fetch again', () async {
-    final prefs = await _prefs();
+    final store = await _store();
     var calls = 0;
     Future<String> fetch() async {
       calls++;
       return _newer;
     }
 
-    await source(prefs: prefs, fetch: fetch).load();
+    await source(store: store, fetch: fetch).load();
     clock = clock.add(const Duration(hours: 30));
-    await source(prefs: prefs, fetch: fetch).load();
+    await source(store: store, fetch: fetch).load();
     expect(calls, 1, reason: 'still inside the 48-hour window');
 
     clock = clock.add(const Duration(hours: 20));
-    await source(prefs: prefs, fetch: fetch).load();
+    await source(store: store, fetch: fetch).load();
     expect(calls, 2, reason: 'past the interval it refreshes');
   });
 
@@ -118,42 +137,37 @@ void main() {
     // The failure this whole design exists to prevent. A feed regenerated per
     // request happily serves an older set, and taking it would make every
     // later prediction worse with no visible symptom.
-    final prefs = await _prefs();
-    await source(prefs: prefs, fetch: () async => _newer).load();
+    final store = await _store();
+    await source(store: store, fetch: () async => _newer).load();
 
     clock = clock.add(const Duration(days: 3));
-    final loaded = await source(prefs: prefs, fetch: () async => _older).load();
+    final loaded = await source(store: store, fetch: () async => _older).load();
 
-    expect(prefs.getString(PreferenceKeys.satelliteElements), _newer);
+    expect((await store.read())?.text, _newer);
     expect(loaded.single.epoch.day, 16);
   });
 
   test('identical elements are accepted as up to date, not as a change', () {
-    return _prefs().then((prefs) async {
-      await source(prefs: prefs, fetch: () async => _newer).load();
-      final firstStamp = prefs.getInt(
-        PreferenceKeys.satelliteElementsFetchedAt,
-      );
+    return _store().then((store) async {
+      await source(store: store, fetch: () async => _newer).load();
+      final firstStamp = (await store.read())!.fetchedAt;
 
       clock = clock.add(const Duration(days: 3));
-      await source(prefs: prefs, fetch: () async => _newer).load();
+      await source(store: store, fetch: () async => _newer).load();
 
       // The stamp moves — we did check — but the stored text is untouched.
-      expect(
-        prefs.getInt(PreferenceKeys.satelliteElementsFetchedAt),
-        greaterThan(firstStamp!),
-      );
-      expect(prefs.getString(PreferenceKeys.satelliteElements), _newer);
+      expect((await store.read())!.fetchedAt.isAfter(firstStamp), isTrue);
+      expect((await store.read())?.text, _newer);
     });
   });
 
   test('a failed fetch falls back and retries next time, not next day', () async {
     // Waiting out the whole interval after one dropped connection would mean a
     // day of stale elements for a moment of bad signal.
-    final prefs = await _prefs();
+    final store = await _store();
     var calls = 0;
     final loaded = await source(
-      prefs: prefs,
+      store: store,
       fetch: () async {
         calls++;
         throw StateError('offline');
@@ -162,45 +176,42 @@ void main() {
 
     expect(calls, 1);
     expect(loaded.single.catalogNumber, 25544, reason: 'the bundle answered');
-    expect(prefs.getInt(PreferenceKeys.satelliteElementsFetchedAt), isNull);
+    expect((await store.read())?.fetchedAt, isNull);
 
-    await source(prefs: prefs, fetch: () async => _newer).load();
+    await source(store: store, fetch: () async => _newer).load();
     expect(calls, 1);
-    expect(prefs.getString(PreferenceKeys.satelliteElements), _newer);
+    expect((await store.read())?.text, _newer);
   });
 
   test('garbage from the feed is ignored, not stored', () async {
-    final prefs = await _prefs();
-    await source(prefs: prefs, fetch: () async => _newer).load();
+    final store = await _store();
+    await source(store: store, fetch: () async => _newer).load();
     clock = clock.add(const Duration(days: 3));
-    await source(prefs: prefs, fetch: () async => _garbage).load();
-    expect(prefs.getString(PreferenceKeys.satelliteElements), _newer);
+    await source(store: store, fetch: () async => _garbage).load();
+    expect((await store.read())?.text, _newer);
   });
 
   test('a corrupt cache falls back instead of taking the page down', () async {
-    final prefs = await _prefs({
-      'astro:satellite:tle': _garbage,
-      'astro:satellite:fetchedAt': clock.millisecondsSinceEpoch,
-    });
-    final loaded = await source(prefs: prefs).load();
+    final store = await _store(seed: _garbage, fetchedAt: clock);
+    final loaded = await source(store: store).load();
     expect(loaded.single.catalogNumber, 25544);
   });
 
   test('an empty everything is an empty list, not a crash', () async {
-    final prefs = await _prefs();
-    final loaded = await source(prefs: prefs, fallback: const _Never()).load();
+    final store = await _store();
+    final loaded = await source(store: store, fallback: const _Never()).load();
     expect(loaded, isEmpty);
   });
 
   test('a backwards clock still refreshes', () async {
     // Device clocks jump. Comparing "now minus last" without allowing for a
     // negative would freeze refreshes until real time caught up.
-    final prefs = await _prefs();
-    await source(prefs: prefs, fetch: () async => _newer).load();
+    final store = await _store();
+    await source(store: store, fetch: () async => _newer).load();
     clock = clock.subtract(const Duration(days: 30));
     var calls = 0;
     await source(
-      prefs: prefs,
+      store: store,
       fetch: () async {
         calls++;
         return _newer;

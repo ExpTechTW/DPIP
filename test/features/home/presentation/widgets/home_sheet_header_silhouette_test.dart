@@ -23,7 +23,7 @@ import 'dart:ui' as ui;
 
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/error/result.dart';
@@ -40,7 +40,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeWeatherRepository implements MeteorWeatherRepository {
   @override
@@ -86,8 +85,7 @@ void main() {
   testWidgets(
     'a located township header rasterises to a non-empty silhouette',
     (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final store = RegionStore(Prefs(await SharedPreferences.getInstance()));
+      final store = RegionStore(SettingsStore.inMemory({}));
       store
         ..select(1)
         ..setCurrentCode('100');
