@@ -353,6 +353,7 @@ Future<Database?> _openDurable() async {
     final db = await openDatabase(
       '${base.path}/dpip.db',
       version: appDatabaseVersion,
+      onConfigure: (db) => _configureJournal(db, durable: true),
       onCreate: (db, _) => _createDurableSchema(db),
     );
     await _createDurableSchema(db);
@@ -360,6 +361,48 @@ Future<Database?> _openDurable() async {
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'durable database unavailable');
     return null;
+  }
+}
+
+/// Puts a database into **WAL**, so a commit is an append rather than a
+/// journal dance.
+///
+/// With the default rollback journal every transaction — a buffered log flush,
+/// an LRU touch, a tile batch — creates a journal file, fsyncs it, fsyncs the
+/// directory, writes the pages back, then deletes the journal and fsyncs the
+/// directory again: several barriers and a double write of every changed page,
+/// for a handful of rows. WAL appends the new pages to one long-lived `-wal`
+/// file and fsyncs that; the write-back into the database file is deferred to a
+/// checkpoint that amortizes over many commits. Same durability, a fraction of
+/// the IO and the flash wear.
+///
+/// This has to run in `onConfigure`: it is the only sqflite callback invoked
+/// outside a transaction, and `journal_mode` cannot be changed inside one.
+/// The mode itself is persisted in the file header (so it only has to take
+/// once), while `synchronous` is per connection and must be set on every open.
+///
+/// [durable] keeps `synchronous = FULL` — the SQLite default — for `dpip.db`:
+/// settings, the mesh conversation and the log cannot be fetched again, so a
+/// commit there still fsyncs before it counts. The cache file relaxes to
+/// `NORMAL`, where a WAL commit costs no fsync at all, because every byte in it
+/// is re-downloadable by definition and lives in a directory the OS may empty
+/// anyway. Both modes survive an app crash; only a power cut can cost the cache
+/// its last commits.
+///
+/// Best-effort, like the opens themselves: a database that will not take WAL
+/// keeps working on the rollback journal.
+Future<void> _configureJournal(Database db, {required bool durable}) async {
+  try {
+    // `PRAGMA journal_mode` returns a row, which Android's `execute` rejects
+    // and Darwin reports as "not an error" — sqflite's helper handles both.
+    await db.setJournalMode('WAL');
+    if (!durable) {
+      // A pragma still goes through [rawQuery] here for the same reason
+      // [EtagCacheStore.configureConnection] does.
+      await db.rawQuery('PRAGMA synchronous = NORMAL');
+    }
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'WAL unavailable (rollback journal)');
   }
 }
 
