@@ -12,6 +12,7 @@ import 'package:dpip/features/earthquake/presentation/widgets/report_filter_shee
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
@@ -318,9 +319,6 @@ class _ReportTile extends StatelessWidget {
 
   final PartialEarthquakeReport report;
 
-  /// Numbered CWA reports — magnitude in gold to mark the official serial set.
-  static const Color _numberedMagGold = Color(0xFFE8C547);
-
   static final DateFormat _stampFormat = DateFormat('HH:mm:ss');
 
   @override
@@ -376,7 +374,9 @@ class _ReportTile extends StatelessWidget {
             Text(
               l10n.reportListMagnitude(mag),
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: report.hasNumber ? _numberedMagGold : colors.onSurface,
+                color: report.hasNumber
+                    ? ReportColors.numberedMagnitude
+                    : colors.onSurface,
                 fontWeight: FontWeight.w800,
                 height: 1,
                 letterSpacing: -0.5,

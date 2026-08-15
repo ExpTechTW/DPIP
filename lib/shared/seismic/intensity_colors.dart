@@ -72,6 +72,16 @@ abstract final class IntensityColors {
   /// colour-vision setting; out-of-range clamps to the ends.
   static Color discrete(int level) => _corrected[level.clamp(0, 9)];
 
+  /// The published CWA colour for [level] (0 → 9), **untransformed**.
+  ///
+  /// For a colour-vision *picker* only, which has to paint each option under
+  /// *its own* setting: [discrete] has already applied the one currently in
+  /// force, and correcting that again daltonises an already-daltonised colour —
+  /// so the swatches drift as soon as any setting but "standard" is on. Never
+  /// render with this anywhere else; everything the app draws comes from
+  /// [discrete].
+  static Color published(int level) => _base[level.clamp(0, 9)];
+
   /// The published CWA scale, untransformed. The one source of these values.
   static const List<Color> _base = [
     Color(0xFF9E9E9E), // 0 — grey

@@ -16,6 +16,19 @@ library;
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:flutter/material.dart';
 
+/// Report chrome that is not part of a colour *ramp*.
+abstract final class ReportColors {
+  /// Numbered CWA reports — magnitude in gold to mark the official serial set
+  /// apart from the unnumbered 小區域 ones, which draw in `onSurface`.
+  ///
+  /// Lives here rather than beside the report tile so the Display settings
+  /// sample can draw the same gold without a second copy of the literal. It is
+  /// `.vision`-corrected like everything else in this file: it is drawn by
+  /// Flutter, so there is nothing to exempt, and gold against `onSurface` is a
+  /// distinction a red-weak eye has to be able to make.
+  static Color get numberedMagnitude => const Color(0xFFE8C547).vision;
+}
+
 /// Continuous colour ramp for magnitude, interpolated between named stops.
 abstract final class MagnitudeColors {
   static List<(double magnitude, Color color)> get _stops => [
