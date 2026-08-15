@@ -133,8 +133,8 @@ void main() {
   test('the cache database holds only cache tables', () async {
     // The failure this guards: a future table of user data created in the
     // cache file would be destroyed by the first clear, and nothing else in
-    // the app would notice. A fresh install has no `net_total` — that one is
-    // legacy residue the clear also sweeps — so the check is one-directional.
+    // the app would notice. The check is one-directional because a fresh
+    // install has none of the cache tables yet.
     expect(await _tables(await _cache()), everyElement(isIn(cacheTables)));
     expect(await _tables(await _cache()), contains('http_cache'));
   });

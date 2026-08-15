@@ -114,9 +114,6 @@ class NetworkUsageStore {
 
   static const String _buckets = 'net_bucket';
 
-  /// Pre-window schema: lifetime counters. Dropped on migration.
-  static const String _legacyTotals = 'net_total';
-
   static const int _hourMs = 3600 * 1000;
   static const int _windowHours = 24 * 7;
 
@@ -145,10 +142,7 @@ class NetworkUsageStore {
   /// Brings a bucket table created by an older build up to date.
   ///
   /// [createSchema] runs on every open with `IF NOT EXISTS`, so an installed
-  /// database never picks up new columns on its own. Saved bytes and hit/miss
-  /// counts used to be lifetime running totals in a separate table; that table
-  /// is dropped here, because a number that only grows can't be windowed after
-  /// the fact and leaving it would just be a second, contradictory answer.
+  /// database never picks up new columns on its own.
   static Future<void> _migrate(Database db) async {
     try {
       final existing = {
@@ -161,7 +155,6 @@ class NetworkUsageStore {
           'ALTER TABLE $_buckets ADD COLUMN $column INTEGER NOT NULL DEFAULT 0',
         );
       }
-      await db.execute('DROP TABLE IF EXISTS $_legacyTotals');
     } catch (_) {
       // Accounting is diagnostic-only; never break the open on it.
     }

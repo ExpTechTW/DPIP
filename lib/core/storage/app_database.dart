@@ -20,13 +20,13 @@
 /// | file          | table            | category    |
 /// |---------------|------------------|-------------|
 /// | `dpip.db`     | `settings`       | config      |
+/// | `dpip.db`     | `logs`           | diagnostics |
 /// | `dpip.db`     | `tle`            | orbital data|
 /// | `dpip.db`     | `mesh_messages`  | meshtastic  |
 /// | `dpip.db`     | `mesh_metrics`   | meshtastic  |
 /// | `dpip.db`     | `mesh_nodes`     | meshtastic  |
 /// | `http_cache.db` | `http_cache`   | cache       |
 /// | `http_cache.db` | `net_bucket`   | cache       |
-/// | `http_cache.db` | `net_total`    | cache       |
 library;
 
 import 'package:dpip/core/logging/log.dart';
@@ -37,10 +37,7 @@ const int appDatabaseVersion = 1;
 
 /// The tables the cache file owns — the complete list of what [clearCache]
 /// may destroy. Anything not named here is, by construction, out of reach.
-/// `net_total` is a table only on installs that predate the hourly buckets;
-/// it is listed so an upgraded device's leftovers are cleared too, and
-/// [clearCache] tolerates a table that is not there.
-const List<String> cacheTables = ['http_cache', 'net_bucket', 'net_total'];
+const List<String> cacheTables = ['http_cache', 'net_bucket'];
 
 /// Handles to both files. Either may be null: a database that will not open is
 /// a degraded app, not a dead one.
