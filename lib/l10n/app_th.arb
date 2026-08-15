@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "บันทึกได้สูงสุด {max} พื้นที่",
+  "meshtasticNewMessages": "ใหม่",
   "meshtasticTitle": "Meshtastic",
   "navMore": "เพิ่มเติม",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "ขนาดตัวอักษร",
+  "displayTextSizeDesc": "มีผลกับข้อความในแอป ป้ายชื่อบนแผนที่ยังคงขนาดเดิม",
+  "displayTextWeight": "น้ำหนักตัวอักษร",
+  "displayTextWeightDesc": "ตัวอักษรหนาขึ้นอาจอ่านง่ายกว่า",
+  "displayContrast": "คอนทราสต์",
+  "displayContrastDesc": "คอนทราสต์สูงขึ้นช่วยให้ข้อความแยกจากพื้นหลังได้ชัดขึ้น",
+  "displayColorVision": "การมองเห็นสี",
+  "displayColorVisionDesc": "ปรับสีทั้งแอป รวมถึงสีบนแผนที่",
+  "displayColorVisionNone": "สีมาตรฐาน",
+  "displayColorVisionProtan": "ตาบอดสีแดง (Protan)",
+  "displayColorVisionDeutan": "ตาบอดสีเขียว (Deutan)",
+  "displayColorVisionTritan": "ตาบอดสีน้ำเงิน–เหลือง (Tritan)",
+  "displayScaleSmall": "เล็ก",
+  "displayScaleDefault": "ปกติ",
+  "displayScaleLarge": "ใหญ่",
+  "displayScaleHuge": "ใหญ่มาก",
+  "displayWeightNormal": "ปกติ",
+  "displayWeightMedium": "ปานกลาง",
+  "displayWeightBold": "หนา",
+  "displayContrastStandard": "มาตรฐาน",
+  "displayContrastMedium": "ปานกลาง",
+  "displayContrastHigh": "สูง"
 }

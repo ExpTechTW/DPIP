@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "最多只能选择 {max} 个地区",
+  "meshtasticNewMessages": "新消息",
   "meshtasticTitle": "Meshtastic",
   "navMore": "更多",
   "meshtasticDpipChannel": "DPIP 频道",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "文字大小",
+  "displayTextSizeDesc": "只调整应用界面的文字，地图上的文字大小不变。",
+  "displayTextWeight": "文字粗细",
+  "displayTextWeightDesc": "文字加粗后通常更容易阅读。",
+  "displayContrast": "对比度",
+  "displayContrastDesc": "提高对比度可以让文字与背景分得更清楚。",
+  "displayColorVision": "色觉调整",
+  "displayColorVisionDesc": "应用与地图的颜色都会一起调整。",
+  "displayColorVisionNone": "不调整",
+  "displayColorVisionProtan": "红色弱",
+  "displayColorVisionDeutan": "绿色弱",
+  "displayColorVisionTritan": "蓝黄色弱",
+  "displayScaleSmall": "小",
+  "displayScaleDefault": "默认",
+  "displayScaleLarge": "大",
+  "displayScaleHuge": "特大",
+  "displayWeightNormal": "标准",
+  "displayWeightMedium": "中等",
+  "displayWeightBold": "粗体",
+  "displayContrastStandard": "标准",
+  "displayContrastMedium": "中等",
+  "displayContrastHigh": "高"
 }

@@ -406,6 +406,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => '新訊息';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2656,6 +2659,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get displayTextSize => '文字大小';
+
+  @override
+  String get displayTextSizeDesc => '只影響 App 介面，地圖上的文字大小不變。';
+
+  @override
+  String get displayTextWeight => '文字粗細';
+
+  @override
+  String get displayTextWeightDesc => '較粗的文字通常更容易閱讀。';
+
+  @override
+  String get displayContrast => '對比度';
+
+  @override
+  String get displayContrastDesc => '對比越高，文字與背景的差異越明顯。';
+
+  @override
+  String get displayColorVision => '色覺調整';
+
+  @override
+  String get displayColorVisionDesc => '整個 App 的顏色都會重新調整，地圖也一併改變。';
+
+  @override
+  String get displayColorVisionNone => '標準色彩';
+
+  @override
+  String get displayColorVisionProtan => '紅色弱';
+
+  @override
+  String get displayColorVisionDeutan => '綠色弱';
+
+  @override
+  String get displayColorVisionTritan => '藍黃色弱';
+
+  @override
+  String get displayScaleSmall => '小';
+
+  @override
+  String get displayScaleDefault => '標準';
+
+  @override
+  String get displayScaleLarge => '大';
+
+  @override
+  String get displayScaleHuge => '特大';
+
+  @override
+  String get displayWeightNormal => '標準';
+
+  @override
+  String get displayWeightMedium => '中等';
+
+  @override
+  String get displayWeightBold => '粗體';
+
+  @override
+  String get displayContrastStandard => '標準';
+
+  @override
+  String get displayContrastMedium => '中等';
+
+  @override
+  String get displayContrastHigh => '高';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3057,6 +3126,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String regionSelectFull(int max) {
     return '最多只能选择 $max 个地区';
   }
+
+  @override
+  String get meshtasticNewMessages => '新消息';
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -5309,6 +5381,72 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒绝，系统不会再询问。请到设置中开启。';
   }
+
+  @override
+  String get displayTextSize => '文字大小';
+
+  @override
+  String get displayTextSizeDesc => '只调整应用界面的文字，地图上的文字大小不变。';
+
+  @override
+  String get displayTextWeight => '文字粗细';
+
+  @override
+  String get displayTextWeightDesc => '文字加粗后通常更容易阅读。';
+
+  @override
+  String get displayContrast => '对比度';
+
+  @override
+  String get displayContrastDesc => '提高对比度可以让文字与背景分得更清楚。';
+
+  @override
+  String get displayColorVision => '色觉调整';
+
+  @override
+  String get displayColorVisionDesc => '应用与地图的颜色都会一起调整。';
+
+  @override
+  String get displayColorVisionNone => '不调整';
+
+  @override
+  String get displayColorVisionProtan => '红色弱';
+
+  @override
+  String get displayColorVisionDeutan => '绿色弱';
+
+  @override
+  String get displayColorVisionTritan => '蓝黄色弱';
+
+  @override
+  String get displayScaleSmall => '小';
+
+  @override
+  String get displayScaleDefault => '默认';
+
+  @override
+  String get displayScaleLarge => '大';
+
+  @override
+  String get displayScaleHuge => '特大';
+
+  @override
+  String get displayWeightNormal => '标准';
+
+  @override
+  String get displayWeightMedium => '中等';
+
+  @override
+  String get displayWeightBold => '粗体';
+
+  @override
+  String get displayContrastStandard => '标准';
+
+  @override
+  String get displayContrastMedium => '中等';
+
+  @override
+  String get displayContrastHigh => '高';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -5710,6 +5848,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String regionSelectFull(int max) {
     return '最多只能選擇 $max 個地區';
   }
+
+  @override
+  String get meshtasticNewMessages => '新訊息';
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -7962,6 +8103,72 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get displayTextSize => '文字大小';
+
+  @override
+  String get displayTextSizeDesc => '只調整 App 介面的文字，地圖上的文字維持原本大小。';
+
+  @override
+  String get displayTextWeight => '文字粗細';
+
+  @override
+  String get displayTextWeightDesc => '文字較粗時可能更容易閱讀。';
+
+  @override
+  String get displayContrast => '對比度';
+
+  @override
+  String get displayContrastDesc => '對比越高，文字與背景越分明。';
+
+  @override
+  String get displayColorVision => '色覺調整';
+
+  @override
+  String get displayColorVisionDesc => '整個 App 的顏色都會一併調整，包括地圖。';
+
+  @override
+  String get displayColorVisionNone => '標準';
+
+  @override
+  String get displayColorVisionProtan => '紅色弱';
+
+  @override
+  String get displayColorVisionDeutan => '綠色弱';
+
+  @override
+  String get displayColorVisionTritan => '藍黃色弱';
+
+  @override
+  String get displayScaleSmall => '小';
+
+  @override
+  String get displayScaleDefault => '預設';
+
+  @override
+  String get displayScaleLarge => '大';
+
+  @override
+  String get displayScaleHuge => '特大';
+
+  @override
+  String get displayWeightNormal => '一般';
+
+  @override
+  String get displayWeightMedium => '中等';
+
+  @override
+  String get displayWeightBold => '粗體';
+
+  @override
+  String get displayContrastStandard => '標準';
+
+  @override
+  String get displayContrastMedium => '中等';
+
+  @override
+  String get displayContrastHigh => '高';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8363,6 +8570,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String regionSelectFull(int max) {
     return '最多只能選擇 $max 個地區';
   }
+
+  @override
+  String get meshtasticNewMessages => '新訊息';
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -10615,4 +10825,70 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get displayTextSize => '文字大小';
+
+  @override
+  String get displayTextSizeDesc => '只影響 App 介面，地圖上的文字大小不變。';
+
+  @override
+  String get displayTextWeight => '文字粗細';
+
+  @override
+  String get displayTextWeightDesc => '較粗的文字通常更容易閱讀。';
+
+  @override
+  String get displayContrast => '對比度';
+
+  @override
+  String get displayContrastDesc => '對比越高，文字與背景的差異越明顯。';
+
+  @override
+  String get displayColorVision => '色覺調整';
+
+  @override
+  String get displayColorVisionDesc => '整個 App 的顏色都會重新調整，地圖也一併改變。';
+
+  @override
+  String get displayColorVisionNone => '標準色彩';
+
+  @override
+  String get displayColorVisionProtan => '紅色弱';
+
+  @override
+  String get displayColorVisionDeutan => '綠色弱';
+
+  @override
+  String get displayColorVisionTritan => '藍黃色弱';
+
+  @override
+  String get displayScaleSmall => '小';
+
+  @override
+  String get displayScaleDefault => '標準';
+
+  @override
+  String get displayScaleLarge => '大';
+
+  @override
+  String get displayScaleHuge => '特大';
+
+  @override
+  String get displayWeightNormal => '標準';
+
+  @override
+  String get displayWeightMedium => '中等';
+
+  @override
+  String get displayWeightBold => '粗體';
+
+  @override
+  String get displayContrastStandard => '標準';
+
+  @override
+  String get displayContrastMedium => '中等';
+
+  @override
+  String get displayContrastHigh => '高';
 }

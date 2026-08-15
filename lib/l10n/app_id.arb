@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "Anda dapat menyimpan hingga {max} wilayah",
+  "meshtasticNewMessages": "BARU",
   "meshtasticTitle": "Meshtastic",
   "navMore": "Lainnya",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "Ukuran teks",
+  "displayTextSizeDesc": "Berlaku untuk antarmuka aplikasi, bukan label peta.",
+  "displayTextWeight": "Ketebalan teks",
+  "displayTextWeightDesc": "Teks yang lebih tebal dapat lebih mudah dibaca.",
+  "displayContrast": "Kontras",
+  "displayContrastDesc": "Kontras yang lebih tinggi memisahkan teks dari latarnya.",
+  "displayColorVision": "Penglihatan warna",
+  "displayColorVisionDesc": "Seluruh aplikasi diwarnai ulang, termasuk warna peta.",
+  "displayColorVisionNone": "Warna standar",
+  "displayColorVisionProtan": "Lemah merah (protanopia)",
+  "displayColorVisionDeutan": "Lemah hijau (deuteranopia)",
+  "displayColorVisionTritan": "Lemah biru-kuning (tritanopia)",
+  "displayScaleSmall": "Kecil",
+  "displayScaleDefault": "Bawaan",
+  "displayScaleLarge": "Besar",
+  "displayScaleHuge": "Sangat besar",
+  "displayWeightNormal": "Normal",
+  "displayWeightMedium": "Sedang",
+  "displayWeightBold": "Tebal",
+  "displayContrastStandard": "Standar",
+  "displayContrastMedium": "Sedang",
+  "displayContrastHigh": "Tinggi"
 }

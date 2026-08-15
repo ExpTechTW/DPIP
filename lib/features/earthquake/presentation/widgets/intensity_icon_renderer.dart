@@ -14,6 +14,7 @@ library;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:flutter/painting.dart';
 
@@ -29,6 +30,8 @@ abstract final class IntensityIconRenderer {
 
   /// Renders every icon in [names] to PNG bytes, cached after the first call.
   static Future<Map<String, Uint8List>> renderAll() async {
+    if (_cachedFor != AppColorVision.current) _cache = null;
+    _cachedFor = AppColorVision.current;
     return _cache ??= await _renderAll();
   }
 
@@ -40,7 +43,10 @@ abstract final class IntensityIconRenderer {
     return icons;
   }
 
+  // Baked bitmaps carry the corrected colours painted into them, so they
+  // must be re-baked when the setting moves — see [VisionCache].
   static Map<String, Uint8List>? _cache;
+  static ColorVision? _cachedFor;
 
   static Future<Uint8List> _paintAndEncode(String name) async {
     final size = name == 'cross' ? 96 : 64;

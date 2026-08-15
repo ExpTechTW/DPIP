@@ -413,6 +413,9 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => 'ใหม่';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2699,4 +2702,72 @@ class AppLocalizationsTh extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” ถูกปฏิเสธไว้ และระบบจะไม่ถามอีก โปรดเปิดในการตั้งค่า';
   }
+
+  @override
+  String get displayTextSize => 'ขนาดตัวอักษร';
+
+  @override
+  String get displayTextSizeDesc =>
+      'มีผลกับข้อความในแอป ป้ายชื่อบนแผนที่ยังคงขนาดเดิม';
+
+  @override
+  String get displayTextWeight => 'น้ำหนักตัวอักษร';
+
+  @override
+  String get displayTextWeightDesc => 'ตัวอักษรหนาขึ้นอาจอ่านง่ายกว่า';
+
+  @override
+  String get displayContrast => 'คอนทราสต์';
+
+  @override
+  String get displayContrastDesc =>
+      'คอนทราสต์สูงขึ้นช่วยให้ข้อความแยกจากพื้นหลังได้ชัดขึ้น';
+
+  @override
+  String get displayColorVision => 'การมองเห็นสี';
+
+  @override
+  String get displayColorVisionDesc => 'ปรับสีทั้งแอป รวมถึงสีบนแผนที่';
+
+  @override
+  String get displayColorVisionNone => 'สีมาตรฐาน';
+
+  @override
+  String get displayColorVisionProtan => 'ตาบอดสีแดง (Protan)';
+
+  @override
+  String get displayColorVisionDeutan => 'ตาบอดสีเขียว (Deutan)';
+
+  @override
+  String get displayColorVisionTritan => 'ตาบอดสีน้ำเงิน–เหลือง (Tritan)';
+
+  @override
+  String get displayScaleSmall => 'เล็ก';
+
+  @override
+  String get displayScaleDefault => 'ปกติ';
+
+  @override
+  String get displayScaleLarge => 'ใหญ่';
+
+  @override
+  String get displayScaleHuge => 'ใหญ่มาก';
+
+  @override
+  String get displayWeightNormal => 'ปกติ';
+
+  @override
+  String get displayWeightMedium => 'ปานกลาง';
+
+  @override
+  String get displayWeightBold => 'หนา';
+
+  @override
+  String get displayContrastStandard => 'มาตรฐาน';
+
+  @override
+  String get displayContrastMedium => 'ปานกลาง';
+
+  @override
+  String get displayContrastHigh => 'สูง';
 }

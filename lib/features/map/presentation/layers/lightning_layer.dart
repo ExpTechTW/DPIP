@@ -52,7 +52,10 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
   List<String> _orderedIds = const [];
   Map<String, int> _indexById = const {};
   bool _mounted = false;
+  // Baked bitmaps carry the corrected colours painted into them, so they
+  // must be re-baked when the setting moves — see [VisionCache].
   bool _imagesReady = false;
+  ColorVision? _imagesVision;
   String? _shownFrameId;
 
   @override
@@ -220,7 +223,8 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
   }
 
   Future<void> _ensureImages(MapLibreMapController controller) async {
-    if (_imagesReady) return;
+    if (_imagesReady && _imagesVision == AppColorVision.current) return;
+    _imagesVision = AppColorVision.current;
     try {
       // One pre-coloured PNG per shape × age bucket, black outline baked in —
       // the same trick as the wind arrows. MapLibre tints a plain (non-SDF)

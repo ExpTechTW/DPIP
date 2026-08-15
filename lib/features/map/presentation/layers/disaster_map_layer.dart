@@ -134,7 +134,10 @@ class DisasterMapLayer with MapLayerDefaults implements MapLayer {
   static const double _pointsMinZoom = 4;
 
   /// Rendered marker PNGs, keyed by image id, cached — a badge never changes.
+  // Baked bitmaps carry the corrected colours painted into them, so they
+  // must be re-baked when the setting moves — see [VisionCache].
   final Map<String, Uint8List> _markerImages = {};
+  ColorVision? _markerVision;
 
   static String _markerImageId(String subId, {int? type}) =>
       type == null ? 'dpm-marker-$subId' : 'dpm-marker-$subId-$type';
@@ -325,6 +328,10 @@ class DisasterMapLayer with MapLayerDefaults implements MapLayer {
       );
 
       final markerId = _markerImageId(sub.id);
+      if (_markerVision != AppColorVision.current) {
+        _markerImages.clear();
+        _markerVision = AppColorVision.current;
+      }
       final bytes = _markerImages[markerId] ??= await _renderMarker(
         sub.icon,
         sub.color,

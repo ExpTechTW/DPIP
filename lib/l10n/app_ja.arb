@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "地域は最大 {max} 件まで登録できます",
+  "meshtasticNewMessages": "新着",
   "meshtasticTitle": "Meshtastic",
   "navMore": "その他",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "文字サイズ",
+  "displayTextSizeDesc": "アプリの画面にのみ適用され、地図のラベルの大きさは変わりません。",
+  "displayTextWeight": "文字の太さ",
+  "displayTextWeightDesc": "文字を太くすると読みやすくなることがあります。",
+  "displayContrast": "コントラスト",
+  "displayContrastDesc": "コントラストを上げると、文字と背景の区別がはっきりします。",
+  "displayColorVision": "色覚調整",
+  "displayColorVisionDesc": "地図の色を含め、アプリ全体の配色を調整します。",
+  "displayColorVisionNone": "なし",
+  "displayColorVisionProtan": "1型（赤）",
+  "displayColorVisionDeutan": "2型（緑）",
+  "displayColorVisionTritan": "3型（青黄）",
+  "displayScaleSmall": "小",
+  "displayScaleDefault": "標準",
+  "displayScaleLarge": "大",
+  "displayScaleHuge": "特大",
+  "displayWeightNormal": "標準",
+  "displayWeightMedium": "やや太い",
+  "displayWeightBold": "太い",
+  "displayContrastStandard": "標準",
+  "displayContrastMedium": "中",
+  "displayContrastHigh": "高"
 }

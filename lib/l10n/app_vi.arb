@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "Bạn chỉ có thể lưu tối đa {max} khu vực",
+  "meshtasticNewMessages": "MỚI",
   "meshtasticTitle": "Meshtastic",
   "navMore": "Thêm",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "Cỡ chữ",
+  "displayTextSizeDesc": "Chỉ áp dụng cho giao diện ứng dụng, không đổi nhãn trên bản đồ.",
+  "displayTextWeight": "Độ đậm chữ",
+  "displayTextWeightDesc": "Chữ đậm hơn có thể dễ đọc hơn.",
+  "displayContrast": "Độ tương phản",
+  "displayContrastDesc": "Tương phản cao hơn giúp chữ tách rõ khỏi nền.",
+  "displayColorVision": "Thị giác màu",
+  "displayColorVisionDesc": "Đổi màu toàn bộ ứng dụng, kể cả màu trên bản đồ.",
+  "displayColorVisionNone": "Màu chuẩn",
+  "displayColorVisionProtan": "Yếu màu đỏ (protanopia)",
+  "displayColorVisionDeutan": "Yếu màu xanh lá (deuteranopia)",
+  "displayColorVisionTritan": "Yếu màu xanh dương/vàng (tritanopia)",
+  "displayScaleSmall": "Nhỏ",
+  "displayScaleDefault": "Mặc định",
+  "displayScaleLarge": "Lớn",
+  "displayScaleHuge": "Rất lớn",
+  "displayWeightNormal": "Thường",
+  "displayWeightMedium": "Đậm vừa",
+  "displayWeightBold": "Đậm",
+  "displayContrastStandard": "Chuẩn",
+  "displayContrastMedium": "Vừa",
+  "displayContrastHigh": "Cao"
 }

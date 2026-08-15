@@ -47,6 +47,8 @@ import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/storage/retention.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/color_vision_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/changelog/changelog_providers.dart';
 import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
@@ -137,6 +139,10 @@ Future<void> bootstrap() async {
   final onboarding = OnboardingStore(settings);
   final locale = LocaleController(settings);
   final theme = ThemeController(settings);
+  // Constructed before the first frame: it installs the saved setting into
+  // AppColorVision, so nothing paints in standard colours and then corrects.
+  final colorVision = ColorVisionController(settings);
+  final display = DisplaySettings(settings);
   final defaultMapLayer = DefaultMapLayerController(settings);
   final mapLayerOrder = MapLayerOrderController(settings);
   final cache = await cacheFuture;
@@ -277,6 +283,8 @@ Future<void> bootstrap() async {
     onboarding: onboarding,
     locale: locale,
     theme: theme,
+    colorVision: colorVision,
+    display: display,
     defaultMapLayer: defaultMapLayer,
     mapLayerOrder: mapLayerOrder,
     meshtastic: meshtastic,

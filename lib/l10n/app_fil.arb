@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "Maaari kang mag-save ng hanggang {max} na rehiyon",
+  "meshtasticNewMessages": "BAGO",
   "meshtasticTitle": "Meshtastic",
   "navMore": "Higit Pa",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "Laki ng teksto",
+  "displayTextSizeDesc": "Nalalapat sa teksto ng app, hindi sa mga label sa mapa.",
+  "displayTextWeight": "Kapal ng teksto",
+  "displayTextWeightDesc": "Maaaring mas madaling basahin ang mas makapal na teksto.",
+  "displayContrast": "Contrast",
+  "displayContrastDesc": "Inihihiwalay ng mas mataas na contrast ang teksto sa background nito.",
+  "displayColorVision": "Paningin sa kulay",
+  "displayColorVisionDesc": "Binabago ang mga kulay sa buong app, pati na sa mapa.",
+  "displayColorVisionNone": "Karaniwang kulay",
+  "displayColorVisionProtan": "Mahina sa pula (protan)",
+  "displayColorVisionDeutan": "Mahina sa berde (deutan)",
+  "displayColorVisionTritan": "Mahina sa asul at dilaw (tritan)",
+  "displayScaleSmall": "Maliit",
+  "displayScaleDefault": "Default",
+  "displayScaleLarge": "Malaki",
+  "displayScaleHuge": "Napakalaki",
+  "displayWeightNormal": "Normal",
+  "displayWeightMedium": "Katamtaman",
+  "displayWeightBold": "Makapal",
+  "displayContrastStandard": "Karaniwan",
+  "displayContrastMedium": "Katamtaman",
+  "displayContrastHigh": "Mataas"
 }

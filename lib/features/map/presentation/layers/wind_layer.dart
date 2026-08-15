@@ -33,7 +33,10 @@ class WindMapLayer
 
   /// The rendered arrow PNGs, cached — the glyph never changes; each bucket's
   /// colour + black outline are baked in at render time.
+  // Baked bitmaps carry the corrected colours painted into them, so they
+  // must be re-baked when the setting moves — see [VisionCache].
   List<Uint8List>? _arrowBytes;
+  ColorVision? _arrowVision;
 
   String _arrowImageFor(int bucket) => '$_arrowImageId-$bucket';
 
@@ -93,6 +96,8 @@ class WindMapLayer
     MapLibreMapController controller,
     String sourceId,
   ) async {
+    if (_arrowVision != AppColorVision.current) _arrowBytes = null;
+    _arrowVision = AppColorVision.current;
     final bytes = _arrowBytes ??= await _renderArrow();
     // One coloured, outline-baked PNG per bucket (no SDF — see [_renderArrow]).
     for (var i = 0; i < windBuckets.length; i++) {

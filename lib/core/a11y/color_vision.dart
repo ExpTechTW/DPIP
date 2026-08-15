@@ -252,3 +252,39 @@ extension ColorVisionHexX on String {
   String get vision =>
       ColorVisionFilter.transformHex(this, AppColorVision.current);
 }
+
+/// A value that has to be rebuilt when the colour-vision setting moves.
+///
+/// Several map layers bake their marker PNGs once and keep them for the life of
+/// the process. Those bitmaps have the corrected colours painted into them, so
+/// a setting change leaves the map drawing yesterday's colours beside a legend
+/// that already updated — the exact disagreement this whole feature is built to
+/// avoid.
+///
+/// The cache remembers which setting it was built for rather than the setting
+/// notifying every cache, so nothing has to keep a registry of them in step:
+/// adding another baked asset cannot forget to register.
+class VisionCache<T> {
+  VisionCache(this._build);
+
+  final T Function() _build;
+  T? _value;
+  ColorVision? _builtFor;
+
+  /// The value, rebuilt if the setting has moved since it was made.
+  T get value {
+    final vision = AppColorVision.current;
+    if (_builtFor != vision || _value == null) {
+      _builtFor = vision;
+      _value = _build();
+    }
+    return _value as T;
+  }
+
+  /// Whether a read would rebuild — for a caller that has to do the rebuild
+  /// itself because it is asynchronous (an icon bake).
+  bool get isStale => _builtFor != AppColorVision.current || _value == null;
+
+  /// Drops the value so the next read rebuilds.
+  void invalidate() => _builtFor = null;
+}

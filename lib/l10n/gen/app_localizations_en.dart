@@ -415,6 +415,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => 'NEW';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2704,4 +2707,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” was declined, and the system will not ask again. Turn it on in Settings.';
   }
+
+  @override
+  String get displayTextSize => 'Text size';
+
+  @override
+  String get displayTextSizeDesc =>
+      'Applies to the app interface — map labels keep their own size.';
+
+  @override
+  String get displayTextWeight => 'Text weight';
+
+  @override
+  String get displayTextWeightDesc => 'Bolder text can be easier to read.';
+
+  @override
+  String get displayContrast => 'Contrast';
+
+  @override
+  String get displayContrastDesc =>
+      'Higher contrast separates text from its background.';
+
+  @override
+  String get displayColorVision => 'Colour vision';
+
+  @override
+  String get displayColorVisionDesc =>
+      'Recolours the whole app, including map colours.';
+
+  @override
+  String get displayColorVisionNone => 'Standard colours';
+
+  @override
+  String get displayColorVisionProtan => 'Red-weak (protanopia)';
+
+  @override
+  String get displayColorVisionDeutan => 'Green-weak (deuteranopia)';
+
+  @override
+  String get displayColorVisionTritan => 'Blue-yellow weak (tritanopia)';
+
+  @override
+  String get displayScaleSmall => 'Small';
+
+  @override
+  String get displayScaleDefault => 'Default';
+
+  @override
+  String get displayScaleLarge => 'Large';
+
+  @override
+  String get displayScaleHuge => 'Extra large';
+
+  @override
+  String get displayWeightNormal => 'Normal';
+
+  @override
+  String get displayWeightMedium => 'Medium';
+
+  @override
+  String get displayWeightBold => 'Bold';
+
+  @override
+  String get displayContrastStandard => 'Standard';
+
+  @override
+  String get displayContrastMedium => 'Medium';
+
+  @override
+  String get displayContrastHigh => 'High';
 }

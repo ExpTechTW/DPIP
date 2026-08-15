@@ -409,6 +409,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => '새 메시지';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2675,4 +2678,70 @@ class AppLocalizationsKo extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」이(가) 거부되어 시스템이 다시 묻지 않습니다. 설정에서 허용해 주세요.';
   }
+
+  @override
+  String get displayTextSize => '글자 크기';
+
+  @override
+  String get displayTextSizeDesc => '앱 화면의 글자에만 적용되며 지도 라벨 크기는 바뀌지 않습니다.';
+
+  @override
+  String get displayTextWeight => '글자 굵기';
+
+  @override
+  String get displayTextWeightDesc => '글자를 굵게 하면 읽기가 더 쉬워질 수 있습니다.';
+
+  @override
+  String get displayContrast => '대비';
+
+  @override
+  String get displayContrastDesc => '대비를 높이면 글자와 배경이 더 뚜렷하게 구분됩니다.';
+
+  @override
+  String get displayColorVision => '색각 보정';
+
+  @override
+  String get displayColorVisionDesc => '지도 색상을 포함해 앱 전체의 색상이 조정됩니다.';
+
+  @override
+  String get displayColorVisionNone => '없음';
+
+  @override
+  String get displayColorVisionProtan => '적색약';
+
+  @override
+  String get displayColorVisionDeutan => '녹색약';
+
+  @override
+  String get displayColorVisionTritan => '청황색약';
+
+  @override
+  String get displayScaleSmall => '작게';
+
+  @override
+  String get displayScaleDefault => '기본';
+
+  @override
+  String get displayScaleLarge => '크게';
+
+  @override
+  String get displayScaleHuge => '아주 크게';
+
+  @override
+  String get displayWeightNormal => '보통';
+
+  @override
+  String get displayWeightMedium => '중간';
+
+  @override
+  String get displayWeightBold => '굵게';
+
+  @override
+  String get displayContrastStandard => '표준';
+
+  @override
+  String get displayContrastMedium => '중간';
+
+  @override
+  String get displayContrastHigh => '높음';
 }

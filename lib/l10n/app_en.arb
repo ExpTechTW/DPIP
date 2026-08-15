@@ -567,6 +567,10 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "You can save up to {max} regions",
+  "meshtasticNewMessages": "NEW",
+  "@meshtasticNewMessages": {
+    "description": "Pill on the red unread divider in the mesh chat log"
+  },
   "meshtasticTitle": "Meshtastic",
   "@moreSectionLinks": {
     "description": "Section header on the More page grouping external website links"
@@ -3604,5 +3608,93 @@
         "type": "String"
       }
     }
+  },
+  "displayTextSize": "Text size",
+  "@displayTextSize": {
+    "description": "Display settings: text size section header"
+  },
+  "displayTextSizeDesc": "Applies to the app interface — map labels keep their own size.",
+  "@displayTextSizeDesc": {
+    "description": "Display settings: what the text size control affects"
+  },
+  "displayTextWeight": "Text weight",
+  "@displayTextWeight": {
+    "description": "Display settings: text weight section header"
+  },
+  "displayTextWeightDesc": "Bolder text can be easier to read.",
+  "@displayTextWeightDesc": {
+    "description": "Display settings: what the text weight control does"
+  },
+  "displayContrast": "Contrast",
+  "@displayContrast": {
+    "description": "Display settings: contrast section header"
+  },
+  "displayContrastDesc": "Higher contrast separates text from its background.",
+  "@displayContrastDesc": {
+    "description": "Display settings: what the contrast control does"
+  },
+  "displayColorVision": "Colour vision",
+  "@displayColorVision": {
+    "description": "Display settings: colour-vision section header"
+  },
+  "displayColorVisionDesc": "Recolours the whole app, including map colours.",
+  "@displayColorVisionDesc": {
+    "description": "Display settings: what the colour-vision control recolours"
+  },
+  "displayColorVisionNone": "Standard colours",
+  "@displayColorVisionNone": {
+    "description": "Display settings option: displayColorVisionNone"
+  },
+  "displayColorVisionProtan": "Red-weak (protanopia)",
+  "@displayColorVisionProtan": {
+    "description": "Display settings option: displayColorVisionProtan"
+  },
+  "displayColorVisionDeutan": "Green-weak (deuteranopia)",
+  "@displayColorVisionDeutan": {
+    "description": "Display settings option: displayColorVisionDeutan"
+  },
+  "displayColorVisionTritan": "Blue-yellow weak (tritanopia)",
+  "@displayColorVisionTritan": {
+    "description": "Display settings option: displayColorVisionTritan"
+  },
+  "displayScaleSmall": "Small",
+  "@displayScaleSmall": {
+    "description": "Display settings option: displayScaleSmall"
+  },
+  "displayScaleDefault": "Default",
+  "@displayScaleDefault": {
+    "description": "Display settings option: displayScaleDefault"
+  },
+  "displayScaleLarge": "Large",
+  "@displayScaleLarge": {
+    "description": "Display settings option: displayScaleLarge"
+  },
+  "displayScaleHuge": "Extra large",
+  "@displayScaleHuge": {
+    "description": "Display settings option: displayScaleHuge"
+  },
+  "displayWeightNormal": "Normal",
+  "@displayWeightNormal": {
+    "description": "Display settings option: displayWeightNormal"
+  },
+  "displayWeightMedium": "Medium",
+  "@displayWeightMedium": {
+    "description": "Display settings option: displayWeightMedium"
+  },
+  "displayWeightBold": "Bold",
+  "@displayWeightBold": {
+    "description": "Display settings option: displayWeightBold"
+  },
+  "displayContrastStandard": "Standard",
+  "@displayContrastStandard": {
+    "description": "Display settings option: displayContrastStandard"
+  },
+  "displayContrastMedium": "Medium",
+  "@displayContrastMedium": {
+    "description": "Display settings option: displayContrastMedium"
+  },
+  "displayContrastHigh": "High",
+  "@displayContrastHigh": {
+    "description": "Display settings option: displayContrastHigh"
   }
 }

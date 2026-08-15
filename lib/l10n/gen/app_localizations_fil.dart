@@ -417,6 +417,9 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => 'BAGO';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2714,4 +2717,74 @@ class AppLocalizationsFil extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return 'Tinanggihan ang “$what” at hindi na magtatanong ang sistema. I-on ito sa Settings.';
   }
+
+  @override
+  String get displayTextSize => 'Laki ng teksto';
+
+  @override
+  String get displayTextSizeDesc =>
+      'Nalalapat sa teksto ng app, hindi sa mga label sa mapa.';
+
+  @override
+  String get displayTextWeight => 'Kapal ng teksto';
+
+  @override
+  String get displayTextWeightDesc =>
+      'Maaaring mas madaling basahin ang mas makapal na teksto.';
+
+  @override
+  String get displayContrast => 'Contrast';
+
+  @override
+  String get displayContrastDesc =>
+      'Inihihiwalay ng mas mataas na contrast ang teksto sa background nito.';
+
+  @override
+  String get displayColorVision => 'Paningin sa kulay';
+
+  @override
+  String get displayColorVisionDesc =>
+      'Binabago ang mga kulay sa buong app, pati na sa mapa.';
+
+  @override
+  String get displayColorVisionNone => 'Karaniwang kulay';
+
+  @override
+  String get displayColorVisionProtan => 'Mahina sa pula (protan)';
+
+  @override
+  String get displayColorVisionDeutan => 'Mahina sa berde (deutan)';
+
+  @override
+  String get displayColorVisionTritan => 'Mahina sa asul at dilaw (tritan)';
+
+  @override
+  String get displayScaleSmall => 'Maliit';
+
+  @override
+  String get displayScaleDefault => 'Default';
+
+  @override
+  String get displayScaleLarge => 'Malaki';
+
+  @override
+  String get displayScaleHuge => 'Napakalaki';
+
+  @override
+  String get displayWeightNormal => 'Normal';
+
+  @override
+  String get displayWeightMedium => 'Katamtaman';
+
+  @override
+  String get displayWeightBold => 'Makapal';
+
+  @override
+  String get displayContrastStandard => 'Karaniwan';
+
+  @override
+  String get displayContrastMedium => 'Katamtaman';
+
+  @override
+  String get displayContrastHigh => 'Mataas';
 }

@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "最多只能選擇 {max} 個地區",
+  "meshtasticNewMessages": "新訊息",
   "meshtasticTitle": "Meshtastic",
   "navMore": "更多",
   "meshtasticDpipChannel": "DPIP 頻道",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "文字大小",
+  "displayTextSizeDesc": "只影響 App 介面，地圖上的文字大小不變。",
+  "displayTextWeight": "文字粗細",
+  "displayTextWeightDesc": "較粗的文字通常更容易閱讀。",
+  "displayContrast": "對比度",
+  "displayContrastDesc": "對比越高，文字與背景的差異越明顯。",
+  "displayColorVision": "色覺調整",
+  "displayColorVisionDesc": "整個 App 的顏色都會重新調整，地圖也一併改變。",
+  "displayColorVisionNone": "標準色彩",
+  "displayColorVisionProtan": "紅色弱",
+  "displayColorVisionDeutan": "綠色弱",
+  "displayColorVisionTritan": "藍黃色弱",
+  "displayScaleSmall": "小",
+  "displayScaleDefault": "標準",
+  "displayScaleLarge": "大",
+  "displayScaleHuge": "特大",
+  "displayWeightNormal": "標準",
+  "displayWeightMedium": "中等",
+  "displayWeightBold": "粗體",
+  "displayContrastStandard": "標準",
+  "displayContrastMedium": "中等",
+  "displayContrastHigh": "高"
 }

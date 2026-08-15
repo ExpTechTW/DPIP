@@ -414,6 +414,9 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => 'MỚI';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2705,4 +2708,73 @@ class AppLocalizationsVi extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” đã bị từ chối và hệ thống sẽ không hỏi lại. Hãy bật trong Cài đặt.';
   }
+
+  @override
+  String get displayTextSize => 'Cỡ chữ';
+
+  @override
+  String get displayTextSizeDesc =>
+      'Chỉ áp dụng cho giao diện ứng dụng, không đổi nhãn trên bản đồ.';
+
+  @override
+  String get displayTextWeight => 'Độ đậm chữ';
+
+  @override
+  String get displayTextWeightDesc => 'Chữ đậm hơn có thể dễ đọc hơn.';
+
+  @override
+  String get displayContrast => 'Độ tương phản';
+
+  @override
+  String get displayContrastDesc =>
+      'Tương phản cao hơn giúp chữ tách rõ khỏi nền.';
+
+  @override
+  String get displayColorVision => 'Thị giác màu';
+
+  @override
+  String get displayColorVisionDesc =>
+      'Đổi màu toàn bộ ứng dụng, kể cả màu trên bản đồ.';
+
+  @override
+  String get displayColorVisionNone => 'Màu chuẩn';
+
+  @override
+  String get displayColorVisionProtan => 'Yếu màu đỏ (protanopia)';
+
+  @override
+  String get displayColorVisionDeutan => 'Yếu màu xanh lá (deuteranopia)';
+
+  @override
+  String get displayColorVisionTritan => 'Yếu màu xanh dương/vàng (tritanopia)';
+
+  @override
+  String get displayScaleSmall => 'Nhỏ';
+
+  @override
+  String get displayScaleDefault => 'Mặc định';
+
+  @override
+  String get displayScaleLarge => 'Lớn';
+
+  @override
+  String get displayScaleHuge => 'Rất lớn';
+
+  @override
+  String get displayWeightNormal => 'Thường';
+
+  @override
+  String get displayWeightMedium => 'Đậm vừa';
+
+  @override
+  String get displayWeightBold => 'Đậm';
+
+  @override
+  String get displayContrastStandard => 'Chuẩn';
+
+  @override
+  String get displayContrastMedium => 'Vừa';
+
+  @override
+  String get displayContrastHigh => 'Cao';
 }

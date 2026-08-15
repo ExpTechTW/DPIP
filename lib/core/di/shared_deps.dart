@@ -27,6 +27,8 @@ import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/color_vision_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
@@ -60,6 +62,8 @@ class SharedDeps {
     required this.onboarding,
     required this.locale,
     required this.theme,
+    required this.colorVision,
+    required this.display,
     required this.defaultMapLayer,
     required this.mapLayerOrder,
     required this.meshtastic,
@@ -132,6 +136,12 @@ class SharedDeps {
 
   /// The selected theme mode (also provided; drives `MaterialApp.themeMode`).
   final ThemeController theme;
+
+  /// The colour-vision correction setting.
+  final ColorVisionController colorVision;
+
+  /// Text size / weight / contrast.
+  final DisplaySettings display;
 
   /// Default Map-tab overlay (also provided; drives nav chrome + map open).
   final DefaultMapLayerController defaultMapLayer;

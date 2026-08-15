@@ -414,6 +414,9 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => 'BARU';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2707,4 +2710,74 @@ class AppLocalizationsId extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” ditolak dan sistem tidak akan bertanya lagi. Aktifkan di Pengaturan.';
   }
+
+  @override
+  String get displayTextSize => 'Ukuran teks';
+
+  @override
+  String get displayTextSizeDesc =>
+      'Berlaku untuk antarmuka aplikasi, bukan label peta.';
+
+  @override
+  String get displayTextWeight => 'Ketebalan teks';
+
+  @override
+  String get displayTextWeightDesc =>
+      'Teks yang lebih tebal dapat lebih mudah dibaca.';
+
+  @override
+  String get displayContrast => 'Kontras';
+
+  @override
+  String get displayContrastDesc =>
+      'Kontras yang lebih tinggi memisahkan teks dari latarnya.';
+
+  @override
+  String get displayColorVision => 'Penglihatan warna';
+
+  @override
+  String get displayColorVisionDesc =>
+      'Seluruh aplikasi diwarnai ulang, termasuk warna peta.';
+
+  @override
+  String get displayColorVisionNone => 'Warna standar';
+
+  @override
+  String get displayColorVisionProtan => 'Lemah merah (protanopia)';
+
+  @override
+  String get displayColorVisionDeutan => 'Lemah hijau (deuteranopia)';
+
+  @override
+  String get displayColorVisionTritan => 'Lemah biru-kuning (tritanopia)';
+
+  @override
+  String get displayScaleSmall => 'Kecil';
+
+  @override
+  String get displayScaleDefault => 'Bawaan';
+
+  @override
+  String get displayScaleLarge => 'Besar';
+
+  @override
+  String get displayScaleHuge => 'Sangat besar';
+
+  @override
+  String get displayWeightNormal => 'Normal';
+
+  @override
+  String get displayWeightMedium => 'Sedang';
+
+  @override
+  String get displayWeightBold => 'Tebal';
+
+  @override
+  String get displayContrastStandard => 'Standar';
+
+  @override
+  String get displayContrastMedium => 'Sedang';
+
+  @override
+  String get displayContrastHigh => 'Tinggi';
 }

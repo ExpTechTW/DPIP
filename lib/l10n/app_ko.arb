@@ -191,6 +191,7 @@
     "description": "Section: device identity"
   },
   "regionSelectFull": "최대 {max}개 지역까지 저장할 수 있습니다",
+  "meshtasticNewMessages": "새 메시지",
   "meshtasticTitle": "Meshtastic",
   "navMore": "더보기",
   "meshtasticDpipChannel": "DPIP channel",
@@ -1772,5 +1773,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "displayTextSize": "글자 크기",
+  "displayTextSizeDesc": "앱 화면의 글자에만 적용되며 지도 라벨 크기는 바뀌지 않습니다.",
+  "displayTextWeight": "글자 굵기",
+  "displayTextWeightDesc": "글자를 굵게 하면 읽기가 더 쉬워질 수 있습니다.",
+  "displayContrast": "대비",
+  "displayContrastDesc": "대비를 높이면 글자와 배경이 더 뚜렷하게 구분됩니다.",
+  "displayColorVision": "색각 보정",
+  "displayColorVisionDesc": "지도 색상을 포함해 앱 전체의 색상이 조정됩니다.",
+  "displayColorVisionNone": "없음",
+  "displayColorVisionProtan": "적색약",
+  "displayColorVisionDeutan": "녹색약",
+  "displayColorVisionTritan": "청황색약",
+  "displayScaleSmall": "작게",
+  "displayScaleDefault": "기본",
+  "displayScaleLarge": "크게",
+  "displayScaleHuge": "아주 크게",
+  "displayWeightNormal": "보통",
+  "displayWeightMedium": "중간",
+  "displayWeightBold": "굵게",
+  "displayContrastStandard": "표준",
+  "displayContrastMedium": "중간",
+  "displayContrastHigh": "높음"
 }

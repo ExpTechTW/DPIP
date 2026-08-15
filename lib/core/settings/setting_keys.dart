@@ -51,6 +51,24 @@ abstract final class SettingKeys {
     'app.themeMode',
   );
 
+  /// UI text scale (`small` / `large` / `huge`; absent = the OS size alone).
+  /// Multiplies the accessibility size the user already set at OS level rather
+  /// than replacing it. See `DisplaySettings`.
+  static const SettingKey<String> textScale = SettingKey<String>._(
+    'app.textScale',
+  );
+
+  /// UI text weight (`medium` / `bold`; absent = normal). See `DisplaySettings`.
+  static const SettingKey<String> textWeight = SettingKey<String>._(
+    'app.textWeight',
+  );
+
+  /// Colour-scheme contrast (`medium` / `high`; absent = standard). See
+  /// `DisplaySettings`.
+  static const SettingKey<String> contrast = SettingKey<String>._(
+    'app.contrast',
+  );
+
   /// Which colour-vision deficiency the app corrects for, or absent for none.
   /// See `core/a11y/color_vision.dart` and `ColorVisionController`.
   static const SettingKey<String> colorVision = SettingKey<String>._(

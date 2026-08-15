@@ -408,6 +408,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get meshtasticNewMessages => '新着';
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2666,4 +2669,70 @@ class AppLocalizationsJa extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」は拒否されており、システムは再度確認しません。設定から許可してください。';
   }
+
+  @override
+  String get displayTextSize => '文字サイズ';
+
+  @override
+  String get displayTextSizeDesc => 'アプリの画面にのみ適用され、地図のラベルの大きさは変わりません。';
+
+  @override
+  String get displayTextWeight => '文字の太さ';
+
+  @override
+  String get displayTextWeightDesc => '文字を太くすると読みやすくなることがあります。';
+
+  @override
+  String get displayContrast => 'コントラスト';
+
+  @override
+  String get displayContrastDesc => 'コントラストを上げると、文字と背景の区別がはっきりします。';
+
+  @override
+  String get displayColorVision => '色覚調整';
+
+  @override
+  String get displayColorVisionDesc => '地図の色を含め、アプリ全体の配色を調整します。';
+
+  @override
+  String get displayColorVisionNone => 'なし';
+
+  @override
+  String get displayColorVisionProtan => '1型（赤）';
+
+  @override
+  String get displayColorVisionDeutan => '2型（緑）';
+
+  @override
+  String get displayColorVisionTritan => '3型（青黄）';
+
+  @override
+  String get displayScaleSmall => '小';
+
+  @override
+  String get displayScaleDefault => '標準';
+
+  @override
+  String get displayScaleLarge => '大';
+
+  @override
+  String get displayScaleHuge => '特大';
+
+  @override
+  String get displayWeightNormal => '標準';
+
+  @override
+  String get displayWeightMedium => 'やや太い';
+
+  @override
+  String get displayWeightBold => '太い';
+
+  @override
+  String get displayContrastStandard => '標準';
+
+  @override
+  String get displayContrastMedium => '中';
+
+  @override
+  String get displayContrastHigh => '高';
 }

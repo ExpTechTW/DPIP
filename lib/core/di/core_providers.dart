@@ -26,6 +26,8 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/color_vision_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +44,8 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),
   ChangeNotifierProvider<ThemeController>.value(value: deps.theme),
+  ChangeNotifierProvider<ColorVisionController>.value(value: deps.colorVision),
+  ChangeNotifierProvider<DisplaySettings>.value(value: deps.display),
   ChangeNotifierProvider<DefaultMapLayerController>.value(
     value: deps.defaultMapLayer,
   ),

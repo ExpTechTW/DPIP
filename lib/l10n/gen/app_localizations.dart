@@ -861,6 +861,12 @@ abstract class AppLocalizations {
   /// **'You can save up to {max} regions'**
   String regionSelectFull(int max);
 
+  /// Pill on the red unread divider in the mesh chat log
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get meshtasticNewMessages;
+
   /// Meshtastic test page title
   ///
   /// In en, this message translates to:
@@ -5162,6 +5168,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'“{what}” was declined, and the system will not ask again. Turn it on in Settings.'**
   String permissionSettingsMessage(String what);
+
+  /// Display settings: text size section header
+  ///
+  /// In en, this message translates to:
+  /// **'Text size'**
+  String get displayTextSize;
+
+  /// Display settings: what the text size control affects
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to the app interface — map labels keep their own size.'**
+  String get displayTextSizeDesc;
+
+  /// Display settings: text weight section header
+  ///
+  /// In en, this message translates to:
+  /// **'Text weight'**
+  String get displayTextWeight;
+
+  /// Display settings: what the text weight control does
+  ///
+  /// In en, this message translates to:
+  /// **'Bolder text can be easier to read.'**
+  String get displayTextWeightDesc;
+
+  /// Display settings: contrast section header
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast'**
+  String get displayContrast;
+
+  /// Display settings: what the contrast control does
+  ///
+  /// In en, this message translates to:
+  /// **'Higher contrast separates text from its background.'**
+  String get displayContrastDesc;
+
+  /// Display settings: colour-vision section header
+  ///
+  /// In en, this message translates to:
+  /// **'Colour vision'**
+  String get displayColorVision;
+
+  /// Display settings: what the colour-vision control recolours
+  ///
+  /// In en, this message translates to:
+  /// **'Recolours the whole app, including map colours.'**
+  String get displayColorVisionDesc;
+
+  /// Display settings option: displayColorVisionNone
+  ///
+  /// In en, this message translates to:
+  /// **'Standard colours'**
+  String get displayColorVisionNone;
+
+  /// Display settings option: displayColorVisionProtan
+  ///
+  /// In en, this message translates to:
+  /// **'Red-weak (protanopia)'**
+  String get displayColorVisionProtan;
+
+  /// Display settings option: displayColorVisionDeutan
+  ///
+  /// In en, this message translates to:
+  /// **'Green-weak (deuteranopia)'**
+  String get displayColorVisionDeutan;
+
+  /// Display settings option: displayColorVisionTritan
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-yellow weak (tritanopia)'**
+  String get displayColorVisionTritan;
+
+  /// Display settings option: displayScaleSmall
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get displayScaleSmall;
+
+  /// Display settings option: displayScaleDefault
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get displayScaleDefault;
+
+  /// Display settings option: displayScaleLarge
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get displayScaleLarge;
+
+  /// Display settings option: displayScaleHuge
+  ///
+  /// In en, this message translates to:
+  /// **'Extra large'**
+  String get displayScaleHuge;
+
+  /// Display settings option: displayWeightNormal
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get displayWeightNormal;
+
+  /// Display settings option: displayWeightMedium
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get displayWeightMedium;
+
+  /// Display settings option: displayWeightBold
+  ///
+  /// In en, this message translates to:
+  /// **'Bold'**
+  String get displayWeightBold;
+
+  /// Display settings option: displayContrastStandard
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get displayContrastStandard;
+
+  /// Display settings option: displayContrastMedium
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get displayContrastMedium;
+
+  /// Display settings option: displayContrastHigh
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get displayContrastHigh;
 }
 
 class _AppLocalizationsDelegate
