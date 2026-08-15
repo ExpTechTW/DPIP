@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
@@ -42,10 +43,18 @@ class NotificationService {
   /// silent / Do-Not-Disturb (iOS; guarded by the app entitlement). Shown as a
   /// separate onboarding step on iOS.
   Future<bool> criticalAllowed() async {
-    final granted = await AwesomeNotifications().checkPermissionList(
-      permissions: const [NotificationPermission.CriticalAlert],
-    );
-    return granted.contains(NotificationPermission.CriticalAlert);
+    try {
+      final granted = await AwesomeNotifications().checkPermissionList(
+        permissions: const [NotificationPermission.CriticalAlert],
+      );
+      Log.debug('permission: criticalAllowed -> $granted');
+      return granted.contains(NotificationPermission.CriticalAlert);
+    } catch (error, stackTrace) {
+      // Used to escape and take the caller's whole handler with it, which is
+      // one of the ways a permission row can end up doing nothing at all.
+      Log.handle(error, stackTrace, 'criticalAllowed');
+      return false;
+    }
   }
 
   /// Initializes channels, the tap listener, and the FCM/APNs transport. Call
@@ -58,13 +67,22 @@ class NotificationService {
     await _initMessaging();
   }
 
-  /// Requests OS notification permission if not already granted; returns whether
-  /// it is now allowed. Includes the **critical-alert** permission (guarded by
-  /// the app's `usernotifications.critical-alerts` entitlement) so EEW alerts can
-  /// override silent/Do-Not-Disturb. Call from a screen (e.g. onboarding), not at
-  /// launch.
-  Future<bool> requestPermission() async {
-    if (await AwesomeNotifications().isNotificationAllowed()) return true;
+  /// Requests ordinary notification permission. Call from a screen (e.g.
+  /// onboarding), not at launch.
+  ///
+  /// Deliberately does **not** ask for the critical alert — that is
+  /// [requestCritical]. iOS treats the two as separate grants, and bundling
+  /// them made the critical request unreachable: this method short-circuits on
+  /// "already allowed", which is true the moment the ordinary prompt is
+  /// answered, so a later tap on the critical-alert row did nothing at all.
+  ///
+  /// A refusal is reported as [PermissionOutcome.needsSettings] rather than a
+  /// bare failure, because both platforms prompt only once: a second tap is
+  /// silent, and the caller has to say so instead of appearing to ignore it.
+  Future<PermissionOutcome> requestPermission() async {
+    final already = await AwesomeNotifications().isNotificationAllowed();
+    Log.info('permission: notifications, already allowed = $already');
+    if (already) return PermissionOutcome.granted;
     final granted = await AwesomeNotifications()
         .requestPermissionToSendNotifications(
           permissions: const [
@@ -73,35 +91,150 @@ class NotificationService {
             NotificationPermission.Badge,
             NotificationPermission.Vibration,
             NotificationPermission.Light,
-            NotificationPermission.CriticalAlert,
           ],
         );
-    // Permission is usually granted well after launch (onboarding) — by then the
-    // launch-time token fetch may have found no APNs token yet. Retry now that
-    // the user has decided (background; never blocks the caller).
-    if (granted) unawaited(_fetchToken());
-    return granted;
+    Log.info('permission: notifications request -> $granted');
+    if (granted) {
+      // Permission is usually granted well after launch (onboarding) — by then
+      // the launch-time token fetch may have found no APNs token yet. Retry now
+      // that the user has decided (background; never blocks the caller).
+      unawaited(_fetchToken());
+      return PermissionOutcome.granted;
+    }
+    return PermissionOutcome.needsSettings;
+  }
+
+  /// Requests the **critical-alert** permission, which lets an EEW sound
+  /// through silent mode and Do Not Disturb. Returns whether it is granted
+  /// afterwards.
+  ///
+  /// Its own request because iOS grants it separately from ordinary
+  /// notifications, and its own *check* afterwards because
+  /// `requestPermissionToSendNotifications` answers "are notifications allowed
+  /// at all", which is already true here — taking it as the result would report
+  /// success no matter what the user chose.
+  ///
+  /// It can legitimately fail with no prompt and nothing to do about it in
+  /// code: the permission is gated by the
+  /// `com.apple.developer.usernotifications.critical-alerts` entitlement, which
+  /// Apple grants per team on request, and it must be in the *provisioning
+  /// profile* as well as in `Runner.entitlements`. When it does not land,
+  /// [openSystemSettings] is the only remaining path.
+  Future<PermissionOutcome> requestCritical() async {
+    try {
+      final answered = await AwesomeNotifications()
+          .requestPermissionToSendNotifications(
+            permissions: const [NotificationPermission.CriticalAlert],
+          );
+      Log.info('permission: critical-alert request -> $answered');
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'critical-alert request');
+    }
+    final granted = await criticalAllowed();
+    Log.info('permission: critical-alert granted = $granted');
+    return granted
+        ? PermissionOutcome.granted
+        : PermissionOutcome.needsSettings;
+  }
+
+  /// Opens the OS notification settings for this app — the fallback when a
+  /// permission cannot be granted from inside the app any more.
+  Future<void> openSystemSettings() async {
+    Log.info('permission: opening notification settings');
+    try {
+      await AwesomeNotifications().showNotificationConfigPage();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'showNotificationConfigPage');
+    }
   }
 
   Future<void> _initChannels() async {
-    await AwesomeNotifications().initialize(
-      NotificationChannels.icon,
-      NotificationChannels.channels,
-      channelGroups: NotificationChannels.groups,
-      debug: kDebugMode,
-    );
+    final channels = NotificationChannels.channels;
 
-    // Android caches channel settings after first creation; force-update them
-    // when the catalogue version changes.
-    final stored = _settings.getInt(SettingKeys.channelVersion) ?? 0;
-    if (stored < NotificationChannels.version) {
-      for (final channel in NotificationChannels.channels) {
+    // The normal path is one batch call — the same one this always made.
+    //
+    // What changed is what happens when it fails. `initialize` validates every
+    // channel natively and throws on the first it rejects, so one bad sound or
+    // icon used to leave the app with **no channels at all** and no push
+    // transport either (the exception aborted the rest of `init`). For an app
+    // whose reason to exist is earthquake alerts, "one typo silences every
+    // notification" is not an acceptable failure mode, and the anonymous
+    // `PlatformException` said nothing about which channel caused it.
+    //
+    // So a batch failure falls through to registering them one at a time,
+    // which costs only the offending channel and names it in the log.
+    var registered = false;
+    try {
+      await AwesomeNotifications().initialize(
+        NotificationChannels.icon,
+        channels,
+        channelGroups: NotificationChannels.groups,
+        debug: kDebugMode,
+      );
+      registered = true;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'channel batch rejected — isolating');
+    }
+
+    final rejected = <String>[];
+    NotificationChannel? seed;
+    if (!registered) {
+      // `initialize` requires at least one channel, so the isolation pass
+      // starts by finding any single channel it will accept; that one seeds
+      // the plugin and the rest go in through `setChannel`.
+      for (final channel in channels) {
         try {
-          await AwesomeNotifications().setChannel(channel, forceUpdate: true);
+          await AwesomeNotifications().initialize(
+            NotificationChannels.icon,
+            [channel],
+            channelGroups: NotificationChannels.groups,
+            debug: kDebugMode,
+          );
+          seed = channel;
+          break;
         } catch (error, stackTrace) {
-          Log.handle(error, stackTrace, 'setChannel ${channel.channelKey}');
+          rejected.add(channel.channelKey ?? '?');
+          Log.handle(error, stackTrace, 'channel ${channel.channelKey}');
         }
       }
+      if (seed == null) {
+        Log.error(
+          'notifications: no channel could be registered — every one was '
+          'rejected. Alerts will not be delivered.',
+        );
+        return;
+      }
+    }
+
+    // Android caches a channel's settings after first creation, so a changed
+    // sound or importance only takes effect with `forceUpdate` — which is what
+    // the catalogue version is for.
+    final stored = _settings.getInt(SettingKeys.channelVersion) ?? 0;
+    final force = stored < NotificationChannels.version;
+
+    // On the happy path this only runs when the catalogue changed. On the
+    // degraded path it always runs, because it is what registers the channels
+    // the seed did not.
+    if (force || !registered) {
+      for (final channel in channels) {
+        if (identical(channel, seed)) continue;
+        if (rejected.contains(channel.channelKey)) continue;
+        try {
+          await AwesomeNotifications().setChannel(channel, forceUpdate: force);
+        } catch (error, stackTrace) {
+          rejected.add(channel.channelKey ?? '?');
+          Log.handle(error, stackTrace, 'channel ${channel.channelKey}');
+        }
+      }
+    }
+
+    if (rejected.isNotEmpty) {
+      Log.error(
+        'notifications: ${rejected.length} of ${channels.length} channel(s) '
+        'rejected — ${rejected.join(', ')}. The rest are registered.',
+      );
+    }
+    if (force) {
       await _settings.setInt(
         SettingKeys.channelVersion,
         NotificationChannels.version,

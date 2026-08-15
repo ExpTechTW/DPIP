@@ -37,8 +37,15 @@ baseline, feature-first architecture).
   `analysis_options.yaml`, so it fails analysis.
 - Uncaught Flutter/async errors are captured automatically
   (`Log.installErrorHandlers()` in `bootstrap.dart`).
-- In-app log viewer: the **App 日誌** page (More tab → `LogPage`), backed by the
-  same `Log` history.
+- The log is **persisted** to the `logs` table of the durable database with a
+  rolling **24-hour** retention (`core/logging/log_store.dart`). Writes are
+  buffered and flushed on a timer, on a burst, and when the app backgrounds —
+  a log call never costs a database round-trip, and the store never throws
+  (it is called from error handlers, where a failure would replace a
+  diagnostic with a crash). Retention runs on write, not on read.
+- In-app log viewer: the **App 日誌** page (More tab → `LogPage`), which shows
+  the live session and replays the last 24 hours from the table on open, so it
+  covers the launch that crashed rather than only the current one.
 
 ## Conventions
 
@@ -129,7 +136,13 @@ baseline, feature-first architecture).
   background messages display via awesome so each honours its channel; a
   `notification`-payload message is shown by the OS. Alert categories live in
   `notification_channels.dart` — bump `version` when one changes so Android
-  re-creates it. Taps funnel through `NotificationTaps` (core carries the channel
+  re-creates it. Channels register as one batch; if that
+  batch is rejected the service falls back to registering them individually, so
+  one bad channel costs only itself and is named in the log instead of leaving
+  the app with no channels *and* no push transport. (`initialize` needs at
+  least one channel, so the fallback seeds itself with the first one that is
+  accepted.) `tool/check_notification_sounds.sh` catches an unresolvable
+  `resource://raw/<name>` before it ships. Taps funnel through `NotificationTaps` (core carries the channel
   key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
   APNs auth key to the Firebase console for iOS; push only works on a physical
   device; permission is requested after the first frame for now (move to
