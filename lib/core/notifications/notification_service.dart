@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
@@ -83,15 +84,42 @@ class NotificationService {
     final already = await AwesomeNotifications().isNotificationAllowed();
     Log.info('permission: notifications, already allowed = $already');
     if (already) return PermissionOutcome.granted;
+
+    // Ask the plugin to prompt **only** when iOS has not decided yet.
+    //
+    // Once the answer is "denied", awesome does not simply return false: it
+    // opens the system settings page itself and parks the completion in a
+    // queue that only drains when the app comes back. From Dart that is an
+    // `await` that may never return — which is exactly what happened here. The
+    // notification row logged "tapped", then nothing at all, twice, while the
+    // rows that take other paths answered instantly.
+    //
+    // So a decided-and-denied state skips the plugin entirely and goes
+    // straight to the caller's own explain-then-open flow, where the app is
+    // the one deciding when to navigate.
+    if (!await _canPrompt()) {
+      Log.info('permission: notifications already decided — settings only');
+      return PermissionOutcome.needsSettings;
+    }
+
     final granted = await AwesomeNotifications()
         .requestPermissionToSendNotifications(
           permissions: const [
             NotificationPermission.Alert,
             NotificationPermission.Sound,
             NotificationPermission.Badge,
-            NotificationPermission.Vibration,
-            NotificationPermission.Light,
           ],
+        )
+        // A backstop for every other way the plugin can fail to answer.
+        // A permission button that hangs is indistinguishable from one
+        // that is broken, and the fallback here is a dialog that at least
+        // tells the user where to go.
+        .timeout(
+          const Duration(seconds: 20),
+          onTimeout: () {
+            Log.warning('permission: notification request never answered');
+            return false;
+          },
         );
     Log.info('permission: notifications request -> $granted');
     if (granted) {
@@ -102,6 +130,26 @@ class NotificationService {
       return PermissionOutcome.granted;
     }
     return PermissionOutcome.needsSettings;
+  }
+
+  /// Whether the OS will still show its own prompt.
+  ///
+  /// `notDetermined` is the only state where asking produces a dialog. Both
+  /// platforms answer once and then never again, and on iOS asking anyway
+  /// hands control to the plugin's settings-page detour.
+  Future<bool> _canPrompt() async {
+    try {
+      final statuses = await AwesomeNotifications().getPermissionStatusList(
+        permissions: const [NotificationPermission.Alert],
+      );
+      Log.debug('permission: notification status -> $statuses');
+      return statuses[NotificationPermission.Alert] ==
+          NotificationPermissionStatus.notDetermined;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'notification permission status');
+      // Unknown: let the plugin try rather than dead-end on a guess.
+      return true;
+    }
   }
 
   /// Requests the **critical-alert** permission, which lets an EEW sound
@@ -125,6 +173,13 @@ class NotificationService {
       final answered = await AwesomeNotifications()
           .requestPermissionToSendNotifications(
             permissions: const [NotificationPermission.CriticalAlert],
+          )
+          .timeout(
+            const Duration(seconds: 20),
+            onTimeout: () {
+              Log.warning('permission: critical request never answered');
+              return false;
+            },
           );
       Log.info('permission: critical-alert request -> $answered');
     } catch (error, stackTrace) {
@@ -141,11 +196,10 @@ class NotificationService {
   /// permission cannot be granted from inside the app any more.
   Future<void> openSystemSettings() async {
     Log.info('permission: opening notification settings');
-    try {
-      await AwesomeNotifications().showNotificationConfigPage();
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'showNotificationConfigPage');
-    }
+    // Not awesome's `showNotificationConfigPage` — on iOS that returned
+    // without navigating anywhere and without an error, which is how the
+    // "Open Settings" button became the next thing that did nothing.
+    await openAppSettingsPage();
   }
 
   Future<void> _initChannels() async {

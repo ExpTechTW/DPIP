@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -66,12 +67,7 @@ class LocationService {
   /// location). Best-effort.
   Future<void> openSettings() async {
     Log.info('permission: opening app settings');
-    try {
-      final opened = await Geolocator.openAppSettings();
-      Log.info('permission: openAppSettings -> $opened');
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'openAppSettings');
-    }
+    await openAppSettingsPage();
   }
 
   /// Requests **foreground** location permission (call from a screen, after

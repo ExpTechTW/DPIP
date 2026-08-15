@@ -136,7 +136,14 @@ baseline, feature-first architecture).
   background messages display via awesome so each honours its channel; a
   `notification`-payload message is shown by the OS. Alert categories live in
   `notification_channels.dart` — bump `version` when one changes so Android
-  re-creates it. Channels register as one batch; if that
+  re-creates it. Permission requests go through
+  `NotificationService`, which asks the plugin to prompt **only** when the OS
+  status is `notDetermined`: once iOS has been told "no", awesome opens the
+  settings page itself and parks its completion until the app returns, so the
+  awaited Future can simply never come back. A decided state therefore returns
+  `PermissionOutcome.needsSettings` without calling the plugin, and every
+  request carries a timeout so a button can never be inert. Channels register
+  as one batch; if that
   batch is rejected the service falls back to registering them individually, so
   one bad channel costs only itself and is named in the log instead of leaving
   the app with no channels *and* no push transport. (`initialize` needs at
