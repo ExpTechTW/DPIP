@@ -14,6 +14,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
@@ -378,7 +379,11 @@ class _NodeDetail extends StatelessWidget {
 
   // l10n-ignore: compact age readout
   String _relative(DateTime at) {
-    final age = DateTime.now().difference(at);
+    // Same calibrated clock the store stamped the sample with — a wall clock
+    // here and AppTime there would disagree by whatever the device clock has
+    // drifted (or been set to), which is exactly the discrepancy that makes an
+    // age readout lie.
+    final age = AppTime.utc.toLocal().difference(at);
     if (age.inMinutes < 1) return 'now';
     if (age.inMinutes < 60) return '${age.inMinutes}m';
     if (age.inHours < 24) return '${age.inHours}h';

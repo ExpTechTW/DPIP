@@ -1,4 +1,5 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -45,7 +46,10 @@ class MapFrame {
 /// happened. For observations the answer is unchanged.
 int nowFrameIndex(List<MapFrame> frames, {DateTime? now}) {
   if (frames.isEmpty) return 0;
-  final at = now ?? DateTime.now();
+  // The frame times are server timestamps, so the default clock must be the
+  // calibrated one, not the device wall clock — a device clock that drifted
+  // (or a timezone the device changed) would pick the wrong "now" frame.
+  final at = now ?? AppTime.utc;
   // Frames are chronological, so scan from the newest backwards.
   for (var i = frames.length - 1; i >= 0; i--) {
     if (!frames[i].time.isAfter(at)) return i;

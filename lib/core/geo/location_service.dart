@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:dpip/core/geo/location_status.dart';
+import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/geo/town_boundaries.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
-import 'package:dpip/core/geo/location_status.dart';
-import 'package:dpip/core/geo/town_boundaries.dart';
-import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// A GPS coordinate fix in decimal degrees.
@@ -291,5 +292,11 @@ class LocationService {
   }
 
   static bool _isFresh(DateTime timestamp) =>
-      DateTime.now().toUtc().difference(timestamp.toUtc()) <= _maxLastKnownAge;
+      // The calibrated clock, not the wall clock: the last-known position is
+      // only worth using while it is genuinely current, and a user who set
+      // their clock forward would age a good fix out (a wasted 10-second
+      // location request) or — worse — set it back and keep trusting a fix
+      // that is 20 minutes old. AppTime is anchored to SNTP, so manual clock
+      // changes cannot move it.
+      AppTime.utc.difference(timestamp.toUtc()) <= _maxLastKnownAge;
 }

@@ -19,6 +19,7 @@ import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/platform/screen_wake.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_utilization_chart.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -75,6 +76,7 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
     // instead of collapsing them into one list.
     final dpipIndex = link.lastKnownDpipChannel;
     final channels = _channelOptions(
+      remembered: controller.channelNames,
       fromRadio: service.channels,
       fromLog: controller.messageCountsByChannel.keys,
     );
@@ -159,20 +161,38 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
   /// Every channel worth offering, index-ordered: the radio's enabled slots,
   /// plus any channel the stored log holds messages for.
   ///
-  /// A log-only channel is synthesised with no name — all that is known about
-  /// it is its index, which is exactly what its label falls back to.
+  /// A channel the radio has not reported takes the name it was last seen
+  /// with ([remembered]); only a channel that has never been named falls back
+  /// to its slot number. The live table still wins where it exists — a channel
+  /// renamed on the radio must not keep showing its old name.
   List<MeshChannel> _channelOptions({
+    required Map<int, String> remembered,
     required List<MeshChannel> fromRadio,
     required Iterable<int> fromLog,
   }) {
     final byIndex = <int, MeshChannel>{
       for (final channel in fromRadio)
-        if (channel.enabled) channel.index: channel,
+        if (channel.enabled)
+          channel.index: channel.name.isNotEmpty
+              ? channel
+              // Connected, but this slot has no name of its own: the remembered
+              // one still beats a slot number.
+              : MeshChannel(
+                  index: channel.index,
+                  name: remembered[channel.index] ?? '',
+                  psk: channel.psk,
+                  enabled: channel.enabled,
+                ),
     };
     for (final index in fromLog) {
       byIndex.putIfAbsent(
         index,
-        () => MeshChannel(index: index, name: '', psk: const [], enabled: true),
+        () => MeshChannel(
+          index: index,
+          name: remembered[index] ?? '',
+          psk: const [],
+          enabled: true,
+        ),
       );
     }
     return byIndex.values.toList()..sort((a, b) => a.index.compareTo(b.index));
@@ -577,7 +597,7 @@ class _HeartbeatState extends State<_Heartbeat>
     final colors = Theme.of(context).colorScheme;
     final age = widget.lastRx == null
         ? null
-        : DateTime.now().difference(widget.lastRx!);
+        : AppTime.utc.toLocal().difference(widget.lastRx!);
     final color = switch (age) {
       null => colors.outline,
       final a when a < const Duration(minutes: 2) => colors.primary,
@@ -620,7 +640,9 @@ class _HeartbeatState extends State<_Heartbeat>
 // l10n-ignore: numeric age readout used in diagnostics rows
 String _sinceLabel(DateTime? at) {
   if (at == null) return '—';
-  return '${_durationLabel(DateTime.now().difference(at))} ago';
+  // The same calibrated clock the stores stamped the sample with — see the
+  // node sheet's _relative for why the wall clock is the wrong baseline here.
+  return '${_durationLabel(AppTime.utc.toLocal().difference(at))} ago';
 }
 
 // l10n-ignore: numeric duration readout used in diagnostics rows
