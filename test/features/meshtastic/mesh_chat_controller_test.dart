@@ -35,7 +35,14 @@ void main() {
     if (reuse != null) {
       store = reuse;
     } else {
-      db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+      // `singleInstance: false` matters: sqflite hands back the *same* handle
+      // for a repeated path, and `:memory:` is a path — so without it every
+      // test here shares one database and `tearDown` closes the handle the
+      // next test is about to use ("This database has already been closed").
+      db = await databaseFactoryFfi.openDatabase(
+        inMemoryDatabasePath,
+        options: OpenDatabaseOptions(singleInstance: false),
+      );
       await MeshStore.createSchema(db);
       store = MeshStore(db);
     }
