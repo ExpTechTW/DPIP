@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
@@ -159,6 +161,12 @@ class _AppServicesHostState extends State<_AppServicesHost>
     // warm foreground is the reliable re-arm point. (The monitor handles the
     // foreground reporter + town on resume.)
     if (state == AppLifecycleState.resumed && _ready) _armBackground();
+    // Going to the background is the moment the process is most likely to be
+    // killed, and the buffered log lines are exactly what would explain why.
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(Log.flush());
+    }
   }
 
   /// Resolves the current township and starts reporting — but only when
