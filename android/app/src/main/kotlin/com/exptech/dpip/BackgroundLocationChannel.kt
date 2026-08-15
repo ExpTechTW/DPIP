@@ -93,7 +93,7 @@ class BackgroundLocationChannel(private val context: Context) :
                 val location = FusedFix.get(appContext)
                 if (location == null) {
                     Log.w(TAG, "no fix available — geofence not armed, keeping the alarm")
-                    ensureAlarm(appContext)
+                    LocationAlarmScheduler.ensure(appContext)
                     return@Thread
                 }
                 if (!BgLocationStore.enabled(appContext)) return@Thread
@@ -103,13 +103,13 @@ class BackgroundLocationChannel(private val context: Context) :
                         LocationAlarmScheduler.cancel(appContext)
                     } else {
                         Log.w(TAG, "geofence refused — falling back to the alarm")
-                        ensureAlarm(appContext)
+                        LocationAlarmScheduler.ensure(appContext)
                     }
                 }
                 BgLocationStore.report(appContext, location.latitude, location.longitude)
             } catch (e: Exception) {
                 Log.w(TAG, "background location arm failed", e)
-                ensureAlarm(appContext)
+                LocationAlarmScheduler.ensure(appContext)
             }
         }.start()
     }
@@ -192,13 +192,4 @@ class BackgroundLocationChannel(private val context: Context) :
         return if (background) "always" else "whenInUse"
     }
 
-    /** Schedules the fallback alarm at its stored interval, or the default. */
-    private fun ensureAlarm(appContext: Context) {
-        if (!BgLocationStore.enabled(appContext)) return
-        val interval = BgLocationStore.prefs(appContext).getLong(
-            BgLocationStore.KEY_INTERVAL_MIN,
-            LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
-        )
-        LocationAlarmScheduler.schedule(appContext, interval)
-    }
 }

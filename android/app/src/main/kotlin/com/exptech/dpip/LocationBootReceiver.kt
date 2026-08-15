@@ -16,17 +16,26 @@ import android.content.Intent
 class LocationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
-        if (!BgLocationStore.enabled(context)) return
+        val appContext = context.applicationContext
+        if (!BgLocationStore.enabled(appContext)) return
 
-        if (GmsAvailability.available(context) && BgLocationStore.hasLast(context)) {
-            GeofenceManager.register(
-                context, BgLocationStore.lastLat(context), BgLocationStore.lastLng(context),
-            )
-        } else {
-            val interval = BgLocationStore.prefs(context).getLong(
-                BgLocationStore.KEY_INTERVAL_MIN, LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
-            )
-            LocationAlarmScheduler.schedule(context, interval)
+        if (!GmsAvailability.available(appContext) || !BgLocationStore.hasLast(appContext)) {
+            LocationAlarmScheduler.ensure(appContext)
+            return
+        }
+        // Registration is a binder call into Play services, so hold the
+        // broadcast open until it answers — the other two receivers already do,
+        // and without it this one can be killed mid-flight. It also carries the
+        // fallback: BOOT_COMPLETED regularly lands before GMS location is ready,
+        // and a not-yet-initialised network location provider is exactly what
+        // returns GEOFENCE_NOT_AVAILABLE. A boot that failed to arm used to
+        // leave the device silent until the user next opened the app.
+        val pending = goAsync()
+        GeofenceManager.register(
+            appContext, BgLocationStore.lastLat(appContext), BgLocationStore.lastLng(appContext),
+        ) { armed ->
+            if (!armed) LocationAlarmScheduler.ensure(appContext)
+            pending.finish()
         }
     }
 }

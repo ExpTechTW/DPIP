@@ -54,6 +54,24 @@ object LocationAlarmScheduler {
         )
     }
 
+    /**
+     * Schedules the fallback at its stored interval — the "the geofence did not
+     * take, don't leave this device with nothing" path.
+     *
+     * Every place that arms a geofence needs this, because every one of them can
+     * fail: the channel on app start, [GeofenceReceiver] re-centring after an
+     * exit or recovering from a GEOFENCE_NOT_AVAILABLE, and
+     * [LocationBootReceiver] after a reboot. A failure with no fallback is
+     * silent and permanent — the geofence is the only spine on a Play-services
+     * device, so nothing is left to notice or retry.
+     */
+    fun ensure(context: Context) {
+        if (!BgLocationStore.enabled(context)) return
+        val interval = BgLocationStore.prefs(context)
+            .getLong(BgLocationStore.KEY_INTERVAL_MIN, DEFAULT_INTERVAL_MIN)
+        schedule(context, interval)
+    }
+
     /** Cancels any pending wake-up. */
     fun cancel(context: Context) {
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

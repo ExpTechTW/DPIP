@@ -41,6 +41,19 @@ class LocationAlarmReceiver : BroadcastReceiver() {
                     BgLocationStore.saveLast(appContext, location.latitude, location.longitude)
                     prefs.edit().putLong(BgLocationStore.KEY_INTERVAL_MIN, n).apply()
                     BgLocationStore.report(appContext, location.latitude, location.longitude)
+                    // Climb back to the good spine if we are only here because a
+                    // geofence arm failed earlier. This receiver is the only
+                    // thing still running on such a device, so without it the
+                    // device stays on the throttled alarm — burning wakeups the
+                    // geofence would not — until the user next opens the app.
+                    // The alarm is cancelled only once a fence is confirmed.
+                    if (GmsAvailability.available(appContext) &&
+                        !BgLocationStore.armed(appContext)
+                    ) {
+                        GeofenceManager.register(
+                            appContext, location.latitude, location.longitude,
+                        ) { armed -> if (armed) LocationAlarmScheduler.cancel(appContext) }
+                    }
                     n
                 } else {
                     // No fix — back off toward the max like the stationary case.
