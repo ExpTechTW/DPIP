@@ -120,6 +120,21 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _eewListening = false;
   bool _added = false;
   RealtimeStatus? _appliedStatus;
+
+  /// Whether the EEW source on the map currently holds [_emptyCollection].
+  ///
+  /// [_pushUpdate] ends with an unconditional [_pushEew], and the RTS feed
+  /// notifies about once a second, so a **calm** feed was re-uploading the same
+  /// empty collection — a platform-channel round trip and a native GeoJSON
+  /// source replacement — once per second for as long as the layer was
+  /// attached, which includes while the map tab is hidden (pausing the render
+  /// loop does not stop the Dart listener). Tracking what is actually on the
+  /// map turns that into a boolean test.
+  ///
+  /// Only the *empty* case is guarded. While an alert is live the wavefront
+  /// geometry is a function of the calibrated clock, so every 200 ms tick
+  /// genuinely differs and must still be sent.
+  bool _eewSourceEmpty = true;
   bool _stationsFetching = false;
   int _stationRetries = 0;
   SeismicTravelTimeTable? _travelTime;
@@ -213,6 +228,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     await _setupEew(controller);
     _added = true;
     _appliedStatus = null;
+    // [_setupEew] has just seeded the source with [_emptyCollection].
+    _eewSourceEmpty = true;
     await _pushUpdate();
     if (!_listening) {
       _feed.addListener(_onFeed);
@@ -285,13 +302,18 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final live =
         _eew.state.status == RealtimeStatus.live &&
         (_eew.state.data?.isNotEmpty ?? false);
+    // Nothing to draw and nothing drawn — the overwhelmingly common case.
+    if (!live && _eewSourceEmpty) return;
     try {
       await controller.setGeoJsonSource(
         _eewSourceId,
         live ? _eewGeoJson() : _emptyCollection,
       );
+      _eewSourceEmpty = !live;
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
+      // The flag is left alone: the write never landed, so whatever was on the
+      // map before still is.
     }
   }
 
