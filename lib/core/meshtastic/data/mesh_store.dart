@@ -98,6 +98,7 @@ class MeshStore {
   static const String _metrics = 'mesh_metrics';
   static const String _channels = 'mesh_channels';
   static const String _nodeMetrics = 'mesh_node_metrics';
+  static const String _reads = 'mesh_reads';
 
   /// How long the conversation log is kept. Generous because the whole point
   /// of the mesh is the times you cannot reach anything else; SQLite makes the
@@ -203,6 +204,16 @@ class MeshStore {
       ..execute(
         'CREATE INDEX IF NOT EXISTS ${_nodeMetrics}_node_ts '
         'ON $_nodeMetrics (node, ts)',
+      )
+      // How far into each conversation the user has read — what the unread
+      // dots are computed against. Its own table rather than a column on
+      // [_channels]: that one is replaced wholesale from the radio's table
+      // and only holds named channels, either of which would silently reset
+      // read positions.
+      ..execute(
+        'CREATE TABLE IF NOT EXISTS $_reads ('
+        'channel INTEGER PRIMARY KEY NOT NULL, '
+        'last_read INTEGER NOT NULL)',
       );
 
     // Columns added after `mesh_metrics` shipped arrive by ALTER — IF NOT
@@ -273,6 +284,54 @@ class MeshStore {
   }
 
   /// How many messages each channel holds — what the channel picker badges.
+  /// Channel → when the user last read it (ms). Missing = never read.
+  Future<Map<int, int>> readLastReads() async {
+    try {
+      final rows = await _db.query(_reads);
+      return {
+        for (final row in rows)
+          row['channel']! as int: row['last_read']! as int,
+      };
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh store readLastReads');
+      return const {};
+    }
+  }
+
+  /// Marks [channel] read up to [ts] (ms).
+  Future<void> writeLastRead(int channel, int ts) async {
+    try {
+      await _db.insert(_reads, {
+        'channel': channel,
+        'last_read': ts,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh store writeLastRead');
+    }
+  }
+
+  /// How many *received* messages each channel holds newer than its read
+  /// position. Own sends never count — the user has read what they typed.
+  ///
+  /// Counted in SQL against the [_reads] table directly: thirty days of a
+  /// busy mesh is tens of thousands of rows, and pulling them into Dart to
+  /// compare timestamps would be a page-open cost for two integers a channel.
+  Future<Map<int, int>> unreadCounts() async {
+    try {
+      final rows = await _db.rawQuery(
+        'SELECT m.channel AS channel, COUNT(*) AS n '
+        'FROM $_messages m '
+        'LEFT JOIN $_reads r ON r.channel = m.channel '
+        'WHERE m.outgoing = 0 AND m.ts > COALESCE(r.last_read, 0) '
+        'GROUP BY m.channel',
+      );
+      return {for (final row in rows) row['channel']! as int: row['n']! as int};
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh store unreadCounts');
+      return const {};
+    }
+  }
+
   Future<Map<int, int>> messageCountsByChannel() async {
     try {
       final rows = await _db.rawQuery(
@@ -403,6 +462,11 @@ class MeshStore {
         where: 'ts < ?',
         whereArgs: [now.subtract(messageRetention).millisecondsSinceEpoch],
       );
+      // Rows written before the channel-hash guard existed can carry a hash
+      // (242, 92, …) where an index belongs; they synthesise phantom "CH242"
+      // conversations in the picker. The guard stops new ones — this clears
+      // the legacy ones. Slot indices are 0–7, fixed by the firmware.
+      await _db.delete(_messages, where: 'channel > 7 OR channel < 0');
       final metricCutoff = now.subtract(metricRetention).millisecondsSinceEpoch;
       await _db.delete(_metrics, where: 'ts < ?', whereArgs: [metricCutoff]);
       await _db.delete(

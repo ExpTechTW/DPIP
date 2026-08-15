@@ -195,6 +195,7 @@ class MeshLink extends ChangeNotifier {
     _lifecycle ??= AppLifecycleListener(onResume: _onResume);
     _deviceId = _settings.getString(SettingKeys.meshDeviceId);
     _deviceName = _settings.getString(SettingKeys.meshDeviceName);
+    _lastDpipChannel ??= _settings.getInt(SettingKeys.meshDpipChannel);
     if (_deviceId == null) return;
     Log.info('mesh link: resuming saved radio ${_deviceName ?? _deviceId}');
     unawaited(_attempt());
@@ -254,11 +255,15 @@ class MeshLink extends ChangeNotifier {
     _deviceId = null;
     _deviceName = null;
     _dpipChannel = null;
+    _lastDpipChannel = null;
     _provision = MeshProvisionState.idle;
     _provisionError = null;
     _lastError = null;
     await _settings.remove(SettingKeys.meshDeviceId);
     await _settings.remove(SettingKeys.meshDeviceName);
+    // Forgetting the radio forgets its channel map with it — the next radio's
+    // DPIP may live in a different slot.
+    await _settings.remove(SettingKeys.meshDpipChannel);
     await _service.disconnect();
     notifyListeners();
   }
@@ -499,6 +504,11 @@ class MeshLink extends ChangeNotifier {
       case Ok(:final value):
         _dpipChannel = value;
         _lastDpipChannel = value;
+        // Persisted so a *restarted* disconnected app still defaults to the
+        // DPIP conversation — the in-memory copy only survived a drop, which
+        // made the chat page open on a different channel after a relaunch
+        // than after a disconnect: the "wrong channel" history report.
+        unawaited(_settings.setInt(SettingKeys.meshDpipChannel, value));
         _provision = MeshProvisionState.ready;
       case Err(:final failure):
         _dpipChannel = null;

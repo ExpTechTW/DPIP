@@ -160,6 +160,13 @@ abstract final class SettingKeys {
     'map.meshExcludeMqtt',
   );
 
+  /// The slot the DPIP channel was last provisioned at. Display only — the
+  /// disconnected chat page defaults to this conversation; nothing ever
+  /// *sends* on a remembered slot.
+  static const SettingKey<int> meshDpipChannel = SettingKey<int>._(
+    'meshtastic.dpipChannel',
+  );
+
   /// The newest release the update dialog has already offered (tag, e.g.
   /// `v3.2.1`). The prompt is once per version, so this is written the moment
   /// the dialog is shown — see `UpdatePrompt`.

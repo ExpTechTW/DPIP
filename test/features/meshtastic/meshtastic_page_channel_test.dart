@@ -57,6 +57,17 @@ void main() {
       final store = MeshStore(db);
       await store.addMessage(stored('on the primary', 0, 2));
       await store.addMessage(stored('on the secondary', 3, 1));
+      // Pre-read both conversations: opening the page advances the read
+      // position, and that write — a real sqflite isolate call — must not be
+      // scheduled from the widget test's fake-async zone.
+      await store.writeLastRead(
+        0,
+        stored('x', 0, 2).timestamp.millisecondsSinceEpoch,
+      );
+      await store.writeLastRead(
+        3,
+        stored('x', 3, 1).timestamp.millisecondsSinceEpoch,
+      );
 
       // Disconnected on purpose: no channel table, the case that broke.
       service = FakeMeshService();

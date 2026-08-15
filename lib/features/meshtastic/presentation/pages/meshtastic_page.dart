@@ -48,17 +48,21 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
   /// Held rather than looked up in [dispose]: by then the element is
   /// deactivated and reaching for an ancestor throws.
   MeshAlerts? _alerts;
+  MeshChatController? _controller;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _alerts = context.read<MeshAlerts>();
+    _controller = context.read<MeshChatController>();
   }
 
   @override
   void dispose() {
-    // Nothing on screen any more, so every channel is worth announcing again.
+    // Nothing on screen any more, so every channel is worth announcing again
+    // and unread accrues for all of them.
     _alerts?.setVisibleChannel(null);
+    _controller?.markVisible(null);
     super.dispose();
   }
 
@@ -95,8 +99,14 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
     }
 
     // A message arriving in the conversation the user is reading is not news;
-    // anything else still is.
+    // anything else still is. The same visibility drives the read state: the
+    // open conversation's dot clears and its read position advances — after
+    // this frame, because clearing a dot notifies and a notify mid-build
+    // throws.
     context.read<MeshAlerts>().setVisibleChannel(selected);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) controller.markVisible(selected);
+    });
 
     // The screen stays awake while a radio is connected: a conversation you
     // are watching for a reply is exactly the case where the display timing
@@ -150,7 +160,7 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
                   channels: channels,
                   selected: selected,
                   dpipIndex: dpipIndex,
-                  counts: controller.messageCountsByChannel,
+                  unread: controller.unreadByChannel,
                   radio: service.radioInfo,
                   onSelected: (index) => setState(() => _channel = index),
                 ),
@@ -192,6 +202,11 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
                 ),
     };
     for (final index in fromLog) {
+      // A row written before the channel-hash guard can carry a hash (242,
+      // 92, …) where an index belongs; offering it would synthesise a
+      // phantom CH242 conversation. The store prunes them — this keeps one
+      // from surfacing in the session that still has old rows in memory.
+      if (!isMeshChannelIndex(index)) continue;
       byIndex.putIfAbsent(
         index,
         () => MeshChannel(
@@ -788,10 +803,13 @@ class _ChannelPicker extends StatelessWidget {
     required this.channels,
     required this.selected,
     required this.dpipIndex,
-    required this.counts,
+    required this.unread,
     required this.radio,
     required this.onSelected,
   });
+
+  /// Received-and-not-yet-read counts, per channel — the red pills.
+  final Map<int, int> unread;
 
   final List<MeshChannel> channels;
   final int selected;
@@ -800,7 +818,6 @@ class _ChannelPicker extends StatelessWidget {
   /// channel restored from the log has no name, and a radio is free to carry
   /// DPIP under any index.
   final int? dpipIndex;
-  final Map<int, int> counts;
   final MeshRadioInfo? radio;
   final ValueChanged<int> onSelected;
 
@@ -849,15 +866,30 @@ class _ChannelPicker extends StatelessWidget {
                       const SizedBox(width: AppSpacing.sm),
                     ],
                     Text(_channelLabel(channel, radio)),
-                    const SizedBox(width: AppSpacing.sm),
-                    if ((counts[channel.index] ?? 0) > 0)
-                      Text(
-                        // l10n-ignore: message count
-                        '${counts[channel.index]}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
+                    // The number is the *unread* count — how many messages
+                    // arrived since this conversation was last read. A total
+                    // says nothing actionable; "3 new" is the reason to tap.
+                    if ((unread[channel.index] ?? 0) > 0) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.error,
+                          borderRadius: AppRadius.small,
+                        ),
+                        child: Text(
+                          // l10n-ignore: unread count
+                          '${unread[channel.index]}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.onError,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
+                    ],
                   ],
                 ),
               ),
@@ -887,6 +919,14 @@ class _ChannelPicker extends StatelessWidget {
                   size: 20,
                   color: colors.onSurfaceVariant,
                 ),
+                // Any *other* conversation with unread — the open one cannot
+                // be unread, but its dot would sit next to its own name.
+                if (unread.entries.any(
+                  (entry) => entry.key != selected && entry.value > 0,
+                )) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  _UnreadDot(color: colors.error),
+                ],
               ],
             ),
           ),
@@ -894,6 +934,58 @@ class _ChannelPicker extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The Discord-style unread rule: a red line with a pill naming what it is,
+/// sitting where the unseen messages begin.
+class _UnreadDivider extends StatelessWidget {
+  const _UnreadDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Row(
+        children: [
+          Expanded(child: Container(height: 1, color: colors.error)),
+          Container(
+            margin: const EdgeInsets.only(left: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: 1,
+            ),
+            decoration: BoxDecoration(
+              color: colors.error,
+              borderRadius: AppRadius.small,
+            ),
+            child: Text(
+              l10n.meshtasticNewMessages,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colors.onError,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The unread marker: a plain filled dot, sized to read at label scale.
+class _UnreadDot extends StatelessWidget {
+  const _UnreadDot({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 8,
+    height: 8,
+    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+  );
 }
 
 /// What to call a channel: its name, or for an unnamed primary the modem
@@ -935,6 +1027,23 @@ class _MessageLog extends StatelessWidget {
       );
     }
 
+    // Where the unread run begins: the oldest *received* message newer than
+    // the read position the conversation was opened at. Newest-first, so the
+    // last hit while walking forward is the oldest.
+    final dividerTs = controller.unreadDividerTs(channel);
+    var firstUnread = -1;
+    if (dividerTs != null) {
+      for (var i = 0; i < messages.length; i++) {
+        final m = messages[i];
+        if (m.outgoing) continue;
+        if (m.timestamp.millisecondsSinceEpoch > dividerTs) {
+          firstUnread = i;
+        } else {
+          break;
+        }
+      }
+    }
+
     return ListView.builder(
       reverse: true,
       padding: const EdgeInsets.symmetric(
@@ -953,6 +1062,10 @@ class _MessageLog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (startsDay) _DayLabel(date: message.timestamp),
+            // The Discord line: everything below it arrived since the user
+            // last read this conversation. Under the day label so a run that
+            // starts a new day reads date-then-new, not new-then-date.
+            if (index == firstUnread) const _UnreadDivider(),
             _Bubble(message: message, controller: controller),
           ],
         );
