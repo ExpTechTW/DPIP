@@ -156,9 +156,28 @@ const String terrainOriginTileUrl =
 const String glyphsOriginUrl =
     'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf';
 
+/// Id of the raster-dem source backing [terrainHillshadeLayerId]. Also used by
+/// [MapScaffold], which removes the source when the relief is switched off —
+/// the id must match what the baked style declares.
+const String terrainSourceId = 'terrain';
+
+/// Terrain tiles start loading at this zoom.
+///
+/// Below it the relief is not worth its cost: a 512px DEM tile shrinks to a
+/// few dozen screen pixels at whole-island zoom (where the home backdrop
+/// sits), and the download/decode/memory bill is the same as at full zoom.
+/// The hillshade's lit-edge detail only starts reading at about z7, so z6
+/// keeps everything the eye can see and drops the rest.
+const double terrainMinZoom = 6;
+
+/// Hillshade lighting shared by the baked style and the runtime layer
+/// [MapScaffold] adds back — one source of truth, so both can't drift.
+const double terrainIlluminationDirection = 335;
+const double terrainExaggeration = 0.3;
+
 /// Id of the hillshade layer the base style bakes when [terrainTileUrl] is
-/// given — [MapScaffold] toggles its visibility for the "terrain relief"
-/// switch, so the id must be stable across style reloads.
+/// given — [MapScaffold] adds/removes it for the "terrain relief" switch, so
+/// the id must be stable across style reloads.
 const String terrainHillshadeLayerId = 'terrain-hillshade';
 
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
@@ -197,13 +216,13 @@ String exptechVectorStyle(
   final terrain = terrainTileUrl == null
       ? ''
       : '''
-  ,"terrain": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
+  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": $terrainMinZoom, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
   final hillshade = terrainTileUrl == null
       ? ''
       : '''
-  ,{ "id": "$terrainHillshadeLayerId", "type": "hillshade", "source": "terrain", "paint": {
-      "hillshade-illumination-direction": 335,
-      "hillshade-exaggeration": 0.3
+  ,{ "id": "$terrainHillshadeLayerId", "type": "hillshade", "source": "$terrainSourceId", "paint": {
+      "hillshade-illumination-direction": $terrainIlluminationDirection,
+      "hillshade-exaggeration": $terrainExaggeration
     } }''';
   return '''
 {

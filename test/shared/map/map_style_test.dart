@@ -48,7 +48,14 @@ void main() {
           'natively, no app-side rewrite (see satellite-tiles-go/web)',
     );
     expect(terrain['tileSize'], 512);
-    expect(terrain['minzoom'], 0);
+    expect(
+      terrain['minzoom'],
+      terrainMinZoom,
+      reason:
+          'below z6 the relief is not worth 512px DEM tiles at whole-island '
+          'zoom — the home backdrop sits there and its download/decode bill '
+          'was the same as at full zoom',
+    );
     expect(terrain['maxzoom'], 12);
     expect(
       terrain['bounds'],

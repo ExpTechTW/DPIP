@@ -85,6 +85,19 @@ class RecordingMapController implements MapLibreMapController {
   final Map<String, Object?> mountTransitions = {};
 
   @override
+  Future<void> addHillshadeLayer(
+    String sourceId,
+    String layerId,
+    HillshadeLayerProperties properties, {
+    String? belowLayerId,
+    String? sourceLayer,
+    double? minzoom,
+    double? maxzoom,
+  }) async {
+    calls.add('addHillshadeLayer:$layerId');
+  }
+
+  @override
   Future<void> addRasterLayer(
     String sourceId,
     String layerId,

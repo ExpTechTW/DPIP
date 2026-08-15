@@ -32,6 +32,24 @@ import 'package:provider/provider.dart';
 /// memory on camera idle. LB has no ETag; the store keys these by URL hash.
 const String _basemapTileUrl = basemapOriginTileUrl;
 
+/// The runtime DEM source — identical to what the baked style declares (see
+/// [exptechVectorStyle]), so [MapScaffold] can rebuild the relief after
+/// removing it, with no drift between the two descriptions.
+const RasterDemSourceProperties _terrainSourceProps = RasterDemSourceProperties(
+  tiles: [terrainOriginTileUrl],
+  bounds: [110.0, 10.0, 132.0, 35.0],
+  minzoom: terrainMinZoom,
+  maxzoom: 12,
+  tileSize: 512,
+  encoding: 'mapbox',
+);
+
+/// The runtime hillshade layer — same id, same paint as the baked style.
+const HillshadeLayerProperties _terrainLayerProps = HillshadeLayerProperties(
+  hillshadeIlluminationDirection: terrainIlluminationDirection,
+  hillshadeExaggeration: terrainExaggeration,
+);
+
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
 ///
@@ -145,6 +163,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// base-map property, so it lives beside [_showTownLabels]. Defaults on —
   /// the relief is the terrain feature's whole point.
   final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
+
+  /// Whether the terrain source + hillshade layer are actually on the map.
+  ///
+  /// This mirrors the native state so the toggle can add/remove instead of
+  /// flipping visibility (see [_syncTerrain]). A style reload re-bakes both,
+  /// so [_onStyleLoaded] sets it back to true and re-syncs.
+  bool _terrainOnMap = false;
 
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
@@ -429,24 +454,60 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   void _setShowTerrain(bool value) {
     if (_showTerrain.value == value) return;
     _showTerrain.value = value;
-    _applyTerrainVisibility();
+    _syncTerrain();
   }
 
-  /// Pushes the terrain-relief setting onto a live map. Like the township
-  /// labels, the base style's hillshade layer survives style reloads (which
-  /// reset it to visible), so this also runs after every [_onStyleLoaded].
-  void _applyTerrainVisibility() {
+  /// Pushes the terrain-relief setting onto a live map — by **adding and
+  /// removing**, not by flipping `visibility`.
+  ///
+  /// MapLibre only stops loading a source's tiles when no layer references it:
+  /// `visibility: none` merely stops rendering, so the DEM kept downloading,
+  /// decoding and holding memory (roughly 1 MB of texture plus 1 MB of float
+  /// mesh per 512px tile, ~49 tiles for a hillshade viewport) with the switch
+  /// off. So off means removeLayer + removeSource — tiles, memory and network
+  /// all released — and on re-adds both with the same id, source and paint the
+  /// baked style used (see [_terrainSourceProps] / [_terrainLayerProps]).
+  ///
+  /// Style reloads re-bake both from the style string, so [_onStyleLoaded]
+  /// re-asserts the user's choice here.
+  void _syncTerrain() {
     final controller = _controller;
     if (controller == null) return;
-    unawaited(
-      controller
-          .setLayerVisibility(terrainHillshadeLayerId, _showTerrain.value)
-          .catchError((Object e, StackTrace st) {
-            // The layer only exists in styles built with terrainTileUrl; a
-            // surface that never baked it has nothing to hide.
-            Log.handle(e, st, 'Failed to sync the terrain relief');
-          }),
-    );
+    unawaited(_syncTerrainLoop(controller));
+  }
+
+  Future<void> _syncTerrainLoop(MapLibreMapController controller) async {
+    // Loop until the map matches the setting: a rapid double-tap flips the
+    // notifier while an add/remove is mid-flight, and each iteration re-reads
+    // it, so the last tap always wins.
+    var dirty = true;
+    while (dirty) {
+      dirty = false;
+      final show = _showTerrain.value;
+      try {
+        if (show && !_terrainOnMap) {
+          await controller.addSource(terrainSourceId, _terrainSourceProps);
+          await controller.addHillshadeLayer(
+            terrainSourceId,
+            terrainHillshadeLayerId,
+            _terrainLayerProps,
+            belowLayerId: townOutlineLayerId,
+          );
+          _terrainOnMap = true;
+        } else if (!show && _terrainOnMap) {
+          await controller.removeLayer(terrainHillshadeLayerId);
+          await controller.removeSource(terrainSourceId);
+          _terrainOnMap = false;
+        }
+      } catch (error, stackTrace) {
+        // A style that never baked the terrain has nothing to remove, and a
+        // mid-reload call can race the native side. Log and stop; the next
+        // toggle or style load re-syncs.
+        Log.handle(error, stackTrace, 'terrain sync');
+        return;
+      }
+      if (_showTerrain.value != show) dirty = true;
+    }
   }
 
   /// Pushes the township-label setting onto a live map. The base style's
@@ -469,6 +530,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (warmer == null) return;
     try {
       final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
       await warmer.warmViewportAbsolute(
         urlFor: (z, x, y) => _basemapTileUrl
             .replaceAll('{z}', '$z')
@@ -478,10 +540,29 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
         east: bounds.northeast.longitude,
-        zoom: controller.cameraPosition?.zoom ?? 8,
+        zoom: zoom,
         maxZoom: 12,
         logLabel: 'basemap',
       );
+      // DEM tiles too, once the camera is past the zoom they start at. Native
+      // downloads a hillshade viewport as one burst of 512px meshes the first
+      // time; warming them from the store the same way as the basemap makes a
+      // repeat visit an SQLite hit instead of a re-download.
+      if (zoom >= terrainMinZoom) {
+        await warmer.warmViewportAbsolute(
+          urlFor: (z, x, y) => terrainOriginTileUrl
+              .replaceAll('{z}', '$z')
+              .replaceAll('{x}', '$x')
+              .replaceAll('{y}', '$y'),
+          south: bounds.southwest.latitude,
+          west: bounds.southwest.longitude,
+          north: bounds.northeast.latitude,
+          east: bounds.northeast.longitude,
+          zoom: zoom,
+          maxZoom: 12,
+          logLabel: 'terrain',
+        );
+      }
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'basemap viewport warm');
     }
@@ -519,8 +600,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     unawaited(_applyCameraHandoff());
     // A reload resets the base style's township-label layer to visible.
     _applyTownLabelVisibility();
-    // …and so does the hillshade layer — re-assert the user's choice.
-    _applyTerrainVisibility();
+    // …and re-bakes the terrain source + hillshade layer, so re-assert the
+    // user's choice — which removes both when the relief is off.
+    _terrainOnMap = true;
+    _syncTerrain();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
