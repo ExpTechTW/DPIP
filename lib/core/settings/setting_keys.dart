@@ -51,6 +51,12 @@ abstract final class SettingKeys {
     'app.themeMode',
   );
 
+  /// Which colour-vision deficiency the app corrects for, or absent for none.
+  /// See `core/a11y/color_vision.dart` and `ColorVisionController`.
+  static const SettingKey<String> colorVision = SettingKey<String>._(
+    'app.colorVision',
+  );
+
   /// Default map overlay when opening the Map tab. See
   /// `DefaultMapLayerController` (`radar` / `satellite` / … / `dpm`).
   static const SettingKey<String> defaultMapLayer = SettingKey<String>._(
