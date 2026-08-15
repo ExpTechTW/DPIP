@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "発震時刻",
   "trendNoData": "トレンドデータがありません",
   "onboardingPermLocation": "位置情報",
+  "sponsorCalloutBody": "広告なし。あなたの支援がサーバーを支えています。",
+  "moreDiscordCalloutBody": "コミュニティに参加して開発チームと話せます。",
   "moreDiscord": "Discord コミュニティ",
   "mapNavPressure": "気圧",
   "mapLayerSatelliteB13": "ひまわり 赤外線(B13)",

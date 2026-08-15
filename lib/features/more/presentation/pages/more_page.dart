@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -34,16 +35,14 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
-          // Support CTA, kept prominent at the top in its own headerless group.
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.favorite_border,
-                title: l10n.sponsorTitle,
-                onTap: () => context.pushNamed(AppRoutes.sponsor),
-              ),
-            ],
-          ),
+          // The two calls to action, in their own headerless block above every
+          // menu group — and in rank order. Support is the page's one ask, so
+          // it is the only row that carries a gradient, a glow and a filled
+          // badge; Discord follows it as the clear second, tinted and badged
+          // but flat, so the pair reads as a hierarchy rather than as two
+          // competing banners.
+          const _SupportCallout(),
+          const _DiscordCallout(),
           SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
@@ -143,12 +142,6 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreAnnouncements,
                 host: 'announcement.exptech.com.tw',
                 url: 'https://announcement.exptech.com.tw/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.discord,
-                title: l10n.moreDiscord,
-                host: 'exptech.com.tw/dc',
-                url: 'https://exptech.com.tw/dc',
               ),
               _MoreLinkTile(
                 icon: Icons.notifications_active_outlined,
@@ -507,19 +500,209 @@ class _MoreLinkTile extends StatelessWidget {
     );
   }
 
-  Future<void> _open(BuildContext context) async {
-    // Capture context-bound objects before the async gap.
-    final messenger = ScaffoldMessenger.of(context);
-    final failed = AppLocalizations.of(context).moreLinkOpenFailed;
-    try {
-      final ok = await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      );
-      if (!ok) throw Exception('launchUrl returned false for $url');
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'open external link $url');
-      messenger.showSnackBar(SnackBar(content: Text(failed)));
-    }
+  Future<void> _open(BuildContext context) => openExternalLink(context, url);
+}
+
+/// Opens [url] in the browser, reporting a failure to the user rather than
+/// leaving a row that silently does nothing.
+Future<void> openExternalLink(BuildContext context, String url) async {
+  // Capture context-bound objects before the async gap.
+  final messenger = ScaffoldMessenger.of(context);
+  final failed = AppLocalizations.of(context).moreLinkOpenFailed;
+  try {
+    final ok = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok) throw Exception('launchUrl returned false for $url');
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'open external link $url');
+    messenger.showSnackBar(SnackBar(content: Text(failed)));
+  }
+}
+
+/// The page's primary call to action.
+///
+/// DPIP carries no ads, so this is the only thing on the page actually asking
+/// the user for something. It is painted in [AppGold] — the one colour in the
+/// app from outside the [ColorScheme], because a card tinted from the same seed
+/// as everything else reads as another menu row, whatever weight it is given.
+/// Gold is what makes it read as *paid*.
+///
+/// The construction is the same either way: a one-hue gradient for the sheen, a
+/// warm cast underneath so it looks lit rather than printed on, a hairline
+/// along the edge, and a filled badge carrying the most saturated step.
+class _SupportCallout extends StatelessWidget {
+  const _SupportCallout();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final gold = AppGold.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xs,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: AppRadius.large,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [gold.fillStart, gold.fillEnd],
+          ),
+          // A warm cast rather than a grey drop shadow — it lifts the card off
+          // the page and reads as light on metal, not as a floating rectangle.
+          boxShadow: [
+            BoxShadow(
+              color: gold.glow,
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          border: Border.all(color: gold.edge),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: AppRadius.large,
+            onTap: () => context.pushNamed(AppRoutes.sponsor),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  // Filled, not outlined: the one active affordance on a page
+                  // whose every other row is an outlined icon.
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: gold.badge,
+                    ),
+                    child: Icon(Icons.favorite, color: gold.onBadge, size: 22),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.sponsorTitle,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: gold.ink,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.sponsorCalloutBody,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: gold.ink.withValues(alpha: 0.78),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Icon(
+                    Icons.chevron_right,
+                    color: gold.ink.withValues(alpha: 0.6),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The page's second call to action, directly under [_SupportCallout].
+///
+/// Deliberately one step down: the same badge-and-two-lines construction, but
+/// a flat secondary container with no gradient and no shadow. That is what
+/// makes the ranking legible — if this card also glowed, neither would lead.
+class _DiscordCallout extends StatelessWidget {
+  const _DiscordCallout();
+
+  static const String _url = 'https://exptech.com.tw/dc';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.secondaryContainer,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openExternalLink(context, _url),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.secondary,
+                  ),
+                  child: Icon(
+                    Icons.discord,
+                    color: colors.onSecondary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.moreDiscord,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSecondaryContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.moreDiscordCalloutBody,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSecondaryContainer.withValues(
+                            alpha: 0.75,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  Icons.open_in_new,
+                  size: 18,
+                  color: colors.onSecondaryContainer.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "Thời gian xảy ra",
   "trendNoData": "Không có dữ liệu xu hướng",
   "onboardingPermLocation": "Vị trí",
+  "sponsorCalloutBody": "Không quảng cáo — hỗ trợ của bạn giúp máy chủ tiếp tục chạy.",
+  "moreDiscordCalloutBody": "Tham gia cộng đồng và trò chuyện với nhóm phát triển.",
   "moreDiscord": "Cộng đồng Discord",
   "mapNavPressure": "Khí áp",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",

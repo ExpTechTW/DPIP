@@ -1502,6 +1502,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPermLocation => 'Location';
 
   @override
+  String get sponsorCalloutBody =>
+      'No ads — your support keeps the servers running.';
+
+  @override
+  String get moreDiscordCalloutBody =>
+      'Join the community and talk to the team.';
+
+  @override
   String get moreDiscord => 'Discord community';
 
   @override

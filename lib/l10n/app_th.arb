@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "เวลาเกิดเหตุ",
   "trendNoData": "ไม่มีข้อมูลแนวโน้ม",
   "onboardingPermLocation": "ตำแหน่งที่ตั้ง",
+  "sponsorCalloutBody": "ไม่มีโฆษณา การสนับสนุนของคุณช่วยให้เซิร์ฟเวอร์ทำงานต่อไป",
+  "moreDiscordCalloutBody": "เข้าร่วมชุมชนและพูดคุยกับทีมพัฒนา",
   "moreDiscord": "ชุมชน Discord",
   "mapNavPressure": "ความกดอากาศ",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",

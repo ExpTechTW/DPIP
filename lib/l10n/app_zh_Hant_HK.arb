@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "發震時間",
   "trendNoData": "沒有趨勢資料",
   "onboardingPermLocation": "定位",
+  "sponsorCalloutBody": "沒有廣告，你的支持讓伺服器持續運作。",
+  "moreDiscordCalloutBody": "加入社群，直接和開發團隊交流。",
   "moreDiscord": "Discord 社群",
   "mapNavPressure": "氣壓",
   "mapLayerSatelliteB13": "ひまわり 紅外線(B13)",

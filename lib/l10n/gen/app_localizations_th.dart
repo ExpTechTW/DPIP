@@ -1499,6 +1499,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingPermLocation => 'ตำแหน่งที่ตั้ง';
 
   @override
+  String get sponsorCalloutBody =>
+      'ไม่มีโฆษณา การสนับสนุนของคุณช่วยให้เซิร์ฟเวอร์ทำงานต่อไป';
+
+  @override
+  String get moreDiscordCalloutBody => 'เข้าร่วมชุมชนและพูดคุยกับทีมพัฒนา';
+
+  @override
   String get moreDiscord => 'ชุมชน Discord';
 
   @override

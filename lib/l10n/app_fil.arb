@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "Oras ng pangyayari",
   "trendNoData": "Walang trend data",
   "onboardingPermLocation": "Lokasyon",
+  "sponsorCalloutBody": "Walang ad — ang suporta mo ang nagpapatakbo ng mga server.",
+  "moreDiscordCalloutBody": "Sumali sa komunidad at makipag-usap sa team.",
   "moreDiscord": "Komunidad sa Discord",
   "mapNavPressure": "Presyon",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",

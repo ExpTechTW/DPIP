@@ -1502,6 +1502,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingPermLocation => 'Lokasi';
 
   @override
+  String get sponsorCalloutBody =>
+      'Tanpa iklan — dukunganmu menjaga server tetap berjalan.';
+
+  @override
+  String get moreDiscordCalloutBody =>
+      'Gabung komunitas dan mengobrol dengan tim.';
+
+  @override
   String get moreDiscord => 'Komunitas Discord';
 
   @override

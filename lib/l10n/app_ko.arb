@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "발생 시각",
   "trendNoData": "추세 데이터 없음",
   "onboardingPermLocation": "위치",
+  "sponsorCalloutBody": "광고 없이 운영됩니다. 후원이 서버를 지탱합니다.",
+  "moreDiscordCalloutBody": "커뮤니티에 참여해 개발팀과 이야기해 보세요.",
   "moreDiscord": "Discord 커뮤니티",
   "mapNavPressure": "기압",
   "mapLayerSatelliteB13": "히마와리 적외(B13)",

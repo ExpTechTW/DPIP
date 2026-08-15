@@ -1483,6 +1483,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingPermLocation => '위치';
 
   @override
+  String get sponsorCalloutBody => '광고 없이 운영됩니다. 후원이 서버를 지탱합니다.';
+
+  @override
+  String get moreDiscordCalloutBody => '커뮤니티에 참여해 개발팀과 이야기해 보세요.';
+
+  @override
   String get moreDiscord => 'Discord 커뮤니티';
 
   @override

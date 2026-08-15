@@ -113,4 +113,41 @@ void main() {
       expect(visited, [route]);
     });
   }
+
+  testWidgets('the two calls to action lead the page, in rank order', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
+    final discord = tester.getTopLeft(find.text('Discord community')).dy;
+    // Support first, Discord immediately under it…
+    expect(discord, greaterThan(support));
+    // …and both above every menu group.
+    expect(
+      tester
+          .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
+          .dy,
+      greaterThan(discord),
+    );
+  });
+
+  testWidgets('Discord appears once, as the callout', (tester) async {
+    // It used to be a row in the links list; leaving it there as well would
+    // undo the ranking the callout exists to create.
+    await _pump(tester, _router([]));
+    expect(find.text('Discord community'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, 'Discord community'), findsNothing);
+  });
+
+  testWidgets('the support callout outranks Discord visually', (tester) async {
+    await _pump(tester, _router([]));
+    // The gradient + shadow belong to support alone: if Discord grew them too,
+    // neither would read as the lead.
+    final decorated = tester
+        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+        .map((d) => d.decoration)
+        .whereType<BoxDecoration>()
+        .where((d) => d.gradient != null && d.boxShadow != null);
+    expect(decorated, hasLength(1));
+  });
 }

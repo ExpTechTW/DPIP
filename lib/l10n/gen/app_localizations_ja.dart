@@ -1479,6 +1479,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingPermLocation => '位置情報';
 
   @override
+  String get sponsorCalloutBody => '広告なし。あなたの支援がサーバーを支えています。';
+
+  @override
+  String get moreDiscordCalloutBody => 'コミュニティに参加して開発チームと話せます。';
+
+  @override
   String get moreDiscord => 'Discord コミュニティ';
 
   @override

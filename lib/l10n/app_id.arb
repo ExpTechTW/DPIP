@@ -738,6 +738,8 @@
   "reportDetailOriginTime": "Waktu kejadian",
   "trendNoData": "Tidak ada data tren",
   "onboardingPermLocation": "Lokasi",
+  "sponsorCalloutBody": "Tanpa iklan — dukunganmu menjaga server tetap berjalan.",
+  "moreDiscordCalloutBody": "Gabung komunitas dan mengobrol dengan tim.",
   "moreDiscord": "Komunitas Discord",
   "mapNavPressure": "Tekanan",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",

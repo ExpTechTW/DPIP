@@ -1503,6 +1503,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingPermLocation => 'Vị trí';
 
   @override
+  String get sponsorCalloutBody =>
+      'Không quảng cáo — hỗ trợ của bạn giúp máy chủ tiếp tục chạy.';
+
+  @override
+  String get moreDiscordCalloutBody =>
+      'Tham gia cộng đồng và trò chuyện với nhóm phát triển.';
+
+  @override
   String get moreDiscord => 'Cộng đồng Discord';
 
   @override

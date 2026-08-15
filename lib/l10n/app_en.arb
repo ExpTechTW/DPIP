@@ -2126,6 +2126,14 @@
   "reportDetailOriginTime": "Origin time",
   "trendNoData": "No trend data",
   "onboardingPermLocation": "Location",
+  "sponsorCalloutBody": "No ads \u2014 your support keeps the servers running.",
+  "@sponsorCalloutBody": {
+    "description": "One-line subtitle on the More tab's support call to action"
+  },
+  "moreDiscordCalloutBody": "Join the community and talk to the team.",
+  "@moreDiscordCalloutBody": {
+    "description": "One-line subtitle on the More tab's Discord call to action"
+  },
   "moreDiscord": "Discord community",
   "@typhoonOverlayStormBandSubtitle": {
     "description": "Subtitle under each storm-band option (fill + dashed avg)"

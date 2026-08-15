@@ -1511,6 +1511,14 @@ class AppLocalizationsFil extends AppLocalizations {
   String get onboardingPermLocation => 'Lokasyon';
 
   @override
+  String get sponsorCalloutBody =>
+      'Walang ad — ang suporta mo ang nagpapatakbo ng mga server.';
+
+  @override
+  String get moreDiscordCalloutBody =>
+      'Sumali sa komunidad at makipag-usap sa team.';
+
+  @override
   String get moreDiscord => 'Komunidad sa Discord';
 
   @override

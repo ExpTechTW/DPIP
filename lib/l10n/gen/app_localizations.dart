@@ -2901,6 +2901,18 @@ abstract class AppLocalizations {
   /// **'Location'**
   String get onboardingPermLocation;
 
+  /// One-line subtitle on the More tab's support call to action
+  ///
+  /// In en, this message translates to:
+  /// **'No ads — your support keeps the servers running.'**
+  String get sponsorCalloutBody;
+
+  /// One-line subtitle on the More tab's Discord call to action
+  ///
+  /// In en, this message translates to:
+  /// **'Join the community and talk to the team.'**
+  String get moreDiscordCalloutBody;
+
   /// More-menu link to the ExpTech Discord community
   ///
   /// In en, this message translates to:

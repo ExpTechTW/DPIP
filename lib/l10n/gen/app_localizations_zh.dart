@@ -1470,6 +1470,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPermLocation => '定位';
 
   @override
+  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+
+  @override
+  String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
+
+  @override
   String get moreDiscord => 'Discord 社群';
 
   @override
@@ -4102,6 +4108,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get onboardingPermLocation => '定位';
+
+  @override
+  String get sponsorCalloutBody => '没有广告，你的支持让服务器持续运作。';
+
+  @override
+  String get moreDiscordCalloutBody => '加入社群，直接和开发团队交流。';
 
   @override
   String get moreDiscord => 'Discord 社区';
@@ -6738,6 +6750,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingPermLocation => '定位';
 
   @override
+  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+
+  @override
+  String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
+
+  @override
   String get moreDiscord => 'Discord 社群';
 
   @override
@@ -9370,6 +9388,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingPermLocation => '定位';
+
+  @override
+  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+
+  @override
+  String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
 
   @override
   String get moreDiscord => 'Discord 社群';
