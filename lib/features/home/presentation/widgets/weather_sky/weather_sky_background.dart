@@ -393,7 +393,14 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
                   )
                 : _lastPainter!;
             _lastPainter = painter;
-            return CustomPaint(size: Size.infinite, painter: painter);
+            // Its own layer, so a repaint of the sky stops at this boundary
+            // instead of dirtying the layer it shares with the sheet's frosted
+            // chrome and the map's overlay — on Home those are full-screen
+            // offscreen passes, and re-rasterising them once per animated frame
+            // is the single most expensive thing this widget can ask for.
+            return RepaintBoundary(
+              child: CustomPaint(size: Size.infinite, painter: painter),
+            );
           },
         );
 

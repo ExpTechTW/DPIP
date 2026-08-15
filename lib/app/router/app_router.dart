@@ -33,6 +33,7 @@ import 'package:dpip/features/settings/presentation/pages/permissions_page.dart'
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,9 @@ import 'package:provider/provider.dart';
 /// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.homePath,
+  // Lets the shell notice that one of the full-screen routes below has covered
+  // it, so the tabs underneath can idle instead of animating at nobody.
+  observers: [shellRouteObserver],
   // First launch: hold everything behind onboarding until it's completed. The
   // redirect reads the app-wide OnboardingStore (mounted above the router), so
   // finishing onboarding (which flips the flag) lets a goNamed(home) through.

@@ -143,15 +143,17 @@ class BaseMap extends StatefulWidget {
   /// render loop while that tab is hidden and resumes when it comes back.
   /// A hidden tab keeps its platform view alive (see `StatefulShellRoute.
   /// indexedStack`), so without this the map would keep producing frames —
-  /// and burning GPU — offstage. `null` (full-screen routes, previews outside
-  /// the shell) never pauses.
+  /// and burning GPU — offstage. `null` belongs to no branch (a full-screen
+  /// route, a preview outside the shell), so only the shell-level tests apply:
+  /// it still pauses when a page covers the shell or the app leaves the
+  /// foreground.
   final int? tabIndex;
 
   @override
   State<BaseMap> createState() => _BaseMapState();
 }
 
-class _BaseMapState extends State<BaseMap> {
+class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   /// Set once the platform view reports in — the readiness gate for the retry.
   MapLibreMapController? _controller;
 
@@ -162,6 +164,10 @@ class _BaseMapState extends State<BaseMap> {
   /// Last-applied pause state, so [setRenderPaused] fires only on transitions.
   bool _renderPaused = false;
 
+  /// Whether the app itself is in the foreground. The render loop is native, so
+  /// it does not stop just because Flutter stops producing frames.
+  bool _foreground = true;
+
   /// Bumped to remount the map's platform view after a failed first attempt
   /// (see [_scheduleReadinessRetry]).
   int _mountAttempt = 0;
@@ -171,7 +177,28 @@ class _BaseMapState extends State<BaseMap> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scheduleReadinessRetry();
+  }
+
+  /// A backgrounded app still owns its platform views, and MapLibre draws from
+  /// its own native render loop rather than Flutter's — so the engine going
+  /// quiet does not stop it. Pause it explicitly and resume on return.
+  ///
+  /// `inactive` is left running on purpose: it fires for a transient overlay
+  /// (the notification shade, the app switcher preview) where the map is still
+  /// on screen and a paused surface would be visibly frozen.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = switch (state) {
+      AppLifecycleState.paused ||
+      AppLifecycleState.hidden ||
+      AppLifecycleState.detached => false,
+      AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    };
+    if (foreground == _foreground) return;
+    _foreground = foreground;
+    _syncRender();
   }
 
   @override
@@ -188,18 +215,23 @@ class _BaseMapState extends State<BaseMap> {
   @override
   void dispose() {
     _visibleTab?.removeListener(_onTabChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _readinessTimer?.cancel();
     super.dispose();
   }
 
-  /// A surface can live in only one tab; anything else (or no scope at all)
-  /// counts as visible. The controller may not exist yet — the state is kept
-  /// and applied when the platform view reports in ([_onMapCreated]), so
-  /// `_renderPaused` only records states that actually reached the platform.
+  /// A surface is worth drawing only while the app is in the foreground *and*
+  /// the surface is in front of the user — its branch selected and nothing
+  /// pushed over the shell ([VisibleTab.isOnScreen]). No scope at all means the
+  /// map lives outside the shell (a full-screen route, a preview), where the
+  /// only thing that can hide it is the app leaving the foreground.
+  ///
+  /// The controller may not exist yet — the state is kept and applied when the
+  /// platform view reports in ([_onMapCreated]), so `_renderPaused` only records
+  /// states that actually reached the platform.
   void _syncRender() {
-    final visible =
-        _visibleTab == null || _visibleTab!.value == widget.tabIndex;
-    final pause = !visible && widget.tabIndex != null;
+    final onScreen = _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
+    final pause = !(_foreground && onScreen);
     final controller = _controller;
     if (controller == null || pause == _renderPaused) return;
     _renderPaused = pause;

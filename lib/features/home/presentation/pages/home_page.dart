@@ -95,8 +95,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _syncTabVisibility() {
-    final visible =
-        (_visibleTab?.value ?? HomePage.tabIndex) == HomePage.tabIndex;
+    // Covered by a pushed full-screen page counts as hidden, not just switched
+    // away from: the sky's shaders and particle field would otherwise keep
+    // stepping under an opaque route (see [VisibleTab.shellOnTop]).
+    final visible = _visibleTab?.isOnScreen(HomePage.tabIndex) ?? true;
     if (visible == _tabVisible) return;
     setState(() => _tabVisible = visible);
   }

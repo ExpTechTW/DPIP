@@ -33,7 +33,7 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with RouteAware {
   /// Index of the data branch (see the destinations in [build]) — the only
   /// branch with nested routes, so leaving it while a replay is on screen
   /// needs the replay closed (see [_closeReplayOnBranchLeave]).
@@ -46,8 +46,44 @@ class _MainShellState extends State<MainShell> {
   /// (see [RefreshOnAppear]).
   final VisibleTab _visibleTab = VisibleTab();
 
+  /// The shell's own route on the root navigator, while subscribed to
+  /// [shellRouteObserver]. Held so the subscription can be dropped again.
+  ModalRoute<void>? _shellRoute;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The shell is built by StatefulShellRoute, so this is the shell's route on
+    // the *root* navigator — the one a full-screen page is pushed on top of.
+    final route = ModalRoute.of<void>(context);
+    if (identical(route, _shellRoute)) return;
+    if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
+    _shellRoute = route;
+    if (route != null) shellRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void didPushNext() => _setShellOnTop(false);
+
+  @override
+  void didPopNext() => _setShellOnTop(true);
+
+  @override
+  void didPush() => _setShellOnTop(true);
+
+  /// Publishes after the frame, for the same reason the branch index does: a
+  /// subscription lands during `didChangeDependencies` (mid-build), and pages
+  /// listening to this call `setState` on the edge.
+  void _setShellOnTop(bool value) {
+    if (_visibleTab.shellOnTop == value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _visibleTab.shellOnTop = value;
+    });
+  }
+
   @override
   void dispose() {
+    if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _visibleTab.dispose();
     super.dispose();
   }

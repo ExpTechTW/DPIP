@@ -13,6 +13,20 @@ class RefreshSignal extends ChangeNotifier {
   void fire() => notifyListeners();
 }
 
+/// Watches the **root** navigator, so the shell can tell that a full-screen
+/// route has been pushed over every tab at once.
+///
+/// One observer is enough for the whole app because of how the route table is
+/// shaped: each of the five branches holds a single route, and every page that
+/// covers a tab (settings, the log viewer, the mesh page, …) is a *sibling* of
+/// the shell route on the root navigator rather than a child of a branch. So
+/// the only way a branch's content gets hidden — short of switching tabs — is a
+/// push seen here. `MainShell` is the sole subscriber and republishes the answer
+/// through [VisibleTab.shellOnTop]; pages read it through [VisibleTab.isOnScreen]
+/// instead of subscribing themselves.
+final RouteObserver<ModalRoute<void>> shellRouteObserver =
+    RouteObserver<ModalRoute<void>>();
+
 /// The index of the tab currently on screen.
 ///
 /// The shell keeps this in step with the navigation branch. It exists because
@@ -21,6 +35,33 @@ class RefreshSignal extends ChangeNotifier {
 /// `initState`/`dispose` fire once for the whole session.
 class VisibleTab extends ValueNotifier<int> {
   VisibleTab([super.value = 0]);
+
+  /// Whether the shell is the top-most root route — `false` while a full-screen
+  /// page covers it.
+  ///
+  /// Being hidden by a pushed route is invisible to the tab index: the branch
+  /// never changes, so a page that gates only on [value] keeps its animations
+  /// and native surfaces running under an opaque page. Flutter already skips
+  /// *painting* a covered route (`Overlay` stops collecting onstage entries at
+  /// the first opaque one), but it does not stop tickers — nothing in
+  /// `ModalRoute` touches `TickerMode` — so the per-frame simulation work still
+  /// runs, and a platform view's native render loop keeps drawing entirely
+  /// outside Flutter's compositor. Both are pure waste while covered.
+  bool get shellOnTop => _shellOnTop;
+  bool _shellOnTop = true;
+  set shellOnTop(bool value) {
+    if (_shellOnTop == value) return;
+    _shellOnTop = value;
+    notifyListeners();
+  }
+
+  /// Whether a surface owned by [tabIndex] is actually in front of the user:
+  /// its branch is selected **and** nothing covers the shell.
+  ///
+  /// A null [tabIndex] belongs to no branch (a nested page, a preview outside
+  /// the shell), so only the shell test applies to it.
+  bool isOnScreen(int? tabIndex) =>
+      _shellOnTop && (tabIndex == null || value == tabIndex);
 }
 
 /// Calls [onAppear] whenever this page comes back into view: its tab is selected
@@ -84,6 +125,12 @@ class _RefreshOnAppearState extends State<RefreshOnAppear>
     _wasVisible = _isVisible;
   }
 
+  /// Deliberately the tab test only, not [VisibleTab.isOnScreen]: coming back
+  /// from a pushed page is not an appearance in this sense — the page was never
+  /// left, and the sub-page it returns from is usually the thing that just
+  /// changed the data. Widening it here would refetch on every settings close.
+  /// The notifier does fire for shell-cover changes, but this reads the same
+  /// value across them, so the edge below never trips on one.
   bool get _isVisible =>
       (_visible?.value ?? widget.tabIndex) == widget.tabIndex;
 

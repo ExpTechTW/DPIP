@@ -116,7 +116,7 @@ void main() {
     expect(platform.paused, [true, false, true]);
   });
 
-  testWidgets('no tabIndex means the map never pauses', (tester) async {
+  testWidgets('no tabIndex means no tab can hide the map', (tester) async {
     final visibleTab = VisibleTab(0);
     await pump(
       tester,
@@ -127,10 +127,94 @@ void main() {
     expect(platform.paused, isEmpty);
   });
 
-  testWidgets('no VisibleTabScope (outside the shell) means never paused', (
+  testWidgets('no VisibleTabScope (outside the shell) means no tab test', (
     tester,
   ) async {
     await pump(tester, const BaseMap(tabIndex: 2));
     expect(platform.paused, isEmpty);
+  });
+
+  testWidgets('a page pushed over the shell pauses the visible tab', (
+    tester,
+  ) async {
+    final visibleTab = VisibleTab(2);
+    await pump(
+      tester,
+      VisibleTabScope(
+        visibleTab: visibleTab,
+        child: const BaseMap(tabIndex: 2),
+      ),
+    );
+    expect(platform.paused, isEmpty, reason: 'on screen at birth');
+
+    // What a full-screen route does: the branch index never moves, so only the
+    // shell flag can tell this map it is no longer being looked at.
+    visibleTab.shellOnTop = false;
+    await tester.pump();
+    expect(platform.paused, [true]);
+
+    visibleTab.shellOnTop = true;
+    await tester.pump();
+    expect(platform.paused, [true, false], reason: 'popped back to the map');
+  });
+
+  testWidgets('a covered map stays paused across a tab switch', (tester) async {
+    final visibleTab = VisibleTab(2);
+    await pump(
+      tester,
+      VisibleTabScope(
+        visibleTab: visibleTab,
+        child: const BaseMap(tabIndex: 2),
+      ),
+    );
+    visibleTab.shellOnTop = false;
+    await tester.pump();
+    visibleTab.value = 0; // hidden two ways over; still just the one pause
+    await tester.pump();
+    expect(platform.paused, [true]);
+  });
+
+  testWidgets('backgrounding pauses a map the shell cannot reach', (
+    tester,
+  ) async {
+    // No scope at all: the native render loop is the whole reason this matters,
+    // since it keeps drawing after Flutter stops producing frames.
+    await pump(tester, const BaseMap());
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    expect(platform.paused, [true]);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(platform.paused, [true, false]);
+  });
+
+  testWidgets('inactive keeps rendering — the map is still on screen', (
+    tester,
+  ) async {
+    await pump(tester, const BaseMap());
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    await tester.pump();
+    expect(platform.paused, isEmpty);
+  });
+
+  testWidgets('a backgrounded hidden tab does not resume on foreground', (
+    tester,
+  ) async {
+    final visibleTab = VisibleTab(0);
+    await pump(
+      tester,
+      VisibleTabScope(
+        visibleTab: visibleTab,
+        child: const BaseMap(tabIndex: 2),
+      ),
+    );
+    expect(platform.paused, [true], reason: 'hidden tab');
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(platform.paused, [true], reason: 'still the wrong tab to draw');
   });
 }
