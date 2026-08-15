@@ -115,6 +115,34 @@ Future<void> _drain() async {
 }
 
 void main() {
+  test('the borders stay over the underlay across a re-sync', () async {
+    // The chrome sync is diff-based — it re-adds a border only when its toggle
+    // changes — so anything that re-mounts the raster has to leave the borders
+    // above it. `belowLayerId` inserts immediately below its anchor, which
+    // makes "both quote the same anchor" the wrong answer twice over.
+    final layer = _layer();
+    final controller = await _rendered(layer);
+
+    void check(String when) {
+      for (final boundary in [AdminBoundary.county, AdminBoundary.town]) {
+        expect(
+          controller.isAbove(boundary.lineLayerId, 'typhoon-wx-lyr'),
+          isTrue,
+          reason: '$when: the ${boundary.name} border sank under the underlay',
+        );
+      }
+    }
+
+    check('on first render');
+
+    // Switch away and back — the path that re-mounts the raster.
+    layer.setWeatherOverlay(TyphoonWeatherOverlay.satellite);
+    await _drain();
+    layer.setWeatherOverlay(TyphoonWeatherOverlay.radar);
+    await _drain();
+    check('after switching underlays');
+  });
+
   test('radar underlay draws the shared white cased county frame', () async {
     final layer = _layer();
     final controller = await _rendered(layer);
