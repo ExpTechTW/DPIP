@@ -420,6 +420,58 @@ class AppLocalizationsFil extends AppLocalizations {
   String get meshtasticNewMessages => 'BAGO';
 
   @override
+  String get meshtasticBatteryHistory => 'Kasaysayan ng baterya';
+
+  @override
+  String get meshtasticStatAvg => 'avg';
+
+  @override
+  String get meshtasticStatPeak => 'peak';
+
+  @override
+  String get meshtasticStatDrain => 'ubos';
+
+  @override
+  String get meshtasticStatEta => 'tatagal';
+
+  @override
+  String get meshtasticStatTrend => 'trend';
+
+  @override
+  String get meshtasticStatCharging => 'nagcha-charge';
+
+  @override
+  String get meshtasticStatStable => 'stable';
+
+  @override
+  String get meshtasticNodesTotal => 'Kilala';
+
+  @override
+  String get meshtasticNodesOnline => 'Online';
+
+  @override
+  String get meshtasticRx => 'Natanggap';
+
+  @override
+  String get meshtasticTx => 'Naipadala';
+
+  @override
+  String get meshtasticNodesHistory => 'Kasaysayan ng node';
+
+  @override
+  String get meshtasticTrafficHistory => 'Kasaysayan ng trapiko';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '~$n oras';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '~$n araw';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2757,6 +2809,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => 'Mahina sa asul at dilaw (tritan)';
+
+  @override
+  String get displayPreviewSample => 'Halimbawang ulat ng lindol';
 
   @override
   String get displayScaleSmall => 'Maliit';

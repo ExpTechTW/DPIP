@@ -867,6 +867,102 @@ abstract class AppLocalizations {
   /// **'NEW'**
   String get meshtasticNewMessages;
 
+  /// Section header over the radio's 24h battery chart
+  ///
+  /// In en, this message translates to:
+  /// **'Battery history'**
+  String get meshtasticBatteryHistory;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'avg'**
+  String get meshtasticStatAvg;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'peak'**
+  String get meshtasticStatPeak;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'drain'**
+  String get meshtasticStatDrain;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'lasts'**
+  String get meshtasticStatEta;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'trend'**
+  String get meshtasticStatTrend;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'charging'**
+  String get meshtasticStatCharging;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'stable'**
+  String get meshtasticStatStable;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Known'**
+  String get meshtasticNodesTotal;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get meshtasticNodesOnline;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get meshtasticRx;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get meshtasticTx;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Node history'**
+  String get meshtasticNodesHistory;
+
+  /// Mesh chart label
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic history'**
+  String get meshtasticTrafficHistory;
+
+  /// Battery time-left estimate
+  ///
+  /// In en, this message translates to:
+  /// **'~{n}h'**
+  String meshtasticEtaHours(int n);
+
+  /// Battery time-left estimate
+  ///
+  /// In en, this message translates to:
+  /// **'~{n}d'**
+  String meshtasticEtaDays(int n);
+
   /// Meshtastic test page title
   ///
   /// In en, this message translates to:
@@ -5240,6 +5336,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Blue-yellow weak (tritanopia)'**
   String get displayColorVisionTritan;
+
+  /// Section header above the live sample on the Display settings page. Marks the mock earthquake report as an example, not a real event — must never read as 'live' or 'current'.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample earthquake report'**
+  String get displayPreviewSample;
 
   /// Display settings option: displayScaleSmall
   ///

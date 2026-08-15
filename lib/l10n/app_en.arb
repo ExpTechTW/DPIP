@@ -571,6 +571,80 @@
   "@meshtasticNewMessages": {
     "description": "Pill on the red unread divider in the mesh chat log"
   },
+  "meshtasticBatteryHistory": "Battery history",
+  "@meshtasticBatteryHistory": {
+    "description": "Section header over the radio's 24h battery chart"
+  },
+  "meshtasticStatAvg": "avg",
+  "@meshtasticStatAvg": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatPeak": "peak",
+  "@meshtasticStatPeak": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatDrain": "drain",
+  "@meshtasticStatDrain": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatEta": "lasts",
+  "@meshtasticStatEta": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatTrend": "trend",
+  "@meshtasticStatTrend": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatCharging": "charging",
+  "@meshtasticStatCharging": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticStatStable": "stable",
+  "@meshtasticStatStable": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticNodesTotal": "Known",
+  "@meshtasticNodesTotal": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticNodesOnline": "Online",
+  "@meshtasticNodesOnline": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticRx": "Received",
+  "@meshtasticRx": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticTx": "Sent",
+  "@meshtasticTx": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticNodesHistory": "Node history",
+  "@meshtasticNodesHistory": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticTrafficHistory": "Traffic history",
+  "@meshtasticTrafficHistory": {
+    "description": "Mesh chart label"
+  },
+  "meshtasticEtaHours": "~{n}h",
+  "@meshtasticEtaHours": {
+    "description": "Battery time-left estimate",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "meshtasticEtaDays": "~{n}d",
+  "@meshtasticEtaDays": {
+    "description": "Battery time-left estimate",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "meshtasticTitle": "Meshtastic",
   "@moreSectionLinks": {
     "description": "Section header on the More page grouping external website links"
@@ -3654,6 +3728,10 @@
     "description": "Display settings option: displayColorVisionDeutan"
   },
   "displayColorVisionTritan": "Blue-yellow weak (tritanopia)",
+  "displayPreviewSample": "Sample earthquake report",
+  "@displayPreviewSample": {
+    "description": "Section header above the live sample on the Display settings page. Marks the mock earthquake report as an example, not a real event — must never read as 'live' or 'current'."
+  },
   "@displayColorVisionTritan": {
     "description": "Display settings option: displayColorVisionTritan"
   },

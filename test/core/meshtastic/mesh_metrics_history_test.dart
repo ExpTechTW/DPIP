@@ -223,4 +223,22 @@ void main() {
       );
     });
   });
+
+  group('traffic deltas', () {
+    test('round-trip through the store', () async {
+      final db = await _open();
+      addTearDown(db.close);
+      final store = MeshStore(db, now: () => _now);
+      await store.addMetric(
+        MeshMetricSample(
+          at: _ago(const Duration(minutes: 5)),
+          rxPackets: 42,
+          txPackets: 3,
+        ),
+      );
+      final sample = (await store.metrics()).single;
+      expect(sample.rxPackets, 42);
+      expect(sample.txPackets, 3);
+    });
+  });
 }

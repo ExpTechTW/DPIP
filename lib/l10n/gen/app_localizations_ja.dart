@@ -411,6 +411,58 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticNewMessages => '新着';
 
   @override
+  String get meshtasticBatteryHistory => 'バッテリー履歴';
+
+  @override
+  String get meshtasticStatAvg => '平均';
+
+  @override
+  String get meshtasticStatPeak => 'ピーク';
+
+  @override
+  String get meshtasticStatDrain => '消費';
+
+  @override
+  String get meshtasticStatEta => '残り目安';
+
+  @override
+  String get meshtasticStatTrend => '傾向';
+
+  @override
+  String get meshtasticStatCharging => '充電中';
+
+  @override
+  String get meshtasticStatStable => '安定';
+
+  @override
+  String get meshtasticNodesTotal => '既知';
+
+  @override
+  String get meshtasticNodesOnline => 'オンライン';
+
+  @override
+  String get meshtasticRx => '受信';
+
+  @override
+  String get meshtasticTx => '送信';
+
+  @override
+  String get meshtasticNodesHistory => 'ノード数履歴';
+
+  @override
+  String get meshtasticTrafficHistory => 'トラフィック履歴';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '約$n時間';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '約$n日';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2705,6 +2757,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => '3型（青黄）';
+
+  @override
+  String get displayPreviewSample => '地震情報のサンプル';
 
   @override
   String get displayScaleSmall => '小';

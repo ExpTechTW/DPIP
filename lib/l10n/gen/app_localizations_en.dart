@@ -418,6 +418,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get meshtasticNewMessages => 'NEW';
 
   @override
+  String get meshtasticBatteryHistory => 'Battery history';
+
+  @override
+  String get meshtasticStatAvg => 'avg';
+
+  @override
+  String get meshtasticStatPeak => 'peak';
+
+  @override
+  String get meshtasticStatDrain => 'drain';
+
+  @override
+  String get meshtasticStatEta => 'lasts';
+
+  @override
+  String get meshtasticStatTrend => 'trend';
+
+  @override
+  String get meshtasticStatCharging => 'charging';
+
+  @override
+  String get meshtasticStatStable => 'stable';
+
+  @override
+  String get meshtasticNodesTotal => 'Known';
+
+  @override
+  String get meshtasticNodesOnline => 'Online';
+
+  @override
+  String get meshtasticRx => 'Received';
+
+  @override
+  String get meshtasticTx => 'Sent';
+
+  @override
+  String get meshtasticNodesHistory => 'Node history';
+
+  @override
+  String get meshtasticTrafficHistory => 'Traffic history';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '~${n}h';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '~${n}d';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2746,6 +2798,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => 'Blue-yellow weak (tritanopia)';
+
+  @override
+  String get displayPreviewSample => 'Sample earthquake report';
 
   @override
   String get displayScaleSmall => 'Small';

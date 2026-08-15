@@ -206,6 +206,33 @@ class MeshNodeStore extends ChangeNotifier {
 
   final Map<int, List<MeshNodeSample>> _history = {};
 
+  /// This node's samples across the last day, oldest first: the persisted
+  /// 2-minute series with the live in-memory ring appended for the freshest
+  /// minutes the recorder has not written yet.
+  ///
+  /// The ring alone was the whole trend before the day series existed, and on
+  /// a busy mesh its 60 slots covered only minutes — "when did that repeater
+  /// start failing" needs the day.
+  Future<List<MeshNodeSample>> dayHistoryOf(int num) async {
+    final store = _store;
+    final ring = historyOf(num);
+    if (store == null) return ring;
+    final persisted = await store.nodeMetrics(node: num);
+    final ringStart = ring.isEmpty
+        ? null
+        : ring.first.time.millisecondsSinceEpoch;
+    return [
+      for (final sample in persisted)
+        if (ringStart == null || sample.at.millisecondsSinceEpoch < ringStart)
+          MeshNodeSample(
+            time: sample.at,
+            snr: sample.snr ?? 0,
+            battery: sample.battery,
+          ),
+      ...ring,
+    ];
+  }
+
   /// This node's recent (time, SNR, battery) samples, oldest first.
   List<MeshNodeSample> historyOf(int num) =>
       List.unmodifiable(_history[num] ?? const []);

@@ -22,8 +22,8 @@ List<SingleChildWidget> meshtasticProviders(SharedDeps deps) => [
     create: (_) => MeshChatController(
       deps.meshtastic,
       deps.meshLink,
-      deps.meshNodes,
       deps.meshStore,
+      unread: deps.meshUnread,
     ),
   ),
 ];

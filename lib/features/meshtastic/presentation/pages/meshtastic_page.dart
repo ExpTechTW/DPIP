@@ -22,7 +22,7 @@ import 'package:dpip/core/platform/screen_wake.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
-import 'package:dpip/features/meshtastic/presentation/widgets/mesh_utilization_chart.dart';
+import 'package:dpip/features/meshtastic/presentation/widgets/mesh_charts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -1586,11 +1586,26 @@ class _RadioSheet extends StatelessWidget {
             title: l10n.meshtasticRadioSettings,
             rows: _lora(l10n, radio, link),
           ),
-          SectionHeader(l10n.meshtasticUtilization),
+          // One query feeds both charts — the same day of samples carries
+          // utilization and battery.
           FutureBuilder<List<MeshMetricSample>>(
             future: context.read<MeshChatController>().metricsHistory(),
-            builder: (context, snapshot) =>
-                MeshUtilizationChart(samples: snapshot.data ?? const []),
+            builder: (context, snapshot) {
+              final samples = snapshot.data ?? const <MeshMetricSample>[];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SectionHeader(l10n.meshtasticUtilization),
+                  MeshUtilizationChart(samples: samples),
+                  SectionHeader(l10n.meshtasticBatteryHistory),
+                  MeshBatteryChart(samples: samples),
+                  SectionHeader(l10n.meshtasticNodesHistory),
+                  MeshNodesChart(samples: samples),
+                  SectionHeader(l10n.meshtasticTrafficHistory),
+                  MeshTrafficChart(samples: samples),
+                ],
+              );
+            },
           ),
           StreamBuilder<MeshTraffic>(
             initialData: service.traffic,

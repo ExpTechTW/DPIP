@@ -412,6 +412,58 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticNewMessages => '새 메시지';
 
   @override
+  String get meshtasticBatteryHistory => '배터리 기록';
+
+  @override
+  String get meshtasticStatAvg => '평균';
+
+  @override
+  String get meshtasticStatPeak => '최고';
+
+  @override
+  String get meshtasticStatDrain => '소모';
+
+  @override
+  String get meshtasticStatEta => '예상 지속';
+
+  @override
+  String get meshtasticStatTrend => '추세';
+
+  @override
+  String get meshtasticStatCharging => '충전 중';
+
+  @override
+  String get meshtasticStatStable => '안정';
+
+  @override
+  String get meshtasticNodesTotal => '알려짐';
+
+  @override
+  String get meshtasticNodesOnline => '온라인';
+
+  @override
+  String get meshtasticRx => '수신';
+
+  @override
+  String get meshtasticTx => '송신';
+
+  @override
+  String get meshtasticNodesHistory => '노드 수 기록';
+
+  @override
+  String get meshtasticTrafficHistory => '트래픽 기록';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '약 $n시간';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '약 $n일';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2714,6 +2766,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => '청황색약';
+
+  @override
+  String get displayPreviewSample => '지진 정보 예시';
 
   @override
   String get displayScaleSmall => '작게';

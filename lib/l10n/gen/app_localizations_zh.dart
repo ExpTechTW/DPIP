@@ -409,6 +409,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get meshtasticNewMessages => '新訊息';
 
   @override
+  String get meshtasticBatteryHistory => '電量歷史';
+
+  @override
+  String get meshtasticStatAvg => '平均';
+
+  @override
+  String get meshtasticStatPeak => '峰值';
+
+  @override
+  String get meshtasticStatDrain => '掉電';
+
+  @override
+  String get meshtasticStatEta => '預估可用';
+
+  @override
+  String get meshtasticStatTrend => '趨勢';
+
+  @override
+  String get meshtasticStatCharging => '充電中';
+
+  @override
+  String get meshtasticStatStable => '穩定';
+
+  @override
+  String get meshtasticNodesTotal => '已知';
+
+  @override
+  String get meshtasticNodesOnline => '在線';
+
+  @override
+  String get meshtasticRx => '接收';
+
+  @override
+  String get meshtasticTx => '發送';
+
+  @override
+  String get meshtasticNodesHistory => '節點數歷史';
+
+  @override
+  String get meshtasticTrafficHistory => '流量歷史';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '約 $n 小時';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '約 $n 天';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2697,6 +2749,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get displayColorVisionTritan => '藍黃色弱';
 
   @override
+  String get displayPreviewSample => '地震報告範例';
+
+  @override
   String get displayScaleSmall => '小';
 
   @override
@@ -3129,6 +3184,58 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get meshtasticNewMessages => '新消息';
+
+  @override
+  String get meshtasticBatteryHistory => '电量历史';
+
+  @override
+  String get meshtasticStatAvg => '平均';
+
+  @override
+  String get meshtasticStatPeak => '峰值';
+
+  @override
+  String get meshtasticStatDrain => '掉电';
+
+  @override
+  String get meshtasticStatEta => '预估可用';
+
+  @override
+  String get meshtasticStatTrend => '趋势';
+
+  @override
+  String get meshtasticStatCharging => '充电中';
+
+  @override
+  String get meshtasticStatStable => '稳定';
+
+  @override
+  String get meshtasticNodesTotal => '已知';
+
+  @override
+  String get meshtasticNodesOnline => '在线';
+
+  @override
+  String get meshtasticRx => '接收';
+
+  @override
+  String get meshtasticTx => '发送';
+
+  @override
+  String get meshtasticNodesHistory => '节点数历史';
+
+  @override
+  String get meshtasticTrafficHistory => '流量历史';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '约 $n 小时';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '约 $n 天';
+  }
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -5419,6 +5526,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get displayColorVisionTritan => '蓝黄色弱';
 
   @override
+  String get displayPreviewSample => '地震报告范例';
+
+  @override
   String get displayScaleSmall => '小';
 
   @override
@@ -5851,6 +5961,58 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get meshtasticNewMessages => '新訊息';
+
+  @override
+  String get meshtasticBatteryHistory => '電量歷史';
+
+  @override
+  String get meshtasticStatAvg => '平均';
+
+  @override
+  String get meshtasticStatPeak => '峰值';
+
+  @override
+  String get meshtasticStatDrain => '掉電';
+
+  @override
+  String get meshtasticStatEta => '預估可用';
+
+  @override
+  String get meshtasticStatTrend => '趨勢';
+
+  @override
+  String get meshtasticStatCharging => '充電中';
+
+  @override
+  String get meshtasticStatStable => '穩定';
+
+  @override
+  String get meshtasticNodesTotal => '已知';
+
+  @override
+  String get meshtasticNodesOnline => '在線';
+
+  @override
+  String get meshtasticRx => '接收';
+
+  @override
+  String get meshtasticTx => '發送';
+
+  @override
+  String get meshtasticNodesHistory => '節點數歷史';
+
+  @override
+  String get meshtasticTrafficHistory => '流量歷史';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '約 $n 小時';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '約 $n 天';
+  }
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -8141,6 +8303,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get displayColorVisionTritan => '藍黃色弱';
 
   @override
+  String get displayPreviewSample => '地震報告範例';
+
+  @override
   String get displayScaleSmall => '小';
 
   @override
@@ -8573,6 +8738,58 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get meshtasticNewMessages => '新訊息';
+
+  @override
+  String get meshtasticBatteryHistory => '電量歷史';
+
+  @override
+  String get meshtasticStatAvg => '平均';
+
+  @override
+  String get meshtasticStatPeak => '峰值';
+
+  @override
+  String get meshtasticStatDrain => '掉電';
+
+  @override
+  String get meshtasticStatEta => '預估可用';
+
+  @override
+  String get meshtasticStatTrend => '趨勢';
+
+  @override
+  String get meshtasticStatCharging => '充電中';
+
+  @override
+  String get meshtasticStatStable => '穩定';
+
+  @override
+  String get meshtasticNodesTotal => '已知';
+
+  @override
+  String get meshtasticNodesOnline => '在線';
+
+  @override
+  String get meshtasticRx => '接收';
+
+  @override
+  String get meshtasticTx => '發送';
+
+  @override
+  String get meshtasticNodesHistory => '節點數歷史';
+
+  @override
+  String get meshtasticTrafficHistory => '流量歷史';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '約 $n 小時';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '約 $n 天';
+  }
 
   @override
   String get meshtasticTitle => 'Meshtastic';
@@ -10861,6 +11078,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get displayColorVisionTritan => '藍黃色弱';
+
+  @override
+  String get displayPreviewSample => '地震報告範例';
 
   @override
   String get displayScaleSmall => '小';

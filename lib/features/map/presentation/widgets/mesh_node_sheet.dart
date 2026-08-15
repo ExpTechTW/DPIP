@@ -330,7 +330,25 @@ class _NodeDetail extends StatelessWidget {
   }
 
   List<Widget> _trends(BuildContext context) {
-    final samples = store.historyOf(node.num);
+    // A day of persisted samples with the live ring on top — the in-memory
+    // ring alone covers minutes on a busy mesh. The ring renders immediately
+    // while the day loads.
+    return [
+      FutureBuilder<List<MeshNodeSample>>(
+        future: store.dayHistoryOf(node.num),
+        initialData: store.historyOf(node.num),
+        builder: (context, snapshot) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: _trendBlocks(context, snapshot.data ?? const []),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _trendBlocks(
+    BuildContext context,
+    List<MeshNodeSample> samples,
+  ) {
     if (samples.length < 2) return const [];
 
     final l10n = AppLocalizations.of(context);

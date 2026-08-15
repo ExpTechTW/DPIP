@@ -417,6 +417,58 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticNewMessages => 'MỚI';
 
   @override
+  String get meshtasticBatteryHistory => 'Lịch sử pin';
+
+  @override
+  String get meshtasticStatAvg => 'TB';
+
+  @override
+  String get meshtasticStatPeak => 'đỉnh';
+
+  @override
+  String get meshtasticStatDrain => 'tiêu hao';
+
+  @override
+  String get meshtasticStatEta => 'còn dùng';
+
+  @override
+  String get meshtasticStatTrend => 'xu hướng';
+
+  @override
+  String get meshtasticStatCharging => 'đang sạc';
+
+  @override
+  String get meshtasticStatStable => 'ổn định';
+
+  @override
+  String get meshtasticNodesTotal => 'Đã biết';
+
+  @override
+  String get meshtasticNodesOnline => 'Trực tuyến';
+
+  @override
+  String get meshtasticRx => 'Nhận';
+
+  @override
+  String get meshtasticTx => 'Gửi';
+
+  @override
+  String get meshtasticNodesHistory => 'Lịch sử nút';
+
+  @override
+  String get meshtasticTrafficHistory => 'Lịch sử lưu lượng';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '~$n giờ';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '~$n ngày';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2747,6 +2799,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => 'Yếu màu xanh dương/vàng (tritanopia)';
+
+  @override
+  String get displayPreviewSample => 'Báo cáo động đất mẫu';
 
   @override
   String get displayScaleSmall => 'Nhỏ';

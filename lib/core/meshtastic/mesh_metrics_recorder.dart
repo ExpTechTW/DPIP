@@ -38,6 +38,14 @@ class MeshMetricsRecorder {
   StreamSubscription<MeshTraffic>? _sub;
   DateTime? _lastRecorded;
 
+  /// The transport's cumulative counters as of the last sample, so each
+  /// sample stores the *delta* — its own slice of activity. Reset detection:
+  /// a counter that went backwards (reconnect zeroes the session counters)
+  /// starts a fresh baseline instead of producing a negative spike.
+  int _lastRxPackets = 0;
+  int _lastTxPackets = 0;
+  bool _trafficBaselined = false;
+
   /// How often the neighbours' readings are written.
   ///
   /// Their telemetry has no timestamp of its own — only the node table's
@@ -67,6 +75,18 @@ class MeshMetricsRecorder {
     if (radio.channelUtilization == null && radio.airUtilTx == null) return;
     _lastRecorded = at;
     final nodes = _nodes.nodes;
+    final traffic = _service.traffic;
+    int? rxDelta;
+    int? txDelta;
+    if (_trafficBaselined &&
+        traffic.rxPackets >= _lastRxPackets &&
+        traffic.txPackets >= _lastTxPackets) {
+      rxDelta = traffic.rxPackets - _lastRxPackets;
+      txDelta = traffic.txPackets - _lastTxPackets;
+    }
+    _lastRxPackets = traffic.rxPackets;
+    _lastTxPackets = traffic.txPackets;
+    _trafficBaselined = true;
     unawaited(
       _store
           .addMetric(
@@ -78,6 +98,8 @@ class MeshMetricsRecorder {
               voltage: radio.voltage,
               nodesTotal: nodes.length,
               nodesOnline: nodes.where((node) => node.isOnline).length,
+              rxPackets: rxDelta,
+              txPackets: txDelta,
             ),
           )
           .catchError(

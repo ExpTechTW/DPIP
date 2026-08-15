@@ -417,6 +417,58 @@ class AppLocalizationsId extends AppLocalizations {
   String get meshtasticNewMessages => 'BARU';
 
   @override
+  String get meshtasticBatteryHistory => 'Riwayat baterai';
+
+  @override
+  String get meshtasticStatAvg => 'rata²';
+
+  @override
+  String get meshtasticStatPeak => 'puncak';
+
+  @override
+  String get meshtasticStatDrain => 'pengurasan';
+
+  @override
+  String get meshtasticStatEta => 'bertahan';
+
+  @override
+  String get meshtasticStatTrend => 'tren';
+
+  @override
+  String get meshtasticStatCharging => 'mengisi daya';
+
+  @override
+  String get meshtasticStatStable => 'stabil';
+
+  @override
+  String get meshtasticNodesTotal => 'Dikenal';
+
+  @override
+  String get meshtasticNodesOnline => 'Daring';
+
+  @override
+  String get meshtasticRx => 'Diterima';
+
+  @override
+  String get meshtasticTx => 'Terkirim';
+
+  @override
+  String get meshtasticNodesHistory => 'Riwayat node';
+
+  @override
+  String get meshtasticTrafficHistory => 'Riwayat lalu lintas';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '~$n jam';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '~$n hari';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2750,6 +2802,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => 'Lemah biru-kuning (tritanopia)';
+
+  @override
+  String get displayPreviewSample => 'Contoh laporan gempa';
 
   @override
   String get displayScaleSmall => 'Kecil';

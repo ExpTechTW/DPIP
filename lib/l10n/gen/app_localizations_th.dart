@@ -416,6 +416,58 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticNewMessages => 'ใหม่';
 
   @override
+  String get meshtasticBatteryHistory => 'ประวัติแบตเตอรี่';
+
+  @override
+  String get meshtasticStatAvg => 'เฉลี่ย';
+
+  @override
+  String get meshtasticStatPeak => 'สูงสุด';
+
+  @override
+  String get meshtasticStatDrain => 'อัตราลด';
+
+  @override
+  String get meshtasticStatEta => 'คงเหลือ';
+
+  @override
+  String get meshtasticStatTrend => 'แนวโน้ม';
+
+  @override
+  String get meshtasticStatCharging => 'กำลังชาร์จ';
+
+  @override
+  String get meshtasticStatStable => 'คงที่';
+
+  @override
+  String get meshtasticNodesTotal => 'ทั้งหมด';
+
+  @override
+  String get meshtasticNodesOnline => 'ออนไลน์';
+
+  @override
+  String get meshtasticRx => 'รับ';
+
+  @override
+  String get meshtasticTx => 'ส่ง';
+
+  @override
+  String get meshtasticNodesHistory => 'ประวัติจำนวนโหนด';
+
+  @override
+  String get meshtasticTrafficHistory => 'ประวัติทราฟฟิก';
+
+  @override
+  String meshtasticEtaHours(int n) {
+    return '~$n ชม.';
+  }
+
+  @override
+  String meshtasticEtaDays(int n) {
+    return '~$n วัน';
+  }
+
+  @override
   String get meshtasticTitle => 'Meshtastic';
 
   @override
@@ -2740,6 +2792,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get displayColorVisionTritan => 'ตาบอดสีน้ำเงิน–เหลือง (Tritan)';
+
+  @override
+  String get displayPreviewSample => 'ตัวอย่างรายงานแผ่นดินไหว';
 
   @override
   String get displayScaleSmall => 'เล็ก';

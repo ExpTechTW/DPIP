@@ -46,6 +46,8 @@ class MeshMetricSample {
     this.voltage,
     this.nodesTotal,
     this.nodesOnline,
+    this.rxPackets,
+    this.txPackets,
   });
 
   final DateTime at;
@@ -66,6 +68,12 @@ class MeshMetricSample {
   /// it shows anywhere else.
   final int? nodesTotal;
   final int? nodesOnline;
+
+  /// Packets received/sent since the *previous* sample — deltas, not the
+  /// transport's session counters, so the series survives the counters
+  /// resetting on a reconnect and each point means "activity in this slice".
+  final int? rxPackets;
+  final int? txPackets;
 }
 
 /// One reading from a *neighbouring* node.
@@ -220,11 +228,7 @@ class MeshStore {
     // EXISTS does nothing for a table that already exists. On a fresh table
     // the probe above ran before the CREATE, so the set is empty and the
     // ALTERs are needed; on an installed one it names what is present.
-    for (final (column, type) in const [
-      ('voltage', 'REAL'),
-      ('nodes_total', 'INTEGER'),
-      ('nodes_online', 'INTEGER'),
-    ]) {
+    for (final (column, type) in _metricAlterColumns) {
       if (metricColumns.isEmpty || metricColumns.contains(column)) continue;
       batch.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
     }
@@ -233,16 +237,22 @@ class MeshStore {
     // ALTER columns, so add them now that the table exists.
     if (metricColumns.isEmpty) {
       final fresh = db.batch();
-      for (final (column, type) in const [
-        ('voltage', 'REAL'),
-        ('nodes_total', 'INTEGER'),
-        ('nodes_online', 'INTEGER'),
-      ]) {
+      for (final (column, type) in _metricAlterColumns) {
         fresh.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
       }
       await fresh.commit(noResult: true);
     }
   }
+
+  /// Columns added to [_metrics] after it shipped — one list so the fresh and
+  /// installed paths cannot drift.
+  static const List<(String, String)> _metricAlterColumns = [
+    ('voltage', 'REAL'),
+    ('nodes_total', 'INTEGER'),
+    ('nodes_online', 'INTEGER'),
+    ('rx_packets', 'INTEGER'),
+    ('tx_packets', 'INTEGER'),
+  ];
 
   /// Appends [message], ignoring one the log already holds. Returns whether it
   /// was new — the caller uses that to decide whether to notify or re-render.
@@ -332,6 +342,23 @@ class MeshStore {
     }
   }
 
+  /// Newest received-message timestamp per channel — what a read position
+  /// advances to when a conversation is opened.
+  Future<Map<int, int>> newestIncomingTsByChannel() async {
+    try {
+      final rows = await _db.rawQuery(
+        'SELECT channel, MAX(ts) AS ts FROM $_messages '
+        'WHERE outgoing = 0 GROUP BY channel',
+      );
+      return {
+        for (final row in rows) row['channel']! as int: row['ts']! as int,
+      };
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh store newestIncomingTsByChannel');
+      return const {};
+    }
+  }
+
   Future<Map<int, int>> messageCountsByChannel() async {
     try {
       final rows = await _db.rawQuery(
@@ -366,6 +393,8 @@ class MeshStore {
         'voltage': sample.voltage,
         'nodes_total': sample.nodesTotal,
         'nodes_online': sample.nodesOnline,
+        'rx_packets': sample.rxPackets,
+        'tx_packets': sample.txPackets,
       }, conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store addMetric');
@@ -392,6 +421,8 @@ class MeshStore {
             voltage: (row['voltage'] as num?)?.toDouble(),
             nodesTotal: (row['nodes_total'] as num?)?.toInt(),
             nodesOnline: (row['nodes_online'] as num?)?.toInt(),
+            rxPackets: (row['rx_packets'] as num?)?.toInt(),
+            txPackets: (row['tx_packets'] as num?)?.toInt(),
           ),
       ];
     } catch (error, stackTrace) {
