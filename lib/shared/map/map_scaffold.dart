@@ -211,12 +211,24 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _visibleTab?.removeListener(_onTabChanged);
     _visibleTab = visibleTab;
     visibleTab?.addListener(_onTabChanged);
+    _wasVisible = _isVisible;
   }
 
-  /// Whether this surface is on screen — null tab (full-screen) counts as
-  /// visible, matching [BaseMap]'s own gate.
-  bool get _isVisible =>
-      _visibleTab == null || _visibleTab!.value == widget.tabIndex;
+  /// Whether this surface is on screen — its branch selected and nothing pushed
+  /// over the shell. A null tab (full-screen routes, previews) belongs to no
+  /// branch, so only the shell test applies. Same contract as [BaseMap].
+  bool get _isVisible => _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
+
+  /// [_isVisible] as of the last notification, so [_onTabChanged] can fire on
+  /// the hidden → visible **edge** rather than on every notification where the
+  /// map happens to be visible.
+  ///
+  /// The notifier reports two independent things (which branch is selected, and
+  /// whether a page covers the shell), so without this a page pushed *over* the
+  /// map would deliver a notification while the map is still the selected
+  /// branch — and re-fetch the whole timeline for the act of opening settings,
+  /// then again on the way back.
+  bool _wasVisible = true;
 
   @override
   void dispose() {
@@ -241,7 +253,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// data sources (RTS, the mesh node store) refresh themselves, and a bare
   /// re-render would only flash the map.
   void _onTabChanged() {
-    if (!_isVisible) return;
+    final visible = _isVisible;
+    final returned = visible && !_wasVisible;
+    _wasVisible = visible;
+    if (!returned) return;
     if (_active.usesTimeline) unawaited(_loadActive());
   }
 
