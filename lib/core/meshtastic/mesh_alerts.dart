@@ -24,6 +24,7 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -54,10 +55,24 @@ class MeshAlerts extends ChangeNotifier {
   MeshAlerts(
     this._service,
     this._settings, {
+    this._store,
     Future<void> Function(MeshAlert alert)? post,
     DateTime Function()? now,
   }) : _post = post ?? _postToOs,
-       _now = now ?? (() => AppTime.utc.toLocal());
+       _now = now ?? (() => AppTime.utc.toLocal()) {
+    unawaited(_loadChannelNames());
+  }
+
+  /// Channel names last reported by a radio, so a notification that arrives
+  /// before the config download finishes still names its channel instead of
+  /// its slot number. Null store = this session only.
+  final MeshStore? _store;
+  final Map<int, String> _rememberedChannels = {};
+
+  Future<void> _loadChannelNames() async {
+    final names = await _store?.readChannels();
+    if (names != null) _rememberedChannels.addAll(names);
+  }
 
   /// How long after the link comes up before a node counts as newly *heard*
   /// rather than newly *introduced*. The config download hands over the whole
@@ -189,7 +204,11 @@ class MeshAlerts extends ChangeNotifier {
         return channel.name;
       }
     }
-    return 'CH$index';
+    // The radio has not reported this slot (yet, or at all): the name it was
+    // last seen with still beats a slot number. A message can easily arrive
+    // before the config download finishes, and "CH2" in the shade names
+    // nothing the user recognises.
+    return _rememberedChannels[index] ?? 'CH$index';
   }
 
   /// `HH:mm:ss`, built by hand rather than through `intl`: this runs in

@@ -10,6 +10,7 @@ library;
 
 import 'dart:io';
 
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/build_info.g.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/features/settings/presentation/widgets/network_usage_chart.dart';
@@ -55,6 +57,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
   List<HourUsage>? _usageHistory;
   List<HourUsage>? _usageWeek;
   StorageScan? _storage;
+  List<TableStat>? _tables;
   bool _clearing = false;
 
   /// Version-row taps toward the experimental unlock. Deliberately not
@@ -73,6 +76,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final notifications = context.read<NotificationService>();
     final etagCache = context.read<EtagCacheStore?>();
     final networkUsage = context.read<NetworkUsageStore?>();
+    final database = context.read<AppDatabase>();
 
     final info = await PackageInfo.fromPlatform();
     final cacheStats = await etagCache?.stats();
@@ -83,6 +87,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
       bucketHours: 6,
     );
     final storage = await const StorageScanner().scan();
+    final tables = await database.tableStats();
     final device = await DeviceInfoService.load();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
@@ -138,6 +143,28 @@ class _DeveloperPageState extends State<DeveloperPage> {
           (
             label: 'Size on disk',
             value: cacheStats == null ? '—' : formatBytes(cacheStats.bytes),
+          ),
+        ],
+      ),
+      // Which table is actually costing the space. "The database is 40 MB" is
+      // not something anyone can act on; "mesh_node_metrics is 38 MB across
+      // 900,000 rows" names both the table and the retention window that is
+      // wrong.
+      (
+        title: 'SQLite tables',
+        fields: [
+          (label: 'Tables', value: '${tables.length} across two files'),
+          (label: 'Rows', value: '${tables.fold(0, (sum, t) => sum + t.rows)}'),
+          (
+            label: 'Measured',
+            value: tables.isEmpty
+                ? '—'
+                : tables.first.onDisk
+                ? 'on-disk pages (dbstat)'
+                // Says so explicitly: the payload sum excludes indexes and
+                // page overhead, so it reads lower than the file itself and
+                // the difference is not a leak.
+                : 'payload only (no dbstat)',
           ),
         ],
       ),
@@ -209,6 +236,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
         _usageHistory = usageHistory;
         _usageWeek = usageWeek;
         _storage = storage;
+        _tables = tables;
       });
     }
   }
@@ -417,6 +445,8 @@ class _DeveloperPageState extends State<DeveloperPage> {
                       slices: storageBreakdown(_storage!),
                       total: _storage!.totalBytes,
                     ),
+                  if (sections[i].title == 'SQLite tables' && _tables != null)
+                    _TableBreakdown(tables: _tables!),
                 ],
                 const SectionHeader('Maintenance'),
                 ListTile(
@@ -478,6 +508,84 @@ class _DiagRow extends StatelessWidget {
               onPressed: () => onCopy!(value),
             )
           : null,
+    );
+  }
+}
+
+/// Per-table rows and bytes, biggest first.
+///
+/// A bar each rather than a number each: the question this answers is "what is
+/// taking the space", and that is a comparison, not a set of readings.
+class _TableBreakdown extends StatelessWidget {
+  const _TableBreakdown({required this.tables});
+
+  final List<TableStat> tables;
+
+  @override
+  Widget build(BuildContext context) {
+    if (tables.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final largest = tables.first.bytes;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final table in tables) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      table.table,
+                      style: theme.textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    // l10n-ignore: developer diagnostics
+                    '${table.rows} · ${formatBytes(table.bytes)}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            ClipRRect(
+              borderRadius: AppRadius.small,
+              child: LinearProgressIndicator(
+                // Against the largest table, not the total: the point is which
+                // one dominates, and against a total the small ones vanish.
+                value: largest == 0 ? 0 : table.bytes / largest,
+                minHeight: 4,
+                backgroundColor: colors.surfaceContainerHighest,
+                // The durable file is the one the user cannot get back; the
+                // cache file the OS may empty on its own.
+                color: table.file == 'dpip.db'
+                    ? colors.primary
+                    : colors.tertiary,
+              ),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            // l10n-ignore: developer diagnostics
+            'blue = dpip.db (durable) · amber = http_cache.db (re-fetchable)',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

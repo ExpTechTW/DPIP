@@ -101,6 +101,29 @@ class LogStore {
     _timer ??= Timer(_flushInterval, () => unawaited(flush()));
   }
 
+  /// Drops anything past the retention window, whether or not there is
+  /// anything to write.
+  ///
+  /// [flush] also prunes, but only as part of writing a batch — it returns
+  /// early when nothing is buffered. So an app left running with a quiet log
+  /// (the radio disconnected, nothing failing) never pruned at all, and the
+  /// table kept yesterday for as long as the process lived. This is what the
+  /// hourly sweep calls; never throws, for the same reason [flush] does not.
+  Future<void> prune() async {
+    try {
+      await _db.delete(
+        logTable,
+        where: 'time < ?',
+        whereArgs: [
+          _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
+        ],
+      );
+    } on Object {
+      // Reporting a logging failure through the logger is how a write loop
+      // starts.
+    }
+  }
+
   /// Writes everything queued and drops anything past the retention window.
   ///
   /// Never throws: a logger that can fail a caller is a logger that turns a

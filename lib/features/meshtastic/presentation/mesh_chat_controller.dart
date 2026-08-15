@@ -77,6 +77,11 @@ class MeshChatController extends ChangeNotifier {
     // of two surfaces showing the same table (the map layer is the other).
     _nodes.addListener(notifyListeners);
     _messageSub = _service.messageStream.listen(_onMessage);
+    // The radio reports its channel table during the config download; capture
+    // the names each time so the log stays labelled after it disconnects.
+    _connectionSub = _service.connectionStream.listen(
+      (_) => _rememberChannels(),
+    );
   }
 
   /// How many messages the in-memory window holds. Not a retention limit —
@@ -96,6 +101,7 @@ class MeshChatController extends ChangeNotifier {
   final MeshStore? _store;
 
   StreamSubscription<MeshMessage>? _messageSub;
+  StreamSubscription<MeshConnectionStatus>? _connectionSub;
   StreamSubscription<MeshDevice>? _scanSub;
 
   final List<MeshChatMessage> _messages = [];
@@ -122,6 +128,40 @@ class MeshChatController extends ChangeNotifier {
   /// Counted in SQL at load and kept up to date locally, so a channel whose
   /// history falls outside the in-memory window still reports its real total.
   Map<int, int> get messageCountsByChannel => Map.unmodifiable(_counts);
+
+  /// Channel index → the name last reported by a radio.
+  ///
+  /// A channel's name arrives only in the config download, so between
+  /// connections the radio cannot be asked. Without this the chat screen fell
+  /// back to the slot number — a conversation the user knows as "DPIP" showing
+  /// as "CH2" whenever the page was opened before the radio finished
+  /// configuring, which is most of the time on a cold start.
+  Map<int, String> get channelNames => Map.unmodifiable(_channelNames);
+
+  final Map<int, String> _channelNames = {};
+
+  /// Records the radio's channel names, if it has reported any yet.
+  ///
+  /// Only ever *adds* names. The table arrives one slot at a time, so a
+  /// snapshot taken mid-download is partial; replacing the map with it would
+  /// blank out names that are already known and make the labels flicker back
+  /// to slot numbers while connecting.
+  Future<void> _rememberChannels() async {
+    final named = <int, String>{
+      for (final channel in _service.channels)
+        if (channel.name.isNotEmpty) channel.index: channel.name,
+    };
+    if (named.isEmpty) return;
+    var changed = false;
+    for (final entry in named.entries) {
+      if (_channelNames[entry.key] == entry.value) continue;
+      _channelNames[entry.key] = entry.value;
+      changed = true;
+    }
+    if (!changed) return;
+    notifyListeners();
+    await _store?.writeChannels(_channelNames);
+  }
 
   /// The message log, **newest first** (the page renders it reversed).
   List<MeshChatMessage> get messages => List.unmodifiable(_messages);
@@ -302,7 +342,13 @@ class MeshChatController extends ChangeNotifier {
     _counts
       ..clear()
       ..addAll(await store.messageCountsByChannel());
-    Log.debug('mesh chat: loaded ${_messages.length} message(s)');
+    _channelNames
+      ..clear()
+      ..addAll(await store.readChannels());
+    Log.debug(
+      'mesh chat: loaded ${_messages.length} message(s), '
+      '${_channelNames.length} channel name(s)',
+    );
     notifyListeners();
   }
 
@@ -310,6 +356,7 @@ class MeshChatController extends ChangeNotifier {
   void dispose() {
     _nodes.removeListener(notifyListeners);
     unawaited(_messageSub?.cancel());
+    unawaited(_connectionSub?.cancel());
     unawaited(_scanSub?.cancel());
     super.dispose();
   }

@@ -530,6 +530,25 @@ class EtagCacheStore {
     return (rows.first['b'] as num).toInt();
   }
 
+  /// Brings the store back inside its byte budget.
+  ///
+  /// The budget is normally enforced on write, amortized over [_sweepEvery]
+  /// rows — which is right, because a cache only grows when something writes
+  /// to it. What that misses is the *carry-over*: a session that ended over
+  /// budget (killed mid-tile-batch, or the ceiling lowered between releases)
+  /// stays over until 96 more writes happen to occur. On an app left open with
+  /// the map closed, that is never. Cheap when already inside the ceiling —
+  /// one `SUM(LENGTH(body))` and no deletes.
+  Future<void> prune() async {
+    try {
+      await _flushTouches();
+      await _trimToBudget();
+    } catch (_) {
+      // A cache that will not trim is a disk cost, not a fault; every other
+      // path in this file swallows the same way.
+    }
+  }
+
   /// Deletes every cached entry.
   Future<void> clear() async {
     try {

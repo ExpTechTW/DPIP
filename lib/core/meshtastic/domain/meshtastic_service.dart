@@ -293,6 +293,29 @@ class MeshDataPacket {
 }
 
 /// A channel slot on the radio.
+/// How many channel slots a Meshtastic radio has. Fixed by the firmware.
+const int meshChannelSlots = 8;
+
+/// Whether [value] can be a channel **index** rather than a channel **hash**.
+///
+/// `MeshPacket.channel` carries two different things depending on the packet:
+///
+/// * On a packet the radio could decrypt, it is the channel index — `0`–`7`.
+/// * On one it could **not**, it is the channel *hash*: a single byte derived
+///   from the channel's name and key, which is how a receiver decides which of
+///   its channels is worth trying. Anything from `0` to `255`.
+///
+/// So a foreign mesh's traffic arrives claiming channel 242, 92, 227 — real
+/// values seen on air — and any code that reads the field as an index invents
+/// conversations, badges and notification titles for channels that do not
+/// exist ("CH242"). The two cases are indistinguishable from the number alone,
+/// which is why this is a named check rather than an inline `< 8`.
+///
+/// A hash *can* land in `0`–`7` by coincidence; that is unavoidable and
+/// harmless, because a packet that reaches app code at all is one the radio
+/// already decrypted.
+bool isMeshChannelIndex(int value) => value >= 0 && value < meshChannelSlots;
+
 class MeshChannel {
   const MeshChannel({
     required this.index,
@@ -379,6 +402,7 @@ class MeshNode {
     required this.displayName,
     required this.isOnline,
     this.batteryLevel,
+    this.voltage,
     this.lastHeard,
     this.latitude,
     this.longitude,
@@ -392,6 +416,11 @@ class MeshNode {
   final String displayName;
   final bool isOnline;
   final int? batteryLevel;
+
+  /// Pack voltage, when the node reports it. Battery *percent* is the radio's
+  /// own estimate from this figure and reads 101% on external power; the volts
+  /// are the raw measurement and the only one that shows a cell ageing.
+  final double? voltage;
   final DateTime? lastHeard;
   final double? latitude;
   final double? longitude;

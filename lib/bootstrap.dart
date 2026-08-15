@@ -43,6 +43,7 @@ import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
+import 'package:dpip/core/storage/retention.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
@@ -124,7 +125,8 @@ Future<void> bootstrap() async {
   // Persist the log as early as the database allows: everything after this
   // point survives a crash or a background kill, which is exactly the window
   // the in-memory history used to lose.
-  if (durable != null) Log.persistTo(LogStore(durable));
+  final logStore = durable == null ? null : LogStore(durable);
+  if (logStore != null) Log.persistTo(logStore);
   final settings = await SettingsStore.open(durable);
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
@@ -229,16 +231,22 @@ Future<void> bootstrap() async {
   // path for disaster information. `start()` picks a saved radio back up.
   final meshtastic = MeshtasticClientImpl();
   final meshLink = MeshLink(meshtastic, settings);
-  final meshAlerts = MeshAlerts(meshtastic, settings);
   // Mesh data lives in the durable database, deliberately **not** the HTTP
   // cache one: that lives in the platform cache directory, which the OS may
   // purge, and a conversation is the one thing here that cannot be fetched
   // again.
   final meshStore = durable == null ? null : MeshStore(durable);
+  final meshAlerts = MeshAlerts(meshtastic, settings, store: meshStore);
   final meshNodes = MeshNodeStore(meshtastic, settings, store: meshStore);
-  if (meshStore != null) {
-    unawaited(meshStore.prune());
-  }
+  // Retention for every table, on one schedule: now, then hourly. No store
+  // prunes on its own timing any more — see [RetentionService] for why an app
+  // that is left running needs a clock rather than a bootstrap.
+  RetentionService(
+    mesh: meshStore,
+    logs: logStore,
+    usage: cache?.usage,
+    httpCache: cache?.etag,
+  ).start();
 
   final deps = SharedDeps(
     settings: settings,
@@ -281,7 +289,7 @@ Future<void> bootstrap() async {
   meshAlerts.start();
   meshNodes.start();
   if (meshStore != null) {
-    MeshMetricsRecorder(meshtastic, meshStore).start();
+    MeshMetricsRecorder(meshtastic, meshNodes, meshStore).start();
   }
 
   // Each feature turns [deps] into its providers (and registers its realtime

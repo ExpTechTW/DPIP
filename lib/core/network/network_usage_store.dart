@@ -240,6 +240,26 @@ class NetworkUsageStore {
     }
   }
 
+  /// Drops buckets past the reporting window, whether or not there is
+  /// anything buffered to write.
+  ///
+  /// [flush] also trims, but only as part of writing an aggregate — it returns
+  /// early when nothing is pending. So an app sitting idle with no network
+  /// traffic (the very state in which nothing else prunes either) kept its
+  /// buckets indefinitely. This is what the hourly sweep calls.
+  Future<void> prune() async {
+    try {
+      final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+      await _db.delete(
+        _buckets,
+        where: 'hour < ?',
+        whereArgs: [hour - _windowHours],
+      );
+    } catch (_) {
+      // Accounting is diagnostic-only; never surface a failure.
+    }
+  }
+
   /// Drops every recorded bucket and anything still buffered.
   ///
   /// The pending aggregate has to go too: it is what a flush would write next,

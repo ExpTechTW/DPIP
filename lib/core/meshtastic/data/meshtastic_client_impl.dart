@@ -39,8 +39,6 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 const String _meshtasticServiceUuid = '6ba1b218-15a8-461f-9fa8-5dcae273eafd';
 
 /// Channel slots every Meshtastic radio reports (`MAX_NUM_CHANNELS`).
-const int _channelSlots = 8;
-
 /// Production impl: talks BLE to a Meshtastic radio.
 class MeshtasticClientImpl implements MeshtasticService {
   mesh.MeshtasticClient? _client;
@@ -444,6 +442,7 @@ class MeshtasticClientImpl implements MeshtasticService {
       displayName: node.displayName,
       isOnline: node.isOnline,
       batteryLevel: node.batteryLevel,
+      voltage: node.voltage,
       lastHeard: node.lastHeard,
       latitude: node.latitude,
       longitude: node.longitude,
@@ -453,8 +452,19 @@ class MeshtasticClientImpl implements MeshtasticService {
   });
 
   @override
-  Stream<MeshMessage> get messageStream =>
-      _c.packetStream.where((packet) => packet.isTextMessage).map((packet) {
+  /// Text messages, with anything whose channel is a *hash* rather than an
+  /// index dropped — see [isMeshChannelIndex].
+  ///
+  /// Today `isTextMessage` is false without a `decoded` payload, so an
+  /// undecryptable packet cannot reach here and this guard never fires. It is
+  /// here because the cost of that changing is silent: a hash reads as a
+  /// perfectly ordinary channel number, so the symptom is not an error but a
+  /// conversation called "CH242" appearing in the chat list and the
+  /// notification shade, with nothing anywhere objecting.
+  Stream<MeshMessage> get messageStream => _c.packetStream
+      .where((packet) => packet.isTextMessage)
+      .where(_hasChannelIndex)
+      .map((packet) {
         final payload = packet.decoded?.payload ?? const [];
         final text = utf8.decode(payload, allowMalformed: true);
         // `bytes` distinguishes "the radio sent an empty body" from "the body
@@ -480,8 +490,14 @@ class MeshtasticClientImpl implements MeshtasticService {
       });
 
   @override
-  Stream<MeshDataPacket> get dataStream =>
-      _c.packetStream.where((packet) => packet.decoded != null).map((packet) {
+  /// Decoded app payloads. Same channel guard as [messageStream] — the DPIP
+  /// gateway filters on `packet.channel == dpipChannel`, so a hash colliding
+  /// with the DPIP slot would let a foreign mesh's traffic through the
+  /// envelope check.
+  Stream<MeshDataPacket> get dataStream => _c.packetStream
+      .where((packet) => packet.decoded != null)
+      .where(_hasChannelIndex)
+      .map((packet) {
         return MeshDataPacket(
           from: packet.from,
           channel: packet.channel,
@@ -573,6 +589,19 @@ class MeshtasticClientImpl implements MeshtasticService {
     );
   }
 
+  /// Whether a packet's `channel` field is an index this app can key on.
+  ///
+  /// Logged at debug when it is not: on a busy mesh this fires for every
+  /// foreign encrypted packet, so it must not be a warning.
+  bool _hasChannelIndex(mesh.MeshPacketWrapper packet) {
+    if (isMeshChannelIndex(packet.channel)) return true;
+    Log.debug(
+      'meshtastic: dropping packet with channel ${packet.channel} — '
+      'that is a channel hash, not an index',
+    );
+    return false;
+  }
+
   @override
   List<MeshChannel> get channels => [
     for (final (index, channel) in _c.channels.indexed)
@@ -611,7 +640,7 @@ class MeshtasticClientImpl implements MeshtasticService {
     // short table means the download was cut off. Choosing a "free" slot from
     // a partial view could hand out one that is actually in use — and would
     // report "no free slot" on a radio that has five.
-    if (table.length < _channelSlots) {
+    if (table.length < meshChannelSlots) {
       Log.warning('meshtastic channel: only ${table.length} slots known');
       return const Err(
         UnexpectedFailure('The radio has not reported its channels yet'),
