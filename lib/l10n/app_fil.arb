@@ -57,6 +57,8 @@
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "Saklaw sa araw",
+  "permissionsTitle": "Pagsusuri ng pahintulot",
+  "permissionsBody": "Kailangan ng DPIP ang mga pahintulot na ito para makapag-alerto agad. Kadalasan, ang dahilan ng hindi dumating na alerto ay isang nawawalang pahintulot.",
   "notifySettingsMenu": "Mga setting ng notipikasyon",
   "typhoonHistoryTitle": "Dataset time",
   "mapAppDefault": "{app} (default)",

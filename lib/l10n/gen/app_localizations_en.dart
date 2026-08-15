@@ -125,6 +125,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherRankingExtremeRange => 'Diurnal range';
 
   @override
+  String get permissionsTitle => 'Permission check';
+
+  @override
+  String get permissionsBody =>
+      'DPIP needs these permissions to alert you in time. A missing one is the usual reason an alert never arrived.';
+
+  @override
   String get notifySettingsMenu => 'Notification settings';
 
   @override

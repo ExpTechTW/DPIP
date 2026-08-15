@@ -123,6 +123,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherRankingExtremeRange => '일교차';
 
   @override
+  String get permissionsTitle => '권한 확인';
+
+  @override
+  String get permissionsBody =>
+      'DPIP가 제때 알리려면 이 권한들이 필요합니다. 알림이 오지 않는 이유는 대개 이 중 하나가 꺼져 있기 때문입니다.';
+
+  @override
   String get notifySettingsMenu => '알림 설정';
 
   @override

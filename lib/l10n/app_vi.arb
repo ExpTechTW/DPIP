@@ -57,6 +57,8 @@
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "Biên độ ngày",
+  "permissionsTitle": "Kiểm tra quyền",
+  "permissionsBody": "DPIP cần các quyền này để cảnh báo bạn kịp thời. Không nhận được cảnh báo thường là do thiếu một trong số đó.",
   "notifySettingsMenu": "Cài đặt thông báo",
   "typhoonHistoryTitle": "Thời điểm dữ liệu",
   "mapAppDefault": "{app} (mặc định)",

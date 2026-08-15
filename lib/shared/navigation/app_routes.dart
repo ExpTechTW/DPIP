@@ -126,6 +126,11 @@ abstract final class AppRoutes {
   static const String regionSelectCity = 'regionSelectCity';
   static const String regionSelectCityPath = ':city';
 
+  /// Permission checklist (權限檢查) — the same rows onboarding shows, kept
+  /// reachable afterwards because a missing alert is usually a missing grant.
+  static const String permissions = 'permissions';
+  static const String permissionsPath = '/permissions';
+
   // Per-channel push notification settings.
   static const String notifySettings = 'notifySettings';
   static const String notifySettingsPath = '/notify-settings';

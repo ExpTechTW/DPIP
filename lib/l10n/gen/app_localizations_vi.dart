@@ -124,6 +124,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherRankingExtremeRange => 'Biên độ ngày';
 
   @override
+  String get permissionsTitle => 'Kiểm tra quyền';
+
+  @override
+  String get permissionsBody =>
+      'DPIP cần các quyền này để cảnh báo bạn kịp thời. Không nhận được cảnh báo thường là do thiếu một trong số đó.';
+
+  @override
   String get notifySettingsMenu => 'Cài đặt thông báo';
 
   @override

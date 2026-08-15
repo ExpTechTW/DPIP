@@ -333,6 +333,18 @@ abstract class AppLocalizations {
   /// **'Diurnal range'**
   String get weatherRankingExtremeRange;
 
+  /// Title of the standalone permission checklist page
+  ///
+  /// In en, this message translates to:
+  /// **'Permission check'**
+  String get permissionsTitle;
+
+  /// Intro line on the permission checklist page
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP needs these permissions to alert you in time. A missing one is the usual reason an alert never arrived.'**
+  String get permissionsBody;
+
   /// More-menu entry that opens the notification-settings page
   ///
   /// In en, this message translates to:

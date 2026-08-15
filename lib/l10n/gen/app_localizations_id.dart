@@ -124,6 +124,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherRankingExtremeRange => 'Rentang harian';
 
   @override
+  String get permissionsTitle => 'Pemeriksaan izin';
+
+  @override
+  String get permissionsBody =>
+      'DPIP memerlukan izin ini untuk memberi peringatan tepat waktu. Peringatan yang tidak muncul biasanya karena salah satunya belum diberikan.';
+
+  @override
   String get notifySettingsMenu => 'Pengaturan notifikasi';
 
   @override

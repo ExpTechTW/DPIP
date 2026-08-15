@@ -1,0 +1,116 @@
+/// The More menu's catalogue.
+///
+/// Same reason as the data hub's test: a tile can silently fail to land — an
+/// edit that no longer matches, a route constant that was never registered —
+/// and nothing else notices. 權限檢查 in particular is the page people reach
+/// for when an alert did not arrive, so a menu that quietly stops offering it
+/// is a failure that only shows up on the day it matters.
+library;
+
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/features/more/presentation/pages/more_page.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+/// The in-app destinations the menu must offer, with their English labels.
+const _tiles = <(String, String)>[
+  (AppRoutes.notifySettings, 'Notification settings'),
+  (AppRoutes.permissions, 'Permission check'),
+  (AppRoutes.language, 'Language'),
+  (AppRoutes.display, 'Display'),
+  (AppRoutes.log, 'App logs'),
+];
+
+GoRouter _router(List<String> visited) => GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (_, _) => const MorePage(),
+      routes: [
+        for (final (name, _) in _tiles)
+          GoRoute(
+            path: name,
+            name: name,
+            builder: (_, _) {
+              visited.add(name);
+              return const SizedBox.shrink();
+            },
+          ),
+      ],
+    ),
+  ],
+);
+
+Future<void> _pump(WidgetTester tester, GoRouter router) async {
+  // Tall enough that every group lays out and hit-tests inside the viewport —
+  // a row past the bottom edge takes taps that silently miss.
+  tester.view.physicalSize = const Size(800, 4000);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+
+  final settings = SettingsStore.inMemory();
+  await tester.pumpWidget(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => DefaultMapLayerController(settings),
+        ),
+        ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
+        ChangeNotifierProvider(create: (_) => RegionStore(settings)),
+        Provider(create: (_) => const TownDirectory({})),
+      ],
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pump();
+}
+
+void main() {
+  testWidgets('offers every in-app destination', (tester) async {
+    await _pump(tester, _router([]));
+    for (final (route, label) in _tiles) {
+      // Scoped to the row: a section header can carry the same word (the
+      // Display group is literally headed "Display").
+      expect(
+        find.widgetWithText(ListTile, label),
+        findsOneWidget,
+        reason: '$route tile missing',
+      );
+    }
+  });
+
+  testWidgets('permission check sits with the notification settings', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    final notify = tester
+        .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
+        .dy;
+    final permissions = tester
+        .getTopLeft(find.widgetWithText(ListTile, 'Permission check'))
+        .dy;
+    expect(permissions - notify, lessThan(120));
+  });
+
+  for (final (route, label) in _tiles) {
+    testWidgets('the $label tile navigates to $route', (tester) async {
+      final visited = <String>[];
+      await _pump(tester, _router(visited));
+      await tester.tap(find.widgetWithText(ListTile, label));
+      await tester.pumpAndSettle();
+      expect(visited, [route]);
+    });
+  }
+}

@@ -54,6 +54,13 @@ class MorePage extends StatelessWidget {
                 title: l10n.notifySettingsMenu,
                 onTap: () => context.pushNamed(AppRoutes.notifySettings),
               ),
+              // Kept beside the notification settings: when an alert does not
+              // arrive, the grant is the first thing to check.
+              _MoreTile(
+                icon: Icons.verified_user_outlined,
+                title: l10n.permissionsTitle,
+                onTap: () => context.pushNamed(AppRoutes.permissions),
+              ),
             ],
           ),
           SectionHeader(l10n.moreSectionDisplay),

@@ -57,6 +57,8 @@
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "일교차",
+  "permissionsTitle": "권한 확인",
+  "permissionsBody": "DPIP가 제때 알리려면 이 권한들이 필요합니다. 알림이 오지 않는 이유는 대개 이 중 하나가 꺼져 있기 때문입니다.",
   "notifySettingsMenu": "알림 설정",
   "typhoonHistoryTitle": "자료 시각",
   "mapAppDefault": "{app} (기본)",

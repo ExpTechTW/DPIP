@@ -125,6 +125,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get weatherRankingExtremeRange => 'Saklaw sa araw';
 
   @override
+  String get permissionsTitle => 'Pagsusuri ng pahintulot';
+
+  @override
+  String get permissionsBody =>
+      'Kailangan ng DPIP ang mga pahintulot na ito para makapag-alerto agad. Kadalasan, ang dahilan ng hindi dumating na alerto ay isang nawawalang pahintulot.';
+
+  @override
   String get notifySettingsMenu => 'Mga setting ng notipikasyon';
 
   @override

@@ -140,6 +140,14 @@
   "@moreSectionRegion": {
     "description": "Section header on the More page for saved regions"
   },
+  "permissionsTitle": "Permission check",
+  "@permissionsTitle": {
+    "description": "Title of the standalone permission checklist page"
+  },
+  "permissionsBody": "DPIP needs these permissions to alert you in time. A missing one is the usual reason an alert never arrived.",
+  "@permissionsBody": {
+    "description": "Intro line on the permission checklist page"
+  },
   "notifySettingsMenu": "Notification settings",
   "@weatherRankingMergeCounty": {
     "description": "Chip to keep one extreme station per county"

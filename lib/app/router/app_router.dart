@@ -29,6 +29,7 @@ import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
+import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -222,6 +223,11 @@ final GoRouter appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+    GoRoute(
+      path: AppRoutes.permissionsPath,
+      name: AppRoutes.permissions,
+      builder: (_, _) => const PermissionsPage(),
     ),
     GoRoute(
       path: AppRoutes.notifySettingsPath,

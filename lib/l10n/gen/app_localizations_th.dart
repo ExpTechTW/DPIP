@@ -124,6 +124,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherRankingExtremeRange => 'ช่วงวัน';
 
   @override
+  String get permissionsTitle => 'ตรวจสอบสิทธิ์';
+
+  @override
+  String get permissionsBody =>
+      'DPIP ต้องใช้สิทธิ์เหล่านี้เพื่อแจ้งเตือนคุณได้ทันเวลา หากไม่ได้รับการแจ้งเตือน มักเป็นเพราะยังไม่ได้เปิดสิทธิ์ข้อใดข้อหนึ่ง';
+
+  @override
   String get notifySettingsMenu => 'การตั้งค่าการแจ้งเตือน';
 
   @override

@@ -57,6 +57,8 @@
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "日較差",
+  "permissionsTitle": "権限チェック",
+  "permissionsBody": "DPIP がすぐに通知するには、これらの権限が必要です。通知が届かない場合、たいていはいずれかが未許可です。",
   "notifySettingsMenu": "通知設定",
   "typhoonHistoryTitle": "資料時刻",
   "mapAppDefault": "{app}（デフォルト）",

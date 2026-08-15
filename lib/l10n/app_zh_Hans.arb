@@ -57,6 +57,8 @@
     "description": "When a node last transmitted"
   },
   "weatherRankingExtremeRange": "日温差",
+  "permissionsTitle": "权限检查",
+  "permissionsBody": "DPIP 需要这些权限才能即时通知你。收不到警报时，通常就是其中一项尚未开启。",
   "notifySettingsMenu": "通知设置",
   "typhoonHistoryTitle": "资料时间",
   "mapAppDefault": "{app}（默认）",

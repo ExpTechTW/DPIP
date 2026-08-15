@@ -123,6 +123,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherRankingExtremeRange => '日溫差';
 
   @override
+  String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -2723,6 +2729,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherRankingExtremeRange => '日温差';
+
+  @override
+  String get permissionsTitle => '权限检查';
+
+  @override
+  String get permissionsBody => 'DPIP 需要这些权限才能即时通知你。收不到警报时，通常就是其中一项尚未开启。';
 
   @override
   String get notifySettingsMenu => '通知设置';
@@ -5327,6 +5339,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherRankingExtremeRange => '日溫差';
 
   @override
+  String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
@@ -7927,6 +7945,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherRankingExtremeRange => '日溫差';
+
+  @override
+  String get permissionsTitle => '權限檢查';
+
+  @override
+  String get permissionsBody => 'DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。';
 
   @override
   String get notifySettingsMenu => '通知設定';

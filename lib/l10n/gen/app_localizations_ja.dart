@@ -123,6 +123,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherRankingExtremeRange => '日較差';
 
   @override
+  String get permissionsTitle => '権限チェック';
+
+  @override
+  String get permissionsBody =>
+      'DPIP がすぐに通知するには、これらの権限が必要です。通知が届かない場合、たいていはいずれかが未許可です。';
+
+  @override
   String get notifySettingsMenu => '通知設定';
 
   @override
