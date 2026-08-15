@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:ui' show Brightness;
 
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/shared/map/town_label_points.g.dart';
 import 'package:dpip/core/network/api_paths.dart';
 
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
@@ -96,30 +97,61 @@ const String townOutlineLayerId = 'town-outline';
 const String townLabelLayerId = 'town-label';
 
 /// Id of the GeoJSON point source backing [townLabelLayerId] — one point per
-/// township at its official centroid (see [townLabelGeoJson]).
+/// township, in the middle of it (see [townLabelGeoJson]).
 const String townLabelSourceId = 'town-label-src';
 
 /// Empty GeoJSON FeatureCollection — the [exptechVectorStyle] default when no
 /// directory is supplied (tests), so the baked style always parses.
 const String emptyTownLabelData = '{"type":"FeatureCollection","features":[]}';
 
+/// The last collection built, keyed by the directory it was built from.
+///
+/// Every `BaseMap.build` asks for this, and the answer is a ~41 KB string over
+/// 368 features that only changes when the directory instance does — which is
+/// once, at bootstrap. Rebuilding it per build is pure garbage.
+TownDirectory? _labelCacheKey;
+String? _labelCacheValue;
+
 /// Builds the township-name label data — a GeoJSON FeatureCollection with one
-/// Point per township at the directory's official centroid.
+/// Point per township, placed at the point inside it furthest from any edge.
 ///
 /// Labels must NOT come from the vector tiles' `town` polygon layer: a township
 /// polygon that crosses a tile boundary is clipped into several tile pieces,
 /// each with its own centroid, so reading names off the polygons rendered the
 /// same township name more than once after a zoom changed the tile grid. A
-/// directory point is unique per township by construction, so exactly one label
-/// ever places per name.
+/// point per township is unique by construction, so exactly one label ever
+/// places per name.
+///
+/// The position comes from [townLabelPoints], not from [TownDirectory]'s
+/// `lat`/`lng`. The directory point is the administrative seat, so a label drawn
+/// there sits whereever the district office happens to be — for a mountain
+/// township, in the inhabited valley at one corner of a shape that runs tens of
+/// kilometres into the range (臺中市和平區's was 42 km from the middle). The
+/// directory point is deliberately left alone because `TownDirectory.nearest`
+/// still needs it: that is the GPS→township fallback used at sea and in
+/// boundary gaps, where the nearest *settlement* is the right answer and the
+/// geometric middle is not.
+///
+/// A township with no baked point falls back to the directory — a label
+/// slightly off is better than a name missing from the map.
 String townLabelGeoJson(TownDirectory directory) {
+  if (identical(_labelCacheKey, directory)) return _labelCacheValue!;
   final features = [
     for (final town in directory.all)
-      '{"type":"Feature",'
-          '"geometry":{"type":"Point","coordinates":[${town.lng},${town.lat}]},'
-          '"properties":{"name":${jsonEncode(town.townName)}}}',
+      if (townLabelPoints[town.code] case final point?)
+        '{"type":"Feature",'
+            '"geometry":{"type":"Point","coordinates":[${point.$2},${point.$1}]},'
+            '"properties":{"name":${jsonEncode(town.townName)}}}'
+      else
+        '{"type":"Feature",'
+            '"geometry":{"type":"Point","coordinates":[${town.lng},${town.lat}]},'
+            '"properties":{"name":${jsonEncode(town.townName)}}}',
   ];
-  return '{"type":"FeatureCollection","features":[${features.join(',')}]}';
+  final json =
+      '{"type":"FeatureCollection","features":[${features.join(',')}]}';
+  _labelCacheKey = directory;
+  _labelCacheValue = json;
+  return json;
 }
 
 /// Township labels start placing at this zoom; [townLabelFadeZoom] finishes the
