@@ -100,12 +100,19 @@ class MeshNodeStore extends ChangeNotifier {
 
   /// Every node known, online first, then most-recently-heard.
   List<MeshNode> get nodes {
+    // The online cutoff is resolved once, not per comparison: the comparator
+    // runs O(n log n) times per access, this getter runs on every rebuild of
+    // the mesh page, and the page rebuilds on every packet — recomputing
+    // `now - lastHeard` inside the sort was thousands of DateTime subtractions
+    // a second on a busy mesh, all answering the same question.
+    final cutoff = _now().subtract(onlineWindow).millisecondsSinceEpoch;
     final all = _nodes.values.toList()
       ..sort((a, b) {
-        final aOnline = isOnline(a);
-        final bOnline = isOnline(b);
+        final aHeard = a.lastHeard?.millisecondsSinceEpoch;
+        final bHeard = b.lastHeard?.millisecondsSinceEpoch;
+        final aOnline = aHeard != null && aHeard > cutoff;
+        final bOnline = bHeard != null && bHeard > cutoff;
         if (aOnline != bOnline) return aOnline ? -1 : 1;
-        final aHeard = a.lastHeard, bHeard = b.lastHeard;
         if (aHeard != null && bHeard != null) return bHeard.compareTo(aHeard);
         if (aHeard != null) return -1;
         if (bHeard != null) return 1;
@@ -113,6 +120,10 @@ class MeshNodeStore extends ChangeNotifier {
       });
     return List.unmodifiable(all);
   }
+
+  /// How many nodes are known — for badges, without paying for the sort
+  /// [nodes] does.
+  int get count => _nodes.length;
 
   /// The nodes the map can draw: they have a position, and — unless
   /// [excludeMqtt] is off — they were heard over the air rather than through

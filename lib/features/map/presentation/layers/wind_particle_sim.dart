@@ -332,6 +332,12 @@ class WindParticleSim {
     final sinR = math.sin(r);
     final halfWidth = size.width / 2;
     final halfHeight = size.height / 2;
+    // In-view margins, hoisted: these four products are invariant across the
+    // population, and the loop below runs 6400 times a frame.
+    final xLo = -0.1 * size.width;
+    final xHi = 1.1 * size.width;
+    final yLo = -0.1 * size.height;
+    final yHi = 1.1 * size.height;
     // `lon0 + x·360` folds into a per-frame constant plus one multiply.
     final xOffset = (field.lon0 + 180) / 360 * world;
     final mercY = _mercY;
@@ -357,11 +363,7 @@ class WindParticleSim {
       final dy = _lutAt(mercY, p.y) * world - cy;
       p.sx = halfWidth + dx * cosR - dy * sinR;
       p.sy = halfHeight + dx * sinR + dy * cosR;
-      final inView =
-          p.sx >= -0.1 * size.width &&
-          p.sx <= 1.1 * size.width &&
-          p.sy >= -0.1 * size.height &&
-          p.sy <= 1.1 * size.height;
+      final inView = p.sx >= xLo && p.sx <= xHi && p.sy >= yLo && p.sy <= yHi;
       p.visible = inView;
 
       // Recycle a particle that has left, and occasionally a healthy one — the

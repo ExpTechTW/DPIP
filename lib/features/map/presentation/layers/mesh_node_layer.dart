@@ -131,7 +131,25 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     }
   }
 
-  void _onNodes() => unawaited(_push());
+  /// Coalesces store notifications into one trailing push.
+  ///
+  /// The store notifies per packet, and a config download replays the whole
+  /// node table as a burst — ~250 notifications in a couple of seconds, each
+  /// of which used to re-serialise a 250-feature GeoJSON and cross the
+  /// platform channel. One trailing update renders the same final state; the
+  /// intermediate frames were never visible anyway, because the flood itself
+  /// was what the frame rate was being spent on.
+  void _onNodes() {
+    if (_pushQueued) return;
+    _pushQueued = true;
+    _pushTimer = Timer(const Duration(milliseconds: 250), () {
+      _pushQueued = false;
+      unawaited(_push());
+    });
+  }
+
+  bool _pushQueued = false;
+  Timer? _pushTimer;
 
   @override
   Future<void> onMapTap(LatLng latLng, MapLibreMapController controller) async {
@@ -357,6 +375,8 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
       _store.removeListener(_onNodes);
       _listening = false;
     }
+    _pushTimer?.cancel();
+    _pushQueued = false;
     _selected.value = null;
     await _removeFromMap(controller);
     _controller = null;

@@ -121,8 +121,8 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
               tooltip: l10n.meshtasticNodes,
               onPressed: () => _showNodes(context),
               icon: Badge(
-                isLabelVisible: controller.nodes.isNotEmpty,
-                label: Text('${controller.nodes.length}'),
+                isLabelVisible: controller.nodeCount > 0,
+                label: Text('${controller.nodeCount}'),
                 child: const Icon(Icons.hub_outlined),
               ),
             ),

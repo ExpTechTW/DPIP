@@ -169,6 +169,10 @@ class MeshChatController extends ChangeNotifier {
   /// Every node heard so far, online first, then most-recently-heard.
   List<MeshNode> get nodes => _nodes.nodes;
 
+  /// Node count without the sorted-list construction — for the page badge,
+  /// which rebuilds on every packet.
+  int get nodeCount => _nodes.count;
+
   /// Whether [node] has been heard recently enough to count as online.
   bool isOnline(MeshNode node) => _nodes.isOnline(node);
 

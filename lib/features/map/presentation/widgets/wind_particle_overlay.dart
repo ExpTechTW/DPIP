@@ -452,18 +452,19 @@ class _TrailBuffer {
       );
     }
 
-    _stampHead(canvas, particles, paint);
-    _recordHead(particles);
+    _stampAndRecordHead(canvas, particles, paint);
   }
 
-  /// The newest frame, bucketed by speed so the head of each streak is
-  /// brighter where the wind is stronger.
+  /// The newest frame: bucketed by speed for the draw (the head of each streak
+  /// is brighter where the wind is stronger) and recorded flat into the
+  /// history ring for the next frames' tails — one pass over the population,
+  /// where stamping and recording separately walked it twice a frame.
   ///
   /// The web gives every point its own alpha from a fragment shader; a
   /// [Canvas] carries one colour per call, so the field is bucketed and drawn a
   /// bucket at a time. Sixteen steps across an alpha range of 0.55 is a third
   /// of a level apart in 8-bit terms — below what rounding does to it anyway.
-  void _stampHead(
+  void _stampAndRecordHead(
     Canvas canvas,
     Iterable<WindParticle> particles,
     Paint paint,
@@ -472,17 +473,32 @@ class _TrailBuffer {
     final points = _buckets;
     final counts = _counts;
     counts.fillRange(0, buckets, 0);
+    final slot = _history[_head];
+    var recorded = 0;
+    // Reciprocal once; a divide per particle per frame is the kind of cost
+    // this loop is too hot to carry.
+    const invScale = 1 / kWindSpeedScale;
     for (final p in particles) {
       if (!p.visible) continue;
-      final t = (p.speed / kWindSpeedScale).clamp(0.0, 1.0);
+      final t = (p.speed * invScale).clamp(0.0, 1.0);
       final bi = math.min(buckets - 1, (t * buckets).floor());
       final i = counts[bi];
-      if (i * 2 + 1 >= _bucketCapacity) continue;
-      counts[bi] = i + 1;
-      final b = points[bi];
-      b[i * 2] = p.sx;
-      b[i * 2 + 1] = p.sy;
+      if (i * 2 + 1 < _bucketCapacity) {
+        counts[bi] = i + 1;
+        final b = points[bi];
+        b[i * 2] = p.sx;
+        b[i * 2 + 1] = p.sy;
+      }
+      if (recorded * 2 + 1 < _bucketCapacity) {
+        slot[recorded * 2] = p.sx;
+        slot[recorded * 2 + 1] = p.sy;
+        recorded++;
+      }
     }
+    _historyCounts[_head] = recorded;
+    _head = (_head + 1) % historyFrames;
+    if (_filled < historyFrames) _filled++;
+
     for (var i = 0; i < buckets; i++) {
       final count = counts[i];
       if (count == 0) continue;
@@ -495,22 +511,6 @@ class _TrailBuffer {
         paint,
       );
     }
-  }
-
-  /// Pushes this frame's positions into the ring for the next paint.
-  void _recordHead(Iterable<WindParticle> particles) {
-    final slot = _history[_head];
-    var n = 0;
-    for (final p in particles) {
-      if (!p.visible) continue;
-      if (n * 2 + 1 >= _bucketCapacity) break;
-      slot[n * 2] = p.sx;
-      slot[n * 2 + 1] = p.sy;
-      n++;
-    }
-    _historyCounts[_head] = n;
-    _head = (_head + 1) % historyFrames;
-    if (_filled < historyFrames) _filled++;
   }
 }
 
