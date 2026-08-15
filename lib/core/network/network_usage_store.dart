@@ -160,24 +160,32 @@ class NetworkUsageStore {
     }
   }
 
-  /// Queues one cacheable response for a coalesced flush: [down] bytes
-  /// downloaded, whether it was a cache [hit], and the bytes [saved] by that
-  /// hit. Completes when the event is buffered (not when SQLite lands).
+  /// Queues [count] cacheable responses for a coalesced flush: [down] bytes
+  /// downloaded between them, whether they were cache [hit]s, and the bytes
+  /// [saved] by those hits. Completes when the event is buffered (not when
+  /// SQLite lands).
+  ///
+  /// [count] is what lets a tile batch be one call. A viewport served from
+  /// cache is dozens of identical hits, and recording them one at a time
+  /// re-crossed [flushEvery] mid-batch — a `net_bucket` transaction, plus its
+  /// 7-day sweep, per 64 tiles. The aggregate written is the same sum either
+  /// way.
   Future<void> record({
     required int down,
     required bool hit,
     required int saved,
+    int count = 1,
   }) async {
     final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
     final pending = _pendingByHour.putIfAbsent(hour, _Pending.new);
     pending.down += down;
     pending.saved += saved;
     if (hit) {
-      pending.hits += 1;
+      pending.hits += count;
     } else {
-      pending.misses += 1;
+      pending.misses += count;
     }
-    _pendingEvents += 1;
+    _pendingEvents += count;
     if (_pendingEvents >= flushEvery) {
       unawaited(flush());
     } else {

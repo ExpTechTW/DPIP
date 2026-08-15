@@ -149,6 +149,9 @@ class EtagCacheStore {
   /// Rows written between byte-budget sweeps (see [_trimToBudget]).
   static const _sweepEvery = 96;
 
+  /// Rows read per pass when picking eviction victims (see [_trimToBudget]).
+  static const _trimScanChunk = 512;
+
   /// Compressed bytes above which a batch inflate is worth an isolate hop.
   static const _isolateThreshold = 64 * 1024;
 
@@ -286,7 +289,14 @@ class EtagCacheStore {
       }
       final inflated = await _gunzipAll(compressed, compressedBytes);
 
+      // The batch touches and meters **once** at the end. Doing either per row
+      // turned one viewport into a burst of transactions: the touch buffer
+      // crossed [_touchFlushEvery] several times mid-loop, and so did the usage
+      // store's own flush counter. What lands is identical either way — the
+      // touch `time` is stamped at flush, and the usage aggregate is a sum.
       final out = <String, CachedBytes>{};
+      final served = <String>[];
+      var savedBytes = 0;
       for (final row in rows) {
         final kind = row['kind'] as int;
         if (kind != kindBinary && kind != kindBinaryGzip) continue;
@@ -295,16 +305,19 @@ class EtagCacheStore {
             ? inflated[key]
             : Uint8List.fromList(row['body'] as Uint8List);
         if (bytes == null) continue;
-        if (touch) _scheduleTouch(key);
         final entry = CachedBytes(
           etag: row['etag'] as String,
           bytes: bytes,
           contentType: row['content_type'] as String?,
           size: (row['size'] as num).toInt(),
         );
-        _recordBinaryHit(entry);
+        served.add(key);
+        savedBytes += entry.size;
         out[key] = entry;
       }
+      if (served.isEmpty) return out;
+      if (touch) _scheduleTouchAll(served);
+      _recordBinaryHits(served.length, savedBytes);
       return out;
     } catch (_) {
       return const {};
@@ -447,15 +460,17 @@ class EtagCacheStore {
       return;
     }
 
-    // Trim orders by `time` (last-used) — land buffered bumps first, or a
-    // just-read entry would look untouched and be swept.
-    await _flushTouches();
-
     if (tracked != null &&
         _trackedBytes! <= maxBytes &&
         _writesSinceSweep < _sweepEvery) {
       return;
     }
+    // Trim orders by `time` (last-used) — land buffered bumps first, or a
+    // just-read entry would look untouched and be swept. Only the trim needs
+    // that, which is why the flush sits *under* the guard: above it, every
+    // tile batch paid an `UPDATE … IN (…)` transaction for a sweep that was
+    // not going to run.
+    await _flushTouches();
     await _trimToBudget();
   }
 
@@ -470,20 +485,39 @@ class EtagCacheStore {
       _trackedBytes = total;
       return;
     }
-    final rows = await _db.rawQuery(
-      'SELECT key, LENGTH(body) AS b FROM $_table ORDER BY time ASC',
-    );
-    final keys = <String>[];
-    for (final row in rows) {
-      if (total <= maxBytes) break;
-      keys.add(row['key'] as String);
-      total -= (row['b'] as num).toInt();
+    // Only the oldest rows can be victims, and the surplus is normally one
+    // sweep's worth of tiles — so page the ordering instead of hauling every
+    // key and blob length in the table (tens of thousands of rows at a 350 MB
+    // budget) across the platform channel to look at the first few. The `ORDER
+    // BY` is unchanged, so the `time` index still serves it without a sort.
+    final victims = <String>{};
+    for (var offset = 0; total > maxBytes; offset += _trimScanChunk) {
+      final rows = await _db.rawQuery(
+        'SELECT key, LENGTH(body) AS b FROM $_table '
+        'ORDER BY time ASC LIMIT ? OFFSET ?',
+        [_trimScanChunk, offset],
+      );
+      if (rows.isEmpty) break;
+      for (final row in rows) {
+        if (total <= maxBytes) break;
+        // Rows tie on `time`, so a page boundary may re-show one. Counting a
+        // key once keeps the running total exact — an over-count would stop
+        // the trim early and leave the store over budget.
+        if (!victims.add(row['key'] as String)) continue;
+        total -= (row['b'] as num).toInt();
+      }
     }
-    if (keys.isNotEmpty) {
+    final keys = victims.toList(growable: false);
+    // Chunked for the same bound-parameter ceiling the read path respects: a
+    // single `IN (…)` of every victim throws "too many SQL variables" once a
+    // trim has to drop more than ~1000 rows, which would abort the sweep.
+    for (var i = 0; i < keys.length; i += _readInChunk) {
+      final end = i + _readInChunk;
+      final chunk = end < keys.length ? keys.sublist(i, end) : keys.sublist(i);
       await _db.delete(
         _table,
-        where: 'key IN (${List.filled(keys.length, '?').join(',')})',
-        whereArgs: keys,
+        where: 'key IN (${List.filled(chunk.length, '?').join(',')})',
+        whereArgs: chunk,
       );
     }
     _trackedBytes = total;
@@ -691,14 +725,39 @@ class EtagCacheStore {
     return false;
   }
 
-  void _recordBinaryHit(CachedBytes entry) {
+  void _recordBinaryHit(CachedBytes entry) => _recordBinaryHits(1, entry.size);
+
+  /// Meters [hits] serves worth [saved] wire bytes as one usage event.
+  ///
+  /// A batch is one call, not one per row: [NetworkUsageStore] flushes on an
+  /// event count, so a metered viewport used to write `net_bucket` (and run its
+  /// 7-day sweep) several times while answering a single [readBytesBatch]. The
+  /// aggregate is the same sum either way.
+  void _recordBinaryHits(int hits, int saved) {
     final usage = _usage;
     if (usage == null) return;
-    unawaited(usage.record(down: 0, hit: true, saved: entry.size));
+    unawaited(usage.record(down: 0, hit: true, saved: saved, count: hits));
   }
 
   void _scheduleTouch(String url) {
     _pendingTouch.add(url);
+    _armTouchFlush();
+  }
+
+  /// Batch form of [_scheduleTouch] — one flush decision per viewport.
+  ///
+  /// Per-key scheduling re-crossed [_touchFlushEvery] inside the loop, so a
+  /// full [readBytesBatch] fired an `UPDATE … IN (…)` transaction every 48
+  /// rows while it was still assembling the answer. Coalescing cannot reorder
+  /// the LRU: the buffered bump is stamped with the time of the *flush*, so
+  /// every key in the batch lands on the same instant either way, and
+  /// [_noteWrite] still flushes before a trim reads `time`.
+  void _scheduleTouchAll(Iterable<String> urls) {
+    _pendingTouch.addAll(urls);
+    _armTouchFlush();
+  }
+
+  void _armTouchFlush() {
     if (_pendingTouch.length >= _touchFlushEvery) {
       unawaited(_flushTouches());
       return;
