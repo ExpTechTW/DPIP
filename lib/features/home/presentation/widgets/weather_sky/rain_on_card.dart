@@ -648,10 +648,13 @@ class _CardWaterPainter extends CustomPainter {
     primary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     secondary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     offscreen.restore();
-    return recorder.endRecording().toImageSync(
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(
       fieldSize.width.ceil(),
       fieldSize.height.ceil(),
     );
+    picture.dispose();
+    return image;
   }
 
   @override

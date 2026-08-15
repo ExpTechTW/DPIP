@@ -897,7 +897,9 @@ Future<Uint8List> _rasterize(ui.Image source, int size) async {
     Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
     Paint()..filterQuality = FilterQuality.medium,
   );
-  final image = recorder.endRecording().toImageSync(size, size);
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(size, size);
+  picture.dispose();
   final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
   image.dispose();
   return data!.buffer.asUint8List();
@@ -950,7 +952,10 @@ Future<ui.Image> _imageFromRgba(Uint8List rgba, int size) {
         canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
       }
     }
-    return recorder.endRecording().toImageSync(size, size);
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(size, size);
+    picture.dispose();
+    return image;
   }
 
   return (build(false), build(true));
