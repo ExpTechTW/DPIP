@@ -16,6 +16,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.d
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -511,11 +512,16 @@ class _TempSparklinePainter extends CustomPainter {
     canvas.drawCircle(markAt, 2, Paint()..color = line);
   }
 
+  /// Value comparison, not identity — [temps] arrives as a fresh
+  /// `points.map((p) => p.temperature).toList(growable: false)` on every
+  /// build, so `old.temps != temps` was unconditionally true and the card's
+  /// layer re-rasterised on every scroll frame for 24 numbers that had not
+  /// moved. Scalars first so the cheap checks short-circuit the list walk.
   @override
   bool shouldRepaint(covariant _TempSparklinePainter old) =>
-      old.temps != temps ||
       old.selected != selected ||
       old.line != line ||
       old.fill != fill ||
-      old.mark != mark;
+      old.mark != mark ||
+      !listEquals(old.temps, temps);
 }
