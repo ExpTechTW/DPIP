@@ -17,6 +17,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
@@ -44,6 +45,48 @@ const String _clearCacheTitle = 'Clear cache';
 /// saw no cacheable request at all — 0% would read as "the cache is failing".
 String _formatRate(double rate, int hits, int total) =>
     total == 0 ? '—' : '${(rate * 100).toStringAsFixed(0)}% ($hits/$total)';
+
+/// A platform bool as text. Null (the platform did not answer, e.g. the channel
+/// is absent) is a dash rather than "no": not knowing is not the same as off.
+String _yesNo(Object? value) => switch (value) {
+  true => 'yes',
+  false => 'no',
+  _ => '—',
+};
+
+/// The last report attempt as `<age> ago · ok (200)`, or why there is none.
+///
+/// The age matters more than the timestamp: "4 minutes ago" and "6 days ago"
+/// are the difference between working and dead, and the failed case is worth
+/// showing rather than hiding — a device that fires and gets a 500 needs a
+/// different fix from one that never fires.
+String _lastReport(Map<String, Object?> d) {
+  final at = d['lastReportAt'];
+  if (at is! int) return 'never';
+  final when = DateTime.fromMillisecondsSinceEpoch(at);
+  final age = DateTime.now().difference(when);
+  final ok = d['lastReportOk'] == true;
+  final code = d['lastReportCode'];
+  final outcome = ok ? 'ok' : 'failed';
+  final suffix = code is int && code > 0 ? ' ($code)' : '';
+  return '${_age(age)} ago · $outcome$suffix';
+}
+
+String _age(Duration d) {
+  if (d.inMinutes < 1) return 'moments';
+  if (d.inHours < 1) return '${d.inMinutes} min';
+  if (d.inDays < 1) return '${d.inHours} h';
+  return '${d.inDays} d';
+}
+
+/// Where the geofence / region sits, to 4 dp (~11 m — finer than either radius
+/// and coarse enough not to be a precise home address in a pasted bug report).
+String _centre(Map<String, Object?> d) {
+  final lat = d['centreLat'];
+  final lng = d['centreLng'];
+  if (lat is! double || lng is! double) return '—';
+  return '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}';
+}
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -77,6 +120,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final etagCache = context.read<EtagCacheStore?>();
     final networkUsage = context.read<NetworkUsageStore?>();
     final database = context.read<AppDatabase>();
+    final backgroundLocation = context.read<BackgroundLocationService>();
 
     final info = await PackageInfo.fromPlatform();
     final cacheStats = await etagCache?.stats();
@@ -89,6 +133,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final storage = await const StorageScanner().scan();
     final tables = await database.tableStats();
     final device = await DeviceInfoService.load();
+    final bgLocation = await backgroundLocation.diagnostics();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
     // the platform build number outside a repo.
@@ -131,6 +176,29 @@ class _DeveloperPageState extends State<DeveloperPage> {
         fields: [
           if (Platform.isAndroid) (label: 'FCM token', value: fcmToken),
           if (Platform.isIOS) (label: 'APNs token', value: apnsToken),
+        ],
+      ),
+      // Whether the app is still being told where the device is while it is
+      // closed — which is what decides whether a disaster alert reaches the
+      // right township. Every value here comes from the platform rather than
+      // from what Dart believes it asked for: the failure this exists to catch
+      // is precisely the one where the app thinks it armed something and the OS
+      // is delivering nothing. `Armed` is the answer that matters; the rest
+      // says why it is what it is.
+      (
+        title: 'Background location',
+        fields: [
+          (label: 'Requested', value: _yesNo(bgLocation['enabled'])),
+          (
+            label: 'Authorization',
+            value: bgLocation['authorization'] as String?,
+          ),
+          (label: 'Armed', value: _yesNo(bgLocation['armed'])),
+          (label: 'Spine', value: bgLocation['spine'] as String?),
+          (label: 'Push token held', value: _yesNo(bgLocation['hasToken'])),
+          (label: 'Last report', value: _lastReport(bgLocation)),
+          (label: 'Centred on', value: _centre(bgLocation)),
+          (label: 'Detail', value: bgLocation['detail'] as String?),
         ],
       ),
       (

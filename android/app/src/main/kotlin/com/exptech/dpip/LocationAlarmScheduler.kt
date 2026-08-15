@@ -60,6 +60,24 @@ object LocationAlarmScheduler {
         am.cancel(pendingIntent(context))
     }
 
+    /**
+     * Whether an alarm is currently pending — diagnostics only.
+     *
+     * `FLAG_NO_CREATE` returns null when no matching PendingIntent exists, which
+     * is the only way to ask AlarmManager "is something scheduled?"; there is no
+     * query API. It must carry the same flags and request code as
+     * [pendingIntent] or it will not match.
+     */
+    fun isScheduled(context: Context): Boolean {
+        val intent = Intent(context, LocationAlarmReceiver::class.java)
+        return PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        ) != null
+    }
+
     private fun pendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, LocationAlarmReceiver::class.java)
         return PendingIntent.getBroadcast(

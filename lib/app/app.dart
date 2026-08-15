@@ -184,11 +184,24 @@ class _AppServicesHostState extends State<_AppServicesHost>
   /// ("Always") location is actually granted — on both platforms (iOS delivers
   /// zero SLC/region events without Always, so assuming it is armed is wrong).
   /// Idempotent; safe to call on every resume.
+  /// Both gates below are silent to the user and each fully disables background
+  /// reporting, so they are logged: the two commonest reasons a device stops
+  /// reporting are a push token that never arrived and an "Always" grant the
+  /// user never made, and neither leaves any other trace. The log is persisted
+  /// and replayed in the in-app log page, which is where this gets diagnosed
+  /// from a user's phone.
   Future<void> _armBackground() async {
     final token = widget.notificationService.token;
-    if (token == null) return;
-    if (!await widget.locationService.backgroundGranted()) return;
+    if (token == null) {
+      Log.info('background location: no push token yet — not armed');
+      return;
+    }
+    if (!await widget.locationService.backgroundGranted()) {
+      Log.info('background location: "Always" not granted — not armed');
+      return;
+    }
     if (!mounted) return;
+    Log.info('background location: arming');
     widget.backgroundLocation.start(token);
   }
 

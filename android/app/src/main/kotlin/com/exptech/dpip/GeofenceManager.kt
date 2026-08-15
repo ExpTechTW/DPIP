@@ -52,11 +52,29 @@ object GeofenceManager {
      * with the same id replaces the previous one, so this re-centres in place.
      * The centre is persisted only once registration actually succeeds, so a
      * failed (re-)arm can't leave the store believing a dead fence is live.
+     *
+     * [onArmed] reports whether a fence is actually monitoring afterwards.
+     * Registration is asynchronous, so a caller that needs to know — the one
+     * deciding whether the alarm fallback can be stood down — cannot infer it
+     * from this function returning. It is invoked on the main looper (Play
+     * services' default listener thread), exactly once, for every outcome
+     * including the permission refusal above.
+     *
+     * Deliberately a callback and not a blocking await: [LocationBootReceiver]
+     * and [GeofenceReceiver]'s error path both call this straight from
+     * `onReceive`, and `Tasks.await` throws when called on the main thread.
      */
     @SuppressLint("MissingPermission")
-    fun register(context: Context, lat: Double, lng: Double) {
+    fun register(
+        context: Context,
+        lat: Double,
+        lng: Double,
+        onArmed: ((Boolean) -> Unit)? = null,
+    ) {
         if (!hasPermission(context)) {
             Log.w(TAG, "background/fine location not granted — geofence not armed")
+            BgLocationStore.setArmed(context, false)
+            onArmed?.invoke(false)
             return
         }
         val geofence = Geofence.Builder()
@@ -75,11 +93,20 @@ object GeofenceManager {
             .build()
         LocationServices.getGeofencingClient(context)
             .addGeofences(request, pendingIntent(context))
-            .addOnSuccessListener { BgLocationStore.saveLast(context, lat, lng) }
-            .addOnFailureListener { e -> Log.w(TAG, "addGeofences failed", e) }
+            .addOnSuccessListener {
+                BgLocationStore.saveLast(context, lat, lng)
+                BgLocationStore.setArmed(context, true)
+                onArmed?.invoke(true)
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "addGeofences failed", e)
+                BgLocationStore.setArmed(context, false)
+                onArmed?.invoke(false)
+            }
     }
 
     fun remove(context: Context) {
+        BgLocationStore.setArmed(context, false)
         LocationServices.getGeofencingClient(context).removeGeofences(pendingIntent(context))
     }
 

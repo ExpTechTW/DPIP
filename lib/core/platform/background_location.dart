@@ -53,6 +53,32 @@ class BackgroundLocationService {
     }
   }
 
+  /// A snapshot of whether background reporting is actually working, for the
+  /// developer page. Empty where the channel isn't available.
+  ///
+  /// Both platforms answer with the same keys, so one UI renders both:
+  /// `enabled` (the app asked for it), `authorization` (always / whenInUse /
+  /// denied / restricted / notDetermined), `armed` (something is monitoring
+  /// **now**), `spine` (which mechanism), `hasToken`, `lastReportAt` (epoch ms),
+  /// `lastReportOk`, `lastReportCode`, `centreLat` / `centreLng` (where the
+  /// fence or region sits) and a free-text `detail` line of platform specifics.
+  ///
+  /// `armed` is the one that matters: every other value can look healthy on a
+  /// device that is silently reporting nothing.
+  Future<Map<String, Object?>> diagnostics() async {
+    try {
+      final raw = await _channel.invokeMapMethod<String, Object?>(
+        'diagnostics',
+      );
+      return raw ?? const {};
+    } on PlatformException catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location diagnostics');
+      return const {};
+    } on MissingPluginException {
+      return const {};
+    }
+  }
+
   /// Disables background reporting.
   Future<void> stop() async {
     try {

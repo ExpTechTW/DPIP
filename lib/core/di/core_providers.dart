@@ -1,6 +1,7 @@
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/astro/tle_store.dart';
@@ -53,6 +54,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
+  // Exposed for the developer page's health readout; the arming itself is
+  // driven from the app shell, not from a page.
+  Provider<BackgroundLocationService>.value(value: deps.backgroundLocation),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
   Provider<MeshtasticService>.value(value: deps.meshtastic),
