@@ -231,7 +231,24 @@ class _CachedBlurState extends State<_CachedBlur> {
       _sigma = widget.sigma;
       _filter = ImageFilter.blur(sigmaX: _sigma, sigmaY: _sigma);
     }
-    return BackdropFilter(filter: _filter!, child: widget.child);
+    // A sigma of 0 is not a cheap blur, it is a full-cost one that returns the
+    // pixels it was given: the layer is still pushed, the backdrop still read
+    // back and resampled. The sheet quantises to 6 steps, so the top step of
+    // its travel (roughly extent 0.988 upward, where the surface has gone fully
+    // opaque and the blur is no longer wanted) lands on exactly 0 — and that is
+    // the *resting* posture at full extent, not a moment in a gesture. Directly
+    // over the map platform view, this is the backdrop-filter path Flutter's own
+    // docs single out as expensive on iOS.
+    //
+    // `enabled` short-circuits inside RenderBackdropFilter.paint before the
+    // filter resolves or the layer is pushed, and leaves the widget, element and
+    // render object in place — so it cannot cause the re-parent flash this file
+    // warns about in [_ScrollBlurredWeather].
+    return BackdropFilter(
+      filter: _filter!,
+      enabled: _sigma > 0,
+      child: widget.child,
+    );
   }
 }
 
