@@ -9,6 +9,7 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
@@ -90,6 +91,10 @@ Future<void> bootstrap() async {
   final appVersionFuture = PackageInfo.fromPlatform().then((p) => p.version);
 
   final durable = await durableFuture;
+  // Persist the log as early as the database allows: everything after this
+  // point survives a crash or a background kill, which is exactly the window
+  // the in-memory history used to lose.
+  if (durable != null) Log.persistTo(LogStore(durable));
   final settings = await SettingsStore.open(durable);
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
@@ -330,6 +335,7 @@ Future<Database?> _openDurable() async {
 
 Future<void> _createDurableSchema(Database db) async {
   await SettingsStore.createSchema(db);
+  await LogStore.createSchema(db);
   await TleStore.createSchema(db);
   await MeshStore.createSchema(db);
 }

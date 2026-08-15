@@ -19,6 +19,7 @@ cd "$(dirname "$0")/.."
 
 sqflite_allow='lib/bootstrap.dart
 lib/core/settings/settings_store.dart
+lib/core/logging/log_store.dart
 lib/core/storage/app_database.dart
 lib/core/astro/tle_store.dart
 lib/core/meshtastic/data/mesh_store.dart

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:dpip/core/logging/crash_sink.dart';
+import 'package:dpip/core/logging/log_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -21,6 +24,39 @@ abstract final class Log {
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled
   /// and uncaught errors are forwarded here in addition to the in-app log.
   static CrashSink? crashSink;
+
+  /// Where the log is persisted, once `bootstrap` has a database. Null before
+  /// that and when the database would not open — logging then behaves exactly
+  /// as it always did, in memory only.
+  static LogStore? store;
+
+  static StreamSubscription<TalkerData>? _bridge;
+
+  /// Starts persisting every line to [store].
+  ///
+  /// Bridged off Talker's stream rather than added to each of the methods
+  /// below, so nothing that already logs has to change and nothing new can
+  /// forget to. Uncaught errors arrive through the same stream, which is the
+  /// half that matters most after a crash.
+  static void persistTo(LogStore logStore) {
+    store = logStore;
+    _bridge?.cancel();
+    _bridge = talker.stream.listen((data) {
+      logStore.add(
+        StoredLog(
+          time: data.time,
+          level: data.logLevel?.name ?? 'info',
+          message: data.displayMessage,
+          error: (data.exception ?? data.error)?.toString(),
+          stackTrace: data.stackTrace?.toString(),
+        ),
+      );
+    });
+  }
+
+  /// Writes anything still buffered — call when the app goes to the
+  /// background, which is the moment it is most likely to be killed.
+  static Future<void> flush() async => store?.flush();
 
   /// Verbose / diagnostic message.
   static void debug(String message) => talker.debug(message);
@@ -47,9 +83,9 @@ abstract final class Log {
     );
   }
 
-  /// Drops in-memory history entries older than [age]. The log screen calls this
-  /// on open, applying a retention window — the history isn't persisted across
-  /// launches and is otherwise bounded only by count (Talker's `maxHistoryItems`).
+  /// Drops in-memory history entries older than [age]. The persisted table has
+  /// its own 24-hour retention (see [LogStore]); this only trims what Talker
+  /// holds for the current session.
   static void pruneOlderThan(Duration age) {
     final cutoff = DateTime.now().subtract(age);
     talker.history.removeWhere((entry) => entry.time.isBefore(cutoff));
