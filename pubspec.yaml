@@ -135,3 +135,12 @@ flutter:
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz
     - assets/astro/
+
+  # Weather glyphs Flutter's bundled MaterialIcons font simply does not have —
+  # there is no rain icon in it at all. A 6.7 KB subset of Material Symbols
+  # Outlined (Apache-2.0), built by `tool/build_weather_icons.py`, which also
+  # generates the codepoint constants so they can never drift from the font.
+  fonts:
+    - family: DpipWeatherIcons
+      fonts:
+        - asset: assets/fonts/DpipWeatherIcons.ttf

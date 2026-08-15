@@ -58,6 +58,8 @@ import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart'
+    show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry;
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -74,11 +76,39 @@ import 'package:sqflite/sqflite.dart';
 /// doesn't depend on the iOS plist being added to the Xcode target's bundle
 /// resources. Firebase init and notification setup are best-effort: a failure is
 /// logged and the app still launches (push is simply unavailable).
+/// The licence for the bundled weather icon font (`assets/fonts/`).
+Stream<LicenseEntry> _weatherIconLicense() async* {
+  yield const LicenseEntryWithLineBreaks(
+    ['DpipWeatherIcons (Material Symbols)'],
+    'Copyright Google LLC\n'
+    '\n'
+    'Licensed under the Apache License, Version 2.0 (the "License"); you may '
+    'not use this file except in compliance with the License. You may obtain '
+    'a copy of the License at\n'
+    '\n'
+    '    http://www.apache.org/licenses/LICENSE-2.0\n'
+    '\n'
+    'Unless required by applicable law or agreed to in writing, software '
+    'distributed under the License is distributed on an "AS IS" BASIS, '
+    'WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. '
+    'See the License for the specific language governing permissions and '
+    'limitations under the License.\n'
+    '\n'
+    'Source: https://github.com/google/material-design-icons',
+  );
+}
+
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
+
+  // The bundled weather glyphs are Material Symbols (Apache-2.0). Registering
+  // the licence puts it in the app's own 開放原始碼授權 page (More → licences),
+  // which is where a bundled third-party asset has to be declared — Flutter
+  // only collects licences for *packages* by itself.
+  LicenseRegistry.addLicense(_weatherIconLicense);
 
   // Kick off every independent resource load in parallel — Firebase, settings,
   // the SQLite cache, the town directory and package info never touch each
