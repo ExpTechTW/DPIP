@@ -41,9 +41,24 @@ class TownBoundaries {
         for (final poly in obj['p'] as List)
           [
             for (final ring in poly as List)
-              Float64List.fromList([
-                for (final v in ring as List) (v as num).toDouble(),
-              ]),
+              // The decode isolate already built each ring as a Float64List,
+              // and typed data survives the isolate hand-off as itself. Going
+              // through the list comprehension anyway boxed all 350k vertices
+              // into a growable List<dynamic> (with its doubling reallocations)
+              // and then copied them a second time — 10.4 ms of it on the UI
+              // isolate, landing inside the first-frame window, which is
+              // exactly what [load]'s isolate exists to avoid. Taking the
+              // buffer as-is measures 0.45 ms.
+              //
+              // Aliasing rather than copying is safe here: rings are only ever
+              // read (see [_TownShape._inRing]), and every caller discards the
+              // decoded map on return.
+              if (ring is Float64List)
+                ring
+              else
+                Float64List.fromList([
+                  for (final v in ring as List) (v as num).toDouble(),
+                ]),
           ],
       ];
       shapes[entry.key] = _TownShape(
