@@ -239,6 +239,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _eew.addListener(_onEew);
       _eewListening = true;
     }
+    _startEewTicker();
+    _travelTimeTable.then((table) {
+      _travelTime = table;
+      unawaited(_pushEew());
+    });
+  }
+
+  void _startEewTicker() {
     _eewTicker?.cancel();
     _eewTicker = Timer.periodic(_eewTick, (_) {
       // Only repaint while an alert is actually up — a calm feed needs no
@@ -249,19 +257,43 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           (_eew.state.data?.isNotEmpty ?? false);
       if (live) unawaited(_pushEew());
     });
-    _travelTimeTable.then((table) {
-      _travelTime = table;
-      unawaited(_pushEew());
-    });
   }
 
   void _onFeed() => unawaited(_pushUpdate());
 
   void _onEew() => unawaited(_pushEew());
 
+  /// Whether the hosting surface can currently be seen. The feeds keep
+  /// polling either way — they are safety feeds and the monitor panel's
+  /// freshness depends on them — but re-uploading a full station GeoJSON at
+  /// 1 Hz (and the EEW wavefront at 5 Hz) to a map that sits behind another
+  /// tab is a platform-channel serialisation nobody can see.
+  bool _surfaceVisible = true;
+
+  @override
+  void onSurfaceVisibility(bool visible) {
+    _surfaceVisible = visible;
+    if (visible) {
+      // One catch-up on the visible edge: the skipped uploads left the map at
+      // whatever second it was hidden on.
+      _lastSent = null;
+      _appliedStatus = null;
+      if (_added) {
+        _startEewTicker();
+        unawaited(_pushUpdate());
+      }
+    } else {
+      // The 5 Hz wavefront ticker stops outright — during a live alert in
+      // the background it was five timer wakeups a second for uploads the
+      // gate above was already discarding.
+      _eewTicker?.cancel();
+      _eewTicker = null;
+    }
+  }
+
   Future<void> _pushUpdate() async {
     final controller = _controller;
-    if (controller == null || !_added) return;
+    if (controller == null || !_added || !_surfaceVisible) return;
     if (_stations.isEmpty) await _ensureStations();
     final status = _feed.state.status;
     // Never present aged shaking as current: hide the dots when the feed is
@@ -298,7 +330,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// expanding wavefront, so anything not live renders nothing.
   Future<void> _pushEew() async {
     final controller = _controller;
-    if (controller == null || !_added) return;
+    if (controller == null || !_added || !_surfaceVisible) return;
     final live =
         _eew.state.status == RealtimeStatus.live &&
         (_eew.state.data?.isNotEmpty ?? false);

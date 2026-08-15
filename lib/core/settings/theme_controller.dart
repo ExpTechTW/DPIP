@@ -27,6 +27,9 @@ class ThemeController extends ChangeNotifier {
   /// Sets the theme mode; [ThemeMode.system] clears the override (back to the OS
   /// setting).
   Future<void> setMode(ThemeMode mode) async {
+    // Re-picking the current mode must not rewrite settings or rebuild
+    // MaterialApp — same change-guard as RegionStore.select.
+    if (mode == this.mode) return;
     switch (mode) {
       case ThemeMode.system:
         await _settings.remove(SettingKeys.themeMode);

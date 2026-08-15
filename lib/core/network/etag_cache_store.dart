@@ -42,6 +42,21 @@ import 'package:sqflite/sqflite.dart';
 /// A cached HTTP response: the server [etag] to revalidate with, the response
 /// [body] (the JSON-encoded payload), its [contentType], and [size] — the wire
 /// bytes the original download cost (so a `304` can report the traffic saved).
+/// A revalidated JSON entry, already decoded — see [EtagCacheStore.readJson].
+class CachedJson {
+  const CachedJson({
+    required this.etag,
+    required this.data,
+    required this.size,
+  });
+
+  final String etag;
+  final Object? data;
+
+  /// Wire bytes the original download cost — what a 304 reports as saved.
+  final int size;
+}
+
 class CachedResponse {
   const CachedResponse({
     required this.etag,
@@ -215,6 +230,51 @@ class EtagCacheStore {
         size: (row['size'] as num).toInt(),
       );
     } catch (_) {
+      return null;
+    }
+  }
+
+  /// Returns the cached JSON entry for [url] **decoded to its object**, or
+  /// null on a miss or a corrupt body.
+  ///
+  /// The parse rides the same worker hop the gunzip already pays: the 304
+  /// revalidation path is the app's hottest cache path (the station
+  /// catalogues are 65–130 KB and almost never change), and `read()` +
+  /// `jsonDecode` on the caller's side put exactly that parse on the UI
+  /// isolate — the one path Dio's own ≥50 KB isolate offload cannot see,
+  /// because a 304 has no body for the transformer to parse.
+  Future<CachedJson?> readJson(String url) async {
+    try {
+      final row = await _queryRow(url);
+      if (row == null || (row['kind'] as int) != kindJson) return null;
+      _scheduleTouch(url);
+      final blob = row['body'] as Uint8List;
+      final Object? data;
+      if (blob.length >= 2 && blob[0] == 0x1f && blob[1] == 0x8b) {
+        data = blob.length > 16 * 1024
+            // One hop for gunzip + utf8 + parse. The fused decoder is the
+            // same pair Dio uses, so the object shape is identical to a
+            // fresh response's.
+            ? await Isolate.run(
+                () => const Utf8Decoder()
+                    .fuse(const JsonDecoder())
+                    .convert(gzip.decode(blob)),
+              )
+            : const Utf8Decoder()
+                  .fuse(const JsonDecoder())
+                  .convert(gzip.decode(blob));
+      } else {
+        data = const Utf8Decoder().fuse(const JsonDecoder()).convert(blob);
+      }
+      return CachedJson(
+        etag: row['etag'] as String,
+        data: data,
+        size: (row['size'] as num).toInt(),
+      );
+    } catch (_) {
+      // A corrupt entry reads as a miss: the interceptor then rejects the
+      // 304 as retryable and the retry fetches a full 200 — safer than
+      // surfacing a decode throw from inside an interceptor.
       return null;
     }
   }

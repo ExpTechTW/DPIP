@@ -143,7 +143,14 @@ class _HomePageState extends State<HomePage> {
     // The station's live reading drives both the look and the continuous
     // channels: the code picks the mode (keyframes/clouds), and the rain/snow
     // intensity + humidity ride along as overrides where the code carries them.
-    final data = context.watch<HomeWeatherController>().weather?.data;
+    // A slice, not the whole controller: the controller notifies twice per
+    // fetch (loading-start, then completion) and RefreshOnAppear refetches on
+    // every return to Home — watching it rebuilt the entire dashboard for
+    // byte-identical data. The freezed type's value equality makes identical
+    // payloads a no-op here.
+    final data = context.select<HomeWeatherController, WeatherRealtimeData?>(
+      (c) => c.weather?.data,
+    );
     final backdrop = resolveBackdrop(experimental.weatherMode, data);
     final weatherMode = backdrop.mode;
     final rainIntensity = backdrop.rain;

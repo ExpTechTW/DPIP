@@ -76,19 +76,24 @@ class LogStore {
 
   /// Creates the table. Safe on every open.
   static Future<void> createSchema(Database db) async {
-    await db.execute(
-      'CREATE TABLE IF NOT EXISTS $logTable ('
-      'id INTEGER PRIMARY KEY AUTOINCREMENT, '
-      'time INTEGER NOT NULL, '
-      'level TEXT NOT NULL, '
-      'message TEXT NOT NULL, '
-      'error TEXT, '
-      'stack TEXT)',
-    );
-    // Both the retention delete and every read are ordered by time.
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS ${logTable}_time ON $logTable(time)',
-    );
+    // One batch: this re-runs on every launch (the IF NOT EXISTS is the
+    // migration mechanism), so every statement here is a launch-window
+    // platform round trip.
+    final batch = db.batch()
+      ..execute(
+        'CREATE TABLE IF NOT EXISTS $logTable ('
+        'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+        'time INTEGER NOT NULL, '
+        'level TEXT NOT NULL, '
+        'message TEXT NOT NULL, '
+        'error TEXT, '
+        'stack TEXT)',
+      )
+      // Both the retention delete and every read are ordered by time.
+      ..execute(
+        'CREATE INDEX IF NOT EXISTS ${logTable}_time ON $logTable(time)',
+      );
+    await batch.commit(noResult: true);
   }
 
   /// Queues a line. Returns immediately — never touches the database.

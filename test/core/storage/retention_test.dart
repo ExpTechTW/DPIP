@@ -121,7 +121,7 @@ void main() {
     await Future.wait([service.sweep(), service.sweep(), service.sweep()]);
   });
 
-  test('start sweeps immediately, so a rare launch still cleans up', () async {
+  test('start defers the first sweep past the launch window', () async {
     final db = await _open();
     addTearDown(db.close);
     final now = DateTime.utc(2026, 8, 15, 12);
@@ -132,10 +132,17 @@ void main() {
 
     final service = _service(mesh: store)..start();
     addTearDown(service.dispose);
-    // The immediate sweep is the whole cleanup for an app opened once a week —
-    // the hourly timer never gets a chance to fire.
+    // Deliberately NOT immediate: the first sweep's deletes and the cache
+    // recount share the serial SQLite queue with the launch window's own
+    // reads. It fires [RetentionService.firstSweepDelay] later — far shorter
+    // than any session, so a rare launch still does its whole cleanup.
     await Future<void>.delayed(const Duration(milliseconds: 50));
-    expect(await _count(db, 'mesh_metrics'), 0);
+    expect(await _count(db, 'mesh_metrics'), 1, reason: 'swept during launch');
+    expect(
+      RetentionService.firstSweepDelay,
+      lessThan(retentionInterval),
+      reason: 'the first sweep must not wait a whole interval',
+    );
   });
 
   test('the interval is short enough to bound the overshoot', () {

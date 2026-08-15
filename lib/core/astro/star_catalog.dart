@@ -54,7 +54,22 @@ class StarCatalog {
 
   /// Decodes both assets off the UI isolate — 5,000 stars is fast, but it is
   /// still work that has no business on the frame thread.
+  /// The catalog is immutable, so one decode serves every open of the sky
+  /// chart — repeat opens used to re-read both gzipped assets, spawn an
+  /// isolate and rebuild 5,000+ star objects each time. A failed load is
+  /// evicted so a reopen retries, keeping the page's error/retry semantics.
+  static Future<StarCatalog>? _cached;
+
   static Future<StarCatalog> load() async {
+    try {
+      return await (_cached ??= _load());
+    } catch (_) {
+      _cached = null;
+      rethrow;
+    }
+  }
+
+  static Future<StarCatalog> _load() async {
     final starBytes = await rootBundle.load('assets/astro/stars.bin.gz');
     final lineBytes = await rootBundle.load(
       'assets/astro/constellations.bin.gz',

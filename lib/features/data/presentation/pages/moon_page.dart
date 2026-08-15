@@ -81,7 +81,13 @@ class _MoonPageState extends State<MoonPage> {
   /// be paged on its own without moving it.
   late DateTime _visibleMonth;
 
-  ui.FragmentProgram? _program;
+  /// The shader instance, minted once at load. Minting it per build —
+  /// `program.fragmentShader()` inside the stage — allocated a native shader
+  /// object on every rebuild (each timeline scrub tick, each calendar page),
+  /// and `_MoonPainter.shouldRepaint`'s identity clause then saw a new shader
+  /// every time, forcing a full globe repaint per rebuild and leaving the old
+  /// instance to the GC.
+  ui.FragmentShader? _shader;
   ui.Image? _color;
   ui.Image? _height;
   Object? _loadError;
@@ -128,30 +134,43 @@ class _MoonPageState extends State<MoonPage> {
   /// The selected instant as Taipei wall time.
   DateTime get _selectedLocal => AppTime.taipei(_selected);
 
+  /// The two moon maps, decoded once for the app's lifetime: ~10 MB of RGBA
+  /// that every open of this page used to re-decode from the bundle. Shared,
+  /// so no State may dispose them.
+  static Future<(ui.Image, ui.Image)>? _maps;
+
+  static Future<(ui.Image, ui.Image)> _decodeMaps() async {
+    final color = await _decode('assets/astro/moon_color_2k.jpg');
+    try {
+      return (color, await _decode('assets/astro/moon_height_1k.png'));
+    } catch (_) {
+      // The error path used to leak the first decode.
+      color.dispose();
+      rethrow;
+    }
+  }
+
   Future<void> _load() async {
     try {
       final program = await ui.FragmentProgram.fromAsset(
         'shaders/weather/moon_display.frag',
       );
-      final color = await _decode('assets/astro/moon_color_2k.jpg');
-      final height = await _decode('assets/astro/moon_height_1k.png');
-      if (!mounted) {
-        color.dispose();
-        height.dispose();
-        return;
-      }
+      final (color, height) = await (_maps ??= _decodeMaps());
+      if (!mounted) return;
       setState(() {
-        _program = program;
+        _shader = program.fragmentShader();
         _color = color;
         _height = height;
       });
     } catch (error) {
+      // Evict so a reopen retries instead of caching the failure.
+      _maps = null;
       if (!mounted) return;
       setState(() => _loadError = error);
     }
   }
 
-  Future<ui.Image> _decode(String key) async {
+  static Future<ui.Image> _decode(String key) async {
     final data = await rootBundle.load(key);
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
     final frame = await codec.getNextFrame();
@@ -161,8 +180,8 @@ class _MoonPageState extends State<MoonPage> {
 
   @override
   void dispose() {
-    _color?.dispose();
-    _height?.dispose();
+    _shader?.dispose();
+    // _color/_height are views of the shared [_maps] pair — never disposed.
     super.dispose();
   }
 
@@ -257,7 +276,7 @@ class _MoonPageState extends State<MoonPage> {
           _MoonStage(
             color: _color,
             height: _height,
-            program: _program,
+            shader: _shader,
             error: _loadError,
             phase: phase,
             libration: Offset(libration.longitude, libration.latitude),
@@ -410,7 +429,7 @@ class _MoonStage extends StatelessWidget {
   const _MoonStage({
     required this.color,
     required this.height,
-    required this.program,
+    required this.shader,
     required this.error,
     required this.phase,
     required this.libration,
@@ -421,7 +440,7 @@ class _MoonStage extends StatelessWidget {
 
   final ui.Image? color;
   final ui.Image? height;
-  final ui.FragmentProgram? program;
+  final ui.FragmentShader? shader;
   final Object? error;
   final MoonPhase phase;
   final Offset libration;
@@ -480,17 +499,17 @@ class _MoonStage extends StatelessWidget {
           ),
           Align(
             alignment: const Alignment(0, -0.26),
-            child: switch ((color, height, program, error)) {
+            child: switch ((color, height, shader, error)) {
               (
                 final ui.Image c,
                 final ui.Image h,
-                final ui.FragmentProgram p,
+                final ui.FragmentShader sh,
                 _,
               ) =>
                 CustomPaint(
                   size: Size.square(disc),
                   painter: _MoonPainter(
-                    shader: p.fragmentShader(),
+                    shader: sh,
                     color: c,
                     height: h,
                     phase: phase.angle,

@@ -42,7 +42,13 @@ abstract final class ScreenWake {
 /// failure mode of a forgotten `disable` is a phone that never sleeps again,
 /// which the user would have no way to connect back to this app.
 class ScreenWakeScope extends StatefulWidget {
-  const ScreenWakeScope({super.key, required this.child});
+  const ScreenWakeScope({super.key, this.enabled = true, required this.child});
+
+  /// Whether the hold is currently wanted. A scope that is mounted but
+  /// disabled releases the screen — the mesh page uses this to hold the
+  /// display only while a radio is actually connected, since with nothing
+  /// connected no reply can arrive and the hold is pure battery.
+  final bool enabled;
 
   final Widget child;
 
@@ -54,12 +60,20 @@ class _ScreenWakeScopeState extends State<ScreenWakeScope> {
   @override
   void initState() {
     super.initState();
-    ScreenWake.enable();
+    if (widget.enabled) ScreenWake.enable();
+  }
+
+  @override
+  void didUpdateWidget(ScreenWakeScope oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.enabled != oldWidget.enabled) {
+      widget.enabled ? ScreenWake.enable() : ScreenWake.disable();
+    }
   }
 
   @override
   void dispose() {
-    ScreenWake.disable();
+    if (widget.enabled) ScreenWake.disable();
     super.dispose();
   }
 

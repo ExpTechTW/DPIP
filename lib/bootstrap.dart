@@ -119,6 +119,9 @@ Future<void> bootstrap() async {
   final durableFuture = _openDurable();
   final cacheFuture = _openCache();
   final townDirectoryFuture = TownDirectory.load();
+  // Boundaries too: independent of everything, and its isolate decode is the
+  // longest single asset load — starting it here overlaps it with the DB opens.
+  final townBoundaries = TownBoundaries.load();
   final appVersionFuture = PackageInfo.fromPlatform().then((p) => p.version);
 
   final durable = await durableFuture;
@@ -182,7 +185,6 @@ Future<void> bootstrap() async {
   // point-in-polygon GPS resolution and decode in a background isolate (see
   // `TownBoundaries.load`) so they never delay launch or the first frames.
   final townDirectory = await townDirectoryFuture;
-  final townBoundaries = TownBoundaries.load();
   final regionStore = RegionStore(settings);
   final locationService = LocationService(
     townDirectory,

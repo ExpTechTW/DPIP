@@ -173,10 +173,13 @@ class _AppServicesHostState extends State<_AppServicesHost>
   /// foreground location is already granted. Never requests (see [_onReady]).
   Future<void> _startLocationIfGranted() async {
     if (!await widget.locationService.granted()) return;
+    if (!mounted) return;
+    // Independent of the town fix below, which can take up to 10 s cold —
+    // foreground move reporting starts immediately rather than behind it.
+    widget.deviceLocationReporter.start();
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
-    widget.deviceLocationReporter.start();
     await _armBackground();
   }
 

@@ -42,6 +42,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     late MeshChatController controller;
+    late MeshNodeStore nodes;
     late MeshLink link;
     late MeshAlerts alerts;
     late FakeMeshService service;
@@ -61,12 +62,8 @@ void main() {
       service = FakeMeshService();
       link = MeshLink(service, settings);
       alerts = MeshAlerts(service, settings, post: (_) async {});
-      controller = MeshChatController(
-        service,
-        link,
-        MeshNodeStore(service, settings)..start(),
-        store,
-      );
+      nodes = MeshNodeStore(service, settings)..start();
+      controller = MeshChatController(service, link, nodes, store);
       // Let the controller's initial load land before the first frame.
       await Future<void>.delayed(const Duration(milliseconds: 200));
     });
@@ -78,6 +75,8 @@ void main() {
           ChangeNotifierProvider<MeshLink>.value(value: link),
           ChangeNotifierProvider<MeshAlerts>.value(value: alerts),
           ChangeNotifierProvider<MeshChatController>.value(value: controller),
+          // The page badges node counts straight off the store now.
+          ChangeNotifierProvider<MeshNodeStore>.value(value: nodes),
         ],
         child: const MaterialApp(
           locale: Locale('zh', 'TW'),

@@ -203,29 +203,39 @@ class _RainOnCardState extends State<RainOnCard>
     // sprites.py` — the kernel is a blurred disc, the normal map an analytic
     // hemisphere, so they are the same *functions* the engine samples.
     try {
-      final kernel = await _decodeAsset(
-        'assets/weather/particles/particle_blurred.webp',
-      );
-      final normalMap = await _decodeAsset(
-        'assets/weather/particles/drop_normal.webp',
-      );
-      final (pos, neg) = await bakeParticleSprites(
-        kernel: kernel,
-        normalMap: normalMap,
-      );
-      kernel.dispose();
-      normalMap.dispose();
-      if (!mounted) {
-        pos.dispose();
-        neg.dispose();
-        return;
-      }
+      // Shared across every card and every mount, like [_fallbackSprites]:
+      // each mounted card used to decode both textures and bake its own
+      // sprite pair — several cards rain at once on Home, and the pair was
+      // never disposed with the State either, so scrolling leaked bakes.
+      final (pos, neg) = await (_bakedSprites ??= _bakeShared());
+      if (!mounted) return;
       _primary.spritePos = pos;
       _primary.spriteNeg = neg;
       _secondary.spritePos = pos;
       _secondary.spriteNeg = neg;
     } catch (error, stackTrace) {
+      // Evict so a later mount retries rather than caching the failure.
+      _bakedSprites = null;
       Log.handle(error, stackTrace, 'Failed to bake the drop sprite');
+    }
+  }
+
+  /// The one baked sprite pair, app-lifetime — never disposed, exactly like
+  /// [_fallbackSprites].
+  static Future<(ui.Image, ui.Image)>? _bakedSprites;
+
+  static Future<(ui.Image, ui.Image)> _bakeShared() async {
+    final kernel = await _decodeAsset(
+      'assets/weather/particles/particle_blurred.webp',
+    );
+    final normalMap = await _decodeAsset(
+      'assets/weather/particles/drop_normal.webp',
+    );
+    try {
+      return await bakeParticleSprites(kernel: kernel, normalMap: normalMap);
+    } finally {
+      kernel.dispose();
+      normalMap.dispose();
     }
   }
 

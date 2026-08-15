@@ -28,6 +28,7 @@ class LocaleController extends ChangeNotifier {
 
   /// Sets the locale override; null clears it (back to the system language).
   Future<void> setLocale(Locale? locale) async {
+    if (locale == this.locale) return;
     if (locale == null) {
       await _settings.remove(SettingKeys.locale);
     } else {

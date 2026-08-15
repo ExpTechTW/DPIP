@@ -217,7 +217,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Whether this surface is on screen — its branch selected and nothing pushed
   /// over the shell. A null tab (full-screen routes, previews) belongs to no
   /// branch, so only the shell test applies. Same contract as [BaseMap].
-  bool get _isVisible => _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
+  bool get _isVisible =>
+      _appForeground && (_visibleTab?.isOnScreen(widget.tabIndex) ?? true);
+
+  /// Whether the app itself is in the foreground — the same definition
+  /// [BaseMap] uses (`inactive` still counts as foreground, so a
+  /// notification-shade pull does not flap the layers).
+  bool _appForeground = true;
 
   /// [_isVisible] as of the last notification, so [_onTabChanged] can fire on
   /// the hidden → visible **edge** rather than on every notification where the
@@ -254,14 +260,31 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// re-render would only flash the map.
   void _onTabChanged() {
     final visible = _isVisible;
+    final changed = visible != _wasVisible;
     final returned = visible && !_wasVisible;
     _wasVisible = visible;
+    // Both edges, before the timeline reload: a realtime layer skips its
+    // platform uploads while hidden and flushes once on return.
+    if (changed) _active.onSurfaceVisibility(visible);
     if (!returned) return;
     if (_active.usesTimeline) unawaited(_loadActive());
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = switch (state) {
+      AppLifecycleState.paused ||
+      AppLifecycleState.hidden ||
+      AppLifecycleState.detached => false,
+      AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    };
+    if (foreground != _appForeground) {
+      _appForeground = foreground;
+      // Backgrounding is the same edge as leaving the tab: realtime layers
+      // stop their platform uploads (and their repaint tickers) while nobody
+      // can see the map, and flush once on the way back.
+      _onTabChanged();
+    }
     if (state != AppLifecycleState.resumed || !_isVisible) return;
     // Coming back from the background is the same event as re-entering the
     // tab: what is on screen has been sitting there unattended. A radar frame
@@ -563,19 +586,27 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       // same way as the basemap. Native downloads a hillshade viewport as one
       // burst of 512px meshes the first time; warming from the store makes a
       // repeat visit an SQLite hit instead of a re-download.
-      await warmer.warmViewportAbsolute(
-        urlFor: (z, x, y) => terrainOriginTileUrl
-            .replaceAll('{z}', '$z')
-            .replaceAll('{x}', '$x')
-            .replaceAll('{y}', '$y'),
-        south: bounds.southwest.latitude,
-        west: bounds.southwest.longitude,
-        north: bounds.northeast.latitude,
-        east: bounds.northeast.longitude,
-        zoom: zoom,
-        maxZoom: 12,
-        logLabel: 'terrain',
-      );
+      //
+      // Only while the relief is on: with it off the DEM source is removed
+      // from the style, MapLibre will never request these tiles, and warming
+      // them was a viewport of downloads per camera settle for pixels that
+      // cannot be drawn. Gated on the toggle (the user's intent), not on
+      // `_terrainOnMap`, which is transiently wrong mid style-reload.
+      if (_showTerrain.value) {
+        await warmer.warmViewportAbsolute(
+          urlFor: (z, x, y) => terrainOriginTileUrl
+              .replaceAll('{z}', '$z')
+              .replaceAll('{x}', '$x')
+              .replaceAll('{y}', '$y'),
+          south: bounds.southwest.latitude,
+          west: bounds.southwest.longitude,
+          north: bounds.northeast.latitude,
+          east: bounds.northeast.longitude,
+          zoom: zoom,
+          maxZoom: 12,
+          logLabel: 'terrain',
+        );
+      }
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'basemap viewport warm');
     }

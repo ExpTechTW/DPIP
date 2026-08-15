@@ -326,12 +326,7 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
       size * 0.28,
       Paint()..color = fill,
     );
-    final image = await recorder.endRecording().toImage(
-      size.toInt(),
-      size.toInt(),
-    );
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    return data!.buffer.asUint8List();
+    return _encodePng(recorder, size.toInt());
   }
 
   Future<Uint8List> _renderCross(Color fill) async {
@@ -355,11 +350,21 @@ class LightningMapLayer with MapLayerDefaults implements MapLayer {
     canvas.drawRRect(bar(size * 0.7 + halo * 2, thickness + halo * 2), black);
     canvas.drawRRect(bar(thickness, size * 0.7), Paint()..color = fill);
     canvas.drawRRect(bar(size * 0.7, thickness), Paint()..color = fill);
-    final image = await recorder.endRecording().toImage(
-      size.toInt(),
-      size.toInt(),
-    );
+    return _encodePng(recorder, size.toInt());
+  }
+
+  /// Rasterises and encodes, disposing the picture and image on the way —
+  /// the ByteData is an independent copy, and the eight icon bakes used to
+  /// leak both native handles on every image (re)registration.
+  static Future<Uint8List> _encodePng(
+    ui.PictureRecorder recorder,
+    int size,
+  ) async {
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(size, size);
+    picture.dispose();
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
     return data!.buffer.asUint8List();
   }
 

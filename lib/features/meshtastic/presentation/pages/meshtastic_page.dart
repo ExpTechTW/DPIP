@@ -17,6 +17,7 @@ import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/platform/screen_wake.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -97,10 +98,13 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
     // anything else still is.
     context.read<MeshAlerts>().setVisibleChannel(selected);
 
-    // The screen stays awake for as long as this page is up: a conversation you
-    // are watching for a reply is exactly the case where the display timing out
-    // costs you the thing you were waiting for. Released on dispose.
+    // The screen stays awake while a radio is connected: a conversation you
+    // are watching for a reply is exactly the case where the display timing
+    // out costs you the thing you were waiting for. With nothing connected no
+    // reply can arrive, so the hold would be pure battery — the page already
+    // watches MeshLink, so the flag follows every connection transition.
     return ScreenWakeScope(
+      enabled: link.isConnected,
       child: Scaffold(
         appBar: AppBar(
           title: Column(
@@ -121,8 +125,11 @@ class _MeshtasticPageState extends State<MeshtasticPage> {
               tooltip: l10n.meshtasticNodes,
               onPressed: () => _showNodes(context),
               icon: Badge(
-                isLabelVisible: controller.nodeCount > 0,
-                label: Text('${controller.nodeCount}'),
+                isLabelVisible:
+                    context.select<MeshNodeStore, int>((s) => s.count) > 0,
+                label: Text(
+                  '${context.select<MeshNodeStore, int>((s) => s.count)}',
+                ),
                 child: const Icon(Icons.hub_outlined),
               ),
             ),
@@ -1009,6 +1016,16 @@ class _Bubble extends StatelessWidget {
         : colors.surfaceContainerHigh;
     final foreground = outgoing ? colors.onPrimaryContainer : colors.onSurface;
     final muted = foreground.withValues(alpha: 0.7);
+    // Selected per sender: a node-info packet naming this sender updates the
+    // label, and every other packet leaves this bubble untouched.
+    final senderName = outgoing
+        ? null
+        : context.select<MeshNodeStore, String?>(
+            (s) => s.byNum(message.from)?.displayName,
+          );
+    final senderLabel = (senderName == null || senderName.isEmpty)
+        ? '0x${message.from.toRadixString(16)}'
+        : senderName;
 
     return Align(
       alignment: outgoing ? Alignment.centerRight : Alignment.centerLeft,
@@ -1044,7 +1061,7 @@ class _Bubble extends StatelessWidget {
                   children: [
                     if (!outgoing)
                       Text(
-                        controller.senderLabel(message.from),
+                        senderLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colors.primary,
                           fontWeight: FontWeight.w600,
@@ -1651,8 +1668,10 @@ class _NodeSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final controller = context.watch<MeshChatController>();
-    final nodes = controller.nodes;
+    // The store directly, not the chat controller: this sheet is the surface
+    // that genuinely follows every packet, and it alone pays for that.
+    final store = context.watch<MeshNodeStore>();
+    final nodes = store.nodes;
 
     return _SheetFrame(
       title: l10n.meshtasticNodes,
@@ -1673,13 +1692,9 @@ class _NodeSheet extends StatelessWidget {
               leading: Icon(
                 // Derived from `lastHeard`, not the flag the node was stored
                 // with: a node saved as online yesterday is not online now.
-                controller.isOnline(node)
-                    ? Icons.circle
-                    : Icons.circle_outlined,
+                store.isOnline(node) ? Icons.circle : Icons.circle_outlined,
                 size: 12,
-                color: controller.isOnline(node)
-                    ? colors.primary
-                    : colors.outline,
+                color: store.isOnline(node) ? colors.primary : colors.outline,
               ),
               title: Text(node.displayName),
               subtitle: Text(_nodeDetail(node)),

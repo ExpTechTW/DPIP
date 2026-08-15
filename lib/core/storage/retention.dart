@@ -72,13 +72,22 @@ class RetentionService {
   /// slow one on a busy disk.
   bool _running = false;
 
-  /// Sweeps now, then every [retentionInterval].
+  /// How long after [start] the first sweep runs.
   ///
-  /// The immediate sweep is the "first launch" half: an app opened once a week
-  /// does its whole cleanup there, and the timer never gets a chance to fire.
+  /// Not zero: the first sweep's deletes and the cache-budget recount (a
+  /// full-table `SUM(LENGTH(body))`) share the serial SQLite queue with the
+  /// launch window's own reads — the first tiles, the first ETag lookups.
+  /// A missed minute costs disk, never correctness, so waiting out the
+  /// launch is free. Still far shorter than a session, so an app opened once
+  /// a week does its whole cleanup on this shot.
+  static const Duration firstSweepDelay = Duration(minutes: 1);
+
+  Timer? _firstSweep;
+
+  /// Sweeps shortly after startup, then every [retentionInterval].
   void start() {
     if (_timer != null) return;
-    unawaited(sweep());
+    _firstSweep = Timer(firstSweepDelay, () => unawaited(sweep()));
     _timer = Timer.periodic(retentionInterval, (_) => unawaited(sweep()));
   }
 
@@ -108,6 +117,8 @@ class RetentionService {
   }
 
   void dispose() {
+    _firstSweep?.cancel();
+    _firstSweep = null;
     _timer?.cancel();
     _timer = null;
   }

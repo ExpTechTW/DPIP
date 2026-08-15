@@ -426,6 +426,14 @@ class _ReportSheetState extends State<_ReportSheet> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final report = widget.report;
+    // Built once per State build, NOT inside the extent builder below: the
+    // sheet's drag fires that builder on every frame, and these two subtrees
+    // are the expensive halves — the expanded one regroups and sorts every
+    // felt county/township on each call. Handing the builder the *same*
+    // widget instances lets Element.updateChild short-circuit the whole
+    // subtree per drag frame; only the Opacity/header shells re-run.
+    final expandedContent = _expandedContent(context, report);
+    final peekContent = _peekContent(context, report);
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -502,7 +510,7 @@ class _ReportSheetState extends State<_ReportSheet> {
                                     opacity: revealProgress,
                                     child: IgnorePointer(
                                       ignoring: !expanded,
-                                      child: _expandedContent(context, report),
+                                      child: expandedContent,
                                     ),
                                   ),
                                   if (peekOpacity > 0)
@@ -510,7 +518,7 @@ class _ReportSheetState extends State<_ReportSheet> {
                                       opacity: peekOpacity,
                                       child: IgnorePointer(
                                         ignoring: expanded,
-                                        child: _peekContent(context, report),
+                                        child: peekContent,
                                       ),
                                     ),
                                 ],

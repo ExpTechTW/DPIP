@@ -487,4 +487,45 @@ void main() {
     expect(await tight.readBytes('https://x/old'), isNotNull);
     expect(await tight.readBytes('https://x/new'), isNotNull);
   });
+
+  test('readJson decodes a large body to the same object as read', () async {
+    // The 304 path's parse rides the store's worker hop now; the object it
+    // hands the interceptor must be exactly what jsonDecode(read().body)
+    // produced, or a revalidated response differs from a fresh one.
+    final big = {
+      'stations': [
+        for (var i = 0; i < 2000; i++)
+          {'id': 'S$i', 'lat': 23.5 + i * 0.001, 'name': '站$i'},
+      ],
+    };
+    await store.write(
+      'https://example.test/catalog',
+      etag: '"c1"',
+      body: jsonEncode(big),
+      contentType: 'application/json',
+      size: 1234,
+    );
+
+    final viaJson = await store.readJson('https://example.test/catalog');
+    final viaText = await store.read('https://example.test/catalog');
+    expect(viaJson, isNotNull);
+    expect(viaJson!.etag, '"c1"');
+    expect(viaJson.size, 1234);
+    expect(viaJson.data, jsonDecode(viaText!.body));
+  });
+
+  test('readJson reads a corrupt entry as a miss, not a throw', () async {
+    // The interceptor turns a miss into a retryable reject and the retry
+    // fetches a full 200 — a decode throw inside an interceptor would be a
+    // failed request instead.
+    await db.insert('http_cache', {
+      'key': 'https://example.test/broken',
+      'etag': '"x"',
+      'kind': EtagCacheStore.kindJson,
+      'body': Uint8List.fromList([0x7b, 0x22]), // truncated '{"'
+      'size': 2,
+      'time': 0,
+    });
+    expect(await store.readJson('https://example.test/broken'), isNull);
+  });
 }

@@ -73,9 +73,11 @@ class MeshChatMessage {
 class MeshChatController extends ChangeNotifier {
   MeshChatController(this._service, this._link, this._nodes, this._store) {
     unawaited(_restore());
-    // Nodes come from the shared store, which persists them — this page is one
-    // of two surfaces showing the same table (the map layer is the other).
-    _nodes.addListener(notifyListeners);
+    // Deliberately NOT forwarding the node store's notifications: it notifies
+    // per packet, and forwarding rebuilt the whole chat page for every
+    // telemetry broadcast on the mesh. The surfaces that render node data
+    // (badge, node sheet, sender names) subscribe to MeshNodeStore themselves,
+    // each to exactly the slice it shows.
     _messageSub = _service.messageStream.listen(_onMessage);
     // The radio reports its channel table during the config download; capture
     // the names each time so the log stays labelled after it disconnects.
@@ -358,7 +360,6 @@ class MeshChatController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _nodes.removeListener(notifyListeners);
     unawaited(_messageSub?.cancel());
     unawaited(_connectionSub?.cancel());
     unawaited(_scanSub?.cancel());

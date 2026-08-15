@@ -220,6 +220,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   @override
   void onMapGestureEnd() {}
 
+  @override
+  void onSurfaceVisibility(bool visible) {}
+
   // --- Frame bookkeeping -----------------------------------------------------
 
   List<String> _orderedIds = const [];

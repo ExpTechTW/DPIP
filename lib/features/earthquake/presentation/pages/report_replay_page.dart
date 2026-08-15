@@ -96,14 +96,36 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
     )..start();
-    _ticker = Timer.periodic(
+    _startTicker();
+    // The session's channels live outside RealtimeService (a replay must not
+    // look like a live feed), so its lifecycle pause never reaches them —
+    // this page pauses its own polling and its 5 Hz UI tick itself, or a
+    // backgrounded replay keeps two polls a second running indefinitely.
+    _lifecycle = AppLifecycleListener(
+      onPause: () {
+        _ticker?.cancel();
+        _ticker = null;
+        _session.pause();
+      },
+      onResume: () {
+        _startTicker();
+        _session.resume();
+      },
+    );
+  }
+
+  void _startTicker() {
+    _ticker ??= Timer.periodic(
       const Duration(milliseconds: 200),
       (_) => _tick.value++,
     );
   }
 
+  late final AppLifecycleListener _lifecycle;
+
   @override
   void dispose() {
+    _lifecycle.dispose();
     _ticker?.cancel();
     _tick.dispose();
     _session.dispose();
@@ -363,8 +385,22 @@ class _ReplayMapState extends State<_ReplayMap> {
     });
   }
 
+  /// Pauses the 1 Hz blink while the app is backgrounded — its platform
+  /// visibility writes would keep running under the lock screen otherwise.
+  /// Restarting on resume just resets the blink phase, which is invisible.
+  late final AppLifecycleListener _blinkLifecycle = AppLifecycleListener(
+    onPause: () {
+      _blinkTimer?.cancel();
+      _blinkTimer = null;
+    },
+    onResume: () {
+      if (_ready) _setupBlink();
+    },
+  );
+
   @override
   void dispose() {
+    _blinkLifecycle.dispose();
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
     _blinkTimer?.cancel();
@@ -641,16 +677,28 @@ class _ReplayMapState extends State<_ReplayMap> {
     await _syncStationMode();
   }
 
+  /// Whether [_eewSourceId] currently holds the empty collection — mirrors
+  /// the live monitor's flag. The old blanket `alerts.isEmpty` skip made the
+  /// one *clearing* write unreachable: once the replayed alert expired, the
+  /// last P/S wavefront rings and the county shaking fill stayed frozen on
+  /// the map for the rest of the replay.
+  bool _eewSourceEmpty = true;
+
   Future<void> _updateEew() async {
     final controller = _controller;
     if (controller == null || !_ready) return;
-    // The source starts as (and a no-alert payload would be) the empty
-    // collection — skip the pointless per-tick round trip entirely.
-    if (widget.eew.alerts.isEmpty) return;
+    final empty = widget.eew.alerts.isEmpty;
+    // Nothing to draw and nothing drawn — skip the per-tick round trip.
+    if (empty && _eewSourceEmpty) return;
     try {
-      await controller.setGeoJsonSource(_eewSourceId, _eewGeoJson());
+      await controller.setGeoJsonSource(
+        _eewSourceId,
+        empty ? _emptyCollection : _eewGeoJson(),
+      );
+      _eewSourceEmpty = empty;
     } catch (_) {
-      // Source not on the map yet (mid style-reload) — the next update retries.
+      // Source not on the map yet (mid style-reload) — the next update
+      // retries; the flag is untouched because the write never landed.
     }
     await _updateAreaFill(controller);
   }

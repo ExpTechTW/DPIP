@@ -16,6 +16,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/shared/widgets/second_ticker.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -120,8 +121,12 @@ class _EewAlertCard extends StatefulWidget {
   State<_EewAlertCard> createState() => _EewAlertCardState();
 }
 
-class _EewAlertCardState extends State<_EewAlertCard> {
-  Timer? _ticker;
+class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
+  /// The home shell wraps hidden tabs in `TickerMode(enabled: false)`; a
+  /// Timer is not a Ticker, so without this gate the countdown kept rebuilding
+  /// behind whichever tab the user switched to during an alert.
+  @override
+  bool get secondTickerActive => TickerMode.valuesOf(context).enabled;
 
   /// The CWA P/S travel-time table once it resolves — the countdown settles on
   /// the table's arrival time the moment it loads (see [estimateLocalShaking]).
@@ -134,9 +139,6 @@ class _EewAlertCardState extends State<_EewAlertCard> {
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
     context.read<Future<SeismicTravelTimeTable>>().then((table) {
       if (mounted) setState(() => _table = table);
     });
@@ -145,12 +147,6 @@ class _EewAlertCardState extends State<_EewAlertCard> {
         setState(() => _fix = LatLng(fix.lat, fix.lng));
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
   }
 
   @override

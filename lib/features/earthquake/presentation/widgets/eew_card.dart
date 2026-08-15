@@ -20,6 +20,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/shared/widgets/second_ticker.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -87,9 +88,7 @@ class EewCardContent extends StatefulWidget {
   State<EewCardContent> createState() => _EewCardContentState();
 }
 
-class _EewCardContentState extends State<EewCardContent> {
-  Timer? _ticker;
-
+class _EewCardContentState extends State<EewCardContent> with SecondTicker {
   /// The CWA P/S travel-time table once it resolves — the countdown settles on
   /// the table's arrival time the moment it loads (see [estimateLocalShaking]).
   SeismicTravelTimeTable? _table;
@@ -103,12 +102,9 @@ class _EewCardContentState extends State<EewCardContent> {
   @override
   void initState() {
     super.initState();
-    // Countdown only needs per-second ticks while an alert is up, which is the
-    // card's whole life here. Start it once; the tiles re-read the calibrated
-    // clock on every tick.
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
+    // The per-second countdown rebuild lives in [SecondTicker], which stops
+    // it while the app is hidden — an alert under the lock screen must not
+    // keep the CPU on a 1 s leash.
     context.read<Future<SeismicTravelTimeTable>>().then((table) {
       if (mounted) setState(() => _table = table);
     });
@@ -117,12 +113,6 @@ class _EewCardContentState extends State<EewCardContent> {
         setState(() => _fix = LatLng(fix.lat, fix.lng));
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
   }
 
   @override

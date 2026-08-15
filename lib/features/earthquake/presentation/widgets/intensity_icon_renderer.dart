@@ -46,8 +46,14 @@ abstract final class IntensityIconRenderer {
     final size = name == 'cross' ? 96 : 64;
     final recorder = ui.PictureRecorder();
     _paint(Canvas(recorder), size.toDouble(), name);
-    final image = await recorder.endRecording().toImage(size, size);
+    // Both native handles released once the PNG copy exists — bounded by the
+    // byte cache to one bake per icon per run, but 19 leaked rasters is still
+    // 19 too many.
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(size, size);
+    picture.dispose();
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    image.dispose();
     return bytes!.buffer.asUint8List();
   }
 

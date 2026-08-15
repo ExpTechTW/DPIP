@@ -111,40 +111,48 @@ class MeshStore {
   final DateTime Function() _now;
 
   static Future<void> createSchema(Database db) async {
-    // The node table the radio hands over on every connect, kept for the times
-    // there is no radio. A row per node, not a JSON blob in a settings key:
-    // 250 nodes re-serialised on every telemetry packet is exactly what the
-    // key-value store was bad at.
-    await db.execute(
-      'CREATE TABLE IF NOT EXISTS $_nodes ('
-      'num INTEGER PRIMARY KEY NOT NULL, '
-      'name TEXT NOT NULL, '
-      'battery INTEGER, '
-      'last_heard INTEGER, '
-      'latitude REAL, '
-      'longitude REAL, '
-      'snr REAL NOT NULL DEFAULT 0, '
-      'via_mqtt INTEGER NOT NULL DEFAULT 0)',
-    );
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS ${_nodes}_heard ON $_nodes(last_heard DESC)',
-    );
+    // This re-runs on every launch (the IF NOT EXISTS is the migration
+    // mechanism), so every statement is a launch-window platform round trip —
+    // one probe for the ALTER-added columns, then everything else as a single
+    // batch commit, instead of ten serial awaits.
+    final metricColumns = {
+      for (final row in await db.rawQuery('PRAGMA table_info($_metrics)'))
+        row['name'] as String,
+    };
 
-    // The channel table, for the times there is no radio to ask.
-    //
-    // A channel's *name* is only known while connected — it arrives in the
-    // config download and lives nowhere else. Without this table the chat
-    // screen fell back to the slot number the moment the radio went away, so a
-    // conversation the user knows as "DPIP" was labelled "CH2" whenever they
-    // opened the page before the radio finished configuring. The stored log
-    // outlives the connection; its labels have to as well.
-    await db.execute(
-      'CREATE TABLE IF NOT EXISTS $_channels ('
-      'idx INTEGER PRIMARY KEY NOT NULL, '
-      'name TEXT NOT NULL)',
-    );
-
-    await db.execute('''
+    final batch = db.batch()
+      // The node table the radio hands over on every connect, kept for the
+      // times there is no radio. A row per node, not a JSON blob in a settings
+      // key: 250 nodes re-serialised on every telemetry packet is exactly what
+      // the key-value store was bad at.
+      ..execute(
+        'CREATE TABLE IF NOT EXISTS $_nodes ('
+        'num INTEGER PRIMARY KEY NOT NULL, '
+        'name TEXT NOT NULL, '
+        'battery INTEGER, '
+        'last_heard INTEGER, '
+        'latitude REAL, '
+        'longitude REAL, '
+        'snr REAL NOT NULL DEFAULT 0, '
+        'via_mqtt INTEGER NOT NULL DEFAULT 0)',
+      )
+      ..execute(
+        'CREATE INDEX IF NOT EXISTS ${_nodes}_heard ON $_nodes(last_heard DESC)',
+      )
+      // The channel table, for the times there is no radio to ask.
+      //
+      // A channel's *name* is only known while connected — it arrives in the
+      // config download and lives nowhere else. Without this table the chat
+      // screen fell back to the slot number the moment the radio went away, so
+      // a conversation the user knows as "DPIP" was labelled "CH2" whenever
+      // they opened the page before the radio finished configuring. The stored
+      // log outlives the connection; its labels have to as well.
+      ..execute(
+        'CREATE TABLE IF NOT EXISTS $_channels ('
+        'idx INTEGER PRIMARY KEY NOT NULL, '
+        'name TEXT NOT NULL)',
+      )
+      ..execute('''
       CREATE TABLE IF NOT EXISTS $_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ts INTEGER NOT NULL,
@@ -153,41 +161,35 @@ class MeshStore {
         text TEXT NOT NULL,
         outgoing INTEGER NOT NULL DEFAULT 0
       )
-    ''');
-    // Duplicate suppression as a constraint, not a scan: a reconnect replays
-    // packets the log may already hold, and `INSERT OR IGNORE` drops them at
-    // the storage layer.
-    await db.execute(
-      'CREATE UNIQUE INDEX IF NOT EXISTS ${_messages}_identity '
-      'ON $_messages (node, channel, ts, text)',
-    );
-    // The read is always "this channel, newest first".
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS ${_messages}_channel_ts '
-      'ON $_messages (channel, ts DESC)',
-    );
-    await db.execute('''
+    ''')
+      // Duplicate suppression as a constraint, not a scan: a reconnect replays
+      // packets the log may already hold, and `INSERT OR IGNORE` drops them at
+      // the storage layer.
+      ..execute(
+        'CREATE UNIQUE INDEX IF NOT EXISTS ${_messages}_identity '
+        'ON $_messages (node, channel, ts, text)',
+      )
+      // The read is always "this channel, newest first".
+      ..execute(
+        'CREATE INDEX IF NOT EXISTS ${_messages}_channel_ts '
+        'ON $_messages (channel, ts DESC)',
+      )
+      ..execute('''
       CREATE TABLE IF NOT EXISTS $_metrics (
         ts INTEGER PRIMARY KEY,
         channel_util REAL,
         air_util REAL,
         battery INTEGER
       )
-    ''');
-    // Added after the table shipped, so they arrive by ALTER rather than in
-    // the CREATE above — see [_addColumn].
-    await _addColumn(db, _metrics, 'voltage', 'REAL');
-    await _addColumn(db, _metrics, 'nodes_total', 'INTEGER');
-    await _addColumn(db, _metrics, 'nodes_online', 'INTEGER');
-
-    // What the rest of the mesh looked like, one row per node per reading.
-    //
-    // The in-memory ring [MeshNodeStore] keeps is bounded by count, so on a
-    // busy mesh it holds minutes; this holds a day, which is the window in
-    // which "when did that node start failing" is a question anyone asks. The
-    // composite key makes a re-emitted reading an overwrite rather than a
-    // duplicate — the radio repeats a node's telemetry until it changes.
-    await db.execute('''
+    ''')
+      // What the rest of the mesh looked like, one row per node per reading.
+      //
+      // The in-memory ring [MeshNodeStore] keeps is bounded by count, so on a
+      // busy mesh it holds minutes; this holds a day, which is the window in
+      // which "when did that node start failing" is a question anyone asks.
+      // The composite key makes a re-emitted reading an overwrite rather than
+      // a duplicate — the radio repeats a node's telemetry until it changes.
+      ..execute('''
       CREATE TABLE IF NOT EXISTS $_nodeMetrics (
         ts INTEGER NOT NULL,
         node INTEGER NOT NULL,
@@ -196,31 +198,39 @@ class MeshStore {
         snr REAL,
         PRIMARY KEY (ts, node)
       )
-    ''');
-    // Both reads are "this node, over time" and "everything since T".
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS ${_nodeMetrics}_node_ts '
-      'ON $_nodeMetrics (node, ts)',
-    );
-  }
+    ''')
+      // Both reads are "this node, over time" and "everything since T".
+      ..execute(
+        'CREATE INDEX IF NOT EXISTS ${_nodeMetrics}_node_ts '
+        'ON $_nodeMetrics (node, ts)',
+      );
 
-  /// Adds a column to an existing table, tolerating one that is already there.
-  ///
-  /// The durable schema is re-applied on every open as `CREATE TABLE IF NOT
-  /// EXISTS`, which silently does nothing for a table that exists — so a new
-  /// *column* on an old table never appears. Checked against `table_info`
-  /// rather than catching the duplicate-column error, so a genuine failure
-  /// still surfaces.
-  static Future<void> _addColumn(
-    Database db,
-    String table,
-    String column,
-    String type,
-  ) async {
-    final columns = await db.rawQuery('PRAGMA table_info($table)');
-    if (columns.any((row) => row['name'] == column)) return;
-    await db.execute('ALTER TABLE $table ADD COLUMN $column $type');
-    Log.info('mesh store: added $table.$column');
+    // Columns added after `mesh_metrics` shipped arrive by ALTER — IF NOT
+    // EXISTS does nothing for a table that already exists. On a fresh table
+    // the probe above ran before the CREATE, so the set is empty and the
+    // ALTERs are needed; on an installed one it names what is present.
+    for (final (column, type) in const [
+      ('voltage', 'REAL'),
+      ('nodes_total', 'INTEGER'),
+      ('nodes_online', 'INTEGER'),
+    ]) {
+      if (metricColumns.isEmpty || metricColumns.contains(column)) continue;
+      batch.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
+    }
+    await batch.commit(noResult: true);
+    // A fresh install: the metrics CREATE above already carries none of the
+    // ALTER columns, so add them now that the table exists.
+    if (metricColumns.isEmpty) {
+      final fresh = db.batch();
+      for (final (column, type) in const [
+        ('voltage', 'REAL'),
+        ('nodes_total', 'INTEGER'),
+        ('nodes_online', 'INTEGER'),
+      ]) {
+        fresh.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
+      }
+      await fresh.commit(noResult: true);
+    }
   }
 
   /// Appends [message], ignoring one the log already holds. Returns whether it

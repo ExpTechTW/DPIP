@@ -192,6 +192,12 @@ abstract interface class MapLayer {
   /// Gesture finished (pointer up with no camera motion, or camera idle).
   void onMapGestureEnd();
 
+  /// The hosting surface was hidden or revealed — a tab switch, or a page
+  /// pushed over the shell. A realtime layer should stop platform-channel
+  /// writes while hidden (the data source keeps polling; the *map* is what
+  /// nobody can see) and push one catch-up on the visible edge.
+  void onSurfaceVisibility(bool visible);
+
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();
@@ -294,6 +300,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   void onMapGestureEnd() {}
+
+  @override
+  void onSurfaceVisibility(bool visible) {}
 
   @override
   double get mapMinZoom => BaseMap.defaultMinZoom;
