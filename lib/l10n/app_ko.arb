@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "성표를 읽을 수 없음",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "설정에서 허용해 주세요",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "앱으로 돌아오면 자동으로 다시 확인합니다.",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "설정 열기",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "「{what}」이(가) 거부되어 시스템이 다시 묻지 않습니다. 설정에서 허용해 주세요.",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

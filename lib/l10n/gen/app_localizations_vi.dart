@@ -2636,4 +2636,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => 'Không đọc được danh mục sao';
+
+  @override
+  String get permissionSettingsTitle => 'Hãy cấp quyền trong Cài đặt';
+
+  @override
+  String get permissionSettingsHint =>
+      'Ứng dụng sẽ kiểm tra lại khi bạn quay lại.';
+
+  @override
+  String get permissionOpenSettings => 'Mở Cài đặt';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '“$what” đã bị từ chối và hệ thống sẽ không hỏi lại. Hãy bật trong Cài đặt.';
+  }
 }

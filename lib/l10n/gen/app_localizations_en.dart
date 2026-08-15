@@ -2635,4 +2635,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => 'Star catalogue unavailable';
+
+  @override
+  String get permissionSettingsTitle => 'Grant it in Settings';
+
+  @override
+  String get permissionSettingsHint =>
+      'The app checks again when you come back.';
+
+  @override
+  String get permissionOpenSettings => 'Open Settings';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '“$what” was declined, and the system will not ask again. Turn it on in Settings.';
+  }
 }

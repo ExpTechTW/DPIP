@@ -5042,6 +5042,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Star catalogue unavailable'**
   String get skyChartUnavailable;
+
+  /// Dialog title: the permission must be granted in system settings
+  ///
+  /// In en, this message translates to:
+  /// **'Grant it in Settings'**
+  String get permissionSettingsTitle;
+
+  /// Reassures the user they can come back and that the app re-checks on return
+  ///
+  /// In en, this message translates to:
+  /// **'The app checks again when you come back.'**
+  String get permissionSettingsHint;
+
+  /// Button that opens the system settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get permissionOpenSettings;
+
+  /// Explains that the system will not ask again for this permission
+  ///
+  /// In en, this message translates to:
+  /// **'“{what}” was declined, and the system will not ask again. Turn it on in Settings.'**
+  String permissionSettingsMessage(String what);
 }
 
 class _AppLocalizationsDelegate

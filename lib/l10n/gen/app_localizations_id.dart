@@ -2638,4 +2638,19 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => 'Katalog bintang tidak terbaca';
+
+  @override
+  String get permissionSettingsTitle => 'Izinkan lewat Pengaturan';
+
+  @override
+  String get permissionSettingsHint =>
+      'Aplikasi memeriksa lagi saat Anda kembali.';
+
+  @override
+  String get permissionOpenSettings => 'Buka Pengaturan';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '“$what” ditolak dan sistem tidak akan bertanya lagi. Aktifkan di Pengaturan.';
+  }
 }

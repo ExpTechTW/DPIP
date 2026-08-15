@@ -2600,4 +2600,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => '星表を読み込めません';
+
+  @override
+  String get permissionSettingsTitle => '設定から許可してください';
+
+  @override
+  String get permissionSettingsHint => 'アプリに戻ると自動で再確認します。';
+
+  @override
+  String get permissionOpenSettings => '設定を開く';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」は拒否されており、システムは再度確認しません。設定から許可してください。';
+  }
 }

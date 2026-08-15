@@ -2632,4 +2632,18 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => 'อ่านแคตตาล็อกดาวไม่ได้';
+
+  @override
+  String get permissionSettingsTitle => 'โปรดอนุญาตในการตั้งค่า';
+
+  @override
+  String get permissionSettingsHint => 'เมื่อกลับมาแอปจะตรวจสอบใหม่อัตโนมัติ';
+
+  @override
+  String get permissionOpenSettings => 'เปิดการตั้งค่า';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '“$what” ถูกปฏิเสธไว้ และระบบจะไม่ถามอีก โปรดเปิดในการตั้งค่า';
+  }
 }

@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "Hindi mabasa ang star catalogue",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "Payagan ito sa Settings",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "Susuriin muli ng app pagbalik mo.",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "Buksan ang Settings",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "Tinanggihan ang “{what}” at hindi na magtatanong ang sistema. I-on ito sa Settings.",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -10,9 +10,12 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_scaffold.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/permission_settings_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,6 +60,7 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
   }
 
   Future<void> _refresh() async {
+    Log.debug('permission: refreshing');
     final notifications = context.read<NotificationService>();
     final location = context.read<LocationService>();
     final notify = await notifications.isAllowed();
@@ -67,6 +71,11 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
     if (!mounted) return;
+    Log.info(
+      'permission state: notify=$notify critical=$critical '
+      'location=$locationGranted background=$backgroundGranted '
+      'battery=$batteryOk',
+    );
     setState(() {
       _notify = notify;
       _critical = critical;
@@ -76,23 +85,91 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
     });
   }
 
-  Future<void> _grantNotify() async {
-    await context.read<NotificationService>().requestPermission();
+  /// Asks for a permission, and when the system will not ask again, says so
+  /// and offers to open its settings.
+  ///
+  /// This is the shape every row needs. Both platforms prompt once; after that
+  /// the request returns silently, so a row that only calls it again is a
+  /// button that does nothing — which is how this screen used to dead-end.
+  Future<void> _grant(
+    Future<PermissionOutcome> Function() request,
+    Future<void> Function() openSettings,
+    String what,
+  ) async {
+    // Logged end to end. A permission row that appears to do nothing has three
+    // indistinguishable causes — the tap never arrived, the request returned
+    // "granted" or "denied" so no dialog was due, or something threw and the
+    // unawaited future swallowed it — and none of them leave a trace by
+    // default. Each step says so now.
+    Log.info('permission[$what]: tapped');
+    try {
+      final outcome = await request();
+      Log.info('permission[$what]: outcome = ${outcome.name}');
+      if (!mounted) {
+        Log.warning('permission[$what]: page gone before the outcome landed');
+        return;
+      }
+      if (outcome == PermissionOutcome.needsSettings) {
+        await promptForSystemSettings(
+          context,
+          what: what,
+          openSettings: openSettings,
+        );
+      }
+    } catch (error, stackTrace) {
+      // Nothing awaits this handler, so without catching here an async failure
+      // becomes an unhandled zone error and the button is simply inert.
+      Log.handle(error, stackTrace, 'permission[$what]');
+    }
     if (mounted) await _refresh();
+  }
+
+  Future<void> _grantNotify() {
+    final notifications = context.read<NotificationService>();
+    return _grant(
+      notifications.requestPermission,
+      notifications.openSystemSettings,
+      AppLocalizations.of(context).onboardingPermNotify,
+    );
+  }
+
+  /// The critical alert is a separate iOS grant, so it needs its own request —
+  /// asking for it as part of the ordinary one meant the row did nothing once
+  /// notifications were already allowed.
+  ///
+  /// It can also be refused with no prompt at all, because it depends on an
+  /// entitlement Apple grants per team; the dialog is then the only thing that
+  /// tells the user anything happened.
+  Future<void> _grantCritical() {
+    final notifications = context.read<NotificationService>();
+    return _grant(
+      notifications.requestCritical,
+      notifications.openSystemSettings,
+      AppLocalizations.of(context).onboardingPermCritical,
+    );
   }
 
   // Foreground location only. Background ("Always") is a SEPARATE step —
   // Android 11+ silently denies both if they're requested in the same gesture.
-  Future<void> _grantLocation() async {
-    await context.read<LocationService>().requestPermission();
-    if (mounted) await _refresh();
+  Future<void> _grantLocation() {
+    final location = context.read<LocationService>();
+    return _grant(
+      location.requestPermission,
+      location.openSettings,
+      AppLocalizations.of(context).onboardingPermLocation,
+    );
   }
 
   // Background ("Always"): only meaningful after foreground is granted; on
-  // Android 11+ this routes to Settings, re-checked on resume.
-  Future<void> _grantBackground() async {
-    await context.read<LocationService>().requestBackground();
-    if (mounted) await _refresh();
+  // Android 11+ and on iOS after "While Using" it lives only in Settings, so
+  // this almost always ends in the dialog rather than a prompt.
+  Future<void> _grantBackground() {
+    final location = context.read<LocationService>();
+    return _grant(
+      location.requestBackground,
+      location.openSettings,
+      AppLocalizations.of(context).onboardingPermBackground,
+    );
   }
 
   Future<void> _grantBattery() async {
@@ -149,7 +226,7 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
           title: l10n.onboardingPermCritical,
           description: l10n.onboardingPermCriticalDesc,
           granted: _critical,
-          onGrant: _grantNotify,
+          onGrant: _grantCritical,
         ),
       _PermissionRow(
         icon: Icons.location_on_outlined,

@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "อ่านแคตตาล็อกดาวไม่ได้",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "โปรดอนุญาตในการตั้งค่า",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "เมื่อกลับมาแอปจะตรวจสอบใหม่อัตโนมัติ",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "เปิดการตั้งค่า",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "“{what}” ถูกปฏิเสธไว้ และระบบจะไม่ถามอีก โปรดเปิดในการตั้งค่า",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

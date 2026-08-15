@@ -2591,6 +2591,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => '無法讀取星表';
+
+  @override
+  String get permissionSettingsTitle => '請到系統設定開啟';
+
+  @override
+  String get permissionSettingsHint => '返回 App 後會自動重新檢查。';
+
+  @override
+  String get permissionOpenSettings => '前往設定';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -5179,6 +5193,20 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get skyChartUnavailable => '无法读取星表';
+
+  @override
+  String get permissionSettingsTitle => '请到系统设置开启';
+
+  @override
+  String get permissionSettingsHint => '返回 App 后会自动重新检查。';
+
+  @override
+  String get permissionOpenSettings => '前往设置';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」已被拒绝，系统不会再询问。请到设置中开启。';
+  }
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -7767,6 +7795,20 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get skyChartUnavailable => '無法讀取星表';
+
+  @override
+  String get permissionSettingsTitle => '請到系統設定開啟';
+
+  @override
+  String get permissionSettingsHint => '返回 App 後會自動重新檢查。';
+
+  @override
+  String get permissionOpenSettings => '前往設定';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -10355,4 +10397,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get skyChartUnavailable => '無法讀取星表';
+
+  @override
+  String get permissionSettingsTitle => '請到系統設定開啟';
+
+  @override
+  String get permissionSettingsHint => '返回 App 後會自動重新檢查。';
+
+  @override
+  String get permissionOpenSettings => '前往設定';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
+  }
 }

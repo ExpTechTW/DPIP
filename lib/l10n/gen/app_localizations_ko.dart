@@ -2609,4 +2609,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => '성표를 읽을 수 없음';
+
+  @override
+  String get permissionSettingsTitle => '설정에서 허용해 주세요';
+
+  @override
+  String get permissionSettingsHint => '앱으로 돌아오면 자동으로 다시 확인합니다.';
+
+  @override
+  String get permissionOpenSettings => '설정 열기';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return '「$what」이(가) 거부되어 시스템이 다시 묻지 않습니다. 설정에서 허용해 주세요.';
+  }
 }

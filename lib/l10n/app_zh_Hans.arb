@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "无法读取星表",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "请到系统设置开启",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "返回 App 后会自动重新检查。",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "前往设置",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "「{what}」已被拒绝，系统不会再询问。请到设置中开启。",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

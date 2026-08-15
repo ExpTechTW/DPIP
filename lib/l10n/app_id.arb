@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "Katalog bintang tidak terbaca",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "Izinkan lewat Pengaturan",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "Aplikasi memeriksa lagi saat Anda kembali.",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "Buka Pengaturan",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "“{what}” ditolak dan sistem tidak akan bertanya lagi. Aktifkan di Pengaturan.",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

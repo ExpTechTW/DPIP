@@ -1735,5 +1735,26 @@
   "skyChartUnavailable": "Không đọc được danh mục sao",
   "@skyChartUnavailable": {
     "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "Hãy cấp quyền trong Cài đặt",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "Ứng dụng sẽ kiểm tra lại khi bạn quay lại.",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "Mở Cài đặt",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "“{what}” đã bị từ chối và hệ thống sẽ không hỏi lại. Hãy bật trong Cài đặt.",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
   }
 }

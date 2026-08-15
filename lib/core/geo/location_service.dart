@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -64,32 +65,44 @@ class LocationService {
   /// be requested in-app (permanently denied, or Android 11+ background
   /// location). Best-effort.
   Future<void> openSettings() async {
+    Log.info('permission: opening app settings');
     try {
-      await Geolocator.openAppSettings();
+      final opened = await Geolocator.openAppSettings();
+      Log.info('permission: openAppSettings -> $opened');
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'openAppSettings');
     }
   }
 
   /// Requests **foreground** location permission (call from a screen, after
-  /// explaining why); returns whether a fix is now permitted. If permission is
-  /// permanently denied, re-requesting can't prompt, so it routes to Settings.
-  /// Never throws.
-  Future<bool> requestPermission() async {
+  /// explaining why).
+  ///
+  /// Reports what happened rather than opening Settings itself. It used to
+  /// jump straight there on a permanent denial, which drops the user into a
+  /// system screen with no idea why they are looking at it — the caller can
+  /// explain first now. Never throws.
+  Future<PermissionOutcome> requestPermission() async {
     try {
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
-        return false;
+        return PermissionOutcome.needsSettings;
       }
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      return permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse;
+      Log.info('permission: location request -> $permission');
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
+        return PermissionOutcome.granted;
+      }
+      // A refusal at the prompt turns into a permanent one on both platforms:
+      // iOS never asks twice, and Android stops after the second refusal.
+      return permission == LocationPermission.deniedForever
+          ? PermissionOutcome.needsSettings
+          : PermissionOutcome.denied;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestPermission');
-      return false;
+      return PermissionOutcome.denied;
     }
   }
 
@@ -130,24 +143,26 @@ class LocationService {
   /// there "Allow all the time" only exists in system Settings. So: try the
   /// in-app prompt, and if that doesn't land on "Always", open Settings, where
   /// the grant lives. Either way the caller re-checks on resume. Never throws.
-  Future<bool> requestBackground() async {
+  Future<PermissionOutcome> requestBackground() async {
     try {
       final current = await Geolocator.checkPermission();
-      if (current == LocationPermission.always) return true;
+      Log.info('permission: background location, current = $current');
+      if (current == LocationPermission.always) {
+        return PermissionOutcome.granted;
+      }
       if (current == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
-        return false;
+        return PermissionOutcome.needsSettings;
       }
       if (await Geolocator.requestPermission() == LocationPermission.always) {
-        return true;
+        return PermissionOutcome.granted;
       }
       // Couldn't escalate in-app (iOS after "While Using", or Android 11+) —
-      // "Always" lives in system Settings.
-      await Geolocator.openAppSettings();
-      return false;
+      // "Always" lives in system Settings, and the caller says so before
+      // sending anyone there.
+      return PermissionOutcome.needsSettings;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestBackground');
-      return false;
+      return PermissionOutcome.denied;
     }
   }
 

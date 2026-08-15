@@ -2646,4 +2646,18 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get skyChartUnavailable => 'Hindi mabasa ang star catalogue';
+
+  @override
+  String get permissionSettingsTitle => 'Payagan ito sa Settings';
+
+  @override
+  String get permissionSettingsHint => 'Susuriin muli ng app pagbalik mo.';
+
+  @override
+  String get permissionOpenSettings => 'Buksan ang Settings';
+
+  @override
+  String permissionSettingsMessage(String what) {
+    return 'Tinanggihan ang “$what” at hindi na magtatanong ang sistema. I-on ito sa Settings.';
+  }
 }
