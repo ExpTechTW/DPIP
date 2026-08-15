@@ -189,14 +189,6 @@ class MeshChatController extends ChangeNotifier {
   /// Why the last scan failed (permission denied, adapter off), else null.
   String? get scanError => _scanError;
 
-  /// The sender's node name once the mesh has told us about it, else its id.
-  String senderLabel(int num) {
-    final name = _nodes.byNum(num)?.displayName;
-    return (name != null && name.isNotEmpty)
-        ? name
-        : '0x${num.toRadixString(16)}';
-  }
-
   /// Starts a scan, replacing the previous results. Safe to call repeatedly —
   /// a running scan is cancelled first.
   Future<void> startScan() async {

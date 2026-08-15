@@ -1023,9 +1023,13 @@ class _Bubble extends StatelessWidget {
         : context.select<MeshNodeStore, String?>(
             (s) => s.byNum(message.from)?.displayName,
           );
+    // Name and id together: names collide on a mesh (several radios ship with
+    // the same default), and the id is what tells two 「Meshtastic」 apart.
+    // With no name yet, the id alone is the whole label.
+    final senderId = '0x${message.from.toRadixString(16)}';
     final senderLabel = (senderName == null || senderName.isEmpty)
-        ? '0x${message.from.toRadixString(16)}'
-        : senderName;
+        ? senderId
+        : '$senderName($senderId)';
 
     return Align(
       alignment: outgoing ? Alignment.centerRight : Alignment.centerLeft,
