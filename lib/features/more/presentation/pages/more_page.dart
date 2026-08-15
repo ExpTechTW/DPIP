@@ -103,6 +103,19 @@ class MorePage extends StatelessWidget {
               ),
             ],
           ),
+          // Its own section rather than a row under 進階: the LoRa mesh is the
+          // app's off-grid reception path, not a developer curiosity, and the
+          // radio it pairs with is a physical thing the user owns and manages.
+          SectionHeader(l10n.moreSectionMesh),
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.router_outlined,
+                title: l10n.meshtasticTitle,
+                onTap: () => context.pushNamed(AppRoutes.meshtastic),
+              ),
+            ],
+          ),
           SectionHeader(l10n.moreSectionAdvanced),
           _MoreGroup(
             children: [
@@ -128,19 +141,6 @@ class MorePage extends StatelessWidget {
                 icon: Icons.developer_mode_outlined,
                 title: l10n.moreDeveloper,
                 onTap: () => context.pushNamed(AppRoutes.developer),
-              ),
-            ],
-          ),
-          // Its own section rather than a row under 進階: the LoRa mesh is the
-          // app's off-grid reception path, not a developer curiosity, and the
-          // radio it pairs with is a physical thing the user owns and manages.
-          SectionHeader(l10n.moreSectionMesh),
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.router_outlined,
-                title: l10n.meshtasticTitle,
-                onTap: () => context.pushNamed(AppRoutes.meshtastic),
               ),
             ],
           ),
