@@ -126,12 +126,16 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
     _inFlight = null;
     _tickerHandle?.cancel();
     _tickerHandle = null;
+    // Stopping the ticker is enough to idle a poll source, but not one holding
+    // a connection open — that keeps costing radio and packets with no reader.
+    _source.pause();
   }
 
   @override
   void resume() {
     if (_disposed) return;
     _startMark = _elapsed.elapsed;
+    _source.resume(); // before the refetch below, which is what re-opens it
     _recompute(); // flip an aged snapshot to stale/offline before refetching
     _tickerHandle ??= _ticker.start(_config.pollInterval, _onTick);
     unawaited(_fetch());

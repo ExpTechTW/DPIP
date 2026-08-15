@@ -203,4 +203,67 @@ void main() {
       expect((await h.source.fetch()).valueOrNull, 'b', reason: 'refreshed');
     });
   });
+
+  group('SseRealtimeSource — background pause', () {
+    test('pause drops the connection and does not reconnect', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.current.add(const SseEvent(data: 'a'));
+      await pumpEventQueue();
+      expect((await h.source.fetch()).valueOrNull, 'a');
+
+      h.source.pause();
+      await pumpEventQueue();
+      expect(h.current.hasListener, isFalse, reason: 'socket released');
+      expect(
+        h.delays,
+        isEmpty,
+        reason: 'a cancel is not a drop to recover from',
+      );
+
+      // A fetch while paused must not quietly re-open the connection.
+      expect((await h.source.fetch()).isOk, isFalse);
+      expect(h.connects, hasLength(1));
+    });
+
+    test('resume re-opens on the next fetch', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.current.add(const SseEvent(data: 'a'));
+      await pumpEventQueue();
+
+      h.source.pause();
+      h.source.resume();
+      expect(h.connects, hasLength(1), reason: 'the open is lazy, as on start');
+
+      expect(
+        (await h.source.fetch()).isOk,
+        isFalse,
+        reason: 'not yet reconnected',
+      );
+      expect(h.connects, hasLength(2), reason: 'the fetch re-opened it');
+
+      h.current.add(const SseEvent(data: 'b'));
+      await pumpEventQueue();
+      expect((await h.source.fetch()).valueOrNull, 'b');
+    });
+
+    test('a reconnect already in flight cannot open a paused source', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      await h.current.close(); // the connection drops, scheduling a reconnect
+      await pumpEventQueue();
+      expect(h.delays, hasLength(1));
+
+      h.source.pause();
+      h.delays.single.complete(); // the backoff fires after the pause landed
+      await pumpEventQueue();
+      expect(h.connects, hasLength(1), reason: 'refused while paused');
+
+      // ...and resuming still gets a connection, with the backoff reset.
+      h.source.resume();
+      await h.source.fetch();
+      expect(h.connects, hasLength(2));
+    });
+  });
 }

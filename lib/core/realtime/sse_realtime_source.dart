@@ -85,6 +85,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   bool _connected = false;
   bool _hasSnapshot = false;
   bool _disposed = false;
+  bool _paused = false;
   int _attempt = 0;
   T? _latest;
   Duration? _lastEventMark;
@@ -113,14 +114,42 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     return mark != null && (_elapsed.elapsed - mark) <= window;
   }
 
+  /// Drops the connection for the duration of a background stint.
+  ///
+  /// Cancelling the subscription does not run [_onClosed] (a cancel raises no
+  /// `onDone`), so this cannot start a reconnect of its own. A reconnect already
+  /// in flight when this lands is harmless: its timer still fires, but
+  /// [_openConnection] refuses while paused.
+  @override
+  void pause() {
+    if (_disposed || _paused) return;
+    _paused = true;
+    _subscription?.cancel();
+    _subscription = null;
+    _connected = false;
+    _hasSnapshot = false;
+  }
+
+  /// Re-arms the lazy open, so the channel's first post-resume `fetch` builds a
+  /// fresh connection exactly the way the first one was built. The backoff is
+  /// reset with it: a new foreground deserves the fast first retry, not whatever
+  /// the connection had climbed to before the app was put away.
+  @override
+  void resume() {
+    if (_disposed || !_paused) return;
+    _paused = false;
+    _started = false;
+    _attempt = 0;
+  }
+
   void _ensureStarted() {
-    if (_started || _disposed) return;
+    if (_started || _disposed || _paused) return;
     _started = true;
     _openConnection();
   }
 
   void _openConnection() {
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     _connected = false;
     _hasSnapshot = false;
     _subscription = _connect().listen(
