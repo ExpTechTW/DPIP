@@ -173,6 +173,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLegendCollapse => 'Hide legend';
 
   @override
+  String get updateAvailableTitle => 'Update available';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'Version $version is out.';
+  }
+
+  @override
+  String get updateSkip => 'Skip this one';
+
+  @override
+  String get updateViewChangelog => 'View changes';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play Store';
+
+  @override
+  String get updateDownload => 'Download';
+
+  @override
   String get changelogTitle => 'Changelog';
 
   @override

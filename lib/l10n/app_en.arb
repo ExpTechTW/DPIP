@@ -186,6 +186,21 @@
   "@typhoonOverlayMenuTooltip": {
     "description": "Tooltip for the typhoon overlay-toggle chip beside the layer switcher"
   },
+  "updateAvailableTitle": "Update available",
+  "@updateAvailableTitle": {
+    "description": "Title of the new-version dialog"
+  },
+  "updateAvailableBody": "Version {version} is out.",
+  "@updateAvailableBody": {
+    "description": "Body of the new-version dialog",
+    "placeholders": { "version": { "type": "String" } }
+  },
+  "updateSkip": "Skip this one",
+  "updateViewChangelog": "View changes",
+  "updateOpenAppStore": "App Store",
+  "updateOpenTestFlight": "TestFlight",
+  "updateOpenPlayStore": "Play Store",
+  "updateDownload": "Download",
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Descending",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

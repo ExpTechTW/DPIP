@@ -170,6 +170,32 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLegendCollapse => '범례 숨기기';
 
   @override
+  String get updateAvailableTitle => '새 버전';
+
+  @override
+  String updateAvailableBody(String version) {
+    return '버전 $version 이(가) 나왔습니다.';
+  }
+
+  @override
+  String get updateSkip => '이번은 건너뛰기';
+
+  @override
+  String get updateViewChangelog => '변경 내용 보기';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play 스토어';
+
+  @override
+  String get updateDownload => '다운로드';
+
+  @override
   String get changelogTitle => '변경 로그';
 
   @override

@@ -170,6 +170,32 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLegendCollapse => '凡例を閉じる';
 
   @override
+  String get updateAvailableTitle => '新しいバージョン';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'バージョン $version が公開されました。';
+  }
+
+  @override
+  String get updateSkip => '今回はスキップ';
+
+  @override
+  String get updateViewChangelog => '内容を見る';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play ストア';
+
+  @override
+  String get updateDownload => 'ダウンロード';
+
+  @override
   String get changelogTitle => '更新履歴';
 
   @override

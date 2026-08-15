@@ -173,6 +173,32 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLegendCollapse => 'Itago ang alamat';
 
   @override
+  String get updateAvailableTitle => 'May bagong bersyon';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'Available na ang bersyon $version.';
+  }
+
+  @override
+  String get updateSkip => 'Laktawan muna';
+
+  @override
+  String get updateViewChangelog => 'Tingnan ang mga pagbabago';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play Store';
+
+  @override
+  String get updateDownload => 'I-download';
+
+  @override
   String get changelogTitle => 'Changelog';
 
   @override

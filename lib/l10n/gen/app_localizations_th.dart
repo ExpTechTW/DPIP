@@ -172,6 +172,32 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLegendCollapse => 'ซ่อนคำอธิบาย';
 
   @override
+  String get updateAvailableTitle => 'มีเวอร์ชันใหม่';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'เวอร์ชัน $version พร้อมใช้งานแล้ว';
+  }
+
+  @override
+  String get updateSkip => 'ข้ามครั้งนี้';
+
+  @override
+  String get updateViewChangelog => 'ดูรายละเอียด';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play Store';
+
+  @override
+  String get updateDownload => 'ดาวน์โหลด';
+
+  @override
   String get changelogTitle => 'บันทึกการอัปเดต';
 
   @override

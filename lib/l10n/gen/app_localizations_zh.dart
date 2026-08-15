@@ -169,6 +169,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLegendCollapse => '收合圖例';
 
   @override
+  String get updateAvailableTitle => '有新版本';
+
+  @override
+  String updateAvailableBody(String version) {
+    return '新版本 $version 已發布。';
+  }
+
+  @override
+  String get updateSkip => '略過此次';
+
+  @override
+  String get updateViewChangelog => '前往查看';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play 商店';
+
+  @override
+  String get updateDownload => '下載更新';
+
+  @override
   String get changelogTitle => '更新日誌';
 
   @override
@@ -2775,6 +2801,32 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLegendCollapse => '收起图例';
+
+  @override
+  String get updateAvailableTitle => '有新版本';
+
+  @override
+  String updateAvailableBody(String version) {
+    return '新版本 $version 已发布。';
+  }
+
+  @override
+  String get updateSkip => '略过此次';
+
+  @override
+  String get updateViewChangelog => '前往查看';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play 商店';
+
+  @override
+  String get updateDownload => '下载更新';
 
   @override
   String get changelogTitle => '更新日志';
@@ -5385,6 +5437,32 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLegendCollapse => '收合圖例';
 
   @override
+  String get updateAvailableTitle => '有新版本';
+
+  @override
+  String updateAvailableBody(String version) {
+    return '新版本 $version 已發佈。';
+  }
+
+  @override
+  String get updateSkip => '略過此次';
+
+  @override
+  String get updateViewChangelog => '前往查看';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play 商店';
+
+  @override
+  String get updateDownload => '下載更新';
+
+  @override
   String get changelogTitle => '更新日誌';
 
   @override
@@ -7991,6 +8069,32 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLegendCollapse => '收合圖例';
+
+  @override
+  String get updateAvailableTitle => '有新版本';
+
+  @override
+  String updateAvailableBody(String version) {
+    return '新版本 $version 已發布。';
+  }
+
+  @override
+  String get updateSkip => '略過此次';
+
+  @override
+  String get updateViewChangelog => '前往查看';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play 商店';
+
+  @override
+  String get updateDownload => '下載更新';
 
   @override
   String get changelogTitle => '更新日誌';

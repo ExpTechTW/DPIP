@@ -172,6 +172,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLegendCollapse => 'Ẩn chú giải';
 
   @override
+  String get updateAvailableTitle => 'Đã có bản mới';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'Phiên bản $version đã phát hành.';
+  }
+
+  @override
+  String get updateSkip => 'Bỏ qua lần này';
+
+  @override
+  String get updateViewChangelog => 'Xem thay đổi';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play Store';
+
+  @override
+  String get updateDownload => 'Tải xuống';
+
+  @override
   String get changelogTitle => 'Nhật ký cập nhật';
 
   @override

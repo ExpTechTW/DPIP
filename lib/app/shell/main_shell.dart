@@ -2,6 +2,7 @@ import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
@@ -113,6 +114,9 @@ class _MainShellState extends State<MainShell> {
       body: Column(
         children: [
           const PermissionBanners(),
+          // Renders nothing; checks once after the first frame whether this
+          // build's channel has a newer release, and says so once per version.
+          const UpdatePrompt(),
           Expanded(
             child: VisibleTabScope(
               visibleTab: _visibleTab,

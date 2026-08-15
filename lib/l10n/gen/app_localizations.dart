@@ -417,6 +417,54 @@ abstract class AppLocalizations {
   /// **'Hide legend'**
   String get mapLegendCollapse;
 
+  /// Title of the new-version dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get updateAvailableTitle;
+
+  /// Body of the new-version dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is out.'**
+  String updateAvailableBody(String version);
+
+  /// No description provided for @updateSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this one'**
+  String get updateSkip;
+
+  /// No description provided for @updateViewChangelog.
+  ///
+  /// In en, this message translates to:
+  /// **'View changes'**
+  String get updateViewChangelog;
+
+  /// No description provided for @updateOpenAppStore.
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get updateOpenAppStore;
+
+  /// No description provided for @updateOpenTestFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'TestFlight'**
+  String get updateOpenTestFlight;
+
+  /// No description provided for @updateOpenPlayStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Store'**
+  String get updateOpenPlayStore;
+
+  /// No description provided for @updateDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get updateDownload;
+
   /// More-menu entry and page title for GitHub release notes
   ///
   /// In en, this message translates to:

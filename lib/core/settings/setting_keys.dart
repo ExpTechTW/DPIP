@@ -136,6 +136,13 @@ abstract final class SettingKeys {
     'map.meshExcludeMqtt',
   );
 
+  /// The newest release the update dialog has already offered (tag, e.g.
+  /// `v3.2.1`). The prompt is once per version, so this is written the moment
+  /// the dialog is shown — see `UpdatePrompt`.
+  static const SettingKey<String> updatePromptedVersion = SettingKey<String>._(
+    'update.promptedVersion',
+  );
+
   /// Selected LB / Core API region. See `RegionSelection`.
   ///
   /// Colon-form kept as-is (pre-existing storage address).

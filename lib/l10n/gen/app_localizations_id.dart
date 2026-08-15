@@ -172,6 +172,32 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLegendCollapse => 'Sembunyikan legenda';
 
   @override
+  String get updateAvailableTitle => 'Versi baru tersedia';
+
+  @override
+  String updateAvailableBody(String version) {
+    return 'Versi $version sudah dirilis.';
+  }
+
+  @override
+  String get updateSkip => 'Lewati kali ini';
+
+  @override
+  String get updateViewChangelog => 'Lihat perubahan';
+
+  @override
+  String get updateOpenAppStore => 'App Store';
+
+  @override
+  String get updateOpenTestFlight => 'TestFlight';
+
+  @override
+  String get updateOpenPlayStore => 'Play Store';
+
+  @override
+  String get updateDownload => 'Unduh';
+
+  @override
   String get changelogTitle => 'Catatan pembaruan';
 
   @override
