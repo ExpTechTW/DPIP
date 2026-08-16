@@ -16,6 +16,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
+import 'package:dpip/features/changelog/presentation/widgets/platform_tag.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -186,6 +187,9 @@ class _Body extends StatelessWidget {
           selectable: true,
           styleSheet: _sheet(theme, colors, accent),
           softLineBreak: true,
+          // Without this the platform tags become Image.network — a fetch, for
+          // a decoration, on a page read when the network is what failed.
+          imageBuilder: platformTagIcon,
           onTapLink: (text, href, title) => _openLink(href),
         ),
       ),

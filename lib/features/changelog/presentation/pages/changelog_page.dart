@@ -10,6 +10,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
+import 'package:dpip/features/changelog/presentation/widgets/platform_tag.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -19,7 +20,6 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dpip/features/changelog/presentation/widgets/platform_tag.dart';
 
 /// Full-screen release list (More → 更新日誌). One row expands at a time;
 /// ETag revalidation keeps pull-to-refresh cheap when nothing changed.
