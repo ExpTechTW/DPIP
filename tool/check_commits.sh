@@ -36,11 +36,22 @@ fi
 readonly USER_FACING='feat|fix|perf'
 readonly ALL_TYPES='feat|fix|perf|refactor|docs|test|chore|build|ci|style|revert'
 
-# The line that separates the two languages. Deliberately unmistakable — a
-# bare `---` shows up in prose and in diffs pasted into a message — and
-# deliberately not starting with a dash, which every tool that takes options
-# would mistake for one.
-readonly MARKER='=== 中文 ==='
+# A changelog entry, in one expression:  Category(locale): text
+#
+# One line per entry, so the note is extracted rather than parsed out of prose.
+# The old scheme split a prose body on a `=== 中文 ===` marker, which a
+# squash-merge destroyed by concatenating four bodies into one — and which
+# could never carry more than the two languages the marker separated.
+readonly LINE_RE='^(New|Optimization|Fix)\(([A-Za-z]{2,3}(-[A-Za-z0-9]+)*)\):[[:space:]]*(.+)$'
+
+# The two every user-facing change must carry: the app's own language, and the
+# one everyone else falls back to. The rest are optional and arrive whenever
+# somebody writes them.
+readonly REQUIRED_LOCALES='zh-Hant en-US'
+
+# Kept in step with lib/l10n/*.arb — a typo'd locale is worse than a missing
+# one, because it publishes a language block no reader is ever served.
+readonly KNOWN_LOCALES='zh-Hant zh-Hans zh-Hant-HK en-US ja-JP ko-KR th-TH vi-VN id-ID fil-PH'
 
 readonly SUMMARY_MAX=72
 
@@ -96,25 +107,70 @@ check_one() { # <subject> <body> <label>
     bad=1
   fi
 
-  # 3. A user-facing change carries both languages, because both are published.
-  if printf '%s' "$subject" | grep -Eq "^($USER_FACING)(\(|:)"; then
-    if [ -z "$(printf '%s' "$body" | tr -d '[:space:]')" ]; then
-      note "a $USER_FACING commit needs a body — it is the release note"
+  # 3. Changelog lines. These are what tool/release_notes.sh publishes, so a
+  #    mistake here is a hole in something users read, and the message cannot
+  #    be edited after it is pushed.
+  # Whole-line match: the marker is only a mistake when it is being *used* as
+  # a separator. Quoting it inline while explaining why it went away is not.
+  if printf '%s\n' "$body" | grep -Fxq -- '=== 中文 ==='; then
+    note "'=== 中文 ===' is gone — declare entries as 'New(zh-Hant): ...' lines"
+    bad=1
+  fi
+
+  entries="$(printf '%s\n' "$body" | grep -E "$LINE_RE" || true)"
+
+  # A line that starts like an entry but does not match is the failure mode
+  # worth naming: it is silently not an entry, and the only symptom is a
+  # shorter published list. `en_US` for `en-US` is the one that will happen.
+  while IFS= read -r cand; do
+    [ -n "$cand" ] || continue
+    printf '%s' "$cand" | grep -Eq "$LINE_RE" || {
+      note "malformed entry: $cand"
+      note "  expected  Category(locale): text  e.g. New(en-US): the map …"
       bad=1
-    elif ! printf '%s\n' "$body" | grep -Fxq -- "$MARKER"; then
-      note "body needs a '$MARKER' line separating English from 中文"
+    }
+  done <<EOF
+$(printf '%s\n' "$body" | grep -E '^(New|Optimization|Fix)[ (]' || true)
+EOF
+
+  # Every declared locale must be one the app actually ships.
+  for loc in $(printf '%s\n' "$entries" | sed -E "s/$LINE_RE/\\2/" | sort -u); do
+    [ -n "$loc" ] || continue
+    case " $KNOWN_LOCALES " in
+    *" $loc "*) ;;
+    *)
+      note "unknown locale '$loc' — one of: ${KNOWN_LOCALES// /, }"
+      bad=1
+      ;;
+    esac
+  done
+
+  # A user-facing type must say what to publish; nothing else has to.
+  if printf '%s' "$subject" | grep -Eq "^($USER_FACING)(\(|:)"; then
+    if [ -z "$entries" ]; then
+      note "a $USER_FACING commit needs at least one 'New|Optimization|Fix(<locale>): ...' line"
       bad=1
     else
-      english="$(printf '%s\n' "$body" | sed -n "1,/^$(printf '%s' "$MARKER" | sed 's/[]\/$*.^[]/\\&/g')\$/p" | sed '$d')"
-      chinese="$(printf '%s\n' "$body" | sed -n "/^$(printf '%s' "$MARKER" | sed 's/[]\/$*.^[]/\\&/g')\$/,\$p" | sed '1d')"
-      if [ -z "$(printf '%s' "$english" | tr -d '[:space:]')" ]; then
-        note "the English half is empty"
-        bad=1
-      fi
-      if [ -z "$(printf '%s' "$chinese" | tr -d '[:space:]')" ]; then
-        note "the 中文 half is empty"
-        bad=1
-      fi
+      for loc in $REQUIRED_LOCALES; do
+        printf '%s\n' "$entries" | grep -Eq "^[A-Za-z]+\($loc\):" || {
+          note "missing $loc entries — every published entry needs one"
+          bad=1
+        }
+      done
+      # The languages are published as parallel lists, so an entry written in
+      # one language and forgotten in another silently ships a shorter list to
+      # those readers. Counting per category catches it.
+      for cat in New Optimization Fix; do
+        base="$(printf '%s\n' "$entries" | grep -Ec "^$cat\(zh-Hant\):" || true)"
+        for loc in $(printf '%s\n' "$entries" | sed -E "s/$LINE_RE/\\2/" | sort -u); do
+          [ -n "$loc" ] && [ "$loc" != zh-Hant ] || continue
+          n="$(printf '%s\n' "$entries" | grep -Ec "^$cat\($loc\):" || true)"
+          [ "$n" -eq 0 ] || [ "$n" -eq "$base" ] || {
+            note "$cat has $base zh-Hant entries but $n for $loc — they must pair up"
+            bad=1
+          }
+        done
+      done
     fi
   fi
 

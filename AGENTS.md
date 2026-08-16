@@ -59,20 +59,22 @@ worth knowing before writing one:
 ```
 <type>(<scope>): <English summary>
 
-<English body>
-
-=== 中文 ===
-<中文標題>
-<中文說明>
+New(zh-Hant): <一行，使用者感覺得到的事>
+New(en-US): <the same, in English>
 ```
 
-- The commit message **is** the release note — `tool/release_notes.sh` reads
-  these bodies and publishes them, and a message cannot be edited once pushed.
-- `feat` / `fix` / `perf` carry both languages; everything else may be a
-  summary line alone.
-- Choose the type by **whether a user can see the change**, not by which folder
-  moved. A user-visible change filed under `build:` never reaches a release
-  note.
+- **Each `Category(locale):` line is one changelog entry**, extracted by
+  `tool/release_notes.sh` with a single regular expression. Categories are
+  `New` / `Optimization` / `Fix`; `zh-Hant` and `en-US` are required and the
+  app's other locales are optional.
+- **There is no prose body.** Why it was done, what was tried, what bit you —
+  all of it goes in a code comment, where the next person to touch the code
+  will see it. Nobody reading a changelog can use any of it.
+- `feat` / `fix` / `perf` need at least one entry line; everything else needs
+  none and simply does not appear in a note.
+- The category is **declared, not inferred from the type** — so a user-visible
+  fix that lives in a `chore:` commit still reaches the changelog, which the
+  old type-derived mapping silently dropped.
 - **One thing per commit.** No gate can check this — whether two changes are
   the same thing is a judgement — so it is on you and on review.
 - **Never** add a `Co-Authored-By:` trailer, `Generated with …`, 🤖, a model

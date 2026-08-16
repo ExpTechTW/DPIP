@@ -143,4 +143,111 @@ void main() {
       expect(localizedReleaseBody(old, 'en'), old);
     });
   });
+
+  group('localizedReleaseBody, per-language blocks', () {
+    // Verbatim output of tool/release_notes.sh, so a change to the publishing
+    // format fails here rather than on a phone.
+    const note = '''
+# 26w33b
+
+_快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
+
+### 🌟 新功能
+
+- 更新日誌的平台標記改用本機圖示，離線也看得到 — YuYu1015
+- 「更多」頁面會顯示這個版本的名稱與送審版號 — YuYu1015
+
+### 🔌 最佳化
+
+- 更新日誌改成捲到底再載入下一頁，開啟快很多 — YuYu1015
+
+### 🐞 錯誤修正
+
+- 更新日誌不再中英文一起顯示 — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) 修正位置回報被大量丟棄，警報範圍可能算在舊位置上 — YuYu1015
+
+<!-- dpip-lang:en-US -->
+<details>
+<summary>English</summary>
+
+### 🌟 New features
+
+- the changelog's platform tags are drawn locally and survive offline — YuYu1015
+- the More page shows this build's own version and the train it ships under — YuYu1015
+
+### 🔌 Improvements
+
+- the changelog loads a page at a time and opens much faster — YuYu1015
+
+### 🐞 Bug fixes
+
+- the changelog no longer shows both languages at once — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) fix location reports being dropped, which could aim alerts at a stale position — YuYu1015
+
+</details>
+<!-- /dpip-lang:en-US -->
+
+<!-- dpip-lang:ja-JP -->
+<details>
+<summary>日本語</summary>
+
+### 🐞 不具合修正
+
+- 更新履歴が日本語と英語を同時に表示しなくなりました — YuYu1015
+
+</details>
+<!-- /dpip-lang:ja-JP -->
+
+<!-- dpip-build: 426000311 -->
+''';
+
+    test('the unfolded language is served to 繁體中文 as-is', () {
+      final out = localizedReleaseBody(note, 'zh-Hant-TW');
+      expect(out, contains('更新日誌的平台標記改用本機圖示'));
+      expect(out, isNot(contains('survive offline')));
+      expect(out, isNot(contains('<details>')));
+      expect(out, isNot(contains('dpip-lang')));
+    });
+
+    test('a reader gets their own language when the note carries it', () {
+      final out = localizedReleaseBody(note, 'ja-JP');
+      expect(out, contains('更新履歴が日本語と英語を同時に表示しなくなりました'));
+      expect(out, isNot(contains('the changelog no longer shows')));
+      expect(out, isNot(contains('<summary>')));
+    });
+
+    test('the language tag need not match exactly', () {
+      // The app hands over `ja`; the note was published as `ja-JP`.
+      expect(
+        localizedReleaseBody(note, 'ja'),
+        contains('更新履歴が日本語と英語を同時に表示しなくなりました'),
+      );
+      expect(
+        localizedReleaseBody(note, 'en'),
+        contains('the changelog loads a page at a time'),
+      );
+    });
+
+    test('an untranslated language falls back to English, not to nothing', () {
+      final out = localizedReleaseBody(note, 'th-TH');
+      expect(out, contains('the changelog loads a page at a time'));
+      expect(out, isNot(contains('更新日誌改成捲到底')));
+    });
+
+    test('简体 is not served 繁體 just because both start with zh', () {
+      // There is no zh-Hans block here, so the primary text stands rather than
+      // a wrong-script match — but it must never pick ja or en for a zh reader.
+      final out = localizedReleaseBody(note, 'zh-Hans');
+      expect(out, isNot(contains('survive offline')));
+      expect(out, isNot(contains('更新履歴が')));
+    });
+
+    test('the heading survives translation', () {
+      // The title and the snapshot caveat are written once, outside every
+      // block; a translated reader would otherwise lose them.
+      final out = localizedReleaseBody(note, 'en');
+      expect(out, startsWith('# 26w33b'));
+      expect(out, contains('快照'));
+    });
+  });
 }

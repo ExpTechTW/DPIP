@@ -1,11 +1,30 @@
 #!/usr/bin/env bash
-# Builds a release note out of the commits it covers, in both languages.
+# Builds a release note out of the changelog lines its commits declare.
 #
-# The commit message *is* the note. Writing one twice — once in the commit and
-# once in a changelog file — is how the two drift, and the version people read
-# is always the one nobody checked. `tool/check_commits.sh` is the other half
-# of that bargain: it refuses a user-facing commit that does not carry both
-# languages, so this can assume they are there.
+# A commit says what belongs in the changelog by carrying one line per entry:
+#
+#     New(zh-Hant): 地圖可以疊加雷達回波
+#     New(en-US): the map can overlay radar echo
+#     Fix(zh-Hant): 修正離線時圖層閃爍
+#     Fix(en-US): stop layers flickering when offline
+#
+# Everything here is extracted with one regular expression. Three consequences
+# make this worth more than the prose bodies it replaces:
+#
+#   * **A squash cannot corrupt it.** GitHub concatenates every commit on the
+#     branch into one body; that just yields more matching lines, all of them
+#     valid. The previous scheme split prose on a `=== 中文 ===` marker, and a
+#     squash put raw markers and whole English paragraphs inside the Chinese
+#     section of 26w33b.
+#   * **One commit can be more than one entry**, in more than one category —
+#     which is often true, and which a one-commit-one-entry mapping could not
+#     express.
+#   * **It scales past two languages.** The app ships ten locales; a note that
+#     is only 中文 and English can serve two of them.
+#
+# The category is declared, not inferred from the commit type. A user-visible
+# change filed under `chore:` used to vanish from every note with nothing to
+# warn anyone; now the line is either there or it is not.
 #
 # **What a note covers depends on which kind it is**, and the difference is not
 # cosmetic:
@@ -24,7 +43,43 @@ label="${1:?label required}"
 code="${2:?build code required}"
 kind="${3:-}"
 
-readonly MARKER='=== 中文 ==='
+# The primary language, printed unfolded. Every other language is published in
+# its own folded, marked block that the in-app changelog picks by locale.
+readonly PRIMARY='zh-Hant'
+
+# Category → heading, per language. Adding a language means adding rows here
+# and a locale to tool/check_commits.sh; nothing else changes.
+heading_for() { # <category> <locale>
+  case "$2::$1" in
+  zh-Hant::New | zh-Hant-HK::New) printf '🌟 新功能' ;;
+  zh-Hant::Optimization | zh-Hant-HK::Optimization) printf '🔌 最佳化' ;;
+  zh-Hant::Fix | zh-Hant-HK::Fix) printf '🐞 錯誤修正' ;;
+  zh-Hans::New) printf '🌟 新功能' ;;
+  zh-Hans::Optimization) printf '🔌 优化' ;;
+  zh-Hans::Fix) printf '🐞 错误修复' ;;
+  ja-JP::New) printf '🌟 新機能' ;;
+  ja-JP::Optimization) printf '🔌 改善' ;;
+  ja-JP::Fix) printf '🐞 不具合修正' ;;
+  *::New) printf '🌟 New features' ;;
+  *::Optimization) printf '🔌 Improvements' ;;
+  *::Fix) printf '🐞 Bug fixes' ;;
+  esac
+}
+
+language_name() { # <locale>
+  case "$1" in
+  en-US) printf 'English' ;;
+  ja-JP) printf '日本語' ;;
+  ko-KR) printf '한국어' ;;
+  th-TH) printf 'ไทย' ;;
+  vi-VN) printf 'Tiếng Việt' ;;
+  id-ID) printf 'Bahasa Indonesia' ;;
+  fil-PH) printf 'Filipino' ;;
+  zh-Hans) printf '简体中文' ;;
+  zh-Hant-HK) printf '繁體中文（香港）' ;;
+  *) printf '%s' "$1" ;;
+  esac
+}
 
 # Platform tags are 14 px SVGs kept in this repository.
 #
@@ -55,77 +110,51 @@ else
 fi
 range="${since:+$since..}HEAD"
 
-# A plain string rather than an array: macOS still ships bash 3.2, which has
-# neither `mapfile` nor `readarray`, and this has to run the same on a laptop
-# as on the runner.
-commits_of() { # <type-pattern>
-  local out="" sha
-  for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
-    if git log -1 --format=%s "$sha" | grep -Eq "^($1)(\(|:)"; then
-      out="$out $sha"
-    fi
-  done
-  printf '%s' "$out"
-}
-
-scope_of() { git log -1 --format=%s "$1" | sed -n 's/^[a-z]*(\([^)]*\)).*/\1/p'; }
-summary_of() { git log -1 --format=%s "$1" | sed 's/^[^:]*: //'; }
-
-# `Platform: android` / `Platform: ios`, or nothing when a change affects both.
-platform_of() {
-  git log -1 --format=%b "$1" |
-    sed -n 's/^[Pp]latform: *\([a-zA-Z]*\).*/\1/p' | head -n 1 |
-    tr '[:upper:]' '[:lower:]'
-}
-
+# Which platforms an entry applies to, always stated.
+#
+# A `Platform:` trailer narrows it to one; without a trailer the change is on
+# both, and both icons are drawn. Marking only the single-platform entries
+# leaves every other line ambiguous — the reader cannot tell "applies to both"
+# from "nobody said", and those are different claims.
 platform_tag() {
-  case "$(platform_of "$1")" in
+  case "$(git log -1 --format=%b "$1" |
+    sed -n 's/^[Pp]latform: *\([a-zA-Z]*\).*/\1/p' | head -n 1 |
+    tr '[:upper:]' '[:lower:]')" in
   android) printf '%s ' "$TAG_ANDROID" ;;
   ios) printf '%s ' "$TAG_IOS" ;;
+  *) printf '%s %s ' "$TAG_ANDROID" "$TAG_IOS" ;;
   esac
 }
 
-# Who to credit. The GitHub login where it can be resolved (CI has `gh` and a
-# token), so the note @-mentions a real account; the commit author's name
-# otherwise, which is all a laptop can know.
+# Who to credit. The GitHub login where it can be resolved, so the note
+# @-mentions a real account; the commit author's display name otherwise, which
+# is all an offline laptop can know — and which mentions nobody, because a
+# display name is not a handle.
 author_of() {
-  local login=""
-  if command -v gh >/dev/null 2>&1 && [ -n "${GITHUB_REPOSITORY:-}" ]; then
-    login="$(gh api "repos/$GITHUB_REPOSITORY/commits/$1" \
-      --jq '.author.login // empty' 2>/dev/null || true)"
-  fi
-  if [ -n "$login" ]; then
-    printf '@%s' "$login"
-  else
-    git log -1 --format=%an "$1"
-  fi
-}
-
-trim() { sed -e '/./,$!d' -e ':a' -e '/^\n*$/{$d;N;ba' -e '}'; }
-
-# One side of the message, with the blank lines around it trimmed — the marker
-# is surrounded by them, and they would otherwise open every entry with a gap.
-half() { # <sha> <english|chinese>
-  local body escaped
-  body="$(git log -1 --format=%b "$1")"
-  # Trailers are metadata, not prose.
-  body="$(printf '%s\n' "$body" | grep -v '^[Pp]latform:' || true)"
-  if ! printf '%s\n' "$body" | grep -Fxq -- "$MARKER"; then
-    [ "$2" = english ] && printf '%s' "$body" | trim
+  local login="" repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
+  # Only for regenerating release-example.md / pre-release-example.md: those
+  # are built from a throwaway repository whose commits do not exist on GitHub,
+  # so the lookup below cannot resolve them and would fall back to a display
+  # name. Resolving by email instead is not an option — GitHub returns nothing
+  # for a private address, and searching by name finds `whes1015` *and*
+  # `whes101592`, so a guess can credit the wrong person. CI never sets this.
+  if [ -n "${DPIP_NOTE_AUTHOR:-}" ]; then
+    printf '%s' "$DPIP_NOTE_AUTHOR"
     return
   fi
-  escaped="$(printf '%s' "$MARKER" | sed 's/[]\/$*.^[]/\\&/g')"
-  if [ "$2" = english ]; then
-    printf '%s\n' "$body" | sed -n "1,/^$escaped\$/p" | sed '$d' | trim
-  else
-    printf '%s\n' "$body" | sed -n "/^$escaped\$/,\$p" | sed '1d' | trim
+  if command -v gh >/dev/null 2>&1; then
+    login="$(gh api "repos/$repo/commits/$1" \
+      --jq '.author.login // empty' 2>/dev/null || true)"
   fi
+  if [ -z "$login" ] && command -v curl >/dev/null 2>&1; then
+    login="$(curl -sS --max-time 10 \
+      -H 'Accept: application/vnd.github+json' \
+      ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
+      "https://api.github.com/repos/$repo/commits/$1" 2>/dev/null |
+      sed -n 's/.*"login": *"\([^"]*\)".*/\1/p' | head -n 1 || true)"
+  fi
+  if [ -n "$login" ]; then printf '@%s' "$login"; else git log -1 --format=%an "$1"; fi
 }
-
-# The 中文 block's first line is its heading, so the Chinese section reads as
-# Chinese rather than as English headings with Chinese underneath.
-zh_summary() { half "$1" chinese | sed -n '1p'; }
-zh_body() { half "$1" chinese | sed '1d' | trim; }
 
 # The snapshot a change first shipped in — the nearest snapshot tag at or after
 # the commit. Only meaningful in a release note; a snapshot's own entries all
@@ -135,69 +164,77 @@ zh_body() { half "$1" chinese | sed '1d' | trim; }
 # Flutter all publish a flat list and answer "what changed between these two"
 # with a compare link instead — which is also at the foot of this note. It is
 # here because DPIP publishes every snapshot, so a tester who has been running
-# them can see at a glance which entries they already have. For everyone
-# upgrading release-to-release it is noise, which is why it sits at the end of
-# the line in a dimmer form rather than in front of the text.
+# them can see at a glance which entries they already have.
 first_seen_in() {
   [ "$kind" = "--release" ] || return 0
   git tag --list '[0-9][0-9]w[0-9][0-9]*' 'snapshot/[0-9][0-9]w[0-9][0-9]*' \
     --contains "$1" 2>/dev/null | sed 's#^snapshot/##' | sort | head -n 1
 }
 
-entries() { # <shas> <english|chinese>
-  local sha scope heading text snapshot
-  for sha in $1; do
-    scope="$(scope_of "$sha")"
-    snapshot="$(first_seen_in "$sha")"
-    if [ "$2" = english ]; then
-      heading="$(summary_of "$sha")"
-      text="$(half "$sha" english)"
-    else
-      heading="$(zh_summary "$sha")"
-      text="$(zh_body "$sha")"
-    fi
-    printf -- '- %s%s%s — %s%s\n' \
-      "$(platform_tag "$sha")" "$heading" \
-      "${scope:+ \`$scope\`}" "$(author_of "$sha")" \
-      "${snapshot:+ · \`$snapshot\`}"
-    if [ -n "$(printf '%s' "$text" | tr -d '[:space:]')" ]; then
-      # Indented so it belongs to the bullet above rather than ending the list.
-      printf '\n%s\n\n' "$(printf '%s\n' "$text" | sed 's/^/  /')"
-    fi
+# One file per category+locale: macOS still ships bash 3.2, which has no
+# associative arrays, and this has to run the same on a laptop as on a runner.
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+# The whole format, in one expression:  Category(locale): text
+readonly LINE_RE='^(New|Optimization|Fix)\(([A-Za-z]{2,3}(-[A-Za-z0-9]+)*)\):[[:space:]]*(.+)$'
+
+locales=""
+for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
+  # Read the body once. A commit with no changelog line contributes nothing and
+  # costs no API call.
+  body="$(git log -1 --format=%b "$sha")"
+  printf '%s\n' "$body" | grep -Eq "$LINE_RE" || continue
+
+  tag="$(platform_tag "$sha")"
+  who="$(author_of "$sha")"
+  snapshot="$(first_seen_in "$sha")"
+
+  while IFS= read -r line; do
+    printf '%s' "$line" | grep -Eq "$LINE_RE" || continue
+    category="$(printf '%s' "$line" | sed -E "s/$LINE_RE/\\1/")"
+    locale="$(printf '%s' "$line" | sed -E "s/$LINE_RE/\\2/")"
+    text="$(printf '%s' "$line" | sed -E "s/$LINE_RE/\\4/")"
+    # The pre-release an entry first shipped in, on the end of its own line. A
+    # tester running snapshots reads it to see what they already have; an entry
+    # with no marker is new in this release and nobody has seen it yet.
+    printf -- '- %s%s — %s%s\n' \
+      "$tag" "$text" "$who" "${snapshot:+ · \`$snapshot\`}" \
+      >>"$work/$category.$locale"
+    case " $locales " in
+    *" $locale "*) ;;
+    *) locales="$locales $locale" ;;
+    esac
+  done <<EOF
+$body
+EOF
+done
+
+# Primary first, then the rest alphabetically, so a note's language order does
+# not shuffle between builds.
+ordered_locales() {
+  printf '%s\n' "$PRIMARY"
+  for l in $locales; do
+    [ "$l" = "$PRIMARY" ] || printf '%s\n' "$l"
+  done | sort
+}
+
+section() { # <locale>
+  local any=0 c file
+  for c in New Optimization Fix; do
+    file="$work/$c.$1"
+    [ -s "$file" ] || continue
+    any=1
+    printf '### %s\n\n' "$(heading_for "$c" "$1")"
+    cat "$file"
+    printf '\n'
   done
-}
-
-group() { # <shas> <english|chinese> <heading>
-  [ -z "$(printf '%s' "$1" | tr -d '[:space:]')" ] && return 0
-  printf '### %s\n\n' "$3"
-  entries "$1" "$2"
-  printf '\n'
-}
-
-# The three groups the previous changelogs used, derived from the commit type
-# so nobody has to pick a heading by hand — and so the type in the message and
-# the heading in the note cannot disagree.
-feats="$(commits_of 'feat')"
-tunes="$(commits_of 'perf|refactor')"
-fixes="$(commits_of 'fix')"
-
-section() { # <english|chinese>
-  if [ -z "$(printf '%s%s%s' "$feats" "$tunes" "$fixes" | tr -d '[:space:]')" ]; then
-    if [ "$1" = english ]; then
-      printf '_No user-facing changes._\n\n'
-    else
+  if [ "$any" -eq 0 ]; then
+    if [ "$1" = "$PRIMARY" ]; then
       printf '_沒有使用者可見的變更。_\n\n'
+    else
+      printf '_No user-facing changes._\n\n'
     fi
-    return
-  fi
-  if [ "$1" = english ]; then
-    group "$feats" english '🌟 New features'
-    group "$tunes" english '🔌 Improvements'
-    group "$fixes" english '🐞 Bug fixes'
-  else
-    group "$feats" chinese '🌟 新功能'
-    group "$tunes" chinese '🔌 最佳化'
-    group "$fixes" chinese '🐞 錯誤修正'
   fi
 }
 
@@ -214,17 +251,21 @@ repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
 
   # 中文 first and unfolded: this app is Taiwanese, and the language most of
   # its readers want should not be behind a click.
-  section chinese
+  section "$PRIMARY"
 
-  # The English half, folded. The marker pair is what lets the app show one
-  # language instead of both — `<details>` is HTML, which the in-app Markdown
-  # renderer does not implement, so without it a phone would print the summary
-  # text and then the whole English section expanded underneath the Chinese.
-  printf '<!-- dpip-en -->\n'
-  printf '<details>\n<summary>English</summary>\n\n'
-  section english
-  printf '</details>\n'
-  printf '<!-- /dpip-en -->\n\n'
+  # Every other language in its own folded block. The markers are what let the
+  # app show one language instead of all of them — `<details>` is HTML, which
+  # the in-app Markdown renderer does not implement, so without them a phone
+  # would print each `<summary>` as prose and then every translation expanded
+  # underneath the Chinese.
+  for locale in $(ordered_locales); do
+    [ "$locale" = "$PRIMARY" ] && continue
+    printf '<!-- dpip-lang:%s -->\n' "$locale"
+    printf '<details>\n<summary>%s</summary>\n\n' "$(language_name "$locale")"
+    section "$locale"
+    printf '</details>\n'
+    printf '<!-- /dpip-lang:%s -->\n\n' "$locale"
+  done
 
   if [ "$kind" = "--release" ] && [ -n "$since" ]; then
     # The compare link is how every other project answers "what changed
@@ -233,14 +274,6 @@ repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
     printf -- '---\n\n'
     printf '**完整差異 / Full changelog**: https://github.com/%s/compare/%s...v%s\n\n' \
       "$repo" "$since" "$label"
-    snapshots="$(git tag --list '[0-9][0-9]w[0-9][0-9]*' \
-      'snapshot/[0-9][0-9]w[0-9][0-9]*' --contains "$since" 2>/dev/null |
-      sort || true)"
-    if [ -n "$snapshots" ]; then
-      printf '<details>\n<summary>包含的快照 · Snapshots covered</summary>\n\n'
-      printf '%s\n' "$snapshots" | sed "s#^#- https://github.com/$repo/releases/tag/#"
-      printf '\n</details>\n\n'
-    fi
   fi
 
   # Machine-readable, and invisible in rendered Markdown: the app compares this

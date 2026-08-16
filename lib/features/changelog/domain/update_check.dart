@@ -87,19 +87,92 @@ int? buildCodeOf(ReleaseNote release) {
 
 final RegExp _buildMarker = RegExp(r'<!--\s*dpip-build:\s*(\d+)\s*-->');
 
-/// A release note with only the half that matches [locale] left in.
+/// One language block per translation the note was published with.
+final RegExp _langBlock = RegExp(
+  r'<!--\s*dpip-lang:([A-Za-z0-9-]+)\s*-->(.*?)<!--\s*/dpip-lang:\1\s*-->',
+  dotAll: true,
+);
+
+/// `<details>` and `<summary>` are HTML, which the in-app Markdown renderer
+/// does not implement — left in, the summary prints as a line of prose.
+final RegExp _fold = RegExp(r'</?details>|<summary>.*?</summary>');
+
+/// A release note with only the language that matches [locale] left in.
 ///
-/// The published note carries both languages: 中文 first, then the English
-/// wrapped in `<details>` so GitHub folds it. That fold is HTML, and the
-/// in-app Markdown renderer does not implement HTML — so on a phone the
-/// `<summary>` text would print as a line of prose and the entire English
-/// section would sit expanded under the Chinese, doubling the length of every
-/// note.
+/// A note is published with 繁體中文 unfolded and every other translation in
+/// its own `<details>`, each wrapped in comment markers precisely so this can
+/// pick one. Without that, a phone would print every `<summary>` as prose and
+/// then stack all ten translations on top of each other.
 ///
-/// The two halves are delimited by comment markers precisely so this can pick
-/// one. A note that has neither marker (anything published before the scheme)
-/// is returned untouched — better a bilingual note than an empty one.
+/// [locale] is a full BCP-47 tag (`zh-Hant-TW`, `zh-Hans`, `ja`), not a bare
+/// language code: `zh-Hant` and `zh-Hans` are different notes, and a reader in
+/// 简体 should not be handed 繁體 because both start with `zh`.
+///
+/// Falls back in the order a reader would want it: their exact tag, then the
+/// same language in another script, then English, then the unfolded 中文 —
+/// because a note in the wrong language beats an empty one.
 String localizedReleaseBody(String body, String locale) {
+  final blocks = _langBlock.allMatches(body).toList();
+  if (blocks.isEmpty) return _legacyBody(body, locale);
+
+  // Everything outside the folded blocks: the primary language, plus the
+  // heading, the compare link and the build marker.
+  final primary = body.replaceAll(_langBlock, '').trim();
+
+  final byTag = <String, String>{};
+  for (final block in blocks) {
+    byTag[block.group(1)!.toLowerCase()] = block
+        .group(2)!
+        .replaceAll(_fold, '')
+        .trim();
+  }
+
+  final wanted = locale.toLowerCase().split(RegExp('[-_]'));
+  String? pick(bool Function(List<String>) matches) {
+    for (final entry in byTag.entries) {
+      if (matches(entry.key.split('-'))) return entry.value;
+    }
+    return null;
+  }
+
+  // `zh-hant-tw` asked for, `zh-hant` published: the published tag is a prefix
+  // of what was asked for, or the other way round. Either is the same language.
+  final exact =
+      pick((tag) => tag.length <= wanted.length && _isPrefix(tag, wanted)) ??
+      pick((tag) => _isPrefix(wanted, tag));
+  if (exact != null) return _withPrimaryHeader(primary, exact);
+
+  final sameLanguage = pick((tag) => tag.first == wanted.first);
+  if (sameLanguage != null) return _withPrimaryHeader(primary, sameLanguage);
+
+  // The unfolded language is 繁體中文, so a Chinese reader is already served by
+  // the primary text and only everyone else needs the English fallback.
+  if (wanted.first == 'zh') return primary;
+  final english = pick((tag) => tag.first == 'en');
+  return english == null ? primary : _withPrimaryHeader(primary, english);
+}
+
+bool _isPrefix(List<String> shorter, List<String> longer) {
+  for (var i = 0; i < shorter.length; i++) {
+    if (shorter[i] != longer[i]) return false;
+  }
+  return true;
+}
+
+/// The translated entries under the note's own heading.
+///
+/// The heading, the snapshot caveat and the compare link are only written once
+/// — outside every language block — so a reader who gets a translation would
+/// otherwise lose them.
+String _withPrimaryHeader(String primary, String translated) {
+  final head = primary.split('\n').takeWhile((l) => !l.startsWith('### '));
+  return '${head.join('\n').trim()}\n\n$translated'.trim();
+}
+
+/// Notes published before the per-language markers, which carried exactly two
+/// languages: 中文 unfolded and English folded between `dpip-en` markers.
+/// Those releases are immutable, so this has to keep working.
+String _legacyBody(String body, String locale) {
   const open = '<!-- dpip-en -->';
   const close = '<!-- /dpip-en -->';
   final start = body.indexOf(open);
@@ -110,12 +183,7 @@ String localizedReleaseBody(String body, String locale) {
     return (body.substring(0, start) + body.substring(end + close.length))
         .trim();
   }
-  // The English half, with the fold's own tags stripped — they would otherwise
-  // render as literal text.
-  return body
-      .substring(start + open.length, end)
-      .replaceAll(RegExp(r'</?details>|<summary>.*?</summary>'), '')
-      .trim();
+  return body.substring(start + open.length, end).replaceAll(_fold, '').trim();
 }
 
 /// The release to offer, or null when there is nothing to say.

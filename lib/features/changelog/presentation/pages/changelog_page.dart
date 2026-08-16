@@ -388,7 +388,7 @@ class _ReleaseTile extends StatelessWidget {
                             ? l10n.changelogBodyEmpty
                             : localizedReleaseBody(
                                 note.body,
-                                Localizations.localeOf(context).languageCode,
+                                Localizations.localeOf(context).toLanguageTag(),
                               ),
                         accent: typeColor,
                       )
