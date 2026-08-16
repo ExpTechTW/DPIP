@@ -56,8 +56,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          previous="$(gh release list --limit 30 --json tagName,body \
-            --jq '[.[] | .body | capture("<!--\\s*dpip-build:\\s*(?<c>\\d+)") | .c | tonumber] | max // 0')"
+          # The REST endpoint rather than `gh release list`: that command has no
+          # `body` field at all (it is only on `gh release view`), so the whole
+          # check errored out before it could compare anything. One request
+          # returns bodies for every release, newest first.
+          #
+          # `.body // ""` because a release created without notes has a null
+          # body, and jq's `capture` refuses to match against null — one such
+          # release anywhere in the list used to abort the run.
+          previous="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '[.[] | (.body // "") | capture("<!--\\s*dpip-build:\\s*(?<c>\\d+)") | .c | tonumber] | max // 0')"
           echo "previous=$previous current=${{ steps.v.outputs.code }}"
           if [ "${{ steps.v.outputs.code }}" -le "$previous" ]; then
             echo "::error::build ordinal ${{ steps.v.outputs.code }} is not above the published $previous"
