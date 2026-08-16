@@ -15,6 +15,7 @@ _自 v26.0 以來的全部變更。_
 - ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新日誌不再中英文一起顯示 — @whes1015 · `26w33b`
 - ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 修正 iOS 上拖曳雷達時間軸時畫面會跟不上手指 — @whes1015
 
+<!-- dpip-en -->
 <!-- dpip-lang:en-US -->
 <details>
 <summary>English</summary>
@@ -36,6 +37,8 @@ _自 v26.0 以來的全部變更。_
 
 </details>
 <!-- /dpip-lang:en-US -->
+
+<!-- /dpip-en -->
 
 ---
 

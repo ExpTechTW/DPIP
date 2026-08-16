@@ -164,6 +164,7 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
 - ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新日誌不再中英文一起顯示 — @whes1015
 - ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) 修正位置回報被大量丟棄，警報範圍可能算在舊位置上 — @whes1015
 
+<!-- dpip-en -->
 <!-- dpip-lang:en-US -->
 <details>
 <summary>English</summary>
@@ -196,6 +197,8 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
 </details>
 <!-- /dpip-lang:ja-JP -->
 
+<!-- /dpip-en -->
+
 <!-- dpip-build: 426000311 -->
 ''';
 
@@ -205,6 +208,9 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
       expect(out, isNot(contains('survive offline')));
       expect(out, isNot(contains('<details>')));
       expect(out, isNot(contains('dpip-lang')));
+      // The legacy `dpip-en` region is published for builds that predate the
+      // per-language blocks; a current build must not print its comments.
+      expect(out, isNot(contains('dpip-en')));
     });
 
     test('a reader gets their own language when the note carries it', () {

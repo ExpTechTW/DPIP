@@ -8,6 +8,7 @@ _快照，取自 main 的 `45365b0`。未經審查，可能有問題。_
 
 - ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 修正 iOS 上拖曳雷達時間軸時畫面會跟不上手指 — @whes1015
 
+<!-- dpip-en -->
 <!-- dpip-lang:en-US -->
 <details>
 <summary>English</summary>
@@ -22,5 +23,7 @@ _快照，取自 main 的 `45365b0`。未經審查，可能有問題。_
 
 </details>
 <!-- /dpip-lang:en-US -->
+
+<!-- /dpip-en -->
 
 <!-- dpip-build: 426000320 -->

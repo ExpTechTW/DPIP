@@ -97,6 +97,10 @@ final RegExp _langBlock = RegExp(
 /// does not implement — left in, the summary prints as a line of prose.
 final RegExp _fold = RegExp(r'</?details>|<summary>.*?</summary>');
 
+/// The marker pair the previous scheme used, still published so that builds
+/// older than the per-language blocks keep showing one language.
+final RegExp _legacyMarker = RegExp(r'<!--\s*/?dpip-en\s*-->');
+
 /// A release note with only the language that matches [locale] left in.
 ///
 /// A note is published with 繁體中文 unfolded and every other translation in
@@ -117,7 +121,12 @@ String localizedReleaseBody(String body, String locale) {
 
   // Everything outside the folded blocks: the primary language, plus the
   // heading, the compare link and the build marker.
-  final primary = body.replaceAll(_langBlock, '').trim();
+  // The legacy `dpip-en` region wraps every block; without it stripped, its
+  // two comments would sit in the primary text.
+  final primary = body
+      .replaceAll(_langBlock, '')
+      .replaceAll(_legacyMarker, '')
+      .trim();
 
   final byTag = <String, String>{};
   for (final block in blocks) {

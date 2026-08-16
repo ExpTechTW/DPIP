@@ -260,14 +260,34 @@ repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
   # the in-app Markdown renderer does not implement, so without them a phone
   # would print each `<summary>` as prose and then every translation expanded
   # underneath the Chinese.
+  # Everything that is not the primary language sits inside one `dpip-en`
+  # region as well.
+  #
+  # Every already-installed build looks for exactly that marker pair, and shows
+  # a body **whole** when it is absent — so publishing only the new per-language
+  # markers made every phone in the field print `<summary>English</summary>` as
+  # a line of prose and then the whole English section under the Chinese. A
+  # note is read by the app versions that already exist, not only by the one
+  # being built.
+  #
+  # One region around all of them rather than a pair per block, because the old
+  # parser understands exactly one: this way a 中文 reader on an old build gets
+  # a clean note, and a reader of some other language gets every translation
+  # unfolded — degraded, but readable, and their own language is in there.
+  first_extra=1
   for locale in $(ordered_locales); do
     [ "$locale" = "$PRIMARY" ] && continue
+    if [ "$first_extra" = 1 ]; then
+      printf '<!-- dpip-en -->\n'
+      first_extra=0
+    fi
     printf '<!-- dpip-lang:%s -->\n' "$locale"
     printf '<details>\n<summary>%s</summary>\n\n' "$(language_name "$locale")"
     section "$locale"
     printf '</details>\n'
     printf '<!-- /dpip-lang:%s -->\n\n' "$locale"
   done
+  [ "$first_extra" = 0 ] && printf '<!-- /dpip-en -->\n\n'
 
   if [ "$kind" = "--release" ] && [ -n "$since" ]; then
     # The compare link is how every other project answers "what changed
