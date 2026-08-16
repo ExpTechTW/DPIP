@@ -344,7 +344,11 @@ class _ReportTile extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
-            IntensityBadge(label: intensity.label, color: intensityColor),
+            IntensityBadge(
+              label: intensity.label,
+              color: intensityColor,
+              outlined: !report.hasNumber,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
