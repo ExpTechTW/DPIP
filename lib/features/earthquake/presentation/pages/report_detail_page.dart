@@ -988,7 +988,7 @@ class _LocalIntensitySection extends StatelessWidget {
                 _LocalIntensityRow(
                   isCurrent: rows[i].$1,
                   town: rows[i].$2,
-                  result: _nearestFeltIntensity(report, rows[i].$2),
+                  result: _nearestFeltIntensity(report, rows[i].$2, directory),
                 ),
               ],
             ],
@@ -1011,14 +1011,20 @@ typedef _LocalIntensityResult = ({
 /// The felt intensity nearest to [town] within [report] — null when
 /// [report]'s felt-area list doesn't include [town]'s county at all (that
 /// list only ever contains counties with at least one felt reading, so a
-/// missing county means "no data here", not "checked and found nothing").
-/// Otherwise, the nearest of that county's stations by straight-line
-/// distance to [town]'s centroid stands in for "your township's reading" —
-/// the report's town-level keys are station names (sometimes landmarks, not
-/// administrative townships), so name-matching them to [town] isn't reliable.
+/// missing county means "no data here", not "checked and found nothing"),
+/// or when none of that county's stations actually resolve to [town]'s own
+/// township. Otherwise, the nearest of [town]'s township's stations by
+/// straight-line distance to its centroid stands in for "your township's
+/// reading" — the report's town-level keys are station names (sometimes
+/// landmarks, not administrative townships), so each candidate is reverse-
+/// geocoded via [directory] and matched by township code rather than by
+/// name. A same-county-but-different-township station is never close
+/// enough to substitute — 花蓮縣, say, runs the whole east coast, so a lone
+/// reading up at 秀林鄉和平 says nothing about 西寶.
 _LocalIntensityResult? _nearestFeltIntensity(
   EarthquakeReport report,
   Town town,
+  TownDirectory directory,
 ) {
   final area = report.list[town.cityName];
   if (area == null || area.town.isEmpty) return null;
@@ -1026,8 +1032,11 @@ _LocalIntensityResult? _nearestFeltIntensity(
   MapEntry<String, StationIntensity>? nearest;
   var nearestDistance = double.infinity;
   for (final entry in area.town.entries) {
+    final station = entry.value;
+    final stationTown = directory.nearest(station.latitude, station.longitude);
+    if (stationTown?.code != town.code) continue;
     final distance = here.distanceTo(
-      geo.LatLng(entry.value.latitude, entry.value.longitude),
+      geo.LatLng(station.latitude, station.longitude),
     );
     if (distance < nearestDistance) {
       nearestDistance = distance;
