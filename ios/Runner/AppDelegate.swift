@@ -26,5 +26,7 @@ import UIKit
     ScreenWakePlugin.register(with: registry.registrar(forPlugin: "ScreenWakePlugin")!)
     BackgroundLocationPlugin.register(
       with: registry.registrar(forPlugin: "BackgroundLocationPlugin")!)
+    BackgroundExecutionPlugin.register(
+      with: registry.registrar(forPlugin: "BackgroundExecutionPlugin")!)
   }
 }
