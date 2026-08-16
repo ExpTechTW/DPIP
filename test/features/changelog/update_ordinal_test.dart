@@ -148,23 +148,21 @@ void main() {
     // Verbatim output of tool/release_notes.sh, so a change to the publishing
     // format fails here rather than on a phone.
     const note = '''
-# 26w33b
-
 _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
 
 ### 🌟 新功能
 
-- 更新日誌的平台標記改用本機圖示，離線也看得到 — YuYu1015
-- 「更多」頁面會顯示這個版本的名稱與送審版號 — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新日誌的平台標記改用本機圖示，離線也看得到 — @whes1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 「更多」頁面會顯示這個版本的名稱與送審版號 — @whes1015
 
 ### 🔌 最佳化
 
-- 更新日誌改成捲到底再載入下一頁，開啟快很多 — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新日誌改成捲到底再載入下一頁，開啟快很多 — @whes1015
 
 ### 🐞 錯誤修正
 
-- 更新日誌不再中英文一起顯示 — YuYu1015
-- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) 修正位置回報被大量丟棄，警報範圍可能算在舊位置上 — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新日誌不再中英文一起顯示 — @whes1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) 修正位置回報被大量丟棄，警報範圍可能算在舊位置上 — @whes1015
 
 <!-- dpip-lang:en-US -->
 <details>
@@ -172,17 +170,17 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
 
 ### 🌟 New features
 
-- the changelog's platform tags are drawn locally and survive offline — YuYu1015
-- the More page shows this build's own version and the train it ships under — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) the changelog's platform tags are drawn locally and survive offline — @whes1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) the More page shows this build's own version and the train it ships under — @whes1015
 
 ### 🔌 Improvements
 
-- the changelog loads a page at a time and opens much faster — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) the changelog loads a page at a time and opens much faster — @whes1015
 
 ### 🐞 Bug fixes
 
-- the changelog no longer shows both languages at once — YuYu1015
-- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) fix location reports being dropped, which could aim alerts at a stale position — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) the changelog no longer shows both languages at once — @whes1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) fix location reports being dropped, which could aim alerts at a stale position — @whes1015
 
 </details>
 <!-- /dpip-lang:en-US -->
@@ -193,7 +191,7 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
 
 ### 🐞 不具合修正
 
-- 更新履歴が日本語と英語を同時に表示しなくなりました — YuYu1015
+- ![Android](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/android.svg) ![iOS](https://raw.githubusercontent.com/ExpTechTW/DPIP/main/.github/assets/ios.svg) 更新履歴が日本語と英語を同時に表示しなくなりました — @whes1015
 
 </details>
 <!-- /dpip-lang:ja-JP -->
@@ -246,8 +244,10 @@ _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_
       // The title and the snapshot caveat are written once, outside every
       // block; a translated reader would otherwise lose them.
       final out = localizedReleaseBody(note, 'en');
-      expect(out, startsWith('# 26w33b'));
-      expect(out, contains('快照'));
+      // No `# 26w33b` heading: GitHub and the app both print the release
+      // name above the body already.
+      expect(out, isNot(contains('# 26w33b')));
+      expect(out, startsWith('_快照'));
     });
   });
 }

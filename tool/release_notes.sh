@@ -241,7 +241,9 @@ section() { # <locale>
 repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
 
 {
-  printf '# %s\n\n' "$label"
+  # No heading: GitHub prints the release name above the body, and the app's
+  # changelog tile prints it too, so a `# 26w33b` here is the same string twice
+  # in both places it is ever read.
   if [ "$kind" = "--release" ]; then
     [ -n "$since" ] && printf '_自 %s 以來的全部變更。_\n\n' "$since"
   else
