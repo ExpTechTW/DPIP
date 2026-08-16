@@ -8,6 +8,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
+import 'package:dpip/features/changelog/domain/update_check.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -264,9 +265,15 @@ class _ReleaseTile extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: expanded
                     ? _ExpandedBody(
+                        // One language, not both: the published note carries
+                        // 中文 and a folded English half, and the fold is HTML
+                        // that this renderer does not implement.
                         body: note.body.isEmpty
                             ? l10n.changelogBodyEmpty
-                            : note.body,
+                            : localizedReleaseBody(
+                                note.body,
+                                Localizations.localeOf(context).languageCode,
+                              ),
                         accent: typeColor,
                       )
                     : const SizedBox(width: double.infinity),

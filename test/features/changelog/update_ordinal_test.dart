@@ -97,4 +97,50 @@ void main() {
       'v3.10.0',
     );
   });
+
+  group('one language, not both', () {
+    const body = '''
+# 26.2
+
+### 🌟 新功能
+
+- 地圖頁新增閃電圖層
+
+<!-- dpip-en -->
+<details>
+<summary>English</summary>
+
+### 🌟 New features
+
+- add a lightning layer
+
+</details>
+<!-- /dpip-en -->
+
+<!-- dpip-build: 426000301 -->''';
+
+    test('a Chinese reader gets the Chinese half', () {
+      final out = localizedReleaseBody(body, 'zh');
+      expect(out, contains('地圖頁新增閃電圖層'));
+      expect(out, isNot(contains('add a lightning layer')));
+      // The fold is HTML, which the in-app renderer does not implement — left
+      // in, its summary would print as prose.
+      expect(out, isNot(contains('<details>')));
+    });
+
+    test('everyone else gets the English half, unfolded', () {
+      final out = localizedReleaseBody(body, 'en');
+      expect(out, contains('add a lightning layer'));
+      expect(out, isNot(contains('地圖頁新增閃電圖層')));
+      expect(out, isNot(contains('<details>')));
+      expect(out, isNot(contains('<summary>')));
+    });
+
+    test('a note from before the scheme is left alone', () {
+      // Better a bilingual note than an empty one.
+      const old = 'Just some notes.';
+      expect(localizedReleaseBody(old, 'zh'), old);
+      expect(localizedReleaseBody(old, 'en'), old);
+    });
+  });
 }

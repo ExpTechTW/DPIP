@@ -87,6 +87,37 @@ int? buildCodeOf(ReleaseNote release) {
 
 final RegExp _buildMarker = RegExp(r'<!--\s*dpip-build:\s*(\d+)\s*-->');
 
+/// A release note with only the half that matches [locale] left in.
+///
+/// The published note carries both languages: 中文 first, then the English
+/// wrapped in `<details>` so GitHub folds it. That fold is HTML, and the
+/// in-app Markdown renderer does not implement HTML — so on a phone the
+/// `<summary>` text would print as a line of prose and the entire English
+/// section would sit expanded under the Chinese, doubling the length of every
+/// note.
+///
+/// The two halves are delimited by comment markers precisely so this can pick
+/// one. A note that has neither marker (anything published before the scheme)
+/// is returned untouched — better a bilingual note than an empty one.
+String localizedReleaseBody(String body, String locale) {
+  const open = '<!-- dpip-en -->';
+  const close = '<!-- /dpip-en -->';
+  final start = body.indexOf(open);
+  final end = body.indexOf(close);
+  if (start < 0 || end < start) return body;
+
+  if (locale.toLowerCase().startsWith('zh')) {
+    return (body.substring(0, start) + body.substring(end + close.length))
+        .trim();
+  }
+  // The English half, with the fold's own tags stripped — they would otherwise
+  // render as literal text.
+  return body
+      .substring(start + open.length, end)
+      .replaceAll(RegExp(r'</?details>|<summary>.*?</summary>'), '')
+      .trim();
+}
+
 /// The release to offer, or null when there is nothing to say.
 ///
 /// Null covers every "stay quiet" case: already current, nothing newer in this
