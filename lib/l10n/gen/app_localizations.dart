@@ -3879,6 +3879,18 @@ abstract class AppLocalizations {
   /// **'Release'**
   String get moreVersionStable;
 
+  /// No description provided for @moreVersionNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'This version'**
+  String get moreVersionNotes;
+
+  /// No description provided for @moreVersionNotesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No changelog for this build'**
+  String get moreVersionNotesEmpty;
+
   /// No description provided for @moreVersionSnapshot.
   ///
   /// In en, this message translates to:

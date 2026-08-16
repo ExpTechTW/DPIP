@@ -2043,6 +2043,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreVersionStable => 'เวอร์ชันเต็ม';
 
   @override
+  String get moreVersionNotes => 'เวอร์ชันปัจจุบัน';
+
+  @override
+  String get moreVersionNotesEmpty => 'ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้';
+
+  @override
   String get moreVersionSnapshot => 'เวอร์ชันทดสอบ';
 
   @override

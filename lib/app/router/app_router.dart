@@ -11,6 +11,7 @@ import 'package:dpip/features/location/presentation/pages/region_city_page.dart'
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
+import 'package:dpip/features/changelog/presentation/pages/version_notes_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/data/presentation/pages/moon_page.dart';
@@ -183,6 +184,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.changelogPath,
       name: AppRoutes.changelog,
       builder: (_, _) => const ChangelogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.versionNotesPath,
+      name: AppRoutes.versionNotes,
+      builder: (_, _) => const VersionNotesPage(),
     ),
     GoRoute(
       path: AppRoutes.developerPath,

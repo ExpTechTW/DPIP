@@ -2022,6 +2022,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreVersionStable => '정식 버전';
 
   @override
+  String get moreVersionNotes => '현재 버전';
+
+  @override
+  String get moreVersionNotesEmpty => '이 빌드의 업데이트 내역을 찾을 수 없습니다';
+
+  @override
   String get moreVersionSnapshot => '테스트 버전';
 
   @override

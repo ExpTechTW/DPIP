@@ -2049,6 +2049,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreVersionStable => 'Versi resmi';
 
   @override
+  String get moreVersionNotes => 'Versi saat ini';
+
+  @override
+  String get moreVersionNotesEmpty => 'Tidak ada changelog untuk build ini';
+
+  @override
   String get moreVersionSnapshot => 'Versi uji';
 
   @override

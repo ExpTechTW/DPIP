@@ -38,22 +38,10 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
-          // The two calls to action, in their own headerless block above every
-          // menu group — and in rank order. Support is the page's one ask, so
-          // it is the only row that carries a gradient, a glow and a filled
-          // badge; Discord follows it as the clear second, tinted and badged
-          // but flat, so the pair reads as a hierarchy rather than as two
-          // competing banners.
-          const _SupportCallout(),
-          const _DiscordCallout(),
-          // The news entry, right behind the two calls to action: it used to
-          // sit four rows deep in the links list, but it is how ExpTech
-          // reaches everyone at once.
-          const _AnnouncementCard(),
-          // This build's identity, before any menu: which train the user is
-          // on, so a bug report can name itself and a tester can see at a
-          // glance whether they are ahead of or behind the store build.
-          const _VersionCard(),
+          // The four cards above the menu, one block: version fills the left
+          // half of the line, support takes the top half of the right column,
+          // and Discord and announcements split the bottom half of it.
+          const _HeroCards(),
           SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
@@ -553,6 +541,55 @@ Future<void> openExternalLink(BuildContext context, String url) async {
   }
 }
 
+/// The four cards above the menu in one block — version fills the left half
+/// full-height, support the top half of the right column, and Discord and
+/// announcements split the bottom half of it.
+///
+/// The heights are fixed so the two columns meet exactly: the block's height
+/// is set on the row, each right-column card gets its share of the remaining
+/// space after the solder gaps, and the version card centers its content in
+/// what is left. Anything textural here would only invite overflow, so the
+/// cards are kept to icon-plus-word constructions.
+class _HeroCards extends StatelessWidget {
+  const _HeroCards();
+
+  static const double _height = 256;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: _height,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Expanded(flex: 1, child: _VersionCard()),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: const [
+                  Expanded(flex: 2, child: _SupportCallout()),
+                  SizedBox(height: AppSpacing.xs),
+                  Expanded(flex: 1, child: _DiscordCallout()),
+                  SizedBox(height: AppSpacing.xs),
+                  Expanded(flex: 1, child: _AnnouncementCard()),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// The page's primary call to action.
 ///
 /// DPIP carries no ads, so this is the only thing on the page actually asking
@@ -572,81 +609,58 @@ class _SupportCallout extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final gold = AppGold.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.xs,
-        AppSpacing.lg,
-        AppSpacing.sm,
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: AppRadius.large,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [gold.fillStart, gold.fillEnd],
-          ),
-          // A warm cast rather than a grey drop shadow — it lifts the card off
-          // the page and reads as light on metal, not as a floating rectangle.
-          boxShadow: [
-            BoxShadow(
-              color: gold.glow,
-              blurRadius: 18,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          border: Border.all(color: gold.edge),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: AppRadius.large,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [gold.fillStart, gold.fillEnd],
         ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: AppRadius.large,
-            onTap: () => context.pushNamed(AppRoutes.sponsor),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  // Filled, not outlined: the one active affordance on a page
-                  // whose every other row is an outlined icon.
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: gold.badge,
-                    ),
-                    child: Icon(Icons.favorite, color: gold.onBadge, size: 22),
+        // A warm cast rather than a grey drop shadow — it lifts the card off
+        // the page and reads as light on metal, not as a floating rectangle.
+        boxShadow: [
+          BoxShadow(
+            color: gold.glow,
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        border: Border.all(color: gold.edge),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: AppRadius.large,
+          onTap: () => context.pushNamed(AppRoutes.sponsor),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Filled, not outlined: the one active affordance on a page
+                // whose every other row is an outlined icon.
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: gold.badge,
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.sponsorTitle,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: gold.ink,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          l10n.sponsorCalloutBody,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: gold.ink.withValues(alpha: 0.78),
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: Icon(Icons.favorite, color: gold.onBadge, size: 24),
+                ),
+                Text(
+                  l10n.sponsorTitle,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: gold.ink,
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Icon(
-                    Icons.chevron_right,
-                    color: gold.ink.withValues(alpha: 0.6),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -670,68 +684,45 @@ class _DiscordCallout extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.md,
-      ),
-      child: Material(
-        color: colors.secondaryContainer,
-        borderRadius: AppRadius.large,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => openExternalLink(context, _url),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.secondary,
-                  ),
-                  child: Icon(
-                    Icons.discord,
-                    color: colors.onSecondary,
-                    size: 20,
-                  ),
+    return Material(
+      color: colors.secondaryContainer,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openExternalLink(context, _url),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.secondary,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.moreDiscord,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colors.onSecondaryContainer,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.moreDiscordCalloutBody,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.onSecondaryContainer.withValues(
-                            alpha: 0.75,
-                          ),
-                        ),
-                      ),
-                    ],
+                child: Icon(Icons.discord, color: colors.onSecondary, size: 19),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Text(
+                  l10n.moreDiscord,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSecondaryContainer,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Icon(
-                  Icons.open_in_new,
-                  size: 18,
-                  color: colors.onSecondaryContainer.withValues(alpha: 0.6),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.open_in_new,
+                size: 14,
+                color: colors.onSecondaryContainer.withValues(alpha: 0.6),
+              ),
+            ],
           ),
         ),
       ),
@@ -755,66 +746,49 @@ class _AnnouncementCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.md,
-      ),
-      child: Material(
-        color: colors.surfaceContainerHigh,
-        borderRadius: AppRadius.large,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => openExternalLink(context, _url),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.surfaceContainerHighest,
-                  ),
-                  child: Icon(
-                    Icons.campaign_outlined,
-                    color: colors.onSurfaceVariant,
-                    size: 20,
-                  ),
+    return Material(
+      color: colors.surfaceContainerHigh,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openExternalLink(context, _url),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.surfaceContainerHighest,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.moreAnnouncements,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'announcement.exptech.com.tw',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                child: Icon(
+                  Icons.campaign_outlined,
+                  color: colors.onSurfaceVariant,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Text(
+                  l10n.moreAnnouncements,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Icon(
-                  Icons.open_in_new,
-                  size: 18,
-                  color: colors.onSurfaceVariant.withValues(alpha: 0.6),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.open_in_new,
+                size: 14,
+                color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+            ],
           ),
         ),
       ),
@@ -822,8 +796,8 @@ class _AnnouncementCard extends StatelessWidget {
   }
 }
 
-/// This install's identity, in the same card voice as the announcements above
-/// it — the logo, the label, and which train it belongs to.
+/// This install's identity — the logo, the label, and which train it belongs
+/// to — sized to lead the block.
 ///
 /// A DPIP label is either a plain `X.Y` (a release, `26.1`) or a weekly
 /// snapshot name (`26w33b`), and the two answer different questions: a release
@@ -835,12 +809,23 @@ class _AnnouncementCard extends StatelessWidget {
 /// The distinction is made by shape, not by lookup: the version string *is*
 /// the channel under the current scheme (a release label is `\d+\.\d+`, a
 /// snapshot is anything else).
+///
+/// The layout borrows the phone's "About" page voice — a pale wash behind the
+/// build (rather than a flat fill), the mark small at the top, and the
+/// version number as the thing the eye lands on — so the number, not the
+/// card, is what reads first.
 class _VersionCard extends StatelessWidget {
   const _VersionCard();
 
   /// A release label is a plain `major.minor`; every other shape (`26w33b`,
   /// `dev`, a local build) is a snapshot.
   static final RegExp _releaseLabel = RegExp(r'^\d+\.\d+$');
+
+  /// Stable = green, snapshot = orange — the same pairing the changelog's
+  /// release/production chips carry, so the badge and the entry it leads to
+  /// agree without any logic in between.
+  static const Color _stableColor = Color(0xFF2E7D32);
+  static const Color _snapshotColor = Color(0xFFEF6C00);
 
   @override
   Widget build(BuildContext context) {
@@ -849,82 +834,85 @@ class _VersionCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final label = AppBuild.label;
     final stable = _releaseLabel.hasMatch(label);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.md,
+    final typeColor = stable ? _stableColor : _snapshotColor;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: AppRadius.large,
+        // A lineage wash from the brand colour down to the surface — the same
+        // idea as the About page's card, kept inside the scheme.
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.primaryContainer,
+            colors.surfaceContainerHigh.withValues(alpha: 0.6),
+          ],
+        ),
       ),
       child: Material(
-        color: colors.surfaceContainerHigh,
-        borderRadius: AppRadius.large,
-        clipBehavior: Clip.antiAlias,
+        type: MaterialType.transparency,
         child: InkWell(
-          onTap: () => context.pushNamed(AppRoutes.changelog),
+          borderRadius: AppRadius.large,
+          onTap: () => context.pushNamed(AppRoutes.versionNotes),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: AppRadius.medium,
-                  child: Image.asset('assets/DPIP.png', width: 44, height: 44),
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: AppRadius.small,
+                      child: Image.asset(
+                        'assets/DPIP.png',
+                        width: 36,
+                        height: 36,
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.7),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'DPIP',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text(
-                            label,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: stable
-                                  ? colors.primaryContainer
-                                  : colors.tertiaryContainer,
-                              borderRadius: AppRadius.small,
-                            ),
-                            child: Text(
-                              stable
-                                  ? l10n.moreVersionStable
-                                  : l10n.moreVersionSnapshot,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: stable
-                                    ? colors.onPrimaryContainer
-                                    : colors.onTertiaryContainer,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                const Spacer(),
+                Text(
+                  'DPIP',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Icon(
-                  Icons.chevron_right,
-                  color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: colors.onSurface,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                // The chip carries the type colour directly — green against
+                // the pale wash for a release, orange for a snapshot.
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: typeColor.withValues(alpha: 0.88),
+                    borderRadius: AppRadius.small,
+                  ),
+                  child: Text(
+                    stable ? l10n.moreVersionStable : l10n.moreVersionSnapshot,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),

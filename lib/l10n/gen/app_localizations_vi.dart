@@ -2048,6 +2048,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreVersionStable => 'Bản chính thức';
 
   @override
+  String get moreVersionNotes => 'Phiên bản hiện tại';
+
+  @override
+  String get moreVersionNotesEmpty =>
+      'Không tìm thấy nhật ký cập nhật cho bản này';
+
+  @override
   String get moreVersionSnapshot => 'Bản thử nghiệm';
 
   @override

@@ -2015,6 +2015,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreVersionStable => '正式版';
 
   @override
+  String get moreVersionNotes => '現在のバージョン';
+
+  @override
+  String get moreVersionNotesEmpty => 'このビルドの更新履歴が見つかりません';
+
+  @override
   String get moreVersionSnapshot => 'テスト版';
 
   @override

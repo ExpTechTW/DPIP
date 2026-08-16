@@ -981,6 +981,8 @@
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "Pengumuman",
   "moreVersionStable": "Versi resmi",
+  "moreVersionNotes": "Versi saat ini",
+  "moreVersionNotesEmpty": "Tidak ada changelog untuk build ini",
   "moreVersionSnapshot": "Versi uji",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

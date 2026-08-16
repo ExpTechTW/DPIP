@@ -2058,6 +2058,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreVersionStable => 'Pormal na bersyon';
 
   @override
+  String get moreVersionNotes => 'Kasalukuyang bersyon';
+
+  @override
+  String get moreVersionNotesEmpty => 'Walang changelog para sa build na ito';
+
+  @override
   String get moreVersionSnapshot => 'Bersyon ng pagsubok';
 
   @override

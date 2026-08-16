@@ -981,6 +981,8 @@
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "Mga Anunsyo",
   "moreVersionStable": "Pormal na bersyon",
+  "moreVersionNotes": "Kasalukuyang bersyon",
+  "moreVersionNotesEmpty": "Walang changelog para sa build na ito",
   "moreVersionSnapshot": "Bersyon ng pagsubok",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

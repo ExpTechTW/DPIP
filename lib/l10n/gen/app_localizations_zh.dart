@@ -2004,6 +2004,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreVersionStable => '正式版';
 
   @override
+  String get moreVersionNotes => '目前版本';
+
+  @override
+  String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
+
+  @override
   String get moreVersionSnapshot => '測試版';
 
   @override
@@ -4872,6 +4878,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionNotes => '当前版本';
+
+  @override
+  String get moreVersionNotesEmpty => '找不到当前版本的更新日志';
 
   @override
   String get moreVersionSnapshot => '測試版';
@@ -7744,6 +7756,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreVersionStable => '正式版';
 
   @override
+  String get moreVersionNotes => '目前版本';
+
+  @override
+  String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
+
+  @override
   String get moreVersionSnapshot => '測試版';
 
   @override
@@ -10612,6 +10630,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionNotes => '目前版本';
+
+  @override
+  String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
 
   @override
   String get moreVersionSnapshot => '測試版';

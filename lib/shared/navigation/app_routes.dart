@@ -113,6 +113,10 @@ abstract final class AppRoutes {
   static const String changelog = 'changelog';
   static const String changelogPath = '/changelog';
 
+  /// This build's own release note — the version card's detail page.
+  static const String versionNotes = 'versionNotes';
+  static const String versionNotesPath = '/version-notes';
+
   // Saved-region management: the manage page (view/remove saved townships)
   // opens the picker to add. Saved townships feed the Home region bar.
   static const String regionManage = 'regionManage';

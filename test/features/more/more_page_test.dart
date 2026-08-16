@@ -51,10 +51,10 @@ GoRouter _router(List<String> visited) => GoRouter(
           ),
         // The version card opens this one.
         GoRoute(
-          path: AppRoutes.changelog,
-          name: AppRoutes.changelog,
+          path: AppRoutes.versionNotesPath,
+          name: AppRoutes.versionNotes,
           builder: (_, _) {
-            visited.add(AppRoutes.changelog);
+            visited.add(AppRoutes.versionNotes);
             return const SizedBox.shrink();
           },
         ),
@@ -232,12 +232,12 @@ void main() {
     expect(find.text('Snapshot'), findsOneWidget);
   });
 
-  testWidgets('the version card opens the changelog', (tester) async {
+  testWidgets('the version card opens this version\x27s notes', (tester) async {
     final visited = <String>[];
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
     await tester.tap(find.text('DPIP').first);
     await tester.pumpAndSettle();
-    expect(visited, [AppRoutes.changelog]);
+    expect(visited, [AppRoutes.versionNotes]);
   });
 }

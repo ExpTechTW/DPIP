@@ -981,6 +981,8 @@
   "mapLayerStyleGrayTooltip": "気象庁の赤外画像の慣例：温度が低いほど白",
   "moreAnnouncements": "お知らせ",
   "moreVersionStable": "正式版",
+  "moreVersionNotes": "現在のバージョン",
+  "moreVersionNotesEmpty": "このビルドの更新履歴が見つかりません",
   "moreVersionSnapshot": "テスト版",
   "mapLayerSatelliteTransparentNoData": "データなし(陸上) = 透明",
   "@meshtasticScanning": {

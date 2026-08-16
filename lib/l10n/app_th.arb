@@ -981,6 +981,8 @@
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "ประกาศ",
   "moreVersionStable": "เวอร์ชันเต็ม",
+  "moreVersionNotes": "เวอร์ชันปัจจุบัน",
+  "moreVersionNotesEmpty": "ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้",
   "moreVersionSnapshot": "เวอร์ชันทดสอบ",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

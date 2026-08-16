@@ -981,6 +981,8 @@
   "mapLayerStyleGrayTooltip": "氣象廳灰階慣例：溫度越低越白",
   "moreAnnouncements": "公告",
   "moreVersionStable": "正式版",
+  "moreVersionNotes": "目前版本",
+  "moreVersionNotesEmpty": "找不到目前版本的更新日誌",
   "moreVersionSnapshot": "測試版",
   "mapLayerSatelliteTransparentNoData": "無資料(陸地) = 透明",
   "@meshtasticScanning": {

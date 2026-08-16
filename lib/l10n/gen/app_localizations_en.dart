@@ -2048,6 +2048,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreVersionStable => 'Release';
 
   @override
+  String get moreVersionNotes => 'This version';
+
+  @override
+  String get moreVersionNotesEmpty => 'No changelog for this build';
+
+  @override
   String get moreVersionSnapshot => 'Snapshot';
 
   @override
